@@ -120,10 +120,16 @@ html.home-glass #scr-home .summary.has-wish .wishbg-ov{
 #scr-home .summary .hint{color:rgba(255,255,255,.78);font-size:12.5px;line-height:1.4;margin-top:6px;}
 #scr-home .summary .wishlink{display:none;}
 #scr-home .summary .herocap .hc-tab b{color:inherit;text-shadow:0 1px 6px rgba(0,0,0,.4);}
-/* світла тема: картка все одно лежить на фото або на темному градієнті,
-   тому текст лишається світлим — інакше var(--text) стає темним і зникає */
+/* Світла тема: картка героя однаково лежить на фото або на темному
+   градієнті (див. нижче), тому текст на ній лишається світлим —
+   інакше var(--text) стає темним і зникає на темному тлі.
+
+   ⚠️ Кнопки навмисне ВИНЕСЕНО в окреме правило. Раніше всі три
+   селектори стояли через кому в одному правилі, і коли кнопкам
+   знадобився власний колір, разом із ними його втратили назва
+   та велика цифра — вони просто зникли. */
 html[data-theme="light"] #scr-home .top .brand h1,
-html[data-theme="light"] #scr-home .summary .big,
+html[data-theme="light"] #scr-home .summary .big{color:#fff;}
 html[data-theme="light"] #scr-home .summary .herocap .hc-tab b{color:inherit;}
 html[data-theme="light"] #scr-home .summary .hint{color:rgba(255,255,255,.82);}
 html[data-theme="light"] #scr-home .summary .label{color:rgba(255,255,255,.72);}
