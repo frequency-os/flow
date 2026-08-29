@@ -4549,11 +4549,18 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     .dsb-i{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:var(--muted);
       font-size:14.5px;font-weight:700;cursor:pointer;background:none;border:none;font-family:inherit;text-align:left;width:100%;transition:.15s;}
     .dsb-i svg{width:20px;height:20px;flex-shrink:0;}
-    .dsb-i.on{background:linear-gradient(135deg,rgba(106,125,255,.22),rgba(160,107,255,.12));color:#fff;
+    /* color брали жорстким #fff. На світлій темі підкладка активного пункту
+       ледь помітна, і білий текст на майже білому зникав. --nav-ink-on має
+       значення для кожної теми і вже використовується нижньою навігацією
+       на телефоні — сайдбар просто забули оновити разом із нею. */
+    .dsb-i.on{background:linear-gradient(135deg,rgba(106,125,255,.22),rgba(160,107,255,.12));
+      color:var(--nav-ink-on,#fff);
       box-shadow:inset 0 1px 0 var(--line);}
-    .dsb-i:not(.on):hover{background:rgba(255,255,255,.04);color:var(--text);}
+    /* підсвітка при наведенні була білою напівпрозорою — на світлому тлі
+       її просто не видно. --hair темніє чи світлішає разом із темою. */
+    .dsb-i:not(.on):hover{background:var(--hair);color:var(--text);}
     .dsb-foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 8px 6px;border-top:1px solid var(--line);cursor:pointer;border-radius:11px;}
-    .dsb-foot:hover{background:rgba(255,255,255,.04);}
+    .dsb-foot:hover{background:var(--hair);}
     .dsb-gear{width:16px;height:16px;color:var(--muted);margin-left:auto;flex-shrink:0;}
     .dsb-prof{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.35);}
     .dsb-prof-in{position:absolute;left:14px;bottom:70px;width:250px;background:var(--bg-2);border:1px solid var(--line);
@@ -32789,7 +32796,10 @@ html[data-theme="light"] .f26w-fx{border-top-color:rgba(0,0,0,.08)}
 .f26w-fxrow .pr i{display:block;height:100%;border-radius:99px}
 .f26w-fxrow .c{flex:none;font-size:10.5px;color:var(--muted,#8f8aa8);font-weight:800;min-width:26px;text-align:right}
 .f26w-fxempty{font-size:12px;color:var(--muted,#8f8aa8);font-weight:700;padding:4px 0}
-.f26w-fxempty b{color:var(--accent2,#c4a8ff);cursor:pointer}
+/* --accent2 ніде не визначена, тому завжди спрацьовував запасний
+   світло-бузковий #c4a8ff — на світлій темі контраст 2.02.
+   Беремо --accent: вона є в кожній темі. */
+.f26w-fxempty b{color:var(--accent);cursor:pointer;font-weight:800}
 /* burndown */
 .f26w-bd{margin-top:10px;border-radius:18px;overflow:hidden}
 .f26w-bdh{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;user-select:none}
@@ -32829,7 +32839,12 @@ html[data-theme="light"] .f26w-chip{border-color:rgba(0,0,0,.1)}
 .f26w-wd .load i{position:absolute;left:0;right:0;bottom:0;border-radius:99px;background:linear-gradient(180deg,#c4a8ff,#8b7cff);transition:height .4s cubic-bezier(.22,1.36,.36,1)}
 .f26w-wd .cnt{font-size:9px;color:var(--muted,#8f8aa8);font-weight:800}
 .f26w-wd.today{border-color:rgba(255,157,92,.42);background:rgba(255,157,92,.08)}
-.f26w-wd.today .n,.f26w-wd.today .d{color:#ff9d5c}
+/* Помаранчевий беремо з палітри (--fin), а не жорстким #ff9d5c:
+   той був розрахований лише на темне тло і у світлій темі
+   давав контраст 1.94 — «Нд» на сьогоднішньому дні не читалось. */
+.f26w-wd.today .n,.f26w-wd.today .d{color:var(--fin,#ff9d5c)}
+html[data-theme="light"] .f26w-wd.today .n,
+html[data-theme="light"] .f26w-wd.today .d{color:color-mix(in srgb,var(--fin) 76%,#000)}
 .f26w-wd.today .load i{background:linear-gradient(180deg,#ff9d5c,#ff5c8a)}
 .f26w-wd.over .load i{background:linear-gradient(180deg,#ff5c8a,#e0356a)}
 .f26w-wd.sel{border-color:rgba(139,124,255,.55);background:rgba(139,124,255,.10)}
@@ -34244,10 +34259,16 @@ html.home-glass #scr-home .summary.has-wish .wishbg-ov{
 #scr-home .summary .hint{color:rgba(255,255,255,.78);font-size:12.5px;line-height:1.4;margin-top:6px;}
 #scr-home .summary .wishlink{display:none;}
 #scr-home .summary .herocap .hc-tab b{color:inherit;text-shadow:0 1px 6px rgba(0,0,0,.4);}
-/* світла тема: картка все одно лежить на фото або на темному градієнті,
-   тому текст лишається світлим — інакше var(--text) стає темним і зникає */
+/* Світла тема: картка героя однаково лежить на фото або на темному
+   градієнті (див. нижче), тому текст на ній лишається світлим —
+   інакше var(--text) стає темним і зникає на темному тлі.
+
+   ⚠️ Кнопки навмисне ВИНЕСЕНО в окреме правило. Раніше всі три
+   селектори стояли через кому в одному правилі, і коли кнопкам
+   знадобився власний колір, разом із ними його втратили назва
+   та велика цифра — вони просто зникли. */
 html[data-theme="light"] #scr-home .top .brand h1,
-html[data-theme="light"] #scr-home .summary .big,
+html[data-theme="light"] #scr-home .summary .big{color:#fff;}
 html[data-theme="light"] #scr-home .summary .herocap .hc-tab b{color:inherit;}
 html[data-theme="light"] #scr-home .summary .hint{color:rgba(255,255,255,.82);}
 html[data-theme="light"] #scr-home .summary .label{color:rgba(255,255,255,.72);}
