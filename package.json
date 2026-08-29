@@ -14,7 +14,8 @@
     "check": "./tools/check.sh",
     "build:mac": "python3 tools/build.py && electron-builder --mac",
     "deploy": "./tools/deploy.sh",
-    "bugs": "./tools/bugs.sh"
+    "bugs": "./tools/bugs.sh",
+    "refs": "./tools/refs.sh"
   },
   "build": {
     "appId": "com.yarosla.frequency",

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Показує, що ти накидав зі скріншотів у папку iCloud «Frequency-баги».
-BOX="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Frequency-баги"
+BOX="${1:-$HOME/Library/Mobile Documents/com~apple~CloudDocs/Frequency-баги}"
 [ -d "$BOX" ] || { echo "Папки немає: $BOX"; exit 1; }
 
 # .icloud = файл ще не завантажився на Mac
