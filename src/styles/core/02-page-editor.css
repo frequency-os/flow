@@ -1187,9 +1187,17 @@
     background:conic-gradient(from var(--ang), var(--fin), var(--skl), #b8e2fb, var(--fin));
     animation:homeRing 4s linear infinite;}
   @keyframes homeRing{to{--ang:360deg}}
-  html.home-glass #scr-home .fcard{
+  /* :not(.fc2) — важливо.
+     Нові картки папок (.fc2) самі малюють собі темне тло: під ним лежить
+     або фото із затемненням, або градієнт кольору папки. Текст на них
+     завжди білий. Якщо скло замінить це тло на var(--card), у світлій
+     темі картка стає світлою, а назва лишається білою — і зникає.
+     Тому скло тут дає лише відблиск і рамку, а тло не чіпає. */
+  html.home-glass #scr-home .fcard:not(.fc2){
     background:linear-gradient(160deg, color-mix(in srgb, var(--text) 6%, var(--card)), var(--card));
     border-color:color-mix(in srgb, var(--text) 12%, var(--line));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 24px var(--shadow);}
+  html.home-glass #scr-home .fcard.fc2{
     box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 24px var(--shadow);}
   /* колірна плашка папки (.fcover) лежить ПОВЕРХ фону .fcard і ховає його майже повністю —
      тому скло має бути видиме поверх усього: діагональний відблиск + світла рамка на самій картці */

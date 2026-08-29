@@ -196,7 +196,10 @@
                       : homeFolderView==='mag'  ? 'fc2-mag' : 'fc2-row';
       const el=document.createElement('div');
       el.className='fcard fc2 '+modeClass;
-      el.style.setProperty('--c', f.c);
+      // Порожній колір НЕ виставляємо: інакше в --c потрапляє сміття,
+      // color-mix() у стилях ламається і картка лишається без фону.
+      // Краще не задати нічого — тоді спрацює запасне значення в CSS.
+      if(f.c) el.style.setProperty('--c', f.c);
       el.dataset.fkey=k;
       let inner='';
       if(f.photo){
