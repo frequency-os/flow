@@ -5,9 +5,9 @@
      міняємо лише цей блок, а не 7000 рядків логіки. ============ */
   (function(){
     const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-    // Заглушка telegram-web-app.js є завжди (навіть поза Telegram), тому для рішень,
-    // що залежать від «ми справді в Telegram чи ні» (kind, hasCloud), довіряємо лише
-    // реальним ознакам сеансу — не самому факту, що об'єкт WebApp існує.
+    // Telegram більше не використовується: SDK прибрано з каркаса, тому
+    // window.Telegram не існує → TG=null, kind ніколи не буде 'telegram'.
+    // Гілку лишено на випадок, якщо Telegram колись знадобиться повернути.
     const isRealTG = !!(TG && TG.initData && TG.initData.length > 0 && TG.platform && TG.platform !== 'unknown');
 
     // Native-обгортка (Capacitor: iOS/Android). Визначаємо тут і тільки тут.

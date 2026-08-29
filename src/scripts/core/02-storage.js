@@ -1,13 +1,11 @@
   /* ============ STORAGE: Telegram CloudStorage + localStorage кеш + версіонування ============ */
   (function(){
     const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-    // ВАЖЛИВО: telegram-web-app.js підключений на сторінці БЕЗУМОВНО і завжди створює
-    // window.Telegram.WebApp із заглушкою CloudStorage, навіть у звичайному браузері
-    // поза Telegram. Перевірка "TG.CloudStorage існує" через це хибно спрацьовувала
-    // скрізь — CS вважався живим, код намагався писати/читати через заглушку, і це
-    // сипало ~150 помилок у консоль ("CloudStorage is not supported in version 6.0")
-    // та хибно позначало cloud:true поза Telegram. Той самий фікс, що й для
-    // ініціалізації Supabase нижче: довіряємо лише реальним ознакам сеансу.
+    /* Telegram більше не використовується (SDK прибрано 2026-08-29, лежить
+       в original/telegram/). window.Telegram тепер просто не існує, тому TG=null,
+       isRealTG=false, CS=null — уся гілка Telegram мертва й ніколи не виконується.
+       Перевірки лишені навмисно: вони нічого не коштують, а якщо колись
+       знадобиться повернути Telegram — досить повернути тег SDK у каркас. */
     const isRealTG = !!(TG && TG.initData && TG.initData.length > 0 && TG.platform && TG.platform !== 'unknown');
     const CS = (isRealTG && TG.CloudStorage) ? TG.CloudStorage : null;
     const LP = 'flowapp_';
@@ -649,13 +647,8 @@
     };
 
     // ініціалізуємо тільки в чистому web-режимі (не Telegram, не native)
-    // ВАЖЛИВО: telegram-web-app.js підключений на сторінці БЕЗУМОВНО (навіть у
-    // звичайному Chrome/Safari поза Telegram) і завжди створює window.Telegram.WebApp
-    // із заглушкою CloudStorage. Перевірка "TG.CloudStorage існує" через це хибно
-    // спрацьовує поза Telegram — sbInit() не викликався, і Google-сесія (яка
-    // реально приходила в URL) нікому було підхопити. Замість CloudStorage
-    // перевіряємо реальні ознаки живого Telegram-сеансу: непорожній initData
-    // і платформу, відмінну від "unknown" (заглушка завжди має platform="unknown").
+    // Telegram прибрано — isRealTG тепер завжди false, тож sbInit() викликається
+    // у web-режимі завжди (крім native, де свій шлях входу через frequency://auth).
     try{
       const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
       const isRealTG = !!(TG && TG.initData && TG.initData.length > 0 && TG.platform && TG.platform !== 'unknown');
