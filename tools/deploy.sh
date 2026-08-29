@@ -7,9 +7,14 @@ echo "1) Збірка"
 python3 tools/build.py | sed 's/^/   /'
 
 echo "2) Кладемо зібране в корінь (звідти GitHub Pages віддає сайт)"
-cp dist/index.html index.html
+# Копіюємо ВСЕ, що зібралось у dist/ — не окремі файли поіменно.
+# Раніше тут був список, і при додаванні маніфесту з іконками вони
+# просто не доїхали на сайт. Тепер такого статись не може.
+for f in dist/*; do
+  [ -f "$f" ] && cp "$f" .
+done
 rm -rf vendor && cp -R dist/vendor vendor
-echo "   index.html $(du -h index.html | cut -f1) + vendor/ $(du -sh vendor | cut -f1)"
+echo "   $(ls dist | tr '\n' ' ')"
 
 echo "3) Записуємо в історію"
 git add -A
