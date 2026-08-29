@@ -12,7 +12,8 @@
     "start": "python3 tools/build.py && electron .",
     "build": "python3 tools/build.py",
     "check": "./tools/check.sh",
-    "build:mac": "python3 tools/build.py && electron-builder --mac"
+    "build:mac": "python3 tools/build.py && electron-builder --mac",
+    "deploy": "./tools/deploy.sh"
   },
   "build": {
     "appId": "com.yarosla.frequency",
