@@ -574,12 +574,51 @@
         if(!client) return;
         // ЧИСТА адреса повернення (без старих #-хвостів) — інакше виходить
         // «##access_token=», який Supabase не може розпарсити
-        const backTo = location.origin + location.pathname;
+        // У браузері повертаємось на ту саму сторінку. У застосунку на Mac/Windows
+        // повертатись «на сторінку» нікуди — там немає адресного рядка, тому
+        // просимо Google повернути людину на frequency://auth, а система
+        // передасть це посилання самому застосунку (див. desktop/main.js).
+        const DESK = window.flowDesktop || null;
+        const backTo = (DESK && DESK.authRedirect) ? DESK.authRedirect
+                                                   : (location.origin + location.pathname);
         await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: backTo } });
       } finally {
         setTimeout(()=>{ sbSigningIn=false; }, 8000);
       }
     };
+    /* ── Повернення з входу в застосунку (Mac/Windows) ──
+       У браузері supabase-js сам ловить токени з адреси після переходу.
+       У застосунку переходу немає: посилання приходить ззовні, тому
+       розбираємо його руками і кладемо сесію самі. Далі — те саме, що
+       робиться після звичайного входу: перечитуємо дані вже з хмари. */
+    (function(){
+      const DESK = window.flowDesktop || null;
+      if(!DESK || typeof DESK.onAuthCallback !== 'function') return;
+      DESK.onAuthCallback(async function(cbUrl){
+        try{
+          const frag = String(cbUrl||'').split('#')[1] || '';
+          const q = new URLSearchParams(frag);
+          const access_token  = q.get('access_token');
+          const refresh_token = q.get('refresh_token');
+          if(!access_token || !refresh_token){
+            const err = q.get('error_description') || q.get('error');
+            if(err){ try{ console.warn('[Flow auth] Google повернув помилку:', err); }catch(_){} }
+            return;
+          }
+          const client = await sbInit();
+          if(!client) return;
+          const { data, error } = await client.auth.setSession({ access_token, refresh_token });
+          if(error){ try{ console.warn('[Flow auth] сесію не прийнято:', error.message); }catch(_){} return; }
+          sbUserCache = data && data.session ? data.session.user : null;
+          try{ if(window.__setSync){ window.__flowSync.quota=false; window.__setSync('synced'); } }catch(_){}
+          try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
+          try{ await sbPrefetchAll(); }catch(_){}
+          try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
+          try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
+        }catch(_){}
+      });
+    })();
+
     window.sbSignOut = async function(){
       const client = await sbInit();
       if(!client) return;

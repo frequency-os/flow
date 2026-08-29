@@ -1,0 +1,52 @@
+{
+  "name": "frequency",
+  "productName": "Frequency",
+  "version": "1.0.0",
+  "description": "Frequency — твоя система вибору хвилі",
+  "author": "Yarosla",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "desktop/main.js",
+  "scripts": {
+    "start": "python3 tools/build.py && electron .",
+    "build:mac": "python3 tools/build.py && electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.yarosla.frequency",
+    "productName": "Frequency",
+    "directories": {
+      "output": "release",
+      "buildResources": "desktop/resources"
+    },
+    "files": [
+      "desktop/**/*",
+      "dist/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "desktop/resources/icon.icns",
+      "darkModeSupport": true
+    },
+    "protocols": [
+      {
+        "name": "Frequency",
+        "schemes": [
+          "frequency"
+        ]
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "^44.0.0",
+    "electron-builder": "^26.15.3"
+  }
+}
