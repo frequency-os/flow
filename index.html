@@ -10541,11 +10541,13 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
         else if(pic){ av.style.background='url('+pic+') center/cover'; av.textContent=''; }
         else{ av.style.background=''; av.textContent=(gname[0]||'G').toUpperCase(); av.style.display='grid'; av.style.placeItems='center'; av.style.fontWeight='800'; av.style.color='#fff'; }
       }else{
-        /* на native акаунта Telegram нема і бути не може — не проси відкрити
-           апку деінде, інакше рецензент бачить непрацездатний онбординг (2.1) */
+        /* Telegram прибрано 2026-08-29 — раніше тут стояло «відкрий через
+           Telegram», що тепер просто неправда: вхід іде через Google.
+           На native лишаємо нейтральний текст: рецензент App Store не має
+           бачити пропозицію відкрити апку деінде (правило 2.1). */
         nm.innerHTML=window.FLOW_NATIVE
           ? 'Цей пристрій<small>дані зберігаються локально</small>'
-          : 'Гість<small>відкрий через Telegram</small>';
+          : 'Гість<small>увійди, щоб дані були на всіх пристроях</small>';
         if(customAvatar){ av.style.background='url('+customAvatar+') center/cover'; av.textContent=''; }
         else{ av.style.background=''; av.textContent='F'; av.style.display='grid'; av.style.placeItems='center'; av.style.fontWeight='800'; av.style.color='#fff'; }
       }
@@ -26447,7 +26449,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
             kt.text=v; if(v && !kt.signed) kt.signed=plTodayStr(); vzSave(); renderVision(); }})},
       {ic:'edit', label:'Дедлайн', sub:kt.deadline||'РРРР-ММ-ДД', onClick:()=>inputModal({title:'Дедлайн контракту (РРРР-ММ-ДД)', value:kt.deadline,
         placeholder:new Date().getFullYear()+'-09-30', onOk:v=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(v)||v==='') kt.deadline=v; vzSave(); renderVision(); }})},
-      {ic:'edit', label:'Підпис (імʼя)', sub:kt.name||'з Telegram', onClick:()=>inputModal({title:'Імʼя для підпису', value:kt.name, onOk:v=>{ kt.name=v; vzSave(); renderVision(); }})},
+      {ic:'edit', label:'Підпис (імʼя)', sub:kt.name||'не задано', onClick:()=>inputModal({title:'Імʼя для підпису', value:kt.name, onOk:v=>{ kt.name=v; vzSave(); renderVision(); }})},
       (kt.text?{ic:'📜', label:'Переглянути контракт', onClick:()=>{
         const s=vzKtStats();
         flowAlert(kt.text+'\n\nПідписано: '+(kt.signed||'—')+(kt.deadline?' · до '+kt.deadline:'')+'\nДотримано: '+s.y+' · зриви: '+s.n,'✍️ '+(kt.name||'Контракт'));
@@ -26881,7 +26883,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       const bkStats=(()=>{const s=window.flowBackup?window.flowBackup.stats():{keys:0,bytes:0};return s.keys+' записів · '+(s.bytes>1024?(s.bytes/1024).toFixed(0)+' КБ':s.bytes+' Б');})();
       const avHintTxt=customAvatar
         ? 'Власна іконка встановлена — можна замінити.'
-        : 'Не обов’язково: можна додати власну іконку профілю, або лишити фото з Telegram/Google чи літеру імені.';
+        : 'Не обов’язково: можна додати власну іконку профілю, або лишити фото з Google чи літеру імені.';
       const avHint=`<p class="acc-hint acc-hint-av">${avHintTxt}${customAvatar?' <button class="acc-mini-link" data-acc-av-remove>прибрати</button>':''}</p>`;
 
       host.innerHTML=`<div class="acc-wrap">
