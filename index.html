@@ -1527,9 +1527,17 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     background:conic-gradient(from var(--ang), var(--fin), var(--skl), #b8e2fb, var(--fin));
     animation:homeRing 4s linear infinite;}
   @keyframes homeRing{to{--ang:360deg}}
-  html.home-glass #scr-home .fcard{
+  /* :not(.fc2) — важливо.
+     Нові картки папок (.fc2) самі малюють собі темне тло: під ним лежить
+     або фото із затемненням, або градієнт кольору папки. Текст на них
+     завжди білий. Якщо скло замінить це тло на var(--card), у світлій
+     темі картка стає світлою, а назва лишається білою — і зникає.
+     Тому скло тут дає лише відблиск і рамку, а тло не чіпає. */
+  html.home-glass #scr-home .fcard:not(.fc2){
     background:linear-gradient(160deg, color-mix(in srgb, var(--text) 6%, var(--card)), var(--card));
     border-color:color-mix(in srgb, var(--text) 12%, var(--line));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 24px var(--shadow);}
+  html.home-glass #scr-home .fcard.fc2{
     box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 24px var(--shadow);}
   /* колірна плашка папки (.fcover) лежить ПОВЕРХ фону .fcard і ховає його майже повністю —
      тому скло має бути видиме поверх усього: діагональний відблиск + світла рамка на самій картці */
@@ -1610,6 +1618,20 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .fbanner .femoji{display:grid;place-items:center;}
   .fbanner .name{font-size:15px;font-weight:800;line-height:1.15;word-break:break-word;color:var(--text);}
   .fbanner .fstat{font-size:11px;color:var(--muted);margin-top:4px;} .fbanner .fstat b{color:var(--c);font-weight:800;}
+/* ══════════════════════════════════════════════════════════════════
+   ЧОМУ ТУТ СКРІЗЬ var(--c, #6a7dff), а не просто var(--c)
+
+   Колір папки приходить із даних. Якщо його немає (папка створена
+   старою версією або приїхала з хмари без поля c), то color-mix()
+   не може порахувати значення — і CSS відкидає ВСЮ властивість,
+   а не лише колір. Картка лишалася зовсім без фону.
+
+   На темній темі це непомітно: прозора картка на темному тлі
+   виглядає майже так само. На світлій — картка ставала світлою,
+   а текст на ній лишався білим, тобто зникав.
+
+   Запасне значення робить такий збій неможливим у принципі.
+   ══════════════════════════════════════════════════════════════════ */
   /* ===== роль «Проєкт» на картці папки ===== */
   .fproj{display:flex;align-items:center;gap:7px;margin-top:5px;min-width:0;flex-wrap:wrap;}
   .fchip{font-size:10px;font-weight:800;letter-spacing:.02em;color:var(--stc,#5b8def);background:color-mix(in srgb, var(--stc,#5b8def) 14%, transparent);border:1px solid color-mix(in srgb, var(--stc,#5b8def) 30%, transparent);border-radius:99px;padding:2px 8px;white-space:nowrap;}
@@ -1706,8 +1728,8 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .fbanner .fsub{position:absolute;top:8px;left:8px;z-index:4;font-size:11px;font-weight:700;
     background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:2px 7px;backdrop-filter:blur(4px);}
   .wcard.subfolder{cursor:pointer;}
-  .wcard.subfolder .fsub-mini{font-size:11px;font-weight:700;color:var(--c);
-    background:color-mix(in srgb,var(--c) 14%,transparent);border-radius:8px;padding:2px 8px;margin-right:4px;}
+  .wcard.subfolder .fsub-mini{font-size:11px;font-weight:700;color:var(--c,#6a7dff);
+    background:color-mix(in srgb,var(--c,#6a7dff) 14%,transparent);border-radius:8px;padding:2px 8px;margin-right:4px;}
   .fld-subs{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
   /* drag & drop папок */
   #folderGrid.fdragging{touch-action:none;}
@@ -1726,7 +1748,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .flay-a{flex-direction:row;min-height:104px;}
   .flay-a .fcover{width:64px;flex-shrink:0;}
   .flay-a .fmeat{padding:12px 38px 12px 12px;display:flex;flex-direction:column;justify-content:center;min-width:0;flex:1;}
-  .flay-a .femoji{width:28px;height:28px;border-radius:9px;font-size:14px;background:color-mix(in srgb,var(--c) 18%,transparent);margin-bottom:7px;}
+  .flay-a .femoji{width:28px;height:28px;border-radius:9px;font-size:14px;background:color-mix(in srgb,var(--c,#6a7dff) 18%,transparent);margin-bottom:7px;}
 
   /* B — top banner, translucent dark bottom */
   .flay-b{flex-direction:column;min-height:150px;}
@@ -1756,7 +1778,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .flay-d .fcover{width:120px;flex-shrink:0;position:relative;}
   .flay-d .fcover-sh{background:linear-gradient(to right,rgba(27,31,41,0) 40%,rgba(27,31,41,1));}
   .flay-d .fmeat{padding:12px;display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0;margin-left:-34px;position:relative;z-index:2;}
-  .flay-d .femoji{width:30px;height:30px;border-radius:9px;font-size:15px;background:color-mix(in srgb,var(--c) 18%,transparent);margin-bottom:7px;}
+  .flay-d .femoji{width:30px;height:30px;border-radius:9px;font-size:15px;background:color-mix(in srgb,var(--c,#6a7dff) 18%,transparent);margin-bottom:7px;}
 
   /* ── Фото на весь рядок у малих (рядкових) розкладках A і D: замість вузького
      корінця фото стає тлом усієї картки з затемненням зліва, текст — білий поверх.
@@ -1810,7 +1832,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .fc2 .fc2-body{position:relative;z-index:2;}
   .fc2 .fc2-em{display:grid;place-items:center;background:rgba(12,10,20,.5);z-index:2;
     border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);flex:none;}
-  .fc2.nocover .fc2-em{background:color-mix(in srgb,var(--c) 30%,rgba(14,12,22,.55));}
+  .fc2.nocover .fc2-em{background:color-mix(in srgb,var(--c,#6a7dff) 30%,rgba(14,12,22,.55));}
   .fc2 .fc2-name{font-weight:800;letter-spacing:-.01em;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5);
     word-break:break-word;}
   .fc2 .fstat{font-size:11.5px;color:rgba(255,255,255,.76);margin-top:3px;font-weight:600;}
@@ -1828,7 +1850,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .fc2-row::after{content:"›";position:absolute;right:18px;top:50%;transform:translateY(-50%);
     color:rgba(255,255,255,.55);font-size:19px;font-weight:700;z-index:2;pointer-events:none;}
   .fc2-row .fc2-veil{background:linear-gradient(90deg,rgba(8,9,14,.9) 32%,rgba(8,9,14,.5) 72%,rgba(8,9,14,.26));}
-  .fc2-row.nocover .fc2-veil{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 34%,#0a0a12),rgba(10,10,18,.94) 72%);}
+  .fc2-row.nocover .fc2-veil{background:linear-gradient(90deg,color-mix(in srgb,var(--c,#6a7dff) 34%,#0a0a12),rgba(10,10,18,.94) 72%);}
   .fc2-row .fc2-em{position:relative;width:52px;height:52px;border-radius:16px;font-size:25px;}
   .fc2-row .fc2-body{flex:1;min-width:0;}
   .fc2-row .fc2-name{font-size:17.5px;}
@@ -1841,7 +1863,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .fc2-tile{height:158px;border-radius:22px;border:1px solid rgba(255,255,255,.10);
     display:flex;flex-direction:column;justify-content:flex-end;padding:12px;}
   .fc2-tile .fc2-veil{background:linear-gradient(transparent 32%,rgba(6,6,12,.9));}
-  .fc2-tile.nocover{background:linear-gradient(150deg,color-mix(in srgb,var(--c) 42%,#0d0d16),#0d0d16 72%);}
+  .fc2-tile.nocover{background:linear-gradient(150deg,color-mix(in srgb,var(--c,#6a7dff) 42%,#0d0d16),#0d0d16 72%);}
   .fc2-tile.nocover .fc2-veil{background:none;}
   .fc2-tile .fc2-em{position:absolute;top:10px;left:10px;width:38px;height:38px;border-radius:12px;font-size:18px;z-index:3;}
   .fc2-tile .fc2-name{font-size:15.5px;}
@@ -1855,7 +1877,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 40px -16px rgba(0,0,0,.7);
     display:flex;flex-direction:column;justify-content:flex-end;padding:14px;}
   .fc2-deck .fc2-veil{background:linear-gradient(transparent 34%,rgba(5,5,11,.92));}
-  .fc2-deck.nocover{background:radial-gradient(140% 100% at 20% 0%,color-mix(in srgb,var(--c) 44%,#0b0b14),#0b0b14 76%);}
+  .fc2-deck.nocover{background:radial-gradient(140% 100% at 20% 0%,color-mix(in srgb,var(--c,#6a7dff) 44%,#0b0b14),#0b0b14 76%);}
   .fc2-deck.nocover .fc2-veil{background:linear-gradient(transparent 52%,rgba(5,5,11,.72));}
   .fc2-deck .fc2-em{position:relative;width:42px;height:42px;border-radius:13px;font-size:20px;margin-bottom:10px;}
   .fc2-deck .fc2-name{font-size:19px;}
@@ -1880,16 +1902,16 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     mask-image:linear-gradient(90deg,#000 52%,transparent);}
   .fc2-mag .fc2-veil{background:none;}
   .fc2-mag.nocover::before{content:"";position:absolute;left:0;top:0;bottom:0;width:118px;z-index:0;
-    background:linear-gradient(140deg,color-mix(in srgb,var(--c) 42%,#101018),transparent 82%);}
+    background:linear-gradient(140deg,color-mix(in srgb,var(--c,#6a7dff) 42%,#101018),transparent 82%);}
   .fc2-mag .fc2-em{position:absolute;left:12px;top:50%;transform:translateY(-50%);
     width:40px;height:40px;border-radius:13px;font-size:19px;z-index:3;}
   .fc2-mag .fc2-name{font-size:15.5px;}
   .fc2-mag .fstat{display:inline-flex;align-items:center;gap:4px;margin-top:5px;
-    font-size:10.5px;font-weight:800;color:var(--c);
-    background:color-mix(in srgb,var(--c) 13%,transparent);
-    border:1px solid color-mix(in srgb,var(--c) 34%,transparent);
+    font-size:10.5px;font-weight:800;color:var(--c,#6a7dff);
+    background:color-mix(in srgb,var(--c,#6a7dff) 13%,transparent);
+    border:1px solid color-mix(in srgb,var(--c,#6a7dff) 34%,transparent);
     border-radius:99px;padding:2px 9px;}
-  .fc2-mag .fstat b{color:var(--c);}
+  .fc2-mag .fstat b{color:var(--c,#6a7dff);}
   .fc2-mag::after{content:"›";position:absolute;right:16px;top:50%;transform:translateY(-50%);
     color:var(--muted);font-size:18px;font-weight:700;z-index:2;pointer-events:none;}
   .fc2-mag .fmenu{top:8px;right:38px;}
@@ -19541,7 +19563,10 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
                       : homeFolderView==='mag'  ? 'fc2-mag' : 'fc2-row';
       const el=document.createElement('div');
       el.className='fcard fc2 '+modeClass;
-      el.style.setProperty('--c', f.c);
+      // Порожній колір НЕ виставляємо: інакше в --c потрапляє сміття,
+      // color-mix() у стилях ламається і картка лишається без фону.
+      // Краще не задати нічого — тоді спрацює запасне значення в CSS.
+      if(f.c) el.style.setProperty('--c', f.c);
       el.dataset.fkey=k;
       let inner='';
       if(f.photo){
