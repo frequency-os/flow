@@ -107,12 +107,12 @@ html.home-glass #scr-home .summary.has-wish .wishbg-ov{
 #scr-home .summary>.hint{order:3;}
 #scr-home .summary>.bar{order:4;}
 #scr-home .summary>.herocap{order:5;}
-#scr-home .summary>.pgdots{order:6;}
+#scr-home .summary>.wishdots{order:6;}
 #scr-home .summary>#nyCountdown{order:7;}
 
 /* текст читається поверх тла в обох станах */
 #scr-home .summary>.label,#scr-home .summary>.big,#scr-home .summary>.hint,
-#scr-home .summary>.bar,#scr-home .summary>.herocap,#scr-home .summary>.pgdots{position:relative;z-index:2;}
+#scr-home .summary>.bar,#scr-home .summary>.herocap,#scr-home .summary>.wishdots{position:relative;z-index:2;}
 #scr-home .summary .label{color:rgba(255,255,255,.72);font-size:10px;letter-spacing:.15em;}
 #scr-home .summary .big{color:#fff;font-size:44px;margin:4px 0 0;
   text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.45);}

@@ -1093,9 +1093,23 @@
   .summary .hc-tab svg{width:16px;height:16px;color:#fff;flex-shrink:0;}
   .summary .hc-tab b{font-size:13.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .summary .hc-tab:active{opacity:.7;transform:scale(.98);}
-  .summary .pgdots{display:flex;gap:5px;margin-top:14px;}
-  .summary .pgdots i{height:3px;border-radius:3px;background:rgba(255,255,255,.22);flex:1;}
-  .summary .pgdots i.on{background:#fff;flex:1.8;}
+  /* Смужка над фото Карти бажань — як у сторіз: сегмент поточного фото
+     наливається білим за той самий час, що показується саме фото.
+     Тривалість задає JS через --wish-dur, щоб анімація і таймер
+     не могли розійтися. */
+  .summary .wishdots{display:none;gap:5px;margin-top:14px;}
+  .summary .wishdots.on{display:flex;}
+  .summary .wishdots i{position:relative;height:3px;border-radius:3px;
+    background:rgba(255,255,255,.22);flex:1;overflow:hidden;}
+  .summary .wishdots i b{position:absolute;left:0;top:0;bottom:0;width:0;
+    background:#fff;border-radius:3px;}
+  .summary .wishdots i.done b{width:100%;}
+  .summary .wishdots i.now b{animation:wishFill var(--wish-dur,5s) linear forwards;}
+  @keyframes wishFill{from{width:0}to{width:100%}}
+  /* якщо людина вимкнула анімації в системі — просто підсвічуємо сегмент */
+  @media (prefers-reduced-motion: reduce){
+    .summary .wishdots i.now b{animation:none;width:100%;}
+  }
   /* === Карта бажань: слайдшоу-тло === */
   .summary .wishslides{position:absolute;inset:0;z-index:0;}
   .summary .wishslide{position:absolute;inset:0;background-size:cover;background-position:center;

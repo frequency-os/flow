@@ -109,6 +109,7 @@
   }
 
   // слайдшоу з фото Карти бажань на блоці «Загальний прогрес»
+  const WISH_SLIDE_MS=5000;          // скільки показується одне фото
   let wishSlideTimer=null, wishSlideIdx=0;
   function updateSummaryBg(){
     try{ renderHeroStreak(); }catch(_){}
@@ -124,7 +125,7 @@
     const withImg=wishes.filter(w=> (w.type==='video') ? !!w.thumb : !!w.img );
     if(!withImg.length){
       slides.style.display='none'; ov.style.display='none';
-      slides.innerHTML=''; dots.innerHTML='';
+      slides.innerHTML=''; dots.innerHTML=''; dots.classList.remove('on');
       card.classList.remove('has-wish');
       if(topBar) topBar.classList.add('top-photobleed');
       const fl0=document.getElementById('wishFlink');
@@ -139,17 +140,33 @@
     const imgs=withImg.slice(-6).map(w=> w.type==='video'?w.thumb:w.img );
     slides.innerHTML=imgs.map((src,i)=>`<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(src)}')"></div>`).join('');
     if(imgs.length>1){
-      dots.innerHTML=imgs.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('');
+      /* Смужка як у сторіз: сегмент поточного фото наливається білим,
+         пройдені лишаються повними, наступні — порожні. Тривалість
+         віддаємо в CSS однією змінною, щоб анімація і таймер не розійшлися. */
+      dots.style.setProperty('--wish-dur', WISH_SLIDE_MS+'ms');
+      dots.innerHTML=imgs.map(()=>'<i><b></b></i>').join('');
+      dots.classList.add('on');
       const slideEls=slides.querySelectorAll('.wishslide');
       const dotEls=dots.querySelectorAll('i');
       wishSlideIdx=0;
+      dotEls[0].classList.add('now');
       wishSlideTimer=setInterval(()=>{
-        slideEls[wishSlideIdx].classList.remove('on'); dotEls[wishSlideIdx].classList.remove('on');
+        slideEls[wishSlideIdx].classList.remove('on');
+        dotEls[wishSlideIdx].classList.remove('now');
+        dotEls[wishSlideIdx].classList.add('done');
+        const wrapped = wishSlideIdx === slideEls.length-1;
         wishSlideIdx=(wishSlideIdx+1)%slideEls.length;
-        slideEls[wishSlideIdx].classList.add('on'); dotEls[wishSlideIdx].classList.add('on');
-      },5000);
+        // новий круг — гасимо всі пройдені, щоб смужка почалася з нуля
+        if(wrapped) dotEls.forEach(d=>d.classList.remove('done'));
+        slideEls[wishSlideIdx].classList.add('on');
+        const cur=dotEls[wishSlideIdx];
+        // перезапуск анімації: без цього сегмент на другому колі лишиться порожнім
+        const fill=cur.querySelector('b');
+        if(fill){ fill.style.animation='none'; void fill.offsetWidth; fill.style.animation=''; }
+        cur.classList.add('now');
+      },WISH_SLIDE_MS);
     }else{
-      dots.innerHTML='';
+      dots.innerHTML=''; dots.classList.remove('on');
     }
   }
 
