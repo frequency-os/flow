@@ -119,12 +119,12 @@ html.home-glass #scr-home .summary.has-wish .wishbg-ov{
 #scr-home .summary .big small{font-size:17px;color:rgba(255,255,255,.72);}
 #scr-home .summary .hint{color:rgba(255,255,255,.78);font-size:12.5px;line-height:1.4;margin-top:6px;}
 #scr-home .summary .wishlink{display:none;}
-#scr-home .summary .herocap .hc-tab b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.4);}
+#scr-home .summary .herocap .hc-tab b{color:inherit;text-shadow:0 1px 6px rgba(0,0,0,.4);}
 /* світла тема: картка все одно лежить на фото або на темному градієнті,
    тому текст лишається світлим — інакше var(--text) стає темним і зникає */
 html[data-theme="light"] #scr-home .top .brand h1,
 html[data-theme="light"] #scr-home .summary .big,
-html[data-theme="light"] #scr-home .summary .herocap .hc-tab b{color:#fff;}
+html[data-theme="light"] #scr-home .summary .herocap .hc-tab b{color:inherit;}
 html[data-theme="light"] #scr-home .summary .hint{color:rgba(255,255,255,.82);}
 html[data-theme="light"] #scr-home .summary .label{color:rgba(255,255,255,.72);}
 html[data-theme="light"] #scr-home .top .icon-btn svg{color:#efedf7;}
