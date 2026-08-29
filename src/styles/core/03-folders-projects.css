@@ -1,0 +1,342 @@
+  /* ===== роль «Проєкт» на картці папки ===== */
+  .fproj{display:flex;align-items:center;gap:7px;margin-top:5px;min-width:0;flex-wrap:wrap;}
+  .fchip{font-size:10px;font-weight:800;letter-spacing:.02em;color:var(--stc,#5b8def);background:color-mix(in srgb, var(--stc,#5b8def) 14%, transparent);border:1px solid color-mix(in srgb, var(--stc,#5b8def) 30%, transparent);border-radius:99px;padding:2px 8px;white-space:nowrap;}
+  .fprg{flex:1 1 46px;min-width:34px;max-width:90px;height:5px;border-radius:99px;background:color-mix(in srgb, var(--c,#6a7dff) 16%, transparent);overflow:hidden;}
+  .fprg i{display:block;height:100%;border-radius:99px;background:var(--c,#6a7dff);transition:width .3s;}
+  .fprg-t{font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;}
+  .fdue{font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;}
+  .fdue.late{color:#ff5a5f;}
+  .flay-c.has-photo .fprg-t,.flay-c.has-photo .fdue{color:rgba(255,255,255,.85);}
+  .frole-pick .flay-opt{gap:3px;} .frole-e{font-size:16px;line-height:1;}
+  .fstatus-pick{display:flex;gap:6px;padding:0 10px 4px;flex-wrap:wrap;}
+  .fst-opt{border:1px solid color-mix(in srgb, var(--stc,#5b8def) 30%, transparent);background:transparent;color:var(--stc,#5b8def);font-size:12px;font-weight:800;border-radius:99px;padding:6px 12px;cursor:pointer;}
+  .fst-opt.on{background:var(--stc,#5b8def);color:#fff;border-color:transparent;}
+
+  /* ===== ВІДЖЕТИ ПРОЄКТІВ (Пульт / Стек / Пайплайн / Таймлайн / Портали) ===== */
+  .pw .pw-empty{color:var(--muted);font-size:13px;text-align:center;padding:18px 8px;line-height:1.6;}
+  .pw .pw-empty small{color:var(--muted);opacity:.75;}
+  .pw-list{display:flex;flex-direction:column;gap:9px;}
+  .pw-row{background:color-mix(in srgb,var(--fc,#6a7dff) 7%,transparent);border:1px solid color-mix(in srgb,var(--fc,#6a7dff) 16%,transparent);border-radius:13px;padding:10px 11px;}
+  .pw-rt{display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;}
+  .pw-em{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:17px;flex:0 0 auto;background:color-mix(in srgb,var(--fc,#6a7dff) 16%,transparent);}
+  .pw-em.big{width:38px;height:38px;font-size:19px;}
+  .pw-meat{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+  .pw-meat>b{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pw-line{display:flex;align-items:center;gap:7px;min-width:0;}
+  .pw-line .fprg{max-width:70px;}
+  .pw-pct{font-size:10px;font-weight:800;color:var(--muted);}
+  .pw-next{display:flex;align-items:center;gap:9px;margin-top:9px;padding:8px 9px;border-radius:10px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid var(--hair);}
+  .pw-next.pw-done{color:var(--muted);font-size:12.5px;}
+  .pw-cb{width:21px;height:21px;border-radius:7px;border:2px solid var(--fc,#6a7dff);background:transparent;cursor:pointer;flex:0 0 auto;transition:.15s;}
+  .pw-cb:active{transform:scale(.9);background:var(--fc,#6a7dff);}
+  .pw-nx{display:flex;flex-direction:column;min-width:0;font-size:13px;}
+  .pw-nx small{font-size:8.5px;font-weight:800;letter-spacing:.13em;color:var(--muted);}
+  /* стек */
+  .pw-scard{display:flex;flex-direction:column;gap:4px;}
+  .pw-shead{display:flex;align-items:center;gap:11px;}
+  .pw-ring{width:48px;height:48px;position:relative;flex:0 0 auto;}
+  .pw-ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:10.5px;font-weight:900;}
+  .pw-sbtns{display:flex;gap:7px;margin-top:9px;}
+  .pw-btn{flex:1;border:0;border-radius:11px;padding:10px 6px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;background:var(--fc,var(--accent));color:#fff;transition:.15s;}
+  .pw-btn:active{transform:scale(.96);}
+  .pw-btn.ghost{background:color-mix(in srgb,var(--fc,#6a7dff) 12%,transparent);color:var(--text);}
+  .pw-btn.go{background:var(--fc,var(--accent));}
+  .pw-cnt{text-align:center;font-size:10.5px;font-weight:700;color:var(--muted);margin-top:7px;}
+  /* пайплайн */
+  .pw-pipe{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+  .pw-pipe::-webkit-scrollbar{display:none;}
+  .pw-col{flex:0 0 138px;background:color-mix(in srgb,var(--card) 55%,transparent);border:1px solid var(--hair);border-radius:12px;padding:7px;}
+  .pw-colh{font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--sc);display:flex;align-items:center;gap:5px;padding:1px 3px 7px;}
+  .pw-colh i{font-style:normal;margin-left:auto;background:color-mix(in srgb,var(--sc) 16%,transparent);border-radius:99px;padding:0 6px;}
+  .pw-pcard{background:color-mix(in srgb,var(--fc,#6a7dff) 9%,transparent);border:1px solid color-mix(in srgb,var(--fc,#6a7dff) 20%,transparent);border-radius:10px;padding:8px;margin-bottom:6px;cursor:pointer;transition:.15s;}
+  .pw-pcard:active{transform:scale(.97);}
+  .pw-pcard b{font-size:12px;font-weight:800;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pw-pcard .pw-line{margin-top:6px;}
+  .pw-colempty{color:var(--muted);text-align:center;font-size:12px;padding:8px 0;}
+  .pw-wip{margin-top:9px;font-size:12px;font-weight:700;color:#f0b429;background:rgba(240,180,41,.12);border-radius:11px;padding:8px 11px;}
+  /* таймлайн */
+  .pw-tl{overflow-x:auto;scrollbar-width:none;} .pw-tl::-webkit-scrollbar{display:none;}
+  .pw-tlin{min-width:520px;position:relative;padding-top:2px;}
+  .pw-hot{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--accent) 8%,transparent);border-right:1.5px dashed color-mix(in srgb,var(--accent) 40%,transparent);pointer-events:none;border-radius:8px 0 0 8px;}
+  .pw-axis{display:flex;border-bottom:1.5px solid var(--hair);padding-bottom:5px;position:relative;}
+  .pw-axis span{flex:1;font-size:9.5px;font-weight:800;color:var(--muted);}
+  .pw-axis span.hot{color:var(--accent);}
+  .pw-tlrow{height:36px;position:relative;}
+  .pw-tlbar{position:absolute;top:4px;height:28px;border-radius:9px;background:color-mix(in srgb,var(--fc,#6a7dff) 12%,transparent);border:1.5px solid color-mix(in srgb,var(--fc,#6a7dff) 35%,transparent);display:flex;align-items:center;padding:0 8px;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;}
+  .pw-tlbar i{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--fc,#6a7dff) 15%,transparent);}
+  .pw-tlbar span{position:relative;z-index:1;}
+  .pw-tlbar.late{border-color:#ff5a5f;background:rgba(255,90,95,.1);}
+  /* портали */
+  .pw-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .pw-gcell{background:color-mix(in srgb,var(--fc,#6a7dff) 8%,transparent);border:1px solid color-mix(in srgb,var(--fc,#6a7dff) 18%,transparent);border-radius:13px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:.15s;}
+  .pw-gcell:active{transform:scale(.96);}
+  .pw-gcell b{font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pw-role{font-size:10px;font-weight:700;color:var(--muted);}
+
+  /* ===== мобільна шапка Простору: не тиснемо, даємо перенос ===== */
+  @media (max-width:640px){
+    #scr-space .top{flex-wrap:wrap;row-gap:10px;}
+    #scr-space .top .brand{min-width:0;}
+    #scr-space .top .brand h1{font-size:19px;}
+    #scr-space .top>div:last-child{margin-left:auto;}
+  }
+  .fmenu{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:8px;background:rgba(0,0,0,.4);
+    border:1px solid rgba(255,255,255,.18);color:#fff;font-size:14px;cursor:pointer;display:grid;place-items:center;padding:0;z-index:5;}
+  .fdrag-handle{position:absolute;bottom:8px;right:8px;width:30px;height:30px;border-radius:9px;
+    background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.75);
+    font-size:15px;line-height:1;cursor:grab;display:grid;place-items:center;padding:0;z-index:6;
+    touch-action:none;-webkit-user-select:none;user-select:none;backdrop-filter:blur(3px);transition:background .15s,transform .1s;}
+  .fdrag-handle:active{cursor:grabbing;transform:scale(.9);background:rgba(0,0,0,.5);color:#fff;}
+  .fcard.fdrag-src .fdrag-handle{opacity:0;}
+  .fbanner .fpin{position:absolute;top:9px;right:40px;font-size:12px;z-index:4;}
+  .fbanner .fpin.fsecret{right:62px;opacity:.85;}
+  @keyframes vshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  .fbanner .fsub{position:absolute;top:8px;left:8px;z-index:4;font-size:11px;font-weight:700;
+    background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:2px 7px;backdrop-filter:blur(4px);}
+  .wcard.subfolder{cursor:pointer;}
+  .wcard.subfolder .fsub-mini{font-size:11px;font-weight:700;color:var(--c);
+    background:color-mix(in srgb,var(--c) 14%,transparent);border-radius:8px;padding:2px 8px;margin-right:4px;}
+  .fld-subs{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
+  /* drag & drop папок */
+  #folderGrid.fdragging{touch-action:none;}
+  .fcard.fdrag-src{opacity:.32;}
+  .fcard.fdrop-into{outline:2px dashed var(--c,#5b8def);outline-offset:-2px;
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--c,#5b8def) 22%,transparent);transform:scale(1.04);
+    transition:outline .1s, box-shadow .1s;}
+  .fdrag-ghost{position:fixed;z-index:9999;pointer-events:none;left:0;top:0;border-radius:18px;overflow:hidden;
+    opacity:.96;box-shadow:0 18px 40px rgba(0,0,0,.45);transform-origin:center;
+    will-change:transform;backface-visibility:hidden;}
+  .fdrop-line{position:absolute;z-index:8;border-radius:4px;
+    background:linear-gradient(90deg,transparent,var(--accent,#6a7dff),transparent);
+    box-shadow:0 0 8px color-mix(in srgb,var(--accent,#6a7dff) 60%,transparent);pointer-events:none;}
+
+  /* A — side, narrow photo, text below emoji (more room) */
+  .flay-a{flex-direction:row;min-height:104px;}
+  .flay-a .fcover{width:64px;flex-shrink:0;}
+  .flay-a .fmeat{padding:12px 38px 12px 12px;display:flex;flex-direction:column;justify-content:center;min-width:0;flex:1;}
+  .flay-a .femoji{width:28px;height:28px;border-radius:9px;font-size:14px;background:color-mix(in srgb,var(--c) 18%,transparent);margin-bottom:7px;}
+
+  /* B — top banner, translucent dark bottom */
+  .flay-b{flex-direction:column;min-height:150px;}
+  .flay-b .fcover{height:88px;}
+  .flay-b .fcover-sh{background:linear-gradient(to bottom,rgba(0,0,0,0),var(--glass));}
+  .flay-b .femoji{position:absolute;left:16px;top:66px;width:44px;height:44px;border-radius:13px;background:var(--emoji-plate);
+    border:2px solid var(--emoji-plate);font-size:21px;z-index:3;box-shadow:0 3px 10px var(--shadow);}
+  .flay-b .fmeat{padding:26px 14px 14px;}
+
+  /* C — photo fills card, glass bar bottom */
+  .flay-c{flex-direction:column;min-height:150px;justify-content:flex-end;background-size:cover;background-position:center;}
+  .flay-c.has-photo{background-color:#1b1f29;}
+  .flay-c .fbar{background:rgba(15,18,24,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    padding:12px 14px;display:flex;align-items:center;gap:10px;position:relative;z-index:2;}
+  .flay-c .femoji{width:36px;height:36px;border-radius:11px;font-size:18px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);flex-shrink:0;}
+  /* білий текст лише коли під ним реальне фото */
+  .flay-c.has-photo .name{color:#fff;} .flay-c.has-photo .fstat{color:rgba(255,255,255,.85);}
+  /* C without photo → fallback to color banner like B */
+  .flay-c:not(.has-photo){justify-content:flex-start;}
+  .flay-c:not(.has-photo) .name{color:var(--text);} .flay-c:not(.has-photo) .fstat{color:var(--muted);}
+  .flay-c:not(.has-photo) .fcover{height:88px;}
+  .flay-c:not(.has-photo) .femoji{position:absolute;left:16px;top:66px;width:44px;height:44px;border-radius:13px;background:var(--emoji-plate);border:2px solid var(--emoji-plate);font-size:21px;z-index:3;box-shadow:0 3px 10px var(--shadow);}
+  .flay-c:not(.has-photo) .fmeat{padding:26px 14px 14px;}
+
+  /* D — side, photo fades into card */
+  .flay-d{flex-direction:row;min-height:104px;position:relative;}
+  .flay-d .fcover{width:120px;flex-shrink:0;position:relative;}
+  .flay-d .fcover-sh{background:linear-gradient(to right,rgba(27,31,41,0) 40%,rgba(27,31,41,1));}
+  .flay-d .fmeat{padding:12px;display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0;margin-left:-34px;position:relative;z-index:2;}
+  .flay-d .femoji{width:30px;height:30px;border-radius:9px;font-size:15px;background:color-mix(in srgb,var(--c) 18%,transparent);margin-bottom:7px;}
+
+  /* ── Фото на весь рядок у малих (рядкових) розкладках A і D: замість вузького
+     корінця фото стає тлом усієї картки з затемненням зліва, текст — білий поверх.
+     Клас .has-photo тепер ставиться з JS для всіх розкладок, коли є f.photo. ── */
+  #folderGrid .fbanner.flay-a.has-photo .fcover,
+  #folderGrid .fbanner.flay-d.has-photo .fcover,
+  .fbanner.flay-a.has-photo .fcover,
+  .fbanner.flay-d.has-photo .fcover{position:absolute;inset:0;width:auto;z-index:0;}
+  #folderGrid.fv-compact .flay-a.has-photo .fcover,
+  #folderGrid.fv-compact .flay-d.has-photo .fcover{width:auto;}
+  .flay-a.has-photo .fcover-sh,
+  .flay-d.has-photo .fcover-sh{background:linear-gradient(90deg,rgba(8,9,14,.86) 30%,rgba(8,9,14,.44) 70%,rgba(8,9,14,.22));}
+  .flay-a.has-photo .femoji,
+  .flay-d.has-photo .femoji{position:relative;z-index:2;background:rgba(12,10,20,.55);
+    border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+  .flay-a.has-photo .fmeat,
+  .flay-d.has-photo .fmeat{position:relative;z-index:2;}
+  .flay-d.has-photo .fmeat{margin-left:0;padding-left:14px;}
+  .flay-a.has-photo .name,.flay-d.has-photo .name{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55);}
+  .flay-a.has-photo .fstat,.flay-d.has-photo .fstat{color:rgba(255,255,255,.82);}
+  .flay-a.has-photo .fmenu,.flay-d.has-photo .fmenu,
+  .flay-a.has-photo .fdrag-handle,.flay-d.has-photo .fdrag-handle{z-index:3;}
+
+  /* ═══════════════════════════════════════════════════════════
+     ПАПКИ v2 · три режими: Список (full-bleed) / Сітка / Колода
+     Керується класом #folderGrid.fv2-list | .fv2-grid | .fv2-deck.
+     Картки — .fc2 (+ .fcard для драгу). Фото завжди тло, з затемненням.
+     ═══════════════════════════════════════════════════════════ */
+  #folderGrid.fv2-list{display:block;margin:0 -18px;border-radius:26px 26px 0 0;overflow:hidden;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card);}
+  #folderGrid.fv2-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 -18px;}
+  #folderGrid.fv2-deck{display:flex;gap:10px;overflow-x:auto;margin:0 -18px;padding:2px 0 12px;
+    scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  #folderGrid.fv2-deck::-webkit-scrollbar{display:none;}
+
+  .fc2{position:relative;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;
+    transition:transform .18s;box-shadow:none;}
+  .fc2:active{transform:scale(.985);}
+  .fc2 .fc2-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;transition:transform .05s linear;}
+  /* ── редактор кадрування фото (папки + фото-блок в аркуші) ── */
+  .pce-ov{position:fixed;inset:0;z-index:100000;background:#0b0d12;display:flex;flex-direction:column;}
+  .pce-top{display:flex;align-items:center;justify-content:space-between;padding:14px 14px calc(10px + env(safe-area-inset-top));padding-top:calc(14px + env(safe-area-inset-top));gap:10px;}
+  .pce-x,.pce-ok{border:0;background:none;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;padding:8px 6px;}
+  .pce-ok{color:#7c8cff;}
+  .pce-t{font-size:13px;font-weight:800;color:#9aa0ae;}
+  .pce-stage{flex:1;position:relative;overflow:hidden;touch-action:none;background:#000;}
+  .pce-img{position:absolute;inset:0;background-size:cover;background-position:center;transform-origin:center center;will-change:transform;}
+  .pce-hint{text-align:center;font-size:11.5px;color:#7d8394;padding:14px 24px;}
+  .pce-reset{display:block;margin:0 auto calc(20px + env(safe-area-inset-bottom));border:1px solid rgba(255,255,255,.14);background:none;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:9px 18px;border-radius:12px;cursor:pointer;}
+  .fc2 .fc2-veil{position:absolute;inset:0;z-index:1;}
+  .fc2 .fc2-body{position:relative;z-index:2;}
+  .fc2 .fc2-em{display:grid;place-items:center;background:rgba(12,10,20,.5);z-index:2;
+    border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);flex:none;}
+  .fc2.nocover .fc2-em{background:color-mix(in srgb,var(--c) 30%,rgba(14,12,22,.55));}
+  .fc2 .fc2-name{font-weight:800;letter-spacing:-.01em;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5);
+    word-break:break-word;}
+  .fc2 .fstat{font-size:11.5px;color:rgba(255,255,255,.76);margin-top:3px;font-weight:600;}
+  .fc2 .fstat b{color:#fff;font-weight:800;}
+  .fc2 .fproj{margin-top:6px;}
+  .fc2 .fmenu,.fc2 .fdrag-handle{z-index:5;}
+  .fc2 .fpin{font-size:13px;z-index:5;}
+  .fc2 .fpin.fsecret{opacity:.85;}
+  .fc2 .fsub{z-index:5;font-size:11px;font-weight:700;background:rgba(0,0,0,.5);color:#fff;
+    border-radius:8px;padding:2px 7px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+
+  /* ── Список: рядок на всю ширину екрана, фото — тло, затемнення зліва ── */
+  .fc2-row{display:flex;align-items:center;gap:14px;min-height:118px;padding:18px 56px 18px 18px;}
+  #folderGrid.fv2-list .fc2-row+.fc2-row{border-top:1.5px solid rgba(255,255,255,.10);}
+  .fc2-row::after{content:"›";position:absolute;right:18px;top:50%;transform:translateY(-50%);
+    color:rgba(255,255,255,.55);font-size:19px;font-weight:700;z-index:2;pointer-events:none;}
+  .fc2-row .fc2-veil{background:linear-gradient(90deg,rgba(8,9,14,.9) 32%,rgba(8,9,14,.5) 72%,rgba(8,9,14,.26));}
+  .fc2-row.nocover .fc2-veil{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 34%,#0a0a12),rgba(10,10,18,.94) 72%);}
+  .fc2-row .fc2-em{position:relative;width:52px;height:52px;border-radius:16px;font-size:25px;}
+  .fc2-row .fc2-body{flex:1;min-width:0;}
+  .fc2-row .fc2-name{font-size:17.5px;}
+  .fc2-row .fmenu{top:12px;right:14px;}
+  .fc2-row .fdrag-handle{bottom:12px;right:12px;}
+  .fc2-row .fpin{position:absolute;top:15px;right:48px;font-size:13px;}
+  .fc2-row .fsub{top:auto;bottom:12px;left:auto;right:48px;}
+
+  /* ── Сітка: фото = вся плитка, затемнення знизу ── */
+  .fc2-tile{height:158px;border-radius:22px;border:1px solid rgba(255,255,255,.10);
+    display:flex;flex-direction:column;justify-content:flex-end;padding:12px;}
+  .fc2-tile .fc2-veil{background:linear-gradient(transparent 32%,rgba(6,6,12,.9));}
+  .fc2-tile.nocover{background:linear-gradient(150deg,color-mix(in srgb,var(--c) 42%,#0d0d16),#0d0d16 72%);}
+  .fc2-tile.nocover .fc2-veil{background:none;}
+  .fc2-tile .fc2-em{position:absolute;top:10px;left:10px;width:38px;height:38px;border-radius:12px;font-size:18px;z-index:3;}
+  .fc2-tile .fc2-name{font-size:15.5px;}
+  .fc2-tile .fmenu{top:11px;right:11px;}
+  .fc2-tile .fdrag-handle{bottom:11px;right:11px;}
+  .fc2-tile .fpin{position:absolute;top:15px;right:44px;font-size:12px;}
+  .fc2-tile .fsub{top:12px;left:56px;}
+
+  /* ── Колода: горизонтальні постери зі snap ── */
+  .fc2-deck{flex:0 0 232px;scroll-snap-align:start;height:296px;border-radius:26px;
+    border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 40px -16px rgba(0,0,0,.7);
+    display:flex;flex-direction:column;justify-content:flex-end;padding:14px;}
+  .fc2-deck .fc2-veil{background:linear-gradient(transparent 34%,rgba(5,5,11,.92));}
+  .fc2-deck.nocover{background:radial-gradient(140% 100% at 20% 0%,color-mix(in srgb,var(--c) 44%,#0b0b14),#0b0b14 76%);}
+  .fc2-deck.nocover .fc2-veil{background:linear-gradient(transparent 52%,rgba(5,5,11,.72));}
+  .fc2-deck .fc2-em{position:relative;width:42px;height:42px;border-radius:13px;font-size:20px;margin-bottom:10px;}
+  .fc2-deck .fc2-name{font-size:19px;}
+  .fc2-deck .fc2-prog{height:4px;border-radius:4px;background:rgba(255,255,255,.16);margin-top:11px;overflow:hidden;}
+  .fc2-deck .fc2-prog i{display:block;height:100%;border-radius:4px;
+    background:linear-gradient(90deg,var(--accent,#8c7bff),#ff6a4d);}
+  .fc2-deck .fmenu{top:12px;right:12px;width:30px;height:30px;font-size:14px;
+    background:rgba(10,8,18,.5);border:1px solid rgba(255,255,255,.16);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+  .fc2-deck .fdrag-handle{display:none;} /* у колоді драг-хендл ховаємо, скрол по горизонталі */
+  .fc2-deck .fpin{position:absolute;top:14px;left:14px;font-size:14px;}
+  .fc2-deck .fsub{top:14px;left:44px;}
+
+  /* ── Журнал: окремі картки, фото-«корінець» зліва розчиняється в картку ── */
+  #folderGrid.fv2-mag{display:block;margin:0 -18px;border-radius:26px 26px 0 0;overflow:hidden;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card);}
+  #folderGrid.fv2-mag .fc2-mag+.fc2-mag{border-top:1.5px solid rgba(255,255,255,.10);}
+  .fc2-mag{height:84px;border:0;background:transparent;
+    display:flex;align-items:center;padding:0 46px 0 128px;}
+  .fc2-mag .fc2-bg{inset:0 auto 0 0;width:118px;
+    -webkit-mask-image:linear-gradient(90deg,#000 52%,transparent);
+    mask-image:linear-gradient(90deg,#000 52%,transparent);}
+  .fc2-mag .fc2-veil{background:none;}
+  .fc2-mag.nocover::before{content:"";position:absolute;left:0;top:0;bottom:0;width:118px;z-index:0;
+    background:linear-gradient(140deg,color-mix(in srgb,var(--c) 42%,#101018),transparent 82%);}
+  .fc2-mag .fc2-em{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    width:40px;height:40px;border-radius:13px;font-size:19px;z-index:3;}
+  .fc2-mag .fc2-name{font-size:15.5px;}
+  .fc2-mag .fstat{display:inline-flex;align-items:center;gap:4px;margin-top:5px;
+    font-size:10.5px;font-weight:800;color:var(--c);
+    background:color-mix(in srgb,var(--c) 13%,transparent);
+    border:1px solid color-mix(in srgb,var(--c) 34%,transparent);
+    border-radius:99px;padding:2px 9px;}
+  .fc2-mag .fstat b{color:var(--c);}
+  .fc2-mag::after{content:"›";position:absolute;right:16px;top:50%;transform:translateY(-50%);
+    color:var(--muted);font-size:18px;font-weight:700;z-index:2;pointer-events:none;}
+  .fc2-mag .fmenu{top:8px;right:38px;}
+  .fc2-mag .fdrag-handle{bottom:8px;right:38px;}
+  .fc2-mag .fpin{position:absolute;top:9px;right:70px;font-size:12px;}
+  .fc2-mag .fsub{position:absolute;bottom:9px;left:126px;}
+
+  /* ── Картка «＋ Нова папка» під кожен режим ── */
+  .fc2-add{border:1.5px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.03);
+    color:var(--muted);display:flex;align-items:center;justify-content:center;gap:12px;}
+  .fc2-add .fc2-plus{font-size:24px;font-weight:300;line-height:1;}
+  #folderGrid.fv2-list .fc2-add{min-height:76px;padding:16px;}
+  #folderGrid.fv2-grid .fc2-add{height:158px;border-radius:22px;flex-direction:column;}
+  #folderGrid.fv2-deck .fc2-add{flex:0 0 132px;height:296px;border-radius:26px;flex-direction:column;scroll-snap-align:start;}
+  #folderGrid.fv2-mag .fc2-add{height:64px;border-radius:20px;}
+  .fc2-add .fc2-addt{font-size:13px;font-weight:800;}
+
+  /* ── Сегментний перемикач режимів (3 кнопки) ── */
+  .fvseg{display:inline-flex;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;}
+  .fvseg button{width:38px;height:30px;border:0;border-radius:9px;background:transparent;color:var(--muted);
+    display:grid;place-items:center;cursor:pointer;transition:background .15s,color .15s;font-family:inherit;}
+  .fvseg button svg{width:16px;height:16px;display:block;}
+  .fvseg button.on{background:linear-gradient(135deg,rgba(106,125,255,.32),rgba(160,107,255,.2));color:#fff;
+    box-shadow:inset 0 0 0 1px rgba(140,123,255,.5);}
+  .fvseg button:active{transform:scale(.92);}
+
+  /* add-folder card */
+  .fadd{display:flex;align-items:center;gap:14px;padding:18px;border:1.5px dashed var(--line);min-height:104px;}
+  .fadd:hover{border-color:var(--accent);}
+  .fadd .fadd-plus{width:46px;height:46px;border-radius:13px;background:var(--field);display:grid;place-items:center;font-size:24px;color:var(--muted);flex-shrink:0;}
+  .fadd .fadd-t{font-size:15px;font-weight:800;} .fadd .fadd-d{font-size:12px;color:var(--muted);margin-top:2px;}
+  /* folder settings sheet */
+  .fmenu-sheet{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;z-index:300;}
+  .fmenu-in{width:100%;max-width:480px;background:var(--sheet);border-top:1px solid var(--hair-2);
+    border-radius:24px 24px 0 0;padding:10px 14px 28px;box-shadow:0 -14px 50px rgba(0,0,0,.5);animation:up .3s cubic-bezier(.2,.85,.25,1);max-height:80vh;overflow-y:auto;}
+  .fmenu-in::-webkit-scrollbar{width:0;}
+  .fmenu-grip{width:40px;height:5px;border-radius:99px;background:rgba(255,255,255,.22);margin:6px auto 12px;}
+  .fmenu-title{font-size:16px;font-weight:800;margin:0 4px 12px;}
+  .fmi{width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:inherit;font-size:15px;font-weight:600;
+    padding:13px 10px;border-radius:11px;cursor:pointer;display:block;}
+  .fmi:hover{background:var(--hair);} .fmi b{color:var(--accent);}
+  .fmi .fmi-ic{width:18px;height:18px;vertical-align:-3.5px;margin-right:3px;color:var(--accent);}
+  .fmi.danger{color:var(--owe);}
+  /* input modal */
+  .imodal{position:fixed;inset:0;z-index:1300;background:var(--scrim);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;}
+  .im-in{width:100%;max-width:480px;background:rgba(24,28,36,.98);border-top:1px solid var(--hair-2);
+    border-radius:24px 24px 0 0;padding:10px 18px 24px;box-shadow:0 -14px 50px rgba(0,0,0,.5);animation:up .3s cubic-bezier(.2,.85,.25,1);}
+  .im-grip{width:40px;height:5px;border-radius:99px;background:rgba(255,255,255,.22);margin:6px auto 14px;}
+  .im-title{font-size:17px;font-weight:800;margin-bottom:14px;}
+  .im-input{width:100%;background:var(--field);border:1.5px solid var(--line);border-radius:13px;padding:14px 15px;
+    color:var(--text);font-family:inherit;font-size:16px;font-weight:600;outline:none;}
+  .im-input:focus{border-color:var(--accent);}
+  .im-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:16px 2px 8px;}
+  .im-emoji-row{display:flex;gap:10px;}
+  .im-emoji{flex:1;background:var(--field);border:1.5px solid var(--line);border-radius:13px;padding:13px 15px;color:var(--text);font-family:inherit;font-size:18px;outline:none;text-align:center;}
+  .im-emoji:focus{border-color:var(--accent);}
+  .im-noemoji{background:var(--card);border:1px solid var(--line);border-radius:13px;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;padding:0 16px;cursor:pointer;}
+  .im-noemoji:hover{color:var(--text);}
+  .im-btns{display:flex;gap:10px;margin-top:20px;}
+  .im-cancel,.im-ok{flex:1;border:none;border-radius:13px;padding:14px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;}
+  .im-cancel{background:var(--field);color:var(--muted);border:1px solid var(--line);}
+  .im-ok{background:linear-gradient(135deg,#6a7dff,#a06bff);color:#fff;}

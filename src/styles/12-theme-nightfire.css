@@ -1,0 +1,462 @@
+
+/* ════════ FD26T · «Nightfire Glass» — три температури однієї ночі ════════
+   🌙 Ніч (фіолет) · ⚫ AMOLED (та сама ніч, вимкнене світло) · ☀️ День (та сама ніч у денному світлі)
+   Шар активний лише з класом html.fd26t. Вимикач: localStorage.fd26t='0'. */
+
+/* ── 1. ТОКЕНИ · 🌙 НІЧ (без data-theme) ── */
+html.fd26t:not([data-theme]){
+  --bg:#07060e; --bg-2:#0d0a1c; --card:#17131f; --card-2:#1e1929; --field:#110e19;
+  --text:#eceaf6; --muted:#9b95b2;
+  --line:rgba(255,255,255,.09);
+  --accent:#8b7cff; --skl:#c4a8ff;
+  --hair:rgba(255,255,255,.06); --hair-2:rgba(255,255,255,.14);
+  --scrim:rgba(7,6,14,.55);
+  --glass:rgba(20,16,32,.55);
+  --sheet:rgba(21,17,32,.97);
+  --shadow:rgba(0,0,0,.5);
+  --glow:rgba(139,124,255,.14);
+  --nav-bg:linear-gradient(180deg,rgba(36,30,56,.62),rgba(14,11,26,.78));
+  --nav-line:rgba(255,255,255,.14);
+}
+/* ── ⚫ AMOLED: чистий чорний, глибші картки, той самий фіолет ── */
+html.fd26t[data-theme="black"]{
+  --bg:#000000; --bg-2:#0a0812; --card:#100d18; --card-2:#161222; --field:#0c0a13;
+  --text:#f0eefa; --muted:#a29cbd;
+  --line:rgba(255,255,255,.11);
+  --accent:#948aff; --skl:#cbb2ff;
+  --hair:rgba(255,255,255,.07); --hair-2:rgba(255,255,255,.16);
+  --scrim:rgba(0,0,0,.64);
+  --glass:rgba(14,11,22,.6);
+  --sheet:rgba(10,8,16,.98);
+  --shadow:rgba(0,0,0,.7);
+  --glow:rgba(148,138,255,.16);
+  --nav-bg:linear-gradient(180deg,rgba(26,22,42,.72),rgba(2,2,6,.9));
+  --nav-line:rgba(255,255,255,.15);
+}
+/* ── ☀️ ДЕНЬ: лавандово-біле небо, той самий фіолетовий всесвіт ── */
+html.fd26t[data-theme="light"]{
+  --bg:#f3f2fa; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1effa; --field:#edebf6;
+  --text:#1a1726; --muted:#5c5776;
+  --line:rgba(32,24,72,.10);
+  --accent:#6d5cf0; --skl:#8a5ce0;
+  --hair:rgba(32,24,72,.05); --hair-2:rgba(32,24,72,.13);
+  --scrim:rgba(36,30,62,.34);
+  --glass:rgba(255,255,255,.66);
+  --sheet:rgba(255,255,255,.98);
+  --shadow:rgba(38,30,80,.16);
+  --glow:rgba(109,92,240,.10);
+  --nav-bg:linear-gradient(180deg,rgba(255,255,255,.85),rgba(243,242,250,.94));
+  --nav-line:rgba(32,24,72,.10);
+  --nav-ink:#5c5776; --nav-ink-on:#1a1726;
+}
+
+/* ── 2. СКЛО (рецепт Glassmorphism 2.0: alpha-градієнт + blur + бордер + inset-грань) ──
+   Лише 2 нові blur-поверхні (nav уже має свій blur). */
+html.fd26t:not([data-theme]) .summary,
+html.fd26t:not([data-theme]) .nyc,
+html.fd26t[data-theme="black"] .summary,
+html.fd26t[data-theme="black"] .nyc{
+  background:linear-gradient(160deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  backdrop-filter:blur(22px) saturate(160%);
+  -webkit-backdrop-filter:blur(22px) saturate(160%);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 12px 34px rgba(0,0,0,.35);
+}
+html.fd26t[data-theme="light"] .summary,
+html.fd26t[data-theme="light"] .nyc{
+  background:linear-gradient(160deg,rgba(255,255,255,.9),rgba(255,255,255,.62));
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  border:1px solid rgba(32,24,72,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85), 0 10px 30px rgba(38,30,80,.10);
+}
+@supports not (backdrop-filter: blur(1px)){
+  html.fd26t:not([data-theme]) .summary, html.fd26t:not([data-theme]) .nyc{background:#14121f;}
+  html.fd26t[data-theme="black"] .summary, html.fd26t[data-theme="black"] .nyc{background:#0e0b16;}
+  html.fd26t[data-theme="light"] .summary, html.fd26t[data-theme="light"] .nyc{background:#ffffff;}
+}
+/* нічне сяйво героя: холодний фіолет угорі + ЄДИНЕ тепле ember-сяйво знизу.
+   isolation + z-index:-1 — щоб НЕ чіпати позиціювання дітей (.wishlink absolute!) */
+html.fd26t .summary{position:relative;overflow:hidden;isolation:isolate;}
+html.fd26t .summary::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+  background:
+    radial-gradient(420px 200px at 82% -30%, color-mix(in srgb,var(--accent) 22%,transparent), transparent 65%),
+    radial-gradient(340px 150px at 12% 118%, rgba(255,157,92,.14), transparent 70%);}
+html.fd26t[data-theme="light"] .summary::before{
+  background:
+    radial-gradient(420px 200px at 82% -30%, color-mix(in srgb,var(--accent) 14%,transparent), transparent 65%),
+    radial-gradient(340px 150px at 12% 118%, rgba(255,157,92,.12), transparent 70%);}
+
+/* лічильник: комірки на склі, фіолетова кома замість жовтої плями */
+html.fd26t .nyc-cell{background:color-mix(in srgb,var(--field) 72%,transparent);border-color:var(--line);}
+html.fd26t[data-theme="light"] .nyc-cell{background:rgba(255,255,255,.75);}
+html.fd26t .nyc::after{background:radial-gradient(circle, color-mix(in srgb,var(--skl) 20%,transparent), transparent 70%);}
+
+/* екран лічильника: прибрати захардкоджені темні фони поза темою */
+html.fd26t .nyc-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--skl) 12%,var(--card)),var(--card));}
+html.fd26t[data-theme="light"] .incx-src .bar,
+html.fd26t[data-theme="light"] .lit-next .bar{background:var(--field);}
+html.fd26t[data-theme="light"] .sdash-st .bar{background:rgba(32,24,72,.08);}
+
+/* ── 3. ЧИТАБЕЛЬНІСТЬ ──
+   muted підняли в токенах; тут — точкові підсилення дрібного тексту на картках. */
+html.fd26t .summary .hint{color:color-mix(in srgb,var(--text) 74%,var(--muted));}
+html.fd26t .summary .label,
+html.fd26t .nyc-title{color:color-mix(in srgb,var(--muted) 82%,var(--text));letter-spacing:.14em;}
+html.fd26t .nyc-cell span{color:color-mix(in srgb,var(--muted) 78%,var(--text));font-size:10.5px;}
+html.fd26t .brand span{color:var(--muted);}
+html.fd26t .sec h3{color:color-mix(in srgb,var(--muted) 85%,var(--text));display:inline-flex;align-items:center;gap:8px;}
+html.fd26t .sec h3 svg{width:15px;height:15px;flex:0 0 auto;opacity:.9;}
+
+/* ── 4. ІКОНКИ ХРОМУ · SVG stroke 1.9 замість емодзі (заміну робить fd26tjs) ── */
+html.fd26t .top .icon-btn svg{width:19px;height:19px;}
+html.fd26t .logo svg{width:22px;height:22px;display:block;}
+/* перемикач теми: JS переписує textContent на емодзі — тому текст глушимо,
+   а іконку малює CSS-маска за data-theme */
+html.fd26t #themeToggle{position:relative;font-size:0;color:var(--muted);}
+html.fd26t #themeToggle::before{content:"";width:19px;height:19px;background:currentColor;
+  -webkit-mask:var(--fdt-ico) center/contain no-repeat; mask:var(--fdt-ico) center/contain no-repeat;}
+html.fd26t:not([data-theme]) #themeToggle{--fdt-ico:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z'/%3E%3C/svg%3E");}
+html.fd26t[data-theme="black"] #themeToggle{--fdt-ico:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z' fill='black'/%3E%3C/svg%3E");}
+html.fd26t[data-theme="light"] #themeToggle{--fdt-ico:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4L19 19M19 5l-1.6 1.6M6.6 17.4L5 19'/%3E%3C/svg%3E");}
+/* ялинка лічильника → штриховий SVG у фіолеті */
+html.fd26t .nyc-emoji{color:var(--skl);display:grid;place-items:center;}
+html.fd26t .nyc-emoji svg{width:17px;height:17px;display:block;}
+
+/* ── 5. ДРІБНИЦІ ЄДИНОГО СТИЛЮ ── */
+html.fd26t .phone{background:
+  radial-gradient(900px 340px at 50% -12%, var(--glow), transparent 62%),
+  linear-gradient(180deg, var(--bg-2), var(--bg) 320px);}
+html.fd26t[data-theme="black"] .phone{background:
+  radial-gradient(900px 300px at 50% -14%, var(--glow), transparent 60%), #000;}
+html.fd26t .icon-btn:active{transform:scale(.94);transition:transform .12s;}
+html.fd26t .count{background:color-mix(in srgb,var(--accent) 16%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 34%,transparent);color:var(--text);}
+
+/* ── 6. ФІНАНСИ (Fusion) · захардкоджені хекси → токени, працює в усіх 3 темах ── */
+html.fd26t .incx-acts button{background:var(--card);border-color:var(--line);color:var(--text);}
+html.fd26t .incx-acts button.pri{background:linear-gradient(140deg,#2aa668,#1f7d4f);border-color:transparent;color:#fff;}
+html.fd26t .incx-exp,html.fd26t .incx-src,html.fd26t .fuz-b,html.fd26t .lit-act,
+html.fd26t .lit-hist,html.fd26t .ana-chart,html.fd26t .ana-row{background:var(--card);border-color:var(--line);}
+html.fd26t .incx-src .bar,html.fd26t .lit-next .bar{background:var(--field);}
+html.fd26t .fuz-lit,html.fd26t .lit-chips .chip{background:var(--card-2);border-color:var(--hair-2);}
+html.fd26t .lit-act button{background:var(--card-2);border-color:var(--hair-2);color:var(--text);}
+html.fd26t .fuz-all{background:var(--card-2);border-color:var(--hair-2);color:var(--muted);}
+html.fd26t .fuz-dots i{background:var(--hair-2);} html.fd26t .fuz-dots i.on{background:var(--text);}
+html.fd26t .fuz-lab,html.fd26t .fuz-sec,html.fd26t .fuz-b s,html.fd26t .fuz-sub,html.fd26t .fuz-hint,
+html.fd26t .fuz-total small,html.fd26t .fuz-total u,html.fd26t .incx-exp small,html.fd26t .lit-act small,
+html.fd26t .lit-next small,html.fd26t .lit-hist s,html.fd26t .ana-col s,html.fd26t .ana-leg{color:var(--muted);}
+html.fd26t .fuz-sec .lnk,html.fd26t .lit-hist b{color:color-mix(in srgb,var(--muted) 60%,var(--text));}
+html.fd26t .fuz-ring svg circle:first-of-type{stroke:var(--field);}
+html.fd26t .fuz-ring svg text{fill:var(--text);}
+html.fd26t[data-theme="light"] .incx-acts button{box-shadow:0 2px 8px rgba(38,30,80,.06);}
+
+/* ── 7. РЕДАКТОР СТОРІНОК · шторки блоків слідують темі апки ── */
+html.fd26t[data-theme="light"] .pg-slash,
+html.fd26t[data-theme="light"] .pg-bmenu,
+html.fd26t[data-theme="light"] #scr-page .pg-slash,
+html.fd26t[data-theme="light"] #scr-page.pg-paper .pg-slash,
+html.fd26t[data-theme="light"] #scr-page.pg-paper .pg-bmenu{
+  --pg-bg:#ffffff;--pg-fg:#1a1726;--pg-fg2:#2e2a40;--pg-mut:#5c5776;--pg-mut2:#8b86a3;
+  --pg-line:rgba(32,24,72,.12);--pg-field:rgba(32,24,72,.06);--pg-acc:#6d5cf0;
+  --pg-danger:#d1483f;--pg-sheet:#ffffff;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.82));
+  -webkit-backdrop-filter:blur(42px) saturate(1.4);backdrop-filter:blur(42px) saturate(1.4);
+  border:1px solid rgba(32,24,72,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 22px 54px -18px rgba(38,30,80,.3);}
+html.fd26t[data-theme="light"] .pg-slash .pg-ssearch{
+  background:rgba(32,24,72,.05);border-color:rgba(32,24,72,.1);color:var(--pg-fg);}
+/* терракотовий тумблер теми сторінки → фіолет сім'ї (ember бережемо для вогнища) */
+html.fd26t #scr-page.pg-paper{--pg-acc:#6d5cf0;}
+
+/* ── 8. ІКОНАЙЗЕР · розміри SVG у хромі меню та плиток ── */
+html.fd26t .fmi svg{width:17px;height:17px;vertical-align:-3.5px;margin-right:9px;color:color-mix(in srgb,var(--muted) 70%,var(--text));}
+html.fd26t .fmi.danger svg{color:#e0454a;}
+html.fd26t .frole-e svg{width:18px;height:18px;display:block;margin:0 auto;color:var(--accent);}
+html.fd26t .incx-acts button i svg{width:17px;height:17px;display:block;}
+html.fd26t .fhx-tile .i svg{width:17px;height:17px;display:block;margin:auto;}
+html.fd26t .fuz-b b svg,html.fd26t .ana-row span svg{width:14px;height:14px;vertical-align:-2.5px;margin-right:5px;color:var(--muted);}
+html.fd26t .fuz-sec .lnk svg{width:12px;height:12px;vertical-align:-2px;margin-right:3px;}
+html.fd26t .fuz-all span svg{width:20px;height:20px;display:block;}
+html.fd26t .incx-exp .ic svg,html.fd26t .lit-act .ic svg{width:19px;height:19px;display:block;color:var(--muted);}
+
+
+/* ── 9. ЛІЧИЛЬНИК «ДО НОВОГО РОКУ» · компактний рядок унизу карти бажань ──
+   DOM-вузол #nyCountdown переносить fd26tjs усередину #summaryCard; всі ID живі. */
+html.fd26t #summaryCard #nyCountdown{
+  background:transparent;border:0;box-shadow:none;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  border-radius:0;padding:12px 0 0;margin:14px 0 0;border-top:1px solid var(--hair-2);
+  display:flex;align-items:center;gap:10px;overflow:visible;}
+html.fd26t #summaryCard #nyCountdown::after{display:none;}
+html.fd26t #summaryCard #nyCountdown .nyc-head{margin:0;gap:7px;flex:none;}
+html.fd26t #summaryCard #nyCountdown .nyc-title{font-size:10px;letter-spacing:.1em;}
+html.fd26t #summaryCard #nyCountdown .nyc-emoji svg{width:14px;height:14px;}
+html.fd26t #summaryCard #nyCountdown .nyc-grid{display:flex;gap:10px;margin-left:auto;}
+html.fd26t #summaryCard #nyCountdown .nyc-cell{background:none;border:0;padding:0;
+  display:flex;align-items:baseline;gap:3px;text-align:left;}
+html.fd26t #summaryCard #nyCountdown .nyc-cell b{font-size:14.5px;}
+html.fd26t #summaryCard #nyCountdown .nyc-cell span{font-size:9px;letter-spacing:.04em;}
+/* режим фото бажань: рядок читається поверх знімка */
+html.fd26t .summary.has-wish #nyCountdown{position:relative;z-index:2;border-top-color:rgba(255,255,255,.28);}
+html.fd26t .summary.has-wish #nyCountdown .nyc-title,
+html.fd26t .summary.has-wish #nyCountdown .nyc-cell b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.55);}
+html.fd26t .summary.has-wish #nyCountdown .nyc-cell span{color:rgba(255,255,255,.75);}
+html.fd26t .summary.has-wish #nyCountdown .nyc-emoji{color:#fff;}
+
+
+/* ── 10. КАРТА БАЖАНЬ · тема «Вітрина» (фокус-колода) ──
+   Свідомо БЕЗ префікса html.fd26t: тема має працювати навіть із вимкненим шаром. */
+.wdk{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+  margin:0 -18px;padding:6px 18px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.wdk::-webkit-scrollbar{display:none;}
+.wdk-slide{flex:0 0 86%;scroll-snap-align:center;border-radius:24px;overflow:hidden;position:relative;
+  height:340px;background-size:cover;background-position:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,.09);box-shadow:0 16px 40px rgba(0,0,0,.45);}
+.wdk-veil{position:absolute;inset:0;background:linear-gradient(transparent 36%,rgba(7,6,14,.9));}
+.wdk-in{position:absolute;left:0;right:0;bottom:0;padding:16px;z-index:2;}
+.wdk-cap{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.15;
+  text-shadow:0 2px 12px rgba(0,0,0,.55);}
+.wdk-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+.wdk-chip{font-size:10px;font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:99px;line-height:1.4;
+  border:1px solid rgba(255,255,255,.18);background:rgba(10,8,20,.45);color:#e6e2f6;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;}
+.wdk-chip.date{color:#d9ccff;border-color:rgba(139,124,255,.45);}
+.wdk-chip.goal{color:#a8f5d0;border-color:rgba(58,212,135,.35);cursor:default;}
+.wdk-cnt{display:flex;align-items:baseline;gap:6px;margin-top:10px;color:#fff;}
+.wdk-cnt b{font-size:25px;font-weight:800;font-variant-numeric:tabular-nums;}
+.wdk-cnt span{font-size:11px;color:rgba(255,255,255,.65);font-weight:700;}
+.wdk-ring{position:absolute;top:12px;right:52px;width:42px;height:42px;z-index:3;}
+.wdk-ring svg{width:42px;height:42px;transform:rotate(-90deg);display:block;}
+.wdk-ring circle{fill:none;stroke:rgba(255,255,255,.16);stroke-width:4;}
+.wdk-ring circle.pv{stroke:#c4a8ff;stroke-linecap:round;}
+.wdk-ring>span{position:absolute;inset:0;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;}
+.wdk-menu{position:absolute;top:12px;right:12px;z-index:4;width:32px;height:32px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(10,8,20,.45);color:#fff;font-size:15px;cursor:pointer;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.wdk-slide .wish-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;
+  width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.7);
+  display:grid;place-items:center;color:#fff;font-size:17px;padding-left:3px;box-shadow:0 4px 14px rgba(0,0,0,.5);}
+/* фокус дня — єдине вогнище колоди */
+.wdk-slide.focus{border-color:rgba(255,157,92,.5);
+  box-shadow:0 0 0 1px rgba(255,157,92,.25),0 14px 44px rgba(255,110,70,.22),0 16px 40px rgba(0,0,0,.45);}
+.wdk-fl{position:absolute;top:12px;left:12px;z-index:3;font-size:9.5px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:#ffd9b8;background:rgba(50,20,10,.55);border:1px solid rgba(255,157,92,.4);
+  border-radius:99px;padding:5px 10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.wdk-add{flex:0 0 100px;scroll-snap-align:center;border-radius:20px;border:1.5px dashed rgba(255,255,255,.22);
+  display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;
+  color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;}
+.wdk-add svg{width:22px;height:22px;}
+.wdk-dots{display:flex;gap:6px;justify-content:center;margin-top:2px;}
+.wdk-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.16);transition:all .25s;}
+.wdk-dots i.on{background:#c4a8ff;width:16px;border-radius:99px;}
+.wdk-ritual{display:flex;align-items:center;gap:11px;margin-top:14px;padding:12px 14px;border-radius:18px;
+  background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.14);}
+.wdk-ritual .ic{width:36px;height:36px;border-radius:11px;flex:none;display:grid;place-items:center;
+  background:rgba(139,124,255,.14);color:#c4a8ff;}
+.wdk-ritual .ic svg{width:16px;height:16px;}
+.wdk-ritual b{display:block;font-size:12.5px;}
+.wdk-ritual small{color:var(--muted);font-size:10.5px;display:block;margin-top:1px;line-height:1.35;}
+.wdk-ritual button{margin-left:auto;flex:none;border:0;font-family:inherit;font-size:11px;font-weight:800;
+  color:#fff;background:linear-gradient(135deg,var(--accent),#6a5ae0);border-radius:11px;padding:9px 13px;cursor:pointer;}
+/* світла тема: рамки колоди і ритуал на світлих поверхнях */
+html[data-theme="light"] .wdk-slide{border-color:rgba(32,24,72,.14);box-shadow:0 14px 34px rgba(38,30,80,.18);}
+html[data-theme="light"] .wdk-add{border-color:rgba(32,24,72,.2);}
+html[data-theme="light"] .wdk-dots i{background:rgba(32,24,72,.16);}
+html[data-theme="light"] .wdk-dots i.on{background:#6d5cf0;}
+html[data-theme="light"] .wdk-ritual{background:#fff;border-color:rgba(32,24,72,.1);box-shadow:0 4px 14px rgba(38,30,80,.08);}
+
+
+/* ── 11. КОЛАЖ «Мудборд» + банер входу на Вітрині ── */
+.clg-banner{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;border-radius:18px;cursor:pointer;
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 26px rgba(0,0,0,.3);
+  transition:transform .3s cubic-bezier(.22,1.36,.36,1);}
+.clg-banner:active{transform:scale(.97);}
+.clg-banner .stack{display:flex;flex:none;}
+.clg-banner .stack i{width:34px;height:34px;border-radius:10px;border:2px solid rgba(20,16,32,.9);
+  background:#241b3e center/cover no-repeat;margin-left:-10px;}
+.clg-banner .stack i:first-child{margin-left:0;}
+.clg-banner .t{flex:1;min-width:0;}
+.clg-banner .t b{display:block;font-size:13.5px;}
+.clg-banner .t small{display:block;font-size:10.5px;color:var(--muted);margin-top:1px;}
+.clg-banner .ar{color:var(--muted);font-size:16px;font-weight:800;}
+.clg-board{columns:2;column-gap:10px;}
+.clg-tile,.clg-quote,.clg-stick{break-inside:avoid;margin-bottom:10px;position:relative;}
+.clg-tile{cursor:pointer;transition:transform .3s cubic-bezier(.22,1.36,.36,1);}
+.clg-tile:active{transform:scale(.97);}
+.clg-ph{height:120px;border-radius:13px;background-size:cover;background-position:center;
+  border:1px solid rgba(255,255,255,.09);box-shadow:0 8px 22px rgba(0,0,0,.4);}
+.clg-tile.L .clg-ph{height:190px;} .clg-tile.S .clg-ph{height:82px;}
+.clg-cap{position:absolute;left:10px;bottom:8px;right:34px;font-size:11px;font-weight:800;color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,.75);z-index:2;line-height:1.25;}
+.clg-sz{position:absolute;top:7px;left:7px;z-index:3;font-size:8.5px;font-weight:800;color:#fff;
+  background:rgba(10,8,20,.55);border:1px solid rgba(255,255,255,.18);border-radius:99px;padding:3px 7px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.clg-mn{position:absolute;top:6px;right:6px;z-index:4;width:26px;height:26px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(10,8,20,.5);color:#fff;font-size:13px;cursor:pointer;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.clg-quote{border-radius:13px;padding:14px 13px;
+  background:linear-gradient(160deg,rgba(139,124,255,.16),rgba(139,124,255,.05));
+  border:1px solid rgba(139,124,255,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);}
+.clg-quote p{font-size:13px;font-weight:800;line-height:1.35;letter-spacing:-.01em;padding-right:20px;}
+.clg-quote small{display:block;margin-top:6px;font-size:9.5px;color:var(--skl);font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;}
+.clg-stick{text-align:center;font-size:30px;padding:8px 0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));}
+.clg-stick .clg-mn{opacity:.6;}
+.clg-bar{position:sticky;bottom:calc(96px + env(safe-area-inset-bottom));display:flex;gap:6px;margin-top:14px;padding:7px;border-radius:18px;z-index:150;
+  background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.035));
+  backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
+  border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 34px rgba(0,0,0,.4);}
+.clg-bar button{flex:1;border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:10px;
+  font-weight:800;padding:8px 2px;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:4px;}
+.clg-bar button svg{width:17px;height:17px;}
+.clg-bar button.hot{background:linear-gradient(135deg,var(--accent),#6a5ae0);color:#fff;}
+.clg-ov{position:fixed;inset:0;z-index:400;background:rgba(7,6,14,.85);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;animation:in .25s ease;}
+.clg-ov .in{text-align:center;padding:20px;max-width:340px;}
+.clg-ov img{max-width:100%;max-height:68vh;border-radius:18px;border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.clg-ov .hint{font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.5;}
+.clg-ov .cls{margin-top:12px;border:0;font-family:inherit;font-size:12px;font-weight:800;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),#6a5ae0);border-radius:12px;padding:10px 22px;}
+#scr-collage{background:
+  radial-gradient(1px 1px at 20% 18%,rgba(255,255,255,.5),transparent),
+  radial-gradient(1px 1px at 74% 10%,rgba(255,255,255,.38),transparent),
+  radial-gradient(1.5px 1.5px at 46% 32%,rgba(255,255,255,.45),transparent),
+  radial-gradient(1px 1px at 88% 52%,rgba(255,255,255,.35),transparent);}
+/* світла тема */
+html[data-theme="light"] .clg-banner{background:#fff;border-color:var(--line);box-shadow:0 4px 14px rgba(38,30,80,.08);}
+html[data-theme="light"] .clg-banner .stack i{border-color:#fff;}
+html[data-theme="light"] .clg-bar{background:rgba(255,255,255,.9);border-color:var(--line);box-shadow:0 10px 30px rgba(38,30,80,.14);}
+html[data-theme="light"] .clg-bar button.hot{color:#fff;}
+html[data-theme="light"] .clg-ph{border-color:rgba(32,24,72,.14);box-shadow:0 8px 20px rgba(38,30,80,.14);}
+
+
+/* ── 12. РАНКОВИЙ РИТУАЛ «Стрічка дня» ── */
+.rit-cal{display:flex;gap:6px;overflow-x:auto;margin:0 -18px 10px;padding:2px 18px 6px;scrollbar-width:none;}
+.rit-cal::-webkit-scrollbar{display:none}
+.rit-cal .cd{flex:none;width:44px;padding:8px 0 7px;border-radius:13px;text-align:center;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);}
+.rit-cal .cd s{text-decoration:none;display:block;font-size:8.5px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+.rit-cal .cd b{display:block;font-size:15px;margin-top:2px;}
+.rit-cal .cd i{display:block;width:5px;height:5px;border-radius:50%;margin:5px auto 0;background:transparent;}
+.rit-cal .cd.done i{background:#3ad487;}
+.rit-cal .cd.miss i{background:rgba(255,255,255,.14);}
+.rit-cal .cd.today{border-color:rgba(255,157,92,.55);background:rgba(255,157,92,.1);}
+.rit-cal .cd.today s{color:#ffd9b8;}
+.rit-streak{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:12px;}
+.rit-streak b{color:var(--fin);}
+.rit-wrap .glass{border-radius:18px;border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.03));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 26px rgba(0,0,0,.35);}
+.rit-wrap .mix{display:flex;align-items:center;gap:11px;padding:12px 14px;margin-bottom:12px;position:relative;overflow:hidden;}
+.rit-wrap .mix::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(220px 100px at 12% 120%,rgba(255,157,92,.16),transparent 70%);}
+.rit-wrap .mix>*{position:relative;z-index:1;}
+.rit-wrap .mix .pl{width:46px;height:46px;border-radius:50%;flex:none;border:0;cursor:pointer;display:grid;place-items:center;
+  background:linear-gradient(140deg,#ff9d5c,#ff5c8a);color:#fff;
+  box-shadow:0 8px 22px rgba(255,120,80,.4),inset 0 1px 0 rgba(255,255,255,.3);}
+.rit-wrap .mix .pl svg{width:17px;height:17px;}
+.rit-wrap .mix .tx{flex:1;min-width:0;}
+.rit-wrap .mix .tx b{display:block;font-size:13px;}
+.rit-wrap .mix .tx small{color:var(--muted);font-size:10.5px;display:block;margin-top:1px;line-height:1.4;}
+.rit-wrap .mix .tm{flex:none;font-size:10px;font-weight:800;color:#ffd9b8;letter-spacing:.06em;min-width:36px;text-align:right;}
+.rit-wrap .mix .rec{flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,157,92,.4);cursor:pointer;
+  background:rgba(255,157,92,.1);color:#ffd9b8;display:grid;place-items:center;position:relative;}
+.rit-wrap .mix .rec svg{width:15px;height:15px;}
+.rit-wrap .mix .rec.live::after{content:"";position:absolute;inset:-6px;border-radius:16px;
+  border:2px solid rgba(255,157,92,.5);animation:ritpulse 1.6s ease-out infinite;}
+@keyframes ritpulse{from{transform:scale(.85);opacity:1}to{transform:scale(1.2);opacity:0}}
+.rit-wrap .jr{padding:13px 14px;margin-bottom:9px;position:relative;}
+.rit-wrap .jr .lb{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--skl);font-weight:800;margin-bottom:6px;}
+.rit-wrap .jr .tx{font-size:13.5px;line-height:1.5;font-weight:600;cursor:text;padding-right:34px;}
+.rit-wrap .jr .tx.ph{color:var(--muted);opacity:.7;}
+.rit-wrap .jr .mic{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:10px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:var(--muted);display:grid;place-items:center;}
+.rit-wrap .jr .mic svg{width:14px;height:14px;}
+.rit-wrap .jr .mic.has{color:var(--skl);border-color:color-mix(in srgb,var(--accent) 45%,transparent);
+  background:color-mix(in srgb,var(--accent) 12%,transparent);}
+.rit-wrap .jr .adur{position:absolute;top:44px;right:12px;font-size:8.5px;color:var(--skl);font-weight:800;}
+.rit-sec{display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);font-weight:800;margin:14px 2px 9px;}
+.rit-sec .add{color:var(--skl);letter-spacing:.02em;cursor:pointer;}
+.rit-wrap .vrail{display:flex;gap:10px;overflow-x:auto;margin:0 -18px;padding:2px 18px 8px;scrollbar-width:none;}
+.rit-wrap .vrail::-webkit-scrollbar{display:none}
+.rit-wrap .vhint{font-size:11px;color:var(--muted);padding:14px 4px;line-height:1.5;}
+.rit-wrap .vcard{flex:0 0 210px;border-radius:16px;overflow:hidden;cursor:pointer;position:relative;
+  border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 26px rgba(0,0,0,.4);
+  transition:transform .3s cubic-bezier(.22,1.36,.36,1);}
+.rit-wrap .vcard:active{transform:scale(.96);}
+.rit-wrap .vth{height:112px;position:relative;background-size:cover;background-position:center;background-color:#1a1430;}
+.rit-wrap .vth.vempty{background:linear-gradient(150deg,#2c2050,#140e28);}
+.rit-wrap .vth::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(7,6,14,.8));}
+.rit-wrap .vth .pb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;
+  background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.7);display:grid;place-items:center;color:#fff;padding-left:2px;z-index:2;}
+.rit-wrap .vth .pb svg{width:13px;height:13px;}
+.rit-wrap .vth .vmn{position:absolute;top:7px;right:7px;z-index:3;width:26px;height:26px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(10,8,20,.5);color:#fff;font-size:13px;cursor:pointer;}
+.rit-wrap .vin{padding:9px 11px 11px;background:rgba(255,255,255,.03);}
+.rit-wrap .vin b{display:block;font-size:11.5px;line-height:1.3;}
+.rit-wrap .vin small{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:9.5px;margin-top:4px;font-weight:700;}
+.rit-wrap .vin .src{width:12px;height:12px;border-radius:4px;display:inline-grid;place-items:center;flex:none;
+  background:#ff0000;color:#fff;font-size:7px;font-weight:900;}
+.rit-done{width:100%;border:0;font-family:inherit;font-size:13px;font-weight:800;color:#fff;cursor:pointer;
+  background:linear-gradient(140deg,#ff9d5c,#ff5c8a);border-radius:15px;padding:14px;margin-top:12px;
+  box-shadow:0 8px 26px rgba(255,120,80,.35);transition:transform .3s cubic-bezier(.22,1.36,.36,1);}
+.rit-done:active{transform:scale(.97);}
+.rit-done.ok{background:linear-gradient(140deg,#2aa668,#1f7d4f);box-shadow:0 8px 26px rgba(42,166,104,.3);}
+
+/* ── Фото дня: картка запису + вхід у «Момент» ── */
+.rit-wrap .rphoto{display:flex;align-items:center;gap:11px;padding:12px 14px;margin-bottom:9px;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.22,1.36,.36,1);}
+.rit-wrap .rphoto:active{transform:scale(.98);}
+.rit-wrap .rphoto .rph-ic{width:40px;height:40px;border-radius:13px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(140deg,#c77dff,#7d6bff);color:#fff;box-shadow:0 8px 20px rgba(140,110,255,.35),inset 0 1px 0 rgba(255,255,255,.3);}
+.rit-wrap .rphoto .rph-ic svg{width:18px;height:18px;}
+.rit-wrap .rphoto .tx{flex:1;min-width:0;}
+.rit-wrap .rphoto .tx b{display:block;font-size:13px;}
+.rit-wrap .rphoto .tx small{color:var(--muted);font-size:10.5px;display:block;margin-top:2px;line-height:1.4;}
+.rit-wrap .rphoto .rph-arrow{flex:none;color:var(--muted);font-size:16px;}
+.rit-wrap .rphoto.has{padding:0;height:78px;}
+.rit-wrap .rphoto .rph-img{position:absolute;inset:0;background-size:cover;background-position:center;}
+.rit-wrap .rphoto .rph-ov{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 14px;
+  background:linear-gradient(100deg,rgba(7,6,14,.72) 40%,rgba(7,6,14,.15));z-index:1;}
+.rit-wrap .rphoto .rph-ov b{font-size:12.5px;color:#fff;}
+.rit-wrap .rphoto .rph-ov small{font-size:10px;color:rgba(255,255,255,.7);margin-top:2px;}
+.rit-wrap .rphoto .rph-menu{position:absolute;top:8px;right:8px;z-index:2;width:26px;height:26px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(10,8,20,.5);color:#fff;font-size:13px;cursor:pointer;}
+
+/* Повноекранна пауза «Момент» */
+.rmom-ov{position:fixed;inset:0;background:#050409;z-index:1400;display:flex;flex-direction:column;
+  animation:rmomIn .5s cubic-bezier(.22,1.36,.36,1);}
+@keyframes rmomIn{from{opacity:0}to{opacity:1}}
+.rmom-bg{position:absolute;inset:0;background-size:cover;background-position:center;animation:rmomZoom 12s ease-in-out infinite alternate;}
+@keyframes rmomZoom{from{transform:scale(1)}to{transform:scale(1.09)}}
+.rmom-ov::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,4,9,.55) 0%,rgba(5,4,9,.25) 40%,rgba(5,4,9,.85) 100%);}
+.rmom-top{position:relative;z-index:2;display:flex;justify-content:flex-end;padding:16px 16px 0;}
+.rmom-x{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.35);
+  color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(6px);}
+.rmom-mid{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  text-align:center;padding:0 26px 18px;}
+.rmom-tm{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#ffd9b8;margin-bottom:10px;}
+.rmom-lb{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:800;margin-bottom:6px;}
+.rmom-cap{font-size:19px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:4px;max-width:340px;}
+.rmom-hint{font-size:12px;color:rgba(255,255,255,.65);line-height:1.5;max-width:300px;}
+.rmom-bot{position:relative;z-index:2;padding:0 18px 30px;}
+.rmom-done{width:100%;border:0;font-family:inherit;font-size:14px;font-weight:800;color:#fff;cursor:pointer;
+  background:linear-gradient(140deg,#ff9d5c,#ff5c8a);border-radius:15px;padding:15px;
+  box-shadow:0 8px 26px rgba(255,120,80,.35);transition:transform .3s cubic-bezier(.22,1.36,.36,1);}
+.rmom-done:active{transform:scale(.97);}
+
+/* світла тема */
+html[data-theme="light"] .rit-wrap .glass,
+html[data-theme="light"] .rit-wrap .vin{background:#fff;}
+html[data-theme="light"] .rit-wrap .glass{border-color:var(--line);box-shadow:0 4px 14px rgba(38,30,80,.08);}
+html[data-theme="light"] .rit-cal .cd{background:#fff;border-color:var(--line);}
+html[data-theme="light"] .rit-cal .cd.miss i{background:rgba(32,24,72,.14);}
+html[data-theme="light"] .rit-wrap .vcard{border-color:var(--line);box-shadow:0 8px 20px rgba(38,30,80,.12);}
+
+@media (prefers-reduced-motion:reduce){ html.fd26t *{animation:none!important;transition:none!important} }

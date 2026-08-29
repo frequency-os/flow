@@ -1,0 +1,201 @@
+
+/* ══ Flow 2026 · Матриця: повноекранне вікно (як у прототипі E) ══ */
+.pl-mq{cursor:pointer;}
+.fdx{position:fixed;inset:0;z-index:260;display:none;flex-direction:column;
+  background:radial-gradient(120% 60% at 50% -8%,#0d0a1c 0%,#07060e 58%);color:var(--text,#eceaf6);}
+.fdx.on{display:flex;animation:fdxIn .42s cubic-bezier(.22,1.36,.36,1);}
+@keyframes fdxIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.fdx-h{display:flex;align-items:center;gap:11px;padding:calc(14px + env(safe-area-inset-top)) 16px 12px;flex:none;}
+.fdx-back{width:38px;height:38px;border-radius:13px;border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.05);color:inherit;font-size:17px;font-weight:800;flex:none;cursor:pointer;font-family:inherit;}
+.fdx-t{flex:1;min-width:0;}
+.fdx-t b{display:block;font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fdx-t small{display:block;font-size:10.5px;color:var(--muted,#8f8aa8);font-weight:800;
+  text-transform:uppercase;letter-spacing:.05em;margin-top:1px;}
+.fdx-b{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:4px 16px calc(60px + env(safe-area-inset-bottom) + var(--fdkb,0px));}
+.fdx-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 13px;}
+.fdx-tabs::-webkit-scrollbar{display:none;}
+.fdx-tabs button{flex:none;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);
+  color:var(--muted,#8f8aa8);border-radius:99px;padding:8px 13px;font-size:11.5px;font-weight:800;
+  white-space:nowrap;cursor:pointer;font-family:inherit;transition:.2s;}
+.fdx-tabs button.on{background:var(--tc,#8b7cff);border-color:transparent;color:#0c0a14;}
+.fdx-add{display:flex;gap:8px;margin:4px 0 14px;}
+.fdx-add input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);
+  border-radius:13px;padding:12px 14px;color:var(--text,#eceaf6);font-size:16px;font-weight:600;
+  outline:none;font-family:inherit;}
+.fdx-add input:focus{border-color:rgba(139,124,255,.5);}
+.fdx-add .go{border:0;border-radius:13px;padding:0 17px;font-weight:800;font-size:15px;color:#fff;
+  background:linear-gradient(135deg,#8b7cff,#6e5df0);cursor:pointer;font-family:inherit;}
+.fdx-it{display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:16px;margin-bottom:8px;
+  background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+.fdx-ck{width:27px;height:27px;border-radius:9px;border:1.8px solid rgba(255,255,255,.18);
+  background:transparent;color:transparent;font-size:12px;display:grid;place-items:center;flex:none;
+  cursor:pointer;transition:.35s cubic-bezier(.22,1.36,.36,1);}
+.fdx-it.done .fdx-ck{background:linear-gradient(135deg,#34c77b,#2aa869);border-color:transparent;
+  color:#06160e;transform:scale(1.08);}
+.fdx-tx{flex:1;min-width:0;font-size:14px;font-weight:800;overflow-wrap:break-word;cursor:pointer;
+  -webkit-user-select:none;user-select:none;}
+.fdx-it.done .fdx-tx{color:var(--muted,#8f8aa8);text-decoration:line-through;}
+.fdx-tx .fol{display:inline-flex;align-items:center;gap:3px;margin-top:5px;font-size:9.5px;font-weight:700;
+  color:var(--muted,#8f8aa8);background:rgba(255,255,255,.06);border-radius:12px;padding:3px 7px;}
+.fdx-act{display:flex;gap:5px;flex:none;}
+.fdx-act button{width:30px;height:30px;border-radius:9px;border:0;background:rgba(255,255,255,.06);
+  color:var(--muted,#8f8aa8);font-size:12px;display:grid;place-items:center;cursor:pointer;
+  font-family:inherit;transition:transform .35s cubic-bezier(.22,1.36,.36,1);}
+.fdx-act button:active{transform:scale(.88);}
+.fdx-empty{border:1.5px dashed rgba(139,124,255,.28);border-radius:16px;padding:16px;text-align:center;
+  font-size:12px;font-weight:700;color:var(--muted,#8f8aa8);}
+.fdx-more{margin:-3px 0 10px 38px;display:flex;flex-wrap:wrap;gap:5px;}
+.fdx-more button{padding:7px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.05);color:var(--muted,#8f8aa8);font-size:10.5px;font-weight:700;
+  cursor:pointer;font-family:inherit;}
+.fdx-more button.del{color:#ff6b7a;border-color:rgba(255,107,122,.3);}
+.fdx-foot{display:flex;gap:8px;margin-top:6px;}
+.fdx-foot button{flex:1;padding:11px;border-radius:13px;border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);color:var(--muted,#8f8aa8);font-size:11.5px;font-weight:700;
+  cursor:pointer;font-family:inherit;}
+.fdx-hint{font-size:10.5px;line-height:1.55;font-weight:600;color:var(--muted,#8f8aa8);margin-top:12px;}
+.fdx-hint b{color:#c4a8ff;}
+/* ── клавіатура не ховає поля вводу, iOS не зумить при фокусі ── */
+.fd-cab-b{padding-bottom:calc(50px + env(safe-area-inset-bottom) + var(--fdkb,0px))!important;}
+.fd-addrow input,.fd-note{font-size:16px!important;}
+@media (prefers-reduced-motion:reduce){.fdx,.fdx *{animation:none!important;transition:none!important}}
+
+/* ══════════════════════════════════════════════════════════════════
+   КАРТА ВІЗУАЛІЗАЦІЇ · варіант A «Подвійний скрим»
+   — обидва стани (з фото і без) мають однакову геометрію та висоту;
+   — вуаль розділена на дві: вузька зверху під шапку, м'яка знизу під текст,
+     середина знімка лишається чистою (було: linear-gradient(110deg) на всю площу);
+   — увесь текст зібрано одним блоком унизу.
+   ══════════════════════════════════════════════════════════════════ */
+#scr-home .top{position:relative;z-index:5;margin-bottom:-84px;background:transparent;}
+#scr-home .top .brand h1{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7),0 1px 3px rgba(0,0,0,.5);}
+#scr-home .top .brand span{color:rgba(255,255,255,.62);text-shadow:0 1px 8px rgba(0,0,0,.55);}
+#scr-home .top .logo{box-shadow:0 6px 20px rgba(90,70,230,.5), inset 0 1px 0 rgba(255,255,255,.3);}
+#scr-home .top .logo svg{width:21px;height:21px;}
+#scr-home .top .icon-btn{background:rgba(14,12,22,.42);border-color:rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);}
+#scr-home .top .icon-btn svg{color:#efedf7;}
+
+/* єдина геометрія картки для обох станів */
+#scr-home .summary{margin-left:-18px;margin-right:-18px;border-left:0;border-right:0;border-top:0;
+  border-radius:0 0 28px 28px;padding:112px 18px 18px;min-height:346px;
+  display:flex;flex-direction:column;justify-content:flex-end;}
+#scr-home .summary::after{display:none;}
+
+/* тло, коли фото ще нема */
+#scr-home .summary .wishgen{position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(120% 105% at 84% -4%,rgba(120,102,245,.85),transparent 58%),
+    radial-gradient(115% 100% at 2% 104%,rgba(240,144,72,.7),transparent 55%),
+    linear-gradient(162deg,#241f3f,#0d1017);}
+#scr-home .summary.has-wish .wishgen{display:none;}
+
+/* подвійний скрим: верх під шапку, низ під текст, середина чиста */
+#scr-home .summary .wishbg-ov,
+html.home-glass #scr-home .summary.has-wish .wishbg-ov{
+  background:
+    linear-gradient(180deg,rgba(4,5,9,.7),rgba(4,5,9,.24) 30%,transparent 44%),
+    linear-gradient(0deg,rgba(5,6,11,.95),rgba(5,6,11,.82) 16%,rgba(5,6,11,.4) 38%,transparent 56%),
+    linear-gradient(rgba(6,7,12,.2),rgba(6,7,12,.2));}
+
+/* порядок: підпис → число → пояснення → бар → капсула → крапки → лічильник */
+#scr-home .summary>.label{order:1;}
+#scr-home .summary>.big{order:2;}
+#scr-home .summary>.hint{order:3;}
+#scr-home .summary>.bar{order:4;}
+#scr-home .summary>.herocap{order:5;}
+#scr-home .summary>.pgdots{order:6;}
+#scr-home .summary>#nyCountdown{order:7;}
+
+/* текст читається поверх тла в обох станах */
+#scr-home .summary>.label,#scr-home .summary>.big,#scr-home .summary>.hint,
+#scr-home .summary>.bar,#scr-home .summary>.herocap,#scr-home .summary>.pgdots{position:relative;z-index:2;}
+#scr-home .summary .label{color:rgba(255,255,255,.72);font-size:10px;letter-spacing:.15em;}
+#scr-home .summary .big{color:#fff;font-size:44px;margin:4px 0 0;
+  text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.45);}
+#scr-home .summary .big small{font-size:17px;color:rgba(255,255,255,.72);}
+#scr-home .summary .hint{color:rgba(255,255,255,.78);font-size:12.5px;line-height:1.4;margin-top:6px;}
+#scr-home .summary .wishlink{display:none;}
+#scr-home .summary .herocap .hc-tab b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.4);}
+/* світла тема: картка все одно лежить на фото або на темному градієнті,
+   тому текст лишається світлим — інакше var(--text) стає темним і зникає */
+html[data-theme="light"] #scr-home .top .brand h1,
+html[data-theme="light"] #scr-home .summary .big,
+html[data-theme="light"] #scr-home .summary .herocap .hc-tab b{color:#fff;}
+html[data-theme="light"] #scr-home .summary .hint{color:rgba(255,255,255,.82);}
+html[data-theme="light"] #scr-home .summary .label{color:rgba(255,255,255,.72);}
+html[data-theme="light"] #scr-home .top .icon-btn svg{color:#efedf7;}
+html[data-theme="light"] #scr-home .summary,
+html.fd26t[data-theme="light"] #scr-home .summary{background:linear-gradient(162deg,#241f3f,#0d1017);}
+
+/* лічильник усередині картки — світлий у будь-якому стані */
+html.fd26t #scr-home .summary #nyCountdown{border-top-color:rgba(255,255,255,.2);}
+html.fd26t #scr-home .summary #nyCountdown .nyc-title,
+html.fd26t #scr-home .summary #nyCountdown .nyc-cell b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5);}
+html.fd26t #scr-home .summary #nyCountdown .nyc-cell span{color:rgba(255,255,255,.7);}
+html.fd26t #scr-home .summary #nyCountdown .nyc-emoji{color:#fff;}
+
+/* ══════════════════════════════════════════════════════════════════
+   ЗНАК FREQUENCY · «Рідке скло»
+   Прозоре тіло з backdrop-filter, блік, промінь і хвиля окремим шаром.
+   Глянець НЕ запечений у графіку — хвиля лишається чистою білою,
+   увесь блиск живе шарами над нею (правило з гайдів Apple для Liquid Glass).
+   ══════════════════════════════════════════════════════════════════ */
+/* Максимальний підйом: .phone має padding-top:26px, тому знімаємо всі 26
+   і повертаємо рівно стільки, скільки вимагає виріз/статус-бар.
+   У міні-застосунку Telegram inset = 0, тож лишається 4px повітря;
+   у нативній збірці — повний env(safe-area-inset-top), під чубчик не залізе. */
+#scr-home{margin-top:calc(max(4px,env(safe-area-inset-top)) - 26px);}
+#scr-home .top{margin-top:0;margin-bottom:-96px;}
+#scr-home .top .brand{gap:10px;}
+#scr-home .top .logo{width:38px;height:38px;}
+#scr-home .top .logo.lg-glass svg{width:20px;height:20px;}
+#scr-home .top .brand h1{font-size:20px;line-height:1.05;}
+#scr-home .top .brand span{font-size:9.5px;letter-spacing:.12em;margin-top:1px;}
+#scr-home .top .icon-btn{width:34px;height:34px;border-radius:11px;}
+
+#scr-home .top .logo.lg-glass{
+  position:relative;overflow:hidden;border-radius:30%;
+  background:linear-gradient(150deg,rgba(255,255,255,.2),rgba(255,255,255,.04) 46%,rgba(255,255,255,.13));
+  -webkit-backdrop-filter:blur(12px) saturate(1.85);backdrop-filter:blur(12px) saturate(1.85);
+  box-shadow:
+    inset 0 1.6px 0 rgba(255,255,255,.7),
+    inset 0 -1.4px 0 rgba(255,255,255,.18),
+    inset 1.4px 0 0 rgba(255,255,255,.28),
+    inset -1.4px 0 0 rgba(255,255,255,.28),
+    inset 0 -10px 16px rgba(255,255,255,.09),
+    0 12px 26px rgba(0,0,0,.42);}
+
+/* блік */
+#scr-home .top .logo.lg-glass .lg-spec{position:absolute;inset:0;z-index:2;
+  background:radial-gradient(42% 34% at 34% 20%,rgba(255,255,255,.72),transparent 66%);}
+
+/* промінь — грає двічі при вході на Огляд, далі стоїть */
+#scr-home .top .logo.lg-glass .lg-sweep{position:absolute;top:-60%;left:-45%;
+  width:34%;height:220%;z-index:3;opacity:0;transform:rotate(18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);filter:blur(3px);}
+#scr-home .top .logo.lg-play .lg-sweep{animation:lgSweep 2.6s cubic-bezier(.5,0,.25,1) .35s 2;}
+@keyframes lgSweep{0%{left:-45%;opacity:0}12%{opacity:1}70%{left:118%;opacity:1}100%{left:118%;opacity:0}}
+
+/* хвиля */
+#scr-home .top .logo.lg-glass svg{position:relative;z-index:4;width:21px;height:21px;overflow:visible;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));}
+#scr-home .top .logo.lg-glass .lg-w{stroke:#fff;stroke-width:2.6;stroke-linecap:round;
+  stroke-linejoin:round;fill:none;stroke-dasharray:60;stroke-dashoffset:0;}
+#scr-home .top .logo.lg-play .lg-w{animation:lgDraw .9s cubic-bezier(.5,0,.25,1);}
+@keyframes lgDraw{from{stroke-dashoffset:60}to{stroke-dashoffset:0}}
+
+/* коли фото ще нема — скло світить на градієнті .wishgen, а не на порожнечі */
+#scr-home .top .logo.lg-glass{box-shadow:
+    inset 0 1.6px 0 rgba(255,255,255,.7),
+    inset 0 -1.4px 0 rgba(255,255,255,.18),
+    inset 1.4px 0 0 rgba(255,255,255,.28),
+    inset -1.4px 0 0 rgba(255,255,255,.28),
+    inset 0 -10px 16px rgba(255,255,255,.09),
+    0 12px 26px rgba(0,0,0,.42), 0 0 26px rgba(125,139,255,.22);}
+
+@media (prefers-reduced-motion:reduce){
+  #scr-home .top .logo.lg-play .lg-w,#scr-home .top .logo.lg-play .lg-sweep{animation:none;}}

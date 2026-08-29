@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="format-detection" content="telephone=no">
+<title>Frequency</title>
+<script>@@INC:scripts/01-crash-screen.js@@</script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>@@INC:scripts/02-vendor-lz-string.js@@</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Lora:wght@600;700&family=Caveat:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<style>@@INCDIR:styles/core@@</style>
+<style>@@INC:styles/02-income-cards.css@@</style>
+<style id="patterns-css">@@INC:styles/03-patterns.css@@</style>
+<style id="diary-css">@@INC:styles/04-diary.css@@</style>
+</head>
+<body>
+<!-- ===== банер: сховище переповнене ===== -->
+<div id="quotaBanner" style="display:none;position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:99999;
+  background:linear-gradient(135deg,#3a2410,#241608);border:1px solid rgba(232,132,60,.5);border-radius:14px;
+  padding:13px 14px;box-shadow:0 12px 34px rgba(0,0,0,.55);font-family:Manrope,system-ui,sans-serif;">
+  <div style="display:flex;align-items:flex-start;gap:11px;">
+    <span style="font-size:20px;line-height:1">⚠️</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:800;font-size:13.5px;color:#fff;">Пам'ять пристрою заповнена</div>
+      <div id="quotaBannerMsg" style="font-size:12px;color:rgba(255,255,255,.82);margin-top:3px;line-height:1.45">
+        Дані збережено в хмару Telegram, але локальна копія може відставати. Звільни місце або очисти старі дані.</div>
+    </div>
+    <button onclick="document.getElementById('quotaBanner').style.display='none'"
+      style="background:transparent;border:0;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;padding:0 2px;line-height:1">×</button>
+  </div>
+</div>
+<script>@@INC:scripts/03-quota-banner.js@@</script>
+<!-- ===== finance line-icon sprite ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="fi-tracker" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+  <symbol id="fi-chart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="fi-analysis" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 17l5-5 4 4 8-9M21 7h-4M21 7v4"/></symbol>
+  <symbol id="fi-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M3 10h18M16 14h2"/></symbol>
+  <symbol id="fi-trophy" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 4h12v4a6 6 0 01-12 0zM6 6H3v1a3 3 0 003 3M18 6h3v1a3 3 0 01-3 3M9 20h6M12 14v6"/></symbol>
+  <symbol id="fi-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></symbol>
+  <symbol id="fi-plane" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M22 4L11 13M22 4l-7 18-4-9-9-4z"/></symbol>
+  <symbol id="fi-handshake" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 8l4-2 5 3 5-3 4 2v7l-4 2-3-2-2 2-2-2-3 2-4-2zM12 9v6"/></symbol>
+  <symbol id="fi-receipt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M5 3l1.5 1.5L8 3l1.5 1.5L11 3l1 1 1-1 1.5 1.5L16 3l1.5 1.5L19 3v18l-1.5-1.5L16 21l-1.5-1.5L13 21l-1-1-1 1-1.5-1.5L8 21l-1.5-1.5L5 21z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 9h8M8 13h5"/></symbol>
+  <symbol id="fi-repeat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17 2l4 4-4 4M3 11V9a4 4 0 014-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"/></symbol>
+  <symbol id="fi-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M5 12l7-7 7 7"/></symbol>
+  <symbol id="fi-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12l7 7 7-7"/></symbol>
+  <symbol id="fi-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></symbol>
+</defs></svg>
+<!-- ===== DESKTOP SIDEBAR (показується тільки на широкому екрані) ===== -->
+<aside class="dsb" id="desktopSidebar">
+  <div class="dsb-brand"><div class="dsb-logo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path class="fd-wave-draw" pathLength="100" d="M2 12c2.3 0 2.3-6.8 4.6-6.8s2.3 13.6 4.6 13.6 2.3-13.6 4.6-13.6 2.3 6.8 4.6 6.8 2.3-3.7 4.6-3.7"/></svg></div><div class="dsb-nm">Frequency<small>твоя система вибору хвилі</small></div>
+  </div>
+  <nav class="dsb-nav">
+    <button class="dsb-i on" data-dnav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10.5V19a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19v-8.5"/><path d="M10 20.5v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/></svg><span>Огляд</span></button>
+    <button class="dsb-i" data-dnav="ai"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M11 6c.6 3.6 2.2 5.2 5.8 5.8.4.07.4.63 0 .7-3.6.6-5.2 2.2-5.8 5.8-.07.4-.63.4-.7 0-.6-3.6-2.2-5.2-5.8-5.8-.4-.07-.4-.63 0-.7 3.6-.6 5.2-2.2 5.8-5.8.07-.4.63-.4.7 0z"/><path d="M18.7 2.6c.33 1.95 1.2 2.82 3.15 3.15.28.05.28.45 0 .5-1.95.33-2.82 1.2-3.15 3.15-.05.28-.45.28-.5 0-.33-1.95-1.2-2.82-3.15-3.15-.28-.05-.28-.45 0-.5 1.95-.33 2.82-1.2 3.15-3.15.05-.28.45-.28.5 0z"/></svg><span>Флоу</span></button>
+    <button class="dsb-i" data-dnav="folders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5a2 2 0 0 1 2-2h3.2a1.5 1.5 0 0 1 1.2.6l1 1.3a1.5 1.5 0 0 0 1.2.6H18.5a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/></svg><span>Папки</span></button>
+    <button class="dsb-i" data-dnav="planner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M8 3v3M16 3v3"/></svg><span>Планер</span></button>
+    <button class="dsb-i" data-dnav="finance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg><span>Гроші</span></button>
+    <button class="dsb-i" data-dnav="projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 20 8l-8 4.5L4 8z"/><path d="M4 12.2l8 4.5 8-4.5"/><path d="M4 16.4l8 4.5 8-4.5"/></svg><span>Проєкти</span></button>
+    <button class="dsb-i" data-dnav="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Ще</span></button>
+  </nav>
+  <div class="dsb-foot" id="dsbFoot" title="Профіль">
+    <div class="dsb-av" id="dsbAv"></div>
+    <div class="dsb-fnm" id="dsbNm">Гість<small>Frequency</small></div>
+    <svg class="dsb-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>
+  </div>
+</aside>
+<button id="sidebarReveal" title="Показати панель"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+<!-- список блоків для 3-панельного режиму Простору (десктоп) -->
+<div class="pane-list" id="paneList"></div>
+<!-- права панель віджетів для Огляду (десктоп, Варіант 3) -->
+<aside class="rrail" id="rightRail"></aside>
+<div class="phone">
+
+  <!-- ===== SCREEN: DASHBOARD ===== -->
+  <section class="screen active" id="scr-home">
+    <div class="top">
+      <div class="brand"><div class="logo lg-glass" id="brandMark" title="Frequency"><i class="lg-spec"></i><i class="lg-sweep"></i><svg viewBox="0 0 24 24" fill="none"><path class="lg-w" d="M2 12h3.2l2.4-6.6 3.8 13.2 2.9-8.4 1.9 3.8H22"/></svg></div><div><h1>Frequency</h1><span>сценарій пишеш ти</span></div></div>
+      <div style="display:flex;gap:8px;">
+        <div class="icon-btn" id="themeToggle" title="Тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 019.5 3.5a8.5 8.5 0 1011 11z"/></svg></div>
+        <div class="icon-btn space-layout-toggle" id="homeWidgetsToggle" title="Панель віджетів"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.2"/><path d="M14 4v16"/></svg></div>
+        <div class="icon-btn" id="dashSettingsBtn" title="Налаштування"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg></div>
+      </div>
+    </div>
+    <div class="summary" id="summaryCard" style="cursor:pointer">
+      <div class="wishgen" id="wishGen"></div>
+      <div class="wishslides" id="wishSlides" style="display:none"></div>
+      <div class="wishbg-ov" id="wishBgOv" style="display:none"></div>
+      <div class="wishlink">Карта бажань ›</div>
+      <div class="label">Прогрес місяця</div>
+      <div class="big" id="heroPctBig">0<small>%</small></div>
+      <div class="hint" id="heroPctHint">Ще нема даних цього місяця.</div>
+      <div class="bar"><i id="heroBarFill"></i></div>
+      <div class="herocap" id="heroCap">
+        <button class="hc-tab wish" id="btnWishMap" onclick="event.stopPropagation();window.goWishes&&window.goWishes();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></svg>
+          <b>Карта бажань</b>
+        </button>
+        <button class="hc-tab diary" id="btnDiary" onclick="event.stopPropagation();window.goDiary&&window.goDiary();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M6 3v18"/><path d="M9 8h6M9 12h6"/></svg>
+          <b>Щоденник</b>
+        </button>
+      </div>
+      <div class="pgdots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+      <div class="wishdots" id="wishDots" style="display:none"></div>
+    </div>
+    <div class="nyc" id="nyCountdown" style="cursor:pointer" onclick="window.goNYC&&window.goNYC()">
+      <div class="nyc-head"><span class="nyc-emoji">🎄</span><span class="nyc-title" id="nycTitle">До Нового року</span></div>
+      <div class="nyc-grid">
+        <div class="nyc-cell"><b id="nycD">0</b><span>днів</span></div>
+        <div class="nyc-cell"><b id="nycH">0</b><span>год</span></div>
+        <div class="nyc-cell"><b id="nycM">0</b><span>хв</span></div>
+        <div class="nyc-cell"><b id="nycS">0</b><span>сек</span></div>
+      </div>
+    </div>
+    <div class="sec"><h3>📁 Папки</h3><div class="sec-actions"><div class="fvseg" id="folderViewSeg">
+      <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></button>
+      <button data-fv="mag" title="Журнал"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 5v6M8 14v6"/></svg></button>
+    </div><div class="count" id="folderCountBadge">5</div></div></div>
+    <div class="foh-row">
+      <div class="proj-rail" id="projRail"></div>
+      <div class="grid" id="folderGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN: FOLDER ===== -->
+  <section class="screen" id="scr-folder">
+    <button class="back" id="folderBack">‹ Папки</button>
+    <div class="ph" id="folderHead" style="display:flex;align-items:flex-end;justify-content:space-between;">
+      <div>
+        <div class="ey">Папка · <b id="fEy"></b></div>
+        <h2><span class="em" id="fEm"></span><span id="fName"></span></h2>
+      </div>
+      <div class="icon-btn" id="folderView" title="Вигляд" style="margin-bottom:6px;">🔲</div>
+    </div>
+    <div id="folderBody"></div>
+  </section>
+
+  <!-- ===== SCREEN: DEBTS WIDGET ===== -->
+  <section class="screen" id="scr-debts">
+    <button class="back" id="debtsBack" style="--c:var(--fin)">‹ Фінанси</button>
+    <div class="ph" style="--c:var(--owe)">
+      <div class="ey">Фінанси · <b>Борги</b></div>
+      <h2><span class="em" style="background:color-mix(in srgb,var(--owe) 16%,transparent)">🤝</span>Хто кому винен</h2>
+    </div>
+
+    <div class="balance">
+      <div class="bcard" style="--bc:var(--owe)"><div class="t"><i></i>Я винен</div><div class="v" id="sumOwe">0 <small>₴</small></div></div>
+      <div class="bcard" style="--bc:var(--owed)"><div class="t"><i></i>Мені винні</div><div class="v" id="sumOwed">0 <small>₴</small></div></div>
+    </div>
+    <div class="netbar"><div class="t">Чистий баланс</div><div class="v" id="net">0 ₴</div></div>
+
+    <div class="form">
+      <div class="lab">+ Новий запис</div>
+      <div class="seg">
+        <button class="on" data-k="owe"><i></i>Я винен</button>
+        <button data-k="owed"><i></i>Мені винні</button>
+      </div>
+      <input id="name" class="mb" placeholder="Ім'я людини (напр. Петро)" maxlength="40">
+      <div class="row">
+        <input id="amount" type="number" inputmode="decimal" placeholder="Сума" min="0" step="0.01">
+        <select id="cur"><option>UAH</option><option>USD</option><option>EUR</option><option>PLN</option></select>
+        <input id="date" type="date">
+      </div>
+      <input id="note" class="mb" placeholder="Причина / коментар (необов'язково)…" maxlength="80">
+      <button class="add" id="add">+ Додати запис</button>
+    </div>
+
+    <div class="lsec"><h3>Записи</h3><div class="cnt" id="cnt">0</div></div>
+    <div id="list"></div>
+  </section>
+
+  <!-- ===== SCREEN: PATTERNS · перехват лазівок + трансформація ===== -->
+  <section class="screen" id="scr-patterns">
+    <button class="back" id="patternsBack" style="--c:var(--owe)">‹ Огляд</button>
+    <div class="ph" style="--c:var(--owe)">
+      <div class="ey">Дисципліна · <b>Патерни</b></div>
+      <h2><span class="em" style="background:color-mix(in srgb,var(--owe) 16%,transparent)">🧠</span>Мозок vs Я</h2>
+    </div>
+
+    <div class="pat-seg">
+      <button class="on" id="patTabI">🛑 Перехват</button>
+      <button id="patTabT">🔄 4 місяці</button>
+    </div>
+
+    <!-- ВИД 1: ПЕРЕХВАТ -->
+    <div id="patViewI">
+      <div class="balance">
+        <div class="bcard" style="--bc:var(--owed)"><div class="t"><i></i>Я перехопив</div><div class="v" id="patWin">0</div></div>
+        <div class="bcard" style="--bc:var(--owe)"><div class="t"><i></i>Мозок виграв</div><div class="v" id="patLose">0</div></div>
+      </div>
+      <div class="netbar"><div class="t">Рахунок</div><div class="v" id="patNet">0 : 0</div></div>
+
+      <button class="pat-panic" id="patPanicBtn">Мозок торгується зараз<small>натисни в момент спокуси</small></button>
+      <div class="pat-panel" id="patPanel">
+        <div class="pat-sub"><div class="pat-qh">Мозок уже казав це — і ось чим закінчилось:</div><div id="patLies"></div></div>
+        <div class="pat-sub"><div class="pat-qh">Твої готові розриви:</div><div id="patBreaks"></div></div>
+        <div class="pat-decide">
+          <button class="pat-dwin" id="patDWin">✓ Перехопив</button>
+          <button class="pat-dlose" id="patDLose">✕ Розібрати зрив</button>
+        </div>
+      </div>
+
+      <div class="form">
+        <div class="lab">⛓️ Розбір зриву</div>
+        <input class="mb" id="patTrigger" placeholder="1 · Тригер — що сталось ззовні" maxlength="80">
+        <input class="mb" id="patThought" placeholder="2 · Лазівка — фраза мозку дослівно" maxlength="80">
+        <input class="mb" id="patAction" placeholder="3 · Дія — що зробив" maxlength="80">
+        <input class="mb" id="patConseq" placeholder="4 · Наслідок — як почувався" maxlength="80">
+        <input class="mb" id="patBreak" placeholder="⚡ Розрив — де можна було зупинити" maxlength="120" style="border-color:var(--owed)">
+        <button class="add" id="patAdd">Зберегти ланцюг</button>
+      </div>
+
+      <div class="lsec"><h3>Ланцюги</h3><div class="cnt" id="patCnt">0</div></div>
+      <div id="patList"></div>
+    </div>
+
+    <!-- ВИД 2: ТРАНСФОРМАЦІЯ 4 МІСЯЦІ -->
+    <div id="patViewT" style="display:none">
+      <div class="pat-phases">
+        <div class="pat-pi" style="--pc:#e0b64a"><b><i>1</i>Виявлення</b><span>30 дн: фіксуй тригери й причини. Без тиску.</span></div>
+        <div class="pat-pi" style="--pc:#6a7dff"><b><i>2</i>Заміна</b><span>30 дн: у момент тригера — новий патерн.</span></div>
+        <div class="pat-pi" style="--pc:#9b7dff"><b><i>3</i>Закріплення</b><span>30 дн: новий = типова відповідь.</span></div>
+        <div class="pat-pi" style="--pc:#34c77b"><b><i>4</i>Автоматизм</b><span>30 дн: працює без зусиль. Новий рівень.</span></div>
+      </div>
+      <div class="form">
+        <div class="lab">+ Патерн на заміну</div>
+        <button class="pat-seed" id="patSeed">✨ приклад: емоційні покупки → конверти</button>
+        <input class="mb" id="patTOld" placeholder="Старий патерн — що робиш зараз" maxlength="100">
+        <input class="mb" id="patTCause" placeholder="Причина — який страх/потреба за цим" maxlength="120">
+        <input class="mb" id="patTNew" placeholder="Новий патерн — на що заміняєш" maxlength="100" style="border-color:var(--owed)">
+        <input class="mb" id="patTTools" placeholder="Інструменти — конкретні правила" maxlength="160">
+        <input class="mb" id="patTStart" type="date">
+        <button class="add" id="patTAdd">Почати 4-місячний цикл</button>
+      </div>
+      <div class="lsec"><h3>Активні заміни</h3><div class="cnt" id="patTCnt">0</div></div>
+      <div id="patTList"></div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN: INCOME · VIRTUAL CARDS ===== -->
+  <section class="screen" id="scr-income">
+    <button class="back" id="incomeBack" style="--c:var(--fin)">‹ Фінанси</button>
+    <div class="ph" style="--c:#34c77b">
+      <div class="ey">Фінанси · <b>Доходи</b></div>
+      <h2><span class="em" style="background:rgba(52,199,123,.16)">💳</span>Мої картки</h2>
+    </div>
+    <div id="incomeBody"></div>
+  </section>
+
+  <!-- ===== SCREEN: ANALYTICS ===== -->
+  <section class="screen" id="scr-analytics">
+    <button class="back" id="analyticsBack" style="--c:var(--fin)">‹ Фінанси</button>
+    <div class="ph" style="--c:#5b8def">
+      <div class="ey">Фінанси · <b>Аналітика</b></div>
+      <h2><span class="em" style="background:rgba(91,141,239,.16)">📈</span>Ріст і спад</h2>
+    </div>
+    <div id="analyticsBody"></div>
+  </section>
+
+  <!-- ===== SCREEN: FIN LITERACY ===== -->
+  <section class="screen" id="scr-finlit">
+    <button class="back" id="finlitBack" style="--c:var(--fin)">‹ Фінанси</button>
+    <div class="ph" style="--c:#f0b429">
+      <div class="ey">Фінанси · <b>Грамотність</b></div>
+      <h2><span class="em" style="background:rgba(240,180,41,.16)">🎓</span>Моя фінансова грамотність</h2>
+    </div>
+    <div id="finlitBody"></div>
+  </section>
+
+  <!-- ===== SCREEN: SPENDING WIDGET ===== -->
+  <section class="screen" id="scr-spend">
+    <button class="back" id="spendBack" style="--c:var(--fin)">‹ Фінанси</button>
+    <div class="ph" style="--c:#f0b429">
+      <div class="ey">Фінанси · <b>Витрати</b></div>
+      <h2><span class="em" style="background:color-mix(in srgb,#f0b429 16%,transparent)">🧾</span>Куди йдуть гроші</h2>
+    </div>
+
+    <div class="balance">
+      <div class="bcard" style="--bc:#f0b429"><div class="t"><i></i>Витрачено</div><div class="v" id="spTotal">0 <small>₴</small></div></div>
+      <div class="bcard" style="--bc:var(--owed)"><div class="t"><i></i>Записів</div><div class="v" id="spCount">0</div></div>
+    </div>
+
+    <div class="form">
+      <div class="lab">+ Додати витрати</div>
+      <input id="spInput" class="mb" placeholder="напр.: кава 80, обід 220, продукти 640">
+      <div class="hintline">Пиши одним рядком через кому. Категорію вгадаю сама, або вкажи: «таксі 180 #транспорт».</div>
+      <button class="add" id="spAdd">+ Розкласти й додати</button>
+    </div>
+
+    <div class="catwrap" id="spCats"></div>
+
+    <div class="lsec"><h3>Останні</h3><div class="cnt" id="spLogCount">0</div></div>
+    <div id="spLog"></div>
+    <div id="spTools"></div>
+  </section>
+
+  <!-- ===== SCREEN: WORK TRACKER ===== -->
+  <section class="screen" id="scr-work">
+    <div class="wk-headrow">
+      <button class="back" id="workBack" style="--c:#6a7dff">‹ Назад</button>
+      <button class="wk-spaces-btn" id="wkSpacesBtn">📋 Простори</button>
+    </div>
+    <div class="ph" style="--c:#6a7dff">
+      <div class="ey">Папка · <b>Робота</b></div>
+      <h2><span class="em" style="background:color-mix(in srgb,#6a7dff 16%,transparent)">💼</span>Години та заробіток</h2>
+    </div>
+
+    <!-- місяць + валюта -->
+    <div class="wk-toprow">
+      <button class="wk-month" id="wkMonthBtn"><span id="wkMonthLbl">—</span></button>
+      <select class="wk-cursel" id="wkCur">
+        <option value="UAH">Гривня ₴</option>
+        <option value="EUR">Євро €</option>
+        <option value="USD">Долар $</option>
+        <option value="PLN">Злотий zł</option>
+      </select>
+    </div>
+
+    <!-- перемикачі блоків -->
+    <div class="wk-toggles" id="wkToggles">
+      <button data-wktog="stats" class="on">Картки</button>
+      <button data-wktog="salary" class="on">Зарплата</button>
+      <button data-wktog="rate" class="on">Ставка</button>
+      <button data-wktog="extras" class="on">Аванси</button>
+    </div>
+
+    <!-- 3 картки підсумку місяця -->
+    <div class="wk-stats wk-block" data-wkblock="stats">
+      <div class="wk-stat"><div class="v" style="color:#6a7dff" id="wkHours">0 <small>год</small></div><div class="l">ГОДИН</div></div>
+      <div class="wk-stat"><div class="v" style="color:#34c77b" id="wkDays">0</div><div class="l">РОБОЧИХ ДНІВ</div></div>
+      <div class="wk-stat"><div class="v" id="wkEarned">0</div><div class="l">ЗАРПЛАТА</div></div>
+    </div>
+
+    <!-- очікується зарплата -->
+    <div class="wk-salary wk-block" data-wkblock="salary">
+      <div class="wk-salary-top">
+        <div class="wk-salary-lab"><span class="dot"></span>ОЧІКУЄТЬСЯ ЗАРПЛАТА</div>
+        <button class="wk-salary-link alloc-btn" id="wkAllocBtn">✉️ Розподілити</button>
+      </div>
+      <div class="wk-salary-amt" id="wkSalaryAmt">0</div>
+      <div class="wk-salary-sub" id="wkSalarySub">Признач ставку й познач дні — порахую зарплату.</div>
+    </div>
+
+    <!-- ставка + день зарплати -->
+    <div class="wk-inputs compact wk-block" data-wkblock="rate">
+      <div class="wk-inp">
+        <div class="wk-inp-lab">💼 СТАВКА</div>
+        <div class="wk-inp-field">
+          <input id="wkRate" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0">
+          <span class="wk-suffix" id="wkRateUnit">€/год</span>
+        </div>
+      </div>
+      <div class="wk-inp">
+        <div class="wk-inp-lab">💰 ДЕНЬ ЗАРПЛАТИ</div>
+        <div class="wk-inp-field">
+          <input id="wkPayday" type="number" inputmode="numeric" min="1" max="31" placeholder="31">
+          <span class="wk-suffix">числа</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- аванси / премії / витрати місяця -->
+    <div class="wk-extras wk-block" data-wkblock="extras">
+      <div class="wk-extras-head">
+        <span class="wk-extras-lab">За місяць</span>
+        <span class="wk-extras-net" id="wkExtrasNet">±0</span>
+      </div>
+      <div class="wk-extras-chips">
+        <button data-extra="advance"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ff6b6f" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>Аванс</button>
+        <button data-extra="bonus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#34c77b" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Премія</button>
+        <button data-extra="expense"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e8843c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l2 2v14l-3-2-3 2-3-2-3 2V4z"/><path d="M8 9h6M8 13h6"/></svg>Витрата</button>
+      </div>
+      <div id="wkExtrasList"></div>
+    </div>
+
+    <!-- календар (нижче) -->
+    <div class="wkcal">
+      <div class="wk-monthstrip" id="wkMonthStrip"></div>
+      <div class="wkcal-head">
+        <button id="wkCalPrev" class="wkcal-nav">‹</button>
+        <div class="wkcal-title"><span id="wkCalMonth">—</span><small class="wkcal-hint">Клікни на день</small></div>
+        <button id="wkCalNext" class="wkcal-nav">›</button>
+      </div>
+      <div class="wkcal-grid" id="wkCalGrid"></div>
+    </div>
+
+    <div class="lsec"><h3>Зміни</h3><div class="cnt" id="wkLogCount">0</div></div>
+    <div id="wkLog"></div>
+    <div id="wkTools"></div>
+
+    <!-- приховані елементи для сумісності з існуючою логікою -->
+    <input id="wkHrsInput" type="hidden">
+    <input id="wkDate" type="hidden">
+    <input id="wkNote" type="hidden">
+    <div id="wkPreview" style="display:none"></div>
+    <button id="wkAdd" style="display:none"></button>
+    <button id="wkMonthBtnPrev" style="display:none"></button>
+  </section>
+
+  <!-- ===== modal: ввід годин на дату ===== -->
+  <div class="wkm-back" id="wkmBack">
+    <div class="wkm">
+      <div class="wkm-date"><span class="ic">🗓</span><span id="wkmTitle">—</span></div>
+      <div class="wkm-lab">ГОДИН ВІДПРАЦЬОВАНО</div>
+      <div class="wkm-stepper">
+        <button id="wkmMinus">−</button>
+        <input id="wkmHours" type="number" inputmode="decimal" min="0" step="0.5" value="0">
+        <button id="wkmPlus">+</button>
+      </div>
+      <div class="wkm-chips" id="wkmChips"></div>
+      <div class="wkm-money" id="wkmMoney">—</div>
+      <div class="wkm-lab">НОТАТКА</div>
+      <input id="wkmNote" class="wkm-note" placeholder="Що робив…">
+      <button class="wkm-save" id="wkmSave">Зберегти</button>
+      <button class="wkm-cancel" id="wkmCancel">Скасувати</button>
+    </div>
+  </div>
+
+  <!-- ===== modal: розподіл зарплати наперед по конвертах ===== -->
+  <div class="wkm-back" id="allocBack">
+    <div class="wkm" style="max-width:380px">
+      <div class="wkm-date"><span class="ic">✉️</span>Розподіл наперед</div>
+      <div class="alloc-summary">
+        <div class="alloc-srow"><span>Зарплата</span><b id="allocTotal">0</b></div>
+        <div class="alloc-srow"><span>Розподілено</span><b id="allocPlanned" style="color:#6a7dff">0</b></div>
+        <div class="alloc-srow"><span>Вільно</span><b id="allocFree" style="color:#34c77b">0</b></div>
+        <div class="alloc-progress"><i id="allocBar" style="width:0%"></i></div>
+      </div>
+      <div class="wkm-lab" style="margin-top:14px">КОНВЕРТИ — закинь наперед</div>
+      <div id="allocList"></div>
+      <button class="wkm-save" id="allocSave">Зберегти план</button>
+      <button class="wkm-cancel" id="allocCancel">Закрити</button>
+    </div>
+  </div>
+
+  <!-- ===== modal: аванс / премія / витрата ===== -->
+  <div class="wkm-back" id="extraBack">
+    <div class="wkm">
+      <div class="wkm-date"><span class="ic" id="extraIc">➖</span><span id="extraTitle">Аванс</span></div>
+      <div class="wkm-lab" id="extraLab">СУМА</div>
+      <div class="wkm-stepper">
+        <button id="extraMinus">−</button>
+        <input id="extraAmt" type="number" inputmode="decimal" min="0" step="10" value="0">
+        <button id="extraPlus">+</button>
+      </div>
+      <div class="wkm-chips" id="extraChips"></div>
+      <div class="wkm-lab">КОМЕНТАР</div>
+      <input id="extraNote" class="wkm-note" placeholder="За що…">
+      <button class="wkm-save" id="extraSave">Додати</button>
+      <button class="wkm-cancel" id="extraCancel">Скасувати</button>
+    </div>
+  </div>
+
+  <!-- ===== modal: вибір віджета для папки ===== -->
+  <div class="wkm-back" id="wpkBack">
+    <div class="wkm" style="max-width:380px">
+      <div class="wkm-date"><span class="ic">🧩</span><span id="wpkTitle">Додати віджет</span></div>
+      <div id="wpkList"></div>
+      <button class="wkm-cancel" id="wpkCancel" style="margin-top:8px">Закрити</button>
+    </div>
+  </div>
+
+  <section class="screen" id="scr-agency">
+    <div class="ag-headrow">
+      <button class="back" id="agencyBack" style="--c:#6a7dff">‹ Назад</button>
+      <button class="wk-spaces-btn" id="agencySpacesBtn">📋 Блоки</button>
+    </div>
+    <div class="ph" style="--c:#6a7dff">
+      <div class="ey">Проєкт · <b>Словаччина</b></div>
+      <h2><span class="em" style="background:color-mix(in srgb,#6a7dff 16%,transparent)">🇸🇰</span>Агенція</h2>
+    </div>
+    <div class="ag-seg" id="agTabs">
+      <div class="segpill" id="agSegPill"></div>
+      <button class="ag-tab on" data-agp="home">🏠 Огляд</button>
+      <button class="ag-tab" data-agp="ptr">🤝 Партнерство</button>
+      <button class="ag-tab" data-agp="fin">💰 Фінанси</button>
+      <button class="ag-tab" data-agp="cli">👥 Клієнти</button>
+      <button class="ag-tab" data-agp="doc">📁 Документи</button>
+      <button class="ag-tab" data-agp="mkt">📣 Маркетинг</button>
+      <button class="ag-tab" data-agp="ops">⚙️ Операційка</button>
+    </div>
+    <div class="ag-pane on" data-agpane="home" id="agPaneHome"></div>
+    <div class="ag-pane" data-agpane="ptr" id="agPanePtr"></div>
+    <div class="ag-pane" data-agpane="fin" id="agPaneFin"></div>
+    <div class="ag-pane" data-agpane="cli" id="agPaneCli"></div>
+    <div class="ag-pane" data-agpane="doc" id="agPaneDoc"></div>
+    <div class="ag-pane" data-agpane="mkt" id="agPaneMkt"></div>
+    <div class="ag-pane" data-agpane="ops" id="agPaneOps"></div>
+  </section>
+
+  <section class="screen" id="scr-client">
+    <div class="ag-headrow">
+      <button class="back" id="clientBack" style="--c:#6a7dff">‹ Клієнти</button>
+    </div>
+    <div class="ph" style="--c:#6a7dff">
+      <div class="ey">Клієнт · <b>Агенція SK</b></div>
+      <h2 id="clientName">—</h2>
+    </div>
+    <div id="clientBody"></div>
+  </section>
+
+  <section class="screen" id="scr-space">
+    <button class="back" id="spaceBack" style="display:none">‹ Папки</button>
+    <div class="top">
+      <div class="brand"><div class="logo">🧩</div><div><h1>Простір</h1><span id="spaceSub">твоя дошка</span></div></div>
+      <div style="display:flex;gap:8px;">
+        <div class="icon-btn" id="spaceCfgBtn" title="Налаштування просторів"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div class="icon-btn" id="viewToggle" title="Вигляд">🔲</div>
+        <div class="icon-btn" id="boardSearchBtn" title="Пошук по дошці"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+        <div class="icon-btn" id="spaceMoreBtn" title="Ще дії"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></div>
+        <div id="spaceHiddenBtns" style="display:none"><div class="icon-btn space-layout-toggle" id="spaceFullToggle" title="Простір на весь екран"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg></div><div class="icon-btn space-layout-toggle" id="spaceLayoutToggle" title="Лейаут: класичний / три панелі"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6" height="16" rx="1.5"/><rect x="11" y="4" width="10" height="16" rx="1.5"/></svg></div><div class="icon-btn" id="boardWideToggle" title="Ширина дошки">↔️</div><div class="icon-btn" id="canvasToggle" title="Вільне полотно: блоки будь-де"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="3" width="8" height="10" rx="1.5"/><rect x="3" y="12" width="8" height="9" rx="1.5"/><rect x="13" y="16" width="8" height="5" rx="1.5"/></svg></div><div class="icon-btn" id="proThemeToggle" title="Pro-стиль">✨</div><div class="icon-btn" id="zenToggle" title="Повний екран (zen)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></div><div class="icon-btn" id="spaceClear" title="Очистити"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></div></div>
+      </div>
+    </div>
+    <div class="space-switcher" id="spaceSwitcher"></div>
+    <div class="boardtabs" id="boardTabs"></div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <!-- ============ ЧИТАЛКА КНИГ ============ -->
+  <section class="screen" id="scr-reader">
+    <div class="rdr-topbar">
+      <button class="rdr-tb-btn" id="rdrBack" title="Назад">‹</button>
+      <div class="rdr-tb-title"><span id="rdrTitle">Книга</span><small id="rdrAuthor"></small></div>
+      <button class="rdr-tb-btn" id="rdrBmAdd" title="Закладка">🔖</button>
+      <button class="rdr-tb-btn" id="rdrBmList" title="Закладки та зміст">☰</button>
+      <button class="rdr-tb-btn" id="rdrCfg" title="Налаштування читання">Aa</button>
+      <button class="rdr-tb-btn" id="rdrFull" title="На весь екран">⛶</button>
+    </div>
+    <!-- плаваюча кнопка виходу з повноекранного режиму -->
+    <button class="rdr-fab-exit" id="rdrFullExit" title="Показати панелі">⛶</button>
+    <!-- зум для PDF -->
+    <div class="rdr-zoom" id="rdrZoom" style="display:none">
+      <button id="rdrZoomOut" title="Зменшити">−</button>
+      <span id="rdrZoomVal">100%</span>
+      <button id="rdrZoomIn" title="Збільшити">+</button>
+    </div>
+    <div class="rdr-progress"><i id="rdrProgFill"></i></div>
+    <div class="rdr-scroll" id="rdrScroll">
+      <div class="rdr-content" id="rdrContent"></div>
+    </div>
+    <div class="rdr-footbar">
+      <span id="rdrPct">0%</span>
+      <input type="range" id="rdrSeek" min="0" max="1000" value="0">
+      <span id="rdrMin" class="rdr-min"></span>
+      <span id="rdrChapter"></span>
+    </div>
+
+    <!-- Панель налаштувань -->
+    <div class="rdr-sheet" id="rdrCfgSheet">
+      <div class="rdr-sheet-inner">
+        <div class="rdr-sheet-grab"></div>
+        <h3>Читання</h3>
+        <div class="rdr-modes" id="rdrModes">
+          <button data-rmode="focus"><b>Focus</b><small>один абзац</small></button>
+          <button data-rmode="eink"><b>E-ink</b><small>+ хвилини</small></button>
+          <button data-rmode="aurora"><b>Aurora</b><small>glass</small></button>
+        </div>
+        <div class="rdr-row"><span>Тема</span>
+          <div class="rdr-themes" id="rdrThemes">
+            <button data-rtheme="light" class="rt-light">A</button>
+            <button data-rtheme="sepia" class="rt-sepia">A</button>
+            <button data-rtheme="dark" class="rt-dark">A</button>
+            <button data-rtheme="night" class="rt-night">A</button>
+          </div>
+        </div>
+        <div class="rdr-row"><span>Шрифт</span>
+          <div class="rdr-fonts" id="rdrFonts">
+            <button data-rfont="serif" style="font-family:Georgia,serif">Serif</button>
+            <button data-rfont="sans" style="font-family:-apple-system,sans-serif">Sans</button>
+            <button data-rfont="mono" style="font-family:ui-monospace,monospace">Mono</button>
+          </div>
+        </div>
+        <div class="rdr-row"><span>Розмір</span>
+          <div class="rdr-steps"><button data-rsize="-1">A−</button><b id="rdrSizeVal">19</b><button data-rsize="1">A+</button></div>
+        </div>
+        <div class="rdr-row"><span>Інтервал</span>
+          <div class="rdr-steps"><button data-rlh="-1">−</button><b id="rdrLhVal">1.6</b><button data-rlh="1">+</button></div>
+        </div>
+        <div class="rdr-row"><span>Ширина</span>
+          <div class="rdr-steps"><button data-rwidth="-1">−</button><b id="rdrWidthVal">680</b><button data-rwidth="1">+</button></div>
+        </div>
+        <button class="rdr-sheet-close" id="rdrCfgClose">Готово</button>
+      </div>
+    </div>
+
+    <!-- Панель закладок / змісту -->
+    <div class="rdr-sheet" id="rdrBmSheet">
+      <div class="rdr-sheet-inner">
+        <div class="rdr-sheet-grab"></div>
+        <div class="rdr-bm-tabs">
+          <button class="on" data-bmtab="toc">Зміст</button>
+          <button data-bmtab="marks">Закладки</button>
+        </div>
+        <div class="rdr-bm-list" id="rdrTocList"></div>
+        <div class="rdr-bm-list" id="rdrMarksList" style="display:none"></div>
+        <button class="rdr-sheet-close" id="rdrBmClose">Закрити</button>
+      </div>
+    </div>
+
+    <div class="rdr-loading" id="rdrLoading"><div class="rdr-spin"></div><span id="rdrLoadTxt">Завантаження…</span></div>
+  </section>
+
+  <section class="screen" id="scr-goals">
+    <div class="top">
+      <div class="brand"><div class="logo">🎯</div><div><h1>План на рік</h1><span id="goalsSub">стратегія</span></div></div>
+    </div>
+    <div id="goalsBody"></div>
+  </section>
+
+  <section class="screen" id="scr-projects">
+    <div class="top">
+      <div class="brand"><div class="logo">🚀</div><div><h1>Проєкти</h1><span id="projectsSub">робота · агенція · твої проєкти</span></div></div>
+    </div>
+    <div id="projectsBody"></div>
+  </section>
+
+  <section class="screen" id="scr-planner">
+    <div class="top">
+      <div class="brand"><div class="logo">📅</div><div><h1>Планер</h1><span id="plannerSub">плани · горизонт · квадрати</span></div></div>
+      <button class="top-act" id="plAiBtn" title="AI-асистент">🤖</button>
+      <button class="top-act" id="plSettingsBtn" title="Налаштування">⚙️</button>
+    </div>
+    <div id="plannerBody"></div>
+  </section>
+
+  <section class="screen" id="scr-finance">
+    <button class="back" id="finBack" style="--c:var(--fin)">‹ Папки</button>
+    <div class="top">
+      <div class="brand"><div class="logo">💰</div><div><h1>Фінанси</h1><span id="finSub">фінансовий центр</span></div></div>
+    </div>
+    <div id="financeBody"></div>
+  </section>
+
+  <!-- ===== envelope goal-card sheet ===== -->
+  <div class="e2dim" id="e2Dim"></div>
+  <div class="e2sheet" id="e2Sheet"></div>
+
+  <section class="screen" id="scr-values">
+    <button class="back" id="valBack" style="--c:var(--val)">‹ Папки</button>
+    <div class="top">
+      <div class="brand"><div class="logo" style="background:linear-gradient(135deg,#5b8def,#3d6fd1)">🧭</div><div><h1>Створи себе</h1><span id="valSub">компас особистості</span></div></div>
+    </div>
+    <div id="valuesBody"></div>
+  </section>
+
+  <section class="screen" id="scr-wishes">
+    <button class="back" id="wishBack">‹ Огляд</button>
+    <div id="wishesBody"></div>
+  </section>
+
+  <!-- ===== SCREEN: COLLAGE (Мудборд) ===== -->
+  <section class="screen" id="scr-collage">
+    <button class="back" id="clgBack">‹ Карта бажань</button>
+    <div id="collageBody"></div>
+  </section>
+
+  <!-- ===== SCREEN: MORNING RITUAL (Ефір + Щоденник) ===== -->
+  <section class="screen" id="scr-ritual">
+    <button class="back" id="ritBack">‹ Карта бажань</button>
+    <div id="ritualBody"></div>
+  </section>
+
+  <!-- ===== SCREEN: NEW YEAR COUNTDOWN ===== -->
+  <section class="screen" id="scr-nyc">
+    <button class="back" id="nycBack">‹ Ще</button>
+    <div class="top">
+      <div class="brand"><div class="logo" style="background:linear-gradient(135deg,#c77dff,#e0843c)">🎄</div><div><h1 id="nycHead">До Нового року</h1><span id="nycSub">лічильник днів</span></div></div>
+    </div>
+
+    <div class="nyc-hero" id="nycHero">
+      <div class="nyc-clock">
+        <div class="nyc-cell"><b id="nyD">0</b><span>днів</span></div>
+        <div class="nyc-cell"><b id="nyH">00</b><span>год</span></div>
+        <div class="nyc-cell"><b id="nyM">00</b><span>хв</span></div>
+        <div class="nyc-cell"><b id="nyS">00</b><span>сек</span></div>
+      </div>
+      <div class="nyc-passed"><b id="nyDone">0</b> днів минуло · <b id="nyLeft">0</b> лишилось</div>
+    </div>
+
+    <div class="nyc-seg">
+      <button class="on" data-nycview="grid">Календар</button>
+      <button data-nycview="bar">Прогрес</button>
+      <button data-nycview="list">Список</button>
+    </div>
+
+    <div id="nycView"></div>
+  </section>
+
+  <!-- ===== SCREEN: ЩОДЕННИК ===== -->
+  <section class="screen" id="scr-diary">
+    <button class="back" id="diaryBack" style="--c:#7c8cff">‹ Огляд</button>
+    <div class="ph" style="--c:#7c8cff">
+      <div class="ey">Рефлексія · <b>Щоденник</b></div>
+      <h2><span class="em" style="background:color-mix(in srgb,#7c8cff 16%,transparent)">📔</span>Як пройшов день</h2>
+    </div>
+
+    <div class="rit-cal" id="diaCal"></div>
+    <div class="rit-streak" id="diaStreakLine"></div>
+
+    <div class="dia-today">
+      <div class="dia-date-row">
+        <div class="dia-date" id="diaTodayDate"></div>
+        <button class="dia-mic" id="diaMicBtn" title="Голосовий запис">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+          <span class="dia-mic-tm" id="diaRecTm"></span>
+        </button>
+      </div>
+      <textarea class="dia-input" id="diaInput" rows="6" placeholder="Опиши сьогоднішній день: що зробив, що вдалось, що зачепило, як почувався..."></textarea>
+      <div class="dia-audio" id="diaAudioRow" style="display:none"></div>
+      <div class="dia-savehint" id="diaSaveHint">Зберігається автоматично</div>
+    </div>
+
+    <button class="dia-ai-btn" id="diaAnalyzeBtn">🧠 Проаналізувати останні записи</button>
+    <div class="dia-ai-out" id="diaAiOut" style="display:none"></div>
+
+    <div class="dia-list-head">Попередні записи</div>
+    <div class="dia-list" id="diaList"></div>
+  </section>
+
+  <!-- ===== SCREEN: PAGE EDITOR (Notion-стиль) ===== -->
+  <section class="screen" id="scr-page">
+    <div class="pg-top">
+      <button class="pg-back" id="pgBack">‹ Папки</button>
+      <div class="pg-top-sp"></div>
+      <div class="pg-theme" id="pgTheme">
+        <button data-pgtheme="ink" class="on" title="Темна">◑</button>
+        <button data-pgtheme="paper" title="Світла">◐</button>
+        <button class="pg-widebtn" id="pgUndoBtn" title="Скасувати (Ctrl+Z)" disabled>↶</button>
+        <button class="pg-widebtn" id="pgShowHiddenBtn" title="Показати сховані умовою блоки">◐</button>
+      </div>
+      <button class="pg-widebtn" id="pgWideBtn" title="На весь екран">⛶</button>
+    </div>
+    <div class="pg-doc">
+      <div class="pg-cover" id="pgCover"></div>
+      <input class="pg-pagetitle" id="pgTitle" placeholder="Без назви">
+      <div id="pgEditor" data-i18n-skip="1"></div>
+      <button class="pg-addblock" id="pgAddBlock">＋ Додати блок</button>
+    </div>
+
+  </section>
+
+  <!-- ===== SCREEN: MORE (Ще) ===== -->
+  <section class="screen" id="scr-vision">
+    <button class="back" id="vzBack" style="--c:#f0b429">‹ Огляд</button>
+    <div class="ph" style="--c:#f0b429">
+      <div class="ey">Навігатор · <b>Точка А → Точка Б</b></div>
+      <h2><span class="em" style="background:rgba(240,180,41,.16)">🧭</span>Візія</h2>
+    </div>
+    <div id="visionBody"></div>
+  </section>
+
+  <section class="screen" id="scr-more">
+    <div class="more-head">
+      <h1>Ще</h1>
+      <p>Інструменти, звіти й налаштування</p>
+    </div>
+    <div id="accountCard"></div>
+    <div class="bkp-card" id="settingsCard" hidden></div>
+    <div id="moreHybrid"></div>
+  </section>
+
+</div>
+
+<!-- history modal -->
+<div class="modal" id="modal">
+  <div class="modal-in" id="modalIn">
+    <div class="grip"></div>
+    <div class="mhead"><div class="av" id="mAv"></div><div><div class="nm" id="mName"></div><div class="st" id="mKind"></div></div></div>
+    <div class="bigbal" id="mBal"><div class="lab">Поточний залишок</div><div class="val" id="mVal">0 ₴</div><div class="desc" id="mDesc"></div></div>
+    <div class="ops"><button class="pay" id="opPay"></button><button class="more" id="opMore"></button></div>
+    <div class="prompt hidden" id="prompt"><div class="pt" id="pTitle"></div><div class="pr">
+      <input id="pAmount" type="number" inputmode="decimal" placeholder="Сума" min="0" step="0.01"><button class="ok" id="pOk">Готово</button></div></div>
+    <div class="hlab">Історія операцій</div>
+    <div id="mHist"></div>
+  </div>
+</div>
+
+<!-- add-block FAB + sheet (space only) -->
+<button class="fab" id="fab">+</button>
+<div id="mobileDock">
+  <button data-dk="note"><b>📝</b><small>НОТАТКА</small></button>
+  <button data-dk="check"><b>✅</b><small>ЧЕКЛІСТ</small></button>
+  <button data-dk="photo"><b>📷</b><small>ФОТО</small></button>
+  <button data-dk="__more" class="dk-plus"><b>＋</b><small>ЩЕ</small></button>
+</div>
+
+<!-- ПОШУК ПО ДОШЦІ -->
+<div class="srch-ov" id="srchOv">
+  <div class="srch-box">
+    <div class="srch-head">
+      <input class="srch-input" id="srchInput" placeholder="Шукати по блоках…" autocomplete="off">
+      <button class="srch-x" id="srchClose" title="Закрити">×</button>
+    </div>
+    <div class="srch-res" id="srchRes"></div>
+  </div>
+</div>
+
+<!-- ШВИДКЕ ЗАХОПЛЕННЯ -->
+<div class="qcap-ov" id="qcapOv">
+  <div class="qcap-in">
+    <div class="qcap-grip"></div>
+    <div class="qcap-h">⚡ Швидка думка</div>
+    <textarea class="qcap-ta" id="qcapTa" placeholder="Запиши, поки не забув… (потрапить у «Вхідні»)"></textarea>
+    <div class="qcap-row">
+      <button class="qcap-cancel" id="qcapCancel">Скасувати</button>
+      <button class="qcap-save" id="qcapSave">Зберегти у Вхідні</button>
+    </div>
+    <div class="qcap-hint">⌘/Ctrl + Enter — зберегти</div>
+  </div>
+</div>
+
+<!-- UNDO -->
+<div class="undo-toast" id="undoToast">
+  <span class="ut-msg" id="undoMsg">Видалено</span>
+  <button class="ut-btn" id="undoBtn">↩ Повернути</button>
+</div>
+<div class="addsheet" id="addsheet">
+  <div class="addsheet-in">
+    <div class="grip"></div>
+    <div class="ash-head">
+      <div class="ash-title" style="margin:0">Додати блок</div>
+      <div class="ash-style-sw" id="ashStyleSw">
+        <button data-ashstyle="standard" title="Стандартний вигляд">☰</button>
+        <button data-ashstyle="gallery" title="Галерея з описами та налаштуваннями">▦</button>
+      </div>
+    </div>
+    <div class="ash-grid" id="ashGrid"></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <a class="on" id="navHome"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10.5V19a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19v-8.5"/><path d="M10 20.5v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/></svg></span>Огляд</a>
+  <a id="navPlanner"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M8 3v3M16 3v3"/></svg></span>Планер</a>
+  <a id="navAI"><span class="ni"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M11 6c.6 3.6 2.2 5.2 5.8 5.8.4.07.4.63 0 .7-3.6.6-5.2 2.2-5.8 5.8-.07.4-.63.4-.7 0-.6-3.6-2.2-5.2-5.8-5.8-.4-.07-.4-.63 0-.7 3.6-.6 5.2-2.2 5.8-5.8.07-.4.63-.4.7 0z"/><path d="M18.7 2.6c.33 1.95 1.2 2.82 3.15 3.15.28.05.28.45 0 .5-1.95.33-2.82 1.2-3.15 3.15-.05.28-.45.28-.5 0-.33-1.95-1.2-2.82-3.15-3.15-.28-.05-.28-.45 0-.5 1.95-.33 2.82-1.2 3.15-3.15.05-.28.45-.28.5 0z"/></svg></span>AI</a>
+  <a id="navFinance"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg></span>Гроші</a>
+  <a id="navProjects"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 20 8l-8 4.5L4 8z"/><path d="M4 12.2l8 4.5 8-4.5"/><path d="M4 16.4l8 4.5 8-4.5"/></svg></span>Проєкти</a>
+</nav>
+<div id="flowCap" style="display:none"></div>
+<div id="fcSay" class="tail-r"></div>
+<button id="zenExit" title="Вийти з повного екрана"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M4 20L20 4"/></svg></button>
+
+<!-- ВІЛЬНЕ ПОЛОТНО: міні-мапа + нижня панель навігації -->
+<div id="canvasMinimap" title="Тапни, щоб перейти"></div>
+<div id="canvasBar">
+  <button id="czExit" class="cb-exit" title="Вийти з полотна"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M4 20L20 4"/></svg></button>
+  <span class="cb-sep"></span>
+  <button id="czOut" title="Зменшити">−</button>
+  <button id="czVal" class="cb-val" title="Скинути на 100%">100%</button>
+  <button id="czIn" title="Збільшити">+</button>
+  <span class="cb-sep"></span>
+  <button id="czFit" title="Вписати все"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg></button>
+  <button id="czTidy" title="Зібрати все в стрічку"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="5" rx="1.5"/><rect x="4" y="11" width="16" height="5" rx="1.5"/><rect x="4" y="18" width="10" height="2.5" rx="1"/></svg></button>
+  <button id="czSkin" title="Стиль полотна">🎨</button>
+  <button id="czSnap" class="on" title="Прилипання до сітки"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
+</div>
+
+<script>@@INCDIR:scripts/core@@</script>
+<div class="bnpop" id="bnpop" aria-hidden="true">
+  <button data-bnpop="text">📄 Текст</button>
+  <button data-bnpop="check">☑️ Чек-лист</button>
+  <button data-bnpop="link">🔗 Посилання</button>
+  <button data-bnpop="divider">➖ Розділювач</button>
+</div>
+<div class="rmenu" id="rmenu" aria-hidden="true">
+  <div class="rmenu-ring" id="rmenuRing">
+    <div class="rmenu-center" id="rmenuCenter"></div>
+  </div>
+</div>
+<script>@@INC:scripts/20-radial-menu.js@@</script>
+<div class="pg-backdrop" id="pgBackdrop"></div>
+<div class="pg-slash" id="pgSlash">
+  <div class="pg-sgrip"></div>
+  <div class="pgst-wrap">
+    <div class="pgst-rail" id="pgstRail"></div>
+    <div class="pgst-mid">
+      <input class="pg-ssearch" id="pgSlashSearch" placeholder="Пошук блоку…" autocomplete="off">
+      <div class="pg-slist" id="pgSlashList"></div>
+    </div>
+  </div>
+</div>
+<div class="pg-bmenu" id="pgBmenu">
+  <div class="pg-sgrip"></div>
+  <div class="pg-bmi" data-pgact="indent"><span class="bmic">→</span> Вкласти (відступ)</div>
+  <div class="pg-bmi" data-pgact="outdent"><span class="bmic">←</span> Підняти рівень</div>
+  <div class="pg-bmi" data-pgact="dup"><span class="bmic">⧉</span> Дублювати</div>
+  <div class="pg-bmi" data-pgact="pin"><span class="bmic">📌</span> Закріпити / відкріпити</div>
+  <div class="pg-bmi" data-pgact="turn"><span class="bmic">🔄</span> Перетворити на…</div>
+  <div class="pg-bmi" data-pgact="cond"><span class="bmic">◐</span> Умова показу…</div>
+  <div class="pg-bmi" data-pgact="hstyle"><span class="bmic">Aa</span> Стиль заголовка…</div>
+  <div class="pg-bmi danger" data-pgact="del"><span class="bmic">🗑</span> Видалити</div>
+</div>
+
+<script>@@INC:scripts/21-newyear-countdown.js@@</script>
+<script>@@INCDIR:scripts/page-editor@@</script>
+
+<style id="fd26css">@@INC:styles/10-fd26.css@@</style>
+<style id="fd26css-agency">@@INC:styles/11-agency.css@@</style>
+<script id="fd26js">@@INC:scripts/40-pets-3d.js@@</script>
+
+<style id="fd26tcss">@@INC:styles/12-theme-nightfire.css@@</style>
+
+<script id="fd26tjs">@@INC:scripts/41-theme-layer.js@@</script>
+
+<script id="fdVoiceJs">@@INC:scripts/42-voice-island.js@@</script>
+
+
+<style id="fd26css-planner">@@INC:styles/13-planner.css@@</style>
+<script id="fd26js-planner">@@INC:scripts/43-planner.js@@</script>
+<style id="fd26css-week">@@INC:styles/14-week.css@@</style>
+<script id="fd26js-week">@@INC:scripts/44-week.js@@</script>
+
+
+<style id="fd26css-month">@@INC:styles/15-month.css@@</style>
+
+<script id="fd26js-month">@@INC:scripts/45-month.js@@</script>
+
+<style id="fd26css-mx">@@INC:styles/16-mx.css@@</style>
+
+<script id="fd26js-mx">@@INC:scripts/46-mx.js@@</script>
+
+<style id="fdHorizonWin">@@INC:styles/17-horizon.css@@</style>
+</body>
+</html>

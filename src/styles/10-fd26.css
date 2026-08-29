@@ -1,0 +1,29 @@
+
+/* ════════ FD26 · Напарники 3D «Nightfire» ════════
+   Вимикач скіна: localStorage.pet3d='0' (легасі-рендер).
+   Вимикач інтерактивного світла/погляду: localStorage.pet3d_fx='0'. */
+:root{--fdlx:0;--fdly:0}
+@keyframes fdBreathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.026,.974)}}
+@keyframes fdBlink{0%,91.5%,95.5%,100%{transform:scaleY(1)}93.5%{transform:scaleY(.06)}}
+@keyframes fdTwitch{0%,76%,84%,100%{transform:rotate(0)}78%{transform:rotate(2.2deg)}81%{transform:rotate(-1.5deg)}}
+@keyframes fdGlowP{0%,100%{opacity:.34}50%{opacity:.5}}
+@keyframes fdBolt{0%,58%,66%,100%{opacity:1}60%,64%{opacity:.25}}
+[data-fd-pet] .fd-body{transform-box:view-box;transform-origin:50% 94%;animation:fdBreathe 3.6s ease-in-out infinite}
+[data-fd-pet] .fd-eyes{transform-box:view-box;transform-origin:50% 48%;animation:fdBlink 5.2s infinite}
+[data-fd-pet] .fd-ears{transform-box:view-box;transform-origin:50% 30%;animation:fdTwitch 8s ease-in-out infinite}
+[data-fd-pet] .fd-glowp{animation:fdGlowP 3.6s ease-in-out infinite}
+[data-fd-pet] .fd-bolt{animation:fdBolt 6s infinite}
+[data-fd-pet] .fd-tilt{transform-box:view-box;transform-origin:50% 82%;
+  transform:rotate(calc(var(--fdlx)*3.2deg)) translate(calc(var(--fdlx)*1.6px),calc(var(--fdly)*1.1px));
+  transition:transform .18s ease-out}
+[data-fd-pet] .fd-spec{transform-box:view-box;
+  transform:translate(calc(var(--fdlx)*6px),calc(var(--fdly)*3.5px));
+  transition:transform .18s ease-out}
+[data-fd-pet] .fd-look{transform:translate(calc(var(--fdex,0)*2.6px),calc(var(--fdey,0)*1.9px));
+  transition:transform .35s ease-out}
+[data-fd-pet] .fd-rimw{opacity:calc(.4 - var(--fdlx)*.28);transition:opacity .2s}
+[data-fd-pet] .fd-rimc{opacity:calc(.3 + var(--fdlx)*.22);transition:opacity .2s}
+[data-fd-pet] .fd-sss{opacity:calc(.45 - var(--fdly)*.18);transition:opacity .25s}
+@media (prefers-reduced-motion:reduce){
+  [data-fd-pet] *{animation:none!important;transition:none!important}
+}
