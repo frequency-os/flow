@@ -138,21 +138,21 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 
   @property --ang{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
   :root{
-    --bg:#0c0e14; --bg-2:#14171f; --card:#1b1f29; --card-2:#20252f; --field:#161a22;
-    --text:#f3f5f8; --muted:#8b93a3; --line:rgba(255,255,255,.08);
-    --fin:#e8843c; --hab:#34c77b; --val:#5b8def; --skl:#c77dff;
-    --accent:#6a7dff; --owe:#ff5a5f; --owed:#34c77b;
+    --bg:#07060e; --bg-2:#0d0a1c; --card:#17131f; --card-2:#1e1929; --field:#110e19;
+    --text:#eceaf6; --muted:#9b95b2; --line:rgba(255,255,255,.09);
+    --fin:#e8843c; --hab:#34c77b; --val:#5b8def; --skl:#c4a8ff;
+    --accent:#8b7cff; --owe:#ff5a5f; --owed:#34c77b;
     /* керовані темою службові поверхні (раніше були захардкоджені) */
     --hair:rgba(255,255,255,.06);     /* легкий hover/розділювач */
-    --hair-2:rgba(255,255,255,.12);   /* виразніший бордер/гріп */
-    --scrim:rgba(8,10,16,.5);         /* затемнення під модалками */
-    --glass:rgba(15,18,24,.55);       /* скляні підкладки на банерах */
-    --sheet:rgba(22,26,34,.96);       /* фон bottom-sheet */
-    --shadow:rgba(0,0,0,.45);         /* тіні */
-    --glow:rgba(106,125,255,.10);     /* фоновий ореол */
+    --hair-2:rgba(255,255,255,.14);   /* виразніший бордер/гріп */
+    --scrim:rgba(7,6,14,.55);         /* затемнення під модалками */
+    --glass:rgba(20,16,32,.55);       /* скляні підкладки на банерах */
+    --sheet:rgba(21,17,32,.97);       /* фон bottom-sheet */
+    --shadow:rgba(0,0,0,.5);         /* тіні */
+    --glow:rgba(139,124,255,.14);     /* фоновий ореол */
     --emoji-plate:var(--card);        /* підкладка під емодзі на банерних картках */
     --on-cover:#ffffff;               /* текст поверх кольорового банера (layout C) */
-    --nav-bg:linear-gradient(180deg,rgba(34,38,50,.62),rgba(16,18,26,.74));
+    --nav-bg:linear-gradient(180deg,rgba(36,30,56,.62),rgba(14,11,26,.78));
     --nav-line:rgba(255,255,255,.14);
     --nav-ink:var(--muted);
     --nav-ink-on:#ffffff;
@@ -172,43 +172,43 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   }
   /* ── СВІТЛА ТЕМА ── */
   html[data-theme="light"]{
-    --bg:#f4f6fb; --bg-2:#ffffff; --card:#ffffff; --card-2:#f0f3f9; --field:#eef1f7;
-    --text:#1a1f2b; --muted:#6b7385; --line:rgba(15,23,42,.10);
-    --fin:#d9701f; --hab:#1ea566; --val:#3f6fd6; --skl:#9d4edd;
-    --accent:#5566ef; --owe:#e0454a; --owed:#1ea566;
-    --hair:rgba(15,23,42,.05);
-    --hair-2:rgba(15,23,42,.12);
-    --scrim:rgba(30,38,55,.32);
-    --glass:rgba(255,255,255,.62);
+    --bg:#f3f2fa; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1effa; --field:#edebf6;
+    --text:#1a1726; --muted:#5c5776; --line:rgba(32,24,72,.10);
+    --fin:#d9701f; --hab:#1ea566; --val:#3f6fd6; --skl:#8a5ce0;
+    --accent:#6d5cf0; --owe:#e0454a; --owed:#1ea566;
+    --hair:rgba(32,24,72,.05);
+    --hair-2:rgba(32,24,72,.13);
+    --scrim:rgba(36,30,62,.34);
+    --glass:rgba(255,255,255,.66);
     --sheet:rgba(255,255,255,.98);
-    --shadow:rgba(20,30,55,.16);
-    --glow:rgba(85,102,239,.10);
+    --shadow:rgba(38,30,80,.16);
+    --glow:rgba(109,92,240,.10);
     --emoji-plate:#ffffff;
     --on-cover:#ffffff;
-    --nav-bg:linear-gradient(180deg,rgba(255,255,255,.82),rgba(244,246,251,.92));
-    --nav-line:rgba(15,23,42,.10);
-    --nav-ink:#6b7385;
-    --nav-ink-on:#1a1f2b;
+    --nav-bg:linear-gradient(180deg,rgba(255,255,255,.85),rgba(243,242,250,.94));
+    --nav-line:rgba(32,24,72,.10);
+    --nav-ink:#5c5776;
+    --nav-ink-on:#1a1726;
     --bt-note:#3f6fd6; --bt-check:#1ea566; --bt-task:#d9701f;
     --bt-fin:#b8860b; --bt-media:#d94f85; --bt-ai:#9d4edd;
   }
   /* ── ЧОРНА (AMOLED) ТЕМА: чистий чорний фон, глибші картки, яскравіший акцент ── */
   html[data-theme="black"]{
-    --bg:#000000; --bg-2:#08080b; --card:#0e0e13; --card-2:#14141b; --field:#0b0b10;
-    --text:#f4f5fa; --muted:#8f94a8; --line:rgba(255,255,255,.10);
-    --fin:#f09048; --hab:#3ad487; --val:#6d9bff; --skl:#cf8dff;
-    --accent:#7d8bff; --owe:#ff6166; --owed:#3ad487;
-    --hair:rgba(255,255,255,.06);
-    --hair-2:rgba(255,255,255,.15);
-    --scrim:rgba(0,0,0,.62);
-    --glass:rgba(14,14,20,.55);
-    --sheet:rgba(12,12,17,.97);
+    --bg:#000000; --bg-2:#0a0812; --card:#100d18; --card-2:#161222; --field:#0c0a13;
+    --text:#f0eefa; --muted:#a29cbd; --line:rgba(255,255,255,.11);
+    --fin:#f09048; --hab:#3ad487; --val:#6d9bff; --skl:#cbb2ff;
+    --accent:#948aff; --owe:#ff6166; --owed:#3ad487;
+    --hair:rgba(255,255,255,.07);
+    --hair-2:rgba(255,255,255,.16);
+    --scrim:rgba(0,0,0,.64);
+    --glass:rgba(14,11,22,.6);
+    --sheet:rgba(10,8,16,.98);
     --shadow:rgba(0,0,0,.7);
-    --glow:rgba(125,139,255,.12);
+    --glow:rgba(148,138,255,.16);
     --emoji-plate:var(--card);
     --on-cover:#ffffff;
-    --nav-bg:linear-gradient(180deg,rgba(20,20,28,.72),rgba(5,5,8,.86));
-    --nav-line:rgba(255,255,255,.14);
+    --nav-bg:linear-gradient(180deg,rgba(26,22,42,.72),rgba(2,2,6,.9));
+    --nav-line:rgba(255,255,255,.15);
     --nav-ink:#8f94a8;
     --nav-ink-on:#ffffff;
     --bt-note:#6d9bff; --bt-check:#3ad487; --bt-task:#f09048;
@@ -31151,57 +31151,19 @@ try{
 })();
 </script>
 
-<style id="fd26tcss">
+<style id="fd26tcss">/* ⚠️ Токени цього шару ПЕРЕНЕСЕНО у styles/core/01-tokens-base.css (30.08.2026).
+   Причина: шар вмикався ЗАВЖДИ (localStorage.fd26t за замовчуванням '1',
+   перемикача в інтерфейсі не існує), тобто це був не необовʼязковий шар,
+   а сам дизайн — просто оголошений у другому місці. Через це кольори жили
+   у двох файлах одночасно, і половина правок промазувала повз.
+   Тут лишились лише правила вигляду, не кольори. */
 /* ════════ FD26T · «Nightfire Glass» — три температури однієї ночі ════════
    🌙 Ніч (фіолет) · ⚫ AMOLED (та сама ніч, вимкнене світло) · ☀️ День (та сама ніч у денному світлі)
    Шар активний лише з класом html.fd26t. Вимикач: localStorage.fd26t='0'. */
 
-/* ── 1. ТОКЕНИ · 🌙 НІЧ (без data-theme) ── */
-html.fd26t:not([data-theme]){
-  --bg:#07060e; --bg-2:#0d0a1c; --card:#17131f; --card-2:#1e1929; --field:#110e19;
-  --text:#eceaf6; --muted:#9b95b2;
-  --line:rgba(255,255,255,.09);
-  --accent:#8b7cff; --skl:#c4a8ff;
-  --hair:rgba(255,255,255,.06); --hair-2:rgba(255,255,255,.14);
-  --scrim:rgba(7,6,14,.55);
-  --glass:rgba(20,16,32,.55);
-  --sheet:rgba(21,17,32,.97);
-  --shadow:rgba(0,0,0,.5);
-  --glow:rgba(139,124,255,.14);
-  --nav-bg:linear-gradient(180deg,rgba(36,30,56,.62),rgba(14,11,26,.78));
-  --nav-line:rgba(255,255,255,.14);
-}
-/* ── ⚫ AMOLED: чистий чорний, глибші картки, той самий фіолет ── */
-html.fd26t[data-theme="black"]{
-  --bg:#000000; --bg-2:#0a0812; --card:#100d18; --card-2:#161222; --field:#0c0a13;
-  --text:#f0eefa; --muted:#a29cbd;
-  --line:rgba(255,255,255,.11);
-  --accent:#948aff; --skl:#cbb2ff;
-  --hair:rgba(255,255,255,.07); --hair-2:rgba(255,255,255,.16);
-  --scrim:rgba(0,0,0,.64);
-  --glass:rgba(14,11,22,.6);
-  --sheet:rgba(10,8,16,.98);
-  --shadow:rgba(0,0,0,.7);
-  --glow:rgba(148,138,255,.16);
-  --nav-bg:linear-gradient(180deg,rgba(26,22,42,.72),rgba(2,2,6,.9));
-  --nav-line:rgba(255,255,255,.15);
-}
-/* ── ☀️ ДЕНЬ: лавандово-біле небо, той самий фіолетовий всесвіт ── */
-html.fd26t[data-theme="light"]{
-  --bg:#f3f2fa; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1effa; --field:#edebf6;
-  --text:#1a1726; --muted:#5c5776;
-  --line:rgba(32,24,72,.10);
-  --accent:#6d5cf0; --skl:#8a5ce0;
-  --hair:rgba(32,24,72,.05); --hair-2:rgba(32,24,72,.13);
-  --scrim:rgba(36,30,62,.34);
-  --glass:rgba(255,255,255,.66);
-  --sheet:rgba(255,255,255,.98);
-  --shadow:rgba(38,30,80,.16);
-  --glow:rgba(109,92,240,.10);
-  --nav-bg:linear-gradient(180deg,rgba(255,255,255,.85),rgba(243,242,250,.94));
-  --nav-line:rgba(32,24,72,.10);
-  --nav-ink:#5c5776; --nav-ink-on:#1a1726;
-}
+
+
+
 
 /* ── 2. СКЛО (рецепт Glassmorphism 2.0: alpha-градієнт + blur + бордер + inset-грань) ──
    Лише 2 нові blur-поверхні (nav уже має свій blur). */
