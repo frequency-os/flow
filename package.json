@@ -8,7 +8,10 @@
   "private": true,
   "main": "desktop/main.js",
   "scripts": {
+    "dev": "./tools/dev.sh",
     "start": "python3 tools/build.py && electron .",
+    "build": "python3 tools/build.py",
+    "check": "./tools/check.sh",
     "build:mac": "python3 tools/build.py && electron-builder --mac"
   },
   "build": {

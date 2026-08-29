@@ -6,6 +6,7 @@
 const { app, BrowserWindow, shell, protocol, net, screen, ipcMain } = require('electron');
 const path = require('node:path');
 const fs   = require('node:fs');
+const { execFile } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
 
 const DIST  = path.join(__dirname, '..', 'dist');
@@ -95,6 +96,10 @@ function createWindow(){
   });
 
   win.once('ready-to-show', () => win.show());
+  if (!app.isPackaged) {
+    // щоб не переплутати вікно розробки зі справжнім застосунком
+    win.setTitle('Frequency — РОЗРОБКА');
+  }
 
   let t = null;
   const remember = () => { clearTimeout(t); t = setTimeout(() => saveState(win), 400); };
@@ -139,6 +144,48 @@ app.on('open-url', (event, url) => {
   deliverAuth(url);
 });
 
+/* ═══════════ РЕЖИМ РОЗРОБКИ: правка → одразу видно ═══════════
+   Працює ТІЛЬКИ коли застосунок запущено через `npm run dev`.
+   У зібраному Frequency.app цього немає взагалі.
+
+   Що робить: стежить за текою src/. Щойно там щось змінилось —
+   пересобирає dist/index.html і оновлює вікно. Тобто правка у файлі
+   зʼявляється у вікні сама, без жодних кнопок. */
+function watchSources(){
+  if (app.isPackaged) return;
+  const SRC  = path.join(__dirname, '..', 'src');
+  const ROOT = path.join(__dirname, '..');
+  let timer = null, building = false, again = false;
+
+  const rebuild = () => {
+    if (building) { again = true; return; }
+    building = true;
+    execFile('python3', ['tools/build.py'], { cwd: ROOT }, (err, stdout, stderr) => {
+      building = false;
+      if (err) {
+        // Збірка впала — вікно НЕ чіпаємо: там зараз робоча версія.
+        console.error('\n⛔️ Збірка не пройшла — вікно лишаю як є:\n' + (stderr || err.message));
+      } else {
+        console.log('↻ ' + String(stdout).trim().split('\n')[0]);
+        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.reload();
+      }
+      if (again) { again = false; rebuild(); }
+    });
+  };
+
+  try {
+    fs.watch(SRC, { recursive: true }, (_evt, file) => {
+      if (!file || /^\.|~$|\.swp$/.test(path.basename(file))) return;
+      clearTimeout(timer);
+      timer = setTimeout(rebuild, 250);   // чекаємо, поки правки вщухнуть
+    });
+    console.log('👀 Стежу за src/ — правки зʼявлятимуться у вікні самі.');
+  } catch(e) {
+    console.error('Не вдалося стежити за src/: ' + e.message);
+  }
+}
+
+
 app.whenReady().then(() => {
   /* Віддаємо файли з dist/ під схемою app://.
      Шлях перевіряємо: за межі dist/ вийти не можна. */
@@ -163,6 +210,7 @@ app.whenReady().then(() => {
   app.setAsDefaultProtocolClient('frequency');
 
   createWindow();
+  watchSources();
 
   // На Mac клік по іконці в Dock при закритих вікнах відкриває вікно знову.
   app.on('activate', () => {
