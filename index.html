@@ -139,12 +139,12 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   @property --ang{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
   :root{
     --bg:#07060e; --bg-2:#0d0a1c; --card:#17131f; --card-2:#1e1929; --field:#110e19;
-    --text:#eceaf6; --muted:#9b95b2; --line:rgba(255,255,255,.09);
+    --text:#eceaf6; --muted:#9b95b2; --line:rgba(255,255,255,.07);
     --fin:#e8843c; --hab:#34c77b; --val:#5b8def; --skl:#c4a8ff;
     --accent:#8b7cff; --owe:#ff5a5f; --owed:#34c77b;
     /* керовані темою службові поверхні (раніше були захардкоджені) */
-    --hair:rgba(255,255,255,.06);     /* легкий hover/розділювач */
-    --hair-2:rgba(255,255,255,.14);   /* виразніший бордер/гріп */
+    --hair:rgba(255,255,255,.05);     /* легкий hover/розділювач */
+    --hair-2:rgba(255,255,255,.12);   /* виразніший бордер/гріп */
     --scrim:rgba(7,6,14,.55);         /* затемнення під модалками */
     --glass:rgba(20,16,32,.55);       /* скляні підкладки на банерах */
     --sheet:rgba(21,17,32,.97);       /* фон bottom-sheet */
@@ -170,14 +170,22 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     --bt-note:#5b8def; --bt-check:#34c77b; --bt-task:#e8843c;
     --bt-fin:#f0b429; --bt-media:#ff6b9d; --bt-ai:#c77dff;
   }
+  /* --line / --hair / --hair-2 перенесено сюди з body.theme-pro (30.08.2026).
+     Той шар вмикався завжди, перемикача в інтерфейсі не існує — тобто це були
+     не «налаштування теми», а справжні значення, просто оголошені окремо.
+     Значення збережено ТОЧНО як діяли, включно зі світлою темою. */
+  /* --hair / --hair-2 повернуто ПО ТЕМАХ (30.08.2026).
+     body.theme-pro затирав їх білим у ВСІХ темах, тому у світлій
+     розділювачі й підсвітки були білим по білому — тобто невидимі
+     у 70 місцях. Значення взято з початкової версії файлу. */
   /* ── СВІТЛА ТЕМА ── */
   html[data-theme="light"]{
     --bg:#f3f2fa; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1effa; --field:#edebf6;
-    --text:#1a1726; --muted:#5c5776; --line:rgba(32,24,72,.10);
+    --text:#1a1726; --muted:#5c5776; --line:rgba(15,23,42,.09);
     --fin:#d9701f; --hab:#1ea566; --val:#3f6fd6; --skl:#8a5ce0;
     --accent:#6d5cf0; --owe:#e0454a; --owed:#1ea566;
-    --hair:rgba(32,24,72,.05);
-    --hair-2:rgba(32,24,72,.13);
+    --hair:rgba(15,23,42,.05);
+    --hair-2:rgba(15,23,42,.12);
     --scrim:rgba(36,30,62,.34);
     --glass:rgba(255,255,255,.66);
     --sheet:rgba(255,255,255,.98);
@@ -195,11 +203,11 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   /* ── ЧОРНА (AMOLED) ТЕМА: чистий чорний фон, глибші картки, яскравіший акцент ── */
   html[data-theme="black"]{
     --bg:#000000; --bg-2:#0a0812; --card:#100d18; --card-2:#161222; --field:#0c0a13;
-    --text:#f0eefa; --muted:#a29cbd; --line:rgba(255,255,255,.11);
+    --text:#f0eefa; --muted:#a29cbd; --line:rgba(255,255,255,.07);
     --fin:#f09048; --hab:#3ad487; --val:#6d9bff; --skl:#cbb2ff;
     --accent:#948aff; --owe:#ff6166; --owed:#3ad487;
-    --hair:rgba(255,255,255,.07);
-    --hair-2:rgba(255,255,255,.16);
+    --hair:rgba(255,255,255,.06);
+    --hair-2:rgba(255,255,255,.15);
     --scrim:rgba(0,0,0,.64);
     --glass:rgba(14,11,22,.6);
     --sheet:rgba(10,8,16,.98);
@@ -4472,11 +4480,11 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 
   /* =======================================================================
      ТЕМА «PRO» — Quiet Luxe база + aurora-сяйво за хедером + bento hero-блок
-     Вмикається класом body.theme-pro (тумблер у налаштуваннях). Оборотна.
+     Клас body.theme-pro вмикається ЗАВЖДИ (flowprotheme=true за замовчуванням,
+     тумблера в інтерфейсі немає). Тобто це не тема на вибір, а сам вигляд.
      ======================================================================= */
-  body.theme-pro{ --line:rgba(255,255,255,.07); --hair:rgba(255,255,255,.05); --hair-2:rgba(255,255,255,.12); }
-  html[data-theme="light"] body.theme-pro,
-  body.theme-pro[data-pro-light]{ --line:rgba(15,23,42,.09); }
+  /* Токени звідси перенесено у core/01-tokens-base.css — тепер кольори
+     оголошуються в одному місці. Нижче лишились лише правила вигляду. */
 
   /* делікатне aurora-сяйво у Просторі (за хедером), дуже стримане */
   body.theme-pro.in-space #scr-space{position:relative;}
