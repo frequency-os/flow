@@ -1429,13 +1429,40 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .summary .herocap{display:flex;gap:10px;}
   .summary .hc-tab{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;
     background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:11px 10px;
-    font-family:inherit;cursor:pointer;}
-  .summary .hc-tab svg{width:16px;height:16px;color:#fff;flex-shrink:0;}
-  .summary .hc-tab b{font-size:13.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    font-family:inherit;cursor:pointer;color:#fff;}
+  .summary .hc-tab svg{width:16px;height:16px;color:currentColor;flex-shrink:0;}
+  .summary .hc-tab b{font-size:13.5px;font-weight:800;color:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* Кожна кнопка — свого кольору за змістом: Карта бажань фіолетова,
+     Щоденник зелений. Кольори беремо з палітри застосунку (--skl, --hab),
+     тому вони самі змінюються разом зі світлою та AMOLED-темою —
+     а не лишаються прибитими одним значенням. */
+  .summary .hc-tab.wish{background:color-mix(in srgb,var(--skl) 22%,transparent);
+    border-color:color-mix(in srgb,var(--skl) 50%,transparent);
+    color:color-mix(in srgb,var(--skl) 30%,#fff);}
+  .summary .hc-tab.wish svg{color:var(--skl);}
+  .summary .hc-tab.diary{background:color-mix(in srgb,var(--hab) 20%,transparent);
+    border-color:color-mix(in srgb,var(--hab) 46%,transparent);
+    color:color-mix(in srgb,var(--hab) 26%,#fff);}
+  .summary .hc-tab.diary svg{color:var(--hab);}
   .summary .hc-tab:active{opacity:.7;transform:scale(.98);}
-  .summary .pgdots{display:flex;gap:5px;margin-top:14px;}
-  .summary .pgdots i{height:3px;border-radius:3px;background:rgba(255,255,255,.22);flex:1;}
-  .summary .pgdots i.on{background:#fff;flex:1.8;}
+  /* Смужка над фото Карти бажань — як у сторіз: сегмент поточного фото
+     наливається білим за той самий час, що показується саме фото.
+     Тривалість задає JS через --wish-dur, щоб анімація і таймер
+     не могли розійтися. */
+  .summary .wishdots{display:none;gap:5px;margin-top:14px;}
+  .summary .wishdots.on{display:flex;}
+  .summary .wishdots i{position:relative;height:3px;border-radius:3px;
+    background:rgba(255,255,255,.22);flex:1;overflow:hidden;}
+  .summary .wishdots i b{position:absolute;left:0;top:0;bottom:0;width:0;
+    background:#fff;border-radius:3px;}
+  .summary .wishdots i.done b{width:100%;}
+  .summary .wishdots i.now b{animation:wishFill var(--wish-dur,5s) linear forwards;}
+  @keyframes wishFill{from{width:0}to{width:100%}}
+  /* якщо людина вимкнула анімації в системі — просто підсвічуємо сегмент */
+  @media (prefers-reduced-motion: reduce){
+    .summary .wishdots i.now b{animation:none;width:100%;}
+  }
   /* === Карта бажань: слайдшоу-тло === */
   .summary .wishslides{position:absolute;inset:0;z-index:0;}
   .summary .wishslide{position:absolute;inset:0;background-size:cover;background-position:center;
@@ -6707,8 +6734,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
           <b>Щоденник</b>
         </button>
       </div>
-      <div class="pgdots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
-      <div class="wishdots" id="wishDots" style="display:none"></div>
+      <div class="wishdots" id="wishDots"></div>
     </div>
     <div class="nyc" id="nyCountdown" style="cursor:pointer" onclick="window.goNYC&&window.goNYC()">
       <div class="nyc-head"><span class="nyc-emoji">🎄</span><span class="nyc-title" id="nycTitle">До Нового року</span></div>
@@ -11147,6 +11173,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   }
 
   // слайдшоу з фото Карти бажань на блоці «Загальний прогрес»
+  const WISH_SLIDE_MS=5000;          // скільки показується одне фото
   let wishSlideTimer=null, wishSlideIdx=0;
   function updateSummaryBg(){
     try{ renderHeroStreak(); }catch(_){}
@@ -11162,7 +11189,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     const withImg=wishes.filter(w=> (w.type==='video') ? !!w.thumb : !!w.img );
     if(!withImg.length){
       slides.style.display='none'; ov.style.display='none';
-      slides.innerHTML=''; dots.innerHTML='';
+      slides.innerHTML=''; dots.innerHTML=''; dots.classList.remove('on');
       card.classList.remove('has-wish');
       if(topBar) topBar.classList.add('top-photobleed');
       const fl0=document.getElementById('wishFlink');
@@ -11177,17 +11204,33 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     const imgs=withImg.slice(-6).map(w=> w.type==='video'?w.thumb:w.img );
     slides.innerHTML=imgs.map((src,i)=>`<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(src)}')"></div>`).join('');
     if(imgs.length>1){
-      dots.innerHTML=imgs.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('');
+      /* Смужка як у сторіз: сегмент поточного фото наливається білим,
+         пройдені лишаються повними, наступні — порожні. Тривалість
+         віддаємо в CSS однією змінною, щоб анімація і таймер не розійшлися. */
+      dots.style.setProperty('--wish-dur', WISH_SLIDE_MS+'ms');
+      dots.innerHTML=imgs.map(()=>'<i><b></b></i>').join('');
+      dots.classList.add('on');
       const slideEls=slides.querySelectorAll('.wishslide');
       const dotEls=dots.querySelectorAll('i');
       wishSlideIdx=0;
+      dotEls[0].classList.add('now');
       wishSlideTimer=setInterval(()=>{
-        slideEls[wishSlideIdx].classList.remove('on'); dotEls[wishSlideIdx].classList.remove('on');
+        slideEls[wishSlideIdx].classList.remove('on');
+        dotEls[wishSlideIdx].classList.remove('now');
+        dotEls[wishSlideIdx].classList.add('done');
+        const wrapped = wishSlideIdx === slideEls.length-1;
         wishSlideIdx=(wishSlideIdx+1)%slideEls.length;
-        slideEls[wishSlideIdx].classList.add('on'); dotEls[wishSlideIdx].classList.add('on');
-      },5000);
+        // новий круг — гасимо всі пройдені, щоб смужка почалася з нуля
+        if(wrapped) dotEls.forEach(d=>d.classList.remove('done'));
+        slideEls[wishSlideIdx].classList.add('on');
+        const cur=dotEls[wishSlideIdx];
+        // перезапуск анімації: без цього сегмент на другому колі лишиться порожнім
+        const fill=cur.querySelector('b');
+        if(fill){ fill.style.animation='none'; void fill.offsetWidth; fill.style.animation=''; }
+        cur.classList.add('now');
+      },WISH_SLIDE_MS);
     }else{
-      dots.innerHTML='';
+      dots.innerHTML=''; dots.classList.remove('on');
     }
   }
 
@@ -34163,24 +34206,24 @@ html.home-glass #scr-home .summary.has-wish .wishbg-ov{
 #scr-home .summary>.hint{order:3;}
 #scr-home .summary>.bar{order:4;}
 #scr-home .summary>.herocap{order:5;}
-#scr-home .summary>.pgdots{order:6;}
+#scr-home .summary>.wishdots{order:6;}
 #scr-home .summary>#nyCountdown{order:7;}
 
 /* текст читається поверх тла в обох станах */
 #scr-home .summary>.label,#scr-home .summary>.big,#scr-home .summary>.hint,
-#scr-home .summary>.bar,#scr-home .summary>.herocap,#scr-home .summary>.pgdots{position:relative;z-index:2;}
+#scr-home .summary>.bar,#scr-home .summary>.herocap,#scr-home .summary>.wishdots{position:relative;z-index:2;}
 #scr-home .summary .label{color:rgba(255,255,255,.72);font-size:10px;letter-spacing:.15em;}
 #scr-home .summary .big{color:#fff;font-size:44px;margin:4px 0 0;
   text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.45);}
 #scr-home .summary .big small{font-size:17px;color:rgba(255,255,255,.72);}
 #scr-home .summary .hint{color:rgba(255,255,255,.78);font-size:12.5px;line-height:1.4;margin-top:6px;}
 #scr-home .summary .wishlink{display:none;}
-#scr-home .summary .herocap .hc-tab b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.4);}
+#scr-home .summary .herocap .hc-tab b{color:inherit;text-shadow:0 1px 6px rgba(0,0,0,.4);}
 /* світла тема: картка все одно лежить на фото або на темному градієнті,
    тому текст лишається світлим — інакше var(--text) стає темним і зникає */
 html[data-theme="light"] #scr-home .top .brand h1,
 html[data-theme="light"] #scr-home .summary .big,
-html[data-theme="light"] #scr-home .summary .herocap .hc-tab b{color:#fff;}
+html[data-theme="light"] #scr-home .summary .herocap .hc-tab b{color:inherit;}
 html[data-theme="light"] #scr-home .summary .hint{color:rgba(255,255,255,.82);}
 html[data-theme="light"] #scr-home .summary .label{color:rgba(255,255,255,.72);}
 html[data-theme="light"] #scr-home .top .icon-btn svg{color:#efedf7;}
