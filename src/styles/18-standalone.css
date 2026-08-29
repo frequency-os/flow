@@ -18,13 +18,26 @@
   body::before{
     content:'';
     position:fixed; left:0; right:0; top:0;
-    height:env(safe-area-inset-top);
+    /* трохи вище за саму смугу — щоб було де розчинитися */
+    height:calc(env(safe-area-inset-top) + 18px);
     /* вище за найвищий шар застосунку (100001), але нижче за
        аварійний екран помилок — той має лишатися видимим завжди */
     z-index:100002;
     pointer-events:none;          /* не перехоплює дотики */
-    background:rgba(10,12,18,.55);
-    backdrop-filter:saturate(1.4) blur(14px);
-    -webkit-backdrop-filter:saturate(1.4) blur(14px);
+
+    /* Затемнення слабке і саме згасає донизу — щоб не було відчуття
+       окремої панелі, приклеєної згори. */
+    background:linear-gradient(to bottom,
+      rgba(10,12,18,.34) 0%,
+      rgba(10,12,18,.18) 55%,
+      rgba(10,12,18,0)  100%);
+    backdrop-filter:saturate(1.25) blur(11px);
+    -webkit-backdrop-filter:saturate(1.25) blur(11px);
+
+    /* Головне: маска гасить і саме розмиття, а не лише затемнення.
+       Без неї внизу лишався б чіткий обрив — та сама «полоска окремо»,
+       тільки з розмиття замість кольору. */
+    mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%);
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%);
   }
 }
