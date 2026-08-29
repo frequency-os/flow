@@ -27,7 +27,10 @@ html[data-theme="light"] .f26w-fx{border-top-color:rgba(0,0,0,.08)}
 .f26w-fxrow .pr i{display:block;height:100%;border-radius:99px}
 .f26w-fxrow .c{flex:none;font-size:10.5px;color:var(--muted,#8f8aa8);font-weight:800;min-width:26px;text-align:right}
 .f26w-fxempty{font-size:12px;color:var(--muted,#8f8aa8);font-weight:700;padding:4px 0}
-.f26w-fxempty b{color:var(--accent2,#c4a8ff);cursor:pointer}
+/* --accent2 ніде не визначена, тому завжди спрацьовував запасний
+   світло-бузковий #c4a8ff — на світлій темі контраст 2.02.
+   Беремо --accent: вона є в кожній темі. */
+.f26w-fxempty b{color:var(--accent);cursor:pointer;font-weight:800}
 /* burndown */
 .f26w-bd{margin-top:10px;border-radius:18px;overflow:hidden}
 .f26w-bdh{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;user-select:none}
@@ -67,7 +70,12 @@ html[data-theme="light"] .f26w-chip{border-color:rgba(0,0,0,.1)}
 .f26w-wd .load i{position:absolute;left:0;right:0;bottom:0;border-radius:99px;background:linear-gradient(180deg,#c4a8ff,#8b7cff);transition:height .4s cubic-bezier(.22,1.36,.36,1)}
 .f26w-wd .cnt{font-size:9px;color:var(--muted,#8f8aa8);font-weight:800}
 .f26w-wd.today{border-color:rgba(255,157,92,.42);background:rgba(255,157,92,.08)}
-.f26w-wd.today .n,.f26w-wd.today .d{color:#ff9d5c}
+/* Помаранчевий беремо з палітри (--fin), а не жорстким #ff9d5c:
+   той був розрахований лише на темне тло і у світлій темі
+   давав контраст 1.94 — «Нд» на сьогоднішньому дні не читалось. */
+.f26w-wd.today .n,.f26w-wd.today .d{color:var(--fin,#ff9d5c)}
+html[data-theme="light"] .f26w-wd.today .n,
+html[data-theme="light"] .f26w-wd.today .d{color:color-mix(in srgb,var(--fin) 76%,#000)}
 .f26w-wd.today .load i{background:linear-gradient(180deg,#ff9d5c,#ff5c8a)}
 .f26w-wd.over .load i{background:linear-gradient(180deg,#ff5c8a,#e0356a)}
 .f26w-wd.sel{border-color:rgba(139,124,255,.55);background:rgba(139,124,255,.10)}
