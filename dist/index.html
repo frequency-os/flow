@@ -11754,6 +11754,14 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     (function(){
       const DESK = window.flowDesktop || null;
       if(!DESK || typeof DESK.onAuthCallback !== 'function') return;
+      /* У застосунку немає адресного рядка й консолі під рукою, тому про
+         результат входу кажемо вголос — інакше при невдачі людина бачить
+         просто «нічого не сталось» і не має за що вхопитись. */
+      const say = (msg)=>{ try{
+        if(typeof window.__flowToast==='function') window.__flowToast(msg);
+        else alert(msg);
+      }catch(_){} };
+
       DESK.onAuthCallback(async function(cbUrl){
         try{
           const frag = String(cbUrl||'').split('#')[1] || '';
@@ -11762,20 +11770,33 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
           const refresh_token = q.get('refresh_token');
           if(!access_token || !refresh_token){
             const err = q.get('error_description') || q.get('error');
-            if(err){ try{ console.warn('[Flow auth] Google повернув помилку:', err); }catch(_){} }
+            if(err){
+              try{ console.warn('[Flow auth] Google повернув помилку:', err); }catch(_){}
+              say('Вхід не вдався: ' + decodeURIComponent(String(err).replace(/\+/g,' ')));
+            } else {
+              say('Вхід не вдався: Supabase не повернув ключі. Перевір, чи додано frequency://auth у Redirect URLs.');
+            }
             return;
           }
           const client = await sbInit();
-          if(!client) return;
+          if(!client){ say('Вхід не вдався: не завантажилась бібліотека Supabase.'); return; }
           const { data, error } = await client.auth.setSession({ access_token, refresh_token });
-          if(error){ try{ console.warn('[Flow auth] сесію не прийнято:', error.message); }catch(_){} return; }
+          if(error){
+            try{ console.warn('[Flow auth] сесію не прийнято:', error.message); }catch(_){}
+            say('Вхід не вдався: ' + error.message);
+            return;
+          }
           sbUserCache = data && data.session ? data.session.user : null;
           try{ if(window.__setSync){ window.__flowSync.quota=false; window.__setSync('synced'); } }catch(_){}
           try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
           try{ await sbPrefetchAll(); }catch(_){}
           try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
           try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
-        }catch(_){}
+          const who = (sbUserCache && sbUserCache.email) ? sbUserCache.email : '';
+          say('Вхід виконано' + (who ? ' · ' + who : ''));
+        }catch(e){
+          say('Вхід не вдався: ' + (e && e.message ? e.message : 'невідома помилка'));
+        }
       });
     })();
 
