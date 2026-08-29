@@ -161,7 +161,7 @@
       const bkStats=(()=>{const s=window.flowBackup?window.flowBackup.stats():{keys:0,bytes:0};return s.keys+' записів · '+(s.bytes>1024?(s.bytes/1024).toFixed(0)+' КБ':s.bytes+' Б');})();
       const avHintTxt=customAvatar
         ? 'Власна іконка встановлена — можна замінити.'
-        : 'Не обов’язково: можна додати власну іконку профілю, або лишити фото з Telegram/Google чи літеру імені.';
+        : 'Не обов’язково: можна додати власну іконку профілю, або лишити фото з Google чи літеру імені.';
       const avHint=`<p class="acc-hint acc-hint-av">${avHintTxt}${customAvatar?' <button class="acc-mini-link" data-acc-av-remove>прибрати</button>':''}</p>`;
 
       host.innerHTML=`<div class="acc-wrap">

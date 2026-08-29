@@ -260,7 +260,7 @@
             kt.text=v; if(v && !kt.signed) kt.signed=plTodayStr(); vzSave(); renderVision(); }})},
       {ic:'edit', label:'Дедлайн', sub:kt.deadline||'РРРР-ММ-ДД', onClick:()=>inputModal({title:'Дедлайн контракту (РРРР-ММ-ДД)', value:kt.deadline,
         placeholder:new Date().getFullYear()+'-09-30', onOk:v=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(v)||v==='') kt.deadline=v; vzSave(); renderVision(); }})},
-      {ic:'edit', label:'Підпис (імʼя)', sub:kt.name||'з Telegram', onClick:()=>inputModal({title:'Імʼя для підпису', value:kt.name, onOk:v=>{ kt.name=v; vzSave(); renderVision(); }})},
+      {ic:'edit', label:'Підпис (імʼя)', sub:kt.name||'не задано', onClick:()=>inputModal({title:'Імʼя для підпису', value:kt.name, onOk:v=>{ kt.name=v; vzSave(); renderVision(); }})},
       (kt.text?{ic:'📜', label:'Переглянути контракт', onClick:()=>{
         const s=vzKtStats();
         flowAlert(kt.text+'\n\nПідписано: '+(kt.signed||'—')+(kt.deadline?' · до '+kt.deadline:'')+'\nДотримано: '+s.y+' · зриви: '+s.n,'✍️ '+(kt.name||'Контракт'));

@@ -1414,11 +1414,13 @@
         else if(pic){ av.style.background='url('+pic+') center/cover'; av.textContent=''; }
         else{ av.style.background=''; av.textContent=(gname[0]||'G').toUpperCase(); av.style.display='grid'; av.style.placeItems='center'; av.style.fontWeight='800'; av.style.color='#fff'; }
       }else{
-        /* на native акаунта Telegram нема і бути не може — не проси відкрити
-           апку деінде, інакше рецензент бачить непрацездатний онбординг (2.1) */
+        /* Telegram прибрано 2026-08-29 — раніше тут стояло «відкрий через
+           Telegram», що тепер просто неправда: вхід іде через Google.
+           На native лишаємо нейтральний текст: рецензент App Store не має
+           бачити пропозицію відкрити апку деінде (правило 2.1). */
         nm.innerHTML=window.FLOW_NATIVE
           ? 'Цей пристрій<small>дані зберігаються локально</small>'
-          : 'Гість<small>відкрий через Telegram</small>';
+          : 'Гість<small>увійди, щоб дані були на всіх пристроях</small>';
         if(customAvatar){ av.style.background='url('+customAvatar+') center/cover'; av.textContent=''; }
         else{ av.style.background=''; av.textContent='F'; av.style.display='grid'; av.style.placeItems='center'; av.style.fontWeight='800'; av.style.color='#fff'; }
       }
