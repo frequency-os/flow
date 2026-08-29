@@ -6,11 +6,10 @@
 <meta name="format-detection" content="telephone=no">
 <title>Frequency</title>
 <script>@@INC:scripts/01-crash-screen.js@@</script>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>@@INC:scripts/00-telegram-sdk.js@@</script>
 <script>@@INC:scripts/02-vendor-lz-string.js@@</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Lora:wght@600;700&family=Caveat:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<!-- шрифти вбудовані в код (див. tools/build-fonts.py) — інтернет не потрібен -->
+<style>@@INC:styles/00-fonts.css@@</style>
 <style>@@INCDIR:styles/core@@</style>
 <style>@@INC:styles/02-income-cards.css@@</style>
 <style id="patterns-css">@@INC:styles/03-patterns.css@@</style>

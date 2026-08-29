@@ -95,10 +95,45 @@ cd ~/frequency && ./tools/check.sh
 
 ---
 
+## Автономність (зроблено)
+
+Застосунок більше **не потребує інтернету, щоб відкритися**. Все, що раніше
+тягнулося з чужих серверів, тепер лежить усередині:
+
+| Що | Було | Стало |
+|---|---|---|
+| Шрифти Manrope / Lora / Caveat | Google Fonts | вшиті в `src/styles/00-fonts.css` |
+| Telegram Web App SDK | `telegram.org` | локальна копія `src/scripts/00-telegram-sdk.js` |
+| JSZip (EPUB) · pdf.js (PDF) · Supabase (вхід) | CDN | `src/vendor/` → `dist/vendor/`, CDN лишився запасним |
+
+Інтернет потрібен лише для того, що без нього не має сенсу: курси валют,
+вхід через Google, вбудовані YouTube-відео, AI.
+
+### Оновити вбудоване
+
+```bash
+./tools/update-telegram-sdk.sh   # Telegram SDK
+python3 tools/build-fonts.py     # шрифти
+./tools/build-vendor.sh          # JSZip / pdf.js / Supabase
+python3 tools/build.py           # і завжди зібрати після
+```
+
+Версії бібліотек **зафіксовані навмисно**. «Остання версія» колись зміниться
+сама і зламає те, що вчора працювало — тому оновлення тут завжди твоє рішення.
+
+### Що складається в `dist/`
+
+```
+dist/index.html     сама програма
+dist/vendor/        3 бібліотеки (потрібні лише для PDF/EPUB/входу)
+```
+Викладати треба **обидва**. Якщо викласти лише `index.html` — програма
+працюватиме, але PDF, EPUB і вхід через Google візьмуться з CDN, тобто
+вимагатимуть інтернету.
+
+---
+
 ## Що далі (не зроблено)
 
-Щоб програма стала застосунком на Mac / Windows / Android / iPhone:
-
-1. Локально покласти шрифти Google Fonts (зараз тягнуться з інтернету — в офлайні не буде).
-2. Прибрати залежність від `telegram.org/js/telegram-web-app.js` у нетелеграмних збірках.
-3. Встановити Node.js, обгорнути `dist/` через Capacitor (iPhone/Android) і Tauri або Electron (Mac/Windows).
+Встановити Node.js і обгорнути `dist/` — Capacitor (iPhone/Android),
+Tauri або Electron (Mac/Windows).

@@ -5,7 +5,7 @@ build.py — збирає src/ назад в один файл dist/index.html.
 Це і є «готова програма»: саме її відкриває браузер, Telegram, iPhone, Android.
 Правиш файли в src/ → запускаєш build → отримуєш dist/index.html.
 """
-import os, re, sys
+import os, re, shutil, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC  = os.path.join(ROOT, 'src')
@@ -53,5 +53,15 @@ def main():
 
     print('Зібрано %d частин → dist/index.html (%.1f KB, %d рядків)'
           % (len(used), len(out.encode('utf-8'))/1024, out.count('\n') + 1))
+
+    # Бібліотеки (PDF, EPUB, вхід через Google) кладемо поруч, а не всередину:
+    # вони важкі й потрібні рідко, тому вантажаться лише коли справді треба.
+    vsrc, vdst = os.path.join(SRC, 'vendor'), os.path.join(DIST, 'vendor')
+    if os.path.isdir(vsrc):
+        if os.path.isdir(vdst): shutil.rmtree(vdst)
+        shutil.copytree(vsrc, vdst)
+        names = sorted(os.listdir(vdst))
+        size = sum(os.path.getsize(os.path.join(vdst, f)) for f in names)
+        print('Скопійовано dist/vendor/: %s (%.0f KB)' % (', '.join(names), size/1024))
 
 main()

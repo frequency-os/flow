@@ -121,14 +121,26 @@
   }
   function agFileSizeStr(b){ if(!b)return ''; if(b<1024)return b+' Б'; if(b<1048576)return Math.round(b/1024)+' КБ'; return (b/1048576).toFixed(1)+' МБ'; }
   function agFileIcon(t){ if(/^image\//.test(t||''))return '🖼'; if(/pdf/i.test(t||''))return '📕'; if(/word|doc/i.test(t||''))return '📘'; return '📎'; }
+  /* Вантажить бібліотеку. Приймає список адрес і пробує їх по черзі:
+     спершу локальну копію з vendor/ (працює без інтернету), і лише якщо
+     її нема — CDN. Так читалка живе і в застосунку, і в браузері. */
   function loadScriptOnce(src){
-    return new Promise((res,rej)=>{
-      if([...document.scripts].some(s=>s.src===src)) return res();
-      const s=document.createElement('script'); s.src=src;
-      s.onload=()=>res(); s.onerror=()=>rej(new Error('cdn-fail'));
-      document.head.appendChild(s);
-      setTimeout(()=>rej(new Error('cdn-timeout')), 12000);
-    });
+    const list = Array.isArray(src) ? src.slice() : [src];
+    const abs = u => { try{ return new URL(u, location.href).href; }catch(_){ return u; } };
+    function tryOne(i){
+      if(i >= list.length) return Promise.reject(new Error('cdn-fail'));
+      const url = abs(list[i]);
+      if([...document.scripts].some(s=>s.src===url)) return Promise.resolve();
+      return new Promise((res,rej)=>{
+        const s=document.createElement('script'); s.src=url;
+        let done=false;
+        const fin=ok=>{ if(done) return; done=true; ok?res():rej(new Error('load-fail')); };
+        s.onload=()=>fin(true); s.onerror=()=>fin(false);
+        document.head.appendChild(s);
+        setTimeout(()=>fin(false), 12000);
+      }).catch(()=>tryOne(i+1));
+    }
+    return tryOne(0);
   }
 
   // вибір файлу книги з пристрою
@@ -275,7 +287,7 @@
   // EPUB — розпаковка zip через JSZip (CDN) + витяг HTML по spine
   async function renderEpub(blob){
     setRdrLoading(true,'Готую EPUB…');
-    try{ await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'); }
+    try{ await loadScriptOnce(['vendor/jszip.min.js','https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js']); }
     catch(_){ throw new Error('Для EPUB потрібен інтернет (перший раз). Спробуй у звичайному браузері або під\u0027єднай мережу.'); }
     const zip=await window.JSZip.loadAsync(blob);
     // знайти OPF
@@ -341,7 +353,7 @@
   // PDF — рендер сторінок у canvas через pdf.js (CDN)
   async function renderPdf(blob){
     setRdrLoading(true,'Готую PDF…');
-    try{ await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'); }
+    try{ await loadScriptOnce(['vendor/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js']); }
     catch(_){ throw new Error('Для PDF потрібен інтернет (перший раз). TXT, MD та EPUB працюють офлайн.'); }
     const pdfjsLib=window.pdfjsLib;
     // У Telegram WebView воркер pdf.js блокується політикою безпеки → працюємо в основному

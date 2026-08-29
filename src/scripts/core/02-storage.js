@@ -477,14 +477,25 @@
     let sbBatchCache = null; // {key: rawJsonString} — заповнюється одним пакетним запитом
     window.__sbReady = false; // стає true, коли перевірку сесії завершено (успішно чи ні)
 
+    /* Спершу локальна копія з vendor/ (працює без інтернету), потім CDN.
+       Версія на CDN зафіксована навмисно: «@2» колись оновиться сама і може
+       зламати вхід у момент, коли ти цього не чекаєш. */
     function loadSupabaseLib(){
       return new Promise((resolve)=>{
         if(window.supabase){ resolve(window.supabase); return; }
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
-        s.onload = ()=> resolve(window.supabase);
-        s.onerror = ()=> { try{ console.warn('[Flow auth] не вдалося завантажити supabase-js з CDN — вхід через Google буде недоступний'); }catch(_){} resolve(null); };
-        document.head.appendChild(s);
+        const urls = ['vendor/supabase.min.js',
+                      'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.js'];
+        (function next(i){
+          if(i >= urls.length){
+            try{ console.warn('[Flow auth] не вдалося завантажити supabase-js — вхід через Google буде недоступний'); }catch(_){}
+            resolve(null); return;
+          }
+          const s = document.createElement('script');
+          s.src = urls[i];
+          s.onload = ()=> window.supabase ? resolve(window.supabase) : next(i+1);
+          s.onerror = ()=> next(i+1);
+          document.head.appendChild(s);
+        })(0);
       });
     }
 
