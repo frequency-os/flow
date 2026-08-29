@@ -54,6 +54,15 @@ def main():
     print('Зібрано %d частин → dist/index.html (%.1f KB, %d рядків)'
           % (len(used), len(out.encode('utf-8'))/1024, out.count('\n') + 1))
 
+    # Іконка + маніфест: щоб сайт можна було поставити на телефон
+    # як застосунок (повний екран, своя іконка, без адресного рядка).
+    wsrc = os.path.join(SRC, 'web')
+    if os.path.isdir(wsrc):
+        names = sorted(os.listdir(wsrc))
+        for n in names:
+            shutil.copy2(os.path.join(wsrc, n), os.path.join(DIST, n))
+        print('Скопійовано в dist/: %s' % ', '.join(names))
+
     # Бібліотеки (PDF, EPUB, вхід через Google) кладемо поруч, а не всередину:
     # вони важкі й потрібні рідко, тому вантажаться лише коли справді треба.
     vsrc, vdst = os.path.join(SRC, 'vendor'), os.path.join(DIST, 'vendor')

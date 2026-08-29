@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="format-detection" content="telephone=no">
 <title>Frequency</title>
+<!-- щоб сайт ставився на телефон як застосунок: повний екран, своя іконка -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Frequency">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0c0e14">
 <script>@@INC:scripts/01-crash-screen.js@@</script>
-<script>@@INC:scripts/00-telegram-sdk.js@@</script>
 <script>@@INC:scripts/02-vendor-lz-string.js@@</script>
 <!-- шрифти вбудовані в код (див. tools/build-fonts.py) — інтернет не потрібен -->
 <style>@@INC:styles/00-fonts.css@@</style>
