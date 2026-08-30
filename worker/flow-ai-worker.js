@@ -40,7 +40,12 @@ const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
 /* ── Голос ────────────────────────────────────────────────────── */
 /* Голос ElevenLabs за замовчуванням. Замінюється змінною
    ELEVENLABS_VOICE_ID, якщо вона задана. */
-const EL11_VOICE_DEFAULT = "";   // порожньо = взяти перший вбудований
+/* Голос ElevenLabs за замовчуванням — «George» із їхнього ж
+   швидкого старту: вбудований, доступний безкоштовним акаунтам.
+   Тримаємо саме ID, бо читання переліку голосів вимагає окремого
+   права (voices_read), якого в ключі може не бути — і тоді все
+   падало з 401 ще до синтезу. */
+const EL11_VOICE_DEFAULT = "JBFqnCBsd6RMkjVDRZzb";
 
 const TTS_VOICES = ["uk-UA-OstapNeural", "uk-UA-PolinaNeural", "en-US-AvaMultilingualNeural", "ru-RU-DmitryNeural"];
 
@@ -191,7 +196,10 @@ export default {
                 { headers: { "xi-api-key": el11Key } }
               );
               const list = lv.ok ? await lv.json().catch(() => null) : null;
-              const alt = ((list && list.voices) || []).map((v) => v.voice_id).filter((id) => id && id !== voiceId)[0];
+              const fromApi = ((list && list.voices) || []).map((v) => v.voice_id);
+              // перелік може бути недоступний (ключ без права voices_read) —
+              // тоді пробуємо вбудований, відомий наперед
+              const alt = fromApi.concat([EL11_VOICE_DEFAULT]).filter((id) => id && id !== voiceId)[0];
               if (alt) {
                 const r2 = await fetch(
                   "https://api.elevenlabs.io/v1/text-to-speech/" + alt + "?output_format=mp3_44100_128",
