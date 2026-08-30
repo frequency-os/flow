@@ -119,13 +119,60 @@ export default {
         const text = String(body.text || "").trim().slice(0, 800);
         if (!text) return json({ error: "порожній text" }, 400);
 
+        const rate = /^[+-]\d{1,3}%$/.test(body.rate || "") ? body.rate : "+6%";
+        const pitch = /^[+-]\d{1,3}(Hz|%)$/.test(body.pitch || "") ? body.pitch : "+0Hz";
+
+        /* ── ElevenLabs ────────────────────────────────────────────
+           Стоїть першим, бо реєстрація без картки — а Azure блокує
+           створення акаунтів. Безкоштовно 10 тис. символів на місяць:
+           на короткі репліки помічника вистачає, на довгі тексти ні.
+           Коли ліміт вичерпано, ElevenLabs віддає 401/429 — і ми
+           чесно повертаємо помилку, після чого застосунок бере
+           системний голос. Тобто озвучка не зникає, лише спрощується. */
+        if (env.ELEVENLABS_KEY) {
+          let voiceId = env.ELEVENLABS_VOICE_ID || "";
+          if (!voiceId) {
+            // голос не заданий — беремо перший доступний в акаунті
+            const lv = await fetch("https://api.elevenlabs.io/v1/voices", {
+              headers: { "xi-api-key": env.ELEVENLABS_KEY },
+            });
+            if (lv.ok) {
+              const list = await lv.json().catch(() => null);
+              voiceId = (list && list.voices && list.voices[0] && list.voices[0].voice_id) || "";
+            }
+          }
+          if (!voiceId) return json({ error: "ElevenLabs: не вдалося визначити голос" }, 502);
+
+          const r11 = await fetch(
+            "https://api.elevenlabs.io/v1/text-to-speech/" + voiceId + "?output_format=mp3_44100_128",
+            {
+              method: "POST",
+              headers: { "xi-api-key": env.ELEVENLABS_KEY, "content-type": "application/json" },
+              body: JSON.stringify({
+                text,
+                // flash — швидша й дешевша за символами, 32 мови разом з українською
+                model_id: env.ELEVENLABS_MODEL || "eleven_flash_v2_5",
+                voice_settings: { stability: 0.4, similarity_boost: 0.75 },
+              }),
+            }
+          );
+          if (!r11.ok) {
+            const d = (await r11.text().catch(() => "")).slice(0, 200);
+            return json({ error: "ElevenLabs: HTTP " + r11.status + (d ? " · " + d : "") }, 502);
+          }
+          const mp3 = await r11.arrayBuffer();
+          if (!mp3 || mp3.byteLength < 400) return json({ error: "ElevenLabs повернув порожнє аудіо" }, 502);
+          return new Response(mp3, {
+            status: 200,
+            headers: { ...cors, "content-type": "audio/mpeg", "cache-control": "no-store", "X-TTS-Engine": "elevenlabs" },
+          });
+        }
+
         if (!env.AZURE_SPEECH_KEY || !env.AZURE_SPEECH_REGION) {
-          return json({ error: "Нейронний голос не налаштований: додай AZURE_SPEECH_KEY і AZURE_SPEECH_REGION" }, 503);
+          return json({ error: "Нейронний голос не налаштований: додай ELEVENLABS_KEY або AZURE_SPEECH_KEY" }, 503);
         }
 
         const voice = TTS_VOICES.includes(body.voice) ? body.voice : "uk-UA-OstapNeural";
-        const rate = /^[+-]\d{1,3}%$/.test(body.rate || "") ? body.rate : "+6%";
-        const pitch = /^[+-]\d{1,3}(Hz|%)$/.test(body.pitch || "") ? body.pitch : "+0Hz";
         const lang = voice.slice(0, 5);
 
         const ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='" + lang + "'>"
