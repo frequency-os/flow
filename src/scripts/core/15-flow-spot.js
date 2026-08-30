@@ -231,10 +231,34 @@
       speechSynthesis.cancel();
       const u=new SpeechSynthesisUtterance(t);
       u.lang='uk-UA'; u.rate=1.04; u.pitch=1;
-      const pick=()=>{ const v=(speechSynthesis.getVoices()||[]).find(x=>(x.lang||'').toLowerCase().startsWith('uk')); if(v) u.voice=v; };
-      pick();
-      if(!u.voice&&speechSynthesis.onvoiceschanged!==undefined){ speechSynthesis.onvoiceschanged=()=>{ pick(); }; }
-      speechSynthesis.speak(u);
+
+      /* Голоси в браузері зʼявляються не одразу. Раніше тут стояв
+         speak() ОДРАЗУ, а український голос підставлявся потім — тобто
+         першу фразу після відкриття читав голос за замовчуванням,
+         зазвичай англійський. Українською це звучало жахливо.
+         Тепер спершу дочекуємось списку, потім говоримо. */
+      const pickUk = () => (speechSynthesis.getVoices()||[])
+        .find(x => (x.lang||'').toLowerCase().startsWith('uk'));
+
+      const say = () => {
+        const v = pickUk();
+        if (v) u.voice = v;          // немає української — хай читає системний
+        speechSynthesis.speak(u);
+      };
+
+      if (pickUk() || (speechSynthesis.getVoices()||[]).length) { say(); }
+      else {
+        /* чекаємо появи голосів, але не вічно: якщо за 800 мс їх так
+           і не буде — говоримо тим, що є, аби не мовчати зовсім */
+        let said = false;
+        const once = () => { if (said) return; said = true; say(); };
+        const prev = speechSynthesis.onvoiceschanged;
+        speechSynthesis.onvoiceschanged = function(e){
+          try{ if (typeof prev === 'function') prev.call(this, e); }catch(_){}
+          once();
+        };
+        setTimeout(once, 800);
+      }
     }catch(e){ console.error('aiSpeak',e); }
   }
   function aiVoiceToggle(){
