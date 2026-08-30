@@ -38,6 +38,10 @@ const MODEL_DEFAULT = "claude-sonnet-5";
 const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
 
 /* ── Голос ────────────────────────────────────────────────────── */
+/* Голос ElevenLabs за замовчуванням. Замінюється змінною
+   ELEVENLABS_VOICE_ID, якщо вона задана. */
+const EL11_VOICE_DEFAULT = "U4IxWQ3B5B0suleGgLcn";
+
 const TTS_VOICES = ["uk-UA-OstapNeural", "uk-UA-PolinaNeural", "en-US-AvaMultilingualNeural", "ru-RU-DmitryNeural"];
 
 /* Скільки чекати на модель, перш ніж здатися. Довгі агентні ходи
@@ -135,7 +139,10 @@ export default {
           || env.ELEVENLABS_API_KEY || env.XI_API_KEY || "";
 
         if (el11Key) {
-          let voiceId = env.ELEVENLABS_VOICE_ID || "";
+          /* Голос за замовчуванням — той, що доданий у кабінеті.
+             Це не таємниця, а просто назва, тому тримаємо в коді:
+             одна змінна менше — один привід менше для помилки. */
+          let voiceId = env.ELEVENLABS_VOICE_ID || EL11_VOICE_DEFAULT;
           let why = "";
           if (!voiceId) {
             /* Голос не заданий — беремо перший доступний в акаунті.
@@ -177,8 +184,13 @@ export default {
             }
           );
           if (!r11.ok) {
-            const d = (await r11.text().catch(() => "")).slice(0, 200);
-            return json({ error: "ElevenLabs: HTTP " + r11.status + (d ? " · " + d : "") }, 502);
+            const d = (await r11.text().catch(() => "")).slice(0, 250);
+            return json({
+              error: "ElevenLabs: HTTP " + r11.status,
+              відповідь: d,
+              голос: voiceId,
+              модель: env.ELEVENLABS_MODEL || "eleven_flash_v2_5",
+            }, 502);
           }
           const mp3 = await r11.arrayBuffer();
           if (!mp3 || mp3.byteLength < 400) return json({ error: "ElevenLabs повернув порожнє аудіо" }, 502);
