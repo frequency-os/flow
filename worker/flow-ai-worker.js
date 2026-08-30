@@ -315,6 +315,7 @@ async function edgeTTS(text, voice, rate) {
 
   return await new Promise((resolve, reject) => {
     const parts = [];
+    const notes = [];      // текстові кадри від сервера — для діагностики
     let done = false;
     const finish = (err) => {
       if (done) return; done = true;
@@ -325,7 +326,13 @@ async function edgeTTS(text, voice, rate) {
          застосунок отримував валідний нульовий файл і програвав
          тишу. Знайти таке в житті майже неможливо — тому кажемо
          прямо, що аудіо не прийшло. */
-      if (!parts.length) { reject(new Error("TTS: аудіо не надійшло")); return; }
+      if (!parts.length) {
+        /* Мікрософт відповідає текстовими кадрами навіть коли відмовляє.
+           Без них помилка виглядає як «щось не так» і шукати нічого. */
+        const said = notes.join(" | ").slice(0, 300);
+        reject(new Error("TTS: аудіо не надійшло" + (said ? " · сервер сказав: " + said : " · сервер мовчав")));
+        return;
+      }
       let len = 0; parts.forEach((p) => len += p.length);
       const out = new Uint8Array(len); let o = 0;
       parts.forEach((p) => { out.set(p, o); o += p.length; });
@@ -336,7 +343,9 @@ async function edgeTTS(text, voice, rate) {
     ws.addEventListener("message", (ev) => {
       try {
         if (typeof ev.data === "string") {
-          if (ev.data.includes("Path:turn.end")) finish(null);
+          const path = (ev.data.match(/Path:([\w.]+)/) || [])[1] || "?";
+          if (notes.length < 6) notes.push(path);
+          if (path === "turn.end") finish(null);
           return;
         }
         const buf = new Uint8Array(ev.data);
@@ -347,7 +356,10 @@ async function edgeTTS(text, voice, rate) {
         if (head.includes("Path:audio")) parts.push(buf.subarray(2 + hlen));
       } catch (e) { finish(e); }
     });
-    ws.addEventListener("close", () => finish(null));
+    ws.addEventListener("close", (ev) => {
+      if (!parts.length && ev && ev.code) notes.push("close " + ev.code + (ev.reason ? " " + ev.reason : ""));
+      finish(null);
+    });
     ws.addEventListener("error", () => finish(new Error("TTS: помилка зʼєднання")));
 
     ws.send(cfg);
