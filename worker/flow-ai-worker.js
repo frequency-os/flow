@@ -182,7 +182,10 @@ export default {
             const d = (await r11.text().catch(() => "")).slice(0, 250);
             /* 402 на конкретному голосі означає «цей голос платний».
                Не здаємось: беремо перший вбудований і пробуємо ще раз. */
-            if (r11.status === 402 && !env.ELEVENLABS_VOICE_ID) {
+            /* Раніше тут стояло ще й !env.ELEVENLABS_VOICE_ID — тобто запасний
+               шлях НЕ спрацьовував саме тоді, коли голос заданий вручну і
+               виявився платним. А це якраз найчастіший випадок. */
+            if (r11.status === 402) {
               const lv = await fetch(
                 "https://api.elevenlabs.io/v2/voices?voice_type=default&page_size=20",
                 { headers: { "xi-api-key": el11Key } }
