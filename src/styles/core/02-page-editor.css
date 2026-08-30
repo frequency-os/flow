@@ -1,13 +1,23 @@
   /* ═══ НОВИЙ РЕДАКТОР СТОРІНКИ (Notion-стиль, Paper/Ink) ═══ */
   #scr-page{padding:0;}
   #scr-page.active{display:block;}
+  /* Приглушений текст редактора підняли до читабельного (30.08.2026).
+     Було: --pg-mut 3.91 і --pg-mut2 3.09 на темній темі,
+           --pg-mut 2.79 і --pg-mut2 2.09 на паперовій — тобто підписи
+           «5 блоків», «ред. 30.08», «тап — старт 25 хв» ледь читались.
+     Стало: не нижче 4.5, різниця між mut і mut2 збережена. */
+  /* --pg-acc-solid — акцент ДЛЯ ЗАЛИВКИ під білим текстом (30.08.2026).
+     Звичайний --pg-acc світлий: як текст на темному він читається чудово
+     (6.35), але як фон під білим написом давав лише 2.98 — активні
+     пігулки «Повний», «День» тощо були майже нечитні. Це різні задачі,
+     тому тепер і різні токени. */
   /* базові токени редактора — тема Ink за замовч. */
-  #scr-page{--pg-bg:#0f1115;--pg-fg:#eef0f4;--pg-fg2:#dfe3ea;--pg-mut:#6b7280;--pg-mut2:#5c6270;
+  #scr-page{--pg-bg:#0f1115;--pg-fg:#eef0f4;--pg-fg2:#dfe3ea;--pg-mut:#8a94a6;--pg-mut2:#7f8799;
     --pg-line:rgba(255,255,255,.08);--pg-hair:rgba(255,255,255,.06);--pg-card:#171a21;--pg-card2:#1f232c;
-    --pg-field:#0f1115;--pg-acc:#7c8cff;--pg-done:#3ad07f;--pg-danger:#ff6b6b;--pg-sheet:#1a1d25;}
-  #scr-page.pg-paper{--pg-bg:#faf9f6;--pg-fg:#1c1a17;--pg-fg2:#33302b;--pg-mut:#9c968b;--pg-mut2:#b4aea3;
+    --pg-field:#0f1115;--pg-acc:#7c8cff;--pg-acc-solid:#616ec8;--pg-done:#3ad07f;--pg-danger:#ff6b6b;--pg-sheet:#1a1d25;}
+  #scr-page.pg-paper{--pg-bg:#faf9f6;--pg-fg:#1c1a17;--pg-fg2:#33302b;--pg-mut:#615d57;--pg-mut2:#6b6861;
     --pg-line:#e8e5df;--pg-hair:#efece6;--pg-card:#ffffff;--pg-card2:#f5f3ee;
-    --pg-field:#f5f3ee;--pg-acc:#e76f51;--pg-done:#2a9d63;--pg-danger:#d1483f;--pg-sheet:#ffffff;}
+    --pg-field:#f5f3ee;--pg-acc:#e76f51;--pg-acc-solid:#b95941;--pg-done:#2a9d63;--pg-danger:#d1483f;--pg-sheet:#ffffff;}
   #scr-page{background:var(--pg-bg);color:var(--pg-fg);min-height:100%;transition:background .3s,color .3s;}
   .pg-top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
     padding:12px 14px 10px;background:color-mix(in srgb,var(--pg-bg) 88%,transparent);
@@ -19,7 +29,7 @@
   .pg-theme{display:flex;gap:3px;background:var(--pg-field);border:1px solid var(--pg-line);border-radius:12px;padding:3px;}
   .pg-theme button{border:0;background:transparent;color:var(--pg-mut);font-size:15px;width:34px;height:30px;
     border-radius:9px;font-family:inherit;cursor:pointer;}
-  .pg-theme button.on{background:var(--pg-acc);color:#fff;}
+  .pg-theme button.on{background:var(--pg-acc-solid,var(--pg-acc));color:#fff;}
   .pg-doc{max-width:none;margin:0 auto;padding:16px 14px 200px;transition:max-width .25s ease;}
   /* порожній аркуш: центруємо блок по висоті екрана, замість того щоб він
      лишався притиснутим до верху з великою порожньою зоною знизу */
@@ -466,8 +476,8 @@
   .pg-db-mini .ms{font-size:12px;color:var(--pg-mut);font-weight:400;margin-top:3px;}
   /* slash + block menu — «рідке скло»: плаваючий поплавок, сторінку видно */
   .pg-slash,.pg-bmenu{
-    --pg-bg:#0f1115;--pg-fg:#eef0f4;--pg-fg2:#dfe3ea;--pg-mut:#98a0b3;--pg-mut2:#6b7280;
-    --pg-line:rgba(255,255,255,.11);--pg-field:rgba(255,255,255,.07);--pg-acc:#7c8cff;--pg-done:#3ad07f;
+    --pg-bg:#0f1115;--pg-fg:#eef0f4;--pg-fg2:#dfe3ea;--pg-mut:#98a0b3;--pg-mut2:#767e8d;
+    --pg-line:rgba(255,255,255,.11);--pg-field:rgba(255,255,255,.07);--pg-acc:#7c8cff;--pg-acc-solid:#616ec8;--pg-done:#3ad07f;
     --pg-danger:#ff6b6b;--pg-sheet:rgba(19,23,34,.26);
     position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:230;
     background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0) 45%),rgba(19,23,34,.26);
@@ -576,7 +586,7 @@
     border:1px solid var(--pg-line);border-radius:10px;padding:2px;flex:none;}
   .jr-mode button{border:0;background:transparent;color:var(--pg-mut);font:700 10px/1 inherit;
     padding:6px 8px;border-radius:8px;cursor:pointer;transition:.15s;}
-  .jr-mode button.on{background:#7c8cff;color:#fff;}
+  .jr-mode button.on{background:var(--pg-acc-solid,#616ec8);color:#fff;}
   /* рядок дати — велика цифра + місяць в один ритм */
   .jr-dline{display:flex;align-items:baseline;gap:9px;margin-bottom:8px;}
   .jr-dnum{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--pg-fg);}
@@ -696,7 +706,7 @@
   .pt-hd{width:20px;height:20px;border-radius:6px;border:1.5px solid color-mix(in srgb,var(--pg-fg) 16%,transparent);
     background:transparent;color:var(--pg-mut);font:700 8px/1 inherit;cursor:pointer;padding:0;
     display:flex;align-items:center;justify-content:center;transition:.12s;}
-  .pt-hd.on{background:var(--hc,#7c8cff);border-color:transparent;color:#fff;}
+  .pt-hd.on{background:var(--hc,var(--pg-acc-solid,#616ec8));border-color:transparent;color:#fff;}
   .pt-hd.today{border-color:#f0b429;}
   .pt-hdel{margin-left:2px;}
   .pt-half{font-size:12.5px;color:var(--pg-mut);padding:4px 2px 2px;line-height:1.5;}

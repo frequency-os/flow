@@ -119,8 +119,8 @@ html.fd26t[data-theme="light"] .pg-bmenu,
 html.fd26t[data-theme="light"] #scr-page .pg-slash,
 html.fd26t[data-theme="light"] #scr-page.pg-paper .pg-slash,
 html.fd26t[data-theme="light"] #scr-page.pg-paper .pg-bmenu{
-  --pg-bg:#ffffff;--pg-fg:#1a1726;--pg-fg2:#2e2a40;--pg-mut:#5c5776;--pg-mut2:#8b86a3;
-  --pg-line:rgba(32,24,72,.12);--pg-field:rgba(32,24,72,.06);--pg-acc:#6d5cf0;
+  --pg-bg:#ffffff;--pg-fg:#1a1726;--pg-fg2:#2e2a40;--pg-mut:#5c5776;--pg-mut2:#76728b;
+  --pg-line:rgba(32,24,72,.12);--pg-field:rgba(32,24,72,.06);--pg-acc:#6d5cf0;--pg-acc-solid:#6d5cf0;
   --pg-danger:#d1483f;--pg-sheet:#ffffff;
   background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.82));
   -webkit-backdrop-filter:blur(42px) saturate(1.4);backdrop-filter:blur(42px) saturate(1.4);
@@ -129,7 +129,7 @@ html.fd26t[data-theme="light"] #scr-page.pg-paper .pg-bmenu{
 html.fd26t[data-theme="light"] .pg-slash .pg-ssearch{
   background:rgba(32,24,72,.05);border-color:rgba(32,24,72,.1);color:var(--pg-fg);}
 /* терракотовий тумблер теми сторінки → фіолет сім'ї (ember бережемо для вогнища) */
-html.fd26t #scr-page.pg-paper{--pg-acc:#6d5cf0;}
+html.fd26t #scr-page.pg-paper{--pg-acc:#6d5cf0;--pg-acc-solid:#6d5cf0;}
 
 /* ── 8. ІКОНАЙЗЕР · розміри SVG у хромі меню та плиток ── */
 html.fd26t .fmi svg{width:17px;height:17px;vertical-align:-3.5px;margin-right:9px;color:color-mix(in srgb,var(--muted) 70%,var(--text));}
