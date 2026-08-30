@@ -93,25 +93,49 @@
       toast('⚠️ Немає доступу до мікрофона');
       return;
     }
-    var mime = (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/mp4')) ? 'audio/mp4'
-      : ((MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '');
+    /* Порядок форматів має значення. Раніше першим стояв audio/mp4:
+       Chrome каже, що підтримує його, але пише туди погано — виходив
+       файл на кілька сотень байтів, і запис виглядав як «закоротко».
+       Тому спершу webm/opus (Chrome, Android), і лише потім mp4
+       (Safari, iPhone — там webm недоступний). */
+    var mime = '';
+    ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac'].some(function (m) {
+      if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)) { mime = m; return true; }
+      return false;
+    });
     rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
     var chunks = [];
+    var startedAt = Date.now();
     rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
     rec.onstop = async function () {
       try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (_) {}
       var blob = new Blob(chunks, { type: mime || 'audio/mp4' });
       rec = null; stream = null; setLive(false);
-      if (blob.size < 1200) { toast('🎙 Закоротко — говори трохи довше'); return; }
+      /* Кажемо, ЩО саме не так. «Закоротко» без подробиць не давало
+         зрозуміти, чи людина мало говорила, чи мікрофон нічого не чув. */
+      var secs = (Date.now() - startedAt) / 1000;
+      if (blob.size < 1200) {
+        toast(secs < 1
+          ? '🎙 Затисни довше — записалось ' + secs.toFixed(1) + ' с'
+          : '🎙 Мікрофон нічого не почув (' + blob.size + ' Б за ' + secs.toFixed(1) + ' с)');
+        return;
+      }
       var txt = await window.__flowTranscribe(blob);
       if (txt) insert(txt);
     };
-    rec.start();
+    rec.start(250);   // шматки кожні 250 мс — надійніше, ніж один в кінці
     setLive(true);
     toast('🎙 Говори — тапни ще раз, щоб зупинити');
   }
 
-  function stop() { try { if (rec) rec.stop(); } catch (_) {} }
+  function stop() {
+    try {
+      if (!rec) return;
+      // просимо віддати те, що ще не віддано, і лише потім спиняємо
+      if (rec.state === 'recording' && rec.requestData) { try { rec.requestData(); } catch (_) {} }
+      rec.stop();
+    } catch (_) {}
+  }
 
   function toggle() { if (rec) stop(); else start(); }
 
