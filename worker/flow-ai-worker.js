@@ -136,17 +136,32 @@ export default {
 
         if (el11Key) {
           let voiceId = env.ELEVENLABS_VOICE_ID || "";
+          let why = "";
           if (!voiceId) {
-            // голос не заданий — беремо перший доступний в акаунті
-            const lv = await fetch("https://api.elevenlabs.io/v1/voices", {
-              headers: { "xi-api-key": el11Key },
-            });
-            if (lv.ok) {
+            /* Голос не заданий — беремо перший доступний в акаунті.
+               Перелік голосів переїхав на /v2, але старі ключі ще
+               ходять через /v1, тому пробуємо обидва. */
+            for (const path of ["/v2/voices?page_size=20", "/v1/voices"]) {
+              const lv = await fetch("https://api.elevenlabs.io" + path, {
+                headers: { "xi-api-key": el11Key },
+              });
+              if (!lv.ok) {
+                why = path + " → HTTP " + lv.status + " " + (await lv.text().catch(() => "")).slice(0, 120);
+                continue;
+              }
               const list = await lv.json().catch(() => null);
-              voiceId = (list && list.voices && list.voices[0] && list.voices[0].voice_id) || "";
+              const vs = (list && list.voices) || [];
+              if (vs.length) { voiceId = vs[0].voice_id; break; }
+              why = path + " → список порожній";
             }
           }
-          if (!voiceId) return json({ error: "ElevenLabs: не вдалося визначити голос" }, 502);
+          if (!voiceId) {
+            return json({
+              error: "ElevenLabs: не вдалося визначити голос",
+              причина: why || "невідома",
+              підказка: "візьми Voice ID у кабінеті ElevenLabs і додай змінну ELEVENLABS_VOICE_ID",
+            }, 502);
+          }
 
           const r11 = await fetch(
             "https://api.elevenlabs.io/v1/text-to-speech/" + voiceId + "?output_format=mp3_44100_128",
