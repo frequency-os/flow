@@ -40,7 +40,7 @@ const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
 /* ── Голос ────────────────────────────────────────────────────── */
 /* Голос ElevenLabs за замовчуванням. Замінюється змінною
    ELEVENLABS_VOICE_ID, якщо вона задана. */
-const EL11_VOICE_DEFAULT = "U4IxWQ3B5B0suleGgLcn";
+const EL11_VOICE_DEFAULT = "";   // порожньо = взяти перший вбудований
 
 const TTS_VOICES = ["uk-UA-OstapNeural", "uk-UA-PolinaNeural", "en-US-AvaMultilingualNeural", "ru-RU-DmitryNeural"];
 
@@ -139,35 +139,30 @@ export default {
           || env.ELEVENLABS_API_KEY || env.XI_API_KEY || "";
 
         if (el11Key) {
-          /* Голос за замовчуванням — той, що доданий у кабінеті.
-             Це не таємниця, а просто назва, тому тримаємо в коді:
-             одна змінна менше — один привід менше для помилки. */
+          /* Вибір голосу.
+             Безкоштовним акаунтам ElevenLabs дозволяє через API лише
+             ВБУДОВАНІ голоси (voice_type=default). Голоси з бібліотеки
+             повертають 402 «paid_plan_required» — на цьому ми й стояли.
+             Тому за замовчуванням беремо перший вбудований. */
           let voiceId = env.ELEVENLABS_VOICE_ID || EL11_VOICE_DEFAULT;
           let why = "";
+
           if (!voiceId) {
-            /* Голос не заданий — беремо перший доступний в акаунті.
-               Перелік голосів переїхав на /v2, але старі ключі ще
-               ходять через /v1, тому пробуємо обидва. */
-            for (const path of ["/v2/voices?page_size=20", "/v1/voices"]) {
-              const lv = await fetch("https://api.elevenlabs.io" + path, {
-                headers: { "xi-api-key": el11Key },
-              });
-              if (!lv.ok) {
-                why = path + " → HTTP " + lv.status + " " + (await lv.text().catch(() => "")).slice(0, 120);
-                continue;
-              }
+            const lv = await fetch(
+              "https://api.elevenlabs.io/v2/voices?voice_type=default&page_size=20",
+              { headers: { "xi-api-key": el11Key } }
+            );
+            if (lv.ok) {
               const list = await lv.json().catch(() => null);
               const vs = (list && list.voices) || [];
-              if (vs.length) { voiceId = vs[0].voice_id; break; }
-              why = path + " → список порожній";
+              voiceId = (vs[0] && vs[0].voice_id) || "";
+              if (!voiceId) why = "перелік вбудованих голосів порожній";
+            } else {
+              why = "HTTP " + lv.status + " " + (await lv.text().catch(() => "")).slice(0, 120);
             }
           }
           if (!voiceId) {
-            return json({
-              error: "ElevenLabs: не вдалося визначити голос",
-              причина: why || "невідома",
-              підказка: "візьми Voice ID у кабінеті ElevenLabs і додай змінну ELEVENLABS_VOICE_ID",
-            }, 502);
+            return json({ error: "ElevenLabs: не вдалося визначити голос", причина: why || "невідома" }, 502);
           }
 
           const r11 = await fetch(
@@ -185,11 +180,47 @@ export default {
           );
           if (!r11.ok) {
             const d = (await r11.text().catch(() => "")).slice(0, 250);
+            /* 402 на конкретному голосі означає «цей голос платний».
+               Не здаємось: беремо перший вбудований і пробуємо ще раз. */
+            if (r11.status === 402 && !env.ELEVENLABS_VOICE_ID) {
+              const lv = await fetch(
+                "https://api.elevenlabs.io/v2/voices?voice_type=default&page_size=20",
+                { headers: { "xi-api-key": el11Key } }
+              );
+              const list = lv.ok ? await lv.json().catch(() => null) : null;
+              const alt = ((list && list.voices) || []).map((v) => v.voice_id).filter((id) => id && id !== voiceId)[0];
+              if (alt) {
+                const r2 = await fetch(
+                  "https://api.elevenlabs.io/v1/text-to-speech/" + alt + "?output_format=mp3_44100_128",
+                  {
+                    method: "POST",
+                    headers: { "xi-api-key": el11Key, "content-type": "application/json" },
+                    body: JSON.stringify({
+                      text,
+                      model_id: env.ELEVENLABS_MODEL || "eleven_flash_v2_5",
+                      voice_settings: { stability: 0.4, similarity_boost: 0.75 },
+                    }),
+                  }
+                );
+                if (r2.ok) {
+                  const mp3b = await r2.arrayBuffer();
+                  if (mp3b && mp3b.byteLength >= 400) {
+                    return new Response(mp3b, {
+                      status: 200,
+                      headers: { ...cors, "content-type": "audio/mpeg", "cache-control": "no-store",
+                                 "X-TTS-Engine": "elevenlabs", "X-TTS-Voice": alt },
+                    });
+                  }
+                }
+              }
+            }
             return json({
               error: "ElevenLabs: HTTP " + r11.status,
               відповідь: d,
               голос: voiceId,
-              модель: env.ELEVENLABS_MODEL || "eleven_flash_v2_5",
+              підказка: r11.status === 402
+                ? "цей голос доступний лише платним акаунтам — потрібен вбудований (voice_type=default)"
+                : undefined,
             }, 502);
           }
           const mp3 = await r11.arrayBuffer();
