@@ -38,9 +38,6 @@ const MODEL_DEFAULT = "claude-sonnet-5";
 const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
 
 /* ── Голос ────────────────────────────────────────────────────── */
-const TTS_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
-const TTS_CHROME = "143.0.3650.75";
-const TTS_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0";
 const TTS_VOICES = ["uk-UA-OstapNeural", "uk-UA-PolinaNeural", "en-US-AvaMultilingualNeural", "ru-RU-DmitryNeural"];
 
 /* Скільки чекати на модель, перш ніж здатися. Довгі агентні ходи
@@ -106,19 +103,61 @@ export default {
       }
     }
 
-    /* ═══ ТЕКСТ → ГОЛОС ═══ */
+    /* ═══ ТЕКСТ → ГОЛОС ═══
+       Через офіційний Azure Speech. Раніше тут був реверс приватного
+       ендпоінта Edge Read Aloud — він дозволяє запити з домашніх адрес
+       і МОВЧКИ відмовляє дата-центрам (перевірено: з Mac приходить
+       15 КБ звуку, з воркера — нуль при тих самих токені й голосі).
+       Полагодити це в коді неможливо, тому шлях офіційний.
+
+       Потрібні змінні: AZURE_SPEECH_KEY і AZURE_SPEECH_REGION.
+       Без них повертаємо зрозумілу відмову — застосунок сам перейде
+       на системний голос. */
     if (url.pathname === "/tts") {
       try {
         const body = await request.json();
         const text = String(body.text || "").trim().slice(0, 800);
         if (!text) return json({ error: "порожній text" }, 400);
+
+        if (!env.AZURE_SPEECH_KEY || !env.AZURE_SPEECH_REGION) {
+          return json({ error: "Нейронний голос не налаштований: додай AZURE_SPEECH_KEY і AZURE_SPEECH_REGION" }, 503);
+        }
+
         const voice = TTS_VOICES.includes(body.voice) ? body.voice : "uk-UA-OstapNeural";
         const rate = /^[+-]\d{1,3}%$/.test(body.rate || "") ? body.rate : "+6%";
-        const mp3 = await edgeTTS(text, voice, rate);
-        if (!mp3 || mp3.byteLength < 400) return json({ error: "порожнє аудіо від TTS" }, 502);
+        const pitch = /^[+-]\d{1,3}(Hz|%)$/.test(body.pitch || "") ? body.pitch : "+0Hz";
+        const lang = voice.slice(0, 5);
+
+        const ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='" + lang + "'>"
+          + "<voice name='" + voice + "'>"
+          + "<prosody pitch='" + pitch + "' rate='" + rate + "'>" + xmlEsc(text) + "</prosody>"
+          + "</voice></speak>";
+
+        const r = await fetch(
+          "https://" + env.AZURE_SPEECH_REGION + ".tts.speech.microsoft.com/cognitiveservices/v1",
+          {
+            method: "POST",
+            headers: {
+              "Ocp-Apim-Subscription-Key": env.AZURE_SPEECH_KEY,
+              "Content-Type": "application/ssml+xml",
+              "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+              "User-Agent": "Frequency",
+            },
+            body: ssml,
+          }
+        );
+
+        if (!r.ok) {
+          const detail = (await r.text().catch(() => "")).slice(0, 200);
+          return json({ error: "Azure TTS: HTTP " + r.status + (detail ? " · " + detail : "") }, 502);
+        }
+
+        const mp3 = await r.arrayBuffer();
+        if (!mp3 || mp3.byteLength < 400) return json({ error: "Azure TTS повернув порожнє аудіо" }, 502);
+
         return new Response(mp3, {
           status: 200,
-          headers: { ...cors, "content-type": "audio/mpeg", "cache-control": "no-store" },
+          headers: { ...cors, "content-type": "audio/mpeg", "cache-control": "no-store", "X-TTS-Engine": "azure" },
         });
       } catch (e) {
         return json({ error: String((e && e.message) || e) }, 502);
@@ -258,111 +297,7 @@ function base64FromBytes(bytes) {
   return btoa(bin);
 }
 
-async function ttsGec() {
-  const sec = BigInt(Math.floor(Date.now() / 1000) + 11644473600);
-  let ticks = sec * 10000000n;
-  ticks -= ticks % 3000000000n;
-  const data = new TextEncoder().encode(ticks.toString() + TTS_TOKEN);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
-}
-
-function ttsUuid() {
-  return crypto.randomUUID().replace(/-/g, "");
-}
-
 function xmlEsc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&apos;");
-}
-
-async function edgeTTS(text, voice, rate) {
-  const gec = await ttsGec();
-  const wsUrl = "https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1"
-    + "?TrustedClientToken=" + TTS_TOKEN
-    + "&Sec-MS-GEC=" + gec
-    + "&Sec-MS-GEC-Version=1-" + TTS_CHROME
-    + "&ConnectionId=" + ttsUuid();
-
-  const resp = await fetch(wsUrl, {
-    headers: {
-      "Upgrade": "websocket",
-      "Origin": "chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold",
-      "User-Agent": TTS_UA,
-      "Pragma": "no-cache",
-      "Cache-Control": "no-cache",
-    },
-  });
-  const ws = resp.webSocket;
-  if (!ws) throw new Error("TTS: WebSocket upgrade не вдався (HTTP " + resp.status + ")");
-  ws.accept();
-
-  const ts = new Date().toString();
-  const cfg = "X-Timestamp:" + ts + "\r\n"
-    + "Content-Type:application/json; charset=utf-8\r\n"
-    + "Path:speech.config\r\n\r\n"
-    + JSON.stringify({ context: { synthesis: { audio: {
-        metadataoptions: { sentenceBoundaryEnabled: "false", wordBoundaryEnabled: "false" },
-        outputFormat: "audio-24khz-48kbitrate-mono-mp3" } } } });
-  const ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='uk-UA'>"
-    + "<voice name='" + voice + "'>"
-    + "<prosody pitch='+0Hz' rate='" + rate + "' volume='+0%'>" + xmlEsc(text) + "</prosody>"
-    + "</voice></speak>";
-  const req = "X-RequestId:" + ttsUuid() + "\r\n"
-    + "Content-Type:application/ssml+xml\r\n"
-    + "X-Timestamp:" + ts + "Z\r\n"
-    + "Path:ssml\r\n\r\n" + ssml;
-
-  return await new Promise((resolve, reject) => {
-    const parts = [];
-    const notes = [];      // текстові кадри від сервера — для діагностики
-    let done = false;
-    const finish = (err) => {
-      if (done) return; done = true;
-      clearTimeout(guard);
-      try { ws.close(); } catch (_) {}
-      if (err) { reject(err); return; }
-      /* Раніше тут порожній набір шматків повертався як успіх:
-         застосунок отримував валідний нульовий файл і програвав
-         тишу. Знайти таке в житті майже неможливо — тому кажемо
-         прямо, що аудіо не прийшло. */
-      if (!parts.length) {
-        /* Мікрософт відповідає текстовими кадрами навіть коли відмовляє.
-           Без них помилка виглядає як «щось не так» і шукати нічого. */
-        const said = notes.join(" | ").slice(0, 300);
-        reject(new Error("TTS: аудіо не надійшло" + (said ? " · сервер сказав: " + said : " · сервер мовчав")));
-        return;
-      }
-      let len = 0; parts.forEach((p) => len += p.length);
-      const out = new Uint8Array(len); let o = 0;
-      parts.forEach((p) => { out.set(p, o); o += p.length; });
-      resolve(out.buffer);
-    };
-    const guard = setTimeout(() => finish(new Error("TTS: таймаут 20с")), 20000);
-
-    ws.addEventListener("message", (ev) => {
-      try {
-        if (typeof ev.data === "string") {
-          const path = (ev.data.match(/Path:([\w.]+)/) || [])[1] || "?";
-          if (notes.length < 6) notes.push(path);
-          if (path === "turn.end") finish(null);
-          return;
-        }
-        const buf = new Uint8Array(ev.data);
-        if (buf.length < 4) return;
-        const hlen = (buf[0] << 8) | buf[1];
-        if (hlen + 2 > buf.length) return;
-        const head = new TextDecoder().decode(buf.subarray(2, 2 + hlen));
-        if (head.includes("Path:audio")) parts.push(buf.subarray(2 + hlen));
-      } catch (e) { finish(e); }
-    });
-    ws.addEventListener("close", (ev) => {
-      if (!parts.length && ev && ev.code) notes.push("close " + ev.code + (ev.reason ? " " + ev.reason : ""));
-      finish(null);
-    });
-    ws.addEventListener("error", () => finish(new Error("TTS: помилка зʼєднання")));
-
-    ws.send(cfg);
-    ws.send(req);
-  });
 }
