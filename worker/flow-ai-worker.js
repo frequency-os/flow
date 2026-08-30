@@ -129,12 +129,17 @@ export default {
            Коли ліміт вичерпано, ElevenLabs віддає 401/429 — і ми
            чесно повертаємо помилку, після чого застосунок бере
            системний голос. Тобто озвучка не зникає, лише спрощується. */
-        if (env.ELEVENLABS_KEY) {
+        /* Ім'я змінної люди пишуть по-різному, а помилка «ключа немає»
+           виглядає однаково. Приймаємо всі розумні варіанти. */
+        const el11Key = env.ELEVENLABS_KEY || env.ELEVEN_LABS_KEY
+          || env.ELEVENLABS_API_KEY || env.XI_API_KEY || "";
+
+        if (el11Key) {
           let voiceId = env.ELEVENLABS_VOICE_ID || "";
           if (!voiceId) {
             // голос не заданий — беремо перший доступний в акаунті
             const lv = await fetch("https://api.elevenlabs.io/v1/voices", {
-              headers: { "xi-api-key": env.ELEVENLABS_KEY },
+              headers: { "xi-api-key": el11Key },
             });
             if (lv.ok) {
               const list = await lv.json().catch(() => null);
@@ -147,7 +152,7 @@ export default {
             "https://api.elevenlabs.io/v1/text-to-speech/" + voiceId + "?output_format=mp3_44100_128",
             {
               method: "POST",
-              headers: { "xi-api-key": env.ELEVENLABS_KEY, "content-type": "application/json" },
+              headers: { "xi-api-key": el11Key, "content-type": "application/json" },
               body: JSON.stringify({
                 text,
                 // flash — швидша й дешевша за символами, 32 мови разом з українською
@@ -169,7 +174,15 @@ export default {
         }
 
         if (!env.AZURE_SPEECH_KEY || !env.AZURE_SPEECH_REGION) {
-          return json({ error: "Нейронний голос не налаштований: додай ELEVENLABS_KEY або AZURE_SPEECH_KEY" }, 503);
+          /* Показуємо ІМЕНА змінних, які воркер бачить — значень не
+             торкаємось. Без цього «ключа немає» не відрізнити від
+             «ключ названий інакше», і шукати нема де. */
+          let names = [];
+          try { names = Object.keys(env).filter((k) => typeof env[k] === "string").sort(); } catch (_) {}
+          return json({
+            error: "Нейронний голос не налаштований: додай ELEVENLABS_KEY",
+            бачу_змінні: names,
+          }, 503);
         }
 
         const voice = TTS_VOICES.includes(body.voice) ? body.voice : "uk-UA-OstapNeural";
