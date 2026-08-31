@@ -921,28 +921,49 @@
   /* ── ТЕМА: ЧОРНА (AMOLED) для AI-екрана ── */
   html[data-theme="black"] .aiscr{background:#000;}
   /* ── ТЕМА: СВІТЛА для AI-екрана ── */
-  html[data-theme="light"] .aiscr{background:#f2f4fb;color:#1a1f2e;}
-  html[data-theme="light"] .aiscr::before{background:
+  html[data-theme="light"] .aiscr,
+  /* ── ТЕМА: СВІТЛА для AI-екрана ── */
+  html.t-light .aiscr{background:#f2f4fb;color:#1a1f2e;}
+  html[data-theme="light"] .aiscr::before,
+  html.t-light .aiscr::before{background:
     radial-gradient(60% 34% at 20% -5%,rgba(106,125,255,.16),transparent 60%),
     radial-gradient(52% 30% at 88% 8%,rgba(160,107,255,.12),transparent 60%),
     radial-gradient(60% 30% at 50% 108%,rgba(78,205,196,.08),transparent 60%);}
-  html[data-theme="light"] .ai-glass{background:rgba(255,255,255,.72);border-color:rgba(20,26,60,.12);box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 4px 14px rgba(25,32,70,.07);}
-  html[data-theme="light"] .aiscr .ai-msg.a{background:#ffffff;border-color:rgba(20,26,60,.1);color:#1a1f2e;box-shadow:0 3px 12px rgba(25,32,70,.06);}
-  html[data-theme="light"] .aiscr .ai-in input{background:#ffffff;border-color:rgba(20,26,60,.13);color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-in input::placeholder{color:#9aa0b8;}
-  html[data-theme="light"] .aiscr .ai-mic{background:#ffffff;border-color:rgba(20,26,60,.13);color:#5566ef;}
-  html[data-theme="light"] .ai-views{background:rgba(20,26,60,.06);border-color:rgba(20,26,60,.12);}
-  html[data-theme="light"] .ai-views button{color:#666e8c;}
-  html[data-theme="light"] .ai-views button.on{color:#fff;}
-  html[data-theme="light"] .aiscr .ai-back,html[data-theme="light"] .aiscr .ai-clear{color:#4a5170;}
-  html[data-theme="light"] .aiscr .ai-ht b{color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-ht small{color:#666e8c;}
-  html[data-theme="light"] .ai-memsheet{background:rgba(35,42,70,.3);}
-  html[data-theme="light"] .ai-memcard{background:#ffffff;color:#1a1f2e;}
-  html[data-theme="light"] .ai-memrow{background:rgba(20,26,60,.05);border-color:rgba(20,26,60,.1);color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-slash{background:#ffffff;border-color:rgba(20,26,60,.12);}
-  html[data-theme="light"] .aiscr .ai-slash button{color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-slash small{color:#666e8c;}
+  html[data-theme="light"] .ai-glass,
+  html.t-light .ai-glass{background:rgba(255,255,255,.72);border-color:rgba(20,26,60,.12);box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 4px 14px rgba(25,32,70,.07);}
+  html[data-theme="light"] .aiscr .ai-msg.a,
+  html.t-light .aiscr .ai-msg.a{background:#ffffff;border-color:rgba(20,26,60,.1);color:#1a1f2e;box-shadow:0 3px 12px rgba(25,32,70,.06);}
+  html[data-theme="light"] .aiscr .ai-in input,
+  html.t-light .aiscr .ai-in input{background:#ffffff;border-color:rgba(20,26,60,.13);color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-in input::placeholder,
+  html.t-light .aiscr .ai-in input::placeholder{color:#9aa0b8;}
+  html[data-theme="light"] .aiscr .ai-mic,
+  html.t-light .aiscr .ai-mic{background:#ffffff;border-color:rgba(20,26,60,.13);color:#5566ef;}
+  html[data-theme="light"] .ai-views,
+  html.t-light .ai-views{background:rgba(20,26,60,.06);border-color:rgba(20,26,60,.12);}
+  html[data-theme="light"] .ai-views button,
+  html.t-light .ai-views button{color:#666e8c;}
+  html[data-theme="light"] .ai-views button.on,
+  html.t-light .ai-views button.on{color:#fff;}
+  html[data-theme="light"] .aiscr .ai-back,html[data-theme="light"] .aiscr .ai-clear,
+  html.t-light .aiscr .ai-back,
+  html.t-light .aiscr .ai-clear{color:#4a5170;}
+  html[data-theme="light"] .aiscr .ai-ht b,
+  html.t-light .aiscr .ai-ht b{color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-ht small,
+  html.t-light .aiscr .ai-ht small{color:#666e8c;}
+  html[data-theme="light"] .ai-memsheet,
+  html.t-light .ai-memsheet{background:rgba(35,42,70,.3);}
+  html[data-theme="light"] .ai-memcard,
+  html.t-light .ai-memcard{background:#ffffff;color:#1a1f2e;}
+  html[data-theme="light"] .ai-memrow,
+  html.t-light .ai-memrow{background:rgba(20,26,60,.05);border-color:rgba(20,26,60,.1);color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-slash,
+  html.t-light .aiscr .ai-slash{background:#ffffff;border-color:rgba(20,26,60,.12);}
+  html[data-theme="light"] .aiscr .ai-slash button,
+  html.t-light .aiscr .ai-slash button{color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-slash small,
+  html.t-light .aiscr .ai-slash small{color:#666e8c;}
   .ai-in{display:flex;gap:8px;align-items:center}
   .ai-mic{width:44px;height:44px;flex-shrink:0;border-radius:16px;display:grid;place-items:center;cursor:pointer;color:#c3cbff;
     background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11)}

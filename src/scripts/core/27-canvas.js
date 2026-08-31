@@ -737,7 +737,7 @@
     document.addEventListener('pointerup', onUp);
     board.__dragMove=onMove; board.__dragUp=onUp;
   }
-  function escAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
   /* ---- load ---- */
   function migrate(){
@@ -827,8 +827,12 @@
     if(cfg&&typeof cfg==='object'){
       Object.keys(cfg).forEach(k=>{
         const c=cfg[k];
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}); }
-        else if(c.custom){ folders[k]={key:k,c:c.c,emoji:c.emoji,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}; }
+        // Папки, збережені до появи іконок, поля icon не мають — підбираємо
+        // його з емодзі на льоту. У сховище воно потрапить при першому ж
+        // saveFolders(); доти емодзі лишається єдиним джерелом правди.
+        const ic=c.icon||folderIconFor(c.emoji);
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}); }
+        else if(c.custom){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}; }
       });
     }
   }
@@ -837,6 +841,11 @@
     if(Array.isArray(ord)&&ord.length){ order=ord.filter(k=>folders[k]); Object.keys(folders).forEach(k=>{ if(!order.includes(k)) order.push(k); }); }
   }
   async function load(){
+    /* Знімки лежать в IndexedDB (PhotoDB) — вичитуємо їх у памʼятний кеш ДО
+       першого рендеру, інакше картки блиснуть без фото. Читання швидке:
+       одна транзакція, десятки записів. Якщо IndexedDB нема — photoWarm
+       поверне false, і все працюватиме на старих data-URL. */
+    try{ await window.photoWarm(); }catch(_){}
     // ⚡ МИТТЄВИЙ ПЕРШИЙ РЕНДЕР: папки з локального кешу ДО очікування хмари Telegram.
     //    Прибирає «порожні папки на пару секунд» при старті. Повний load нижче все оновить.
     try{
@@ -1033,6 +1042,9 @@
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}
     try{ fxUpdate(false).then(ok=>{ if(ok){ try{renderFinance();}catch(_){} } }); }catch(_){}
     try{ ensureCards(); }catch(_){}
+    // TODO(гаманець): увімкнути, коли буде готовий новий екран Фінансів —
+    // try{ migrateToWallet(); }catch(e){ console.error('migrateToWallet',e); }
+    try{ migrateFolderPhotosOnce(); }catch(e){ console.error('migratePhotos',e); }
     try{ removeSystemSeedFoldersOnce(); }catch(e){ console.error('removeSeedFolders',e); }
     try{ seedAgencySlovakia(); }catch(e){ console.error('seedAgency',e); }
     try{ agskCleanupOnce(); }catch(e){ console.error('agskCleanup',e); }
@@ -1111,6 +1123,27 @@
   const VISION_FKEY='f_vision_seed';
   // одноразове прибирання: якщо «Патерни»/«Візія» вже встигли створитись
   // раніше (старі акаунти) — видаляємо їх, звільняючи Огляд під власні папки.
+  /* Переїзд наявних знімків: усе, що лежить у folders_cfg як `data:…`,
+     переносимо в PhotoDB, а в конфігу лишаємо посилання. Робиться тихо, у
+     фоні, по одному запису; якщо IndexedDB недоступний — просто нічого не
+     стається і фото лишаються там, де були. */
+  async function migrateFolderPhotosOnce(){
+    try{
+      if(!window.PhotoDB || !window.PhotoDB.available()) return;
+      const keys=Object.keys(folders||{}).filter(k=>{
+        const p=folders[k] && folders[k].photo;
+        return p && String(p).slice(0,5)==='data:';
+      });
+      if(!keys.length) return;
+      for(const k of keys){
+        const ref=await window.photoPut('ph_'+k, folders[k].photo);
+        if(ref && String(ref).slice(0,4)==='idb:') folders[k].photo=ref;
+      }
+      saveFolders();
+      try{ renderDashboard(); }catch(_){}
+      console.log('[Flow] знімків перенесено в PhotoDB:', keys.length);
+    }catch(e){ console.error('migrateFolderPhotos', e); }
+  }
   function removeSystemSeedFoldersOnce(){
     var FLAG='flowapp_seedfolders_removed_v1';
     try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }

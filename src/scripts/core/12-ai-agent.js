@@ -60,7 +60,7 @@
   }
   window.devContentTranslateToggleSheet = devContentTranslateToggleSheet;
   const AI_DEV_SYS='Ти — Нокс, технічний dev-асистент розробника Flow. Це службовий режим для власника апки, НЕ для користувачів: без мотивації, персон і FLOW_OPS. '
-    +'Flow — single-file HTML/JS Telegram Mini App: дані в localStorage/Telegram CloudStorage (реєстр window.FLOW_KEYS), AI — через Cloudflare Worker до Anthropic (Haiku 4.5 / Sonnet 4.6, prompt caching, агентний цикл на клієнті). '
+    +'Flow — односторінкова HTML/JS-апка (Mac через Electron + сайт/iPhone; Telegram прибрано): дані в localStorage + Supabase (Google-вхід) + IndexedDB для важкого (реєстр window.FLOW_KEYS), AI — через Cloudflare Worker до Anthropic (Haiku 4.5 / Sonnet 5 / Opus 5, prompt caching, агентний цикл на клієнті). '
     +'Твої dev-інструменти: dev_storage (keys/get/check), dev_errors (помилки JS), dev_cost (токени і $), dev_selftest (воркер+storage+парсинг), dev_data (backup/restore storage), dev_eval (JS у живій апці — з підтвердженням і авто-бекапом; для фіксів даних: змінив → save-функція → перевір check-ом). '
     +'Коли просять довідку/«що вмієш» — стисло перелічи ці можливості з прикладами запитів, без викликів інструментів. '
     +'Також доступні звичайні інструменти (get_data, planner, goals, finance, patterns, memory) — для перевірки поведінки. '
@@ -312,7 +312,7 @@
   function aiAgentStatusFor(name,inp){
     inp=inp||{};
     if(name==='get_data'){
-      const M={day:'дивлюсь день',range:'дивлюсь період',goals:'дивлюсь цілі',finance:'дивлюсь фінанси',backlog:'дивлюсь беклог',folders:'дивлюсь папки'};
+      const M={day:'дивлюсь день',range:'дивлюсь період',goals:'дивлюсь цілі',finance:'дивлюсь фінанси',backlog:'дивлюсь беклог',folders:'дивлюсь папки',diary:'читаю щоденник',vision:'дивлюсь Візію',wishes:'дивлюсь Карту бажань'};
       return '🔍 '+(M[inp.what]||'читаю дані')+'…';
     }
     if(name==='planner'){
@@ -342,9 +342,9 @@
 
   const FLOW_TOOLS=[
     { name:'get_data',
-      description:'Прочитати живі дані Frequency. Клич, коли потрібних даних немає в КОНТЕКСТІ (минулі дні, деталі цілей, фінанси, беклог, папки). Повертає стислий текст.',
+      description:'Прочитати живі дані Frequency. Клич, коли потрібних даних немає в КОНТЕКСТІ (минулі дні, деталі цілей, фінанси, беклог, папки, щоденник, Візія, Карта бажань). Повертає стислий текст.',
       input_schema:{ type:'object', properties:{
-        what:{ type:'string', enum:['day','range','goals','finance','backlog','folders'] },
+        what:{ type:'string', enum:['day','range','goals','finance','backlog','folders','diary','vision','wishes'] },
         ds:{ type:'string', description:'YYYY-MM-DD, для what=day' },
         from:{ type:'string', description:'YYYY-MM-DD, для what=range' },
         to:{ type:'string', description:'YYYY-MM-DD, для what=range (до 31 дня)' }
@@ -426,6 +426,7 @@
     +'FLOW_OPS використовуй лише для pages. '
     +'ПІДТВЕРДЖЕННЯ: майже кожен інструмент, що щось МІНЯЄ (не читає), сам питає людину підтвердити дію шторкою знизу — просто викликай його, шторка зʼявиться автоматично. Якщо результат каже "людина скасувала" — прийми це, не повторюй той самий виклик і не наполягай. '
     +'Перед плануванням дня, якого немає в КОНТЕКСТІ, спершу подивись його через get_data. '
+    +'get_data також читає щоденник (diary), Візію (vision: куди йду / навіщо / фокус) і Карту бажань (wishes). Коли треба дати пораду «з душею» чи ранковий бриф — зазирни туди, щоб спиратись на те, що людині справді важливо, а не радити абстрактно. '
     +'Після кожного інструмента прочитай результат: якщо конфлікт чи ⚠️ — виправ наступним викликом або чесно скажи, що не вийшло. '
     +'Не переказуй сирі дані з інструментів — лише висновок. Максимум стислості. '
     +'ГОЛОСОВИЙ ДАМП: повідомлення з 🎙 — надиктоване. Якщо в ньому кілька думок/задач/фактів — сам розклади все по місцях інструментами (задачі з часом → planner, кроки цілей → goals, витрати/доходи → finance, довготривалі факти → memory) і підсумуй одним рядком, що куди поклав. Не перепитуй, якщо зрозуміло з контексту.';
@@ -497,6 +498,44 @@
           .map(f=>(f.emoji||'📁')+' '+f.name+(f.role==='project'?' (проєкт'+(f.due?', до '+f.due:'')+')':''))
           .join('\n')||'папок немає';
       }catch(_){ return 'папок немає'; }
+    }
+    if(inp.what==='diary'){
+      // останні до 10 записів щоденника; кожен обрізаємо, щоб не роздути контекст
+      try{
+        const src=(typeof diaryEntries==='object'&&diaryEntries)?diaryEntries:{};
+        const keys=Object.keys(src).filter(k=>src[k]&&src[k].text&&String(src[k].text).trim()).sort().reverse().slice(0,10);
+        if(!keys.length) return 'щоденник порожній';
+        return keys.map(k=>{ let t=String(src[k].text).trim(); if(t.length>500) t=t.slice(0,500)+'…'; return k+': '+t; }).join('\n\n');
+      }catch(_){ return 'щоденник недоступний'; }
+    }
+    if(inp.what==='vision'){
+      // Візія: куди йду / навіщо / фокус / кроки / опори — щоб радити не абстрактно
+      try{
+        const v=(typeof vzData==='object'&&vzData)?vzData:{};
+        const p=[];
+        if(v.statement&&String(v.statement).trim()) p.push('Куди йду: '+String(v.statement).trim());
+        const why=[v.why,v.why2].map(x=>String(x||'').trim()).filter(Boolean).join(' / ');
+        if(why) p.push('Навіщо: '+why);
+        if(v.focus&&v.focus.title&&String(v.focus.title).trim()){
+          const rng=(v.focus.start||v.focus.end)?(' ('+(v.focus.start||'?')+'–'+(v.focus.end||'?')+')'):'';
+          p.push('Фокус зараз: '+String(v.focus.title).trim()+rng);
+        }
+        const st=(Array.isArray(v.steps)?v.steps:[]).map(s=>typeof s==='string'?s:(s&&(s.t||s.title||s.name)||'')).filter(Boolean);
+        if(st.length) p.push('Кроки: '+st.slice(0,6).join('; '));
+        if(Array.isArray(v.tags)&&v.tags.length) p.push('Опори/теги: '+v.tags.join(', '));
+        return p.join('\n')||'Візія ще не заповнена';
+      }catch(_){ return 'Візія недоступна'; }
+    }
+    if(inp.what==='wishes'){
+      // Карта бажань: фото текстом не передати — віддаємо ціну мрії й підписи образів
+      try{
+        const arr=Array.isArray(wishes)?wishes:[];
+        const caps=arr.map(w=>w&&w.cap&&String(w.cap).trim()).filter(Boolean);
+        const p=[];
+        if(typeof wishPrice==='string'&&wishPrice.trim()) p.push('Ціна мрії: '+wishPrice.trim());
+        if(arr.length) p.push('Образів на карті: '+arr.length+(caps.length?(' · підписи: '+caps.map(c=>'«'+c+'»').join('; ')):' (без підписів, лише фото)'));
+        return p.join('\n')||'Карта бажань порожня';
+      }catch(_){ return 'Карта бажань порожня'; }
     }
     return '⚠️ невідомий what';
   }

@@ -143,28 +143,32 @@ html.fd26t .fuz-all span svg{width:20px;height:20px;display:block;}
 html.fd26t .incx-exp .ic svg,html.fd26t .lit-act .ic svg{width:19px;height:19px;display:block;color:var(--muted);}
 
 
-/* ── 9. ЛІЧИЛЬНИК «ДО НОВОГО РОКУ» · компактний рядок унизу карти бажань ──
-   DOM-вузол #nyCountdown переносить fd26tjs усередину #summaryCard; всі ID живі. */
-html.fd26t #summaryCard #nyCountdown{
+/* ── 9. ЛІЧИЛЬНИК «ДО НОВОГО РОКУ» · компактний рядок ПІД картою бажань ──
+   Вузол #nyCountdown лишається там, де він у розмітці — сусідом одразу під
+   #summaryCard. Клас .nyc-strip навішує fd26tjs (41-theme-layer.js).
+
+   Раніше селектори були прив'язані до #summaryCard #nyCountdown, бо скрипт
+   переносив вузол усередину картки. Тепер на нижньому краї картки стоїть
+   скляна полиця з кнопками, лічильник туди не влазить — тому й прив'язка
+   змінилася на клас. Разом із переносом відпали й правила «поверх знімка»:
+   рядок лежить на фоні сторінки, а не на фото. */
+html.fd26t #nyCountdown.nyc-strip{
   background:transparent;border:0;box-shadow:none;
   backdrop-filter:none;-webkit-backdrop-filter:none;
-  border-radius:0;padding:12px 0 0;margin:14px 0 0;border-top:1px solid var(--hair-2);
-  display:flex;align-items:center;gap:10px;overflow:visible;}
-html.fd26t #summaryCard #nyCountdown::after{display:none;}
-html.fd26t #summaryCard #nyCountdown .nyc-head{margin:0;gap:7px;flex:none;}
-html.fd26t #summaryCard #nyCountdown .nyc-title{font-size:10px;letter-spacing:.1em;}
-html.fd26t #summaryCard #nyCountdown .nyc-emoji svg{width:14px;height:14px;}
-html.fd26t #summaryCard #nyCountdown .nyc-grid{display:flex;gap:10px;margin-left:auto;}
-html.fd26t #summaryCard #nyCountdown .nyc-cell{background:none;border:0;padding:0;
+  border-radius:0;margin:16px 0 0;
+  /* padding знизу, а не margin: із заголовком «Папки» вони сусіди в блоці,
+     і два margin схлопнулись би в один — рядок лип би до заголовка. */
+  padding:0 0 10px;
+  display:flex;align-items:center;gap:9px;overflow:visible;}
+html.fd26t #nyCountdown.nyc-strip::after{display:none;}
+html.fd26t #nyCountdown.nyc-strip .nyc-head{margin:0;gap:7px;flex:none;}
+html.fd26t #nyCountdown.nyc-strip .nyc-title{font-size:10px;letter-spacing:.1em;}
+html.fd26t #nyCountdown.nyc-strip .nyc-emoji svg{width:14px;height:14px;}
+html.fd26t #nyCountdown.nyc-strip .nyc-grid{display:flex;gap:10px;margin-left:auto;}
+html.fd26t #nyCountdown.nyc-strip .nyc-cell{background:none;border:0;padding:0;
   display:flex;align-items:baseline;gap:3px;text-align:left;}
-html.fd26t #summaryCard #nyCountdown .nyc-cell b{font-size:14.5px;}
-html.fd26t #summaryCard #nyCountdown .nyc-cell span{font-size:9px;letter-spacing:.04em;}
-/* режим фото бажань: рядок читається поверх знімка */
-html.fd26t .summary.has-wish #nyCountdown{position:relative;z-index:2;border-top-color:rgba(255,255,255,.28);}
-html.fd26t .summary.has-wish #nyCountdown .nyc-title,
-html.fd26t .summary.has-wish #nyCountdown .nyc-cell b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.55);}
-html.fd26t .summary.has-wish #nyCountdown .nyc-cell span{color:rgba(255,255,255,.75);}
-html.fd26t .summary.has-wish #nyCountdown .nyc-emoji{color:#fff;}
+html.fd26t #nyCountdown.nyc-strip .nyc-cell b{font-size:14.5px;color:var(--text);}
+html.fd26t #nyCountdown.nyc-strip .nyc-cell span{font-size:9px;letter-spacing:.04em;}
 
 
 /* ── 10. КАРТА БАЖАНЬ · тема «Вітрина» (фокус-колода) ──

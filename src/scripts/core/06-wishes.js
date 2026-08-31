@@ -68,6 +68,28 @@
   async function loadWishes(){
     try{ const r=await window.storage.get(WISH_KEY,false); if(r&&r.value){ const d=JSON.parse(r.value); if(Array.isArray(d)) wishes=d; } }catch(_){}
     try{ const r2=await window.storage.get(WISH_ACT_KEY,false); if(r2&&r2.value){ const d2=JSON.parse(r2.value); if(d2&&typeof d2==='object') wishActiveDays=d2; } }catch(_){}
+    try{ await migrateWishPhotosOnce(); }catch(e){ console.error('migrateWishPhotos', e); }
+  }
+  /* Переїзд знімків Карти бажань у PhotoDB. Тут вони найважчі: до шести
+     кадрів по 1400px, і всі лежали одним рядком у wishes_board — тобто
+     будь-яка зміна підпису переписувала мегабайти. Формат посилання той
+     самий, що й у папок: `idb:wi_<id>` для фото, `idb:wt_<id>` для
+     обкладинки відео. Якщо IndexedDB нема — нічого не стається. */
+  async function migrateWishPhotosOnce(){
+    if(!window.PhotoDB || !window.PhotoDB.available()) return;
+    const isData=v=>!!v && String(v).slice(0,5)==='data:';
+    const todo=wishes.filter(w=>isData(w.img)||isData(w.thumb));
+    if(!todo.length) return;
+    for(const w of todo){
+      if(isData(w.img)){ const ref=await window.photoPut('wi_'+w.id, w.img);
+        if(String(ref).slice(0,4)==='idb:') w.img=ref; }
+      if(isData(w.thumb)){ const ref=await window.photoPut('wt_'+w.id, w.thumb);
+        if(String(ref).slice(0,4)==='idb:') w.thumb=ref; }
+    }
+    saveWishes();
+    try{ renderWishes(); }catch(_){}
+    try{ updateSummaryBg(); }catch(_){}
+    console.log('[Flow] знімків Карти бажань перенесено:', todo.length);
   }
   function saveWishActiveDays(){ try{ const p=window.storage.set(WISH_ACT_KEY,JSON.stringify(wishActiveDays),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
   function saveWishes(){
@@ -137,8 +159,14 @@
     const fl1=document.getElementById('wishFlink');
     if(fl1) fl1.textContent='🎯';
     slides.style.display='block'; ov.style.display='block';
-    const imgs=withImg.slice(-6).map(w=> w.type==='video'?w.thumb:w.img );
-    slides.innerHTML=imgs.map((src,i)=>`<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(src)}')"></div>`).join('');
+    // разом із картинкою несемо збережений кадр (w.pos) — той самий формат
+    // {x,y,scale}, що й photoPos у папок
+    const shown=withImg.slice(-6);
+    const imgs=shown.map(w=> ({ src:(w.type==='video'?w.thumb:w.img), pos:w.pos||null }) );
+    slides.innerHTML=imgs.map((it,i)=>{
+      const xf=it.pos?`transform:translate(${it.pos.x}%,${it.pos.y}%) scale(${it.pos.scale});`:'';
+      return `<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(it.src)}');${xf}"></div>`;
+    }).join('');
     if(imgs.length>1){
       /* Смужка як у сторіз: сегмент поточного фото наливається білим,
          пройдені лишаються повними, наступні — порожні. Тривалість
@@ -176,12 +204,14 @@
     reader.onload=()=>{
       const img=new Image();
       img.onload=()=>{
-        const max=900; let{width:w,height:h}=img;
+        // 1400px / 0.82 замість 900 / 0.72 (30.08.2026): на Retina 900px
+        // розтягувалось удвічі й давало «мило». Файл більшає приблизно втричі.
+        const max=1400; let{width:w,height:h}=img;
         if(w>h && w>max){ h=Math.round(h*max/w); w=max; }
         else if(h>=w && h>max){ w=Math.round(w*max/h); h=max; }
         const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
         cv.getContext('2d').drawImage(img,0,0,w,h);
-        try{ cb(cv.toDataURL('image/jpeg',0.72)); }
+        try{ cb(cv.toDataURL('image/jpeg',0.82)); }
         catch(_){ cb(reader.result); }
       };
       img.onerror=()=>cb(reader.result);
@@ -204,7 +234,10 @@
           const id='w'+Date.now()+'_'+fi;
           if(firstNewId===null) firstNewId=id;
           const size=sizes[(wishes.length)%sizes.length];
-          wishes.push({id,img:dataUrl,cap:'',size});
+          const w={id,img:dataUrl,cap:'',size};
+          wishes.push(w);
+          // важке — в IndexedDB, у wishes_board лишиться посилання
+          Promise.resolve(window.photoPut('wi_'+id, dataUrl)).then(ref=>{ w.img=ref; saveWishes(); });
           done++;
           if(done===files.length){
             saveWishes(); renderWishes();
@@ -317,7 +350,10 @@
       title:'Прибрати з карти?',
       sub:w&&w.cap?('«'+w.cap+'» зникне з Карти бажань.'):'Цей образ зникне з Карти бажань.',
       okLabel:'Прибрати',
-      onOk:()=>{ wishes=wishes.filter(x=>x.id!==id); saveWishes(); renderWishes(); }
+      onOk:()=>{
+        // знімок цього образу більше нікому не потрібен
+        try{ if(w){ window.photoDel(w.img); window.photoDel(w.thumb); } }catch(_){}
+        wishes=wishes.filter(x=>x.id!==id); saveWishes(); renderWishes(); }
     });
   }
 
@@ -374,7 +410,11 @@
     inp.onchange=()=>{
       const f=inp.files&&inp.files[0]; inp.remove();
       if(!f){ askWishCap(id); return; }
-      compressImage(f,(dataUrl)=>{ w.thumb=dataUrl; saveWishes(); renderWishes(); });
+      compressImage(f,(dataUrl)=>{
+        const prev=w.thumb; w.thumb=dataUrl; renderWishes();
+        Promise.resolve(window.photoPut('wt_'+w.id, dataUrl)).then(ref=>{
+          w.thumb=ref; if(prev&&prev!==ref) window.photoDel(prev); saveWishes(); });
+      });
     };
     inp.click();
   }
@@ -406,6 +446,22 @@
       items.push({ic:'🎯', label:'Зробити ціллю', sub:'Додати в Цілі з цим фото', primary:true, onClick:()=>wishToGoal(id)});
     }
     items.push({ic:'resize', label:'Розмір плитки', sub:'Зараз: '+szNow+' · тап щоб змінити', onClick:()=>cycleWishSize(id)});
+    /* Кадрування для банера Огляду. Знімок там лежить у широкій картці, тож
+       вертикальне фото обрізається по центру — часто не там, де треба.
+       Редактор той самий, що й для фото папки (openPhotoCropEditor). */
+    { const src = (w.type==='video') ? w.thumb : w.img;
+      if(src) items.push({ic:'image', label:'Кадрувати для Огляду',
+        sub: w.pos ? 'Кадр підібрано · тап щоб змінити' : 'Обрати видиму частину',
+        onClick:()=>{
+          if(typeof openPhotoCropEditor!=='function'){ flowAlert('Редактор кадру недоступний.'); return; }
+          openPhotoCropEditor({ img:src, pos:w.pos||null, title:'Кадр для Огляду',
+            onSave:(pos)=>{ w.pos=pos; saveWishes(); try{renderWishes();}catch(_){}
+              // тло банера малює updateSummaryBg(), не renderWishBg — назва
+              // інша, і без цього виклику кадр застосувався б лише після
+              // перезавантаження екрана
+              try{ updateSummaryBg(); }catch(_){} } });
+        }});
+    }
     if(idx>0) items.push({ic:'up', label:'Перемістити вперед', onClick:()=>moveWish(id,-1)});
     if(idx<wishes.length-1) items.push({ic:'down', label:'Перемістити назад', onClick:()=>moveWish(id,1)});
     items.push({ic:'trash', label:'Прибрати з карти', danger:true, onClick:()=>delWish(id)});

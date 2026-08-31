@@ -222,6 +222,135 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     --bt-note:#6d9bff; --bt-check:#3ad487; --bt-task:#f09048;
   }
   html[data-theme="black"]{background:#000;}
+
+  /* ═══════════════════════════════════════════════════════════════════
+     НОВІ НАБОРИ ТЕМ (30.08.2026) — «Робочий стіл» (desk) і «Студія» (studio).
+     Кожен набір має світлу й темну пару. Старі три теми (dark/black/light)
+     лишаються недоторканими — це окремі значення data-theme, вони нічого
+     не перекривають.
+
+     Спільне для обох наборів: без градієнтів у поверхнях, без кольорового
+     світіння, колір папки живе як мітка (--mark), а не як заливка картки.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* ── A · РОБОЧИЙ СТІЛ · світла ── */
+  html[data-theme="desk-light"]{
+    --bg:#f6f7f9; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1f3f6; --field:#eef0f4;
+    --text:#191c20; --muted:#767c85; --line:#e4e7eb;
+    --fin:#c2410c; --hab:#15803d; --val:#3d5afe; --skl:#6d28d9;
+    --accent:#3d5afe; --owe:#dc2626; --owed:#15803d;
+    --hair:rgba(15,23,42,.045);
+    --hair-2:rgba(15,23,42,.11);
+    --scrim:rgba(20,24,32,.34);
+    --glass:rgba(255,255,255,.86);
+    --sheet:#ffffff;
+    --shadow:rgba(20,24,32,.13);
+    --glow:transparent;
+    --emoji-plate:#ffffff;
+    --on-cover:#ffffff;
+    --nav-bg:#ffffff;
+    --nav-line:#e4e7eb;
+    --nav-ink:#767c85;
+    --nav-ink-on:#3d5afe;
+    --bt-note:#3d5afe; --bt-check:#15803d; --bt-task:#c2410c;
+    --bt-fin:#a16207; --bt-media:#be185d; --bt-ai:#6d28d9;
+    --ico:#767c85;            /* штрих лінійних іконок */
+    --ico-on:#3d5afe;         /* іконка активного пункту */
+    --folder-fill:#ffffff;    /* поверхня картки папки */
+    --folder-line:#e4e7eb;    /* її контур */
+    --sel:rgba(61,90,254,.09); /* підкладка вибраного пункту меню */
+  }
+  /* ── A · РОБОЧИЙ СТІЛ · темна ── */
+  html[data-theme="desk-dark"]{
+    --bg:#101317; --bg-2:#141820; --card:#171b20; --card-2:#1d222a; --field:#151920;
+    --text:#e6e9ed; --muted:#858c96; --line:#262b32;
+    --fin:#fb923c; --hab:#4ade80; --val:#7c93ff; --skl:#c4b5fd;
+    --accent:#7c93ff; --owe:#f87171; --owed:#4ade80;
+    --hair:rgba(255,255,255,.045);
+    --hair-2:rgba(255,255,255,.12);
+    --scrim:rgba(6,8,11,.6);
+    --glass:rgba(23,27,32,.88);
+    --sheet:#171b20;
+    --shadow:rgba(0,0,0,.5);
+    --glow:transparent;
+    --emoji-plate:var(--card);
+    --on-cover:#ffffff;
+    --nav-bg:#171b20;
+    --nav-line:#262b32;
+    --nav-ink:#858c96;
+    --nav-ink-on:#7c93ff;
+    --bt-note:#7c93ff; --bt-check:#4ade80; --bt-task:#fb923c;
+    --bt-fin:#eab308; --bt-media:#f472b6; --bt-ai:#c4b5fd;
+    --ico:#858c96;
+    --ico-on:#7c93ff;
+    --folder-fill:#171b20;
+    --folder-line:#262b32;
+    --sel:rgba(124,147,255,.14);
+  }
+  /* ── B · СТУДІЯ · темна ── */
+  html[data-theme="studio-dark"]{
+    --bg:#0e1011; --bg-2:#111415; --card:#16191b; --card-2:#1c2022; --field:#141718;
+    --text:#e9ebec; --muted:#868d92; --line:#252a2d;
+    --fin:#e0a458; --hab:#6ba57f; --val:#8aa9c9; --skl:#c2a86a;
+    --accent:#d4a24c; --owe:#d97070; --owed:#6ba57f;
+    --hair:rgba(255,255,255,.04);
+    --hair-2:rgba(255,255,255,.11);
+    --scrim:rgba(5,6,7,.62);
+    --glass:rgba(22,25,27,.88);
+    --sheet:#16191b;
+    --shadow:rgba(0,0,0,.55);
+    --glow:transparent;
+    --emoji-plate:var(--card);
+    --on-cover:#ffffff;
+    --nav-bg:#111415;
+    --nav-line:#252a2d;
+    --nav-ink:#868d92;
+    --nav-ink-on:#d4a24c;
+    --bt-note:#8aa9c9; --bt-check:#6ba57f; --bt-task:#e0a458;
+    --bt-fin:#d4a24c; --bt-media:#c98b9b; --bt-ai:#c2a86a;
+    --ico:#868d92;
+    --ico-on:#d4a24c;
+    --folder-fill:#16191b;
+    --folder-line:#252a2d;
+    --sel:rgba(212,162,76,.13);
+  }
+  /* ── B · СТУДІЯ · світла ── */
+  html[data-theme="studio-light"]{
+    --bg:#f7f7f6; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1f1ef; --field:#efefed;
+    --text:#1c1e1f; --muted:#75797c; --line:#e5e4e1;
+    --fin:#a3611c; --hab:#2f7d63; --val:#3f6382; --skl:#8a6d2f;
+    --accent:#9a6f1f; --owe:#b8443f; --owed:#2f7d63;
+    --hair:rgba(28,30,31,.04);
+    --hair-2:rgba(28,30,31,.11);
+    --scrim:rgba(28,30,31,.34);
+    --glass:rgba(255,255,255,.86);
+    --sheet:#ffffff;
+    --shadow:rgba(28,30,31,.13);
+    --glow:transparent;
+    --emoji-plate:#ffffff;
+    --on-cover:#ffffff;
+    --nav-bg:#f1f1ef;
+    --nav-line:#e5e4e1;
+    --nav-ink:#75797c;
+    --nav-ink-on:#9a6f1f;
+    --bt-note:#3f6382; --bt-check:#2f7d63; --bt-task:#a3611c;
+    --bt-fin:#9a6f1f; --bt-media:#a14a63; --bt-ai:#8a6d2f;
+    --ico:#75797c;
+    --ico-on:#9a6f1f;
+    --folder-fill:#ffffff;
+    --folder-line:#e5e4e1;
+    --sel:rgba(154,111,31,.10);
+  }
+  /* Старі теми теж мають знати нові змінні — інакше іконки лишаться без
+     кольору там, де новий код уже малює SVG. Значення підібрані під
+     чинні палітри, вигляд старих тем не змінюється. */
+  :root{
+    --ico:var(--muted); --ico-on:var(--accent);
+    --folder-fill:var(--card); --folder-line:var(--line);
+    --sel:rgba(139,124,255,.14);
+  }
+  html[data-theme="light"]{ --sel:rgba(109,92,240,.10); }
+  html[data-theme="black"]{ --sel:rgba(148,138,255,.16); }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{height:100%;background:var(--bg);overflow:hidden;}
   html{background:#0b0d12;min-height:100%;}
@@ -1886,16 +2015,36 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .fc2-row .fpin{position:absolute;top:15px;right:48px;font-size:13px;}
   .fc2-row .fsub{top:auto;bottom:12px;left:auto;right:48px;}
 
-  /* ── Сітка: фото = вся плитка, затемнення знизу ── */
-  .fc2-tile{height:158px;border-radius:22px;border:1px solid rgba(255,255,255,.10);
-    display:flex;flex-direction:column;justify-content:flex-end;padding:12px;}
-  .fc2-tile .fc2-veil{background:linear-gradient(transparent 32%,rgba(6,6,12,.9));}
-  .fc2-tile.nocover{background:linear-gradient(150deg,color-mix(in srgb,var(--c,#6a7dff) 42%,#0d0d16),#0d0d16 72%);}
-  .fc2-tile.nocover .fc2-veil{background:none;}
-  .fc2-tile .fc2-em{position:absolute;top:10px;left:10px;width:38px;height:38px;border-radius:12px;font-size:18px;z-index:3;}
-  .fc2-tile .fc2-name{font-size:15.5px;}
+  /* ── Сітка: кришка зверху, назва — на суцільній підкладці ──
+     Було: фото (або колір папки) заливало всю плитку, а назва лежала
+     просто на ньому. На світлому знімку назва зникала, а знизу її ще й
+     підрізала нижня панель — «Розбір теми» видно на скріншоті обрізаним.
+
+     Стало: колір/фото живе на кришці 58px, а назва і лічильник сидять на
+     суцільній підкладці кольору картки. Текст більше ні з чим не бореться.
+     Плитка нижча (132 замість 158), тож у той самий екран влазить більше
+     папок — це компенсує вищу картку героя. Мінус чесний: фото папки
+     стало смужкою зверху замість цілої плитки. ── */
+  .fc2-tile{min-height:132px;border-radius:22px;border:1px solid var(--line);
+    background:var(--card);display:block;padding:0;}
+  .fc2-tile .fc2-bg{inset:0 0 auto 0;height:58px;}
+  .fc2-tile .fc2-veil{inset:0 0 auto 0;height:58px;
+    background:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.28));}
+  /* без фото кришку малює сама вуаль — кольором папки */
+  .fc2-tile.nocover{background:var(--card);}
+  .fc2-tile.nocover .fc2-veil{background:linear-gradient(135deg,var(--c,#6a7dff),
+    color-mix(in srgb,var(--c,#6a7dff) 42%,#000));}
+  /* плашка емодзі звисає з кришки на підкладку */
+  .fc2-tile .fc2-em,
+  .fc2-tile.nocover .fc2-em{position:absolute;top:34px;left:12px;width:38px;height:38px;
+    border-radius:12px;font-size:18px;z-index:3;background:var(--card);border:2px solid var(--card);
+    -webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 4px 12px var(--shadow);}
+  .fc2-tile .fc2-body{padding:82px 12px 12px;}
+  .fc2-tile .fc2-name{font-size:14.5px;color:var(--text);text-shadow:none;}
+  .fc2-tile .fstat{color:var(--muted);}
+  .fc2-tile .fstat b{color:var(--c,#6a7dff);}
   .fc2-tile .fmenu{top:11px;right:11px;}
-  .fc2-tile .fdrag-handle{bottom:11px;right:11px;}
+  .fc2-tile .fdrag-handle{display:none;} /* у сітці перетягування — довгим дотиком, як у колоді */
   .fc2-tile .fpin{position:absolute;top:15px;right:44px;font-size:12px;}
   .fc2-tile .fsub{top:12px;left:56px;}
 
@@ -1951,7 +2100,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     color:var(--muted);display:flex;align-items:center;justify-content:center;gap:12px;}
   .fc2-add .fc2-plus{font-size:24px;font-weight:300;line-height:1;}
   #folderGrid.fv2-list .fc2-add{min-height:76px;padding:16px;}
-  #folderGrid.fv2-grid .fc2-add{height:158px;border-radius:22px;flex-direction:column;}
+  #folderGrid.fv2-grid .fc2-add{min-height:132px;border-radius:22px;flex-direction:column;}
   #folderGrid.fv2-deck .fc2-add{flex:0 0 132px;height:296px;border-radius:26px;flex-direction:column;scroll-snap-align:start;}
   #folderGrid.fv2-mag .fc2-add{height:64px;border-radius:20px;}
   .fc2-add .fc2-addt{font-size:13px;font-weight:800;}
@@ -2001,6 +2150,185 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .im-cancel,.im-ok{flex:1;border:none;border-radius:13px;padding:14px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;}
   .im-cancel{background:var(--field);color:var(--muted);border:1px solid var(--line);}
   .im-ok{background:linear-gradient(135deg,#6a7dff,#a06bff);color:#fff;}
+
+  /* ═══════════════════════════════════════════════════════════════════
+     НОВІ НАБОРИ ТЕМ · ПАПКИ (30.08.2026)
+     Діє тільки під html.t-flat — тобто в наборах «Робочий стіл» і «Студія».
+     Старі три теми сюди не потрапляють і виглядають точно як раніше.
+
+     Що міняється: кольоровий градієнт-заливка картки → рівна поверхня з
+     контуром; колір папки лишається, але як мітка (риска), а не як фон;
+     емодзі-плитка → лінійна іконка; білий текст із тінню → звичайний
+     текст теми. Папки з фото не чіпаємо — там затемнення потрібне, щоб
+     назва читалась поверх знімка.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* ── базовий вигляд лінійної іконки ── */
+  .ico{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;display:block;}
+  /* емодзі та іконка — взаємозамінна пара, показуємо одну */
+  .fc2-ico{display:none;}
+  html.t-flat .fc2-emj{display:none;}
+  html.t-flat .fc2-ico{display:block;}
+
+  /* ── картка без фото: рівна поверхня замість градієнта ── */
+  html.t-flat .fc2.nocover{background:var(--folder-fill);}
+  html.t-flat .fc2.nocover .fc2-veil{background:none;}
+  html.t-flat .fc2 .fc2-name{color:var(--text);text-shadow:none;font-weight:700;}
+  html.t-flat .fc2.nocover .fstat{color:var(--muted);}
+  html.t-flat .fc2.nocover .fstat b{color:var(--text);}
+  /* плитка під іконкою — прозора з контуром, а не кольорове скло */
+  html.t-flat .fc2.nocover .fc2-em{background:transparent;border:1px solid var(--folder-line);
+    color:var(--ico);-webkit-backdrop-filter:none;backdrop-filter:none;}
+  html.t-flat .fc2.nocover .fc2-em .ico{width:56%;height:56%;}
+  html.t-flat .fc2.nocover .fsub{background:var(--card-2);color:var(--muted);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+
+  /* ── список: кольорова мітка зліва, шеврон у колір теми ── */
+  html.t-flat .fc2-row.nocover .fc2-veil{background:none;}
+  html.t-flat .fc2-row.nocover::before{content:"";position:absolute;left:0;top:18px;bottom:18px;
+    width:3px;border-radius:0 3px 3px 0;background:var(--c,var(--accent));z-index:2;}
+  html.t-flat .fc2-row::after{color:var(--muted);}
+  html.t-flat #folderGrid.fv2-list .fc2-row+.fc2-row{border-top:1px solid var(--line);}
+  html.t-flat .fc2-row.nocover .fc2-em{border-radius:12px;}
+
+  /* ── сітка: кольорова риска зверху плитки ── */
+  html.t-flat .fc2-tile{border-color:var(--folder-line);}
+  html.t-flat .fc2-tile.nocover::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+    background:var(--c,var(--accent));z-index:3;}
+  /* У звичайних темах плитка має кришку 58px, і під неї відведено відступ
+     зверху. Тут кришки немає — замість неї риска 2px, — тож іконка й текст
+     піднімаються, щоб не висіти над порожнечею. */
+  html.t-flat .fc2-tile.nocover .fc2-em{top:12px;}
+  html.t-flat .fc2-tile.nocover .fc2-body{padding-top:60px;}
+
+  /* ── колода: постер без радіального сяйва ── */
+  html.t-flat .fc2-deck{border-color:var(--folder-line);box-shadow:0 10px 26px -14px var(--shadow);}
+  html.t-flat .fc2-deck.nocover{background:var(--folder-fill);}
+  html.t-flat .fc2-deck.nocover .fc2-veil{background:none;}
+  html.t-flat .fc2-deck.nocover::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+    background:var(--c,var(--accent));z-index:3;}
+  html.t-flat .fc2-deck .fc2-prog{background:var(--field);}
+  html.t-flat .fc2-deck .fc2-prog i{background:var(--c,var(--accent));}
+  html.t-flat .fc2-deck .fmenu{background:transparent;border-color:var(--folder-line);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+
+  /* ── журнал: замість фото-корінця — рівна смуга кольору папки ── */
+  html.t-flat .fc2-mag.nocover::before{width:3px;
+    background:var(--c,var(--accent));}
+  html.t-flat #folderGrid.fv2-mag .fc2-mag+.fc2-mag{border-top:1px solid var(--line);}
+  html.t-flat .fc2-mag{padding-left:64px;}
+  html.t-flat .fc2-mag .fc2-em{left:16px;}
+  html.t-flat .fc2-mag .fsub{left:64px;}
+
+  /* ── картка «Нова папка» ── */
+  html.t-flat .fc2-add{border:1px dashed var(--folder-line);background:transparent;color:var(--muted);}
+
+  /* ── кнопка теми в шапці, коли в ній SVG замість емодзі ── */
+  #themeToggle .ico{width:17px;height:17px;margin:0 auto;}
+
+  /* ═══ НОВІ НАБОРИ ТЕМ · ОГЛЯД І САЙДБАР ═══
+     Тут гасяться градієнти, які лишились повз токени. Селектори навмисно
+     «важчі» за оригінальні (html.t-flat + той самий шлях): частина правил
+     живе у styles/16-mx.css, який збирається ПІСЛЯ core/, тож перебити їх
+     порядком файлів не вийшло б — тільки специфічністю. */
+
+  /* сайдбар */
+  html.t-flat .dsb-logo{background:var(--accent);}
+  html.t-flat .dsb-av{background:var(--accent);}
+  html.t-flat .dsb-i.on,
+  html.t-flat body.theme-pro .dsb-i.on{background:var(--sel);color:var(--nav-ink-on);}
+  html.t-flat .dsb-i.on svg{color:var(--ico-on);}
+
+  /* велика картка Огляду: рівна поверхня, без фіолетового «генератора» */
+  html.t-flat #scr-home .summary,
+  html.t-flat .summary{background:var(--card);border:1px solid var(--line);box-shadow:none;}
+  html.t-flat #scr-home .summary .wishgen{display:none;}
+  html.t-flat.home-glass #scr-home .summary{box-shadow:none;}
+
+  /* логотип у шапці: скло й відблиск не вписуються в рівний стиль */
+  html.t-flat #scr-home .top .logo.lg-glass{background:var(--card-2);border:1px solid var(--line);
+    box-shadow:none;}
+  html.t-flat #scr-home .top .logo.lg-glass .lg-spec,
+  html.t-flat #scr-home .top .logo.lg-glass .lg-sweep{display:none;}
+
+  /* сегменти вибору режиму папок */
+  html.t-flat .fvseg button.on,
+  html.t-flat #folderViewSeg button.on{background:var(--sel);color:var(--ico-on);}
+
+  /* ── текст усередині великої картки Огляду ──
+     Він був жорстко білий: картка завжди мала темне тло, тож інакше й не
+     було потрібно. У світлих наборах це білим по білому, тому переводимо
+     на токени. */
+  html.t-flat #scr-home .summary .big,
+  html.t-flat #scr-home .summary .nyc-title,
+  html.t-flat #scr-home .summary .nyc-cell,
+  html.t-flat #scr-home .nyc-title,
+  html.t-flat #scr-home .nyc-cell{color:var(--text);}
+  html.t-flat #scr-home .summary .label,
+  html.t-flat #scr-home .summary .hint,
+  html.t-flat #scr-home .summary .big small,
+  html.t-flat #scr-home .summary .nyc-cell span,
+  html.t-flat #scr-home .nyc-cell span{color:var(--muted);}
+  /* нічне сяйво героя — це і є «світіння», від якого йдемо */
+  html.t-flat.fd26t #scr-home .summary::before,
+  html.t-flat.fd26t .summary::before,
+  html.t-flat.fd26t .nyc::after{display:none;}
+  /* кнопка теми: шар fd26t малює свій значок маскою — вимикаємо, щоб було
+     видно наш SVG (сонце/місяць) */
+  html.t-flat.fd26t #themeToggle::before{display:none;}
+
+  /* вкладки «Карта бажань» / «Щоденник»: нейтральна поверхня, колір лишається
+     тільки в іконці.
+     Кнопки живуть у скляній полиці на нижньому краї картки (16-mx.css).
+     Скло там темне — на світлій поверхні рівних наборів воно читалось би
+     сірою плямою, тому тут полиця стає звичайною поверхнею теми. */
+  html.t-flat #scr-home .summary .herocap{background:var(--card-2);
+    border-top:1px solid var(--line);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+  html.t-flat #scr-home .summary .hc-tab,
+  html.t-flat #scr-home .summary .hc-tab.wish,
+  html.t-flat #scr-home .summary .hc-tab.diary{background:transparent;border:0;color:var(--text);}
+  html.t-flat #scr-home .summary .hc-tab+.hc-tab{border-left:1px solid var(--line);}
+  html.t-flat #scr-home .summary .hc-tab:active{background:var(--hair);}
+  html.t-flat #scr-home .summary .herocap .hc-tab b{text-shadow:none;}
+  html.t-flat #scr-home .summary .hc-tab.wish svg{color:var(--skl);}
+  html.t-flat #scr-home .summary .hc-tab.diary svg{color:var(--hab);}
+
+  /* Шапка Огляду. Назву жорстко фарбує 16-mx.css у білий із тінню — так було
+     задумано під фото-шапку на темному. Повторюємо той самий шлях і додаємо
+     html.t-flat, інакше специфічності не вистачає. */
+  html.t-flat #scr-home .top .brand h1{color:var(--text);text-shadow:none;}
+  html.t-flat #scr-home .top .brand span,
+  html.t-flat #scr-home .top .brand small{color:var(--muted);text-shadow:none;}
+
+  /* ── картка «Налаштування» ──
+     Формально це екран «Ще», а не Огляд. Але саме тут живе вибір набору
+     стилю, і в світлих наборах картка була темною з майже нечитабельним
+     текстом — новою можливістю неможливо було скористатись. Тому переводимо
+     її на токени разом з рештою. */
+  html.t-flat .stg-row{border-bottom:1px solid var(--line);}
+  html.t-flat .stg-tt{color:var(--text);}
+  html.t-flat .stg-sub{color:var(--muted);}
+  html.t-flat .stg-ic{background:var(--card-2);box-shadow:none;color:var(--ico);}
+  html.t-flat .stg-ic.c-lang,
+  html.t-flat .stg-ic.c-theme,
+  html.t-flat .stg-ic.c-ai,
+  html.t-flat .stg-ic.c-dev{background:var(--card-2);}
+  html.t-flat .stg-seg{background:var(--field);}
+  html.t-flat .stg-seg button{color:var(--muted);}
+  html.t-flat .stg-seg button.on{background:var(--accent);color:var(--bg-2);box-shadow:none;}
+  html.t-flat .stg-sw{background:var(--hair-2);}
+  html.t-flat .stg-sw.on{background:var(--accent);}
+  /* Контейнер картки та тло сторінки. `html` має жорсткий #0b0d12 (лишався
+     від часів, коли світлої теми не було), а `.phone` малює фонове сяйво —
+     у рівних наборах і те, й те заважає. */
+  html.t-flat .bkp-card{background:var(--card);background-image:none;border:1px solid var(--line);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+  html.t-flat{background:var(--bg);}
+  html.t-flat .phone{background-image:none;}
+  html.t-flat .stg-go{background:var(--field);color:var(--text);border:1px solid var(--line);}
+  html.t-flat .stg-go:active{background:var(--hair);}
   /* ===== універсальне меню дій / підтвердження ===== */
   .asheet{position:fixed;inset:0;background:rgba(8,10,16,.55);backdrop-filter:blur(5px);
     display:flex;align-items:flex-end;justify-content:center;z-index:1300;animation:fadein .2s;}
@@ -2153,7 +2481,8 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .wprice .tx small{color:var(--text);font-size:12.5px;display:block;margin-top:4px;line-height:1.45;font-weight:600;}
   .wprice.empty .tx small{color:var(--muted);font-weight:500;}
   .wprice .wp-edit{flex:none;color:var(--muted);font-size:13px;}
-  html[data-theme="light"] .wprice{background:#fff;border-color:var(--line);box-shadow:0 4px 14px rgba(38,30,80,.08);}
+  html[data-theme="light"] .wprice,
+  html.t-light .wprice{background:#fff;border-color:var(--line);box-shadow:0 4px 14px rgba(38,30,80,.08);}
   .wish-collage{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:88px;gap:9px;}
   .wish-cell{border-radius:14px;border:1px solid rgba(255,255,255,.1);box-shadow:0 6px 18px rgba(0,0,0,.4);
     position:relative;overflow:hidden;background-size:cover;background-position:center;cursor:pointer;}
@@ -3074,9 +3403,12 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   .tcode i{ font-style:normal; }
   .tcode .c-kw{ color:#c77dff; } .tcode .c-str{ color:#34c77b; }
   .tcode .c-num{ color:#f0b429; } .tcode .c-com{ color:var(--muted); opacity:.7; }
-  html[data-theme="light"] .tcode .c-kw{ color:#9d4edd; }
-  html[data-theme="light"] .tcode .c-str{ color:#1ea566; }
-  html[data-theme="light"] .tcode .c-num{ color:#b8860b; }
+  html[data-theme="light"] .tcode .c-kw,
+  html.t-light .tcode .c-kw{ color:#9d4edd; }
+  html[data-theme="light"] .tcode .c-str,
+  html.t-light .tcode .c-str{ color:#1ea566; }
+  html[data-theme="light"] .tcode .c-num,
+  html.t-light .tcode .c-num{ color:#b8860b; }
   /* embed */
   .tembed .em-wrap{ position:relative; width:100%; aspect-ratio:16/9; border-radius:14px;
     overflow:hidden; border:0; background:#000 center/cover no-repeat; cursor:pointer; display:block; padding:0; }
@@ -5630,28 +5962,49 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   /* ── ТЕМА: ЧОРНА (AMOLED) для AI-екрана ── */
   html[data-theme="black"] .aiscr{background:#000;}
   /* ── ТЕМА: СВІТЛА для AI-екрана ── */
-  html[data-theme="light"] .aiscr{background:#f2f4fb;color:#1a1f2e;}
-  html[data-theme="light"] .aiscr::before{background:
+  html[data-theme="light"] .aiscr,
+  /* ── ТЕМА: СВІТЛА для AI-екрана ── */
+  html.t-light .aiscr{background:#f2f4fb;color:#1a1f2e;}
+  html[data-theme="light"] .aiscr::before,
+  html.t-light .aiscr::before{background:
     radial-gradient(60% 34% at 20% -5%,rgba(106,125,255,.16),transparent 60%),
     radial-gradient(52% 30% at 88% 8%,rgba(160,107,255,.12),transparent 60%),
     radial-gradient(60% 30% at 50% 108%,rgba(78,205,196,.08),transparent 60%);}
-  html[data-theme="light"] .ai-glass{background:rgba(255,255,255,.72);border-color:rgba(20,26,60,.12);box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 4px 14px rgba(25,32,70,.07);}
-  html[data-theme="light"] .aiscr .ai-msg.a{background:#ffffff;border-color:rgba(20,26,60,.1);color:#1a1f2e;box-shadow:0 3px 12px rgba(25,32,70,.06);}
-  html[data-theme="light"] .aiscr .ai-in input{background:#ffffff;border-color:rgba(20,26,60,.13);color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-in input::placeholder{color:#9aa0b8;}
-  html[data-theme="light"] .aiscr .ai-mic{background:#ffffff;border-color:rgba(20,26,60,.13);color:#5566ef;}
-  html[data-theme="light"] .ai-views{background:rgba(20,26,60,.06);border-color:rgba(20,26,60,.12);}
-  html[data-theme="light"] .ai-views button{color:#666e8c;}
-  html[data-theme="light"] .ai-views button.on{color:#fff;}
-  html[data-theme="light"] .aiscr .ai-back,html[data-theme="light"] .aiscr .ai-clear{color:#4a5170;}
-  html[data-theme="light"] .aiscr .ai-ht b{color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-ht small{color:#666e8c;}
-  html[data-theme="light"] .ai-memsheet{background:rgba(35,42,70,.3);}
-  html[data-theme="light"] .ai-memcard{background:#ffffff;color:#1a1f2e;}
-  html[data-theme="light"] .ai-memrow{background:rgba(20,26,60,.05);border-color:rgba(20,26,60,.1);color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-slash{background:#ffffff;border-color:rgba(20,26,60,.12);}
-  html[data-theme="light"] .aiscr .ai-slash button{color:#1a1f2e;}
-  html[data-theme="light"] .aiscr .ai-slash small{color:#666e8c;}
+  html[data-theme="light"] .ai-glass,
+  html.t-light .ai-glass{background:rgba(255,255,255,.72);border-color:rgba(20,26,60,.12);box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 4px 14px rgba(25,32,70,.07);}
+  html[data-theme="light"] .aiscr .ai-msg.a,
+  html.t-light .aiscr .ai-msg.a{background:#ffffff;border-color:rgba(20,26,60,.1);color:#1a1f2e;box-shadow:0 3px 12px rgba(25,32,70,.06);}
+  html[data-theme="light"] .aiscr .ai-in input,
+  html.t-light .aiscr .ai-in input{background:#ffffff;border-color:rgba(20,26,60,.13);color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-in input::placeholder,
+  html.t-light .aiscr .ai-in input::placeholder{color:#9aa0b8;}
+  html[data-theme="light"] .aiscr .ai-mic,
+  html.t-light .aiscr .ai-mic{background:#ffffff;border-color:rgba(20,26,60,.13);color:#5566ef;}
+  html[data-theme="light"] .ai-views,
+  html.t-light .ai-views{background:rgba(20,26,60,.06);border-color:rgba(20,26,60,.12);}
+  html[data-theme="light"] .ai-views button,
+  html.t-light .ai-views button{color:#666e8c;}
+  html[data-theme="light"] .ai-views button.on,
+  html.t-light .ai-views button.on{color:#fff;}
+  html[data-theme="light"] .aiscr .ai-back,html[data-theme="light"] .aiscr .ai-clear,
+  html.t-light .aiscr .ai-back,
+  html.t-light .aiscr .ai-clear{color:#4a5170;}
+  html[data-theme="light"] .aiscr .ai-ht b,
+  html.t-light .aiscr .ai-ht b{color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-ht small,
+  html.t-light .aiscr .ai-ht small{color:#666e8c;}
+  html[data-theme="light"] .ai-memsheet,
+  html.t-light .ai-memsheet{background:rgba(35,42,70,.3);}
+  html[data-theme="light"] .ai-memcard,
+  html.t-light .ai-memcard{background:#ffffff;color:#1a1f2e;}
+  html[data-theme="light"] .ai-memrow,
+  html.t-light .ai-memrow{background:rgba(20,26,60,.05);border-color:rgba(20,26,60,.1);color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-slash,
+  html.t-light .aiscr .ai-slash{background:#ffffff;border-color:rgba(20,26,60,.12);}
+  html[data-theme="light"] .aiscr .ai-slash button,
+  html.t-light .aiscr .ai-slash button{color:#1a1f2e;}
+  html[data-theme="light"] .aiscr .ai-slash small,
+  html.t-light .aiscr .ai-slash small{color:#666e8c;}
   .ai-in{display:flex;gap:8px;align-items:center}
   .ai-mic{width:44px;height:44px;flex-shrink:0;border-radius:16px;display:grid;place-items:center;cursor:pointer;color:#c3cbff;
     background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11)}
@@ -6702,7 +7055,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     <div style="flex:1;min-width:0">
       <div style="font-weight:800;font-size:13.5px;color:#fff;">Пам'ять пристрою заповнена</div>
       <div id="quotaBannerMsg" style="font-size:12px;color:rgba(255,255,255,.82);margin-top:3px;line-height:1.45">
-        Дані збережено в хмару Telegram, але локальна копія може відставати. Звільни місце або очисти старі дані.</div>
+        Локальна памʼять заповнена — нові зміни могли не зберегтись на цей пристрій. Якщо ти увійшов через Google, вони в хмарі. Звільни місце: прибери великі фото або старі дані.</div>
     </div>
     <button onclick="document.getElementById('quotaBanner').style.display='none'"
       style="background:transparent;border:0;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;padding:0 2px;line-height:1">×</button>
@@ -6734,6 +7087,46 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   <symbol id="fi-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M5 12l7-7 7 7"/></symbol>
   <symbol id="fi-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12l7 7 7-7"/></symbol>
   <symbol id="fi-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></symbol>
+</defs></svg>
+<!-- ===== folder line-icon sprite (нові теми: іконки замість емодзі) =====
+     Один спрайт на всю програму. Малюються через <svg class="ico"><use href="#fo-…"/></svg>,
+     колір беруть із currentColor, товщину штриха — з CSS. Емодзі нікуди не зникли:
+     у даних папки лишається поле emoji, іконка живе поруч у полі icon. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="fo-folder" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2.5h8.5A1.5 1.5 0 0 1 21 10v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18Z"/></symbol>
+  <symbol id="fo-briefcase" viewBox="0 0 24 24"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5M3 12.5h18"/></symbol>
+  <symbol id="fo-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M14.5 10c0-1-1.1-1.7-2.5-1.7S9.5 9 9.5 10s1 1.4 2.5 1.7 2.5.7 2.5 1.8-1.1 1.8-2.5 1.8-2.5-.8-2.5-1.8"/></symbol>
+  <symbol id="fo-run" viewBox="0 0 24 24"><circle cx="15" cy="4.5" r="1.8"/><path d="m8 20 2.5-5 3-2-1-4.5-3 2-2 3M13.5 13l3 2 1.5 4M6 11l2.5-2.5"/></symbol>
+  <symbol id="fo-star" viewBox="0 0 24 24"><path d="m12 3.5 2.7 5.5 6 .9-4.35 4.25L17.4 20 12 17.15 6.6 20l1.05-5.85L3.3 9.9l6-.9z"/></symbol>
+  <symbol id="fo-book" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H19v16H5.5A1.5 1.5 0 0 1 4 18.5Z"/><path d="M4 16.5h15"/></symbol>
+  <symbol id="fo-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r=".8" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="fo-bulb" viewBox="0 0 24 24"><path d="M9 17a6.5 6.5 0 1 1 6 0v1.5a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 18.5Z"/><path d="M9.5 17h5"/></symbol>
+  <symbol id="fo-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-9.3A4.2 4.2 0 0 1 12 8.4a4.2 4.2 0 0 1 7.5 2.3C19.5 15.6 12 20 12 20Z"/></symbol>
+  <symbol id="fo-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></symbol>
+  <symbol id="fo-plane" viewBox="0 0 24 24"><path d="M21 4 10.5 14.5M21 4l-6.5 17-3.5-8.5L2.5 9z"/></symbol>
+  <symbol id="fo-apple" viewBox="0 0 24 24"><path d="M12 8c-1-1.2-2.5-1.6-4-1-2 .8-3 3-2.5 5.6.5 2.8 2.4 6.4 4.4 6.4.9 0 1.4-.4 2.1-.4s1.2.4 2.1.4c2 0 3.9-3.6 4.4-6.4.5-2.6-.5-4.8-2.5-5.6-1.5-.6-3 -.2-4 1Z"/><path d="M12 8c.2-1.7 1.3-3 2.8-3.4"/></symbol>
+  <symbol id="fo-dumbbell" viewBox="0 0 24 24"><path d="M3 9.5v5M6 7v10M18 7v10M21 9.5v5M6 12h12"/></symbol>
+  <symbol id="fo-brain" viewBox="0 0 24 24"><path d="M12 5.5a3 3 0 0 0-5.6 1.2A3 3 0 0 0 5 12a3 3 0 0 0 1.7 4.6A3 3 0 0 0 12 18.5Z"/><path d="M12 5.5a3 3 0 0 1 5.6 1.2A3 3 0 0 1 19 12a3 3 0 0 1-1.7 4.6A3 3 0 0 1 12 18.5Z"/></symbol>
+  <symbol id="fo-palette" viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 1 8-8c0 2-1.6 2.6-3 2.6h-1.4a1.8 1.8 0 0 0-1.2 3.1A1.7 1.7 0 0 1 12 20Z"/><circle cx="8.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="10" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="fo-music" viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></symbol>
+  <symbol id="fo-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="m7.5 15.5 3.5-4 3 2.5 4.5-6"/></symbol>
+  <symbol id="fo-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="fo-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="fo-doc" viewBox="0 0 24 24"><path d="M5.5 3.5h8L19 9v11.5H5.5Z"/><path d="M13.5 3.5V9H19M8.5 13h7M8.5 16.5h5"/></symbol>
+  <symbol id="fo-spark" viewBox="0 0 24 24"><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/><path d="m6.5 6.5 3 3M14.5 14.5l3 3M17.5 6.5l-3 3M9.5 14.5l-3 3"/></symbol>
+  <symbol id="fo-tool" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 1 5 5l-8 8a2.1 2.1 0 0 1-3-3l8-8a4 4 0 0 1-2-2Z"/><path d="M9.5 4.5 5 9 3 7l4.5-4.5z"/></symbol>
+  <symbol id="fo-study" viewBox="0 0 24 24"><path d="m12 4 9 4.5-9 4.5-9-4.5z"/><path d="M6.5 10.5V16c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-5.5M21 8.5v5"/></symbol>
+  <symbol id="fo-plant" viewBox="0 0 24 24"><path d="M12 20v-8"/><path d="M12 12C12 8 9.5 5.5 5.5 5.5c0 4 2.5 6.5 6.5 6.5Z"/><path d="M12 13.5c0-3.3 2.2-5.5 5.5-5.5 0 3.3-2.2 5.5-5.5 5.5Z"/></symbol>
+  <symbol id="fo-flame" viewBox="0 0 24 24"><path d="M12 20a5.5 5.5 0 0 0 5.5-5.5c0-4.5-5.5-10.5-5.5-10.5S6.5 10 6.5 14.5A5.5 5.5 0 0 0 12 20Z"/><path d="M12 20a2.5 2.5 0 0 0 2.5-2.5c0-2-2.5-4.5-2.5-4.5s-2.5 2.5-2.5 4.5A2.5 2.5 0 0 0 12 20Z"/></symbol>
+  <symbol id="fo-cart" viewBox="0 0 24 24"><path d="M3 4h2.2l2.3 11h10l2.2-8H6"/><circle cx="9" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></symbol>
+  <symbol id="fo-car" viewBox="0 0 24 24"><path d="M4 16v2.5M20 16v2.5M3 15.5v-3l2-5h14l2 5v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M5 12.5h14"/><circle cx="7.5" cy="15.5" r=".9" fill="currentColor" stroke="none"/><circle cx="16.5" cy="15.5" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="fo-camera" viewBox="0 0 24 24"><path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5l1.5-2h6l1.5 2H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5Z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="fo-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+  <symbol id="fo-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-3 7.8-7 9.5-4-1.7-7-5-7-9.5V6z"/></symbol>
+  <symbol id="fo-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.8M17 14.8c2.2.5 3.5 2.3 3.5 4.7"/></symbol>
+  <symbol id="fo-rocket" viewBox="0 0 24 24"><path d="M13.5 4.5c3 1.5 5 4.5 5.5 8l-4 2.5-5-5 2.5-4a6 6 0 0 1 1-1.5Z"/><path d="M10 15 6 19M9 11.5 5 13l1 3 3 1 1.5-4M14 16l1 3 3-1 1.5-4"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></symbol>
 </defs></svg>
 <!-- ===== DESKTOP SIDEBAR (показується тільки на широкому екрані) ===== -->
 <aside class="dsb" id="desktopSidebar">
@@ -6790,9 +7183,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
           <b>Щоденник</b>
         </button>
       </div>
-      <div class="wishdots" id="wishDots"></div>
-    </div>
-    <div class="nyc" id="nyCountdown" style="cursor:pointer" onclick="window.goNYC&&window.goNYC()">
+      <div class="nyc" id="nyCountdown" style="cursor:pointer" onclick="window.goNYC&&window.goNYC()">
       <div class="nyc-head"><span class="nyc-emoji">🎄</span><span class="nyc-title" id="nycTitle">До Нового року</span></div>
       <div class="nyc-grid">
         <div class="nyc-cell"><b id="nycD">0</b><span>днів</span></div>
@@ -6801,6 +7192,9 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
         <div class="nyc-cell"><b id="nycS">0</b><span>сек</span></div>
       </div>
     </div>
+      <div class="wishdots" id="wishDots"></div>
+    </div>
+
     <div class="sec"><h3>📁 Папки</h3><div class="sec-actions"><div class="fvseg" id="folderViewSeg">
       <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></button>
@@ -7562,6 +7956,18 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   function ymLocal(d){ return ymdLocal(d).slice(0,7); }
   window.ymdLocal = ymdLocal; window.ymLocal = ymLocal;
+
+  /* Відмінювання за українськими правилами:
+     pluralUk(1,'картка','картки','карток') → 'картка', pluralUk(5,…) → 'карток'.
+     Одне місце на всю апку — раніше форми зашивались руками в кожному екрані. */
+  function pluralUk(n, one, few, many){
+    n = Math.abs(+n||0); const t = n%100, d = n%10;
+    if(t>=11 && t<=14) return many;
+    if(d===1) return one;
+    if(d>=2 && d<=4) return few;
+    return many;
+  }
+  window.pluralUk = pluralUk;
 
   /* ============ РЕЄСТР КЛЮЧІВ СХОВИЩА — єдине джерело правди ============
      Новий ключ додаєш ТУТ (і за потреби версію в SCHEMAS).
@@ -8761,6 +9167,109 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     window.flowBackup = { collect, stats, exportToFile, importFromFile, snapshot, restoreSnapshot, FORMAT };
   })();
 
+  /* ============ PhotoDB — знімки папок і Карти бажань в IndexedDB ============
+     Раніше фото лежали base64-рядком просто в folders_cfg / wishes_board. Через
+     це один знімок роздував увесь JSON, а кожна дрібна зміна (перейменував
+     папку) переписувала всі фото разом з нею. localStorage має жорсткий ліміт
+     у кілька мегабайтів — саме туди впирався банер «памʼять заповнена».
+
+     Тут той самий підхід, що вже працює для книжок (BookDB) і документів
+     (DocDB): важке лежить в IndexedDB, у конфігу — лише посилання виду
+     `idb:ph_<id>`. Старі записи з `data:` читаються як раніше й переїжджають
+     самі при першому збереженні. ============================================ */
+  window.PhotoDB = (function(){
+    const DB='flow_photos', STORE='photos'; let _db=null;
+    function open(){
+      return new Promise((res,rej)=>{
+        if(_db) return res(_db);
+        if(!window.indexedDB) return rej(new Error('no-idb'));
+        const r=indexedDB.open(DB,1);
+        r.onupgradeneeded=()=>{ const db=r.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
+        r.onsuccess=()=>{ _db=r.result; res(_db); };
+        r.onerror=()=>rej(r.error||new Error('idb-open'));
+      });
+    }
+    return {
+      available(){ return !!window.indexedDB; },
+      async put(id,dataUrl){ const db=await open(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(dataUrl,id); tx.oncomplete=()=>res(true); tx.onerror=()=>rej(tx.error); }); },
+      async get(id){ const db=await open(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readonly'); const rq=tx.objectStore(STORE).get(id); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>rej(rq.error); }); },
+      async del(id){ try{ const db=await open(); return new Promise(res=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(id); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false); }); }catch(_){ return false; } },
+      /* Усе одразу — щоб на старті скласти памʼятний кеш і далі малювати
+         синхронно, як і раніше. Знімків десятки, не тисячі. */
+      async all(){
+        try{
+          const db=await open();
+          return new Promise(res=>{
+            const out={}; const tx=db.transaction(STORE,'readonly'); const st=tx.objectStore(STORE);
+            const rq=st.openCursor();
+            rq.onsuccess=()=>{ const c=rq.result; if(!c){ res(out); return; } out[c.key]=c.value; c.continue(); };
+            rq.onerror=()=>res(out);
+          });
+        }catch(_){ return {}; }
+      }
+    };
+  })();
+
+  /* Памʼятний кеш знімків. Рендер карток синхронний, тож читати IndexedDB
+     під час малювання не можна — натомість на старті один раз вичитуємо все
+     у память (photoWarm), а далі photoSrc() віддає готовий data-URL.
+     photoSrc також приймає старі значення (`data:…`) і повертає їх як є,
+     тому виклики працюють однаково до і після переїзду. */
+  window.__photoCache = Object.create(null);
+  /* Самозцілення промаху: якщо рендер попросив знімок, якого ще немає в
+     кеші (перемалювання спрацювало раніше за photoWarm — так сталось у
+     Electron-збірці, і фото зникали назавжди), тихо дотягуємо його з
+     IndexedDB і перемальовуємо екрани один раз, пакетом. Після цього кеш
+     заповнений і промахів більше не буде. */
+  const __phPending=new Set(); let __phPoke=null;
+  function __photoPoke(){
+    if(__phPoke) return;
+    __phPoke=setTimeout(()=>{ __phPoke=null;
+      try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
+      try{ if(typeof updateSummaryBg==='function') updateSummaryBg(); }catch(_){}
+      try{ if(typeof renderWishes==='function') renderWishes(); }catch(_){}
+    },60);
+  }
+  window.photoSrc = function(ref){
+    if(!ref) return '';
+    const r=String(ref);
+    if(r.slice(0,4)!=='idb:') return r;         // старий формат — сам data-URL
+    const id=r.slice(4);
+    const hit=window.__photoCache[id];
+    if(hit) return hit;
+    if(!__phPending.has(id) && window.PhotoDB && window.PhotoDB.available()){
+      __phPending.add(id);
+      window.PhotoDB.get(id)
+        .then(v=>{ if(v){ window.__photoCache[id]=v; __photoPoke(); } })
+        .catch(()=>{})
+        .then(()=>__phPending.delete(id));
+    }
+    return '';
+  };
+  window.photoIsRef = function(ref){ return !!ref && String(ref).slice(0,4)==='idb:'; };
+  window.photoWarm = async function(){
+    try{ if(!window.PhotoDB||!window.PhotoDB.available()) return false;
+      window.__photoCache = await window.PhotoDB.all(); return true; }catch(_){ return false; }
+  };
+  /* Зберегти знімок і повернути посилання для конфігу. Якщо IndexedDB
+     недоступний — віддаємо сам data-URL, і все працює як раніше. */
+  window.photoPut = async function(id, dataUrl){
+    try{
+      if(!window.PhotoDB||!window.PhotoDB.available()) return dataUrl;
+      await window.PhotoDB.put(id, dataUrl);
+      window.__photoCache[id]=dataUrl;
+      return 'idb:'+id;
+    }catch(_){ return dataUrl; }
+  };
+  window.photoDel = async function(ref){
+    try{
+      if(!window.photoIsRef(ref)) return;
+      const id=String(ref).slice(4);
+      delete window.__photoCache[id];
+      if(window.PhotoDB&&window.PhotoDB.available()) await window.PhotoDB.del(id);
+    }catch(_){}
+  };
+
 
   /* ============ PLATFORM: єдиний шар над Telegram / Desktop / Mobile ============
      Єдине місце в усьому застосунку, що знає про конкретну платформу.
@@ -8865,7 +9374,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 
   /* ============ FOLDER / NAV DATA ============ */
   let folders = {
-    work: { key:'work', c:'#6a7dff', emoji:'💼', name:'Робота', pct:0, photo:'', flayout:'a', pinned:false,
+    work: { key:'work', c:'#6a7dff', emoji:'💼', icon:'fo-briefcase', name:'Робота', pct:0, photo:'', flayout:'a', pinned:false,
       widgets:[ { id:'worktrack', emoji:'⏱', t:'Години та заробіток', d:'Календар змін + зарплата', ready:true } ]},
   };
   let order = ['work'];
@@ -8878,6 +9387,72 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   const FKEY='folders_cfg', FOKEY='folders_order';
   const FOLDER_COLORS=['#e8843c','#34c77b','#5b8def','#c77dff','#ff6b9d','#4ecdc4','#f0b429','#9b8cff','#ff5a5f','#2dd4bf'];
   const FOLDER_EMOJIS=['📁','💰','🏃','⭐','📚','🎯','💡','❤️','🏠','✈️','🍎','💪','🧠','🎨','🎵','📈'];
+  /* ── лінійні іконки папок (нові теми) ──
+     Той самий порядок, що й у FOLDER_EMOJIS: нова папка отримує пару
+     «емодзі + іконка», тож виглядає правильно в будь-якій темі.
+     Поле emoji НЕ прибрано: у старих темах малюється воно. */
+  const FOLDER_ICONS=['fo-folder','fo-coin','fo-run','fo-star','fo-book','fo-target','fo-bulb','fo-heart',
+                      'fo-home','fo-plane','fo-apple','fo-dumbbell','fo-brain','fo-palette','fo-music','fo-chart'];
+  /* Мапа для переїзду вже наявних папок: емодзі, яке ти колись поставив,
+     → найближча іконка. Що не впізналось — стає загальною текою (fo-folder). */
+  const EMOJI_ICON={
+    '📁':'fo-folder','📂':'fo-folder','🗂':'fo-folder','🗃':'fo-folder','🗄':'fo-folder',
+    '💼':'fo-briefcase','👔':'fo-briefcase','🏢':'fo-briefcase',
+    '💰':'fo-coin','💵':'fo-coin','💸':'fo-coin','🪙':'fo-coin','💳':'fo-coin','🏦':'fo-coin','💲':'fo-coin',
+    '🏃':'fo-run','🚶':'fo-run','🏅':'fo-run',
+    '⭐':'fo-star','🌟':'fo-star','✴️':'fo-star',
+    '✨':'fo-spark','🪄':'fo-spark',
+    '📚':'fo-book','📖':'fo-book','📕':'fo-book','📗':'fo-book','📘':'fo-book','📙':'fo-book',
+    '🎯':'fo-target','🏹':'fo-target',
+    '💡':'fo-bulb',
+    '❤️':'fo-heart','❤':'fo-heart','💗':'fo-heart','💖':'fo-heart','💜':'fo-heart','🧡':'fo-heart',
+    '🏠':'fo-home','🏡':'fo-home','🏘':'fo-home',
+    '✈️':'fo-plane','✈':'fo-plane','🌍':'fo-plane','🌎':'fo-plane','🧳':'fo-plane','🗺':'fo-plane',
+    '🍎':'fo-apple','🍏':'fo-apple','🥗':'fo-apple','🍽':'fo-apple','🥑':'fo-apple',
+    '💪':'fo-dumbbell','🏋':'fo-dumbbell','🤸':'fo-dumbbell','🧘':'fo-dumbbell',
+    '🧠':'fo-brain','🤯':'fo-brain','🫀':'fo-brain',
+    '🎨':'fo-palette','🖌':'fo-palette','🖼':'fo-palette','🎭':'fo-palette',
+    '🎵':'fo-music','🎶':'fo-music','🎧':'fo-music','🎸':'fo-music','🎤':'fo-music',
+    '📈':'fo-chart','📊':'fo-chart','📉':'fo-chart',
+    '📅':'fo-calendar','🗓':'fo-calendar','📆':'fo-calendar',
+    '⏱':'fo-clock','⏰':'fo-clock','🕐':'fo-clock','⌛':'fo-clock','⏳':'fo-clock',
+    '📄':'fo-doc','📝':'fo-doc','✍️':'fo-doc','📋':'fo-doc','🧾':'fo-doc','📃':'fo-doc',
+    '🔧':'fo-tool','🛠':'fo-tool','⚙️':'fo-tool','🔨':'fo-tool',
+    '🎓':'fo-study','🏫':'fo-study','👨‍🎓':'fo-study',
+    '🌱':'fo-plant','🌿':'fo-plant','🪴':'fo-plant','🌳':'fo-plant','🌸':'fo-plant',
+    '🔥':'fo-flame',
+    '🚀':'fo-rocket','🛸':'fo-rocket',
+    '🛒':'fo-cart','🛍':'fo-cart',
+    '🚗':'fo-car','🚙':'fo-car','🚕':'fo-car','🚲':'fo-car',
+    '📷':'fo-camera','📸':'fo-camera','🎬':'fo-camera','📹':'fo-camera',
+    '✉️':'fo-mail','📧':'fo-mail','📮':'fo-mail','💬':'fo-mail',
+    '🛡':'fo-shield','🔒':'fo-shield','🕶️':'fo-shield','🔐':'fo-shield',
+    '👥':'fo-users','🤝':'fo-users','👪':'fo-users','👨‍👩‍👧':'fo-users','👨‍👩‍👦':'fo-users',
+  };
+  /* Емодзі приходить із даних користувача — там трапляються варіаційні
+     селектори (U+FE0F) і модифікатори тону/статі. Перед пошуком у мапі
+     чистимо їх, інакше '🏃‍♂️' не збіглося б із '🏃'. */
+  function folderIconFor(emoji){
+    if(!emoji) return 'fo-folder';
+    const raw=String(emoji).trim();
+    if(EMOJI_ICON[raw]) return EMOJI_ICON[raw];
+    const bare=raw.replace(/[\u{FE0E}\u{FE0F}\u{200D}\u{1F3FB}-\u{1F3FF}\u{2640}\u{2642}]/gu,'');
+    return EMOJI_ICON[bare] || 'fo-folder';
+  }
+  function folderIcon(f){ return (f&&f.icon) ? f.icon : folderIconFor(f&&f.emoji); }
+  /* Повний перелік іконок для ручного вибору — той самий порядок, що у
+     спрайті в index.html. Підписи потрібні лише для підказки при наведенні. */
+  const ICON_ALL=[
+    ['fo-folder','Тека'],       ['fo-briefcase','Робота'],  ['fo-coin','Гроші'],      ['fo-chart','Графік'],
+    ['fo-target','Ціль'],       ['fo-rocket','Проєкт'],     ['fo-calendar','Календар'],['fo-clock','Час'],
+    ['fo-doc','Документ'],      ['fo-book','Книга'],        ['fo-study','Навчання'],  ['fo-brain','Мислення'],
+    ['fo-bulb','Ідея'],         ['fo-spark','Іскра'],       ['fo-star','Зірка'],      ['fo-flame','Вогонь'],
+    ['fo-heart','Серце'],       ['fo-home','Дім'],          ['fo-users','Люди'],      ['fo-mail','Пошта'],
+    ['fo-run','Біг'],           ['fo-dumbbell','Спорт'],    ['fo-apple','Їжа'],       ['fo-plant','Ріст'],
+    ['fo-palette','Творчість'], ['fo-music','Музика'],      ['fo-camera','Фото'],     ['fo-tool','Інструменти'],
+    ['fo-cart','Покупки'],      ['fo-car','Транспорт'],     ['fo-plane','Подорожі'],  ['fo-shield','Захист'],
+  ];
+  try{ window.folderIconFor=folderIconFor; }catch(_){}
 
   /* ===== 🕶️ VAULT: приховані папки за PIN =====
      У коді та сховищі НЕМає самого PIN — лише SHA-256(salt+pin).
@@ -8999,7 +9574,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       const cfg={};
       Object.keys(folders).forEach(k=>{
         const f=folders[k];
-        cfg[k]={c:f.c,emoji:f.emoji,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||'',secret:!!f.secret};
+        cfg[k]={c:f.c,emoji:f.emoji,icon:f.icon||folderIconFor(f.emoji),iconSet:f.iconSet?1:0,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||'',secret:!!f.secret};
       });
       const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
       const p2=window.storage.set(FOKEY,JSON.stringify(order),false); if(p2&&p2.catch)p2.catch(()=>{});
@@ -10637,8 +11212,15 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
           </div>
         </div>
         <div class="stg-row">
+          <div class="stg-ic c-theme">🎨</div>
+          <div class="stg-tx"><div class="stg-tt">Набір стилю</div><div class="stg-sub">${THEME_SETS[themeSetOf(theme)].name}</div></div>
+          <div class="stg-seg" id="stgThemeSetSeg">
+            ${Object.keys(THEME_SETS).map(id=>`<button data-ts="${id}" class="${themeSetOf(theme)===id?'on':''}">${THEME_SETS[id].name}</button>`).join('')}
+          </div>
+        </div>
+        <div class="stg-row">
           <div class="stg-ic c-theme">🌓</div>
-          <div class="stg-tx"><div class="stg-tt">Тема</div><div class="stg-sub">Світла / темна</div></div>
+          <div class="stg-tx"><div class="stg-tt">Тема</div><div class="stg-sub">${THEME_META[theme]?THEME_META[theme][1]:'Світла / темна'}</div></div>
           <button class="stg-go" id="stgThemeBtn">Перемкнути</button>
         </div>
         <div class="stg-row">
@@ -10665,7 +11247,9 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       if(l!==lang && window.flowSetLang) window.flowSetLang(l);
       renderSettingsCard();
     });
-    const tb=document.getElementById('stgThemeBtn'); if(tb) tb.onclick=()=>{ const t=document.getElementById('themeToggle'); if(t) t.click(); };
+    const tb=document.getElementById('stgThemeBtn'); if(tb) tb.onclick=()=>{ toggleTheme(); };
+    { const seg=document.getElementById('stgThemeSetSeg');
+      if(seg) seg.querySelectorAll('[data-ts]').forEach(b=>b.onclick=()=>setThemeSet(b.dataset.ts)); }
     const hgs=document.getElementById('stgHomeGlassSw'); if(hgs) hgs.onclick=()=>{ homeGlass=!homeGlass; applyHomeGlass(); saveHomeGlass(); renderSettingsCard(); };
     const pb=document.getElementById('stgProxyBtn'); if(pb) pb.onclick=()=>{ if(typeof aiConfig==='function') aiConfig(()=>{}); };
     const cs=document.getElementById('stgCtSw'); if(cs) cs.onclick=()=>{ if(typeof devContentTranslateToggleSheet==='function') devContentTranslateToggleSheet(); setTimeout(renderSettingsCard,50); };
@@ -10852,30 +11436,92 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       try{ prefSet('homewidgets', homeWidgets?'1':'0'); }catch(_){}
       applyHomeWidgets(); }; }
 
-  // ── перемикач теми (Flow-дарк / чорна AMOLED / світла) ──
+  /* ── перемикач теми ──
+     Три старі теми (dark / black / light) лишились як були — вони живуть
+     у наборі «classic» і гортаються тією ж каруселлю, що й раніше.
+     Додано два нові набори: desk («Робочий стіл») і studio («Студія»),
+     у кожного своя світла й темна пара. Кнопка в шапці всередині нового
+     набору не гортає по колу, а перемикає світло↔темно — з семи тем
+     карусель була б незручною. Сам набір обирають у Налаштуваннях. */
+  const THEME_SETS={
+    classic:{ name:'Класична',      light:'light',        dark:'dark' },
+    desk:   { name:'Робочий стіл',  light:'desk-light',   dark:'desk-dark' },
+    studio: { name:'Студія',        light:'studio-light', dark:'studio-dark' },
+  };
+  // [значок, назва, колір шапки платформи, id SVG-іконки або '' для емодзі]
+  const THEME_META={
+    dark:          ['🌙','Frequency-дарк',        '#0c0e14',''],
+    black:         ['⚫','Чорна (AMOLED)',        '#000000',''],
+    light:         ['☀️','Світла',                '#f4f6fb',''],
+    'desk-light':  ['', 'Робочий стіл · світла',  '#f6f7f9','i-sun'],
+    'desk-dark':   ['', 'Робочий стіл · темна',   '#101317','i-moon'],
+    'studio-light':['', 'Студія · світла',        '#f7f7f6','i-sun'],
+    'studio-dark': ['', 'Студія · темна',         '#0e1011','i-moon'],
+  };
+  const THEME_KEYS=Object.keys(THEME_META);
+  const isTheme=v=>THEME_KEYS.indexOf(v)>=0;
+  // до якого набору належить тема (для перемикача в Налаштуваннях)
+  function themeSetOf(t){
+    for(const id in THEME_SETS){ const s=THEME_SETS[id]; if(s.light===t||s.dark===t) return id; }
+    return 'classic'; // 'black' теж класика
+  }
+  function themeIsDark(t){ return t!=='light' && t!=='desk-light' && t!=='studio-light'; }
   let theme='dark';
-  try{ const t=localStorage.getItem('flowtheme'); if(t==='light'||t==='dark'||t==='black') theme=t; }catch(_){}
-  const THEME_META={ dark:['🌙','Frequency-дарк','#0c0e14'], black:['⚫','Чорна (AMOLED)','#000000'], light:['☀️','Світла','#f4f6fb'] };
+  try{ const t=localStorage.getItem('flowtheme'); if(isTheme(t)) theme=t; }catch(_){}
   function applyTheme(){
     const r=document.documentElement;
-    if(theme==='light') r.setAttribute('data-theme','light');
-    else if(theme==='black') r.setAttribute('data-theme','black');
-    else r.removeAttribute('data-theme');
+    // 'dark' — тема за замовчуванням, вона живе на голому :root без атрибута
+    if(theme==='dark') r.removeAttribute('data-theme');
+    else r.setAttribute('data-theme',theme);
+    // Клас-прапорець для стилів, спільних усім новим наборам: рівні поверхні
+    // замість градієнтів, лінійні іконки замість емодзі. Один клас замість
+    // дублювання селекторів [data-theme^="desk-"],[data-theme^="studio-"].
+    const flat=themeSetOf(theme)!=='classic';
+    r.classList.toggle('t-flat', flat);
+    /* Другий прапорець — «це світла тема». У коді десятки правил написані як
+       html[data-theme="light"]: вони знають лише про стару світлу тему й для
+       desk-light / studio-light не спрацьовували, через що цілі екрани
+       (AI-чат, тиждень, місяць) лишались темними посеред світлої теми.
+       Замість переписувати кожне правило під кожну нову тему — один клас,
+       який ті селектори отримують додатковою копією. */
+    r.classList.toggle('t-light', flat && !themeIsDark(theme));
     const m=THEME_META[theme]||THEME_META.dark;
     const b=document.getElementById('themeToggle');
-    if(b){ b.textContent=m[0]; b.title='Тема: '+m[1]+' (тап → наступна)'; }
+    if(b){
+      if(m[3]) b.innerHTML=`<svg class="ico"><use href="#${m[3]}"/></svg>`;
+      else b.textContent=m[0];
+      b.title='Тема: '+m[1];
+    }
     // синхронізувати колір шапки Telegram, якщо доступно
     window.platform.setBgColor(m[2]);
   }
-  prefCatchup('flowtheme', v=>{ if(v==='light'||v==='dark'||v==='black'){ theme=v; applyTheme(); } });
-  function toggleTheme(){
-    theme = theme==='dark' ? 'black' : theme==='black' ? 'light' : 'dark';
+  prefCatchup('flowtheme', v=>{ if(isTheme(v)){ theme=v; applyTheme(); } });
+  function setTheme(t){
+    if(!isTheme(t)||t===theme) return;
+    theme=t;
     try{ prefSet('flowtheme', theme); }catch(_){}
     applyTheme();
-    try{ if(typeof plToast==='function'){ const m=THEME_META[theme]; plToast(m[0]+' '+m[1]); } }catch(_){}
+    try{ if(typeof renderSettingsCard==='function') renderSettingsCard(); }catch(_){}
+    try{ if(typeof plToast==='function'){ const m=THEME_META[theme]; plToast((m[0]?m[0]+' ':'')+m[1]); } }catch(_){}
     window.platform.haptic('light');
   }
+  // вибір набору з Налаштувань: лишаємось на тій самій половині (світло/темно)
+  function setThemeSet(id){
+    const s=THEME_SETS[id]; if(!s) return;
+    setTheme(themeIsDark(theme) ? s.dark : s.light);
+  }
+  function toggleTheme(){
+    const set=themeSetOf(theme);
+    // класика: стара карусель dark → black → light → dark, без змін
+    if(set==='classic'){ setTheme(theme==='dark' ? 'black' : theme==='black' ? 'light' : 'dark'); return; }
+    const s=THEME_SETS[set];
+    setTheme(themeIsDark(theme) ? s.light : s.dark);
+  }
   { const b=document.getElementById('themeToggle'); if(b) b.onclick=toggleTheme; }
+  /* Обгортки для інших частин програми. Імена НАВМИСНО інші, ніж у самих
+     функцій: файли складаються в один глобальний скоуп, тож window.themeSetOf
+     затер би функцію themeSetOf і вона почала б викликати саму себе. */
+  try{ window.flowSetThemeSet=setThemeSet; window.flowThemeSet=()=>themeSetOf(theme); window.FLOW_THEME_SETS=THEME_SETS; }catch(_){}
 
   // ── PRO-СТИЛЬ (Quiet Luxe + aurora + bento hero) ── увімкнено за замовчуванням
   let proTheme=true;
@@ -11191,6 +11837,28 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   async function loadWishes(){
     try{ const r=await window.storage.get(WISH_KEY,false); if(r&&r.value){ const d=JSON.parse(r.value); if(Array.isArray(d)) wishes=d; } }catch(_){}
     try{ const r2=await window.storage.get(WISH_ACT_KEY,false); if(r2&&r2.value){ const d2=JSON.parse(r2.value); if(d2&&typeof d2==='object') wishActiveDays=d2; } }catch(_){}
+    try{ await migrateWishPhotosOnce(); }catch(e){ console.error('migrateWishPhotos', e); }
+  }
+  /* Переїзд знімків Карти бажань у PhotoDB. Тут вони найважчі: до шести
+     кадрів по 1400px, і всі лежали одним рядком у wishes_board — тобто
+     будь-яка зміна підпису переписувала мегабайти. Формат посилання той
+     самий, що й у папок: `idb:wi_<id>` для фото, `idb:wt_<id>` для
+     обкладинки відео. Якщо IndexedDB нема — нічого не стається. */
+  async function migrateWishPhotosOnce(){
+    if(!window.PhotoDB || !window.PhotoDB.available()) return;
+    const isData=v=>!!v && String(v).slice(0,5)==='data:';
+    const todo=wishes.filter(w=>isData(w.img)||isData(w.thumb));
+    if(!todo.length) return;
+    for(const w of todo){
+      if(isData(w.img)){ const ref=await window.photoPut('wi_'+w.id, w.img);
+        if(String(ref).slice(0,4)==='idb:') w.img=ref; }
+      if(isData(w.thumb)){ const ref=await window.photoPut('wt_'+w.id, w.thumb);
+        if(String(ref).slice(0,4)==='idb:') w.thumb=ref; }
+    }
+    saveWishes();
+    try{ renderWishes(); }catch(_){}
+    try{ updateSummaryBg(); }catch(_){}
+    console.log('[Flow] знімків Карти бажань перенесено:', todo.length);
   }
   function saveWishActiveDays(){ try{ const p=window.storage.set(WISH_ACT_KEY,JSON.stringify(wishActiveDays),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
   function saveWishes(){
@@ -11260,8 +11928,14 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     const fl1=document.getElementById('wishFlink');
     if(fl1) fl1.textContent='🎯';
     slides.style.display='block'; ov.style.display='block';
-    const imgs=withImg.slice(-6).map(w=> w.type==='video'?w.thumb:w.img );
-    slides.innerHTML=imgs.map((src,i)=>`<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(src)}')"></div>`).join('');
+    // разом із картинкою несемо збережений кадр (w.pos) — той самий формат
+    // {x,y,scale}, що й photoPos у папок
+    const shown=withImg.slice(-6);
+    const imgs=shown.map(w=> ({ src:(w.type==='video'?w.thumb:w.img), pos:w.pos||null }) );
+    slides.innerHTML=imgs.map((it,i)=>{
+      const xf=it.pos?`transform:translate(${it.pos.x}%,${it.pos.y}%) scale(${it.pos.scale});`:'';
+      return `<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(it.src)}');${xf}"></div>`;
+    }).join('');
     if(imgs.length>1){
       /* Смужка як у сторіз: сегмент поточного фото наливається білим,
          пройдені лишаються повними, наступні — порожні. Тривалість
@@ -11299,12 +11973,14 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     reader.onload=()=>{
       const img=new Image();
       img.onload=()=>{
-        const max=900; let{width:w,height:h}=img;
+        // 1400px / 0.82 замість 900 / 0.72 (30.08.2026): на Retina 900px
+        // розтягувалось удвічі й давало «мило». Файл більшає приблизно втричі.
+        const max=1400; let{width:w,height:h}=img;
         if(w>h && w>max){ h=Math.round(h*max/w); w=max; }
         else if(h>=w && h>max){ w=Math.round(w*max/h); h=max; }
         const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
         cv.getContext('2d').drawImage(img,0,0,w,h);
-        try{ cb(cv.toDataURL('image/jpeg',0.72)); }
+        try{ cb(cv.toDataURL('image/jpeg',0.82)); }
         catch(_){ cb(reader.result); }
       };
       img.onerror=()=>cb(reader.result);
@@ -11327,7 +12003,10 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
           const id='w'+Date.now()+'_'+fi;
           if(firstNewId===null) firstNewId=id;
           const size=sizes[(wishes.length)%sizes.length];
-          wishes.push({id,img:dataUrl,cap:'',size});
+          const w={id,img:dataUrl,cap:'',size};
+          wishes.push(w);
+          // важке — в IndexedDB, у wishes_board лишиться посилання
+          Promise.resolve(window.photoPut('wi_'+id, dataUrl)).then(ref=>{ w.img=ref; saveWishes(); });
           done++;
           if(done===files.length){
             saveWishes(); renderWishes();
@@ -11440,7 +12119,10 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       title:'Прибрати з карти?',
       sub:w&&w.cap?('«'+w.cap+'» зникне з Карти бажань.'):'Цей образ зникне з Карти бажань.',
       okLabel:'Прибрати',
-      onOk:()=>{ wishes=wishes.filter(x=>x.id!==id); saveWishes(); renderWishes(); }
+      onOk:()=>{
+        // знімок цього образу більше нікому не потрібен
+        try{ if(w){ window.photoDel(w.img); window.photoDel(w.thumb); } }catch(_){}
+        wishes=wishes.filter(x=>x.id!==id); saveWishes(); renderWishes(); }
     });
   }
 
@@ -11497,7 +12179,11 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     inp.onchange=()=>{
       const f=inp.files&&inp.files[0]; inp.remove();
       if(!f){ askWishCap(id); return; }
-      compressImage(f,(dataUrl)=>{ w.thumb=dataUrl; saveWishes(); renderWishes(); });
+      compressImage(f,(dataUrl)=>{
+        const prev=w.thumb; w.thumb=dataUrl; renderWishes();
+        Promise.resolve(window.photoPut('wt_'+w.id, dataUrl)).then(ref=>{
+          w.thumb=ref; if(prev&&prev!==ref) window.photoDel(prev); saveWishes(); });
+      });
     };
     inp.click();
   }
@@ -11529,6 +12215,22 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       items.push({ic:'🎯', label:'Зробити ціллю', sub:'Додати в Цілі з цим фото', primary:true, onClick:()=>wishToGoal(id)});
     }
     items.push({ic:'resize', label:'Розмір плитки', sub:'Зараз: '+szNow+' · тап щоб змінити', onClick:()=>cycleWishSize(id)});
+    /* Кадрування для банера Огляду. Знімок там лежить у широкій картці, тож
+       вертикальне фото обрізається по центру — часто не там, де треба.
+       Редактор той самий, що й для фото папки (openPhotoCropEditor). */
+    { const src = (w.type==='video') ? w.thumb : w.img;
+      if(src) items.push({ic:'image', label:'Кадрувати для Огляду',
+        sub: w.pos ? 'Кадр підібрано · тап щоб змінити' : 'Обрати видиму частину',
+        onClick:()=>{
+          if(typeof openPhotoCropEditor!=='function'){ flowAlert('Редактор кадру недоступний.'); return; }
+          openPhotoCropEditor({ img:src, pos:w.pos||null, title:'Кадр для Огляду',
+            onSave:(pos)=>{ w.pos=pos; saveWishes(); try{renderWishes();}catch(_){}
+              // тло банера малює updateSummaryBg(), не renderWishBg — назва
+              // інша, і без цього виклику кадр застосувався б лише після
+              // перезавантаження екрана
+              try{ updateSummaryBg(); }catch(_){} } });
+        }});
+    }
     if(idx>0) items.push({ic:'up', label:'Перемістити вперед', onClick:()=>moveWish(id,-1)});
     if(idx<wishes.length-1) items.push({ic:'down', label:'Перемістити назад', onClick:()=>moveWish(id,1)});
     items.push({ic:'trash', label:'Прибрати з карти', danger:true, onClick:()=>delWish(id)});
@@ -12635,6 +13337,72 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
         }};
       })});
   }
+  /* ============ ГАМАНЕЦЬ: злиття всіх карток в одну ============
+     Одноразова міграція під спрощені Фінанси. Кожна операція
+     переприв'язується до єдиного гаманця; суми в іноземній валюті
+     переводяться в гривні за останнім збереженим курсом і фіксуються
+     назавжди. Слід конвертації лишається в op._fx — щоб через рік
+     було видно, звідки взялась цифра.
+
+     Повторний запуск нешкідливий: після міграції інших карток немає,
+     тож конвертувати вже нічого. */
+  const WALLET_ID='wallet';
+  function walletCard(){
+    return { id:WALLET_ID, name:'Гаманець', emoji:'💳', type:'custom', cur:'UAH', color:'#5b8def', main:true };
+  }
+  // сума всієї книги у гривнях — рахується однаково до і після міграції,
+  // тому годиться як доказ, що гроші не загубились
+  // курси беремо зі сховища напряму, а не з fx — щоб міграція пережила
+  // видалення блоку FX і не залежала від порядку завантаження
+  function migRates(){
+    const def={UAH:1,EUR:48.6,USD:41.6,PLN:11.4};
+    try{
+      const raw=localStorage.getItem('flowapp_fx_cfg'); if(!raw) return def;
+      let o=JSON.parse(raw);
+      if(o && typeof o==='object' && typeof o.d==='string') o=JSON.parse(o.d);
+      return (o && o.rates) ? Object.assign({}, def, o.rates) : def;
+    }catch(_){ return def; }
+  }
+  function walletSumUAH(rates){
+    const r=rates||migRates();
+    let s=0;
+    (finOps||[]).forEach(o=>{
+      if(o.envSpend) return;
+      const c=cardById(o.card), cur=(c&&c.cur)||'UAH';
+      const v=(+o.amount||0)*(r[cur]||1);
+      s += (o.type==='in' ? v : -v);
+    });
+    return Math.round(s*100)/100;
+  }
+  function migrateToWallet(){
+    const rep={ ops:0, converted:0, orphan:0, before:0, after:0, diff:0 };
+    if(!Array.isArray(finOps)) return rep;
+    const rates=migRates();
+    rep.before=walletSumUAH(rates);
+    finOps.forEach(o=>{
+      rep.ops++;
+      const c=cardById(o.card);
+      if(o.card && !c) rep.orphan++;         // картку вже видалено — валюту не встановити, лишаємо як гривні
+      const cur=(c&&c.cur)||'UAH';
+      if(cur!=='UAH'){
+        const r=rates[cur]||1;
+        o._fx={ cur, rate:r, was:+o.amount||0 };
+        o.amount=Math.round((+o.amount||0)*r*100)/100;
+        o.label=(o.label||'Операція')+' · '+fmt(o._fx.was)+' '+(CUR[cur]||cur)+' × '+r;
+        rep.converted++;
+      }
+      o.card=WALLET_ID;
+    });
+    cards=[walletCard()];
+    cardCfg.sel=WALLET_ID;
+    rep.after=walletSumUAH(rates);
+    rep.diff=Math.round((rep.after-rep.before)*100)/100;
+    if(rep.ops){ saveFinOps(); saveCards(); saveCardCfg(); }
+    try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
+    return rep;
+  }
+  try{ window.migrateToWallet=migrateToWallet; window.walletSumUAH=walletSumUAH; }catch(_){}
+
   /* ==== FX: курси валют (НБУ → er-api → офлайн), автооновлення раз на добу ==== */
   let fx={ base:'UAH', rates:{UAH:1,EUR:48.6,USD:41.6,PLN:11.4}, ts:0, src:'офлайн' };
   const FXKEY='fx_cfg';
@@ -12772,7 +13540,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     const heroVal=`<div data-fuzfx="1" style="cursor:pointer">${fmt(Math.round(fxTotalIn(dispCur)))} <small>${CUR[dispCur]||dispCur} ▾</small></div>`
       + (curKeys.length>1?`<div class="cur2">${curKeys.map(k=>fmt(totals[k])+' '+(CUR[k]||k)).join(' · ')}</div>`:`<div class="cur2">${fxAgo()}</div>`);
     body.innerHTML=`
-      <div class="incx-hero"><div class="l">Загальний баланс · ${cards.length} карток</div>
+      <div class="incx-hero"><div class="l">Загальний баланс · ${cards.length} ${pluralUk(cards.length,'картка','картки','карток')}</div>
         <div class="v">${heroVal}</div>
         <div class="incx-styles">${[[1,'Aurora'],[2,'Glass'],[3,'Carbon'],[4,'Minimal'],[5,'Neo']].map(([n,l])=>`<button class="${(cardCfg.style||1)===n?'on':''}" data-cstyle="${n}">${l}</button>`).join('')}</div>
       </div>
@@ -13190,7 +13958,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 
     body.innerHTML=`
       <div class="fuz-head">
-        <div data-fuzfx="1" style="cursor:pointer"><div class="fuz-lab">Гроші · ${cards.length} карток</div><div class="fuz-total">${headTotal} <u>▾</u></div>
+        <div data-fuzfx="1" style="cursor:pointer"><div class="fuz-lab">Гроші · ${cards.length} ${pluralUk(cards.length,'картка','картки','карток')}</div><div class="fuz-total">${headTotal} <u>▾</u></div>
           <div class="fuz-sub">${headSub}</div></div>
         <button class="fuz-lit" data-fdash="finlit">🎓 ${lit}</button>
       </div>
@@ -15681,7 +16449,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   }
   window.devContentTranslateToggleSheet = devContentTranslateToggleSheet;
   const AI_DEV_SYS='Ти — Нокс, технічний dev-асистент розробника Flow. Це службовий режим для власника апки, НЕ для користувачів: без мотивації, персон і FLOW_OPS. '
-    +'Flow — single-file HTML/JS Telegram Mini App: дані в localStorage/Telegram CloudStorage (реєстр window.FLOW_KEYS), AI — через Cloudflare Worker до Anthropic (Haiku 4.5 / Sonnet 4.6, prompt caching, агентний цикл на клієнті). '
+    +'Flow — односторінкова HTML/JS-апка (Mac через Electron + сайт/iPhone; Telegram прибрано): дані в localStorage + Supabase (Google-вхід) + IndexedDB для важкого (реєстр window.FLOW_KEYS), AI — через Cloudflare Worker до Anthropic (Haiku 4.5 / Sonnet 5 / Opus 5, prompt caching, агентний цикл на клієнті). '
     +'Твої dev-інструменти: dev_storage (keys/get/check), dev_errors (помилки JS), dev_cost (токени і $), dev_selftest (воркер+storage+парсинг), dev_data (backup/restore storage), dev_eval (JS у живій апці — з підтвердженням і авто-бекапом; для фіксів даних: змінив → save-функція → перевір check-ом). '
     +'Коли просять довідку/«що вмієш» — стисло перелічи ці можливості з прикладами запитів, без викликів інструментів. '
     +'Також доступні звичайні інструменти (get_data, planner, goals, finance, patterns, memory) — для перевірки поведінки. '
@@ -15933,7 +16701,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   function aiAgentStatusFor(name,inp){
     inp=inp||{};
     if(name==='get_data'){
-      const M={day:'дивлюсь день',range:'дивлюсь період',goals:'дивлюсь цілі',finance:'дивлюсь фінанси',backlog:'дивлюсь беклог',folders:'дивлюсь папки'};
+      const M={day:'дивлюсь день',range:'дивлюсь період',goals:'дивлюсь цілі',finance:'дивлюсь фінанси',backlog:'дивлюсь беклог',folders:'дивлюсь папки',diary:'читаю щоденник',vision:'дивлюсь Візію',wishes:'дивлюсь Карту бажань'};
       return '🔍 '+(M[inp.what]||'читаю дані')+'…';
     }
     if(name==='planner'){
@@ -15963,9 +16731,9 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 
   const FLOW_TOOLS=[
     { name:'get_data',
-      description:'Прочитати живі дані Frequency. Клич, коли потрібних даних немає в КОНТЕКСТІ (минулі дні, деталі цілей, фінанси, беклог, папки). Повертає стислий текст.',
+      description:'Прочитати живі дані Frequency. Клич, коли потрібних даних немає в КОНТЕКСТІ (минулі дні, деталі цілей, фінанси, беклог, папки, щоденник, Візія, Карта бажань). Повертає стислий текст.',
       input_schema:{ type:'object', properties:{
-        what:{ type:'string', enum:['day','range','goals','finance','backlog','folders'] },
+        what:{ type:'string', enum:['day','range','goals','finance','backlog','folders','diary','vision','wishes'] },
         ds:{ type:'string', description:'YYYY-MM-DD, для what=day' },
         from:{ type:'string', description:'YYYY-MM-DD, для what=range' },
         to:{ type:'string', description:'YYYY-MM-DD, для what=range (до 31 дня)' }
@@ -16047,6 +16815,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     +'FLOW_OPS використовуй лише для pages. '
     +'ПІДТВЕРДЖЕННЯ: майже кожен інструмент, що щось МІНЯЄ (не читає), сам питає людину підтвердити дію шторкою знизу — просто викликай його, шторка зʼявиться автоматично. Якщо результат каже "людина скасувала" — прийми це, не повторюй той самий виклик і не наполягай. '
     +'Перед плануванням дня, якого немає в КОНТЕКСТІ, спершу подивись його через get_data. '
+    +'get_data також читає щоденник (diary), Візію (vision: куди йду / навіщо / фокус) і Карту бажань (wishes). Коли треба дати пораду «з душею» чи ранковий бриф — зазирни туди, щоб спиратись на те, що людині справді важливо, а не радити абстрактно. '
     +'Після кожного інструмента прочитай результат: якщо конфлікт чи ⚠️ — виправ наступним викликом або чесно скажи, що не вийшло. '
     +'Не переказуй сирі дані з інструментів — лише висновок. Максимум стислості. '
     +'ГОЛОСОВИЙ ДАМП: повідомлення з 🎙 — надиктоване. Якщо в ньому кілька думок/задач/фактів — сам розклади все по місцях інструментами (задачі з часом → planner, кроки цілей → goals, витрати/доходи → finance, довготривалі факти → memory) і підсумуй одним рядком, що куди поклав. Не перепитуй, якщо зрозуміло з контексту.';
@@ -16118,6 +16887,44 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
           .map(f=>(f.emoji||'📁')+' '+f.name+(f.role==='project'?' (проєкт'+(f.due?', до '+f.due:'')+')':''))
           .join('\n')||'папок немає';
       }catch(_){ return 'папок немає'; }
+    }
+    if(inp.what==='diary'){
+      // останні до 10 записів щоденника; кожен обрізаємо, щоб не роздути контекст
+      try{
+        const src=(typeof diaryEntries==='object'&&diaryEntries)?diaryEntries:{};
+        const keys=Object.keys(src).filter(k=>src[k]&&src[k].text&&String(src[k].text).trim()).sort().reverse().slice(0,10);
+        if(!keys.length) return 'щоденник порожній';
+        return keys.map(k=>{ let t=String(src[k].text).trim(); if(t.length>500) t=t.slice(0,500)+'…'; return k+': '+t; }).join('\n\n');
+      }catch(_){ return 'щоденник недоступний'; }
+    }
+    if(inp.what==='vision'){
+      // Візія: куди йду / навіщо / фокус / кроки / опори — щоб радити не абстрактно
+      try{
+        const v=(typeof vzData==='object'&&vzData)?vzData:{};
+        const p=[];
+        if(v.statement&&String(v.statement).trim()) p.push('Куди йду: '+String(v.statement).trim());
+        const why=[v.why,v.why2].map(x=>String(x||'').trim()).filter(Boolean).join(' / ');
+        if(why) p.push('Навіщо: '+why);
+        if(v.focus&&v.focus.title&&String(v.focus.title).trim()){
+          const rng=(v.focus.start||v.focus.end)?(' ('+(v.focus.start||'?')+'–'+(v.focus.end||'?')+')'):'';
+          p.push('Фокус зараз: '+String(v.focus.title).trim()+rng);
+        }
+        const st=(Array.isArray(v.steps)?v.steps:[]).map(s=>typeof s==='string'?s:(s&&(s.t||s.title||s.name)||'')).filter(Boolean);
+        if(st.length) p.push('Кроки: '+st.slice(0,6).join('; '));
+        if(Array.isArray(v.tags)&&v.tags.length) p.push('Опори/теги: '+v.tags.join(', '));
+        return p.join('\n')||'Візія ще не заповнена';
+      }catch(_){ return 'Візія недоступна'; }
+    }
+    if(inp.what==='wishes'){
+      // Карта бажань: фото текстом не передати — віддаємо ціну мрії й підписи образів
+      try{
+        const arr=Array.isArray(wishes)?wishes:[];
+        const caps=arr.map(w=>w&&w.cap&&String(w.cap).trim()).filter(Boolean);
+        const p=[];
+        if(typeof wishPrice==='string'&&wishPrice.trim()) p.push('Ціна мрії: '+wishPrice.trim());
+        if(arr.length) p.push('Образів на карті: '+arr.length+(caps.length?(' · підписи: '+caps.map(c=>'«'+c+'»').join('; ')):' (без підписів, лише фото)'));
+        return p.join('\n')||'Карта бажань порожня';
+      }catch(_){ return 'Карта бажань порожня'; }
     }
     return '⚠️ невідомий what';
   }
@@ -19588,7 +20395,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
     try{ renderProjRail(); }catch(_){}
-    try{ window.FLOW_BUILD='2026-07-29-folders-v2.4'; console.log('[Flow] build', window.FLOW_BUILD); }catch(_){}
+    try{ if(!window.FLOW_BUILD){ window.FLOW_BUILD='2026-07-29-folders-v2.4'; console.log('[Flow] build', window.FLOW_BUILD); } }catch(_){}
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag');
@@ -19616,7 +20423,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       } else if(f.role==='page'){
         metaHtml=`<div class="fstat">📄 сторінка</div>`;
       } else {
-        metaHtml=`<div class="fstat"><b>${active}</b> активних${f.pct?` · ${f.pct}%`:''}</div>`;
+        metaHtml=`<div class="fstat"><b>${active}</b> ${pluralUk(active,'активний','активні','активних')}${f.pct?` · ${f.pct}%`:''}</div>`;
       }
       // ── v2: єдина розмітка, режим вирішує лише клас-обгортку ──
       const modeClass = homeFolderView==='grid' ? 'fc2-tile'
@@ -19633,11 +20440,15 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       if(f.photo){
         const pp=f.photoPos;
         const xf=pp?`transform:translate(${pp.x}%,${pp.y}%) scale(${pp.scale});`:'';
-        inner+=`<div class="fc2-bg" style="background-image:url('${safeImg(f.photo)}');${xf}"></div>`;
+        inner+=`<div class="fc2-bg" style="background-image:url('${safeImg(window.photoSrc(f.photo))}');${xf}"></div>`;
       }
       else { el.classList.add('nocover'); }
       inner+=`<div class="fc2-veil"></div>`+pinDot+subBadge;
-      inner+=`<div class="fc2-em">${emojiShow}</div>`;
+      // Емодзі й іконка малюються обидва, показує CSS лише одне: у старих
+      // темах — емодзі, у нових (desk-*/studio-*) — лінійну іконку. Так
+      // перемикання теми міняє вигляд миттєво, без перемальовування списку.
+      inner+=`<div class="fc2-em"><span class="fc2-emj">${emojiShow}</span>`+
+             `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${folderIcon(f)}"/></svg></div>`;
       if(homeFolderView==='deck'){
         let dpct=0;
         if(f.role==='project'){ const pr=folderProgress(k); dpct=pr.total?pr.pct:0; }
@@ -19709,8 +20520,9 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
         const used=order.length;
         const nm = name || ('Папка '+(used+1));
         const key='f_'+Date.now();
+        const em=(emojiVal!==undefined?emojiVal:FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]);
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
-          emoji:(emojiVal!==undefined?emojiVal:FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]),
+          emoji:em, icon:folderIconFor(em),
           name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
         order.push(key);
         saveFolders(); renderDashboard();
@@ -19726,8 +20538,9 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
         // контекст: якщо активна дошка належить папці — робимо проєкт її дочірньою папкою
         let parent='';
         try{ const base=String(boardKey||'').split('__sp_')[0]; if(base && base!=='__root__' && base!=='all' && folders[base]) parent=base; }catch(_){}
+        const em=(emojiVal!==undefined&&emojiVal!==''?emojiVal:'🚀');
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
-          emoji:(emojiVal!==undefined&&emojiVal!==''?emojiVal:'🚀'),
+          emoji:em, icon:folderIconFor(em),
           name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[],
           parent, role:'project', status:'active', due:'' };
         order.push(key);
@@ -19839,6 +20652,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       <button class="fmi" data-act="rename">✏️ Перейменувати</button>
       <button class="fmi" data-act="move">📂 ${f.parent?'Перемістити / на головну':'Перемістити в папку'}</button>
       <button class="fmi" data-act="color">🎨 Змінити колір</button>
+      <button class="fmi" data-act="icon"><svg class="ico fmi-ic" aria-hidden="true"><use href="#${folderIcon(f)}"/></svg> Іконка${f.iconSet?'':' · за емодзі'}</button>
       <button class="fmi" data-act="emoji">😀 Змінити емодзі</button>
       ${f.custom?`<button class="fmi danger" data-act="delete">🗑️ Видалити папку</button>`:''}
     </div>`;
@@ -19860,6 +20674,44 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     });
   }
   function closeFolderMenu(){ const e=document.getElementById('fmenuSheet'); if(e) e.remove(); }
+
+  /* ── вибір іконки папки вручну ──
+     Доти іконка виводилась з емодзі автоматично. Тут її можна задати самому;
+     обраний вручну варіант позначається прапорцем iconSet, і відтоді зміна
+     емодзі його вже не перезаписує — інакше вибір мовчки губився б.
+     Кнопка «За емодзі» повертає автоматичний режим. */
+  function openFolderIconPicker(key){
+    const f=folders[key]; if(!f) return;
+    closeFolderMenu();
+    const cur=folderIcon(f);
+    const m=document.createElement('div');
+    m.className='fmenu-sheet'; m.id='fmenuSheet';
+    m.innerHTML=`<div class="fmenu-in">
+      <div class="fmenu-grip"></div>
+      <div class="fmenu-title">Іконка · ${esc(f.name)}</div>
+      <div class="fic-grid">
+        ${ICON_ALL.map(([id,nm])=>`<button class="fic-opt ${cur===id?'on':''}" data-fic="${id}" title="${nm}" aria-label="${nm}" style="--c:${f.c||'var(--accent)'}">
+          <svg class="ico" aria-hidden="true"><use href="#${id}"/></svg></button>`).join('')}
+      </div>
+      <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+f.emoji+')':''}</button>
+      <button class="fmi" data-ficback="1">‹ Назад до налаштувань</button>
+    </div>`;
+    m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
+    document.body.appendChild(m);
+    m.querySelectorAll('[data-fic]').forEach(b=>b.onclick=()=>{
+      f.icon=b.dataset.fic; f.iconSet=1;
+      saveFolders(); renderDashboard(); closeFolderMenu();
+      try{ window.platform.haptic('select'); }catch(_){}
+    });
+    const auto=m.querySelector('[data-ficauto]');
+    if(auto) auto.onclick=()=>{
+      f.icon=folderIconFor(f.emoji); f.iconSet=0;
+      saveFolders(); renderDashboard(); closeFolderMenu();
+      try{ window.platform.haptic('select'); }catch(_){}
+    };
+    const back=m.querySelector('[data-ficback]');
+    if(back) back.onclick=()=>openFolderMenu(key);
+  }
 
   function openFolderMovePicker(key){
     const f=folders[key]; if(!f) return;
@@ -19885,17 +20737,21 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     if(act==='cropphoto'){
       closeFolderMenu();
       if(!f.photo) return;
-      openPhotoCropEditor({ img:f.photo, pos:f.photoPos, title:'Кадрувати «'+f.name+'»',
+      openPhotoCropEditor({ img:window.photoSrc(f.photo), pos:f.photoPos, title:'Кадрувати «'+f.name+'»',
         onSave:(pos)=>{ f.photoPos=pos; saveFolders(); renderDashboard(); } });
       return;
     }
-    if(act==='rmphoto'){ f.photo=''; f.photoPos=null; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
+    if(act==='rmphoto'){ const prev=f.photo; f.photo=''; f.photoPos=null;
+      window.photoDel(prev); saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='secret'){ if(!vaultOpen) return; f.secret=!f.secret; saveFolders(); renderDashboard(); closeFolderMenu(); try{ window.platform.haptic('select'); }catch(_){} return; }
     if(act==='pin'){ f.pinned=!f.pinned; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='rename'){ closeFolderMenu(); inputModal({title:'Перейменувати папку',value:f.name,placeholder:'Назва папки',onOk:(v)=>{ if(v){f.name=v;saveFolders();renderDashboard();} }}); return; }
     if(act==='move'){ closeFolderMenu(); openFolderMovePicker(key); return; }
     if(act==='color'){ cycleFolderColor(key); saveFolders(); renderDashboard(); openFolderMenu(key); return; }
-    if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; saveFolders(); renderDashboard(); }}); return; }
+    if(act==='icon'){ openFolderIconPicker(key); return; }
+    // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
+    // губився б мовчки. Автоматичну — переобираємо під нове емодзі.
+    if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; if(!f.iconSet) f.icon=folderIconFor(v); saveFolders(); renderDashboard(); }}); return; }
     if(act==='delete'){ confirmSheet({title:'Видалити папку «'+f.name+'»?', onOk:()=>{ const par=f.parent||''; Object.keys(folders).forEach(ck=>{ if(folders[ck]&&(folders[ck].parent||'')===key) folders[ck].parent=par; }); delete folders[key]; order=order.filter(x=>x!==key); saveFolders(); renderDashboard(); closeFolderMenu(); }}); return; }
   }
   function cycleFolderColor(key){
@@ -19912,14 +20768,20 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       reader.onload=()=>{
         const img=new Image();
         img.onload=()=>{
-          // downscale to max 900px wide, store compact JPEG
-          const maxW=900; const scale=Math.min(1,maxW/img.width);
+          // 1400px / 0.82 (30.08.2026): 900px на Retina розтягувалось удвічі.
+          const maxW=1400; const scale=Math.min(1,maxW/img.width);
           const cv=document.createElement('canvas');
           cv.width=Math.round(img.width*scale); cv.height=Math.round(img.height*scale);
           cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-          try{ folders[key].photo=cv.toDataURL('image/jpeg',0.72); }catch(_){ folders[key].photo=reader.result; }
+          let du; try{ du=cv.toDataURL('image/jpeg',0.82); }catch(_){ du=reader.result; }
           folders[key].photoPos=null;
-          saveFolders(); renderDashboard(); closeFolderMenu();
+          // старий знімок цієї папки більше не потрібен
+          const prev=folders[key].photo;
+          Promise.resolve(window.photoPut('ph_'+key, du)).then(ref=>{
+            folders[key].photo=ref;
+            if(prev && prev!==ref) window.photoDel(prev);
+            saveFolders(); renderDashboard(); closeFolderMenu();
+          });
         };
         img.onerror=()=>{ folders[key].photo=reader.result; saveFolders(); renderDashboard(); closeFolderMenu(); };
         img.src=reader.result;
@@ -20194,6 +21056,12 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   }
   // безпечне джерело зображення: лише data:image/* або http(s); інакше порожньо (захист від XSS у src/url())
   function safeImg(u){
+    /* Знімки переїхали в IndexedDB, і в даних тепер лежить посилання
+       `idb:ph_…` замість самого data-URL. Розв'язуємо його тут, у єдиній
+       точці, крізь яку проходить кожне зображення — інакше довелося б
+       правити півтора десятка місць рендеру. Звичайні data:/http адреси
+       photoSrc повертає незмінними. */
+    try{ if(window.photoSrc) u=window.photoSrc(u); }catch(_){}
     u=String(u==null?'':u).trim();
     if(/^data:image\/(png|jpe?g|gif|webp|svg\+xml);/i.test(u)) return u.replace(/'/g,'%27').replace(/"/g,'%22');
     if(/^https?:\/\//i.test(u)) return u.replace(/'/g,'%27').replace(/"/g,'%22');
@@ -21177,7 +22045,9 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       const p=String(ymd).split('-').map(Number);
       const d=new Date(p[0],p[1]-1,p[2]);
       const months=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
-      return d.getDate()+' '+months[d.getMonth()];
+      // рік показуємо лише для записів не цьогорічних — інакше «5 січня» з різних років не розрізнити
+      const cy=new Date().getFullYear();
+      return d.getDate()+' '+months[d.getMonth()]+(p[0]!==cy ? ' '+p[0] : '');
     }catch(_){ return ymd; }
   }
   // 'YYYY-MM-DD' для дня зі зсувом off від сьогодні (не залежить від хелперів інших модулів)
@@ -23103,6 +23973,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   // ── ініціалізація обробників читалки (один раз) ──
   function initReader(){
     const sc=document.getElementById('rdrScroll'); if(!sc||sc.__init) return; sc.__init=true;
+    loadRdrCfg();   // підтягти збережені налаштування читалки (тема/шрифт/розмір) — раніше не викликалось, тож вони не переживали перезапуск
     sc.addEventListener('scroll', ()=>{ requestAnimationFrame(updateRdrProgressUI); }, {passive:true});
 
     document.getElementById('rdrBack').onclick=()=>{
@@ -25851,7 +26722,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     document.addEventListener('pointerup', onUp);
     board.__dragMove=onMove; board.__dragUp=onUp;
   }
-  function escAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
   /* ---- load ---- */
   function migrate(){
@@ -25941,8 +26812,12 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     if(cfg&&typeof cfg==='object'){
       Object.keys(cfg).forEach(k=>{
         const c=cfg[k];
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}); }
-        else if(c.custom){ folders[k]={key:k,c:c.c,emoji:c.emoji,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}; }
+        // Папки, збережені до появи іконок, поля icon не мають — підбираємо
+        // його з емодзі на льоту. У сховище воно потрапить при першому ж
+        // saveFolders(); доти емодзі лишається єдиним джерелом правди.
+        const ic=c.icon||folderIconFor(c.emoji);
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}); }
+        else if(c.custom){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}; }
       });
     }
   }
@@ -25951,6 +26826,11 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     if(Array.isArray(ord)&&ord.length){ order=ord.filter(k=>folders[k]); Object.keys(folders).forEach(k=>{ if(!order.includes(k)) order.push(k); }); }
   }
   async function load(){
+    /* Знімки лежать в IndexedDB (PhotoDB) — вичитуємо їх у памʼятний кеш ДО
+       першого рендеру, інакше картки блиснуть без фото. Читання швидке:
+       одна транзакція, десятки записів. Якщо IndexedDB нема — photoWarm
+       поверне false, і все працюватиме на старих data-URL. */
+    try{ await window.photoWarm(); }catch(_){}
     // ⚡ МИТТЄВИЙ ПЕРШИЙ РЕНДЕР: папки з локального кешу ДО очікування хмари Telegram.
     //    Прибирає «порожні папки на пару секунд» при старті. Повний load нижче все оновить.
     try{
@@ -26147,6 +27027,9 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}
     try{ fxUpdate(false).then(ok=>{ if(ok){ try{renderFinance();}catch(_){} } }); }catch(_){}
     try{ ensureCards(); }catch(_){}
+    // TODO(гаманець): увімкнути, коли буде готовий новий екран Фінансів —
+    // try{ migrateToWallet(); }catch(e){ console.error('migrateToWallet',e); }
+    try{ migrateFolderPhotosOnce(); }catch(e){ console.error('migratePhotos',e); }
     try{ removeSystemSeedFoldersOnce(); }catch(e){ console.error('removeSeedFolders',e); }
     try{ seedAgencySlovakia(); }catch(e){ console.error('seedAgency',e); }
     try{ agskCleanupOnce(); }catch(e){ console.error('agskCleanup',e); }
@@ -26225,6 +27108,27 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
   const VISION_FKEY='f_vision_seed';
   // одноразове прибирання: якщо «Патерни»/«Візія» вже встигли створитись
   // раніше (старі акаунти) — видаляємо їх, звільняючи Огляд під власні папки.
+  /* Переїзд наявних знімків: усе, що лежить у folders_cfg як `data:…`,
+     переносимо в PhotoDB, а в конфігу лишаємо посилання. Робиться тихо, у
+     фоні, по одному запису; якщо IndexedDB недоступний — просто нічого не
+     стається і фото лишаються там, де були. */
+  async function migrateFolderPhotosOnce(){
+    try{
+      if(!window.PhotoDB || !window.PhotoDB.available()) return;
+      const keys=Object.keys(folders||{}).filter(k=>{
+        const p=folders[k] && folders[k].photo;
+        return p && String(p).slice(0,5)==='data:';
+      });
+      if(!keys.length) return;
+      for(const k of keys){
+        const ref=await window.photoPut('ph_'+k, folders[k].photo);
+        if(ref && String(ref).slice(0,4)==='idb:') folders[k].photo=ref;
+      }
+      saveFolders();
+      try{ renderDashboard(); }catch(_){}
+      console.log('[Flow] знімків перенесено в PhotoDB:', keys.length);
+    }catch(e){ console.error('migrateFolderPhotos', e); }
+  }
   function removeSystemSeedFoldersOnce(){
     var FLAG='flowapp_seedfolders_removed_v1';
     try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
@@ -26883,7 +27787,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     }
     function syncLabel(st){
       const gUser=(window.sbUser && window.sbUser())||null;
-      const cloudTxt = window.FLOW_NATIVE ? 'збережено на цьому пристрої' : (gUser ? 'хмара Google · всі пристрої' : 'хмара Telegram · всі пристрої');
+      const cloudTxt = window.FLOW_NATIVE ? 'збережено на цьому пристрої' : (gUser ? 'хмара Google · всі пристрої' : 'лише на цьому пристрої · увійди для хмари');
       if(st==='syncing') return ['syncing','Синхронізація…','дані вирівнюються між пристроями'];
       if(st==='synced')  return ['synced','Синхронізовано',cloudTxt];
       if(st==='error'){
@@ -26896,7 +27800,34 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     }
     function ALL_KEYS(){ return (window.FLOW_KEYS||[]).slice(); }
 
-    function tgDiag(){ return window.platform.diag(); }
+    /* ── індикатор пам'яті ──
+       localStorage («швидка память») впирається в ~5 МБ — саме він дає банер
+       «памʼять заповнена». Фото й книги живуть окремо в IndexedDB, де місця на
+       порядки більше. Показуємо обидва, щоб було видно, що саме тисне. */
+    async function flowStorageInfo(){
+      let lsBytes=0;
+      try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(!k) continue;
+        lsBytes += (k.length + (localStorage.getItem(k)||'').length)*2; } }catch(_){}
+      const lsCap=5*1024*1024;
+      let usage=0, quota=0;
+      try{ if(navigator.storage && navigator.storage.estimate){ const e=await navigator.storage.estimate(); usage=e.usage||0; quota=e.quota||0; } }catch(_){}
+      return { lsBytes, lsCap, idbBytes:Math.max(0, usage-lsBytes), quota };
+    }
+    function fmtMem(b){ return b>=1048576 ? (b/1048576).toFixed(1)+' МБ' : Math.max(1,Math.round(b/1024))+' КБ'; }
+    async function fillMemRow(host){
+      try{
+        const el=host&&host.querySelector('[data-acc-mem] .acc-mem-body'); if(!el) return;
+        const s=await flowStorageInfo();
+        const pct=Math.min(100, Math.round(s.lsBytes/s.lsCap*100));
+        const col=pct>=85?'var(--owe,#ff5a5f)':pct>=65?'var(--fin,#f0b429)':'var(--hab,#34c77b)';
+        const idbTxt=s.quota?(fmtMem(s.idbBytes)+' · вільно ще '+fmtMem(Math.max(0,s.quota-s.idbBytes-s.lsBytes))):fmtMem(s.idbBytes);
+        el.innerHTML=
+          '<div class="acc-rsub">Швидка памʼять (дані): <b style="color:var(--text)">'+fmtMem(s.lsBytes)+'</b> з ~'+fmtMem(s.lsCap)+'</div>'
+          +'<div style="height:6px;border-radius:99px;background:var(--field);overflow:hidden;margin:6px 0 2px"><i style="display:block;height:100%;width:'+pct+'%;background:'+col+';border-radius:99px"></i></div>'
+          +'<div class="acc-rsub" style="margin-top:5px">Фото й книги (окремо): '+idbTxt+'</div>'
+          +(pct>=85?'<div class="acc-rsub" style="color:var(--owe,#ff5a5f);margin-top:4px">Майже повна — зроби експорт і почисти старі фото чи дані.</div>':'');
+      }catch(_){}
+    }
 
     function renderAccount(){
       const host=document.getElementById('accountCard'); if(!host) return;
@@ -26928,8 +27859,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
         : `<span class="acc-chev">›</span>`;
       const loginExpand=(!loggedIn && !window.FLOW_NATIVE && !checking) ? `
         <div class="acc-expand" data-acc-login-expand hidden>
-          <button class="acc-mini tg" data-acc-tg>✈️ Telegram</button>
-          <button class="acc-mini gg" data-acc-google>🔵 Google</button>
+          <button class="acc-mini gg" data-acc-google>🔵 Увійти через Google</button>
         </div>` : '';
 
       const bkStats=(()=>{const s=window.flowBackup?window.flowBackup.stats():{keys:0,bytes:0};return s.keys+' записів · '+(s.bytes>1024?(s.bytes/1024).toFixed(0)+' КБ':s.bytes+' Б');})();
@@ -26970,12 +27900,21 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
           <input type="file" accept="application/json,.json" data-acc-file style="display:none">
           <p class="acc-hint">Імпорт перезапише поточні дані (попередній стан зберігається автоматично).</p>
         </div>
+        <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
+          <div class="acc-rico">💾</div>
+          <div class="acc-rtext" style="flex:1;min-width:0">
+            <div class="acc-rtitle">Пам'ять пристрою</div>
+            <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
+          </div>
+        </div>
         <div class="acc-row" data-acc-settings-row>
           <div class="acc-rico">⚙️</div>
           <div class="acc-rtext"><div class="acc-rtitle">Всі налаштування</div></div>
           <span class="acc-chev">›</span>
         </div>
       </div>`;
+
+      try{ fillMemRow(host); }catch(_){}
 
       function toggle(sel){ const el=host.querySelector(sel); if(el) el.hidden=!el.hidden; }
 
@@ -27000,9 +27939,6 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       if(loginRow) loginRow.onclick=()=>{ if(!loggedIn) toggle('[data-acc-login-expand]'); };
       const outBtn=host.querySelector('[data-acc-out]');
       if(outBtn) outBtn.onclick=(e)=>{ e.stopPropagation(); if(window.sbSignOut) window.sbSignOut(); };
-      const tb=host.querySelector('[data-acc-tg]');
-      if(tb) tb.onclick=(e)=>{ e.stopPropagation(); const d=tgDiag();
-        flowAlert('Щоб увійти:\n\n1) Відкрий Frequency через Menu Button свого бота (BotFather → /setmenubutton), а не через посилання в браузері.\n2) initData зараз: '+(d.initLen||0)+' символів.\n\nЯкщо 0 — Telegram не передав акаунт. Перевір, що домен Mini App у BotFather збігається з хостингом.'); };
       const gb=host.querySelector('[data-acc-google]');
       if(gb) gb.onclick=async (e)=>{
         e.stopPropagation();
@@ -31503,28 +32439,32 @@ html.fd26t .fuz-all span svg{width:20px;height:20px;display:block;}
 html.fd26t .incx-exp .ic svg,html.fd26t .lit-act .ic svg{width:19px;height:19px;display:block;color:var(--muted);}
 
 
-/* ── 9. ЛІЧИЛЬНИК «ДО НОВОГО РОКУ» · компактний рядок унизу карти бажань ──
-   DOM-вузол #nyCountdown переносить fd26tjs усередину #summaryCard; всі ID живі. */
-html.fd26t #summaryCard #nyCountdown{
+/* ── 9. ЛІЧИЛЬНИК «ДО НОВОГО РОКУ» · компактний рядок ПІД картою бажань ──
+   Вузол #nyCountdown лишається там, де він у розмітці — сусідом одразу під
+   #summaryCard. Клас .nyc-strip навішує fd26tjs (41-theme-layer.js).
+
+   Раніше селектори були прив'язані до #summaryCard #nyCountdown, бо скрипт
+   переносив вузол усередину картки. Тепер на нижньому краї картки стоїть
+   скляна полиця з кнопками, лічильник туди не влазить — тому й прив'язка
+   змінилася на клас. Разом із переносом відпали й правила «поверх знімка»:
+   рядок лежить на фоні сторінки, а не на фото. */
+html.fd26t #nyCountdown.nyc-strip{
   background:transparent;border:0;box-shadow:none;
   backdrop-filter:none;-webkit-backdrop-filter:none;
-  border-radius:0;padding:12px 0 0;margin:14px 0 0;border-top:1px solid var(--hair-2);
-  display:flex;align-items:center;gap:10px;overflow:visible;}
-html.fd26t #summaryCard #nyCountdown::after{display:none;}
-html.fd26t #summaryCard #nyCountdown .nyc-head{margin:0;gap:7px;flex:none;}
-html.fd26t #summaryCard #nyCountdown .nyc-title{font-size:10px;letter-spacing:.1em;}
-html.fd26t #summaryCard #nyCountdown .nyc-emoji svg{width:14px;height:14px;}
-html.fd26t #summaryCard #nyCountdown .nyc-grid{display:flex;gap:10px;margin-left:auto;}
-html.fd26t #summaryCard #nyCountdown .nyc-cell{background:none;border:0;padding:0;
+  border-radius:0;margin:16px 0 0;
+  /* padding знизу, а не margin: із заголовком «Папки» вони сусіди в блоці,
+     і два margin схлопнулись би в один — рядок лип би до заголовка. */
+  padding:0 0 10px;
+  display:flex;align-items:center;gap:9px;overflow:visible;}
+html.fd26t #nyCountdown.nyc-strip::after{display:none;}
+html.fd26t #nyCountdown.nyc-strip .nyc-head{margin:0;gap:7px;flex:none;}
+html.fd26t #nyCountdown.nyc-strip .nyc-title{font-size:10px;letter-spacing:.1em;}
+html.fd26t #nyCountdown.nyc-strip .nyc-emoji svg{width:14px;height:14px;}
+html.fd26t #nyCountdown.nyc-strip .nyc-grid{display:flex;gap:10px;margin-left:auto;}
+html.fd26t #nyCountdown.nyc-strip .nyc-cell{background:none;border:0;padding:0;
   display:flex;align-items:baseline;gap:3px;text-align:left;}
-html.fd26t #summaryCard #nyCountdown .nyc-cell b{font-size:14.5px;}
-html.fd26t #summaryCard #nyCountdown .nyc-cell span{font-size:9px;letter-spacing:.04em;}
-/* режим фото бажань: рядок читається поверх знімка */
-html.fd26t .summary.has-wish #nyCountdown{position:relative;z-index:2;border-top-color:rgba(255,255,255,.28);}
-html.fd26t .summary.has-wish #nyCountdown .nyc-title,
-html.fd26t .summary.has-wish #nyCountdown .nyc-cell b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.55);}
-html.fd26t .summary.has-wish #nyCountdown .nyc-cell span{color:rgba(255,255,255,.75);}
-html.fd26t .summary.has-wish #nyCountdown .nyc-emoji{color:#fff;}
+html.fd26t #nyCountdown.nyc-strip .nyc-cell b{font-size:14.5px;color:var(--text);}
+html.fd26t #nyCountdown.nyc-strip .nyc-cell span{font-size:9px;letter-spacing:.04em;}
 
 
 /* ── 10. КАРТА БАЖАНЬ · тема «Вітрина» (фокус-колода) ──
@@ -31840,12 +32780,16 @@ try{
       });
 
 
-      /* лічильник → компактний рядок унизу карти бажань */
-      var sc=document.getElementById('summaryCard'), nyc=document.getElementById('nyCountdown');
-      if(sc && nyc && nyc.parentElement!==sc){
-        sc.appendChild(nyc);
-        nyc.addEventListener('click',function(e){ e.stopPropagation(); }); /* тап по лічильнику ≠ тап по карті бажань */
-      }
+      /* лічильник → компактний рядок ПІД картою бажань.
+         Раніше вузол переносився всередину #summaryCard. Тепер на нижньому
+         краї картки стоїть скляна полиця з кнопками «Карта бажань» і
+         «Щоденник» — місця під лічильник там більше немає. Вузол лишається
+         там, де він у розмітці (одразу під карткою), а клас .nyc-strip
+         вмикає той самий компактний рядок. Перенос прибрано, тому й
+         stopPropagation більше не потрібен: лічильник уже не всередині
+         клікабельної картки. */
+      var nyc=document.getElementById('nyCountdown');
+      if(nyc) nyc.classList.add('nyc-strip');
 
       /* 🎄 → штрихова ялинка */
       var ny=document.querySelector('#scr-home .nyc-emoji');
@@ -32943,12 +33887,13 @@ try{
 .f26w-glass{background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
   border:1px solid rgba(255,255,255,.08);border-radius:22px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 30px rgba(0,0,0,.32)}
-html[data-theme="light"] .f26w-glass{background:var(--card,#fff);border-color:rgba(0,0,0,.08);box-shadow:0 6px 18px rgba(0,0,0,.06)}
+html[data-theme="light"] .f26w-glass,
+  html.t-light .f26w-glass{background:var(--card,#fff);border-color:rgba(0,0,0,.08);box-shadow:0 6px 18px rgba(0,0,0,.06)}
 .f26w-lbl{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8f8aa8);margin:18px 4px 9px;display:flex;align-items:center;gap:6px}
 .f26w-lbl .r{margin-left:auto;font-size:11px;letter-spacing:0;text-transform:none;color:var(--accent2,#c4a8ff);font-weight:800;cursor:pointer}
 /* hero */
 .f26w-hero{padding:15px;position:relative;overflow:hidden}
-html:not([data-theme="light"]) .f26w-hero::after{content:'';position:absolute;inset:auto -30% -70% -30%;height:110px;
+html:not([data-theme="light"]):not(.t-light) .f26w-hero::after{content:'';position:absolute;inset:auto -30% -70% -30%;height:110px;
   background:radial-gradient(50% 100% at 50% 100%,rgba(255,157,92,.14),transparent 70%);pointer-events:none}
 .f26w-top{display:flex;align-items:center;gap:12px}
 .f26w-ring{position:relative;width:56px;height:56px;flex:none}
@@ -32958,7 +33903,8 @@ html:not([data-theme="light"]) .f26w-hero::after{content:'';position:absolute;in
 .f26w-ti p{margin:3px 0 0;font-size:12px;color:var(--muted,#8f8aa8);font-weight:700}
 .f26w-ti p b{color:#ff9d5c;font-weight:800}
 .f26w-fx{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.08)}
-html[data-theme="light"] .f26w-fx{border-top-color:rgba(0,0,0,.08)}
+html[data-theme="light"] .f26w-fx,
+  html.t-light .f26w-fx{border-top-color:rgba(0,0,0,.08)}
 .f26w-fxrow{display:flex;align-items:center;gap:9px;padding:5px 0}
 .f26w-fxrow .n{width:20px;height:20px;flex:none;border-radius:7px;display:grid;place-items:center;font-size:10.5px;font-weight:900;background:rgba(139,124,255,.14);color:var(--muted,#8f8aa8)}
 .f26w-fxrow.prime .n{background:linear-gradient(135deg,#ff9d5c,#ff5c8a);color:#fff;box-shadow:0 0 12px rgba(255,157,92,.45)}
@@ -32994,7 +33940,8 @@ html[data-theme="light"] .f26w-fx{border-top-color:rgba(0,0,0,.08)}
 .f26w-pool{padding:11px;display:flex;flex-wrap:wrap;gap:7px;min-height:46px}
 .f26w-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:8px 12px;border-radius:99px;cursor:pointer;
   background:rgba(139,124,255,.08);border:1px solid rgba(255,255,255,.09);color:var(--text,#eceaf6);transition:all .25s}
-html[data-theme="light"] .f26w-chip{border-color:rgba(0,0,0,.1)}
+html[data-theme="light"] .f26w-chip,
+  html.t-light .f26w-chip{border-color:rgba(0,0,0,.1)}
 .f26w-chip .dot{width:7px;height:7px;border-radius:99px}
 .f26w-chip.pick{border-color:rgba(139,124,255,.7);background:rgba(139,124,255,.18);box-shadow:0 0 0 3px rgba(139,124,255,.13)}
 .f26w-poolempty{font-size:12px;color:var(--muted,#8f8aa8);font-weight:700;align-self:center;padding:3px 5px}
@@ -33015,7 +33962,9 @@ html[data-theme="light"] .f26w-chip{border-color:rgba(0,0,0,.1)}
    давав контраст 1.94 — «Нд» на сьогоднішньому дні не читалось. */
 .f26w-wd.today .n,.f26w-wd.today .d{color:var(--fin,#ff9d5c)}
 html[data-theme="light"] .f26w-wd.today .n,
-html[data-theme="light"] .f26w-wd.today .d{color:color-mix(in srgb,var(--fin) 76%,#000)}
+html[data-theme="light"] .f26w-wd.today .d,
+  html.t-light .f26w-wd.today .n,
+  html.t-light .f26w-wd.today .d{color:color-mix(in srgb,var(--fin) 76%,#000)}
 .f26w-wd.today .load i{background:linear-gradient(180deg,#ff9d5c,#ff5c8a)}
 .f26w-wd.over .load i{background:linear-gradient(180deg,#ff5c8a,#e0356a)}
 .f26w-wd.sel{border-color:rgba(139,124,255,.55);background:rgba(139,124,255,.10)}
@@ -33023,11 +33972,13 @@ html[data-theme="light"] .f26w-wd.today .d{color:color-mix(in srgb,var(--fin) 76
 .f26w-wd.pulse{border-color:rgba(139,124,255,.6);animation:f26wPulse 1.2s ease-in-out infinite}
 @keyframes f26wPulse{0%,100%{background:rgba(139,124,255,.06)}50%{background:rgba(139,124,255,.16)}}
 .f26w-peek{grid-column:1/-1;margin-top:4px;padding:9px 11px;border-radius:13px;background:rgba(139,124,255,.07);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted,#8f8aa8);font-weight:700;display:none}
-html[data-theme="light"] .f26w-peek{border-color:rgba(0,0,0,.08)}
+html[data-theme="light"] .f26w-peek,
+  html.t-light .f26w-peek{border-color:rgba(0,0,0,.08)}
 .f26w-peek.on{display:block;animation:f26wIn .35s cubic-bezier(.22,1.36,.36,1)}
 @keyframes f26wIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 .f26w-peek b{color:var(--text,#eceaf6)}
-html[data-theme="light"] .f26w-peek b{color:var(--text,#1a1a2e)}
+html[data-theme="light"] .f26w-peek b,
+  html.t-light .f26w-peek b{color:var(--text,#1a1a2e)}
 .f26w-peek .row{display:flex;align-items:center;gap:7px;margin-top:6px}
 .f26w-peek .dot{width:7px;height:7px;border-radius:99px;flex:none}
 .f26w-peek .rm{margin-left:auto;cursor:pointer;opacity:.6;padding:0 4px;font-weight:800}
@@ -33036,22 +33987,26 @@ html[data-theme="light"] .f26w-peek b{color:var(--text,#1a1a2e)}
 .f26w-gh .dot{width:8px;height:8px;border-radius:99px}
 .f26w-gh .c{margin-left:auto;font-weight:800;font-size:10.5px}
 .f26w-t{border-radius:14px;margin-bottom:6px;background:rgba(139,124,255,.06);border:1px solid rgba(255,255,255,.07)}
-html[data-theme="light"] .f26w-t{border-color:rgba(0,0,0,.08)}
+html[data-theme="light"] .f26w-t,
+  html.t-light .f26w-t{border-color:rgba(0,0,0,.08)}
 .f26w-trow{display:flex;align-items:center;gap:9px;padding:9px 11px}
 .f26w-t.done .tt{opacity:.5;text-decoration:line-through}
 .f26w-ck{width:22px;height:22px;flex:none;border-radius:8px;border:1.6px solid rgba(255,255,255,.22);display:grid;place-items:center;cursor:pointer;font-size:11px;color:transparent;transition:all .3s cubic-bezier(.22,1.36,.36,1)}
-html[data-theme="light"] .f26w-ck{border-color:rgba(0,0,0,.2)}
+html[data-theme="light"] .f26w-ck,
+  html.t-light .f26w-ck{border-color:rgba(0,0,0,.2)}
 .f26w-t.done .f26w-ck{background:linear-gradient(135deg,#34c77b,#1fa864);border-color:transparent;color:#fff}
 .f26w-tx{flex:1;min-width:0;cursor:pointer}
 .f26w-tx .tt{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f26w-tx .mt{display:flex;gap:6px;margin-top:2px;font-size:10px;color:var(--muted,#8f8aa8);font-weight:800}
 .f26w-prio{display:inline-block;font-size:9px;font-weight:900;color:#0d0a1c;border-radius:5px;padding:1px 5px;margin-right:5px;vertical-align:1px}
 .f26w-day{flex:none;font-size:10.5px;font-weight:800;padding:5px 9px;border-radius:99px;cursor:pointer;border:1px dashed rgba(255,255,255,.28);color:var(--muted,#8f8aa8);background:transparent;font-family:inherit}
-html[data-theme="light"] .f26w-day{border-color:rgba(0,0,0,.2)}
+html[data-theme="light"] .f26w-day,
+  html.t-light .f26w-day{border-color:rgba(0,0,0,.2)}
 .f26w-day.set{border-style:solid;border-color:rgba(139,124,255,.5);color:var(--accent2,#c4a8ff);background:rgba(139,124,255,.12)}
 .f26w-day.today{border-color:rgba(255,157,92,.5);color:#ff9d5c;background:rgba(255,157,92,.1)}
 .f26w-fxd{flex:none;width:15px;height:15px;border-radius:99px;border:2px solid rgba(255,255,255,.25);background:transparent;cursor:pointer;padding:0;transition:all .25s}
-html[data-theme="light"] .f26w-fxd{border-color:rgba(0,0,0,.22)}
+html[data-theme="light"] .f26w-fxd,
+  html.t-light .f26w-fxd{border-color:rgba(0,0,0,.22)}
 .f26w-fxd.set{border-color:transparent}
 .f26w-del{flex:none;width:22px;height:22px;display:grid;place-items:center;color:var(--muted,#8f8aa8);opacity:.55;cursor:pointer;font-size:13px;font-weight:800}
 .f26w-subs{padding:0 11px 10px 42px}
@@ -33073,7 +34028,8 @@ html[data-theme="light"] .f26w-fxd{border-color:rgba(0,0,0,.22)}
 /* шит вибору дня / фокусів */
 .f26w-dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 4px}
 .f26w-dbtn{border:1px solid rgba(255,255,255,.12);background:rgba(139,124,255,.07);color:var(--text,#eceaf6);border-radius:13px;padding:10px 4px;font-family:inherit;font-weight:800;font-size:12.5px;cursor:pointer;text-align:center}
-html[data-theme="light"] .f26w-dbtn{border-color:rgba(0,0,0,.12);color:var(--text,#1a1a2e)}
+html[data-theme="light"] .f26w-dbtn,
+  html.t-light .f26w-dbtn{border-color:rgba(0,0,0,.12);color:var(--text,#1a1a2e)}
 .f26w-dbtn small{display:block;font-size:9.5px;color:var(--muted,#8f8aa8);font-weight:800;margin-top:1px}
 .f26w-dbtn.on{border-color:rgba(139,124,255,.65);background:rgba(139,124,255,.2)}
 .f26w-dbtn.tdy{border-color:rgba(255,157,92,.5)}
@@ -33428,13 +34384,13 @@ try{
   --f26-fnt:Manrope,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
 }
 /* скло — тільки нічна тема, світлу не чіпаємо */
-html:not([data-theme="light"]) .f26m{
+html:not([data-theme="light"]):not(.t-light) .f26m{
   background:linear-gradient(160deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
   backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
   border-color:var(--fd-glass-line);
   box-shadow:inset 0 1px 0 var(--fd-glass-hi),0 12px 34px rgba(0,0,0,.35);
 }
-@supports not (backdrop-filter:blur(1px)){ html:not([data-theme="light"]) .f26m{background:#14121f;} }
+@supports not (backdrop-filter:blur(1px)){ html:not([data-theme="light"]):not(.t-light) .f26m{background:#14121f;} }
 
 .f26m{background:var(--card);border:1px solid var(--line);border-radius:var(--fd-r-lg);
   padding:15px;margin-bottom:14px;overflow:hidden;}
@@ -34390,8 +35346,11 @@ try{
 #scr-home .top .icon-btn svg{color:#efedf7;}
 
 /* єдина геометрія картки для обох станів */
+/* padding знизу — 0: там сидить скляна полиця з кнопками, вона й дає
+   картці нижній край. Бокові 18px лишаються для тексту, а полиця виходить
+   за них назад через margin:0 -18px. */
 #scr-home .summary{margin-left:-18px;margin-right:-18px;border-left:0;border-right:0;border-top:0;
-  border-radius:0 0 28px 28px;padding:112px 18px 18px;min-height:346px;
+  border-radius:0 0 28px 28px;padding:112px 18px 0;min-height:346px;
   display:flex;flex-direction:column;justify-content:flex-end;}
 #scr-home .summary::after{display:none;}
 
@@ -34411,24 +35370,54 @@ html.home-glass #scr-home .summary.has-wish .wishbg-ov{
     linear-gradient(0deg,rgba(5,6,11,.95),rgba(5,6,11,.82) 16%,rgba(5,6,11,.4) 38%,transparent 56%),
     linear-gradient(rgba(6,7,12,.2),rgba(6,7,12,.2));}
 
-/* порядок: підпис → число → пояснення → бар → капсула → крапки → лічильник */
+/* порядок: крапки → підпис → число → пояснення → бар → полиця.
+   Крапки слайдшоу піднято НАД текст — вони як сторіз показують, котре
+   фото зараз, і на самому низу картки їх заступала б полиця.
+   Лічильник більше не в картці — він сусідній рядок під нею. */
+#scr-home .summary>.wishdots{order:0;}
 #scr-home .summary>.label{order:1;}
 #scr-home .summary>.big{order:2;}
 #scr-home .summary>.hint{order:3;}
 #scr-home .summary>.bar{order:4;}
 #scr-home .summary>.herocap{order:5;}
-#scr-home .summary>.wishdots{order:6;}
-#scr-home .summary>#nyCountdown{order:7;}
 
 /* текст читається поверх тла в обох станах */
 #scr-home .summary>.label,#scr-home .summary>.big,#scr-home .summary>.hint,
 #scr-home .summary>.bar,#scr-home .summary>.herocap,#scr-home .summary>.wishdots{position:relative;z-index:2;}
+/* лічильник «До Нового року» лежить під фото-скримом (.has-wish → #wishBgOv, z-index:1),
+   через що лівий край рядка не тапався; піднімаємо над скрим, як і решту вмісту картки. */
+#scr-home .summary>#nyCountdown{position:relative;z-index:2;}
+#scr-home .summary .wishdots{margin:0 0 14px;}
 #scr-home .summary .label{color:rgba(255,255,255,.72);font-size:10px;letter-spacing:.15em;}
 #scr-home .summary .big{color:#fff;font-size:44px;margin:4px 0 0;
   text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.45);}
 #scr-home .summary .big small{font-size:17px;color:rgba(255,255,255,.72);}
 #scr-home .summary .hint{color:rgba(255,255,255,.78);font-size:12.5px;line-height:1.4;margin-top:6px;}
 #scr-home .summary .wishlink{display:none;}
+/* ── Смужка прогресу: 3px білого замість 7px помаранчево-фіолетового.
+   На картці і так живе фото або кольоровий градієнт; градієнт у смужці
+   був третім джерелом кольору в одній точці. ── */
+#scr-home .summary .bar{height:3px;background:rgba(255,255,255,.22);margin:14px 0 0;}
+#scr-home .summary .bar i{background:#fff;}
+
+/* ── Полиця замість двох залитих капсул ──
+   Було: дві капсули, фіолетова (--skl) і зелена (--hab), кожна із власною
+   заливкою і рамкою, поверх фіолетово-помаранчевого тла. Три насичені
+   кольори в одному місці — звідси відчуття «забито».
+   Стало: одна скляна полиця на всю ширину картки, приліплена до нижнього
+   краю; кнопки — дві її половини з волосинкою між ними. Колір лишився
+   тільки в іконках, тож призначення кнопок читається так само. ── */
+#scr-home .summary .herocap{gap:0;margin:16px -18px 0;
+  border-top:1px solid rgba(255,255,255,.16);border-radius:0 0 28px 28px;
+  background:rgba(10,8,18,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
+#scr-home .summary .hc-tab,
+#scr-home .summary .hc-tab.wish,
+#scr-home .summary .hc-tab.diary{background:transparent;border:0;border-radius:0;
+  padding:15px 6px;color:#fff;}
+#scr-home .summary .hc-tab+.hc-tab{border-left:1px solid rgba(255,255,255,.16);}
+#scr-home .summary .hc-tab.wish svg{color:var(--skl);}
+#scr-home .summary .hc-tab.diary svg{color:var(--hab);}
+#scr-home .summary .hc-tab:active{opacity:1;transform:none;background:rgba(255,255,255,.09);}
 #scr-home .summary .herocap .hc-tab b{color:inherit;text-shadow:0 1px 6px rgba(0,0,0,.4);}
 /* Світла тема: картка героя однаково лежить на фото або на темному
    градієнті (див. нижче), тому текст на ній лишається світлим —
@@ -34446,13 +35435,15 @@ html[data-theme="light"] #scr-home .summary .label{color:rgba(255,255,255,.72);}
 html[data-theme="light"] #scr-home .top .icon-btn svg{color:#efedf7;}
 html[data-theme="light"] #scr-home .summary,
 html.fd26t[data-theme="light"] #scr-home .summary{background:linear-gradient(162deg,#241f3f,#0d1017);}
+/* Копій під html.t-light тут свідомо НЕМАЄ.
+   Правила вище — задум СТАРОЇ світлої теми: картка героя лишається темною,
+   і текст на ній тому світлий. Нові набори роблять протилежне — рівну світлу
+   поверхню з темним текстом. Автоматичне дублювання селекторів (яким ці
+   копії з'явились) тут дало прямо протилежний до потрібного результат. */
 
-/* лічильник усередині картки — світлий у будь-якому стані */
-html.fd26t #scr-home .summary #nyCountdown{border-top-color:rgba(255,255,255,.2);}
-html.fd26t #scr-home .summary #nyCountdown .nyc-title,
-html.fd26t #scr-home .summary #nyCountdown .nyc-cell b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5);}
-html.fd26t #scr-home .summary #nyCountdown .nyc-cell span{color:rgba(255,255,255,.7);}
-html.fd26t #scr-home .summary #nyCountdown .nyc-emoji{color:#fff;}
+/* Правила «лічильник усередині картки» прибрано разом із переносом вузла:
+   рядок тепер лежить під карткою, на фоні сторінки, і бере звичайні
+   кольори теми (див. 12-theme-nightfire.css, розділ 9). */
 
 /* ══════════════════════════════════════════════════════════════════
    ЗНАК FREQUENCY · «Рідке скло»
@@ -35141,6 +36132,407 @@ try{
     -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%);
   }
 }
+</style>
+<style id="themes-flat">/* ════════ НОВІ НАБОРИ ТЕМ · ЗАГАЛЬНА ПРОПОЛКА ════════
+   Останній підключений стиль — тому тут не треба воювати за специфічність
+   із правилами, що живуть у 16-mx.css чи 13-planner.css: досить того самого
+   селектора з префіксом html.t-flat.
+
+   Два прапорці на <html> ставить applyTheme() у scripts/core/05-agency.js:
+     .t-flat   — активний один із нових наборів (desk / studio);
+     .t-light  — і при цьому він світлий.
+   Старі три теми (dark / black / light) сюди не потрапляють.
+
+   Правила для Огляду й Папок лишились у core/03-folders-projects.css —
+   вони писались першими, до появи цього файлу. Нове додається сюди. */
+
+/* ── кнопка «⋮» на картці папки ──
+   Мала темну підкладку під світлий значок: розрахована на темну картку.
+   На рівній світлій поверхні виходив білий значок на сірому кружку. */
+html.t-flat .fmenu{background:transparent;color:var(--muted);border:0;}
+html.t-flat .fmenu:active{background:var(--hair);}
+html.t-flat .fdrag-handle{color:var(--muted);}
+
+/* ── акцентні градієнти на рівний колір ──
+   У старій палітрі акцент був парою #6a7dff → #a06bff. У нових наборах
+   акцент один, тож градієнт замінюємо суцільним кольором теми. */
+html.t-flat #scr-planner .logo,
+html.t-flat #scr-planner .seg .on,
+html.t-flat #scr-planner .pl-seg .on,
+html.t-flat #scr-planner .go{background:var(--accent);color:var(--bg-2);}
+html.t-flat #scr-planner .f26w-rit{background:var(--card-2);border-color:var(--line);}
+
+/* ── бульбашка свого повідомлення у Флоу ── */
+html.t-flat .ai-msg.u{background:var(--accent);color:var(--bg-2);box-shadow:none;}
+
+/* ── тло сторінки без фонового сяйва ── */
+html.t-flat .phone{background-image:none;}
+
+/* ── стара акцентна пара #6a7dff → #a06bff ──
+   Автоматично зібрані місця, де акцент малювався фіолетовим градієнтом.
+   У нових наборах акцент один, тож замінюємо рівним var(--accent), а
+   фіолетові тіні під ним гасимо. Список згенеровано обходом усіх CSS,
+   тому нічого не пропущено — але кожен рядок звичайний і правиться руками. */
+html.t-flat .dia-ai-btn{background:var(--accent);background-image:none;}  /* 04-diary.css */
+html.t-flat #scr-page .pgsp-c.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 17-horizon.css */
+html.t-flat .coved-b.pri{background:var(--accent);background-image:none;}  /* 17-horizon.css */
+html.t-flat #scr-page .pg-es-qk button.pri{background:var(--accent);background-image:none;}  /* 17-horizon.css */
+html.t-flat .pgst-ins{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .bkp-b{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .stg-seg button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 02-page-editor.css */
+html.t-flat .stg-sw.on{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .pgsp-c.on{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .pgcal-d.sel{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .fc2-deck .fc2-prog i{background:var(--accent);background-image:none;}  /* 03-folders-projects.css */
+html.t-flat .im-ok{background:var(--accent);background-image:none;}  /* 03-folders-projects.css */
+html.t-flat .pgsz-bar{background:var(--accent);background-image:none;}  /* 04-menus.css */
+html.t-flat .wt-btn.on{background:var(--accent);background-image:none;}  /* 05-values-wishes.css */
+html.t-flat .pth-seg button.on{background:var(--accent);background-image:none;}  /* 06-goals.css */
+html.t-flat .gtab.on{background:var(--accent);background-image:none;}  /* 06-goals.css */
+html.t-flat .nav #navAI .ni{background:var(--accent);background-image:none;box-shadow:none;}  /* 07-finance.css */
+html.t-flat .sw-story.on .ring{background:var(--accent);background-image:none;}  /* 09-board-canvas.css */
+html.t-flat #mobileDock .dk-plus{background:var(--accent);background-image:none;}  /* 09-board-canvas.css */
+html.t-flat .ash-tabs button.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
+html.t-flat .ash-style-sw button.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
+html.t-flat .ash-toggle.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
+html.t-flat .fab{background:var(--accent);background-image:none;box-shadow:none;}  /* 10-reader-blocks.css */
+html.t-flat .dsb-logo{background:var(--accent);background-image:none;box-shadow:none;}  /* 11-spaces-desktop.css */
+html.t-flat .dpr-av{background:var(--accent);background-image:none;}  /* 11-spaces-desktop.css */
+html.t-flat #flowSpot .fs-msg.u{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat #flowSpot .fs-send{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-cd.on{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-sheet-ok{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-seg button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-toplvl button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-fbtn{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-icst-b.on{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-addblock{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .mh-mode-seg button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-startbtn{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-actions .pri{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-load .orb{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-orb::before{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .acc-av{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .acc-head .acc-av{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+
+/* ── --accent2 ──
+   Змінна використовується у 9 місцях, але НІДЕ не оголошена: усюди мовчки
+   спрацьовував запасний #c4a8ff (світло-бузковий під темний фон). На світлій
+   темі це давало контраст 1.9 — текст майже зникав. У нових наборах акцент
+   один, тож другий акцент дорівнює основному. */
+html.t-flat{--accent2:var(--accent);}
+
+/* ── чип фінансової грамотності ──
+   Жовтий #f0b429 читався на темному, на світлому — ні. --bt-fin у світлих
+   наборах уже приглушений до охри. */
+html.t-flat .fuz-lit{color:var(--bt-fin);background:color-mix(in srgb,var(--bt-fin) 12%,transparent);}
+
+/* ── кнопки в шапці Огляду ──
+   16-mx.css освітлює їх під темну фото-шапку (color:#efedf7). У нових
+   наборах шапка світла, тож беремо звичайний колір іконок теми. */
+html.t-flat #scr-home .top .icon-btn{background:var(--card-2);border:1px solid var(--line);}
+html.t-flat #scr-home .top .icon-btn svg{color:var(--ico);}
+
+/* ── сітка вибору іконки папки ──
+   Живе в тому ж аркуші налаштувань папки, що й вибір ролі та розкладки.
+   Не під t-flat: іконку можна обрати і в старих темах — там її просто не
+   видно на картці, але вибір зберігається й проявиться при перемиканні. */
+.fic-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;padding:2px 10px 10px;}
+.fic-opt{display:grid;place-items:center;aspect-ratio:1;border-radius:11px;cursor:pointer;
+  border:1px solid var(--line);background:var(--field);color:var(--muted);
+  transition:transform .12s,border-color .15s,color .15s;}
+.fic-opt .ico{width:19px;height:19px;}
+.fic-opt:active{transform:scale(.92);}
+.fic-opt.on{border-color:var(--c,var(--accent));color:var(--c,var(--accent));
+  background:color-mix(in srgb,var(--c,#6a7dff) 14%,transparent);}
+@media (max-width:420px){ .fic-grid{grid-template-columns:repeat(6,1fr);} }
+/* У меню папки іконка стоїть у рядку з написом. Базовий .ico має
+   display:block — у кнопці це відкидало текст на новий рядок. */
+.fmi .ico.fmi-ic{width:18px;height:18px;display:inline-block;vertical-align:-4px;
+  flex:none;color:var(--muted);}
+
+/* ── екран «Гроші · Fusion» (styles/02-income-cards.css) ──
+   Той файл написаний суцільними темними хексами: #12151f поверхня,
+   #1e2230 рамка, #8b93a3 текст. У світлих наборах екран лишався
+   темним островом. Нижче — ті самі правила з підставленими токенами.
+   Згенеровано з оригіналу, тому нічого не пропущено; сам оригінал
+   не чіпали — старі теми беруть його як є. */
+html.t-flat .incx-hero{background:linear-gradient(160deg,var(--card-2),#0e1017);}
+html.t-flat .incx-hero .l{color:var(--muted);}
+html.t-flat .incx-hero .v small{color:var(--muted);}
+html.t-flat .incx-styles button{border:1px solid var(--line);color:var(--muted);}
+html.t-flat .incx-styles button.on{color:var(--text);}
+html.t-flat .incx-addc{border:1.5px dashed var(--hair-2);color:var(--muted);}
+html.t-flat .incx-rail.v3 .incx-card{border:1px solid var(--line);}
+html.t-flat .incx-acts button{border:1px solid var(--line);background:var(--card-2);color:var(--text);}
+html.t-flat .incx-exp{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--bt-fin);}
+html.t-flat .incx-exp small{color:var(--muted);}
+html.t-flat .incx-src{background:var(--card);border:1px solid var(--line);}
+html.t-flat .fuz-lab{color:var(--muted);}
+html.t-flat .fuz-total small{color:var(--muted);}
+html.t-flat .fuz-lit{border:1px solid var(--line);background:var(--card-2);color:var(--bt-fin);}
+html.t-flat .fuz-all{border:1.5px dashed var(--hair-2);color:var(--muted);}
+html.t-flat .fuz-sec{color:var(--muted);}
+html.t-flat .fuz-b{background:var(--card);border:1px solid var(--line);}
+html.t-flat .fuz-b s{color:var(--muted);}
+html.t-flat .fuz-bars i.o{background:var(--owe);}
+html.t-flat .fuz-dots i{background:var(--hair-2);}
+html.t-flat .fuz-dots i.on{background:var(--text);}
+html.t-flat .fuz-sub{color:var(--muted);}
+html.t-flat .lit-next .bar i{background:var(--bt-fin);}
+html.t-flat .lit-next small{color:var(--muted);}
+html.t-flat .lit-chips .chip{background:var(--card-2);border:1px solid var(--line);}
+html.t-flat .lit-act{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--bt-fin);}
+html.t-flat .lit-act small{color:var(--muted);}
+html.t-flat .lit-act button{border:1px solid var(--hair-2);color:var(--text);}
+html.t-flat .lit-hist{background:var(--card);border:1px solid var(--line);}
+html.t-flat .lit-hist .bw i{background:var(--bt-fin);}
+html.t-flat .lit-hist s{color:var(--muted);}
+html.t-flat .ana-chart{background:var(--card);border:1px solid var(--line);}
+html.t-flat .ana-col .bars i.bout{background:var(--owe);}
+html.t-flat .ana-col s{color:var(--muted);}
+html.t-flat .ana-leg{color:var(--muted);}
+html.t-flat .ana-leg .bout{background:var(--owe);}
+html.t-flat .ana-row{background:var(--card);border:1px solid var(--line);}
+html.t-flat .ana-dn{color:var(--owe);}
+html.t-flat .lit-hero{border:1px solid var(--line);}
+html.t-flat .lit-sub{color:var(--muted);}
+html.t-flat .lit-part{background:var(--card);border:1px solid var(--line);}
+html.t-flat .lit-part .bar i{background:var(--bt-fin);}
+html.t-flat .lit-part small{color:var(--muted);}
+html.t-flat .lit-lesson{background:var(--card);border:1px solid var(--line);}
+html.t-flat .lit-lesson .ck{border:1.5px solid var(--hair-2);}
+html.t-flat .lit-lesson small{color:var(--muted);}
+
+/* ── кольорові акценти на світлому тлі ──
+   Числа й підписи фарбуються кольором сутності (--c / --bc / --ec), який
+   приходить із даних. Ці кольори добиралися під темне тло і на світлому
+   дають контраст близько 1.7–2. Не міняємо колір — притемнюємо його,
+   підмішуючи колір тексту: картки лишаються різними, але читаються.
+   Діє лише у світлих наборах: на темних вихідний колір правильний. */
+html.t-light .ph .ey b{color:color-mix(in srgb,var(--c,var(--fin)) 55%,var(--text));}
+html.t-light .bcard .v{color:color-mix(in srgb,var(--bc,var(--accent)) 55%,var(--text));}
+html.t-light .env2 .e2pct{color:color-mix(in srgb,var(--ec,var(--accent)) 55%,var(--text));}
+/* .wk-stat .v колір ставить JS прямо в style="" — перебити можна лише так.
+   Виняток свідомий і обмежений одним селектором. */
+html.t-light .wk-stat .v{color:var(--text)!important;}
+
+/* ── екран «Робота» ── */
+html.t-flat .wk-toggles button.on{background:var(--sel);border-color:var(--accent);color:var(--accent);}
+html.t-flat .wkcal-d.today{outline-color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 10%,transparent);}
+html.t-light .wkcal-d.today .dn{color:color-mix(in srgb,var(--owe) 70%,var(--text));}
+
+/* ── плитки статистики Простору ──
+   Темне напівпрозоре скло під світлим фоном читалось сірою плямою. */
+html.t-flat .sdash-st{background:var(--card-2);border:1px solid var(--line);box-shadow:none;}
+html.t-flat .sdash-st b{color:var(--text);}
+
+/* ── календар ритуалу (шар fd26t) ── */
+html.t-light .rit-cal .cd.today s{color:color-mix(in srgb,var(--fin) 65%,var(--text));}
+
+/* ── доробка після автозаміни ──
+   Генератор вище підставляє токени лише замість кольорів, які є в мапі.
+   Там, де в одному значенні їх кілька (градієнт із двох хексів), лишався
+   «хвіст» — напр. linear-gradient(160deg,var(--card-2),#0e1017) тримав
+   панель балансу майже чорною. Тут ці місця дописані повністю. */
+html.t-flat .incx-hero{background:var(--card);border-color:var(--line);}
+html.t-flat .incx-hero::before{display:none;}
+html.t-flat .incx-hero .v{color:var(--text);}
+html.t-flat .incx-hero .v .cur2{color:var(--muted);}
+html.t-flat .incx-styles button{background:var(--field);}
+html.t-flat .incx-styles button.on{background:var(--sel);color:var(--accent);border-color:var(--accent);}
+
+/* ── лічильник-бейдж на екрані «Ще» ──
+   JS ставить inline і фон, і текст одного відтінку (бірюзовий на бірюзовому
+   з прозорістю). На темному тлі підкладка темніє й контраст є; на світлому
+   вона майже біла, а цифра лишається блідою. Колір підкладки зберігаємо —
+   він кодує розділ — а цифру робимо текстовою. !important тут єдиний спосіб
+   перебити inline-стиль. */
+html.t-light .mh-row .mh-pill{color:var(--text)!important;}
+
+/* ═══ БАНЕР ОГЛЯДУ З ФОТО (.summary.has-wish) ═══
+   Коли в Карті бажань є знімки, вони стають тлом картки. Рівні правила
+   нових наборів (темний текст, суцільна поверхня) для цього випадку не
+   годяться: на фото потрібен світлий текст і скляні підкладки. Тому все,
+   що вище зроблено «пласким», тут повертається — але тільки під .has-wish.
+   Без фото картка лишається рівною і світлою. */
+
+/* текст на фото — світлий із тінню (перекриває пласкі правила вище) */
+html.t-flat #scr-home .summary.has-wish .big,
+html.t-flat #scr-home .summary.has-wish .nyc-title,
+html.t-flat #scr-home .summary.has-wish .nyc-cell{color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.55);}
+html.t-flat #scr-home .summary.has-wish .label,
+html.t-flat #scr-home .summary.has-wish .hint,
+html.t-flat #scr-home .summary.has-wish .big small,
+html.t-flat #scr-home .summary.has-wish .nyc-cell span{color:rgba(255,255,255,.82);
+  text-shadow:0 1px 8px rgba(0,0,0,.5);}
+html.t-flat #scr-home .summary.has-wish{background:transparent;border-color:transparent;}
+
+/* індикатор слайдів ──
+   Був смугами «як у сторіз»: flex:1 розтягував їх на всю ширину картки, і
+   через увесь банер лягала біла лінія — найпомітніша річ на екрані. Тепер це
+   маленькі крапки по центру; активна витягується в пігулку й наливається
+   білим, тож видно і котрий слайд, і скільки лишилось. */
+html.t-flat #scr-home .summary .wishdots{justify-content:center;gap:5px;margin:0 0 10px;}
+html.t-flat #scr-home .summary .wishdots i{flex:none;width:5px;height:5px;border-radius:99px;
+  background:rgba(255,255,255,.34);transition:width .32s var(--ease-out,ease);}
+html.t-flat #scr-home .summary .wishdots i.done{background:rgba(255,255,255,.5);}
+html.t-flat #scr-home .summary .wishdots i.now{width:20px;background:rgba(255,255,255,.26);}
+html.t-flat #scr-home .summary .wishdots i b{border-radius:99px;}
+html.t-flat #scr-home .summary .wishdots i.done b{width:0;}
+
+/* нижня панель: скло, крізь яке видно фото */
+html.t-flat #scr-home .summary.has-wish .herocap{background:rgba(12,14,18,.42);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+  border-top:1px solid rgba(255,255,255,.16);}
+html.t-flat #scr-home .summary.has-wish .hc-tab,
+html.t-flat #scr-home .summary.has-wish .hc-tab.wish,
+html.t-flat #scr-home .summary.has-wish .hc-tab.diary{color:#fff;}
+html.t-flat #scr-home .summary.has-wish .hc-tab+.hc-tab{border-left:1px solid rgba(255,255,255,.16);}
+
+/* значок 🎯 у кутку картки — прибираємо, він лише заважає */
+#scr-home #wishFlink{display:none;}
+
+/* лічильник до Нового року — третій поверх картки, те саме скло */
+/* Нижнього padding у картки немає (112px 18px 0), тож від'ємний margin-bottom
+   виштовхував лічильник за край, а overflow:hidden його зрізав. */
+html.t-flat #scr-home .summary .nyc{margin:0 -18px;padding:10px 18px;
+  border-top:1px solid var(--line);border-radius:0 0 26px 26px;background:var(--card-2);}
+html.t-flat #scr-home .summary.has-wish .nyc{background:rgba(12,14,18,.42);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+  border-top:1px solid rgba(255,255,255,.14);}
+html.t-flat #scr-home .summary .herocap{border-radius:0;}
+
+/* ═══ ФОТО ПАПКИ НА ВСЮ КАРТКУ ═══
+   У сітці фото було обрізане смугою 58px зверху — «половинка». Тепер воно
+   заповнює плитку, а назву тримає читабельною градієнт знизу. */
+html.t-flat .fc2-tile .fc2-bg{inset:0;height:auto;}
+html.t-flat .fc2-tile:not(.nocover) .fc2-veil{background:linear-gradient(transparent 38%,rgba(6,8,12,.82));}
+html.t-flat .fc2-tile:not(.nocover) .fc2-name{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
+html.t-flat .fc2-tile:not(.nocover) .fstat{color:rgba(255,255,255,.85);}
+html.t-flat .fc2-tile:not(.nocover) .fstat b{color:#fff;}
+html.t-flat .fc2:not(.nocover) .fc2-em{background:rgba(10,12,16,.42);border-color:rgba(255,255,255,.22);
+  color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+html.t-flat .fc2:not(.nocover) .fmenu{color:#fff;}
+/* .summary — flex із порядком через order; лічильник має бути останнім
+   поверхом, під панеллю кнопок. */
+#scr-home .summary>.nyc{order:6;}
+
+/* ── нижній блок картки: панель кнопок + лічильник як одне скло ──
+   Раніше вони мали різну підкладку й читались як дві окремі смуги, до того
+   ж лічильник узагалі лежав під карткою. Тепер це один суцільний «підвал»
+   із заокругленням лише знизу; фото просвічує крізь обидва поверхи. */
+html.t-flat #scr-home .summary.has-wish .herocap,
+html.t-flat #scr-home .summary.has-wish .nyc{
+  background:rgba(10,12,16,.16);
+  -webkit-backdrop-filter:blur(6px) saturate(160%);backdrop-filter:blur(6px) saturate(160%);}
+/* на майже прозорому склі текст тримається тінню, а не заливкою */
+html.t-flat #scr-home .summary.has-wish .herocap .hc-tab b,
+html.t-flat #scr-home .summary.has-wish .nyc-title,
+html.t-flat #scr-home .summary.has-wish .nyc-cell{text-shadow:0 1px 8px rgba(0,0,0,.6);}
+html.t-flat #scr-home .summary.has-wish .herocap{border-top:1px solid rgba(255,255,255,.18);border-radius:0;}
+html.t-flat #scr-home .summary.has-wish .nyc{border-top:1px solid rgba(255,255,255,.10);
+  border-radius:0 0 26px 26px;}
+/* підписи лічильника трохи яскравіші — на склі поверх фото вони губились */
+html.t-flat #scr-home .summary.has-wish .nyc-cell span{color:rgba(255,255,255,.9);}
+html.t-flat #scr-home .summary.has-wish .nyc-title{color:#fff;}
+
+/* затемнення поверх фото ──
+   Рівна вуаль на весь знімок глушила його цілком. Натомість два локальні
+   градієнти: діагональний зліва — рівно під текстовим стовпчиком (заголовок,
+   відсоток, підказка), і вузький знизу — під скляним підвалом. Права
+   половина знімка лишається практично чистою, тому фото видно, а текст
+   усе одно читається. */
+html.t-flat #scr-home .summary.has-wish .wishbg-ov{
+  background:
+    linear-gradient(101deg,rgba(6,8,12,.62) 0%,rgba(6,8,12,.42) 26%,rgba(6,8,12,.14) 52%,rgba(6,8,12,0) 74%),
+    linear-gradient(180deg,rgba(6,8,12,.34) 0%,rgba(6,8,12,0) 22%,rgba(6,8,12,0) 66%,rgba(6,8,12,.14) 100%);}
+
+/* ── шапка Огляду, коли під нею фото ──
+   Шапка лежить поверх банера, тож її колір залежить не від теми, а від того,
+   чи стоїть у Карті бажань знімок. Клас .top-photobleed для цього не годиться —
+   JS вішає його завжди, і з фото, і без. Тому питаємо саму картку через :has().
+   Порядок правил важливий: це має йти після пласких правил шапки вище. */
+html.t-flat #scr-home:has(.summary.has-wish) .top .brand h1{color:#fff;
+  text-shadow:0 2px 14px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.45);}
+html.t-flat #scr-home:has(.summary.has-wish) .top .brand span,
+html.t-flat #scr-home:has(.summary.has-wish) .top .brand small{color:rgba(255,255,255,.82);
+  text-shadow:0 1px 8px rgba(0,0,0,.5);}
+html.t-flat #scr-home:has(.summary.has-wish) .top .icon-btn{background:rgba(16,18,24,.34);
+  border:1px solid rgba(255,255,255,.2);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}
+html.t-flat #scr-home:has(.summary.has-wish) .top .icon-btn svg{color:#fff;}
+html.t-flat #scr-home:has(.summary.has-wish) .top .logo.lg-glass{background:rgba(16,18,24,.34);
+  border:1px solid rgba(255,255,255,.2);}
+
+/* смуга прогресу місяця на фото — друга суцільна лінія через увесь банер.
+   Робимо підкладку майже невидимою, лишаючи помітною тільки заповнену частину. */
+html.t-flat #scr-home .summary.has-wish .bar{background:rgba(255,255,255,.16);height:3px;}
+html.t-flat #scr-home .summary.has-wish .bar i{background:#fff;}
+
+/* ═══════════════════════════════════════════════════════════════════
+   БАНЕР ОГЛЯДУ · варіант «Тихий»
+   Порядок елементів у картці задає flex-order (розмітку не чіпаємо).
+   Згори — назва, далі порожнеча, унизу велике тонке число з підписом,
+   потім крапки праворуч і скляний підвал.
+   Manrope має ваги 400–800, тож найтонше доступне накреслення — 400.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Назва замість логотипа. У розмітці це .wishlink — він був position:absolute
+   у правому верхньому куті («Карта бажань ›») і ховався, щойно з'являлось
+   фото. Повертаємо його в потік, інакше flex-order на нього не діє і напис
+   лягає просто поверх числа. Власний текст ставимо через ::before, щоб не
+   чіпати розмітку й стрілку з вихідного рядка. */
+html.t-flat #scr-home .summary .wishlink,
+html.t-flat #scr-home .summary.has-wish .wishlink{display:block;order:0;
+  position:static;z-index:2;margin:0 0 auto;font-size:0;color:#fff;
+  text-shadow:0 1px 12px rgba(0,0,0,.5);}
+html.t-flat #scr-home .summary .wishlink::before{content:"Карта бажань";
+  font-family:'Caveat',cursive;font-size:29px;font-weight:700;letter-spacing:.01em;
+  text-transform:none;line-height:1;}
+html.t-flat #scr-home .summary:not(.has-wish) .wishlink{color:var(--text);text-shadow:none;}
+/* число притискаємо до низу текстового блоку — між назвою і ним усе повітря */
+html.t-flat #scr-home .summary>.big{margin-top:auto;}
+/* коли назва пішла з шапки, кнопки мають лишитись праворуч, а не з'їхати вліво */
+@media (min-width:1024px){
+  html.t-flat #scr-home .top{justify-content:flex-end;}
+}
+
+/* число — велике й тонке, притиснуте до низу текстового блоку */
+html.t-flat #scr-home .summary>.big{order:2;font-weight:400;font-size:52px;letter-spacing:-.04em;
+  line-height:1;margin:0;}
+html.t-flat #scr-home .summary>.big small{font-size:19px;font-weight:400;}
+/* підпис ПІД числом (у вихідній розмітці він стоїть над ним) */
+html.t-flat #scr-home .summary>.label{order:3;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;margin-top:7px;}
+html.t-flat #scr-home .summary>.hint{order:4;font-size:11.5px;margin-top:4px;}
+html.t-flat #scr-home .summary>.bar{order:5;max-width:300px;margin:11px 0 0;}
+/* крапки — унизу праворуч, щоб не ділили кадр навпіл */
+html.t-flat #scr-home .summary>.wishdots{order:6;justify-content:flex-end;
+  margin:12px 0 9px;padding:0;}
+html.t-flat #scr-home .summary>.herocap{order:7;}
+html.t-flat #scr-home .summary>.nyc{order:8;}
+
+/* Верх картки. Шапка (.top-photobleed) тягне банер угору на 84px, щоб
+   сидіти на фото — але так заокруглені кути опинялись ЗА краєм екрана і
+   верх виглядав обрубаним. Послаблюємо натяг: шапка так само лежить на
+   знімку, а кути видно. Внутрішній відступ зменшено на ту ж величину,
+   щоб число не з'їхало вниз. */
+html.t-flat #scr-home .summary{border-radius:26px;}
+html.t-flat #scr-home .top.top-photobleed{margin-bottom:-38px;}
+html.t-flat #scr-home .summary{padding-top:72px;}
+
+/* на широкому екрані назва застосунку вже стоїть у сайдбарі — у шапці
+   Огляду вона лише дублювалась і сперечалася з назвою на банері */
+@media (min-width:1024px){
+  html.t-flat #scr-home .top .brand{display:none;}
+}
+
+/* ═══ ПАПКИ: без кольорової смужки ═══
+   Риска згори плитки дублювала те, що й так видно з іконки та назви. */
+html.t-flat .fc2-tile.nocover::before{display:none;}
+html.t-flat .fc2-deck.nocover::before{display:none;}
 </style>
 </body>
 </html>

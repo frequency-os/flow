@@ -80,8 +80,11 @@
 #scr-home .top .icon-btn svg{color:#efedf7;}
 
 /* єдина геометрія картки для обох станів */
+/* padding знизу — 0: там сидить скляна полиця з кнопками, вона й дає
+   картці нижній край. Бокові 18px лишаються для тексту, а полиця виходить
+   за них назад через margin:0 -18px. */
 #scr-home .summary{margin-left:-18px;margin-right:-18px;border-left:0;border-right:0;border-top:0;
-  border-radius:0 0 28px 28px;padding:112px 18px 18px;min-height:346px;
+  border-radius:0 0 28px 28px;padding:112px 18px 0;min-height:346px;
   display:flex;flex-direction:column;justify-content:flex-end;}
 #scr-home .summary::after{display:none;}
 
@@ -101,24 +104,54 @@ html.home-glass #scr-home .summary.has-wish .wishbg-ov{
     linear-gradient(0deg,rgba(5,6,11,.95),rgba(5,6,11,.82) 16%,rgba(5,6,11,.4) 38%,transparent 56%),
     linear-gradient(rgba(6,7,12,.2),rgba(6,7,12,.2));}
 
-/* порядок: підпис → число → пояснення → бар → капсула → крапки → лічильник */
+/* порядок: крапки → підпис → число → пояснення → бар → полиця.
+   Крапки слайдшоу піднято НАД текст — вони як сторіз показують, котре
+   фото зараз, і на самому низу картки їх заступала б полиця.
+   Лічильник більше не в картці — він сусідній рядок під нею. */
+#scr-home .summary>.wishdots{order:0;}
 #scr-home .summary>.label{order:1;}
 #scr-home .summary>.big{order:2;}
 #scr-home .summary>.hint{order:3;}
 #scr-home .summary>.bar{order:4;}
 #scr-home .summary>.herocap{order:5;}
-#scr-home .summary>.wishdots{order:6;}
-#scr-home .summary>#nyCountdown{order:7;}
 
 /* текст читається поверх тла в обох станах */
 #scr-home .summary>.label,#scr-home .summary>.big,#scr-home .summary>.hint,
 #scr-home .summary>.bar,#scr-home .summary>.herocap,#scr-home .summary>.wishdots{position:relative;z-index:2;}
+/* лічильник «До Нового року» лежить під фото-скримом (.has-wish → #wishBgOv, z-index:1),
+   через що лівий край рядка не тапався; піднімаємо над скрим, як і решту вмісту картки. */
+#scr-home .summary>#nyCountdown{position:relative;z-index:2;}
+#scr-home .summary .wishdots{margin:0 0 14px;}
 #scr-home .summary .label{color:rgba(255,255,255,.72);font-size:10px;letter-spacing:.15em;}
 #scr-home .summary .big{color:#fff;font-size:44px;margin:4px 0 0;
   text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.45);}
 #scr-home .summary .big small{font-size:17px;color:rgba(255,255,255,.72);}
 #scr-home .summary .hint{color:rgba(255,255,255,.78);font-size:12.5px;line-height:1.4;margin-top:6px;}
 #scr-home .summary .wishlink{display:none;}
+/* ── Смужка прогресу: 3px білого замість 7px помаранчево-фіолетового.
+   На картці і так живе фото або кольоровий градієнт; градієнт у смужці
+   був третім джерелом кольору в одній точці. ── */
+#scr-home .summary .bar{height:3px;background:rgba(255,255,255,.22);margin:14px 0 0;}
+#scr-home .summary .bar i{background:#fff;}
+
+/* ── Полиця замість двох залитих капсул ──
+   Було: дві капсули, фіолетова (--skl) і зелена (--hab), кожна із власною
+   заливкою і рамкою, поверх фіолетово-помаранчевого тла. Три насичені
+   кольори в одному місці — звідси відчуття «забито».
+   Стало: одна скляна полиця на всю ширину картки, приліплена до нижнього
+   краю; кнопки — дві її половини з волосинкою між ними. Колір лишився
+   тільки в іконках, тож призначення кнопок читається так само. ── */
+#scr-home .summary .herocap{gap:0;margin:16px -18px 0;
+  border-top:1px solid rgba(255,255,255,.16);border-radius:0 0 28px 28px;
+  background:rgba(10,8,18,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
+#scr-home .summary .hc-tab,
+#scr-home .summary .hc-tab.wish,
+#scr-home .summary .hc-tab.diary{background:transparent;border:0;border-radius:0;
+  padding:15px 6px;color:#fff;}
+#scr-home .summary .hc-tab+.hc-tab{border-left:1px solid rgba(255,255,255,.16);}
+#scr-home .summary .hc-tab.wish svg{color:var(--skl);}
+#scr-home .summary .hc-tab.diary svg{color:var(--hab);}
+#scr-home .summary .hc-tab:active{opacity:1;transform:none;background:rgba(255,255,255,.09);}
 #scr-home .summary .herocap .hc-tab b{color:inherit;text-shadow:0 1px 6px rgba(0,0,0,.4);}
 /* Світла тема: картка героя однаково лежить на фото або на темному
    градієнті (див. нижче), тому текст на ній лишається світлим —
@@ -136,13 +169,15 @@ html[data-theme="light"] #scr-home .summary .label{color:rgba(255,255,255,.72);}
 html[data-theme="light"] #scr-home .top .icon-btn svg{color:#efedf7;}
 html[data-theme="light"] #scr-home .summary,
 html.fd26t[data-theme="light"] #scr-home .summary{background:linear-gradient(162deg,#241f3f,#0d1017);}
+/* Копій під html.t-light тут свідомо НЕМАЄ.
+   Правила вище — задум СТАРОЇ світлої теми: картка героя лишається темною,
+   і текст на ній тому світлий. Нові набори роблять протилежне — рівну світлу
+   поверхню з темним текстом. Автоматичне дублювання селекторів (яким ці
+   копії з'явились) тут дало прямо протилежний до потрібного результат. */
 
-/* лічильник усередині картки — світлий у будь-якому стані */
-html.fd26t #scr-home .summary #nyCountdown{border-top-color:rgba(255,255,255,.2);}
-html.fd26t #scr-home .summary #nyCountdown .nyc-title,
-html.fd26t #scr-home .summary #nyCountdown .nyc-cell b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5);}
-html.fd26t #scr-home .summary #nyCountdown .nyc-cell span{color:rgba(255,255,255,.7);}
-html.fd26t #scr-home .summary #nyCountdown .nyc-emoji{color:#fff;}
+/* Правила «лічильник усередині картки» прибрано разом із переносом вузла:
+   рядок тепер лежить під карткою, на фоні сторінки, і бере звичайні
+   кольори теми (див. 12-theme-nightfire.css, розділ 9). */
 
 /* ══════════════════════════════════════════════════════════════════
    ЗНАК FREQUENCY · «Рідке скло»

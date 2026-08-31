@@ -32,7 +32,7 @@
     <div style="flex:1;min-width:0">
       <div style="font-weight:800;font-size:13.5px;color:#fff;">Пам'ять пристрою заповнена</div>
       <div id="quotaBannerMsg" style="font-size:12px;color:rgba(255,255,255,.82);margin-top:3px;line-height:1.45">
-        Дані збережено в хмару Telegram, але локальна копія може відставати. Звільни місце або очисти старі дані.</div>
+        Локальна памʼять заповнена — нові зміни могли не зберегтись на цей пристрій. Якщо ти увійшов через Google, вони в хмарі. Звільни місце: прибери великі фото або старі дані.</div>
     </div>
     <button onclick="document.getElementById('quotaBanner').style.display='none'"
       style="background:transparent;border:0;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;padding:0 2px;line-height:1">×</button>
@@ -54,6 +54,46 @@
   <symbol id="fi-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M5 12l7-7 7 7"/></symbol>
   <symbol id="fi-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12l7 7 7-7"/></symbol>
   <symbol id="fi-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></symbol>
+</defs></svg>
+<!-- ===== folder line-icon sprite (нові теми: іконки замість емодзі) =====
+     Один спрайт на всю програму. Малюються через <svg class="ico"><use href="#fo-…"/></svg>,
+     колір беруть із currentColor, товщину штриха — з CSS. Емодзі нікуди не зникли:
+     у даних папки лишається поле emoji, іконка живе поруч у полі icon. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="fo-folder" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2.5h8.5A1.5 1.5 0 0 1 21 10v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18Z"/></symbol>
+  <symbol id="fo-briefcase" viewBox="0 0 24 24"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5M3 12.5h18"/></symbol>
+  <symbol id="fo-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M14.5 10c0-1-1.1-1.7-2.5-1.7S9.5 9 9.5 10s1 1.4 2.5 1.7 2.5.7 2.5 1.8-1.1 1.8-2.5 1.8-2.5-.8-2.5-1.8"/></symbol>
+  <symbol id="fo-run" viewBox="0 0 24 24"><circle cx="15" cy="4.5" r="1.8"/><path d="m8 20 2.5-5 3-2-1-4.5-3 2-2 3M13.5 13l3 2 1.5 4M6 11l2.5-2.5"/></symbol>
+  <symbol id="fo-star" viewBox="0 0 24 24"><path d="m12 3.5 2.7 5.5 6 .9-4.35 4.25L17.4 20 12 17.15 6.6 20l1.05-5.85L3.3 9.9l6-.9z"/></symbol>
+  <symbol id="fo-book" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H19v16H5.5A1.5 1.5 0 0 1 4 18.5Z"/><path d="M4 16.5h15"/></symbol>
+  <symbol id="fo-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r=".8" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="fo-bulb" viewBox="0 0 24 24"><path d="M9 17a6.5 6.5 0 1 1 6 0v1.5a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 18.5Z"/><path d="M9.5 17h5"/></symbol>
+  <symbol id="fo-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-9.3A4.2 4.2 0 0 1 12 8.4a4.2 4.2 0 0 1 7.5 2.3C19.5 15.6 12 20 12 20Z"/></symbol>
+  <symbol id="fo-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></symbol>
+  <symbol id="fo-plane" viewBox="0 0 24 24"><path d="M21 4 10.5 14.5M21 4l-6.5 17-3.5-8.5L2.5 9z"/></symbol>
+  <symbol id="fo-apple" viewBox="0 0 24 24"><path d="M12 8c-1-1.2-2.5-1.6-4-1-2 .8-3 3-2.5 5.6.5 2.8 2.4 6.4 4.4 6.4.9 0 1.4-.4 2.1-.4s1.2.4 2.1.4c2 0 3.9-3.6 4.4-6.4.5-2.6-.5-4.8-2.5-5.6-1.5-.6-3 -.2-4 1Z"/><path d="M12 8c.2-1.7 1.3-3 2.8-3.4"/></symbol>
+  <symbol id="fo-dumbbell" viewBox="0 0 24 24"><path d="M3 9.5v5M6 7v10M18 7v10M21 9.5v5M6 12h12"/></symbol>
+  <symbol id="fo-brain" viewBox="0 0 24 24"><path d="M12 5.5a3 3 0 0 0-5.6 1.2A3 3 0 0 0 5 12a3 3 0 0 0 1.7 4.6A3 3 0 0 0 12 18.5Z"/><path d="M12 5.5a3 3 0 0 1 5.6 1.2A3 3 0 0 1 19 12a3 3 0 0 1-1.7 4.6A3 3 0 0 1 12 18.5Z"/></symbol>
+  <symbol id="fo-palette" viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 1 8-8c0 2-1.6 2.6-3 2.6h-1.4a1.8 1.8 0 0 0-1.2 3.1A1.7 1.7 0 0 1 12 20Z"/><circle cx="8.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="10" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="fo-music" viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></symbol>
+  <symbol id="fo-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="m7.5 15.5 3.5-4 3 2.5 4.5-6"/></symbol>
+  <symbol id="fo-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="fo-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="fo-doc" viewBox="0 0 24 24"><path d="M5.5 3.5h8L19 9v11.5H5.5Z"/><path d="M13.5 3.5V9H19M8.5 13h7M8.5 16.5h5"/></symbol>
+  <symbol id="fo-spark" viewBox="0 0 24 24"><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/><path d="m6.5 6.5 3 3M14.5 14.5l3 3M17.5 6.5l-3 3M9.5 14.5l-3 3"/></symbol>
+  <symbol id="fo-tool" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 1 5 5l-8 8a2.1 2.1 0 0 1-3-3l8-8a4 4 0 0 1-2-2Z"/><path d="M9.5 4.5 5 9 3 7l4.5-4.5z"/></symbol>
+  <symbol id="fo-study" viewBox="0 0 24 24"><path d="m12 4 9 4.5-9 4.5-9-4.5z"/><path d="M6.5 10.5V16c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-5.5M21 8.5v5"/></symbol>
+  <symbol id="fo-plant" viewBox="0 0 24 24"><path d="M12 20v-8"/><path d="M12 12C12 8 9.5 5.5 5.5 5.5c0 4 2.5 6.5 6.5 6.5Z"/><path d="M12 13.5c0-3.3 2.2-5.5 5.5-5.5 0 3.3-2.2 5.5-5.5 5.5Z"/></symbol>
+  <symbol id="fo-flame" viewBox="0 0 24 24"><path d="M12 20a5.5 5.5 0 0 0 5.5-5.5c0-4.5-5.5-10.5-5.5-10.5S6.5 10 6.5 14.5A5.5 5.5 0 0 0 12 20Z"/><path d="M12 20a2.5 2.5 0 0 0 2.5-2.5c0-2-2.5-4.5-2.5-4.5s-2.5 2.5-2.5 4.5A2.5 2.5 0 0 0 12 20Z"/></symbol>
+  <symbol id="fo-cart" viewBox="0 0 24 24"><path d="M3 4h2.2l2.3 11h10l2.2-8H6"/><circle cx="9" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></symbol>
+  <symbol id="fo-car" viewBox="0 0 24 24"><path d="M4 16v2.5M20 16v2.5M3 15.5v-3l2-5h14l2 5v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M5 12.5h14"/><circle cx="7.5" cy="15.5" r=".9" fill="currentColor" stroke="none"/><circle cx="16.5" cy="15.5" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="fo-camera" viewBox="0 0 24 24"><path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5l1.5-2h6l1.5 2H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5Z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="fo-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+  <symbol id="fo-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-3 7.8-7 9.5-4-1.7-7-5-7-9.5V6z"/></symbol>
+  <symbol id="fo-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.8M17 14.8c2.2.5 3.5 2.3 3.5 4.7"/></symbol>
+  <symbol id="fo-rocket" viewBox="0 0 24 24"><path d="M13.5 4.5c3 1.5 5 4.5 5.5 8l-4 2.5-5-5 2.5-4a6 6 0 0 1 1-1.5Z"/><path d="M10 15 6 19M9 11.5 5 13l1 3 3 1 1.5-4M14 16l1 3 3-1 1.5-4"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></symbol>
 </defs></svg>
 <!-- ===== DESKTOP SIDEBAR (показується тільки на широкому екрані) ===== -->
 <aside class="dsb" id="desktopSidebar">
@@ -110,9 +150,7 @@
           <b>Щоденник</b>
         </button>
       </div>
-      <div class="wishdots" id="wishDots"></div>
-    </div>
-    <div class="nyc" id="nyCountdown" style="cursor:pointer" onclick="window.goNYC&&window.goNYC()">
+      <div class="nyc" id="nyCountdown" style="cursor:pointer" onclick="window.goNYC&&window.goNYC()">
       <div class="nyc-head"><span class="nyc-emoji">🎄</span><span class="nyc-title" id="nycTitle">До Нового року</span></div>
       <div class="nyc-grid">
         <div class="nyc-cell"><b id="nycD">0</b><span>днів</span></div>
@@ -121,6 +159,9 @@
         <div class="nyc-cell"><b id="nycS">0</b><span>сек</span></div>
       </div>
     </div>
+      <div class="wishdots" id="wishDots"></div>
+    </div>
+
     <div class="sec"><h3>📁 Папки</h3><div class="sec-actions"><div class="fvseg" id="folderViewSeg">
       <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></button>
@@ -931,5 +972,6 @@
 
 <style id="fdHorizonWin">@@INC:styles/17-horizon.css@@</style>
 <style id="standalone-top">@@INC:styles/18-standalone.css@@</style>
+<style id="themes-flat">@@INC:styles/19-themes-flat.css@@</style>
 </body>
 </html>

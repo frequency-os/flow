@@ -86,6 +86,135 @@
     --bt-note:#6d9bff; --bt-check:#3ad487; --bt-task:#f09048;
   }
   html[data-theme="black"]{background:#000;}
+
+  /* ═══════════════════════════════════════════════════════════════════
+     НОВІ НАБОРИ ТЕМ (30.08.2026) — «Робочий стіл» (desk) і «Студія» (studio).
+     Кожен набір має світлу й темну пару. Старі три теми (dark/black/light)
+     лишаються недоторканими — це окремі значення data-theme, вони нічого
+     не перекривають.
+
+     Спільне для обох наборів: без градієнтів у поверхнях, без кольорового
+     світіння, колір папки живе як мітка (--mark), а не як заливка картки.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* ── A · РОБОЧИЙ СТІЛ · світла ── */
+  html[data-theme="desk-light"]{
+    --bg:#f6f7f9; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1f3f6; --field:#eef0f4;
+    --text:#191c20; --muted:#767c85; --line:#e4e7eb;
+    --fin:#c2410c; --hab:#15803d; --val:#3d5afe; --skl:#6d28d9;
+    --accent:#3d5afe; --owe:#dc2626; --owed:#15803d;
+    --hair:rgba(15,23,42,.045);
+    --hair-2:rgba(15,23,42,.11);
+    --scrim:rgba(20,24,32,.34);
+    --glass:rgba(255,255,255,.86);
+    --sheet:#ffffff;
+    --shadow:rgba(20,24,32,.13);
+    --glow:transparent;
+    --emoji-plate:#ffffff;
+    --on-cover:#ffffff;
+    --nav-bg:#ffffff;
+    --nav-line:#e4e7eb;
+    --nav-ink:#767c85;
+    --nav-ink-on:#3d5afe;
+    --bt-note:#3d5afe; --bt-check:#15803d; --bt-task:#c2410c;
+    --bt-fin:#a16207; --bt-media:#be185d; --bt-ai:#6d28d9;
+    --ico:#767c85;            /* штрих лінійних іконок */
+    --ico-on:#3d5afe;         /* іконка активного пункту */
+    --folder-fill:#ffffff;    /* поверхня картки папки */
+    --folder-line:#e4e7eb;    /* її контур */
+    --sel:rgba(61,90,254,.09); /* підкладка вибраного пункту меню */
+  }
+  /* ── A · РОБОЧИЙ СТІЛ · темна ── */
+  html[data-theme="desk-dark"]{
+    --bg:#101317; --bg-2:#141820; --card:#171b20; --card-2:#1d222a; --field:#151920;
+    --text:#e6e9ed; --muted:#858c96; --line:#262b32;
+    --fin:#fb923c; --hab:#4ade80; --val:#7c93ff; --skl:#c4b5fd;
+    --accent:#7c93ff; --owe:#f87171; --owed:#4ade80;
+    --hair:rgba(255,255,255,.045);
+    --hair-2:rgba(255,255,255,.12);
+    --scrim:rgba(6,8,11,.6);
+    --glass:rgba(23,27,32,.88);
+    --sheet:#171b20;
+    --shadow:rgba(0,0,0,.5);
+    --glow:transparent;
+    --emoji-plate:var(--card);
+    --on-cover:#ffffff;
+    --nav-bg:#171b20;
+    --nav-line:#262b32;
+    --nav-ink:#858c96;
+    --nav-ink-on:#7c93ff;
+    --bt-note:#7c93ff; --bt-check:#4ade80; --bt-task:#fb923c;
+    --bt-fin:#eab308; --bt-media:#f472b6; --bt-ai:#c4b5fd;
+    --ico:#858c96;
+    --ico-on:#7c93ff;
+    --folder-fill:#171b20;
+    --folder-line:#262b32;
+    --sel:rgba(124,147,255,.14);
+  }
+  /* ── B · СТУДІЯ · темна ── */
+  html[data-theme="studio-dark"]{
+    --bg:#0e1011; --bg-2:#111415; --card:#16191b; --card-2:#1c2022; --field:#141718;
+    --text:#e9ebec; --muted:#868d92; --line:#252a2d;
+    --fin:#e0a458; --hab:#6ba57f; --val:#8aa9c9; --skl:#c2a86a;
+    --accent:#d4a24c; --owe:#d97070; --owed:#6ba57f;
+    --hair:rgba(255,255,255,.04);
+    --hair-2:rgba(255,255,255,.11);
+    --scrim:rgba(5,6,7,.62);
+    --glass:rgba(22,25,27,.88);
+    --sheet:#16191b;
+    --shadow:rgba(0,0,0,.55);
+    --glow:transparent;
+    --emoji-plate:var(--card);
+    --on-cover:#ffffff;
+    --nav-bg:#111415;
+    --nav-line:#252a2d;
+    --nav-ink:#868d92;
+    --nav-ink-on:#d4a24c;
+    --bt-note:#8aa9c9; --bt-check:#6ba57f; --bt-task:#e0a458;
+    --bt-fin:#d4a24c; --bt-media:#c98b9b; --bt-ai:#c2a86a;
+    --ico:#868d92;
+    --ico-on:#d4a24c;
+    --folder-fill:#16191b;
+    --folder-line:#252a2d;
+    --sel:rgba(212,162,76,.13);
+  }
+  /* ── B · СТУДІЯ · світла ── */
+  html[data-theme="studio-light"]{
+    --bg:#f7f7f6; --bg-2:#ffffff; --card:#ffffff; --card-2:#f1f1ef; --field:#efefed;
+    --text:#1c1e1f; --muted:#75797c; --line:#e5e4e1;
+    --fin:#a3611c; --hab:#2f7d63; --val:#3f6382; --skl:#8a6d2f;
+    --accent:#9a6f1f; --owe:#b8443f; --owed:#2f7d63;
+    --hair:rgba(28,30,31,.04);
+    --hair-2:rgba(28,30,31,.11);
+    --scrim:rgba(28,30,31,.34);
+    --glass:rgba(255,255,255,.86);
+    --sheet:#ffffff;
+    --shadow:rgba(28,30,31,.13);
+    --glow:transparent;
+    --emoji-plate:#ffffff;
+    --on-cover:#ffffff;
+    --nav-bg:#f1f1ef;
+    --nav-line:#e5e4e1;
+    --nav-ink:#75797c;
+    --nav-ink-on:#9a6f1f;
+    --bt-note:#3f6382; --bt-check:#2f7d63; --bt-task:#a3611c;
+    --bt-fin:#9a6f1f; --bt-media:#a14a63; --bt-ai:#8a6d2f;
+    --ico:#75797c;
+    --ico-on:#9a6f1f;
+    --folder-fill:#ffffff;
+    --folder-line:#e5e4e1;
+    --sel:rgba(154,111,31,.10);
+  }
+  /* Старі теми теж мають знати нові змінні — інакше іконки лишаться без
+     кольору там, де новий код уже малює SVG. Значення підібрані під
+     чинні палітри, вигляд старих тем не змінюється. */
+  :root{
+    --ico:var(--muted); --ico-on:var(--accent);
+    --folder-fill:var(--card); --folder-line:var(--line);
+    --sel:rgba(139,124,255,.14);
+  }
+  html[data-theme="light"]{ --sel:rgba(109,92,240,.10); }
+  html[data-theme="black"]{ --sel:rgba(148,138,255,.16); }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{height:100%;background:var(--bg);overflow:hidden;}
   html{background:#0b0d12;min-height:100%;}

@@ -597,9 +597,12 @@
   .tcode i{ font-style:normal; }
   .tcode .c-kw{ color:#c77dff; } .tcode .c-str{ color:#34c77b; }
   .tcode .c-num{ color:#f0b429; } .tcode .c-com{ color:var(--muted); opacity:.7; }
-  html[data-theme="light"] .tcode .c-kw{ color:#9d4edd; }
-  html[data-theme="light"] .tcode .c-str{ color:#1ea566; }
-  html[data-theme="light"] .tcode .c-num{ color:#b8860b; }
+  html[data-theme="light"] .tcode .c-kw,
+  html.t-light .tcode .c-kw{ color:#9d4edd; }
+  html[data-theme="light"] .tcode .c-str,
+  html.t-light .tcode .c-str{ color:#1ea566; }
+  html[data-theme="light"] .tcode .c-num,
+  html.t-light .tcode .c-num{ color:#b8860b; }
   /* embed */
   .tembed .em-wrap{ position:relative; width:100%; aspect-ratio:16/9; border-radius:14px;
     overflow:hidden; border:0; background:#000 center/cover no-repeat; cursor:pointer; display:block; padding:0; }

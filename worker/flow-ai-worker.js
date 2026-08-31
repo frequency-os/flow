@@ -243,14 +243,8 @@ export default {
         }
 
         if (!env.AZURE_SPEECH_KEY || !env.AZURE_SPEECH_REGION) {
-          /* Показуємо ІМЕНА змінних, які воркер бачить — значень не
-             торкаємось. Без цього «ключа немає» не відрізнити від
-             «ключ названий інакше», і шукати нема де. */
-          let names = [];
-          try { names = Object.keys(env).filter((k) => typeof env[k] === "string").sort(); } catch (_) {}
           return json({
             error: "Нейронний голос не налаштований: додай ELEVENLABS_KEY",
-            бачу_змінні: names,
           }, 503);
         }
 

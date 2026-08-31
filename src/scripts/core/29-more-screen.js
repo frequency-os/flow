@@ -109,7 +109,7 @@
     }
     function syncLabel(st){
       const gUser=(window.sbUser && window.sbUser())||null;
-      const cloudTxt = window.FLOW_NATIVE ? 'збережено на цьому пристрої' : (gUser ? 'хмара Google · всі пристрої' : 'хмара Telegram · всі пристрої');
+      const cloudTxt = window.FLOW_NATIVE ? 'збережено на цьому пристрої' : (gUser ? 'хмара Google · всі пристрої' : 'лише на цьому пристрої · увійди для хмари');
       if(st==='syncing') return ['syncing','Синхронізація…','дані вирівнюються між пристроями'];
       if(st==='synced')  return ['synced','Синхронізовано',cloudTxt];
       if(st==='error'){
@@ -122,7 +122,34 @@
     }
     function ALL_KEYS(){ return (window.FLOW_KEYS||[]).slice(); }
 
-    function tgDiag(){ return window.platform.diag(); }
+    /* ── індикатор пам'яті ──
+       localStorage («швидка память») впирається в ~5 МБ — саме він дає банер
+       «памʼять заповнена». Фото й книги живуть окремо в IndexedDB, де місця на
+       порядки більше. Показуємо обидва, щоб було видно, що саме тисне. */
+    async function flowStorageInfo(){
+      let lsBytes=0;
+      try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(!k) continue;
+        lsBytes += (k.length + (localStorage.getItem(k)||'').length)*2; } }catch(_){}
+      const lsCap=5*1024*1024;
+      let usage=0, quota=0;
+      try{ if(navigator.storage && navigator.storage.estimate){ const e=await navigator.storage.estimate(); usage=e.usage||0; quota=e.quota||0; } }catch(_){}
+      return { lsBytes, lsCap, idbBytes:Math.max(0, usage-lsBytes), quota };
+    }
+    function fmtMem(b){ return b>=1048576 ? (b/1048576).toFixed(1)+' МБ' : Math.max(1,Math.round(b/1024))+' КБ'; }
+    async function fillMemRow(host){
+      try{
+        const el=host&&host.querySelector('[data-acc-mem] .acc-mem-body'); if(!el) return;
+        const s=await flowStorageInfo();
+        const pct=Math.min(100, Math.round(s.lsBytes/s.lsCap*100));
+        const col=pct>=85?'var(--owe,#ff5a5f)':pct>=65?'var(--fin,#f0b429)':'var(--hab,#34c77b)';
+        const idbTxt=s.quota?(fmtMem(s.idbBytes)+' · вільно ще '+fmtMem(Math.max(0,s.quota-s.idbBytes-s.lsBytes))):fmtMem(s.idbBytes);
+        el.innerHTML=
+          '<div class="acc-rsub">Швидка памʼять (дані): <b style="color:var(--text)">'+fmtMem(s.lsBytes)+'</b> з ~'+fmtMem(s.lsCap)+'</div>'
+          +'<div style="height:6px;border-radius:99px;background:var(--field);overflow:hidden;margin:6px 0 2px"><i style="display:block;height:100%;width:'+pct+'%;background:'+col+';border-radius:99px"></i></div>'
+          +'<div class="acc-rsub" style="margin-top:5px">Фото й книги (окремо): '+idbTxt+'</div>'
+          +(pct>=85?'<div class="acc-rsub" style="color:var(--owe,#ff5a5f);margin-top:4px">Майже повна — зроби експорт і почисти старі фото чи дані.</div>':'');
+      }catch(_){}
+    }
 
     function renderAccount(){
       const host=document.getElementById('accountCard'); if(!host) return;
@@ -154,8 +181,7 @@
         : `<span class="acc-chev">›</span>`;
       const loginExpand=(!loggedIn && !window.FLOW_NATIVE && !checking) ? `
         <div class="acc-expand" data-acc-login-expand hidden>
-          <button class="acc-mini tg" data-acc-tg>✈️ Telegram</button>
-          <button class="acc-mini gg" data-acc-google>🔵 Google</button>
+          <button class="acc-mini gg" data-acc-google>🔵 Увійти через Google</button>
         </div>` : '';
 
       const bkStats=(()=>{const s=window.flowBackup?window.flowBackup.stats():{keys:0,bytes:0};return s.keys+' записів · '+(s.bytes>1024?(s.bytes/1024).toFixed(0)+' КБ':s.bytes+' Б');})();
@@ -196,12 +222,21 @@
           <input type="file" accept="application/json,.json" data-acc-file style="display:none">
           <p class="acc-hint">Імпорт перезапише поточні дані (попередній стан зберігається автоматично).</p>
         </div>
+        <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
+          <div class="acc-rico">💾</div>
+          <div class="acc-rtext" style="flex:1;min-width:0">
+            <div class="acc-rtitle">Пам'ять пристрою</div>
+            <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
+          </div>
+        </div>
         <div class="acc-row" data-acc-settings-row>
           <div class="acc-rico">⚙️</div>
           <div class="acc-rtext"><div class="acc-rtitle">Всі налаштування</div></div>
           <span class="acc-chev">›</span>
         </div>
       </div>`;
+
+      try{ fillMemRow(host); }catch(_){}
 
       function toggle(sel){ const el=host.querySelector(sel); if(el) el.hidden=!el.hidden; }
 
@@ -226,9 +261,6 @@
       if(loginRow) loginRow.onclick=()=>{ if(!loggedIn) toggle('[data-acc-login-expand]'); };
       const outBtn=host.querySelector('[data-acc-out]');
       if(outBtn) outBtn.onclick=(e)=>{ e.stopPropagation(); if(window.sbSignOut) window.sbSignOut(); };
-      const tb=host.querySelector('[data-acc-tg]');
-      if(tb) tb.onclick=(e)=>{ e.stopPropagation(); const d=tgDiag();
-        flowAlert('Щоб увійти:\n\n1) Відкрий Frequency через Menu Button свого бота (BotFather → /setmenubutton), а не через посилання в браузері.\n2) initData зараз: '+(d.initLen||0)+' символів.\n\nЯкщо 0 — Telegram не передав акаунт. Перевір, що домен Mini App у BotFather збігається з хостингом.'); };
       const gb=host.querySelector('[data-acc-google]');
       if(gb) gb.onclick=async (e)=>{
         e.stopPropagation();

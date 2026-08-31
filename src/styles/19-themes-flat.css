@@ -1,0 +1,400 @@
+/* ════════ НОВІ НАБОРИ ТЕМ · ЗАГАЛЬНА ПРОПОЛКА ════════
+   Останній підключений стиль — тому тут не треба воювати за специфічність
+   із правилами, що живуть у 16-mx.css чи 13-planner.css: досить того самого
+   селектора з префіксом html.t-flat.
+
+   Два прапорці на <html> ставить applyTheme() у scripts/core/05-agency.js:
+     .t-flat   — активний один із нових наборів (desk / studio);
+     .t-light  — і при цьому він світлий.
+   Старі три теми (dark / black / light) сюди не потрапляють.
+
+   Правила для Огляду й Папок лишились у core/03-folders-projects.css —
+   вони писались першими, до появи цього файлу. Нове додається сюди. */
+
+/* ── кнопка «⋮» на картці папки ──
+   Мала темну підкладку під світлий значок: розрахована на темну картку.
+   На рівній світлій поверхні виходив білий значок на сірому кружку. */
+html.t-flat .fmenu{background:transparent;color:var(--muted);border:0;}
+html.t-flat .fmenu:active{background:var(--hair);}
+html.t-flat .fdrag-handle{color:var(--muted);}
+
+/* ── акцентні градієнти на рівний колір ──
+   У старій палітрі акцент був парою #6a7dff → #a06bff. У нових наборах
+   акцент один, тож градієнт замінюємо суцільним кольором теми. */
+html.t-flat #scr-planner .logo,
+html.t-flat #scr-planner .seg .on,
+html.t-flat #scr-planner .pl-seg .on,
+html.t-flat #scr-planner .go{background:var(--accent);color:var(--bg-2);}
+html.t-flat #scr-planner .f26w-rit{background:var(--card-2);border-color:var(--line);}
+
+/* ── бульбашка свого повідомлення у Флоу ── */
+html.t-flat .ai-msg.u{background:var(--accent);color:var(--bg-2);box-shadow:none;}
+
+/* ── тло сторінки без фонового сяйва ── */
+html.t-flat .phone{background-image:none;}
+
+/* ── стара акцентна пара #6a7dff → #a06bff ──
+   Автоматично зібрані місця, де акцент малювався фіолетовим градієнтом.
+   У нових наборах акцент один, тож замінюємо рівним var(--accent), а
+   фіолетові тіні під ним гасимо. Список згенеровано обходом усіх CSS,
+   тому нічого не пропущено — але кожен рядок звичайний і правиться руками. */
+html.t-flat .dia-ai-btn{background:var(--accent);background-image:none;}  /* 04-diary.css */
+html.t-flat #scr-page .pgsp-c.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 17-horizon.css */
+html.t-flat .coved-b.pri{background:var(--accent);background-image:none;}  /* 17-horizon.css */
+html.t-flat #scr-page .pg-es-qk button.pri{background:var(--accent);background-image:none;}  /* 17-horizon.css */
+html.t-flat .pgst-ins{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .bkp-b{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .stg-seg button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 02-page-editor.css */
+html.t-flat .stg-sw.on{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .pgsp-c.on{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .pgcal-d.sel{background:var(--accent);background-image:none;}  /* 02-page-editor.css */
+html.t-flat .fc2-deck .fc2-prog i{background:var(--accent);background-image:none;}  /* 03-folders-projects.css */
+html.t-flat .im-ok{background:var(--accent);background-image:none;}  /* 03-folders-projects.css */
+html.t-flat .pgsz-bar{background:var(--accent);background-image:none;}  /* 04-menus.css */
+html.t-flat .wt-btn.on{background:var(--accent);background-image:none;}  /* 05-values-wishes.css */
+html.t-flat .pth-seg button.on{background:var(--accent);background-image:none;}  /* 06-goals.css */
+html.t-flat .gtab.on{background:var(--accent);background-image:none;}  /* 06-goals.css */
+html.t-flat .nav #navAI .ni{background:var(--accent);background-image:none;box-shadow:none;}  /* 07-finance.css */
+html.t-flat .sw-story.on .ring{background:var(--accent);background-image:none;}  /* 09-board-canvas.css */
+html.t-flat #mobileDock .dk-plus{background:var(--accent);background-image:none;}  /* 09-board-canvas.css */
+html.t-flat .ash-tabs button.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
+html.t-flat .ash-style-sw button.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
+html.t-flat .ash-toggle.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
+html.t-flat .fab{background:var(--accent);background-image:none;box-shadow:none;}  /* 10-reader-blocks.css */
+html.t-flat .dsb-logo{background:var(--accent);background-image:none;box-shadow:none;}  /* 11-spaces-desktop.css */
+html.t-flat .dpr-av{background:var(--accent);background-image:none;}  /* 11-spaces-desktop.css */
+html.t-flat #flowSpot .fs-msg.u{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat #flowSpot .fs-send{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-cd.on{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-sheet-ok{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-seg button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-toplvl button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-fbtn{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-icst-b.on{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .pl-addblock{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .mh-mode-seg button.on{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-startbtn{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-actions .pri{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-load .orb{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .ai-orb::before{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+html.t-flat .acc-av{background:var(--accent);background-image:none;box-shadow:none;}  /* 12-pets-more-planner.css */
+html.t-flat .acc-head .acc-av{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
+
+/* ── --accent2 ──
+   Змінна використовується у 9 місцях, але НІДЕ не оголошена: усюди мовчки
+   спрацьовував запасний #c4a8ff (світло-бузковий під темний фон). На світлій
+   темі це давало контраст 1.9 — текст майже зникав. У нових наборах акцент
+   один, тож другий акцент дорівнює основному. */
+html.t-flat{--accent2:var(--accent);}
+
+/* ── чип фінансової грамотності ──
+   Жовтий #f0b429 читався на темному, на світлому — ні. --bt-fin у світлих
+   наборах уже приглушений до охри. */
+html.t-flat .fuz-lit{color:var(--bt-fin);background:color-mix(in srgb,var(--bt-fin) 12%,transparent);}
+
+/* ── кнопки в шапці Огляду ──
+   16-mx.css освітлює їх під темну фото-шапку (color:#efedf7). У нових
+   наборах шапка світла, тож беремо звичайний колір іконок теми. */
+html.t-flat #scr-home .top .icon-btn{background:var(--card-2);border:1px solid var(--line);}
+html.t-flat #scr-home .top .icon-btn svg{color:var(--ico);}
+
+/* ── сітка вибору іконки папки ──
+   Живе в тому ж аркуші налаштувань папки, що й вибір ролі та розкладки.
+   Не під t-flat: іконку можна обрати і в старих темах — там її просто не
+   видно на картці, але вибір зберігається й проявиться при перемиканні. */
+.fic-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;padding:2px 10px 10px;}
+.fic-opt{display:grid;place-items:center;aspect-ratio:1;border-radius:11px;cursor:pointer;
+  border:1px solid var(--line);background:var(--field);color:var(--muted);
+  transition:transform .12s,border-color .15s,color .15s;}
+.fic-opt .ico{width:19px;height:19px;}
+.fic-opt:active{transform:scale(.92);}
+.fic-opt.on{border-color:var(--c,var(--accent));color:var(--c,var(--accent));
+  background:color-mix(in srgb,var(--c,#6a7dff) 14%,transparent);}
+@media (max-width:420px){ .fic-grid{grid-template-columns:repeat(6,1fr);} }
+/* У меню папки іконка стоїть у рядку з написом. Базовий .ico має
+   display:block — у кнопці це відкидало текст на новий рядок. */
+.fmi .ico.fmi-ic{width:18px;height:18px;display:inline-block;vertical-align:-4px;
+  flex:none;color:var(--muted);}
+
+/* ── екран «Гроші · Fusion» (styles/02-income-cards.css) ──
+   Той файл написаний суцільними темними хексами: #12151f поверхня,
+   #1e2230 рамка, #8b93a3 текст. У світлих наборах екран лишався
+   темним островом. Нижче — ті самі правила з підставленими токенами.
+   Згенеровано з оригіналу, тому нічого не пропущено; сам оригінал
+   не чіпали — старі теми беруть його як є. */
+html.t-flat .incx-hero{background:linear-gradient(160deg,var(--card-2),#0e1017);}
+html.t-flat .incx-hero .l{color:var(--muted);}
+html.t-flat .incx-hero .v small{color:var(--muted);}
+html.t-flat .incx-styles button{border:1px solid var(--line);color:var(--muted);}
+html.t-flat .incx-styles button.on{color:var(--text);}
+html.t-flat .incx-addc{border:1.5px dashed var(--hair-2);color:var(--muted);}
+html.t-flat .incx-rail.v3 .incx-card{border:1px solid var(--line);}
+html.t-flat .incx-acts button{border:1px solid var(--line);background:var(--card-2);color:var(--text);}
+html.t-flat .incx-exp{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--bt-fin);}
+html.t-flat .incx-exp small{color:var(--muted);}
+html.t-flat .incx-src{background:var(--card);border:1px solid var(--line);}
+html.t-flat .fuz-lab{color:var(--muted);}
+html.t-flat .fuz-total small{color:var(--muted);}
+html.t-flat .fuz-lit{border:1px solid var(--line);background:var(--card-2);color:var(--bt-fin);}
+html.t-flat .fuz-all{border:1.5px dashed var(--hair-2);color:var(--muted);}
+html.t-flat .fuz-sec{color:var(--muted);}
+html.t-flat .fuz-b{background:var(--card);border:1px solid var(--line);}
+html.t-flat .fuz-b s{color:var(--muted);}
+html.t-flat .fuz-bars i.o{background:var(--owe);}
+html.t-flat .fuz-dots i{background:var(--hair-2);}
+html.t-flat .fuz-dots i.on{background:var(--text);}
+html.t-flat .fuz-sub{color:var(--muted);}
+html.t-flat .lit-next .bar i{background:var(--bt-fin);}
+html.t-flat .lit-next small{color:var(--muted);}
+html.t-flat .lit-chips .chip{background:var(--card-2);border:1px solid var(--line);}
+html.t-flat .lit-act{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--bt-fin);}
+html.t-flat .lit-act small{color:var(--muted);}
+html.t-flat .lit-act button{border:1px solid var(--hair-2);color:var(--text);}
+html.t-flat .lit-hist{background:var(--card);border:1px solid var(--line);}
+html.t-flat .lit-hist .bw i{background:var(--bt-fin);}
+html.t-flat .lit-hist s{color:var(--muted);}
+html.t-flat .ana-chart{background:var(--card);border:1px solid var(--line);}
+html.t-flat .ana-col .bars i.bout{background:var(--owe);}
+html.t-flat .ana-col s{color:var(--muted);}
+html.t-flat .ana-leg{color:var(--muted);}
+html.t-flat .ana-leg .bout{background:var(--owe);}
+html.t-flat .ana-row{background:var(--card);border:1px solid var(--line);}
+html.t-flat .ana-dn{color:var(--owe);}
+html.t-flat .lit-hero{border:1px solid var(--line);}
+html.t-flat .lit-sub{color:var(--muted);}
+html.t-flat .lit-part{background:var(--card);border:1px solid var(--line);}
+html.t-flat .lit-part .bar i{background:var(--bt-fin);}
+html.t-flat .lit-part small{color:var(--muted);}
+html.t-flat .lit-lesson{background:var(--card);border:1px solid var(--line);}
+html.t-flat .lit-lesson .ck{border:1.5px solid var(--hair-2);}
+html.t-flat .lit-lesson small{color:var(--muted);}
+
+/* ── кольорові акценти на світлому тлі ──
+   Числа й підписи фарбуються кольором сутності (--c / --bc / --ec), який
+   приходить із даних. Ці кольори добиралися під темне тло і на світлому
+   дають контраст близько 1.7–2. Не міняємо колір — притемнюємо його,
+   підмішуючи колір тексту: картки лишаються різними, але читаються.
+   Діє лише у світлих наборах: на темних вихідний колір правильний. */
+html.t-light .ph .ey b{color:color-mix(in srgb,var(--c,var(--fin)) 55%,var(--text));}
+html.t-light .bcard .v{color:color-mix(in srgb,var(--bc,var(--accent)) 55%,var(--text));}
+html.t-light .env2 .e2pct{color:color-mix(in srgb,var(--ec,var(--accent)) 55%,var(--text));}
+/* .wk-stat .v колір ставить JS прямо в style="" — перебити можна лише так.
+   Виняток свідомий і обмежений одним селектором. */
+html.t-light .wk-stat .v{color:var(--text)!important;}
+
+/* ── екран «Робота» ── */
+html.t-flat .wk-toggles button.on{background:var(--sel);border-color:var(--accent);color:var(--accent);}
+html.t-flat .wkcal-d.today{outline-color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 10%,transparent);}
+html.t-light .wkcal-d.today .dn{color:color-mix(in srgb,var(--owe) 70%,var(--text));}
+
+/* ── плитки статистики Простору ──
+   Темне напівпрозоре скло під світлим фоном читалось сірою плямою. */
+html.t-flat .sdash-st{background:var(--card-2);border:1px solid var(--line);box-shadow:none;}
+html.t-flat .sdash-st b{color:var(--text);}
+
+/* ── календар ритуалу (шар fd26t) ── */
+html.t-light .rit-cal .cd.today s{color:color-mix(in srgb,var(--fin) 65%,var(--text));}
+
+/* ── доробка після автозаміни ──
+   Генератор вище підставляє токени лише замість кольорів, які є в мапі.
+   Там, де в одному значенні їх кілька (градієнт із двох хексів), лишався
+   «хвіст» — напр. linear-gradient(160deg,var(--card-2),#0e1017) тримав
+   панель балансу майже чорною. Тут ці місця дописані повністю. */
+html.t-flat .incx-hero{background:var(--card);border-color:var(--line);}
+html.t-flat .incx-hero::before{display:none;}
+html.t-flat .incx-hero .v{color:var(--text);}
+html.t-flat .incx-hero .v .cur2{color:var(--muted);}
+html.t-flat .incx-styles button{background:var(--field);}
+html.t-flat .incx-styles button.on{background:var(--sel);color:var(--accent);border-color:var(--accent);}
+
+/* ── лічильник-бейдж на екрані «Ще» ──
+   JS ставить inline і фон, і текст одного відтінку (бірюзовий на бірюзовому
+   з прозорістю). На темному тлі підкладка темніє й контраст є; на світлому
+   вона майже біла, а цифра лишається блідою. Колір підкладки зберігаємо —
+   він кодує розділ — а цифру робимо текстовою. !important тут єдиний спосіб
+   перебити inline-стиль. */
+html.t-light .mh-row .mh-pill{color:var(--text)!important;}
+
+/* ═══ БАНЕР ОГЛЯДУ З ФОТО (.summary.has-wish) ═══
+   Коли в Карті бажань є знімки, вони стають тлом картки. Рівні правила
+   нових наборів (темний текст, суцільна поверхня) для цього випадку не
+   годяться: на фото потрібен світлий текст і скляні підкладки. Тому все,
+   що вище зроблено «пласким», тут повертається — але тільки під .has-wish.
+   Без фото картка лишається рівною і світлою. */
+
+/* текст на фото — світлий із тінню (перекриває пласкі правила вище) */
+html.t-flat #scr-home .summary.has-wish .big,
+html.t-flat #scr-home .summary.has-wish .nyc-title,
+html.t-flat #scr-home .summary.has-wish .nyc-cell{color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.55);}
+html.t-flat #scr-home .summary.has-wish .label,
+html.t-flat #scr-home .summary.has-wish .hint,
+html.t-flat #scr-home .summary.has-wish .big small,
+html.t-flat #scr-home .summary.has-wish .nyc-cell span{color:rgba(255,255,255,.82);
+  text-shadow:0 1px 8px rgba(0,0,0,.5);}
+html.t-flat #scr-home .summary.has-wish{background:transparent;border-color:transparent;}
+
+/* індикатор слайдів ──
+   Був смугами «як у сторіз»: flex:1 розтягував їх на всю ширину картки, і
+   через увесь банер лягала біла лінія — найпомітніша річ на екрані. Тепер це
+   маленькі крапки по центру; активна витягується в пігулку й наливається
+   білим, тож видно і котрий слайд, і скільки лишилось. */
+html.t-flat #scr-home .summary .wishdots{justify-content:center;gap:5px;margin:0 0 10px;}
+html.t-flat #scr-home .summary .wishdots i{flex:none;width:5px;height:5px;border-radius:99px;
+  background:rgba(255,255,255,.34);transition:width .32s var(--ease-out,ease);}
+html.t-flat #scr-home .summary .wishdots i.done{background:rgba(255,255,255,.5);}
+html.t-flat #scr-home .summary .wishdots i.now{width:20px;background:rgba(255,255,255,.26);}
+html.t-flat #scr-home .summary .wishdots i b{border-radius:99px;}
+html.t-flat #scr-home .summary .wishdots i.done b{width:0;}
+
+/* нижня панель: скло, крізь яке видно фото */
+html.t-flat #scr-home .summary.has-wish .herocap{background:rgba(12,14,18,.42);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+  border-top:1px solid rgba(255,255,255,.16);}
+html.t-flat #scr-home .summary.has-wish .hc-tab,
+html.t-flat #scr-home .summary.has-wish .hc-tab.wish,
+html.t-flat #scr-home .summary.has-wish .hc-tab.diary{color:#fff;}
+html.t-flat #scr-home .summary.has-wish .hc-tab+.hc-tab{border-left:1px solid rgba(255,255,255,.16);}
+
+/* значок 🎯 у кутку картки — прибираємо, він лише заважає */
+#scr-home #wishFlink{display:none;}
+
+/* лічильник до Нового року — третій поверх картки, те саме скло */
+/* Нижнього padding у картки немає (112px 18px 0), тож від'ємний margin-bottom
+   виштовхував лічильник за край, а overflow:hidden його зрізав. */
+html.t-flat #scr-home .summary .nyc{margin:0 -18px;padding:10px 18px;
+  border-top:1px solid var(--line);border-radius:0 0 26px 26px;background:var(--card-2);}
+html.t-flat #scr-home .summary.has-wish .nyc{background:rgba(12,14,18,.42);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+  border-top:1px solid rgba(255,255,255,.14);}
+html.t-flat #scr-home .summary .herocap{border-radius:0;}
+
+/* ═══ ФОТО ПАПКИ НА ВСЮ КАРТКУ ═══
+   У сітці фото було обрізане смугою 58px зверху — «половинка». Тепер воно
+   заповнює плитку, а назву тримає читабельною градієнт знизу. */
+html.t-flat .fc2-tile .fc2-bg{inset:0;height:auto;}
+html.t-flat .fc2-tile:not(.nocover) .fc2-veil{background:linear-gradient(transparent 38%,rgba(6,8,12,.82));}
+html.t-flat .fc2-tile:not(.nocover) .fc2-name{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);}
+html.t-flat .fc2-tile:not(.nocover) .fstat{color:rgba(255,255,255,.85);}
+html.t-flat .fc2-tile:not(.nocover) .fstat b{color:#fff;}
+html.t-flat .fc2:not(.nocover) .fc2-em{background:rgba(10,12,16,.42);border-color:rgba(255,255,255,.22);
+  color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+html.t-flat .fc2:not(.nocover) .fmenu{color:#fff;}
+/* .summary — flex із порядком через order; лічильник має бути останнім
+   поверхом, під панеллю кнопок. */
+#scr-home .summary>.nyc{order:6;}
+
+/* ── нижній блок картки: панель кнопок + лічильник як одне скло ──
+   Раніше вони мали різну підкладку й читались як дві окремі смуги, до того
+   ж лічильник узагалі лежав під карткою. Тепер це один суцільний «підвал»
+   із заокругленням лише знизу; фото просвічує крізь обидва поверхи. */
+html.t-flat #scr-home .summary.has-wish .herocap,
+html.t-flat #scr-home .summary.has-wish .nyc{
+  background:rgba(10,12,16,.16);
+  -webkit-backdrop-filter:blur(6px) saturate(160%);backdrop-filter:blur(6px) saturate(160%);}
+/* на майже прозорому склі текст тримається тінню, а не заливкою */
+html.t-flat #scr-home .summary.has-wish .herocap .hc-tab b,
+html.t-flat #scr-home .summary.has-wish .nyc-title,
+html.t-flat #scr-home .summary.has-wish .nyc-cell{text-shadow:0 1px 8px rgba(0,0,0,.6);}
+html.t-flat #scr-home .summary.has-wish .herocap{border-top:1px solid rgba(255,255,255,.18);border-radius:0;}
+html.t-flat #scr-home .summary.has-wish .nyc{border-top:1px solid rgba(255,255,255,.10);
+  border-radius:0 0 26px 26px;}
+/* підписи лічильника трохи яскравіші — на склі поверх фото вони губились */
+html.t-flat #scr-home .summary.has-wish .nyc-cell span{color:rgba(255,255,255,.9);}
+html.t-flat #scr-home .summary.has-wish .nyc-title{color:#fff;}
+
+/* затемнення поверх фото ──
+   Рівна вуаль на весь знімок глушила його цілком. Натомість два локальні
+   градієнти: діагональний зліва — рівно під текстовим стовпчиком (заголовок,
+   відсоток, підказка), і вузький знизу — під скляним підвалом. Права
+   половина знімка лишається практично чистою, тому фото видно, а текст
+   усе одно читається. */
+html.t-flat #scr-home .summary.has-wish .wishbg-ov{
+  background:
+    linear-gradient(101deg,rgba(6,8,12,.62) 0%,rgba(6,8,12,.42) 26%,rgba(6,8,12,.14) 52%,rgba(6,8,12,0) 74%),
+    linear-gradient(180deg,rgba(6,8,12,.34) 0%,rgba(6,8,12,0) 22%,rgba(6,8,12,0) 66%,rgba(6,8,12,.14) 100%);}
+
+/* ── шапка Огляду, коли під нею фото ──
+   Шапка лежить поверх банера, тож її колір залежить не від теми, а від того,
+   чи стоїть у Карті бажань знімок. Клас .top-photobleed для цього не годиться —
+   JS вішає його завжди, і з фото, і без. Тому питаємо саму картку через :has().
+   Порядок правил важливий: це має йти після пласких правил шапки вище. */
+html.t-flat #scr-home:has(.summary.has-wish) .top .brand h1{color:#fff;
+  text-shadow:0 2px 14px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.45);}
+html.t-flat #scr-home:has(.summary.has-wish) .top .brand span,
+html.t-flat #scr-home:has(.summary.has-wish) .top .brand small{color:rgba(255,255,255,.82);
+  text-shadow:0 1px 8px rgba(0,0,0,.5);}
+html.t-flat #scr-home:has(.summary.has-wish) .top .icon-btn{background:rgba(16,18,24,.34);
+  border:1px solid rgba(255,255,255,.2);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}
+html.t-flat #scr-home:has(.summary.has-wish) .top .icon-btn svg{color:#fff;}
+html.t-flat #scr-home:has(.summary.has-wish) .top .logo.lg-glass{background:rgba(16,18,24,.34);
+  border:1px solid rgba(255,255,255,.2);}
+
+/* смуга прогресу місяця на фото — друга суцільна лінія через увесь банер.
+   Робимо підкладку майже невидимою, лишаючи помітною тільки заповнену частину. */
+html.t-flat #scr-home .summary.has-wish .bar{background:rgba(255,255,255,.16);height:3px;}
+html.t-flat #scr-home .summary.has-wish .bar i{background:#fff;}
+
+/* ═══════════════════════════════════════════════════════════════════
+   БАНЕР ОГЛЯДУ · варіант «Тихий»
+   Порядок елементів у картці задає flex-order (розмітку не чіпаємо).
+   Згори — назва, далі порожнеча, унизу велике тонке число з підписом,
+   потім крапки праворуч і скляний підвал.
+   Manrope має ваги 400–800, тож найтонше доступне накреслення — 400.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Назва замість логотипа. У розмітці це .wishlink — він був position:absolute
+   у правому верхньому куті («Карта бажань ›») і ховався, щойно з'являлось
+   фото. Повертаємо його в потік, інакше flex-order на нього не діє і напис
+   лягає просто поверх числа. Власний текст ставимо через ::before, щоб не
+   чіпати розмітку й стрілку з вихідного рядка. */
+html.t-flat #scr-home .summary .wishlink,
+html.t-flat #scr-home .summary.has-wish .wishlink{display:block;order:0;
+  position:static;z-index:2;margin:0 0 auto;font-size:0;color:#fff;
+  text-shadow:0 1px 12px rgba(0,0,0,.5);}
+html.t-flat #scr-home .summary .wishlink::before{content:"Карта бажань";
+  font-family:'Caveat',cursive;font-size:29px;font-weight:700;letter-spacing:.01em;
+  text-transform:none;line-height:1;}
+html.t-flat #scr-home .summary:not(.has-wish) .wishlink{color:var(--text);text-shadow:none;}
+/* число притискаємо до низу текстового блоку — між назвою і ним усе повітря */
+html.t-flat #scr-home .summary>.big{margin-top:auto;}
+/* коли назва пішла з шапки, кнопки мають лишитись праворуч, а не з'їхати вліво */
+@media (min-width:1024px){
+  html.t-flat #scr-home .top{justify-content:flex-end;}
+}
+
+/* число — велике й тонке, притиснуте до низу текстового блоку */
+html.t-flat #scr-home .summary>.big{order:2;font-weight:400;font-size:52px;letter-spacing:-.04em;
+  line-height:1;margin:0;}
+html.t-flat #scr-home .summary>.big small{font-size:19px;font-weight:400;}
+/* підпис ПІД числом (у вихідній розмітці він стоїть над ним) */
+html.t-flat #scr-home .summary>.label{order:3;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;margin-top:7px;}
+html.t-flat #scr-home .summary>.hint{order:4;font-size:11.5px;margin-top:4px;}
+html.t-flat #scr-home .summary>.bar{order:5;max-width:300px;margin:11px 0 0;}
+/* крапки — унизу праворуч, щоб не ділили кадр навпіл */
+html.t-flat #scr-home .summary>.wishdots{order:6;justify-content:flex-end;
+  margin:12px 0 9px;padding:0;}
+html.t-flat #scr-home .summary>.herocap{order:7;}
+html.t-flat #scr-home .summary>.nyc{order:8;}
+
+/* Верх картки. Шапка (.top-photobleed) тягне банер угору на 84px, щоб
+   сидіти на фото — але так заокруглені кути опинялись ЗА краєм екрана і
+   верх виглядав обрубаним. Послаблюємо натяг: шапка так само лежить на
+   знімку, а кути видно. Внутрішній відступ зменшено на ту ж величину,
+   щоб число не з'їхало вниз. */
+html.t-flat #scr-home .summary{border-radius:26px;}
+html.t-flat #scr-home .top.top-photobleed{margin-bottom:-38px;}
+html.t-flat #scr-home .summary{padding-top:72px;}
+
+/* на широкому екрані назва застосунку вже стоїть у сайдбарі — у шапці
+   Огляду вона лише дублювалась і сперечалася з назвою на банері */
+@media (min-width:1024px){
+  html.t-flat #scr-home .top .brand{display:none;}
+}
+
+/* ═══ ПАПКИ: без кольорової смужки ═══
+   Риска згори плитки дублювала те, що й так видно з іконки та назви. */
+html.t-flat .fc2-tile.nocover::before{display:none;}
+html.t-flat .fc2-deck.nocover::before{display:none;}

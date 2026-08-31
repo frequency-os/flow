@@ -13,7 +13,9 @@
       const p=String(ymd).split('-').map(Number);
       const d=new Date(p[0],p[1]-1,p[2]);
       const months=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
-      return d.getDate()+' '+months[d.getMonth()];
+      // рік показуємо лише для записів не цьогорічних — інакше «5 січня» з різних років не розрізнити
+      const cy=new Date().getFullYear();
+      return d.getDate()+' '+months[d.getMonth()]+(p[0]!==cy ? ' '+p[0] : '');
     }catch(_){ return ymd; }
   }
   // 'YYYY-MM-DD' для дня зі зсувом off від сьогодні (не залежить від хелперів інших модулів)

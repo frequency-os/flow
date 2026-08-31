@@ -160,7 +160,7 @@
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
     try{ renderProjRail(); }catch(_){}
-    try{ window.FLOW_BUILD='2026-07-29-folders-v2.4'; console.log('[Flow] build', window.FLOW_BUILD); }catch(_){}
+    try{ if(!window.FLOW_BUILD){ window.FLOW_BUILD='2026-07-29-folders-v2.4'; console.log('[Flow] build', window.FLOW_BUILD); } }catch(_){}
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag');
@@ -188,7 +188,7 @@
       } else if(f.role==='page'){
         metaHtml=`<div class="fstat">📄 сторінка</div>`;
       } else {
-        metaHtml=`<div class="fstat"><b>${active}</b> активних${f.pct?` · ${f.pct}%`:''}</div>`;
+        metaHtml=`<div class="fstat"><b>${active}</b> ${pluralUk(active,'активний','активні','активних')}${f.pct?` · ${f.pct}%`:''}</div>`;
       }
       // ── v2: єдина розмітка, режим вирішує лише клас-обгортку ──
       const modeClass = homeFolderView==='grid' ? 'fc2-tile'
@@ -205,11 +205,15 @@
       if(f.photo){
         const pp=f.photoPos;
         const xf=pp?`transform:translate(${pp.x}%,${pp.y}%) scale(${pp.scale});`:'';
-        inner+=`<div class="fc2-bg" style="background-image:url('${safeImg(f.photo)}');${xf}"></div>`;
+        inner+=`<div class="fc2-bg" style="background-image:url('${safeImg(window.photoSrc(f.photo))}');${xf}"></div>`;
       }
       else { el.classList.add('nocover'); }
       inner+=`<div class="fc2-veil"></div>`+pinDot+subBadge;
-      inner+=`<div class="fc2-em">${emojiShow}</div>`;
+      // Емодзі й іконка малюються обидва, показує CSS лише одне: у старих
+      // темах — емодзі, у нових (desk-*/studio-*) — лінійну іконку. Так
+      // перемикання теми міняє вигляд миттєво, без перемальовування списку.
+      inner+=`<div class="fc2-em"><span class="fc2-emj">${emojiShow}</span>`+
+             `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${folderIcon(f)}"/></svg></div>`;
       if(homeFolderView==='deck'){
         let dpct=0;
         if(f.role==='project'){ const pr=folderProgress(k); dpct=pr.total?pr.pct:0; }
@@ -281,8 +285,9 @@
         const used=order.length;
         const nm = name || ('Папка '+(used+1));
         const key='f_'+Date.now();
+        const em=(emojiVal!==undefined?emojiVal:FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]);
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
-          emoji:(emojiVal!==undefined?emojiVal:FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]),
+          emoji:em, icon:folderIconFor(em),
           name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
         order.push(key);
         saveFolders(); renderDashboard();
@@ -298,8 +303,9 @@
         // контекст: якщо активна дошка належить папці — робимо проєкт її дочірньою папкою
         let parent='';
         try{ const base=String(boardKey||'').split('__sp_')[0]; if(base && base!=='__root__' && base!=='all' && folders[base]) parent=base; }catch(_){}
+        const em=(emojiVal!==undefined&&emojiVal!==''?emojiVal:'🚀');
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
-          emoji:(emojiVal!==undefined&&emojiVal!==''?emojiVal:'🚀'),
+          emoji:em, icon:folderIconFor(em),
           name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[],
           parent, role:'project', status:'active', due:'' };
         order.push(key);
@@ -411,6 +417,7 @@
       <button class="fmi" data-act="rename">✏️ Перейменувати</button>
       <button class="fmi" data-act="move">📂 ${f.parent?'Перемістити / на головну':'Перемістити в папку'}</button>
       <button class="fmi" data-act="color">🎨 Змінити колір</button>
+      <button class="fmi" data-act="icon"><svg class="ico fmi-ic" aria-hidden="true"><use href="#${folderIcon(f)}"/></svg> Іконка${f.iconSet?'':' · за емодзі'}</button>
       <button class="fmi" data-act="emoji">😀 Змінити емодзі</button>
       ${f.custom?`<button class="fmi danger" data-act="delete">🗑️ Видалити папку</button>`:''}
     </div>`;
@@ -432,6 +439,44 @@
     });
   }
   function closeFolderMenu(){ const e=document.getElementById('fmenuSheet'); if(e) e.remove(); }
+
+  /* ── вибір іконки папки вручну ──
+     Доти іконка виводилась з емодзі автоматично. Тут її можна задати самому;
+     обраний вручну варіант позначається прапорцем iconSet, і відтоді зміна
+     емодзі його вже не перезаписує — інакше вибір мовчки губився б.
+     Кнопка «За емодзі» повертає автоматичний режим. */
+  function openFolderIconPicker(key){
+    const f=folders[key]; if(!f) return;
+    closeFolderMenu();
+    const cur=folderIcon(f);
+    const m=document.createElement('div');
+    m.className='fmenu-sheet'; m.id='fmenuSheet';
+    m.innerHTML=`<div class="fmenu-in">
+      <div class="fmenu-grip"></div>
+      <div class="fmenu-title">Іконка · ${esc(f.name)}</div>
+      <div class="fic-grid">
+        ${ICON_ALL.map(([id,nm])=>`<button class="fic-opt ${cur===id?'on':''}" data-fic="${id}" title="${nm}" aria-label="${nm}" style="--c:${f.c||'var(--accent)'}">
+          <svg class="ico" aria-hidden="true"><use href="#${id}"/></svg></button>`).join('')}
+      </div>
+      <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+f.emoji+')':''}</button>
+      <button class="fmi" data-ficback="1">‹ Назад до налаштувань</button>
+    </div>`;
+    m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
+    document.body.appendChild(m);
+    m.querySelectorAll('[data-fic]').forEach(b=>b.onclick=()=>{
+      f.icon=b.dataset.fic; f.iconSet=1;
+      saveFolders(); renderDashboard(); closeFolderMenu();
+      try{ window.platform.haptic('select'); }catch(_){}
+    });
+    const auto=m.querySelector('[data-ficauto]');
+    if(auto) auto.onclick=()=>{
+      f.icon=folderIconFor(f.emoji); f.iconSet=0;
+      saveFolders(); renderDashboard(); closeFolderMenu();
+      try{ window.platform.haptic('select'); }catch(_){}
+    };
+    const back=m.querySelector('[data-ficback]');
+    if(back) back.onclick=()=>openFolderMenu(key);
+  }
 
   function openFolderMovePicker(key){
     const f=folders[key]; if(!f) return;
@@ -457,17 +502,21 @@
     if(act==='cropphoto'){
       closeFolderMenu();
       if(!f.photo) return;
-      openPhotoCropEditor({ img:f.photo, pos:f.photoPos, title:'Кадрувати «'+f.name+'»',
+      openPhotoCropEditor({ img:window.photoSrc(f.photo), pos:f.photoPos, title:'Кадрувати «'+f.name+'»',
         onSave:(pos)=>{ f.photoPos=pos; saveFolders(); renderDashboard(); } });
       return;
     }
-    if(act==='rmphoto'){ f.photo=''; f.photoPos=null; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
+    if(act==='rmphoto'){ const prev=f.photo; f.photo=''; f.photoPos=null;
+      window.photoDel(prev); saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='secret'){ if(!vaultOpen) return; f.secret=!f.secret; saveFolders(); renderDashboard(); closeFolderMenu(); try{ window.platform.haptic('select'); }catch(_){} return; }
     if(act==='pin'){ f.pinned=!f.pinned; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='rename'){ closeFolderMenu(); inputModal({title:'Перейменувати папку',value:f.name,placeholder:'Назва папки',onOk:(v)=>{ if(v){f.name=v;saveFolders();renderDashboard();} }}); return; }
     if(act==='move'){ closeFolderMenu(); openFolderMovePicker(key); return; }
     if(act==='color'){ cycleFolderColor(key); saveFolders(); renderDashboard(); openFolderMenu(key); return; }
-    if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; saveFolders(); renderDashboard(); }}); return; }
+    if(act==='icon'){ openFolderIconPicker(key); return; }
+    // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
+    // губився б мовчки. Автоматичну — переобираємо під нове емодзі.
+    if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; if(!f.iconSet) f.icon=folderIconFor(v); saveFolders(); renderDashboard(); }}); return; }
     if(act==='delete'){ confirmSheet({title:'Видалити папку «'+f.name+'»?', onOk:()=>{ const par=f.parent||''; Object.keys(folders).forEach(ck=>{ if(folders[ck]&&(folders[ck].parent||'')===key) folders[ck].parent=par; }); delete folders[key]; order=order.filter(x=>x!==key); saveFolders(); renderDashboard(); closeFolderMenu(); }}); return; }
   }
   function cycleFolderColor(key){
@@ -484,14 +533,20 @@
       reader.onload=()=>{
         const img=new Image();
         img.onload=()=>{
-          // downscale to max 900px wide, store compact JPEG
-          const maxW=900; const scale=Math.min(1,maxW/img.width);
+          // 1400px / 0.82 (30.08.2026): 900px на Retina розтягувалось удвічі.
+          const maxW=1400; const scale=Math.min(1,maxW/img.width);
           const cv=document.createElement('canvas');
           cv.width=Math.round(img.width*scale); cv.height=Math.round(img.height*scale);
           cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-          try{ folders[key].photo=cv.toDataURL('image/jpeg',0.72); }catch(_){ folders[key].photo=reader.result; }
+          let du; try{ du=cv.toDataURL('image/jpeg',0.82); }catch(_){ du=reader.result; }
           folders[key].photoPos=null;
-          saveFolders(); renderDashboard(); closeFolderMenu();
+          // старий знімок цієї папки більше не потрібен
+          const prev=folders[key].photo;
+          Promise.resolve(window.photoPut('ph_'+key, du)).then(ref=>{
+            folders[key].photo=ref;
+            if(prev && prev!==ref) window.photoDel(prev);
+            saveFolders(); renderDashboard(); closeFolderMenu();
+          });
         };
         img.onerror=()=>{ folders[key].photo=reader.result; saveFolders(); renderDashboard(); closeFolderMenu(); };
         img.src=reader.result;

@@ -480,6 +480,7 @@
   // ── ініціалізація обробників читалки (один раз) ──
   function initReader(){
     const sc=document.getElementById('rdrScroll'); if(!sc||sc.__init) return; sc.__init=true;
+    loadRdrCfg();   // підтягти збережені налаштування читалки (тема/шрифт/розмір) — раніше не викликалось, тож вони не переживали перезапуск
     sc.addEventListener('scroll', ()=>{ requestAnimationFrame(updateRdrProgressUI); }, {passive:true});
 
     document.getElementById('rdrBack').onclick=()=>{

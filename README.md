@@ -54,7 +54,7 @@ cd ~/frequency && ./tools/check.sh
 | `dist/index.html` | **Готова програма.** Створюється збіркою |
 | `original/index11.html` | Недоторканий еталон «як було до розбору» |
 | `tools/` | Скрипти збірки та перевірки |
-| `CODEMAP.md` | Карта коду (де яка система живе) |
+| `CODEMAP.md` | Карта коду: де яка функція живе. Створює `npm run map`, руками не правити |
 
 ### Маркери в каркасі
 
@@ -103,7 +103,6 @@ cd ~/frequency && ./tools/check.sh
 | Що | Було | Стало |
 |---|---|---|
 | Шрифти Manrope / Lora / Caveat | Google Fonts | вшиті в `src/styles/00-fonts.css` |
-| Telegram Web App SDK | `telegram.org` | локальна копія `src/scripts/00-telegram-sdk.js` |
 | JSZip (EPUB) · pdf.js (PDF) · Supabase (вхід) | CDN | `src/vendor/` → `dist/vendor/`, CDN лишився запасним |
 
 Інтернет потрібен лише для того, що без нього не має сенсу: курси валют,
@@ -112,7 +111,6 @@ cd ~/frequency && ./tools/check.sh
 ### Оновити вбудоване
 
 ```bash
-./tools/update-telegram-sdk.sh   # Telegram SDK
 python3 tools/build-fonts.py     # шрифти
 ./tools/build-vendor.sh          # JSZip / pdf.js / Supabase
 python3 tools/build.py           # і завжди зібрати після

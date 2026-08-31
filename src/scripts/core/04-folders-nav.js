@@ -1,6 +1,6 @@
   /* ============ FOLDER / NAV DATA ============ */
   let folders = {
-    work: { key:'work', c:'#6a7dff', emoji:'💼', name:'Робота', pct:0, photo:'', flayout:'a', pinned:false,
+    work: { key:'work', c:'#6a7dff', emoji:'💼', icon:'fo-briefcase', name:'Робота', pct:0, photo:'', flayout:'a', pinned:false,
       widgets:[ { id:'worktrack', emoji:'⏱', t:'Години та заробіток', d:'Календар змін + зарплата', ready:true } ]},
   };
   let order = ['work'];
@@ -13,6 +13,72 @@
   const FKEY='folders_cfg', FOKEY='folders_order';
   const FOLDER_COLORS=['#e8843c','#34c77b','#5b8def','#c77dff','#ff6b9d','#4ecdc4','#f0b429','#9b8cff','#ff5a5f','#2dd4bf'];
   const FOLDER_EMOJIS=['📁','💰','🏃','⭐','📚','🎯','💡','❤️','🏠','✈️','🍎','💪','🧠','🎨','🎵','📈'];
+  /* ── лінійні іконки папок (нові теми) ──
+     Той самий порядок, що й у FOLDER_EMOJIS: нова папка отримує пару
+     «емодзі + іконка», тож виглядає правильно в будь-якій темі.
+     Поле emoji НЕ прибрано: у старих темах малюється воно. */
+  const FOLDER_ICONS=['fo-folder','fo-coin','fo-run','fo-star','fo-book','fo-target','fo-bulb','fo-heart',
+                      'fo-home','fo-plane','fo-apple','fo-dumbbell','fo-brain','fo-palette','fo-music','fo-chart'];
+  /* Мапа для переїзду вже наявних папок: емодзі, яке ти колись поставив,
+     → найближча іконка. Що не впізналось — стає загальною текою (fo-folder). */
+  const EMOJI_ICON={
+    '📁':'fo-folder','📂':'fo-folder','🗂':'fo-folder','🗃':'fo-folder','🗄':'fo-folder',
+    '💼':'fo-briefcase','👔':'fo-briefcase','🏢':'fo-briefcase',
+    '💰':'fo-coin','💵':'fo-coin','💸':'fo-coin','🪙':'fo-coin','💳':'fo-coin','🏦':'fo-coin','💲':'fo-coin',
+    '🏃':'fo-run','🚶':'fo-run','🏅':'fo-run',
+    '⭐':'fo-star','🌟':'fo-star','✴️':'fo-star',
+    '✨':'fo-spark','🪄':'fo-spark',
+    '📚':'fo-book','📖':'fo-book','📕':'fo-book','📗':'fo-book','📘':'fo-book','📙':'fo-book',
+    '🎯':'fo-target','🏹':'fo-target',
+    '💡':'fo-bulb',
+    '❤️':'fo-heart','❤':'fo-heart','💗':'fo-heart','💖':'fo-heart','💜':'fo-heart','🧡':'fo-heart',
+    '🏠':'fo-home','🏡':'fo-home','🏘':'fo-home',
+    '✈️':'fo-plane','✈':'fo-plane','🌍':'fo-plane','🌎':'fo-plane','🧳':'fo-plane','🗺':'fo-plane',
+    '🍎':'fo-apple','🍏':'fo-apple','🥗':'fo-apple','🍽':'fo-apple','🥑':'fo-apple',
+    '💪':'fo-dumbbell','🏋':'fo-dumbbell','🤸':'fo-dumbbell','🧘':'fo-dumbbell',
+    '🧠':'fo-brain','🤯':'fo-brain','🫀':'fo-brain',
+    '🎨':'fo-palette','🖌':'fo-palette','🖼':'fo-palette','🎭':'fo-palette',
+    '🎵':'fo-music','🎶':'fo-music','🎧':'fo-music','🎸':'fo-music','🎤':'fo-music',
+    '📈':'fo-chart','📊':'fo-chart','📉':'fo-chart',
+    '📅':'fo-calendar','🗓':'fo-calendar','📆':'fo-calendar',
+    '⏱':'fo-clock','⏰':'fo-clock','🕐':'fo-clock','⌛':'fo-clock','⏳':'fo-clock',
+    '📄':'fo-doc','📝':'fo-doc','✍️':'fo-doc','📋':'fo-doc','🧾':'fo-doc','📃':'fo-doc',
+    '🔧':'fo-tool','🛠':'fo-tool','⚙️':'fo-tool','🔨':'fo-tool',
+    '🎓':'fo-study','🏫':'fo-study','👨‍🎓':'fo-study',
+    '🌱':'fo-plant','🌿':'fo-plant','🪴':'fo-plant','🌳':'fo-plant','🌸':'fo-plant',
+    '🔥':'fo-flame',
+    '🚀':'fo-rocket','🛸':'fo-rocket',
+    '🛒':'fo-cart','🛍':'fo-cart',
+    '🚗':'fo-car','🚙':'fo-car','🚕':'fo-car','🚲':'fo-car',
+    '📷':'fo-camera','📸':'fo-camera','🎬':'fo-camera','📹':'fo-camera',
+    '✉️':'fo-mail','📧':'fo-mail','📮':'fo-mail','💬':'fo-mail',
+    '🛡':'fo-shield','🔒':'fo-shield','🕶️':'fo-shield','🔐':'fo-shield',
+    '👥':'fo-users','🤝':'fo-users','👪':'fo-users','👨‍👩‍👧':'fo-users','👨‍👩‍👦':'fo-users',
+  };
+  /* Емодзі приходить із даних користувача — там трапляються варіаційні
+     селектори (U+FE0F) і модифікатори тону/статі. Перед пошуком у мапі
+     чистимо їх, інакше '🏃‍♂️' не збіглося б із '🏃'. */
+  function folderIconFor(emoji){
+    if(!emoji) return 'fo-folder';
+    const raw=String(emoji).trim();
+    if(EMOJI_ICON[raw]) return EMOJI_ICON[raw];
+    const bare=raw.replace(/[\u{FE0E}\u{FE0F}\u{200D}\u{1F3FB}-\u{1F3FF}\u{2640}\u{2642}]/gu,'');
+    return EMOJI_ICON[bare] || 'fo-folder';
+  }
+  function folderIcon(f){ return (f&&f.icon) ? f.icon : folderIconFor(f&&f.emoji); }
+  /* Повний перелік іконок для ручного вибору — той самий порядок, що у
+     спрайті в index.html. Підписи потрібні лише для підказки при наведенні. */
+  const ICON_ALL=[
+    ['fo-folder','Тека'],       ['fo-briefcase','Робота'],  ['fo-coin','Гроші'],      ['fo-chart','Графік'],
+    ['fo-target','Ціль'],       ['fo-rocket','Проєкт'],     ['fo-calendar','Календар'],['fo-clock','Час'],
+    ['fo-doc','Документ'],      ['fo-book','Книга'],        ['fo-study','Навчання'],  ['fo-brain','Мислення'],
+    ['fo-bulb','Ідея'],         ['fo-spark','Іскра'],       ['fo-star','Зірка'],      ['fo-flame','Вогонь'],
+    ['fo-heart','Серце'],       ['fo-home','Дім'],          ['fo-users','Люди'],      ['fo-mail','Пошта'],
+    ['fo-run','Біг'],           ['fo-dumbbell','Спорт'],    ['fo-apple','Їжа'],       ['fo-plant','Ріст'],
+    ['fo-palette','Творчість'], ['fo-music','Музика'],      ['fo-camera','Фото'],     ['fo-tool','Інструменти'],
+    ['fo-cart','Покупки'],      ['fo-car','Транспорт'],     ['fo-plane','Подорожі'],  ['fo-shield','Захист'],
+  ];
+  try{ window.folderIconFor=folderIconFor; }catch(_){}
 
   /* ===== 🕶️ VAULT: приховані папки за PIN =====
      У коді та сховищі НЕМає самого PIN — лише SHA-256(salt+pin).
@@ -134,7 +200,7 @@
       const cfg={};
       Object.keys(folders).forEach(k=>{
         const f=folders[k];
-        cfg[k]={c:f.c,emoji:f.emoji,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||'',secret:!!f.secret};
+        cfg[k]={c:f.c,emoji:f.emoji,icon:f.icon||folderIconFor(f.emoji),iconSet:f.iconSet?1:0,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||'',secret:!!f.secret};
       });
       const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
       const p2=window.storage.set(FOKEY,JSON.stringify(order),false); if(p2&&p2.catch)p2.catch(()=>{});

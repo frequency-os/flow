@@ -1482,8 +1482,15 @@
           </div>
         </div>
         <div class="stg-row">
+          <div class="stg-ic c-theme">🎨</div>
+          <div class="stg-tx"><div class="stg-tt">Набір стилю</div><div class="stg-sub">${THEME_SETS[themeSetOf(theme)].name}</div></div>
+          <div class="stg-seg" id="stgThemeSetSeg">
+            ${Object.keys(THEME_SETS).map(id=>`<button data-ts="${id}" class="${themeSetOf(theme)===id?'on':''}">${THEME_SETS[id].name}</button>`).join('')}
+          </div>
+        </div>
+        <div class="stg-row">
           <div class="stg-ic c-theme">🌓</div>
-          <div class="stg-tx"><div class="stg-tt">Тема</div><div class="stg-sub">Світла / темна</div></div>
+          <div class="stg-tx"><div class="stg-tt">Тема</div><div class="stg-sub">${THEME_META[theme]?THEME_META[theme][1]:'Світла / темна'}</div></div>
           <button class="stg-go" id="stgThemeBtn">Перемкнути</button>
         </div>
         <div class="stg-row">
@@ -1510,7 +1517,9 @@
       if(l!==lang && window.flowSetLang) window.flowSetLang(l);
       renderSettingsCard();
     });
-    const tb=document.getElementById('stgThemeBtn'); if(tb) tb.onclick=()=>{ const t=document.getElementById('themeToggle'); if(t) t.click(); };
+    const tb=document.getElementById('stgThemeBtn'); if(tb) tb.onclick=()=>{ toggleTheme(); };
+    { const seg=document.getElementById('stgThemeSetSeg');
+      if(seg) seg.querySelectorAll('[data-ts]').forEach(b=>b.onclick=()=>setThemeSet(b.dataset.ts)); }
     const hgs=document.getElementById('stgHomeGlassSw'); if(hgs) hgs.onclick=()=>{ homeGlass=!homeGlass; applyHomeGlass(); saveHomeGlass(); renderSettingsCard(); };
     const pb=document.getElementById('stgProxyBtn'); if(pb) pb.onclick=()=>{ if(typeof aiConfig==='function') aiConfig(()=>{}); };
     const cs=document.getElementById('stgCtSw'); if(cs) cs.onclick=()=>{ if(typeof devContentTranslateToggleSheet==='function') devContentTranslateToggleSheet(); setTimeout(renderSettingsCard,50); };
@@ -1697,30 +1706,92 @@
       try{ prefSet('homewidgets', homeWidgets?'1':'0'); }catch(_){}
       applyHomeWidgets(); }; }
 
-  // ── перемикач теми (Flow-дарк / чорна AMOLED / світла) ──
+  /* ── перемикач теми ──
+     Три старі теми (dark / black / light) лишились як були — вони живуть
+     у наборі «classic» і гортаються тією ж каруселлю, що й раніше.
+     Додано два нові набори: desk («Робочий стіл») і studio («Студія»),
+     у кожного своя світла й темна пара. Кнопка в шапці всередині нового
+     набору не гортає по колу, а перемикає світло↔темно — з семи тем
+     карусель була б незручною. Сам набір обирають у Налаштуваннях. */
+  const THEME_SETS={
+    classic:{ name:'Класична',      light:'light',        dark:'dark' },
+    desk:   { name:'Робочий стіл',  light:'desk-light',   dark:'desk-dark' },
+    studio: { name:'Студія',        light:'studio-light', dark:'studio-dark' },
+  };
+  // [значок, назва, колір шапки платформи, id SVG-іконки або '' для емодзі]
+  const THEME_META={
+    dark:          ['🌙','Frequency-дарк',        '#0c0e14',''],
+    black:         ['⚫','Чорна (AMOLED)',        '#000000',''],
+    light:         ['☀️','Світла',                '#f4f6fb',''],
+    'desk-light':  ['', 'Робочий стіл · світла',  '#f6f7f9','i-sun'],
+    'desk-dark':   ['', 'Робочий стіл · темна',   '#101317','i-moon'],
+    'studio-light':['', 'Студія · світла',        '#f7f7f6','i-sun'],
+    'studio-dark': ['', 'Студія · темна',         '#0e1011','i-moon'],
+  };
+  const THEME_KEYS=Object.keys(THEME_META);
+  const isTheme=v=>THEME_KEYS.indexOf(v)>=0;
+  // до якого набору належить тема (для перемикача в Налаштуваннях)
+  function themeSetOf(t){
+    for(const id in THEME_SETS){ const s=THEME_SETS[id]; if(s.light===t||s.dark===t) return id; }
+    return 'classic'; // 'black' теж класика
+  }
+  function themeIsDark(t){ return t!=='light' && t!=='desk-light' && t!=='studio-light'; }
   let theme='dark';
-  try{ const t=localStorage.getItem('flowtheme'); if(t==='light'||t==='dark'||t==='black') theme=t; }catch(_){}
-  const THEME_META={ dark:['🌙','Frequency-дарк','#0c0e14'], black:['⚫','Чорна (AMOLED)','#000000'], light:['☀️','Світла','#f4f6fb'] };
+  try{ const t=localStorage.getItem('flowtheme'); if(isTheme(t)) theme=t; }catch(_){}
   function applyTheme(){
     const r=document.documentElement;
-    if(theme==='light') r.setAttribute('data-theme','light');
-    else if(theme==='black') r.setAttribute('data-theme','black');
-    else r.removeAttribute('data-theme');
+    // 'dark' — тема за замовчуванням, вона живе на голому :root без атрибута
+    if(theme==='dark') r.removeAttribute('data-theme');
+    else r.setAttribute('data-theme',theme);
+    // Клас-прапорець для стилів, спільних усім новим наборам: рівні поверхні
+    // замість градієнтів, лінійні іконки замість емодзі. Один клас замість
+    // дублювання селекторів [data-theme^="desk-"],[data-theme^="studio-"].
+    const flat=themeSetOf(theme)!=='classic';
+    r.classList.toggle('t-flat', flat);
+    /* Другий прапорець — «це світла тема». У коді десятки правил написані як
+       html[data-theme="light"]: вони знають лише про стару світлу тему й для
+       desk-light / studio-light не спрацьовували, через що цілі екрани
+       (AI-чат, тиждень, місяць) лишались темними посеред світлої теми.
+       Замість переписувати кожне правило під кожну нову тему — один клас,
+       який ті селектори отримують додатковою копією. */
+    r.classList.toggle('t-light', flat && !themeIsDark(theme));
     const m=THEME_META[theme]||THEME_META.dark;
     const b=document.getElementById('themeToggle');
-    if(b){ b.textContent=m[0]; b.title='Тема: '+m[1]+' (тап → наступна)'; }
+    if(b){
+      if(m[3]) b.innerHTML=`<svg class="ico"><use href="#${m[3]}"/></svg>`;
+      else b.textContent=m[0];
+      b.title='Тема: '+m[1];
+    }
     // синхронізувати колір шапки Telegram, якщо доступно
     window.platform.setBgColor(m[2]);
   }
-  prefCatchup('flowtheme', v=>{ if(v==='light'||v==='dark'||v==='black'){ theme=v; applyTheme(); } });
-  function toggleTheme(){
-    theme = theme==='dark' ? 'black' : theme==='black' ? 'light' : 'dark';
+  prefCatchup('flowtheme', v=>{ if(isTheme(v)){ theme=v; applyTheme(); } });
+  function setTheme(t){
+    if(!isTheme(t)||t===theme) return;
+    theme=t;
     try{ prefSet('flowtheme', theme); }catch(_){}
     applyTheme();
-    try{ if(typeof plToast==='function'){ const m=THEME_META[theme]; plToast(m[0]+' '+m[1]); } }catch(_){}
+    try{ if(typeof renderSettingsCard==='function') renderSettingsCard(); }catch(_){}
+    try{ if(typeof plToast==='function'){ const m=THEME_META[theme]; plToast((m[0]?m[0]+' ':'')+m[1]); } }catch(_){}
     window.platform.haptic('light');
   }
+  // вибір набору з Налаштувань: лишаємось на тій самій половині (світло/темно)
+  function setThemeSet(id){
+    const s=THEME_SETS[id]; if(!s) return;
+    setTheme(themeIsDark(theme) ? s.dark : s.light);
+  }
+  function toggleTheme(){
+    const set=themeSetOf(theme);
+    // класика: стара карусель dark → black → light → dark, без змін
+    if(set==='classic'){ setTheme(theme==='dark' ? 'black' : theme==='black' ? 'light' : 'dark'); return; }
+    const s=THEME_SETS[set];
+    setTheme(themeIsDark(theme) ? s.light : s.dark);
+  }
   { const b=document.getElementById('themeToggle'); if(b) b.onclick=toggleTheme; }
+  /* Обгортки для інших частин програми. Імена НАВМИСНО інші, ніж у самих
+     функцій: файли складаються в один глобальний скоуп, тож window.themeSetOf
+     затер би функцію themeSetOf і вона почала б викликати саму себе. */
+  try{ window.flowSetThemeSet=setThemeSet; window.flowThemeSet=()=>themeSetOf(theme); window.FLOW_THEME_SETS=THEME_SETS; }catch(_){}
 
   // ── PRO-СТИЛЬ (Quiet Luxe + aurora + bento hero) ── увімкнено за замовчуванням
   let proTheme=true;

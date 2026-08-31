@@ -38,6 +38,12 @@
   }
   // безпечне джерело зображення: лише data:image/* або http(s); інакше порожньо (захист від XSS у src/url())
   function safeImg(u){
+    /* Знімки переїхали в IndexedDB, і в даних тепер лежить посилання
+       `idb:ph_…` замість самого data-URL. Розв'язуємо його тут, у єдиній
+       точці, крізь яку проходить кожне зображення — інакше довелося б
+       правити півтора десятка місць рендеру. Звичайні data:/http адреси
+       photoSrc повертає незмінними. */
+    try{ if(window.photoSrc) u=window.photoSrc(u); }catch(_){}
     u=String(u==null?'':u).trim();
     if(/^data:image\/(png|jpe?g|gif|webp|svg\+xml);/i.test(u)) return u.replace(/'/g,'%27').replace(/"/g,'%22');
     if(/^https?:\/\//i.test(u)) return u.replace(/'/g,'%27').replace(/"/g,'%22');

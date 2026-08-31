@@ -912,4 +912,107 @@
     window.flowBackup = { collect, stats, exportToFile, importFromFile, snapshot, restoreSnapshot, FORMAT };
   })();
 
+  /* ============ PhotoDB — знімки папок і Карти бажань в IndexedDB ============
+     Раніше фото лежали base64-рядком просто в folders_cfg / wishes_board. Через
+     це один знімок роздував увесь JSON, а кожна дрібна зміна (перейменував
+     папку) переписувала всі фото разом з нею. localStorage має жорсткий ліміт
+     у кілька мегабайтів — саме туди впирався банер «памʼять заповнена».
+
+     Тут той самий підхід, що вже працює для книжок (BookDB) і документів
+     (DocDB): важке лежить в IndexedDB, у конфігу — лише посилання виду
+     `idb:ph_<id>`. Старі записи з `data:` читаються як раніше й переїжджають
+     самі при першому збереженні. ============================================ */
+  window.PhotoDB = (function(){
+    const DB='flow_photos', STORE='photos'; let _db=null;
+    function open(){
+      return new Promise((res,rej)=>{
+        if(_db) return res(_db);
+        if(!window.indexedDB) return rej(new Error('no-idb'));
+        const r=indexedDB.open(DB,1);
+        r.onupgradeneeded=()=>{ const db=r.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
+        r.onsuccess=()=>{ _db=r.result; res(_db); };
+        r.onerror=()=>rej(r.error||new Error('idb-open'));
+      });
+    }
+    return {
+      available(){ return !!window.indexedDB; },
+      async put(id,dataUrl){ const db=await open(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(dataUrl,id); tx.oncomplete=()=>res(true); tx.onerror=()=>rej(tx.error); }); },
+      async get(id){ const db=await open(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readonly'); const rq=tx.objectStore(STORE).get(id); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>rej(rq.error); }); },
+      async del(id){ try{ const db=await open(); return new Promise(res=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(id); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false); }); }catch(_){ return false; } },
+      /* Усе одразу — щоб на старті скласти памʼятний кеш і далі малювати
+         синхронно, як і раніше. Знімків десятки, не тисячі. */
+      async all(){
+        try{
+          const db=await open();
+          return new Promise(res=>{
+            const out={}; const tx=db.transaction(STORE,'readonly'); const st=tx.objectStore(STORE);
+            const rq=st.openCursor();
+            rq.onsuccess=()=>{ const c=rq.result; if(!c){ res(out); return; } out[c.key]=c.value; c.continue(); };
+            rq.onerror=()=>res(out);
+          });
+        }catch(_){ return {}; }
+      }
+    };
+  })();
+
+  /* Памʼятний кеш знімків. Рендер карток синхронний, тож читати IndexedDB
+     під час малювання не можна — натомість на старті один раз вичитуємо все
+     у память (photoWarm), а далі photoSrc() віддає готовий data-URL.
+     photoSrc також приймає старі значення (`data:…`) і повертає їх як є,
+     тому виклики працюють однаково до і після переїзду. */
+  window.__photoCache = Object.create(null);
+  /* Самозцілення промаху: якщо рендер попросив знімок, якого ще немає в
+     кеші (перемалювання спрацювало раніше за photoWarm — так сталось у
+     Electron-збірці, і фото зникали назавжди), тихо дотягуємо його з
+     IndexedDB і перемальовуємо екрани один раз, пакетом. Після цього кеш
+     заповнений і промахів більше не буде. */
+  const __phPending=new Set(); let __phPoke=null;
+  function __photoPoke(){
+    if(__phPoke) return;
+    __phPoke=setTimeout(()=>{ __phPoke=null;
+      try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
+      try{ if(typeof updateSummaryBg==='function') updateSummaryBg(); }catch(_){}
+      try{ if(typeof renderWishes==='function') renderWishes(); }catch(_){}
+    },60);
+  }
+  window.photoSrc = function(ref){
+    if(!ref) return '';
+    const r=String(ref);
+    if(r.slice(0,4)!=='idb:') return r;         // старий формат — сам data-URL
+    const id=r.slice(4);
+    const hit=window.__photoCache[id];
+    if(hit) return hit;
+    if(!__phPending.has(id) && window.PhotoDB && window.PhotoDB.available()){
+      __phPending.add(id);
+      window.PhotoDB.get(id)
+        .then(v=>{ if(v){ window.__photoCache[id]=v; __photoPoke(); } })
+        .catch(()=>{})
+        .then(()=>__phPending.delete(id));
+    }
+    return '';
+  };
+  window.photoIsRef = function(ref){ return !!ref && String(ref).slice(0,4)==='idb:'; };
+  window.photoWarm = async function(){
+    try{ if(!window.PhotoDB||!window.PhotoDB.available()) return false;
+      window.__photoCache = await window.PhotoDB.all(); return true; }catch(_){ return false; }
+  };
+  /* Зберегти знімок і повернути посилання для конфігу. Якщо IndexedDB
+     недоступний — віддаємо сам data-URL, і все працює як раніше. */
+  window.photoPut = async function(id, dataUrl){
+    try{
+      if(!window.PhotoDB||!window.PhotoDB.available()) return dataUrl;
+      await window.PhotoDB.put(id, dataUrl);
+      window.__photoCache[id]=dataUrl;
+      return 'idb:'+id;
+    }catch(_){ return dataUrl; }
+  };
+  window.photoDel = async function(ref){
+    try{
+      if(!window.photoIsRef(ref)) return;
+      const id=String(ref).slice(4);
+      delete window.__photoCache[id];
+      if(window.PhotoDB&&window.PhotoDB.available()) await window.PhotoDB.del(id);
+    }catch(_){}
+  };
+
 

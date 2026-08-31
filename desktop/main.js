@@ -167,7 +167,10 @@ function watchSources(){
         console.error('\n⛔️ Збірка не пройшла — вікно лишаю як є:\n' + (stderr || err.message));
       } else {
         console.log('↻ ' + String(stdout).trim().split('\n')[0]);
-        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.reload();
+        // reload() бере сторінку З КЕШУ — після перезбірки вікно показувало
+        // стару версію, і здавалося, що правки не діють. Потрібне саме
+        // перезавантаження в обхід кешу.
+        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.reloadIgnoringCache();
       }
       if (again) { again = false; rebuild(); }
     });
@@ -200,7 +203,12 @@ app.whenReady().then(() => {
       return new Response('forbidden', { status: 403 });
     }
     try {
-      return await net.fetch(pathToFileURL(file).toString());
+      const res = await net.fetch(pathToFileURL(file).toString());
+      /* Заборона кешу для власної схеми. Без цього Chromium тримає
+         index.html у памʼяті, і навіть Cmd+R показує попередню збірку. */
+      const h = new Headers(res.headers);
+      h.set('Cache-Control', 'no-store, must-revalidate');
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
     } catch(_) {
       return new Response('not found: ' + rel, { status: 404 });
     }

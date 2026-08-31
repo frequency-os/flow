@@ -175,6 +175,72 @@
         }};
       })});
   }
+  /* ============ ГАМАНЕЦЬ: злиття всіх карток в одну ============
+     Одноразова міграція під спрощені Фінанси. Кожна операція
+     переприв'язується до єдиного гаманця; суми в іноземній валюті
+     переводяться в гривні за останнім збереженим курсом і фіксуються
+     назавжди. Слід конвертації лишається в op._fx — щоб через рік
+     було видно, звідки взялась цифра.
+
+     Повторний запуск нешкідливий: після міграції інших карток немає,
+     тож конвертувати вже нічого. */
+  const WALLET_ID='wallet';
+  function walletCard(){
+    return { id:WALLET_ID, name:'Гаманець', emoji:'💳', type:'custom', cur:'UAH', color:'#5b8def', main:true };
+  }
+  // сума всієї книги у гривнях — рахується однаково до і після міграції,
+  // тому годиться як доказ, що гроші не загубились
+  // курси беремо зі сховища напряму, а не з fx — щоб міграція пережила
+  // видалення блоку FX і не залежала від порядку завантаження
+  function migRates(){
+    const def={UAH:1,EUR:48.6,USD:41.6,PLN:11.4};
+    try{
+      const raw=localStorage.getItem('flowapp_fx_cfg'); if(!raw) return def;
+      let o=JSON.parse(raw);
+      if(o && typeof o==='object' && typeof o.d==='string') o=JSON.parse(o.d);
+      return (o && o.rates) ? Object.assign({}, def, o.rates) : def;
+    }catch(_){ return def; }
+  }
+  function walletSumUAH(rates){
+    const r=rates||migRates();
+    let s=0;
+    (finOps||[]).forEach(o=>{
+      if(o.envSpend) return;
+      const c=cardById(o.card), cur=(c&&c.cur)||'UAH';
+      const v=(+o.amount||0)*(r[cur]||1);
+      s += (o.type==='in' ? v : -v);
+    });
+    return Math.round(s*100)/100;
+  }
+  function migrateToWallet(){
+    const rep={ ops:0, converted:0, orphan:0, before:0, after:0, diff:0 };
+    if(!Array.isArray(finOps)) return rep;
+    const rates=migRates();
+    rep.before=walletSumUAH(rates);
+    finOps.forEach(o=>{
+      rep.ops++;
+      const c=cardById(o.card);
+      if(o.card && !c) rep.orphan++;         // картку вже видалено — валюту не встановити, лишаємо як гривні
+      const cur=(c&&c.cur)||'UAH';
+      if(cur!=='UAH'){
+        const r=rates[cur]||1;
+        o._fx={ cur, rate:r, was:+o.amount||0 };
+        o.amount=Math.round((+o.amount||0)*r*100)/100;
+        o.label=(o.label||'Операція')+' · '+fmt(o._fx.was)+' '+(CUR[cur]||cur)+' × '+r;
+        rep.converted++;
+      }
+      o.card=WALLET_ID;
+    });
+    cards=[walletCard()];
+    cardCfg.sel=WALLET_ID;
+    rep.after=walletSumUAH(rates);
+    rep.diff=Math.round((rep.after-rep.before)*100)/100;
+    if(rep.ops){ saveFinOps(); saveCards(); saveCardCfg(); }
+    try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
+    return rep;
+  }
+  try{ window.migrateToWallet=migrateToWallet; window.walletSumUAH=walletSumUAH; }catch(_){}
+
   /* ==== FX: курси валют (НБУ → er-api → офлайн), автооновлення раз на добу ==== */
   let fx={ base:'UAH', rates:{UAH:1,EUR:48.6,USD:41.6,PLN:11.4}, ts:0, src:'офлайн' };
   const FXKEY='fx_cfg';
@@ -312,7 +378,7 @@
     const heroVal=`<div data-fuzfx="1" style="cursor:pointer">${fmt(Math.round(fxTotalIn(dispCur)))} <small>${CUR[dispCur]||dispCur} ▾</small></div>`
       + (curKeys.length>1?`<div class="cur2">${curKeys.map(k=>fmt(totals[k])+' '+(CUR[k]||k)).join(' · ')}</div>`:`<div class="cur2">${fxAgo()}</div>`);
     body.innerHTML=`
-      <div class="incx-hero"><div class="l">Загальний баланс · ${cards.length} карток</div>
+      <div class="incx-hero"><div class="l">Загальний баланс · ${cards.length} ${pluralUk(cards.length,'картка','картки','карток')}</div>
         <div class="v">${heroVal}</div>
         <div class="incx-styles">${[[1,'Aurora'],[2,'Glass'],[3,'Carbon'],[4,'Minimal'],[5,'Neo']].map(([n,l])=>`<button class="${(cardCfg.style||1)===n?'on':''}" data-cstyle="${n}">${l}</button>`).join('')}</div>
       </div>
@@ -730,7 +796,7 @@
 
     body.innerHTML=`
       <div class="fuz-head">
-        <div data-fuzfx="1" style="cursor:pointer"><div class="fuz-lab">Гроші · ${cards.length} карток</div><div class="fuz-total">${headTotal} <u>▾</u></div>
+        <div data-fuzfx="1" style="cursor:pointer"><div class="fuz-lab">Гроші · ${cards.length} ${pluralUk(cards.length,'картка','картки','карток')}</div><div class="fuz-total">${headTotal} <u>▾</u></div>
           <div class="fuz-sub">${headSub}</div></div>
         <button class="fuz-lit" data-fdash="finlit">🎓 ${lit}</button>
       </div>

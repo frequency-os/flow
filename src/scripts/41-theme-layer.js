@@ -54,12 +54,16 @@ try{
       });
 
 
-      /* лічильник → компактний рядок унизу карти бажань */
-      var sc=document.getElementById('summaryCard'), nyc=document.getElementById('nyCountdown');
-      if(sc && nyc && nyc.parentElement!==sc){
-        sc.appendChild(nyc);
-        nyc.addEventListener('click',function(e){ e.stopPropagation(); }); /* тап по лічильнику ≠ тап по карті бажань */
-      }
+      /* лічильник → компактний рядок ПІД картою бажань.
+         Раніше вузол переносився всередину #summaryCard. Тепер на нижньому
+         краї картки стоїть скляна полиця з кнопками «Карта бажань» і
+         «Щоденник» — місця під лічильник там більше немає. Вузол лишається
+         там, де він у розмітці (одразу під карткою), а клас .nyc-strip
+         вмикає той самий компактний рядок. Перенос прибрано, тому й
+         stopPropagation більше не потрібен: лічильник уже не всередині
+         клікабельної картки. */
+      var nyc=document.getElementById('nyCountdown');
+      if(nyc) nyc.classList.add('nyc-strip');
 
       /* 🎄 → штрихова ялинка */
       var ny=document.querySelector('#scr-home .nyc-emoji');

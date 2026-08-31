@@ -16,6 +16,18 @@
   function ymLocal(d){ return ymdLocal(d).slice(0,7); }
   window.ymdLocal = ymdLocal; window.ymLocal = ymLocal;
 
+  /* Відмінювання за українськими правилами:
+     pluralUk(1,'картка','картки','карток') → 'картка', pluralUk(5,…) → 'карток'.
+     Одне місце на всю апку — раніше форми зашивались руками в кожному екрані. */
+  function pluralUk(n, one, few, many){
+    n = Math.abs(+n||0); const t = n%100, d = n%10;
+    if(t>=11 && t<=14) return many;
+    if(d===1) return one;
+    if(d>=2 && d<=4) return few;
+    return many;
+  }
+  window.pluralUk = pluralUk;
+
   /* ============ РЕЄСТР КЛЮЧІВ СХОВИЩА — єдине джерело правди ============
      Новий ключ додаєш ТУТ (і за потреби версію в SCHEMAS).
      Звідси беруться prefetchAll на старті та ALL_KEYS для бекапу.

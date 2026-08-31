@@ -239,16 +239,36 @@
   .fc2-row .fpin{position:absolute;top:15px;right:48px;font-size:13px;}
   .fc2-row .fsub{top:auto;bottom:12px;left:auto;right:48px;}
 
-  /* ── Сітка: фото = вся плитка, затемнення знизу ── */
-  .fc2-tile{height:158px;border-radius:22px;border:1px solid rgba(255,255,255,.10);
-    display:flex;flex-direction:column;justify-content:flex-end;padding:12px;}
-  .fc2-tile .fc2-veil{background:linear-gradient(transparent 32%,rgba(6,6,12,.9));}
-  .fc2-tile.nocover{background:linear-gradient(150deg,color-mix(in srgb,var(--c,#6a7dff) 42%,#0d0d16),#0d0d16 72%);}
-  .fc2-tile.nocover .fc2-veil{background:none;}
-  .fc2-tile .fc2-em{position:absolute;top:10px;left:10px;width:38px;height:38px;border-radius:12px;font-size:18px;z-index:3;}
-  .fc2-tile .fc2-name{font-size:15.5px;}
+  /* ── Сітка: кришка зверху, назва — на суцільній підкладці ──
+     Було: фото (або колір папки) заливало всю плитку, а назва лежала
+     просто на ньому. На світлому знімку назва зникала, а знизу її ще й
+     підрізала нижня панель — «Розбір теми» видно на скріншоті обрізаним.
+
+     Стало: колір/фото живе на кришці 58px, а назва і лічильник сидять на
+     суцільній підкладці кольору картки. Текст більше ні з чим не бореться.
+     Плитка нижча (132 замість 158), тож у той самий екран влазить більше
+     папок — це компенсує вищу картку героя. Мінус чесний: фото папки
+     стало смужкою зверху замість цілої плитки. ── */
+  .fc2-tile{min-height:132px;border-radius:22px;border:1px solid var(--line);
+    background:var(--card);display:block;padding:0;}
+  .fc2-tile .fc2-bg{inset:0 0 auto 0;height:58px;}
+  .fc2-tile .fc2-veil{inset:0 0 auto 0;height:58px;
+    background:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.28));}
+  /* без фото кришку малює сама вуаль — кольором папки */
+  .fc2-tile.nocover{background:var(--card);}
+  .fc2-tile.nocover .fc2-veil{background:linear-gradient(135deg,var(--c,#6a7dff),
+    color-mix(in srgb,var(--c,#6a7dff) 42%,#000));}
+  /* плашка емодзі звисає з кришки на підкладку */
+  .fc2-tile .fc2-em,
+  .fc2-tile.nocover .fc2-em{position:absolute;top:34px;left:12px;width:38px;height:38px;
+    border-radius:12px;font-size:18px;z-index:3;background:var(--card);border:2px solid var(--card);
+    -webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 4px 12px var(--shadow);}
+  .fc2-tile .fc2-body{padding:82px 12px 12px;}
+  .fc2-tile .fc2-name{font-size:14.5px;color:var(--text);text-shadow:none;}
+  .fc2-tile .fstat{color:var(--muted);}
+  .fc2-tile .fstat b{color:var(--c,#6a7dff);}
   .fc2-tile .fmenu{top:11px;right:11px;}
-  .fc2-tile .fdrag-handle{bottom:11px;right:11px;}
+  .fc2-tile .fdrag-handle{display:none;} /* у сітці перетягування — довгим дотиком, як у колоді */
   .fc2-tile .fpin{position:absolute;top:15px;right:44px;font-size:12px;}
   .fc2-tile .fsub{top:12px;left:56px;}
 
@@ -304,7 +324,7 @@
     color:var(--muted);display:flex;align-items:center;justify-content:center;gap:12px;}
   .fc2-add .fc2-plus{font-size:24px;font-weight:300;line-height:1;}
   #folderGrid.fv2-list .fc2-add{min-height:76px;padding:16px;}
-  #folderGrid.fv2-grid .fc2-add{height:158px;border-radius:22px;flex-direction:column;}
+  #folderGrid.fv2-grid .fc2-add{min-height:132px;border-radius:22px;flex-direction:column;}
   #folderGrid.fv2-deck .fc2-add{flex:0 0 132px;height:296px;border-radius:26px;flex-direction:column;scroll-snap-align:start;}
   #folderGrid.fv2-mag .fc2-add{height:64px;border-radius:20px;}
   .fc2-add .fc2-addt{font-size:13px;font-weight:800;}
@@ -354,3 +374,182 @@
   .im-cancel,.im-ok{flex:1;border:none;border-radius:13px;padding:14px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;}
   .im-cancel{background:var(--field);color:var(--muted);border:1px solid var(--line);}
   .im-ok{background:linear-gradient(135deg,#6a7dff,#a06bff);color:#fff;}
+
+  /* ═══════════════════════════════════════════════════════════════════
+     НОВІ НАБОРИ ТЕМ · ПАПКИ (30.08.2026)
+     Діє тільки під html.t-flat — тобто в наборах «Робочий стіл» і «Студія».
+     Старі три теми сюди не потрапляють і виглядають точно як раніше.
+
+     Що міняється: кольоровий градієнт-заливка картки → рівна поверхня з
+     контуром; колір папки лишається, але як мітка (риска), а не як фон;
+     емодзі-плитка → лінійна іконка; білий текст із тінню → звичайний
+     текст теми. Папки з фото не чіпаємо — там затемнення потрібне, щоб
+     назва читалась поверх знімка.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* ── базовий вигляд лінійної іконки ── */
+  .ico{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;display:block;}
+  /* емодзі та іконка — взаємозамінна пара, показуємо одну */
+  .fc2-ico{display:none;}
+  html.t-flat .fc2-emj{display:none;}
+  html.t-flat .fc2-ico{display:block;}
+
+  /* ── картка без фото: рівна поверхня замість градієнта ── */
+  html.t-flat .fc2.nocover{background:var(--folder-fill);}
+  html.t-flat .fc2.nocover .fc2-veil{background:none;}
+  html.t-flat .fc2 .fc2-name{color:var(--text);text-shadow:none;font-weight:700;}
+  html.t-flat .fc2.nocover .fstat{color:var(--muted);}
+  html.t-flat .fc2.nocover .fstat b{color:var(--text);}
+  /* плитка під іконкою — прозора з контуром, а не кольорове скло */
+  html.t-flat .fc2.nocover .fc2-em{background:transparent;border:1px solid var(--folder-line);
+    color:var(--ico);-webkit-backdrop-filter:none;backdrop-filter:none;}
+  html.t-flat .fc2.nocover .fc2-em .ico{width:56%;height:56%;}
+  html.t-flat .fc2.nocover .fsub{background:var(--card-2);color:var(--muted);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+
+  /* ── список: кольорова мітка зліва, шеврон у колір теми ── */
+  html.t-flat .fc2-row.nocover .fc2-veil{background:none;}
+  html.t-flat .fc2-row.nocover::before{content:"";position:absolute;left:0;top:18px;bottom:18px;
+    width:3px;border-radius:0 3px 3px 0;background:var(--c,var(--accent));z-index:2;}
+  html.t-flat .fc2-row::after{color:var(--muted);}
+  html.t-flat #folderGrid.fv2-list .fc2-row+.fc2-row{border-top:1px solid var(--line);}
+  html.t-flat .fc2-row.nocover .fc2-em{border-radius:12px;}
+
+  /* ── сітка: кольорова риска зверху плитки ── */
+  html.t-flat .fc2-tile{border-color:var(--folder-line);}
+  html.t-flat .fc2-tile.nocover::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+    background:var(--c,var(--accent));z-index:3;}
+  /* У звичайних темах плитка має кришку 58px, і під неї відведено відступ
+     зверху. Тут кришки немає — замість неї риска 2px, — тож іконка й текст
+     піднімаються, щоб не висіти над порожнечею. */
+  html.t-flat .fc2-tile.nocover .fc2-em{top:12px;}
+  html.t-flat .fc2-tile.nocover .fc2-body{padding-top:60px;}
+
+  /* ── колода: постер без радіального сяйва ── */
+  html.t-flat .fc2-deck{border-color:var(--folder-line);box-shadow:0 10px 26px -14px var(--shadow);}
+  html.t-flat .fc2-deck.nocover{background:var(--folder-fill);}
+  html.t-flat .fc2-deck.nocover .fc2-veil{background:none;}
+  html.t-flat .fc2-deck.nocover::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+    background:var(--c,var(--accent));z-index:3;}
+  html.t-flat .fc2-deck .fc2-prog{background:var(--field);}
+  html.t-flat .fc2-deck .fc2-prog i{background:var(--c,var(--accent));}
+  html.t-flat .fc2-deck .fmenu{background:transparent;border-color:var(--folder-line);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+
+  /* ── журнал: замість фото-корінця — рівна смуга кольору папки ── */
+  html.t-flat .fc2-mag.nocover::before{width:3px;
+    background:var(--c,var(--accent));}
+  html.t-flat #folderGrid.fv2-mag .fc2-mag+.fc2-mag{border-top:1px solid var(--line);}
+  html.t-flat .fc2-mag{padding-left:64px;}
+  html.t-flat .fc2-mag .fc2-em{left:16px;}
+  html.t-flat .fc2-mag .fsub{left:64px;}
+
+  /* ── картка «Нова папка» ── */
+  html.t-flat .fc2-add{border:1px dashed var(--folder-line);background:transparent;color:var(--muted);}
+
+  /* ── кнопка теми в шапці, коли в ній SVG замість емодзі ── */
+  #themeToggle .ico{width:17px;height:17px;margin:0 auto;}
+
+  /* ═══ НОВІ НАБОРИ ТЕМ · ОГЛЯД І САЙДБАР ═══
+     Тут гасяться градієнти, які лишились повз токени. Селектори навмисно
+     «важчі» за оригінальні (html.t-flat + той самий шлях): частина правил
+     живе у styles/16-mx.css, який збирається ПІСЛЯ core/, тож перебити їх
+     порядком файлів не вийшло б — тільки специфічністю. */
+
+  /* сайдбар */
+  html.t-flat .dsb-logo{background:var(--accent);}
+  html.t-flat .dsb-av{background:var(--accent);}
+  html.t-flat .dsb-i.on,
+  html.t-flat body.theme-pro .dsb-i.on{background:var(--sel);color:var(--nav-ink-on);}
+  html.t-flat .dsb-i.on svg{color:var(--ico-on);}
+
+  /* велика картка Огляду: рівна поверхня, без фіолетового «генератора» */
+  html.t-flat #scr-home .summary,
+  html.t-flat .summary{background:var(--card);border:1px solid var(--line);box-shadow:none;}
+  html.t-flat #scr-home .summary .wishgen{display:none;}
+  html.t-flat.home-glass #scr-home .summary{box-shadow:none;}
+
+  /* логотип у шапці: скло й відблиск не вписуються в рівний стиль */
+  html.t-flat #scr-home .top .logo.lg-glass{background:var(--card-2);border:1px solid var(--line);
+    box-shadow:none;}
+  html.t-flat #scr-home .top .logo.lg-glass .lg-spec,
+  html.t-flat #scr-home .top .logo.lg-glass .lg-sweep{display:none;}
+
+  /* сегменти вибору режиму папок */
+  html.t-flat .fvseg button.on,
+  html.t-flat #folderViewSeg button.on{background:var(--sel);color:var(--ico-on);}
+
+  /* ── текст усередині великої картки Огляду ──
+     Він був жорстко білий: картка завжди мала темне тло, тож інакше й не
+     було потрібно. У світлих наборах це білим по білому, тому переводимо
+     на токени. */
+  html.t-flat #scr-home .summary .big,
+  html.t-flat #scr-home .summary .nyc-title,
+  html.t-flat #scr-home .summary .nyc-cell,
+  html.t-flat #scr-home .nyc-title,
+  html.t-flat #scr-home .nyc-cell{color:var(--text);}
+  html.t-flat #scr-home .summary .label,
+  html.t-flat #scr-home .summary .hint,
+  html.t-flat #scr-home .summary .big small,
+  html.t-flat #scr-home .summary .nyc-cell span,
+  html.t-flat #scr-home .nyc-cell span{color:var(--muted);}
+  /* нічне сяйво героя — це і є «світіння», від якого йдемо */
+  html.t-flat.fd26t #scr-home .summary::before,
+  html.t-flat.fd26t .summary::before,
+  html.t-flat.fd26t .nyc::after{display:none;}
+  /* кнопка теми: шар fd26t малює свій значок маскою — вимикаємо, щоб було
+     видно наш SVG (сонце/місяць) */
+  html.t-flat.fd26t #themeToggle::before{display:none;}
+
+  /* вкладки «Карта бажань» / «Щоденник»: нейтральна поверхня, колір лишається
+     тільки в іконці.
+     Кнопки живуть у скляній полиці на нижньому краї картки (16-mx.css).
+     Скло там темне — на світлій поверхні рівних наборів воно читалось би
+     сірою плямою, тому тут полиця стає звичайною поверхнею теми. */
+  html.t-flat #scr-home .summary .herocap{background:var(--card-2);
+    border-top:1px solid var(--line);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+  html.t-flat #scr-home .summary .hc-tab,
+  html.t-flat #scr-home .summary .hc-tab.wish,
+  html.t-flat #scr-home .summary .hc-tab.diary{background:transparent;border:0;color:var(--text);}
+  html.t-flat #scr-home .summary .hc-tab+.hc-tab{border-left:1px solid var(--line);}
+  html.t-flat #scr-home .summary .hc-tab:active{background:var(--hair);}
+  html.t-flat #scr-home .summary .herocap .hc-tab b{text-shadow:none;}
+  html.t-flat #scr-home .summary .hc-tab.wish svg{color:var(--skl);}
+  html.t-flat #scr-home .summary .hc-tab.diary svg{color:var(--hab);}
+
+  /* Шапка Огляду. Назву жорстко фарбує 16-mx.css у білий із тінню — так було
+     задумано під фото-шапку на темному. Повторюємо той самий шлях і додаємо
+     html.t-flat, інакше специфічності не вистачає. */
+  html.t-flat #scr-home .top .brand h1{color:var(--text);text-shadow:none;}
+  html.t-flat #scr-home .top .brand span,
+  html.t-flat #scr-home .top .brand small{color:var(--muted);text-shadow:none;}
+
+  /* ── картка «Налаштування» ──
+     Формально це екран «Ще», а не Огляд. Але саме тут живе вибір набору
+     стилю, і в світлих наборах картка була темною з майже нечитабельним
+     текстом — новою можливістю неможливо було скористатись. Тому переводимо
+     її на токени разом з рештою. */
+  html.t-flat .stg-row{border-bottom:1px solid var(--line);}
+  html.t-flat .stg-tt{color:var(--text);}
+  html.t-flat .stg-sub{color:var(--muted);}
+  html.t-flat .stg-ic{background:var(--card-2);box-shadow:none;color:var(--ico);}
+  html.t-flat .stg-ic.c-lang,
+  html.t-flat .stg-ic.c-theme,
+  html.t-flat .stg-ic.c-ai,
+  html.t-flat .stg-ic.c-dev{background:var(--card-2);}
+  html.t-flat .stg-seg{background:var(--field);}
+  html.t-flat .stg-seg button{color:var(--muted);}
+  html.t-flat .stg-seg button.on{background:var(--accent);color:var(--bg-2);box-shadow:none;}
+  html.t-flat .stg-sw{background:var(--hair-2);}
+  html.t-flat .stg-sw.on{background:var(--accent);}
+  /* Контейнер картки та тло сторінки. `html` має жорсткий #0b0d12 (лишався
+     від часів, коли світлої теми не було), а `.phone` малює фонове сяйво —
+     у рівних наборах і те, й те заважає. */
+  html.t-flat .bkp-card{background:var(--card);background-image:none;border:1px solid var(--line);
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+  html.t-flat{background:var(--bg);}
+  html.t-flat .phone{background-image:none;}
+  html.t-flat .stg-go{background:var(--field);color:var(--text);border:1px solid var(--line);}
+  html.t-flat .stg-go:active{background:var(--hair);}
