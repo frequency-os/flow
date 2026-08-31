@@ -6782,6 +6782,60 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     color:var(--muted);font-size:12.5px;line-height:1.5;}
   @media (max-width:360px){ .vz-grid{grid-template-columns:1fr;} .vz-why .inner{min-height:120px;} }
 
+  /* ============ АПГРЕЙД (dev) · персонаж і сфери ============ */
+  #scr-upgrade{max-width:560px;}
+  .up-devbadge{display:inline-flex;align-items:center;gap:6px;border:1px dashed color-mix(in srgb,#f0b429 50%,transparent);
+    border-radius:999px;padding:5px 12px;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#f0b429;}
+  .up-top{display:flex;align-items:flex-start;justify-content:space-between;}
+  .up-hero{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:18px;}
+  .up-ring{width:116px;height:116px;border-radius:50%;display:grid;place-items:center;
+    box-shadow:0 0 34px color-mix(in srgb,var(--accent) 28%,transparent);}
+  .up-ring-in{width:102px;height:102px;border-radius:50%;background:linear-gradient(135deg,var(--card-2),var(--card));
+    border:1px solid var(--line);display:grid;place-items:center;}
+  .up-av{width:94px;height:94px;border-radius:50%;display:grid;place-items:center;font-size:46px;}
+  .up-lvl{margin-top:-24px;background:linear-gradient(135deg,#6a7dff,#a06bff);border-radius:999px;padding:5px 14px;
+    font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;
+    box-shadow:0 6px 16px rgba(106,125,255,.35);position:relative;z-index:1;}
+  .up-name{font-size:22px;font-weight:800;letter-spacing:-.02em;}
+  .up-path{font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:13px;line-height:1.45;color:var(--muted);
+    text-align:center;max-width:300px;background:transparent;border:0;cursor:pointer;padding:0;}
+  .up-path:hover{color:var(--text);}
+  .up-path.empty{font-style:normal;font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);
+    border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent);border-radius:12px;padding:9px 14px;}
+  .up-xp{margin-bottom:16px;}
+  .up-xp-t{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+  .up-xp-t b{color:var(--text);}
+  .up-bar{height:5px;border-radius:4px;background:var(--field);overflow:hidden;}
+  .up-bar i{display:block;height:100%;border-radius:4px;transition:width .4s;}
+  .up-bar.big{height:8px;border:1px solid var(--line);}
+  .up-bar.big i{background:linear-gradient(90deg,#6a7dff,#a06bff);}
+  .up-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px;}
+  .up-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px 14px;
+    display:flex;flex-direction:column;gap:8px;cursor:pointer;font-family:inherit;color:var(--text);
+    text-align:left;transition:border-color .18s;}
+  .up-card:hover{border-color:var(--accent);}
+  .up-card-h{display:flex;align-items:center;gap:8px;}
+  .up-card-h b{font-size:13px;}
+  .up-card-ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex:none;}
+  .up-card-m{display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:var(--muted);}
+  .up-cta{width:100%;border:0;border-radius:16px;padding:15px;text-align:center;font-family:inherit;
+    font-size:14px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--accent),#9b6aff);
+    box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 30%,transparent);}
+  .up-cta-sub{text-align:center;font-size:11px;color:var(--muted);margin-top:8px;}
+  /* ── шторка вердикту AI ── */
+  .up-vd-wait{text-align:center;padding:22px 0;font-size:14px;font-weight:700;color:var(--text);}
+  .up-vd-wait small{display:block;margin-top:6px;font-size:11px;color:var(--muted);font-weight:600;}
+  .up-vd-sum{font-size:13px;line-height:1.5;margin:0 0 12px;color:var(--text);}
+  .up-vd-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .up-vd-row:last-of-type{border-bottom:0;}
+  .up-vd-tx{flex:1;min-width:0;}
+  .up-vd-tx b{font-size:13px;display:block;}
+  .up-vd-tx small{font-size:11px;color:var(--muted);line-height:1.4;display:block;margin-top:2px;}
+  .up-vd-xp{flex:none;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px;}
+  .up-vd-ok{margin-top:14px;}
+  .up-vd-no{display:block;width:100%;margin-top:8px;border:0;background:transparent;color:var(--muted);
+    font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:8px;}
+  .up-vd-no:hover{color:var(--text);}
 </style>
 <style>
 /* ============ INCOME · VIRTUAL CARDS (Доходи) ============ */
@@ -7834,6 +7888,14 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     <div id="visionBody"></div>
   </section>
 
+  <section class="screen" id="scr-upgrade">
+    <div class="up-top">
+      <button class="back" id="upBack" style="--c:#8b7cff">‹ Ще</button>
+      <span class="up-devbadge">Розробка</span>
+    </div>
+    <div id="upgradeBody"></div>
+  </section>
+
   <section class="screen" id="scr-more">
     <div class="more-head">
       <h1>Ще</h1>
@@ -7987,7 +8049,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     'spaceview','spacewide','spacecanvas','spacecanvaszoom',
     'readerCfg',
     'patterns_chains','patterns_score','patterns_transform',
-    'vision_v1','vault_cfg','custom_avatar_v1','diary_entries_v1',
+    'vision_v1','vault_cfg','custom_avatar_v1','diary_entries_v1','upgrade_profile_v1',
     'lang_pref','i18n_content_cache'
   ];
 
@@ -27745,7 +27807,11 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
          <div class="mh-lbl">⚡ Головне</div>
          <div class="mh-grid">${MAIN.map(tileHTML).join('')}</div>
          <div class="mh-lbl mt">🧩 Ще інструменти</div>
-         <div class="mh-rows">${MORE.map(rowHTML).join('')}</div>`;
+         <div class="mh-rows">${MORE.map(rowHTML).join('')}</div>` +
+        ((window.upDevOn&&window.upDevOn())
+          ? `<div class="mh-lbl mt">🧪 Розробка</div>
+             <div class="mh-rows">${rowHTML({k:'upgrade', emo:'🧬', c:'139,124,255', t:'Апгрейд', d:'Персонаж, сфери, заявлений шлях'})}</div>`
+          : '');
       host.querySelectorAll('[data-mh]').forEach(b=>b.addEventListener('click',()=>openMoreSheet(b.dataset.mh)));
       host.querySelectorAll('[data-uimode]').forEach(b=>b.addEventListener('click',()=>{
         (window.setUiMode||function(){})(b.dataset.uimode);
@@ -27753,6 +27819,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
       }));
     }
     function openMoreSheet(key){
+      if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
       const m=[...MAIN,...MORE].find(x=>x.k===key); if(!m) return;
       window.platform.haptic('light');
       // живі дії замість заглушок
@@ -28030,6 +28097,276 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
     document.querySelectorAll('.dsb-i[data-dnav="more"]').forEach(b=>b.onclick=goMore);
     renderMore();
     renderAccount();
+  })();
+  /* ════════ АПГРЕЙД (dev): персонаж, сфери життя, заявлений шлях ════════
+     Оболонка над наявними системами: власних даних мінімум (профіль сфер +
+     заявлений шлях + зрізи), решту читаємо з планера/цілей/щоденника.
+     Екран видно лише в dev-режимі: акаунт Ярослава або прапорець flow_dev. */
+  (function(){
+    const UPKEY='upgrade_profile_v1';
+    const UP_DEV_EMAIL='life.yaroslav.kril@gmail.com';
+    const UP_XP_LEVEL=100; // досвіду на рівень сфери
+    const UP_DEF_SPHERES=[
+      {id:'health', name:'Здоровʼя', emo:'💪', c:'#34c77b'},
+      {id:'craft',  name:'Справа',   emo:'🔥', c:'#e8843c'},
+      {id:'money',  name:'Фінанси',  emo:'💰', c:'#f0b429'},
+      {id:'people', name:'Стосунки', emo:'💛', c:'#ff6b9d'},
+      {id:'growth', name:'Розвиток', emo:'📚', c:'#5b8def'},
+      {id:'sense',  name:'Сенс',     emo:'✨', c:'#c4a8ff'},
+    ];
+    let upData=null, upLoaded=false;
+
+    function upEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    function upNorm(){
+      if(!upData||typeof upData!=='object') upData={};
+      if(typeof upData.path!=='string') upData.path='';
+      if(typeof upData.pathDate!=='string') upData.pathDate='';
+      if(!Array.isArray(upData.spheres)||!upData.spheres.length)
+        upData.spheres=UP_DEF_SPHERES.map(s=>({...s, level:1, xp:0}));
+      upData.spheres.forEach(s=>{
+        if(typeof s.name!=='string') s.name='Сфера';
+        if(typeof s.emo!=='string') s.emo='●';
+        if(typeof s.c!=='string') s.c='#8b7cff';
+        s.level=Math.max(1, Math.round(+s.level||1));
+        s.xp=Math.max(0, Math.min(UP_XP_LEVEL, Math.round(+s.xp||0)));
+      });
+      if(!Array.isArray(upData.snapshots)) upData.snapshots=[];
+    }
+    async function upLoad(){
+      if(upLoaded) return;
+      try{
+        const r=await window.storage.get(UPKEY);
+        const d=r&&r.value?JSON.parse(r.value):null;
+        if(d&&typeof d==='object') upData=d;
+      }catch(_){}
+      upNorm(); upLoaded=true;
+    }
+    function upSave(){ try{ const p=window.storage.set(UPKEY,JSON.stringify(upData)); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+
+    /* dev-ворота: бачить лише власник акаунта або пристрій із flow_dev=1 */
+    function upDevOn(){
+      try{ if(localStorage.getItem('flow_dev')==='1') return true; }catch(_){}
+      try{ const u=window.sbUser&&window.sbUser(); if(u&&String(u.email||'').toLowerCase()===UP_DEV_EMAIL) return true; }catch(_){}
+      return false;
+    }
+    window.upDevOn=upDevOn;
+
+    function upOverall(){
+      const ss=upData.spheres;
+      const lvl=Math.max(1, Math.round(ss.reduce((a,s)=>a+s.level,0)/ss.length));
+      const pct=Math.round(ss.reduce((a,s)=>a+s.xp,0)/(ss.length*UP_XP_LEVEL)*100);
+      return {lvl, pct};
+    }
+    function upUserName(){
+      try{ const u=window.platform.user(); if(u&&u.first_name) return u.first_name; }catch(_){}
+      try{ const u=window.sbUser&&window.sbUser(); if(u&&u.email) return String(u.email).split('@')[0]; }catch(_){}
+      return 'Ти';
+    }
+    function upAvatarHTML(){
+      try{
+        if(typeof customAvatar==='string'&&customAvatar)
+          return `<div class="up-av" style="background:url(${customAvatar.replace(/'/g,'%27').replace(/"/g,'%22')}) center/cover"></div>`;
+      }catch(_){}
+      return `<div class="up-av">🧑‍🚀</div>`;
+    }
+
+    function upSphereCard(s,i){
+      const pct=Math.round(s.xp/UP_XP_LEVEL*100);
+      return `<button class="up-card" data-upsp="${i}">
+        <div class="up-card-h"><span class="up-card-ico" style="background:${upEsc(s.c)}22">${upEsc(s.emo)}</span><b>${upEsc(s.name)}</b></div>
+        <div class="up-card-m"><span>рів. ${s.level}</span><span style="color:${upEsc(s.c)}">${pct}%</span></div>
+        <div class="up-bar"><i style="width:${pct}%;background:${upEsc(s.c)}"></i></div>
+      </button>`;
+    }
+
+    function renderUpgrade(){
+      const host=document.getElementById('upgradeBody'); if(!host) return;
+      const o=upOverall();
+      const pathHTML = upData.path
+        ? `<button class="up-path" data-uppath>«${upEsc(upData.path)}»</button>`
+        : `<button class="up-path empty" data-uppath>Шлях ще не заявлено — розкажи, куди йдеш</button>`;
+      host.innerHTML=`
+        <div class="up-hero">
+          <div class="up-ring" style="background:conic-gradient(var(--accent) 0 ${Math.max(2,o.pct)}%, var(--card) ${Math.max(2,o.pct)}% 100%)">
+            <div class="up-ring-in">${upAvatarHTML()}</div>
+          </div>
+          <div class="up-lvl">Рівень ${o.lvl}</div>
+          <div class="up-name">${upEsc(upUserName())}</div>
+          ${pathHTML}
+        </div>
+        <div class="up-xp">
+          <div class="up-xp-t"><span>Досвід шляху</span><b>${upData.spheres.reduce((a,s)=>a+s.xp,0)} / ${upData.spheres.length*UP_XP_LEVEL}</b></div>
+          <div class="up-bar big"><i style="width:${o.pct}%"></i></div>
+        </div>
+        <div class="up-grid">${upData.spheres.map(upSphereCard).join('')}</div>
+        <button class="up-cta" data-upanalyze>✦ Проаналізувати мій рух</button>
+        <div class="up-cta-sub">${upLastSnapLine()}</div>`;
+
+      host.querySelectorAll('[data-uppath]').forEach(el=>el.addEventListener('click',upEditPath));
+      host.querySelectorAll('[data-upsp]').forEach(el=>el.addEventListener('click',()=>upEditSphere(+el.dataset.upsp)));
+      const an=host.querySelector('[data-upanalyze]'); if(an) an.addEventListener('click',upAnalyze);
+    }
+    function upLastSnapLine(){
+      const sn=upData.snapshots[upData.snapshots.length-1];
+      if(!sn) return 'AI звірить твої дні із заявленим шляхом';
+      try{
+        const p=String(sn.d).split('-').map(Number);
+        const MN=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+        return 'Останній зріз: '+p[2]+' '+MN[p[1]-1];
+      }catch(_){ return 'Останній зріз: '+upEsc(sn.d); }
+    }
+
+    function upEditPath(){
+      if(typeof inputModal!=='function') return;
+      inputModal({title:'Мій шлях — куди я йду', value:upData.path, onOk:v=>{
+        upData.path=String(v||'').trim();
+        if(upData.path&&!upData.pathDate) upData.pathDate=new Date().toISOString().slice(0,10);
+        upSave(); renderUpgrade();
+      }});
+    }
+    function upEditSphere(i){
+      const s=upData.spheres[i]; if(!s||typeof inputModal!=='function') return;
+      inputModal({title:'Назва сфери', value:s.name, onOk:v=>{
+        if(v&&v.trim()) s.name=v.trim().slice(0,24);
+        upSave(); renderUpgrade();
+      }});
+    }
+    /* ── AI-аналіз руху: планер + щоденник проти заявленого шляху ── */
+
+    /* дні періоду: від останнього зрізу (не включно), максимум 14 днів назад.
+       Читаємо blocksByDay напряму, БЕЗ plBlocksFor — щоб не матеріалізувати
+       повторювані блоки в минулі дні (побічний запис у дані планера). */
+    function upCollectDays(){
+      const last=upData.snapshots.length?String(upData.snapshots[upData.snapshots.length-1].d||''):'';
+      const days=[];
+      let byDay={}; try{ const p=plData(); byDay=p.blocksByDay||{}; }catch(_){}
+      for(let i=13;i>=0;i--){
+        const ds=ymdLocal(new Date(Date.now()-i*86400000));
+        if(last && ds<=last) continue;
+        const list=Array.isArray(byDay[ds])?byDay[ds]:[];
+        const items=list.map(b=>(b.done?'[x] ':'[ ] ')+String(b.t||'').slice(0,60)).filter(s=>s.trim().length>4);
+        let dia=''; try{ const e=(typeof diaryEntries==='object'&&diaryEntries)?diaryEntries[ds]:null; if(e&&e.text) dia=String(e.text).replace(/\s+/g,' ').slice(0,220); }catch(_){}
+        if(items.length||dia) days.push({ds, items, dia});
+      }
+      return days;
+    }
+    function upBuildPrompt(days){
+      const sys='Ти — «дзеркало руху» в застосунку Frequency. Людина заявила свій шлях і сфери життя. '
+        +'Тобі дають її реальні дні: блоки планера ([x] — зроблено, [ ] — ні) та записи щоденника. '
+        +'Оціни ЧЕСНО, чи ці дні працювали на заявлений шлях — окремо по кожній сфері. '
+        +'Відповідай ЛИШЕ валідним JSON одним рядком, без markdown і пояснень: '
+        +'{"summary":"2-3 речення підсумку українською, звертайся на ти, чесно і по-людськи","spheres":[{"id":"...","verdict":"одне чесне речення по цій сфері","xp":0}]} '
+        +'де xp — ціле число 0..30: 0 — жодного руху в сфері за період, 30 — потужний стабільний рух. '
+        +'Використовуй ЛИШЕ передані id сфер, кожну сферу згадай рівно один раз. '
+        +'Якщо даних по сфері немає — так і скажи у verdict і дай xp 0-3. Не вигадуй фактів поза наданим контекстом.';
+      const lines=[];
+      lines.push('ЗАЯВЛЕНИЙ ШЛЯХ: «'+upData.path+'»'+(upData.pathDate?' (заявлено '+upData.pathDate+')':''));
+      lines.push('СФЕРИ: '+upData.spheres.map(s=>s.id+' — '+s.name).join('; '));
+      lines.push('ДНІ ('+days.length+'):');
+      days.forEach(d=>{
+        let ln=d.ds+': '+(d.items.length?d.items.join('; '):'планер порожній');
+        if(d.dia) ln+=' · Щоденник: «'+d.dia+'»';
+        lines.push(ln);
+      });
+      return {sys, user:lines.join('\n')};
+    }
+    function upParseVerdict(txt){
+      let t=String(txt||'').replace(/```json|```/g,'').trim();
+      const a=t.indexOf('{'), b=t.lastIndexOf('}');
+      if(a<0||b<=a) throw new Error('no json');
+      const d=JSON.parse(t.slice(a,b+1));
+      if(typeof d.summary!=='string'||!Array.isArray(d.spheres)) throw new Error('bad shape');
+      const out={summary:d.summary.trim().slice(0,600), gains:{}, verdicts:{}};
+      d.spheres.forEach(x=>{
+        if(!x||typeof x.id!=='string') return;
+        if(!upData.spheres.some(s=>s.id===x.id)) return;
+        out.gains[x.id]=Math.max(0,Math.min(30,Math.round(+x.xp||0)));
+        out.verdicts[x.id]=String(x.verdict||'').trim().slice(0,200);
+      });
+      if(!Object.keys(out.gains).length) throw new Error('no spheres');
+      return out;
+    }
+    function upSheet(bodyHTML){
+      const old=document.querySelector('.mh-sheet.up-sheet'); if(old) old.remove();
+      const ov=document.createElement('div'); ov.className='mh-sheet up-sheet';
+      ov.innerHTML=`<div class="mh-sheet-in">
+        <div class="mh-grip"></div>
+        <div class="mh-sheet-h">
+          <div class="mh-ico" style="background:rgba(139,124,255,.18)">✦</div>
+          <div><h3>AI-аналіз руху</h3><span>звірка днів із заявленим шляхом</span></div></div>
+        <div class="mh-sheet-body up-vd-body">${bodyHTML}</div>
+      </div>`;
+      ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
+      document.body.appendChild(ov);
+      return ov;
+    }
+    function upApplyVerdict(v){
+      upData.spheres.forEach(s=>{
+        const add=v.gains[s.id]||0;
+        s.xp+=add;
+        while(s.xp>=UP_XP_LEVEL){ s.xp-=UP_XP_LEVEL; s.level++; }
+      });
+      upData.snapshots.push({
+        d:ymdLocal(), summary:v.summary, gains:v.gains, verdicts:v.verdicts,
+        levels:upData.spheres.map(s=>({id:s.id, level:s.level, xp:s.xp}))
+      });
+      if(upData.snapshots.length>60) upData.snapshots=upData.snapshots.slice(-60);
+      upSave(); renderUpgrade();
+      try{ window.platform.haptic('success'); }catch(_){}
+    }
+    async function upAnalyze(){
+      try{ window.platform.haptic('light'); }catch(_){}
+      if(!upData.path){ upEditPath(); return; }
+      const days=upCollectDays();
+      if(!days.length){
+        upSheet('За цей період у планері й щоденнику порожньо — AI нема з чого робити висновок. Поживи кілька днів у застосунку і повертайся.');
+        return;
+      }
+      const ov=upSheet('<div class="up-vd-wait">✦ Дивлюся на твої дні…<br><small>'+days.length+' дн. · планер + щоденник</small></div>');
+      let v;
+      try{
+        const p=upBuildPrompt(days);
+        const txt=await aiCall(p.sys,[{role:'user',content:p.user}]);
+        v=upParseVerdict(txt);
+      }catch(e){
+        console.error('upAnalyze',e);
+        const body=ov.querySelector('.up-vd-body');
+        if(body) body.innerHTML='Не вдалося отримати аналіз — перевір зʼєднання і спробуй ще раз.<br><small style="color:var(--muted)">'+upEsc(String(e&&e.message||e))+'</small>';
+        return;
+      }
+      const total=Object.values(v.gains).reduce((a,x)=>a+x,0);
+      const rows=upData.spheres.map(s=>{
+        const add=v.gains[s.id]; if(add==null) return '';
+        return `<div class="up-vd-row">
+          <span class="up-card-ico" style="background:${upEsc(s.c)}22">${upEsc(s.emo)}</span>
+          <div class="up-vd-tx"><b>${upEsc(s.name)}</b><small>${upEsc(v.verdicts[s.id]||'')}</small></div>
+          <span class="up-vd-xp" style="color:${upEsc(s.c)}">+${add}</span>
+        </div>`;
+      }).join('');
+      const body=ov.querySelector('.up-vd-body');
+      if(!body) return;
+      body.innerHTML=`<p class="up-vd-sum">${upEsc(v.summary)}</p>${rows}
+        <button class="up-cta up-vd-ok">Зарахувати ріст · +${total} досвіду</button>
+        <button class="up-vd-no">Не зараховувати</button>`;
+      const okB=body.querySelector('.up-vd-ok');
+      if(okB) okB.addEventListener('click',()=>{ upApplyVerdict(v); ov.remove(); });
+      const noB=body.querySelector('.up-vd-no');
+      if(noB) noB.addEventListener('click',()=>ov.remove());
+    }
+
+    function goUpgrade(){
+      (async()=>{
+        try{
+          await upLoad(); renderUpgrade();
+          const sh=window.__show||window.show||(typeof show==='function'?show:null);
+          if(sh) sh('scr-upgrade');
+        }catch(e){ console.error('goUpgrade',e); }
+      })();
+    }
+    window.goUpgrade=goUpgrade;
+
+    { const b=document.getElementById('upBack'); if(b) b.onclick=()=>{ if(window.goMore) window.goMore(); }; }
   })();
 </script>
 <div class="bnpop" id="bnpop" aria-hidden="true">

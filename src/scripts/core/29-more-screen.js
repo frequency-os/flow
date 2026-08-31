@@ -54,7 +54,11 @@
          <div class="mh-lbl">⚡ Головне</div>
          <div class="mh-grid">${MAIN.map(tileHTML).join('')}</div>
          <div class="mh-lbl mt">🧩 Ще інструменти</div>
-         <div class="mh-rows">${MORE.map(rowHTML).join('')}</div>`;
+         <div class="mh-rows">${MORE.map(rowHTML).join('')}</div>` +
+        ((window.upDevOn&&window.upDevOn())
+          ? `<div class="mh-lbl mt">🧪 Розробка</div>
+             <div class="mh-rows">${rowHTML({k:'upgrade', emo:'🧬', c:'139,124,255', t:'Апгрейд', d:'Персонаж, сфери, заявлений шлях'})}</div>`
+          : '');
       host.querySelectorAll('[data-mh]').forEach(b=>b.addEventListener('click',()=>openMoreSheet(b.dataset.mh)));
       host.querySelectorAll('[data-uimode]').forEach(b=>b.addEventListener('click',()=>{
         (window.setUiMode||function(){})(b.dataset.uimode);
@@ -62,6 +66,7 @@
       }));
     }
     function openMoreSheet(key){
+      if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
       const m=[...MAIN,...MORE].find(x=>x.k===key); if(!m) return;
       window.platform.haptic('light');
       // живі дії замість заглушок

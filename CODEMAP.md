@@ -13,12 +13,12 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 51 |
-| Рядків JS | 26553 |
-| Файлів CSS | 29 |
-| Рядків CSS | 9037 |
-| Сутностей верхнього рівня | 1564 |
-| Ключів сховища (FLOW_KEYS) | 45 |
+| Файлів JS | 52 |
+| Рядків JS | 26828 |
+| Файлів CSS | 30 |
+| Рядків CSS | 9091 |
+| Сутностей верхнього рівня | 1591 |
+| Ключів сховища (FLOW_KEYS) | 46 |
 
 ## Файли JS
 
@@ -64,7 +64,8 @@
 | `src/scripts/core/26-blocks-render.js` | 1891 | 25 |
 | `src/scripts/core/27-canvas.js` | 1160 | 28 |
 | `src/scripts/core/28-vision.js` | 533 | 43 |
-| `src/scripts/core/29-more-screen.js` | 342 | 22 |
+| `src/scripts/core/29-more-screen.js` | 347 | 22 |
+| `src/scripts/core/30-upgrade.js` | 270 | 27 |
 | `src/scripts/page-editor/01-palette.js` | 204 | 18 |
 | `src/scripts/page-editor/02-block-styles.js` | 924 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 590 | 27 |
@@ -109,8 +110,9 @@
 | `src/styles/core/13-search-capture.css` | 69 | 0 |
 | `src/styles/core/14-agency.css` | 332 | 0 |
 | `src/styles/core/15-vision.css` | 172 | 0 |
+| `src/styles/core/16-upgrade.css` | 54 | 0 |
 
-## Ключі сховища — FLOW_KEYS (45)
+## Ключі сховища — FLOW_KEYS (46)
 
 `src/scripts/core/01-base.js`
 
@@ -126,9 +128,9 @@
 
 `spacecanvaszoom` · `spaces_map_v2` · `spaceview` · `spacewide` · `spend` · `switcher_style`
 
-`ui_mode` · `values_state` · `vault_cfg` · `vision_v1` · `wishes_board` · `work_blocks`
+`ui_mode` · `upgrade_profile_v1` · `values_state` · `vault_cfg` · `vision_v1` · `wishes_board`
 
-`work_cfg` · `work_extras` · `work_sessions`
+`work_blocks` · `work_cfg` · `work_extras` · `work_sessions`
 
 ## Сутності по файлах
 
@@ -1658,22 +1660,54 @@
 | `tileHTML` | функція | `src/scripts/core/29-more-screen.js:25` |
 | `rowHTML` | функція | `src/scripts/core/29-more-screen.js:32` |
 | `renderMore` | функція | `src/scripts/core/29-more-screen.js:41` |
-| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:64` |
-| `goMore` | функція | `src/scripts/core/29-more-screen.js:81` |
-| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:82` |
-| `escA` | функція | `src/scripts/core/29-more-screen.js:85` |
-| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:86` |
-| `tgUser` | функція | `src/scripts/core/29-more-screen.js:87` |
-| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:89` |
-| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:110` |
-| `ALL_KEYS` | функція | `src/scripts/core/29-more-screen.js:123` |
-| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:129` |
-| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:138` |
-| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:139` |
-| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:154` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:325` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:335` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:336` |
+| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:68` |
+| `goMore` | функція | `src/scripts/core/29-more-screen.js:86` |
+| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:87` |
+| `escA` | функція | `src/scripts/core/29-more-screen.js:90` |
+| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:91` |
+| `tgUser` | функція | `src/scripts/core/29-more-screen.js:92` |
+| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:94` |
+| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:115` |
+| `ALL_KEYS` | функція | `src/scripts/core/29-more-screen.js:128` |
+| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:134` |
+| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:143` |
+| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:144` |
+| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:159` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:330` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:340` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:341` |
+
+### `src/scripts/core/30-upgrade.js` — 27 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `UPKEY` | значення | `src/scripts/core/30-upgrade.js:6` |
+| `UP_DEV_EMAIL` | значення | `src/scripts/core/30-upgrade.js:7` |
+| `UP_XP_LEVEL` | значення | `src/scripts/core/30-upgrade.js:8` |
+| `UP_DEF_SPHERES` | масив | `src/scripts/core/30-upgrade.js:9` |
+| `upData` | значення | `src/scripts/core/30-upgrade.js:17` |
+| `upEsc` | функція | `src/scripts/core/30-upgrade.js:19` |
+| `upNorm` | функція | `src/scripts/core/30-upgrade.js:21` |
+| `upLoad` | функція | `src/scripts/core/30-upgrade.js:36` |
+| `upSave` | функція | `src/scripts/core/30-upgrade.js:45` |
+| `upDevOn` | функція | `src/scripts/core/30-upgrade.js:48` |
+| `window.upDevOn` | значення | `src/scripts/core/30-upgrade.js:53` |
+| `upOverall` | функція | `src/scripts/core/30-upgrade.js:55` |
+| `upUserName` | функція | `src/scripts/core/30-upgrade.js:61` |
+| `upAvatarHTML` | функція | `src/scripts/core/30-upgrade.js:66` |
+| `upSphereCard` | функція | `src/scripts/core/30-upgrade.js:74` |
+| `renderUpgrade` | функція | `src/scripts/core/30-upgrade.js:83` |
+| `upLastSnapLine` | функція | `src/scripts/core/30-upgrade.js:110` |
+| `upEditPath` | функція | `src/scripts/core/30-upgrade.js:120` |
+| `upEditSphere` | функція | `src/scripts/core/30-upgrade.js:128` |
+| `upCollectDays` | функція | `src/scripts/core/30-upgrade.js:140` |
+| `upBuildPrompt` | функція | `src/scripts/core/30-upgrade.js:154` |
+| `upParseVerdict` | функція | `src/scripts/core/30-upgrade.js:174` |
+| `upSheet` | функція | `src/scripts/core/30-upgrade.js:190` |
+| `upApplyVerdict` | функція | `src/scripts/core/30-upgrade.js:204` |
+| `upAnalyze` | функція | `src/scripts/core/30-upgrade.js:218` |
+| `goUpgrade` | функція | `src/scripts/core/30-upgrade.js:258` |
+| `window.goUpgrade` | значення | `src/scripts/core/30-upgrade.js:267` |
 
 ### `src/scripts/page-editor/01-palette.js` — 18 сутностей
 

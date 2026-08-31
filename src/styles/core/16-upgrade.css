@@ -1,0 +1,54 @@
+  /* ============ АПГРЕЙД (dev) · персонаж і сфери ============ */
+  #scr-upgrade{max-width:560px;}
+  .up-devbadge{display:inline-flex;align-items:center;gap:6px;border:1px dashed color-mix(in srgb,#f0b429 50%,transparent);
+    border-radius:999px;padding:5px 12px;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#f0b429;}
+  .up-top{display:flex;align-items:flex-start;justify-content:space-between;}
+  .up-hero{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:18px;}
+  .up-ring{width:116px;height:116px;border-radius:50%;display:grid;place-items:center;
+    box-shadow:0 0 34px color-mix(in srgb,var(--accent) 28%,transparent);}
+  .up-ring-in{width:102px;height:102px;border-radius:50%;background:linear-gradient(135deg,var(--card-2),var(--card));
+    border:1px solid var(--line);display:grid;place-items:center;}
+  .up-av{width:94px;height:94px;border-radius:50%;display:grid;place-items:center;font-size:46px;}
+  .up-lvl{margin-top:-24px;background:linear-gradient(135deg,#6a7dff,#a06bff);border-radius:999px;padding:5px 14px;
+    font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;
+    box-shadow:0 6px 16px rgba(106,125,255,.35);position:relative;z-index:1;}
+  .up-name{font-size:22px;font-weight:800;letter-spacing:-.02em;}
+  .up-path{font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:13px;line-height:1.45;color:var(--muted);
+    text-align:center;max-width:300px;background:transparent;border:0;cursor:pointer;padding:0;}
+  .up-path:hover{color:var(--text);}
+  .up-path.empty{font-style:normal;font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);
+    border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent);border-radius:12px;padding:9px 14px;}
+  .up-xp{margin-bottom:16px;}
+  .up-xp-t{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+  .up-xp-t b{color:var(--text);}
+  .up-bar{height:5px;border-radius:4px;background:var(--field);overflow:hidden;}
+  .up-bar i{display:block;height:100%;border-radius:4px;transition:width .4s;}
+  .up-bar.big{height:8px;border:1px solid var(--line);}
+  .up-bar.big i{background:linear-gradient(90deg,#6a7dff,#a06bff);}
+  .up-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px;}
+  .up-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px 14px;
+    display:flex;flex-direction:column;gap:8px;cursor:pointer;font-family:inherit;color:var(--text);
+    text-align:left;transition:border-color .18s;}
+  .up-card:hover{border-color:var(--accent);}
+  .up-card-h{display:flex;align-items:center;gap:8px;}
+  .up-card-h b{font-size:13px;}
+  .up-card-ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex:none;}
+  .up-card-m{display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:var(--muted);}
+  .up-cta{width:100%;border:0;border-radius:16px;padding:15px;text-align:center;font-family:inherit;
+    font-size:14px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--accent),#9b6aff);
+    box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 30%,transparent);}
+  .up-cta-sub{text-align:center;font-size:11px;color:var(--muted);margin-top:8px;}
+  /* ── шторка вердикту AI ── */
+  .up-vd-wait{text-align:center;padding:22px 0;font-size:14px;font-weight:700;color:var(--text);}
+  .up-vd-wait small{display:block;margin-top:6px;font-size:11px;color:var(--muted);font-weight:600;}
+  .up-vd-sum{font-size:13px;line-height:1.5;margin:0 0 12px;color:var(--text);}
+  .up-vd-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .up-vd-row:last-of-type{border-bottom:0;}
+  .up-vd-tx{flex:1;min-width:0;}
+  .up-vd-tx b{font-size:13px;display:block;}
+  .up-vd-tx small{font-size:11px;color:var(--muted);line-height:1.4;display:block;margin-top:2px;}
+  .up-vd-xp{flex:none;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px;}
+  .up-vd-ok{margin-top:14px;}
+  .up-vd-no{display:block;width:100%;margin-top:8px;border:0;background:transparent;color:var(--muted);
+    font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:8px;}
+  .up-vd-no:hover{color:var(--text);}
