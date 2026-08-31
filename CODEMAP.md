@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 51 |
-| Рядків JS | 26540 |
+| Рядків JS | 26553 |
 | Файлів CSS | 29 |
-| Рядків CSS | 9021 |
+| Рядків CSS | 9037 |
 | Сутностей верхнього рівня | 1564 |
 | Ключів сховища (FLOW_KEYS) | 45 |
 
@@ -40,7 +40,7 @@
 | `src/scripts/core/02-storage.js` | 1018 | 90 |
 | `src/scripts/core/03-platform.js` | 101 | 16 |
 | `src/scripts/core/04-folders-nav.js` | 356 | 54 |
-| `src/scripts/core/05-agency.js` | 2039 | 149 |
+| `src/scripts/core/05-agency.js` | 2052 | 149 |
 | `src/scripts/core/06-wishes.js` | 1191 | 92 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 1558 | 145 |
@@ -93,7 +93,7 @@
 | `src/styles/16-mx.css` | 242 | 2 |
 | `src/styles/17-horizon.css` | 363 | 1 |
 | `src/styles/18-standalone.css` | 43 | 1 |
-| `src/styles/19-themes-flat.css` | 400 | 2 |
+| `src/styles/19-themes-flat.css` | 416 | 3 |
 | `src/styles/core/01-tokens-base.css` | 341 | 8 |
 | `src/styles/core/02-page-editor.css` | 1299 | 10 |
 | `src/styles/core/03-folders-projects.css` | 555 | 0 |
@@ -535,35 +535,35 @@
 | `themeSetOf` | функція | `src/scripts/core/05-agency.js:1734` |
 | `themeIsDark` | функція | `src/scripts/core/05-agency.js:1738` |
 | `theme` | значення | `src/scripts/core/05-agency.js:1739` |
-| `applyTheme` | функція | `src/scripts/core/05-agency.js:1741` |
-| `setTheme` | функція | `src/scripts/core/05-agency.js:1769` |
-| `setThemeSet` | функція | `src/scripts/core/05-agency.js:1779` |
-| `toggleTheme` | функція | `src/scripts/core/05-agency.js:1783` |
-| `proTheme` | значення | `src/scripts/core/05-agency.js:1797` |
-| `applyProTheme` | функція | `src/scripts/core/05-agency.js:1799` |
-| `toggleProTheme` | функція | `src/scripts/core/05-agency.js:1805` |
-| `cardSkin` | значення | `src/scripts/core/05-agency.js:1815` |
-| `applyCardSkin` | функція | `src/scripts/core/05-agency.js:1817` |
-| `setCardSkin` | функція | `src/scripts/core/05-agency.js:1823` |
-| `zenMode` | значення | `src/scripts/core/05-agency.js:1833` |
-| `applyZen` | функція | `src/scripts/core/05-agency.js:1834` |
-| `setZen` | функція | `src/scripts/core/05-agency.js:1841` |
-| `tidyCanvas` | функція | `src/scripts/core/05-agency.js:1873` |
-| `window.__fitAll` | значення | `src/scripts/core/05-agency.js:1881` |
-| `RR_DEFS` | обʼєкт | `src/scripts/core/05-agency.js:1892` |
-| `rrCfg` | функція | `src/scripts/core/05-agency.js:1893` |
-| `rrSave` | функція | `src/scripts/core/05-agency.js:1898` |
-| `rrCfgSheet` | функція | `src/scripts/core/05-agency.js:1899` |
-| `renderRightRail` | функція | `src/scripts/core/05-agency.js:1918` |
-| `goGoals` | функція | `src/scripts/core/05-agency.js:1952` |
-| `prjHexToRgb` | функція | `src/scripts/core/05-agency.js:1955` |
-| `prjTileHTML` | функція | `src/scripts/core/05-agency.js:1963` |
-| `renderProjects` | функція | `src/scripts/core/05-agency.js:1971` |
-| `goProjects` | функція | `src/scripts/core/05-agency.js:2006` |
-| `goPlanner` | функція | `src/scripts/core/05-agency.js:2010` |
-| `goValues` | функція | `src/scripts/core/05-agency.js:2011` |
-| `goWishes` | функція | `src/scripts/core/05-agency.js:2013` |
-| `window.goWishes` | значення | `src/scripts/core/05-agency.js:2014` |
+| `applyTheme` | функція | `src/scripts/core/05-agency.js:1757` |
+| `setTheme` | функція | `src/scripts/core/05-agency.js:1782` |
+| `setThemeSet` | функція | `src/scripts/core/05-agency.js:1792` |
+| `toggleTheme` | функція | `src/scripts/core/05-agency.js:1796` |
+| `proTheme` | значення | `src/scripts/core/05-agency.js:1810` |
+| `applyProTheme` | функція | `src/scripts/core/05-agency.js:1812` |
+| `toggleProTheme` | функція | `src/scripts/core/05-agency.js:1818` |
+| `cardSkin` | значення | `src/scripts/core/05-agency.js:1828` |
+| `applyCardSkin` | функція | `src/scripts/core/05-agency.js:1830` |
+| `setCardSkin` | функція | `src/scripts/core/05-agency.js:1836` |
+| `zenMode` | значення | `src/scripts/core/05-agency.js:1846` |
+| `applyZen` | функція | `src/scripts/core/05-agency.js:1847` |
+| `setZen` | функція | `src/scripts/core/05-agency.js:1854` |
+| `tidyCanvas` | функція | `src/scripts/core/05-agency.js:1886` |
+| `window.__fitAll` | значення | `src/scripts/core/05-agency.js:1894` |
+| `RR_DEFS` | обʼєкт | `src/scripts/core/05-agency.js:1905` |
+| `rrCfg` | функція | `src/scripts/core/05-agency.js:1906` |
+| `rrSave` | функція | `src/scripts/core/05-agency.js:1911` |
+| `rrCfgSheet` | функція | `src/scripts/core/05-agency.js:1912` |
+| `renderRightRail` | функція | `src/scripts/core/05-agency.js:1931` |
+| `goGoals` | функція | `src/scripts/core/05-agency.js:1965` |
+| `prjHexToRgb` | функція | `src/scripts/core/05-agency.js:1968` |
+| `prjTileHTML` | функція | `src/scripts/core/05-agency.js:1976` |
+| `renderProjects` | функція | `src/scripts/core/05-agency.js:1984` |
+| `goProjects` | функція | `src/scripts/core/05-agency.js:2019` |
+| `goPlanner` | функція | `src/scripts/core/05-agency.js:2023` |
+| `goValues` | функція | `src/scripts/core/05-agency.js:2024` |
+| `goWishes` | функція | `src/scripts/core/05-agency.js:2026` |
+| `window.goWishes` | значення | `src/scripts/core/05-agency.js:2027` |
 
 ### `src/scripts/core/06-wishes.js` — 92 сутностей
 

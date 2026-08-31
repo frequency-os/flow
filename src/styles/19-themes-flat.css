@@ -398,3 +398,19 @@ html.t-flat #scr-home .summary{padding-top:72px;}
    Риска згори плитки дублювала те, що й так видно з іконки та назви. */
 html.t-flat .fc2-tile.nocover::before{display:none;}
 html.t-flat .fc2-deck.nocover::before{display:none;}
+
+/* ═══ ОДИН ВИГЛЯД ДЛЯ ВСІХ СВІТЛИХ ТЕМ (01.09.2026) ═══
+   Класична світла тема (data-theme="light") тримала банер Огляду темним із білим
+   текстом і білою назвою в шапці (16-mx.css:164-171) — слід старого скляного
+   вигляду. Під універсальним плоским дизайном будь-яка світла тема має виглядати
+   однаково з desk-light: світлий банер, темний текст. `t-light` стоїть на всіх
+   світлих темах, тож для desk-light / studio-light це просто підтверджує наявне.
+   Текст лишається світлим лише в режимі фото (.has-wish) — там він на знімку. */
+html.t-flat.t-light.fd26t #scr-home .summary,
+html.t-flat.t-light #scr-home .summary{
+  background:var(--card);background-image:none;border:1px solid var(--line);box-shadow:none;}
+html.t-flat.t-light #scr-home .summary:not(.has-wish) .big{color:var(--text);text-shadow:none;}
+html.t-flat.t-light #scr-home .summary:not(.has-wish) .label,
+html.t-flat.t-light #scr-home .summary:not(.has-wish) .hint{color:var(--muted);text-shadow:none;}
+html.t-flat.t-light #scr-home .top .brand h1{color:var(--text);text-shadow:none;}
+html.t-flat.t-light #scr-home .top .icon-btn svg{color:var(--ico,var(--muted));}

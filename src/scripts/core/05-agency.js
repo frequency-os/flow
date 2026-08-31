@@ -1720,9 +1720,9 @@
   };
   // [значок, назва, колір шапки платформи, id SVG-іконки або '' для емодзі]
   const THEME_META={
-    dark:          ['🌙','Frequency-дарк',        '#0c0e14',''],
-    black:         ['⚫','Чорна (AMOLED)',        '#000000',''],
-    light:         ['☀️','Світла',                '#f4f6fb',''],
+    dark:          ['🌙','Frequency-дарк',        '#0c0e14','i-moon'],
+    black:         ['⚫','Чорна (AMOLED)',        '#000000','i-moon'],
+    light:         ['☀️','Світла',                '#f4f6fb','i-sun'],
     'desk-light':  ['', 'Робочий стіл · світла',  '#f6f7f9','i-sun'],
     'desk-dark':   ['', 'Робочий стіл · темна',   '#101317','i-moon'],
     'studio-light':['', 'Студія · світла',        '#f7f7f6','i-sun'],
@@ -1736,25 +1736,38 @@
     return 'classic'; // 'black' теж класика
   }
   function themeIsDark(t){ return t!=='light' && t!=='desk-light' && t!=='studio-light'; }
-  let theme='dark';
+  let theme='desk-dark';
   try{ const t=localStorage.getItem('flowtheme'); if(isTheme(t)) theme=t; }catch(_){}
+  /* Базовий набір — desk (рішення Ярослава 01.09.2026): чистий плоский дизайн +
+     нейтральна палітра. Хто був на класичній темі — переїжджає на пару desk
+     (light→desk-light, dark/black→desk-dark), нові користувачі стартують на
+     desk-dark. Робиться РАЗ (прапорець), далі будь-який вибір сталий — класична,
+     студія, AMOLED лишаються доступними в «Набір стилю». */
+  try{
+    if(!localStorage.getItem('theme_flat_default_v1')){
+      localStorage.setItem('theme_flat_default_v1','1');
+      const MIG={ light:'desk-light', dark:'desk-dark', black:'desk-dark' };
+      const saved=localStorage.getItem('flowtheme');
+      let next=null;
+      if(saved && MIG[saved]) next=MIG[saved];    // був на класичній — переносимо
+      else if(!isTheme(saved)) next='desk-dark';  // нічого валідного — новий дефолт
+      if(next){ theme=next; try{ prefSet('flowtheme', theme); }catch(_){ try{ localStorage.setItem('flowtheme', theme); }catch(_){} } }
+    }
+  }catch(_){}
   function applyTheme(){
     const r=document.documentElement;
     // 'dark' — тема за замовчуванням, вона живе на голому :root без атрибута
     if(theme==='dark') r.removeAttribute('data-theme');
     else r.setAttribute('data-theme',theme);
-    // Клас-прапорець для стилів, спільних усім новим наборам: рівні поверхні
-    // замість градієнтів, лінійні іконки замість емодзі. Один клас замість
-    // дублювання селекторів [data-theme^="desk-"],[data-theme^="studio-"].
-    const flat=themeSetOf(theme)!=='classic';
-    r.classList.toggle('t-flat', flat);
-    /* Другий прапорець — «це світла тема». У коді десятки правил написані як
-       html[data-theme="light"]: вони знають лише про стару світлу тему й для
-       desk-light / studio-light не спрацьовували, через що цілі екрани
-       (AI-чат, тиждень, місяць) лишались темними посеред світлої теми.
-       Замість переписувати кожне правило під кожну нову тему — один клас,
-       який ті селектори отримують додатковою копією. */
-    r.classList.toggle('t-light', flat && !themeIsDark(theme));
+    // Плаский дизайн — УНІВЕРСАЛЬНИЙ для всіх тем (рішення Ярослава 01.09.2026):
+    // рівні поверхні замість градієнтів, лінійні іконки замість емодзі. Оновлення
+    // застосунку одне на всі теми; самі теми — лише палітри кольорів поверх нього.
+    r.classList.add('t-flat');
+    /* «Це світла тема» — для будь-якої світлої теми (не лише нових наборів).
+       Десятки правил написані як html[data-theme="light"]; цей клас дає їх також
+       світлим desk-light / studio-light, а для класичної light просто дублює
+       наявні правила (нешкідливо). */
+    r.classList.toggle('t-light', !themeIsDark(theme));
     const m=THEME_META[theme]||THEME_META.dark;
     const b=document.getElementById('themeToggle');
     if(b){
