@@ -30,7 +30,6 @@ NAMES = {
     34081: 'scripts/46-mx.js',
     # ---- <style> ----
     34:    'styles/01-core.css',
-    6247:  'styles/02-income-cards.css',
     6400:  'styles/03-patterns.css',
     6472:  'styles/04-diary.css',
     30531: 'styles/10-fd26.css',

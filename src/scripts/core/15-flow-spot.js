@@ -7,7 +7,7 @@
       let nm=''; try{ nm=br&&br.folderName()||''; }catch(_){}
       return {key:'page',label:'📁 '+(nm||'Простір'),canWrite:!!br};
     }
-    if(/^scr-(finance|values|debts|income|analytics|finlit|spend|work)$/.test(scr)) return {key:'fin',label:'💰 Гроші'};
+    if(/^scr-(finance|values|debts|spend|work)$/.test(scr)) return {key:'fin',label:'💰 Гроші'};
     if(scr==='scr-planner') return {key:'plan',label:'📅 Планер'};
     if(scr==='scr-vision') return {key:'vision',label:'🧭 Візія'};
     if(scr==='scr-goals') return {key:'goals',label:'🎯 Цілі'};

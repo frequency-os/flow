@@ -988,7 +988,7 @@
         if(o.type==='in') inc+=o.amount; else out+=o.amount; });
       parts.push('Місяць: +'+fmt(inc)+' / -'+fmt(out));
     }catch(_){}
-    try{ parts.push('Картки: '+incomeSummary()); }catch(_){}
+    try{ parts.push('Гаманець: '+incomeSummary()); }catch(_){}
     try{
       if(envelopes&&envelopes.length){
         parts.push('Конверти: '+envelopes.slice(0,5).map(e=>{

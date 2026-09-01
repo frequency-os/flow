@@ -214,7 +214,6 @@
     debts:     { emoji:'🤝', t:'Борги', d:'Хто кому винен · синхрон із фінансами', open:()=>goDebts() },
     spend:     { emoji:'🧾', t:'Витрати', d:'Куди йдуть гроші', open:()=>goSpend() },
     envelopes: { emoji:'✉️', t:'Конверти', d:'Накопичення на мрії та проєкти · впливає на баланс', open:()=>goEnvelopes() },
-    income:    { emoji:'💳', t:'Доходи · Картки', d:'Робота · ЗП · проєкти · додатковий дохід', open:()=>goIncome() },
     patterns:  { emoji:'🧠', t:'Патерни', d:'Перехват лазівок · заміна патернів за 4 міс', open:()=>goPatterns() },
     planday:   { emoji:'📅', t:'План на день', d:'Точки проєкту в сьогоднішньому розкладі · синхрон із Планером', open:()=>plFolderDaySheet(currentFolderKey) },
     planmonth: { emoji:'🗓', t:'План на місяць', d:'Календар точок проєкту + найближчі', open:()=>plFolderMonthSheet(currentFolderKey) },

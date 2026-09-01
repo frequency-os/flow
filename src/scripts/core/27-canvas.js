@@ -872,8 +872,7 @@
     const __RAW = await (async ()=>{
       const keys=[KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,CBKEY,UKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,VAULT_KEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,
-        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CHKEY,CARDKEY,CARDCFGKEY,
-        FINLITKEY,FXKEY,DIARY_KEY];
+        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
           r=>[k,(r&&typeof r.value!=='undefined')?r.value:null],
@@ -1033,17 +1032,12 @@
     try{ const raw=__RAW[WKEXTRAKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) workExtras=d; }catch(_){}
     try{ const raw=__RAW[WKBLKKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') wkBlocks=Object.assign(wkBlocks,d); }catch(_){}
     try{ const raw=__RAW[RECKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) recurring=d; }catch(_){}
-    try{ const raw=__RAW[CHKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) challenges=d; }catch(_){}
     try{ const raw=__RAW[CARDKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) cards=d; }catch(_){}
-    try{ const raw=__RAW[CARDCFGKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') cardCfg=Object.assign(cardCfg,d); }catch(_){}
     try{ migrateSpendsToFin(); }catch(_){}   // одна книга: старі spends → finOps (ідемпотентно)
-    try{ const raw=__RAW[FINLITKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object'&&Array.isArray(d.done)) finlit=Object.assign({done:[],hist:{}},d); }catch(_){}
-    try{ const raw=__RAW[FXKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') fx=Object.assign(fx,d); }catch(_){}
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}
-    try{ fxUpdate(false).then(ok=>{ if(ok){ try{renderFinance();}catch(_){} } }); }catch(_){}
+    // спершу міграція — їй потрібні СТАРІ картки й курси, які ensureCards() затирає
+    try{ migrateToWallet(__RAW[CARDKEY], __RAW['fx_cfg']); }catch(e){ console.error('migrateToWallet',e); }
     try{ ensureCards(); }catch(_){}
-    // TODO(гаманець): увімкнути, коли буде готовий новий екран Фінансів —
-    // try{ migrateToWallet(); }catch(e){ console.error('migrateToWallet',e); }
     try{ migrateFolderPhotosOnce(); }catch(e){ console.error('migratePhotos',e); }
     try{ removeSystemSeedFoldersOnce(); }catch(e){ console.error('removeSeedFolders',e); }
     try{ seedAgencySlovakia(); }catch(e){ console.error('seedAgency',e); }

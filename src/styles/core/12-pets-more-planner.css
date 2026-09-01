@@ -616,36 +616,6 @@
   /* ── Гроші: «Вільно до зарплати» + «Вільний від боргу» ── */
   /* ── 4D: тижневий ритм ── */
   .fwk{margin:14px 0 4px;}
-  .fwk-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
-  .fwk-h>span:first-child{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:800;}
-  .fwk-h .lnk{font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;}
-  .fwk-plot{position:relative;display:flex;align-items:flex-end;gap:6px;height:88px;}
-  .fwk-norm{position:absolute;left:0;right:0;border-top:1px dashed rgba(255,255,255,.22);pointer-events:none;margin-bottom:18px;}
-  .fwk-d{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;}
-  .fwk-d i{display:block;width:100%;border-radius:5px 5px 3px 3px;background:#1b1f2a;transition:height .5s cubic-bezier(.34,1.2,.64,1);}
-  .fwk-d i.ok{background:var(--hab);opacity:.75;}
-  .fwk-d i.hi{background:var(--owe);opacity:.8;}
-  .fwk-d i.now{background:var(--fin);}
-  .fwk-d span{font-size:10.5px;color:var(--muted);font-weight:700;}
-  .fwk-sum{display:flex;margin-top:16px;border-top:1px solid var(--hair);}
-  .fwk-sum>div{flex:1;padding-top:12px;}
-  .fwk-sum>div+div{border-left:1px solid var(--hair);padding-left:13px;}
-  .fwk-sum b{display:block;font-size:17px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
-  .fwk-sum span{font-size:10.5px;color:var(--muted);font-weight:600;}
-  .fwk-cat{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--hair);cursor:pointer;}
-  .fwk-cat:last-child{border-bottom:0;}
-  .fwk-cat .e{width:26px;text-align:center;font-size:15px;flex:none;}
-  .fwk-cat .b{flex:1;min-width:0;}
-  .fwk-cat .n{font-size:14px;font-weight:600;}
-  .fwk-cat .ln{height:3px;border-radius:3px;background:rgba(255,255,255,.09);overflow:hidden;margin-top:7px;}
-  .fwk-cat .ln i{display:block;height:100%;border-radius:3px;}
-  .fwk-cat>b{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;}
-  .fuz-free{display:flex;gap:10px;margin:2px 0 12px;}
-  .fuz-free-half{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 13px;cursor:pointer;}
-  .fuz-free-half .l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;display:block;}
-  .fuz-free-half b{font-size:19px;font-weight:800;display:block;margin:4px 0 2px;}
-  .fuz-free-half small{font-size:10.5px;color:var(--muted);line-height:1.35;display:block;}
-  .fuz-free-half.debt b{color:var(--hab);}
   /* ── AI-старт: Точка А/Б → готова система ── */
   .ai-startbtn{display:block;width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:14px;
     color:#fff;background:linear-gradient(135deg,var(--accent),#a06bff);border-radius:15px;padding:13px;

@@ -1335,7 +1335,7 @@
     if(id==='scr-projects'||id==='scr-work'||id==='scr-agency'||id==='scr-client'){ const npr=document.getElementById('navProjects'); if(npr) npr.classList.add('on'); }
     // синхронізація десктопного сайдбару
     const dmap={'scr-home':'home','scr-folder':'home','scr-space':'home','scr-goals':'planner','scr-projects':'projects',
-                'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-income':'finance','scr-analytics':'finance','scr-finlit':'finance','scr-spend':'finance','scr-work':'projects','scr-agency':'projects','scr-client':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home'};
+                'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-agency':'projects','scr-client':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home'};
     const dkey=dmap[id]||'home';
     document.querySelectorAll('.dsb-i').forEach(b=>b.classList.toggle('on', b.dataset.dnav===dkey));
     // прапорець для 3-панельного режиму Простору
