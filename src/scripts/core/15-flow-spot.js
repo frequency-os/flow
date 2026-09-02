@@ -1140,7 +1140,8 @@
         <span class="cw">${DOW[i]}</span><span class="cn">${d.getDate()}</span>
         ${dots?`<span class="cdots">${dots}</span>`:''}</div>`;
     }
-    return `<div class="pl-dayscroll">${cells}</div>`;
+    const jump = sel!==today ? `<div class="pl-todayjump"><button data-plday="${today}">↩ Сьогодні</button></div>` : '';
+    return `${jump}<div class="pl-dayscroll">${cells}</div>`;
   }
   function plDayTitle(ds){
     const MON=['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
@@ -1305,10 +1306,10 @@
         <button class="fps-add" data-fpsadd>＋ Точка проєкту</button>`;
       ov.querySelectorAll('[data-fpmnav]').forEach(b=>b.onclick=()=>{ shift(+b.dataset.fpmnav); paint(); });
       ov.querySelectorAll('[data-fpmday]').forEach(b=>b.onclick=()=>{
-        p.selDate=b.dataset.fpmday; p.scope='day'; saveGoals(); close(); goPlanner();
+        p.selDate=b.dataset.fpmday; p.scope='day'; saveGoals(); close(); goPlanner(true);
       });
       ov.querySelectorAll('[data-fpmgo]').forEach(b=>b.onclick=()=>{
-        p.selDate=b.dataset.fpmgo; p.scope='day'; saveGoals(); close(); goPlanner();
+        p.selDate=b.dataset.fpmgo; p.scope='day'; saveGoals(); close(); goPlanner(true);
       });
       { const ad=ov.querySelector('[data-fpsadd]'); if(ad) ad.onclick=()=>{
         p.selDate=plTodayStr(); saveGoals(); close();

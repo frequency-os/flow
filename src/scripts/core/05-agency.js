@@ -2019,7 +2019,11 @@
   try{ window.goProjects=goProjects; window.renderProjects=renderProjects; }catch(_){}
   // 🕶️ непомітний вхід у Vault: довге утримання на заголовку «Проєкти»
   try{ const lp=document.querySelector('#scr-projects .brand'); if(lp) vaultAttachLongPress(lp); }catch(_){}
-  function goPlanner(){ try{ const c=document.getElementById('plannerBody'); if(c) renderPlanner(c); show('scr-planner'); const sb=document.getElementById('plSettingsBtn'); if(sb) sb.onclick=()=>plRangeSheet(); const ab=document.getElementById('plAiBtn'); if(ab) ab.onclick=()=>aiChatSheet(); }catch(e){ console.error('goPlanner',e); } }
+  // keepDay=true — не скидати обраний день (навмисний перехід на конкретну дату)
+  function goPlanner(keepDay){ try{
+    if(!keepDay){ const pp=plData(); const td=plTodayStr();
+      if(pp.selDate!==td){ pp.selDate=td; pp.calMonth=td.slice(0,7); saveGoals(); } }
+    const c=document.getElementById('plannerBody'); if(c) renderPlanner(c); show('scr-planner'); const sb=document.getElementById('plSettingsBtn'); if(sb) sb.onclick=()=>plRangeSheet(); const ab=document.getElementById('plAiBtn'); if(ab) ab.onclick=()=>aiChatSheet(); }catch(e){ console.error('goPlanner',e); } }
   function goValues(){ try{ renderValues(); show('scr-values'); }catch(e){ console.error('goValues',e); } }
   document.getElementById('valBack').onclick = () => { currentFolderKey=null; goHome(); };
   function goWishes(){ try{ renderWishes(); show('scr-wishes'); }catch(e){ console.error('goWishes',e); } }

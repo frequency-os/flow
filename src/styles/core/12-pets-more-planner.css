@@ -261,6 +261,11 @@
   /* ════════ ПЛАНЕР (преміум) ════════ */
   .pl-seg{display:flex;background:var(--bg-2);border:1px solid var(--line);border-radius:15px;padding:4px;gap:3px;margin-bottom:16px;}
   /* тижневий календар планера */
+  .pl-todayjump{display:flex;justify-content:flex-end;margin-bottom:8px;}
+  .pl-todayjump button{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:99px;
+    background:var(--accent-soft, rgba(106,125,255,.14));color:var(--accent);border:1px solid var(--line);
+    font-size:12.5px;font-weight:700;cursor:pointer;}
+  .pl-todayjump button:active{transform:scale(.96);}
   .pl-dayscroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:5px;margin-bottom:14px;-webkit-overflow-scrolling:touch;}
   .pl-dayscroll::-webkit-scrollbar{height:0;}
   .pl-cd{flex:0 0 46px;height:60px;border-radius:13px;background:var(--card);border:1px solid var(--line);
@@ -1156,6 +1161,7 @@
   .acc-expand[hidden]{display:none;}
   .acc-mini{flex:1;min-width:120px;background:var(--card-2);border:1px solid var(--line);border-radius:11px;padding:10px;font-family:inherit;font-size:12px;font-weight:800;color:var(--text);cursor:pointer;}
   .acc-mini.gg{background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;border-color:transparent;}
+  .acc-mini.dng{color:var(--owe,#ff5a5f);}
   .acc-mini.tg{background:linear-gradient(135deg,#2aabee,#229ed9);color:#fff;border-color:transparent;}
   .acc-hint{width:100%;font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:2px;}
   .bk-diag{margin-top:10px;width:100%;background:var(--bg-2);border:1px solid var(--line);color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;padding:9px;border-radius:10px;cursor:pointer;}
