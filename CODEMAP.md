@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 53 |
-| Рядків JS | 27114 |
+| Рядків JS | 27145 |
 | Файлів CSS | 30 |
-| Рядків CSS | 9075 |
-| Сутностей верхнього рівня | 1635 |
+| Рядків CSS | 9079 |
+| Сутностей верхнього рівня | 1639 |
 | Ключів сховища (FLOW_KEYS) | 45 |
 
 ## Файли JS
@@ -37,7 +37,7 @@
 | `src/scripts/45-month.js` | 661 | 0 |
 | `src/scripts/46-mx.js` | 215 | 0 |
 | `src/scripts/core/01-base.js` | 314 | 37 |
-| `src/scripts/core/02-storage.js` | 1287 | 114 |
+| `src/scripts/core/02-storage.js` | 1308 | 118 |
 | `src/scripts/core/03-platform.js` | 101 | 16 |
 | `src/scripts/core/04-folders-nav.js` | 355 | 54 |
 | `src/scripts/core/05-agency.js` | 2055 | 149 |
@@ -49,7 +49,7 @@
 | `src/scripts/core/11-ai-flow.js` | 160 | 14 |
 | `src/scripts/core/12-ai-agent.js` | 1382 | 65 |
 | `src/scripts/core/13-pets.js` | 206 | 13 |
-| `src/scripts/core/14-react.js` | 335 | 41 |
+| `src/scripts/core/14-react.js` | 345 | 41 |
 | `src/scripts/core/15-flow-spot.js` | 2059 | 103 |
 | `src/scripts/core/16-dashboard.js` | 558 | 21 |
 | `src/scripts/core/17-folder-render.js` | 225 | 8 |
@@ -106,7 +106,7 @@
 | `src/styles/core/09-board-canvas.css` | 527 | 9 |
 | `src/styles/core/10-reader-blocks.css` | 529 | 4 |
 | `src/styles/core/11-spaces-desktop.css` | 336 | 5 |
-| `src/styles/core/12-pets-more-planner.css` | 1185 | 0 |
+| `src/styles/core/12-pets-more-planner.css` | 1189 | 0 |
 | `src/styles/core/13-search-capture.css` | 69 | 0 |
 | `src/styles/core/14-agency.css` | 332 | 0 |
 | `src/styles/core/15-vision.css` | 172 | 0 |
@@ -239,7 +239,7 @@
 | `push` | функція | `src/scripts/core/01-base.js:285` |
 | `window.flowErrors` | функція | `src/scripts/core/01-base.js:294` |
 
-### `src/scripts/core/02-storage.js` — 114 сутностей
+### `src/scripts/core/02-storage.js` — 118 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -321,42 +321,46 @@
 | `phPendingSet` | функція | `src/scripts/core/02-storage.js:891` |
 | `phPendingAdd` | функція | `src/scripts/core/02-storage.js:892` |
 | `phPendingDrop` | функція | `src/scripts/core/02-storage.js:893` |
-| `window.sbPhotoPush` | функція | `src/scripts/core/02-storage.js:895` |
-| `window.sbPhotoFetch` | функція | `src/scripts/core/02-storage.js:909` |
-| `window.sbPhotoDel` | функція | `src/scripts/core/02-storage.js:917` |
-| `phSyncBusy` | значення | `src/scripts/core/02-storage.js:925` |
-| `sbPhotoSync` | функція | `src/scripts/core/02-storage.js:926` |
-| `window.sbPhotoSync` | значення | `src/scripts/core/02-storage.js:947` |
-| `window.sbWipeAll` | функція | `src/scripts/core/02-storage.js:952` |
-| `prefSet` | функція | `src/scripts/core/02-storage.js:1005` |
-| `prefCatchup` | функція | `src/scripts/core/02-storage.js:1009` |
-| `UIMODE_KEY` | значення | `src/scripts/core/02-storage.js:1022` |
-| `window.uiMode` | значення | `src/scripts/core/02-storage.js:1023` |
-| `applyUiMode` | функція | `src/scripts/core/02-storage.js:1024` |
-| `setUiMode` | функція | `src/scripts/core/02-storage.js:1025` |
-| `window.setUiMode` | значення | `src/scripts/core/02-storage.js:1033` |
-| `LP` | значення | `src/scripts/core/02-storage.js:1040` |
-| `FORMAT` | значення | `src/scripts/core/02-storage.js:1041` |
-| `APP` | значення | `src/scripts/core/02-storage.js:1042` |
-| `collect` | функція | `src/scripts/core/02-storage.js:1045` |
-| `stats` | функція | `src/scripts/core/02-storage.js:1056` |
-| `makeEnvelope` | функція | `src/scripts/core/02-storage.js:1063` |
-| `exportToFile` | функція | `src/scripts/core/02-storage.js:1074` |
-| `snapshot` | функція | `src/scripts/core/02-storage.js:1089` |
-| `restoreSnapshot` | функція | `src/scripts/core/02-storage.js:1092` |
-| `applyEnvelope` | функція | `src/scripts/core/02-storage.js:1098` |
-| `importFromFile` | функція | `src/scripts/core/02-storage.js:1120` |
-| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1129` |
-| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1143` |
-| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:1184` |
-| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:1222` |
-| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:1228` |
-| `__photoPoke` | функція | `src/scripts/core/02-storage.js:1229` |
-| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:1237` |
-| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:1261` |
-| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:1262` |
-| `window.photoPut` | функція | `src/scripts/core/02-storage.js:1268` |
-| `window.photoDel` | функція | `src/scripts/core/02-storage.js:1277` |
+| `PH_TS` | значення | `src/scripts/core/02-storage.js:898` |
+| `phTsGet` | функція | `src/scripts/core/02-storage.js:899` |
+| `phTsSet` | функція | `src/scripts/core/02-storage.js:900` |
+| `phTsDrop` | функція | `src/scripts/core/02-storage.js:901` |
+| `window.sbPhotoPush` | функція | `src/scripts/core/02-storage.js:903` |
+| `window.sbPhotoFetch` | функція | `src/scripts/core/02-storage.js:918` |
+| `window.sbPhotoDel` | функція | `src/scripts/core/02-storage.js:927` |
+| `phSyncBusy` | значення | `src/scripts/core/02-storage.js:937` |
+| `sbPhotoSync` | функція | `src/scripts/core/02-storage.js:938` |
+| `window.sbPhotoSync` | значення | `src/scripts/core/02-storage.js:968` |
+| `window.sbWipeAll` | функція | `src/scripts/core/02-storage.js:973` |
+| `prefSet` | функція | `src/scripts/core/02-storage.js:1026` |
+| `prefCatchup` | функція | `src/scripts/core/02-storage.js:1030` |
+| `UIMODE_KEY` | значення | `src/scripts/core/02-storage.js:1043` |
+| `window.uiMode` | значення | `src/scripts/core/02-storage.js:1044` |
+| `applyUiMode` | функція | `src/scripts/core/02-storage.js:1045` |
+| `setUiMode` | функція | `src/scripts/core/02-storage.js:1046` |
+| `window.setUiMode` | значення | `src/scripts/core/02-storage.js:1054` |
+| `LP` | значення | `src/scripts/core/02-storage.js:1061` |
+| `FORMAT` | значення | `src/scripts/core/02-storage.js:1062` |
+| `APP` | значення | `src/scripts/core/02-storage.js:1063` |
+| `collect` | функція | `src/scripts/core/02-storage.js:1066` |
+| `stats` | функція | `src/scripts/core/02-storage.js:1077` |
+| `makeEnvelope` | функція | `src/scripts/core/02-storage.js:1084` |
+| `exportToFile` | функція | `src/scripts/core/02-storage.js:1095` |
+| `snapshot` | функція | `src/scripts/core/02-storage.js:1110` |
+| `restoreSnapshot` | функція | `src/scripts/core/02-storage.js:1113` |
+| `applyEnvelope` | функція | `src/scripts/core/02-storage.js:1119` |
+| `importFromFile` | функція | `src/scripts/core/02-storage.js:1141` |
+| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1150` |
+| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1164` |
+| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:1205` |
+| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:1243` |
+| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:1249` |
+| `__photoPoke` | функція | `src/scripts/core/02-storage.js:1250` |
+| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:1258` |
+| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:1282` |
+| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:1283` |
+| `window.photoPut` | функція | `src/scripts/core/02-storage.js:1289` |
+| `window.photoDel` | функція | `src/scripts/core/02-storage.js:1298` |
 
 ### `src/scripts/core/03-platform.js` — 16 сутностей
 
@@ -1043,12 +1047,12 @@
 | `fcSayTimer` | значення | `src/scripts/core/14-react.js:255` |
 | `fcSayHide` | функція | `src/scripts/core/14-react.js:256` |
 | `fcSayShow` | функція | `src/scripts/core/14-react.js:257` |
-| `fcSayStart` | функція | `src/scripts/core/14-react.js:279` |
-| `flowCapRender` | функція | `src/scripts/core/14-react.js:284` |
-| `fcCheckOverlap` | функція | `src/scripts/core/14-react.js:309` |
-| `window.fcCheckOverlap` | значення | `src/scripts/core/14-react.js:329` |
-| `t` | значення | `src/scripts/core/14-react.js:331` |
-| `sched` | функція | `src/scripts/core/14-react.js:332` |
+| `fcSayStart` | функція | `src/scripts/core/14-react.js:289` |
+| `flowCapRender` | функція | `src/scripts/core/14-react.js:294` |
+| `fcCheckOverlap` | функція | `src/scripts/core/14-react.js:319` |
+| `window.fcCheckOverlap` | значення | `src/scripts/core/14-react.js:339` |
+| `t` | значення | `src/scripts/core/14-react.js:341` |
+| `sched` | функція | `src/scripts/core/14-react.js:342` |
 
 ### `src/scripts/core/15-flow-spot.js` — 103 сутностей
 

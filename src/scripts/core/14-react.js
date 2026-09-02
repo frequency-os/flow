@@ -260,16 +260,26 @@
     if(petSleeping()||cap.style.display==='none') return;
     if(document.body.classList.contains('spot-open')||document.body.classList.contains('ai-open')||document.body.classList.contains('kb-open')) return;
     b.textContent=fcSayPick();
-    // позиція: над улюбленцем, хвостик з того боку, де він сидить
+    // позиція: збоку від улюбленця (щоб не накривати контент над ним);
+    // якщо збоку не влазить — fallback над ним, як раніше
     const r=cap.getBoundingClientRect(); const onLeft=(r.left + r.width/2) < window.innerWidth/2;
-    b.classList.toggle('tail-l',onLeft); b.classList.toggle('tail-r',!onLeft);
     b.style.visibility='hidden'; b.classList.add('on');
     requestAnimationFrame(()=>{
       const bw=b.offsetWidth, bh=b.offsetHeight, m=10;
-      let x=onLeft ? r.left : (r.right - bw);
-      x=Math.max(m,Math.min(window.innerWidth-bw-m,x));
-      let y=r.top - bh - 12; if(y<64) y=r.bottom+12;
-      b.style.left=x+'px'; b.style.top=y+'px'; b.style.visibility='';
+      b.classList.remove('tail-l','tail-r','tail-sl','tail-sr');
+      let x=onLeft ? (r.right+12) : (r.left-bw-12);
+      if(x>=m && x+bw<=window.innerWidth-m){
+        const y=Math.max(64, Math.min(window.innerHeight-bh-m, r.top+r.height/2-bh/2));
+        b.classList.add(onLeft?'tail-sl':'tail-sr');
+        b.style.left=x+'px'; b.style.top=y+'px';
+      } else {
+        x=onLeft ? r.left : (r.right - bw);
+        x=Math.max(m,Math.min(window.innerWidth-bw-m,x));
+        let y=r.top - bh - 12; if(y<64) y=r.bottom+12;
+        b.classList.add(onLeft?'tail-l':'tail-r');
+        b.style.left=x+'px'; b.style.top=y+'px';
+      }
+      b.style.visibility='';
     });
     b.onclick=()=>{ fcSayHide(); flowSpotOpen(); };
     try{ window.platform.haptic('light'); }catch(_){}

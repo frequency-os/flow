@@ -28,6 +28,10 @@
   #fcSay::after{content:"";position:absolute;bottom:-6px;width:11px;height:11px;background:rgba(24,28,54,.94);
     border-right:1px solid rgba(139,123,255,.42);border-bottom:1px solid rgba(139,123,255,.42);transform:rotate(45deg);}
   #fcSay.tail-r::after{right:19px;} #fcSay.tail-l::after{left:19px;}
+  /* бічні хвостики: бульбашка стоїть збоку від орба, стрілка по центру висоти */
+  #fcSay.tail-sr::after,#fcSay.tail-sl::after{bottom:auto;top:50%;margin-top:-5px;}
+  #fcSay.tail-sr::after{right:-6px;border-bottom:none;border-top:1px solid rgba(139,123,255,.42);}
+  #fcSay.tail-sl::after{left:-6px;border-right:none;border-left:1px solid rgba(139,123,255,.42);}
   /* ── анімації життя: поява, поф, віґл, сон на іконці ── */
   @keyframes fcAppear{0%{transform:scale(0);opacity:0}55%{transform:scale(1.22);opacity:1}75%{transform:scale(.92)}100%{transform:scale(1);opacity:1}}
   @keyframes fcPoof{0%{transform:scale(1);opacity:1}35%{transform:scale(1.28)}100%{transform:scale(0);opacity:0;filter:blur(5px)}}
