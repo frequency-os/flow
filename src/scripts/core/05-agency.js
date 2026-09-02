@@ -1332,7 +1332,7 @@
     if(id==='scr-finance'){ const nf=document.getElementById('navFinance'); if(nf) nf.classList.add('on'); }
     if(id==='scr-goals'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
     if(id==='scr-planner'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
-    if(id==='scr-projects'||id==='scr-work'||id==='scr-agency'||id==='scr-client'){ const npr=document.getElementById('navProjects'); if(npr) npr.classList.add('on'); }
+    if(id==='scr-more'||id==='scr-projects'||id==='scr-work'||id==='scr-agency'||id==='scr-client'){ const nmr=document.getElementById('navMore'); if(nmr) nmr.classList.add('on'); }
     // синхронізація десктопного сайдбару
     const dmap={'scr-home':'home','scr-folder':'home','scr-space':'home','scr-goals':'planner','scr-projects':'projects',
                 'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-income':'finance','scr-analytics':'finance','scr-finlit':'finance','scr-spend':'finance','scr-work':'projects','scr-agency':'projects','scr-client':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home'};
@@ -1363,7 +1363,6 @@
   document.getElementById('navHome').onclick = goHome;
   document.getElementById('navFinance').onclick = goFinance;
   document.getElementById('navPlanner').onclick = ()=>{ goPlanner(); };
-  { const npr=document.getElementById('navProjects'); if(npr) npr.onclick = ()=>{ try{ goProjects(); }catch(e){ console.error('navProjects',e); } }; }
   { const b=document.getElementById('spaceCfgBtn'); if(b) b.onclick=()=>openSpaceSettings(); }
 
   // ── меню «⋯» Простору: другорядні дії однією шторкою ──

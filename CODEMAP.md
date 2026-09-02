@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 52 |
-| Рядків JS | 26828 |
-| Файлів CSS | 30 |
-| Рядків CSS | 9091 |
-| Сутностей верхнього рівня | 1591 |
+| Файлів JS | 53 |
+| Рядків JS | 27034 |
+| Файлів CSS | 31 |
+| Рядків CSS | 9156 |
+| Сутностей верхнього рівня | 1614 |
 | Ключів сховища (FLOW_KEYS) | 46 |
 
 ## Файли JS
@@ -40,7 +40,7 @@
 | `src/scripts/core/02-storage.js` | 1018 | 90 |
 | `src/scripts/core/03-platform.js` | 101 | 16 |
 | `src/scripts/core/04-folders-nav.js` | 356 | 54 |
-| `src/scripts/core/05-agency.js` | 2052 | 149 |
+| `src/scripts/core/05-agency.js` | 2051 | 149 |
 | `src/scripts/core/06-wishes.js` | 1191 | 92 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 1558 | 145 |
@@ -64,8 +64,9 @@
 | `src/scripts/core/26-blocks-render.js` | 1891 | 25 |
 | `src/scripts/core/27-canvas.js` | 1160 | 28 |
 | `src/scripts/core/28-vision.js` | 533 | 43 |
-| `src/scripts/core/29-more-screen.js` | 347 | 22 |
-| `src/scripts/core/30-upgrade.js` | 270 | 27 |
+| `src/scripts/core/29-more-screen.js` | 350 | 23 |
+| `src/scripts/core/30-upgrade.js` | 274 | 28 |
+| `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/page-editor/01-palette.js` | 204 | 18 |
 | `src/scripts/page-editor/02-block-styles.js` | 924 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 590 | 27 |
@@ -106,11 +107,12 @@
 | `src/styles/core/09-board-canvas.css` | 527 | 9 |
 | `src/styles/core/10-reader-blocks.css` | 529 | 4 |
 | `src/styles/core/11-spaces-desktop.css` | 336 | 5 |
-| `src/styles/core/12-pets-more-planner.css` | 1170 | 0 |
+| `src/styles/core/12-pets-more-planner.css` | 1171 | 0 |
 | `src/styles/core/13-search-capture.css` | 69 | 0 |
 | `src/styles/core/14-agency.css` | 332 | 0 |
 | `src/styles/core/15-vision.css` | 172 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
+| `src/styles/core/17-my-year.css` | 64 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (46)
 
@@ -513,59 +515,59 @@
 | `goSpaceFor` | функція | `src/scripts/core/05-agency.js:1300` |
 | `spaceFromFolder` | значення | `src/scripts/core/05-agency.js:1321` |
 | `show` | функція | `src/scripts/core/05-agency.js:1324` |
-| `openSpaceMore` | функція | `src/scripts/core/05-agency.js:1370` |
-| `dsbFillUser` | функція | `src/scripts/core/05-agency.js:1397` |
-| `window.dsbFillUser` | значення | `src/scripts/core/05-agency.js:1429` |
-| `dsbProfileSheet` | функція | `src/scripts/core/05-agency.js:1430` |
-| `renderSettingsCard` | функція | `src/scripts/core/05-agency.js:1468` |
-| `window.renderSettingsCard` | значення | `src/scripts/core/05-agency.js:1527` |
-| `openSettings` | функція | `src/scripts/core/05-agency.js:1529` |
-| `window.openSettingsSheet` | значення | `src/scripts/core/05-agency.js:1545` |
-| `ex` | значення | `src/scripts/core/05-agency.js:1568` |
-| `setNote` | функція | `src/scripts/core/05-agency.js:1570` |
-| `spaceLayout` | значення | `src/scripts/core/05-agency.js:1626` |
-| `applySpaceLayout` | функція | `src/scripts/core/05-agency.js:1629` |
-| `sidebarCollapsed` | значення | `src/scripts/core/05-agency.js:1641` |
-| `applyChrome` | функція | `src/scripts/core/05-agency.js:1646` |
-| `renderPaneList` | функція | `src/scripts/core/05-agency.js:1662` |
-| `homeWidgets` | значення | `src/scripts/core/05-agency.js:1693` |
-| `applyHomeWidgets` | функція | `src/scripts/core/05-agency.js:1696` |
-| `THEME_SETS` | обʼєкт | `src/scripts/core/05-agency.js:1716` |
-| `THEME_META` | обʼєкт | `src/scripts/core/05-agency.js:1722` |
-| `THEME_KEYS` | значення | `src/scripts/core/05-agency.js:1731` |
-| `isTheme` | функція | `src/scripts/core/05-agency.js:1732` |
-| `themeSetOf` | функція | `src/scripts/core/05-agency.js:1734` |
-| `themeIsDark` | функція | `src/scripts/core/05-agency.js:1738` |
-| `theme` | значення | `src/scripts/core/05-agency.js:1739` |
-| `applyTheme` | функція | `src/scripts/core/05-agency.js:1757` |
-| `setTheme` | функція | `src/scripts/core/05-agency.js:1782` |
-| `setThemeSet` | функція | `src/scripts/core/05-agency.js:1792` |
-| `toggleTheme` | функція | `src/scripts/core/05-agency.js:1796` |
-| `proTheme` | значення | `src/scripts/core/05-agency.js:1810` |
-| `applyProTheme` | функція | `src/scripts/core/05-agency.js:1812` |
-| `toggleProTheme` | функція | `src/scripts/core/05-agency.js:1818` |
-| `cardSkin` | значення | `src/scripts/core/05-agency.js:1828` |
-| `applyCardSkin` | функція | `src/scripts/core/05-agency.js:1830` |
-| `setCardSkin` | функція | `src/scripts/core/05-agency.js:1836` |
-| `zenMode` | значення | `src/scripts/core/05-agency.js:1846` |
-| `applyZen` | функція | `src/scripts/core/05-agency.js:1847` |
-| `setZen` | функція | `src/scripts/core/05-agency.js:1854` |
-| `tidyCanvas` | функція | `src/scripts/core/05-agency.js:1886` |
-| `window.__fitAll` | значення | `src/scripts/core/05-agency.js:1894` |
-| `RR_DEFS` | обʼєкт | `src/scripts/core/05-agency.js:1905` |
-| `rrCfg` | функція | `src/scripts/core/05-agency.js:1906` |
-| `rrSave` | функція | `src/scripts/core/05-agency.js:1911` |
-| `rrCfgSheet` | функція | `src/scripts/core/05-agency.js:1912` |
-| `renderRightRail` | функція | `src/scripts/core/05-agency.js:1931` |
-| `goGoals` | функція | `src/scripts/core/05-agency.js:1965` |
-| `prjHexToRgb` | функція | `src/scripts/core/05-agency.js:1968` |
-| `prjTileHTML` | функція | `src/scripts/core/05-agency.js:1976` |
-| `renderProjects` | функція | `src/scripts/core/05-agency.js:1984` |
-| `goProjects` | функція | `src/scripts/core/05-agency.js:2019` |
-| `goPlanner` | функція | `src/scripts/core/05-agency.js:2023` |
-| `goValues` | функція | `src/scripts/core/05-agency.js:2024` |
-| `goWishes` | функція | `src/scripts/core/05-agency.js:2026` |
-| `window.goWishes` | значення | `src/scripts/core/05-agency.js:2027` |
+| `openSpaceMore` | функція | `src/scripts/core/05-agency.js:1369` |
+| `dsbFillUser` | функція | `src/scripts/core/05-agency.js:1396` |
+| `window.dsbFillUser` | значення | `src/scripts/core/05-agency.js:1428` |
+| `dsbProfileSheet` | функція | `src/scripts/core/05-agency.js:1429` |
+| `renderSettingsCard` | функція | `src/scripts/core/05-agency.js:1467` |
+| `window.renderSettingsCard` | значення | `src/scripts/core/05-agency.js:1526` |
+| `openSettings` | функція | `src/scripts/core/05-agency.js:1528` |
+| `window.openSettingsSheet` | значення | `src/scripts/core/05-agency.js:1544` |
+| `ex` | значення | `src/scripts/core/05-agency.js:1567` |
+| `setNote` | функція | `src/scripts/core/05-agency.js:1569` |
+| `spaceLayout` | значення | `src/scripts/core/05-agency.js:1625` |
+| `applySpaceLayout` | функція | `src/scripts/core/05-agency.js:1628` |
+| `sidebarCollapsed` | значення | `src/scripts/core/05-agency.js:1640` |
+| `applyChrome` | функція | `src/scripts/core/05-agency.js:1645` |
+| `renderPaneList` | функція | `src/scripts/core/05-agency.js:1661` |
+| `homeWidgets` | значення | `src/scripts/core/05-agency.js:1692` |
+| `applyHomeWidgets` | функція | `src/scripts/core/05-agency.js:1695` |
+| `THEME_SETS` | обʼєкт | `src/scripts/core/05-agency.js:1715` |
+| `THEME_META` | обʼєкт | `src/scripts/core/05-agency.js:1721` |
+| `THEME_KEYS` | значення | `src/scripts/core/05-agency.js:1730` |
+| `isTheme` | функція | `src/scripts/core/05-agency.js:1731` |
+| `themeSetOf` | функція | `src/scripts/core/05-agency.js:1733` |
+| `themeIsDark` | функція | `src/scripts/core/05-agency.js:1737` |
+| `theme` | значення | `src/scripts/core/05-agency.js:1738` |
+| `applyTheme` | функція | `src/scripts/core/05-agency.js:1756` |
+| `setTheme` | функція | `src/scripts/core/05-agency.js:1781` |
+| `setThemeSet` | функція | `src/scripts/core/05-agency.js:1791` |
+| `toggleTheme` | функція | `src/scripts/core/05-agency.js:1795` |
+| `proTheme` | значення | `src/scripts/core/05-agency.js:1809` |
+| `applyProTheme` | функція | `src/scripts/core/05-agency.js:1811` |
+| `toggleProTheme` | функція | `src/scripts/core/05-agency.js:1817` |
+| `cardSkin` | значення | `src/scripts/core/05-agency.js:1827` |
+| `applyCardSkin` | функція | `src/scripts/core/05-agency.js:1829` |
+| `setCardSkin` | функція | `src/scripts/core/05-agency.js:1835` |
+| `zenMode` | значення | `src/scripts/core/05-agency.js:1845` |
+| `applyZen` | функція | `src/scripts/core/05-agency.js:1846` |
+| `setZen` | функція | `src/scripts/core/05-agency.js:1853` |
+| `tidyCanvas` | функція | `src/scripts/core/05-agency.js:1885` |
+| `window.__fitAll` | значення | `src/scripts/core/05-agency.js:1893` |
+| `RR_DEFS` | обʼєкт | `src/scripts/core/05-agency.js:1904` |
+| `rrCfg` | функція | `src/scripts/core/05-agency.js:1905` |
+| `rrSave` | функція | `src/scripts/core/05-agency.js:1910` |
+| `rrCfgSheet` | функція | `src/scripts/core/05-agency.js:1911` |
+| `renderRightRail` | функція | `src/scripts/core/05-agency.js:1930` |
+| `goGoals` | функція | `src/scripts/core/05-agency.js:1964` |
+| `prjHexToRgb` | функція | `src/scripts/core/05-agency.js:1967` |
+| `prjTileHTML` | функція | `src/scripts/core/05-agency.js:1975` |
+| `renderProjects` | функція | `src/scripts/core/05-agency.js:1983` |
+| `goProjects` | функція | `src/scripts/core/05-agency.js:2018` |
+| `goPlanner` | функція | `src/scripts/core/05-agency.js:2022` |
+| `goValues` | функція | `src/scripts/core/05-agency.js:2023` |
+| `goWishes` | функція | `src/scripts/core/05-agency.js:2025` |
+| `window.goWishes` | значення | `src/scripts/core/05-agency.js:2026` |
 
 ### `src/scripts/core/06-wishes.js` — 92 сутностей
 
@@ -1650,7 +1652,7 @@
 | `goVision` | функція | `src/scripts/core/28-vision.js:530` |
 | `window.goVision` | значення | `src/scripts/core/28-vision.js:531` |
 
-### `src/scripts/core/29-more-screen.js` — 22 сутностей
+### `src/scripts/core/29-more-screen.js` — 23 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1660,24 +1662,25 @@
 | `tileHTML` | функція | `src/scripts/core/29-more-screen.js:25` |
 | `rowHTML` | функція | `src/scripts/core/29-more-screen.js:32` |
 | `renderMore` | функція | `src/scripts/core/29-more-screen.js:41` |
-| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:68` |
-| `goMore` | функція | `src/scripts/core/29-more-screen.js:86` |
-| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:87` |
-| `escA` | функція | `src/scripts/core/29-more-screen.js:90` |
-| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:91` |
-| `tgUser` | функція | `src/scripts/core/29-more-screen.js:92` |
-| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:94` |
-| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:115` |
-| `ALL_KEYS` | функція | `src/scripts/core/29-more-screen.js:128` |
-| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:134` |
-| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:143` |
-| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:144` |
-| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:159` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:330` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:340` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:341` |
+| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:69` |
+| `goMore` | функція | `src/scripts/core/29-more-screen.js:88` |
+| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:89` |
+| `escA` | функція | `src/scripts/core/29-more-screen.js:92` |
+| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:93` |
+| `tgUser` | функція | `src/scripts/core/29-more-screen.js:94` |
+| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:96` |
+| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:117` |
+| `ALL_KEYS` | функція | `src/scripts/core/29-more-screen.js:130` |
+| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:136` |
+| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:145` |
+| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:146` |
+| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:161` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:332` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:342` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:343` |
+| `nm` | значення | `src/scripts/core/29-more-screen.js:344` |
 
-### `src/scripts/core/30-upgrade.js` — 27 сутностей
+### `src/scripts/core/30-upgrade.js` — 28 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1692,22 +1695,49 @@
 | `upSave` | функція | `src/scripts/core/30-upgrade.js:45` |
 | `upDevOn` | функція | `src/scripts/core/30-upgrade.js:48` |
 | `window.upDevOn` | значення | `src/scripts/core/30-upgrade.js:53` |
-| `upOverall` | функція | `src/scripts/core/30-upgrade.js:55` |
-| `upUserName` | функція | `src/scripts/core/30-upgrade.js:61` |
-| `upAvatarHTML` | функція | `src/scripts/core/30-upgrade.js:66` |
-| `upSphereCard` | функція | `src/scripts/core/30-upgrade.js:74` |
-| `renderUpgrade` | функція | `src/scripts/core/30-upgrade.js:83` |
-| `upLastSnapLine` | функція | `src/scripts/core/30-upgrade.js:110` |
-| `upEditPath` | функція | `src/scripts/core/30-upgrade.js:120` |
-| `upEditSphere` | функція | `src/scripts/core/30-upgrade.js:128` |
-| `upCollectDays` | функція | `src/scripts/core/30-upgrade.js:140` |
-| `upBuildPrompt` | функція | `src/scripts/core/30-upgrade.js:154` |
-| `upParseVerdict` | функція | `src/scripts/core/30-upgrade.js:174` |
-| `upSheet` | функція | `src/scripts/core/30-upgrade.js:190` |
-| `upApplyVerdict` | функція | `src/scripts/core/30-upgrade.js:204` |
-| `upAnalyze` | функція | `src/scripts/core/30-upgrade.js:218` |
-| `goUpgrade` | функція | `src/scripts/core/30-upgrade.js:258` |
-| `window.goUpgrade` | значення | `src/scripts/core/30-upgrade.js:267` |
+| `window.upProfile` | функція | `src/scripts/core/30-upgrade.js:55` |
+| `upOverall` | функція | `src/scripts/core/30-upgrade.js:57` |
+| `upUserName` | функція | `src/scripts/core/30-upgrade.js:63` |
+| `upAvatarHTML` | функція | `src/scripts/core/30-upgrade.js:68` |
+| `upSphereCard` | функція | `src/scripts/core/30-upgrade.js:76` |
+| `renderUpgrade` | функція | `src/scripts/core/30-upgrade.js:85` |
+| `upLastSnapLine` | функція | `src/scripts/core/30-upgrade.js:114` |
+| `upEditPath` | функція | `src/scripts/core/30-upgrade.js:124` |
+| `upEditSphere` | функція | `src/scripts/core/30-upgrade.js:132` |
+| `upCollectDays` | функція | `src/scripts/core/30-upgrade.js:144` |
+| `upBuildPrompt` | функція | `src/scripts/core/30-upgrade.js:158` |
+| `upParseVerdict` | функція | `src/scripts/core/30-upgrade.js:178` |
+| `upSheet` | функція | `src/scripts/core/30-upgrade.js:194` |
+| `upApplyVerdict` | функція | `src/scripts/core/30-upgrade.js:208` |
+| `upAnalyze` | функція | `src/scripts/core/30-upgrade.js:222` |
+| `goUpgrade` | функція | `src/scripts/core/30-upgrade.js:262` |
+| `window.goUpgrade` | значення | `src/scripts/core/30-upgrade.js:271` |
+
+### `src/scripts/core/31-my-year.js` — 21 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `myEsc` | функція | `src/scripts/core/31-my-year.js:7` |
+| `myGoalKey` | функція | `src/scripts/core/31-my-year.js:8` |
+| `myPlanGoals` | функція | `src/scripts/core/31-my-year.js:9` |
+| `myQNow` | функція | `src/scripts/core/31-my-year.js:10` |
+| `MY_Q_LABEL` | обʼєкт | `src/scripts/core/31-my-year.js:11` |
+| `MY_MON` | масив | `src/scripts/core/31-my-year.js:12` |
+| `mySpheres` | масив | `src/scripts/core/31-my-year.js:14` |
+| `mySphere` | функція | `src/scripts/core/31-my-year.js:16` |
+| `myWeekDays` | функція | `src/scripts/core/31-my-year.js:17` |
+| `myWeekBlocks` | функція | `src/scripts/core/31-my-year.js:23` |
+| `myGoalCard` | функція | `src/scripts/core/31-my-year.js:36` |
+| `myGoalRowFuture` | функція | `src/scripts/core/31-my-year.js:49` |
+| `renderMyYear` | функція | `src/scripts/core/31-my-year.js:57` |
+| `mySheet` | функція | `src/scripts/core/31-my-year.js:110` |
+| `mySphereSheet` | функція | `src/scripts/core/31-my-year.js:118` |
+| `myGoalSheet` | функція | `src/scripts/core/31-my-year.js:134` |
+| `myPickSphere` | функція | `src/scripts/core/31-my-year.js:151` |
+| `myPickQuarter` | функція | `src/scripts/core/31-my-year.js:156` |
+| `myAddSheet` | функція | `src/scripts/core/31-my-year.js:162` |
+| `goMyYear` | функція | `src/scripts/core/31-my-year.js:185` |
+| `window.goMyYear` | значення | `src/scripts/core/31-my-year.js:196` |
 
 ### `src/scripts/page-editor/01-palette.js` — 18 сутностей
 

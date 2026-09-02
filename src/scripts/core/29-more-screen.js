@@ -42,7 +42,8 @@
       const host=document.getElementById('moreHybrid'); if(!host) return;
       const _m=(window.uiMode||'pro');
       host.innerHTML=
-        `<div class="mh-mode">
+        `<div class="mh-rows mh-projects">${rowHTML({k:'projects', emo:'🗂️', c:'139,124,255', t:'Проєкти', d:'Агенція, клієнти й робочі проєкти'})}</div>
+         <div class="mh-mode">
            <div class="mh-mode-tx"><b>Режим Frequency</b><span>${_m==='lite'
              ?'Lite — ядро: Планер · Гроші · Проєкти. Решта чекає тут.'
              :'Pro — повний Frequency: Огляд, простір, папки, все одразу.'}</span></div>
@@ -67,6 +68,7 @@
     }
     function openMoreSheet(key){
       if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
+      if(key==='projects'){ if(window.goProjects) window.goProjects(); return; }
       const m=[...MAIN,...MORE].find(x=>x.k===key); if(!m) return;
       window.platform.haptic('light');
       // живі дії замість заглушок
@@ -339,6 +341,7 @@
     // прив'язка кнопок «Ще» (топбар Огляду + десктопний сайдбар) і центральної AI
     const hm=document.getElementById('homeMoreBtn'); if(hm) hm.onclick=goMore;
     const na=document.getElementById('navAI'); if(na) na.onclick=()=>{ if(window.aiChatSheet) window.aiChatSheet(); };
+    const nm=document.getElementById('navMore'); if(nm) nm.onclick=goMore;
     try{ flowCapRender(); setInterval(flowCapRender,60000); }catch(_){}
     try{ prefCatchup('pet_pos',()=>flowCapRender()); prefCatchup('pet_sleep',()=>flowCapRender()); }catch(_){}
     document.querySelectorAll('.dsb-i[data-dnav="more"]').forEach(b=>b.onclick=goMore);

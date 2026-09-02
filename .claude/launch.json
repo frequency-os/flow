@@ -3,9 +3,17 @@
   "configurations": [
     {
       "name": "frequency",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "dist"],
-      "port": 4173
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-4173} --directory dist"],
+      "port": 4173,
+      "autoPort": true
+    },
+    {
+      "name": "wallet-proof",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-4180} --directory /private/tmp/claude-501/-Users-yarosla-frequency/27c7532d-c763-4449-8dfa-9092960d693b/scratchpad/wt-wallet/dist"],
+      "port": 4180,
+      "autoPort": true
     }
   ]
 }

@@ -51,6 +51,8 @@
       return false;
     }
     window.upDevOn=upDevOn;
+    /* профіль сфер для сусідніх dev-модулів («Мій рік»): читати, не мутувати */
+    window.upProfile=async function(){ await upLoad(); return upData; };
 
     function upOverall(){
       const ss=upData.spheres;
@@ -100,12 +102,14 @@
           <div class="up-bar big"><i style="width:${o.pct}%"></i></div>
         </div>
         <div class="up-grid">${upData.spheres.map(upSphereCard).join('')}</div>
+        <button class="up-year" data-upyear>🗺 <b>Мій рік</b><span>план на рік по сферах</span><i>›</i></button>
         <button class="up-cta" data-upanalyze>✦ Проаналізувати мій рух</button>
         <div class="up-cta-sub">${upLastSnapLine()}</div>`;
 
       host.querySelectorAll('[data-uppath]').forEach(el=>el.addEventListener('click',upEditPath));
       host.querySelectorAll('[data-upsp]').forEach(el=>el.addEventListener('click',()=>upEditSphere(+el.dataset.upsp)));
       const an=host.querySelector('[data-upanalyze]'); if(an) an.addEventListener('click',upAnalyze);
+      const yr=host.querySelector('[data-upyear]'); if(yr) yr.addEventListener('click',()=>{ if(window.goMyYear) window.goMyYear(); });
     }
     function upLastSnapLine(){
       const sn=upData.snapshots[upData.snapshots.length-1];

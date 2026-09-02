@@ -604,6 +604,7 @@
   body.mode-lite [data-dnav="home"]{display:none;}
   body.mode-lite .pl-seg{display:none;}
   body.mode-lite .gtabs{display:none;}
+  .mh-projects{margin-bottom:14px;}
   .mh-mode{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
     border-radius:16px;padding:13px 14px;margin-bottom:14px;}
   .mh-mode-tx{flex:1;min-width:0;}
