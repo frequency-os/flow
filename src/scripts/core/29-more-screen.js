@@ -236,6 +236,16 @@
             <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
           </div>
         </div>
+        <div class="acc-row" data-acc-reset-row>
+          <div class="acc-rico">♻️</div>
+          <div class="acc-rtext"><div class="acc-rtitle">Скидання</div><div class="acc-rsub">до заводських установок</div></div>
+          <span class="acc-chev">›</span>
+        </div>
+        <div class="acc-expand" data-acc-reset-expand hidden>
+          <button class="acc-mini" data-acc-reset-device>♻️ Скинути цей пристрій</button>
+          <button class="acc-mini dng" data-acc-reset-all>🗑 Стерти все з акаунта</button>
+          <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл.</p>
+        </div>
         <div class="acc-row" data-acc-settings-row>
           <div class="acc-rico">⚙️</div>
           <div class="acc-rtext"><div class="acc-rtitle">Всі налаштування</div></div>
@@ -279,6 +289,36 @@
 
       const bkRow=host.querySelector('[data-acc-backup-row]');
       if(bkRow) bkRow.onclick=()=>toggle('[data-acc-backup-expand]');
+
+      // ── скидання до заводських ──
+      const rsRow=host.querySelector('[data-acc-reset-row]');
+      if(rsRow) rsRow.onclick=()=>toggle('[data-acc-reset-expand]');
+      const rsDev=host.querySelector('[data-acc-reset-device]');
+      if(rsDev) rsDev.onclick=(e)=>{
+        e.stopPropagation();
+        const inAcc=!!(window.sbUser&&window.sbUser());
+        confirmSheet({title:'Скинути цей пристрій?',
+          sub:'Локальні дані буде стерто'+(inAcc?' — після перезапуску вони повернуться з хмари акаунта':'. Входу в акаунт немає, тож вони НЕ відновляться')+'. Спершу бекап збережеться у файл.',
+          okLabel:'Скинути', onOk:async ()=>{
+            const r=await window.flowFactoryReset({wipeCloud:false});
+            if(!r.ok) flowAlert('❌ Скидання зупинено: '+r.error);
+          }});
+      };
+      const rsAll=host.querySelector('[data-acc-reset-all]');
+      if(rsAll) rsAll.onclick=(e)=>{
+        e.stopPropagation();
+        confirmSheet({title:'Стерти ВСЕ з акаунта?',
+          sub:'Дані на цьому пристрої і в хмарі буде видалено. Інші пристрої після наступної синхронізації теж спорожніють.',
+          okLabel:'Далі', onOk:()=>{
+            /* друге, окреме підтвердження — пауза, щоб перший аркуш встиг закритись */
+            setTimeout(()=>{ confirmSheet({title:'Точно стерти все?',
+              sub:'Це незворотно. Єдина копія лишиться у файлі бекапу, який зараз збережеться.',
+              okLabel:'Стерти назавжди', onOk:async ()=>{
+                const r=await window.flowFactoryReset({wipeCloud:true});
+                if(!r.ok) flowAlert('❌ Стирання зупинено: '+r.error);
+              }}); }, 350);
+          }});
+      };
       const exb=host.querySelector('[data-acc-export]');
       if(exb) exb.onclick=(e)=>{
         e.stopPropagation();

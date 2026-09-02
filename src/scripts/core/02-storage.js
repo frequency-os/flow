@@ -1,4 +1,23 @@
   /* ============ STORAGE: Telegram CloudStorage + localStorage кеш + версіонування ============ */
+
+  /* ── Дочистка IndexedDB після «Скинути до заводських» ──
+     deleteDatabase не проходить, поки живі зʼєднання (PhotoDB/BookDB/DocDB
+     тримають свої постійно) — тому скидання лише ставить прапорець і
+     перезапускає сторінку, а СПРАВЖНЄ видалення робимо тут: на самому
+     старті, до того, як будь-хто встиг відкрити базу. Запити open,
+     видані пізніше, за специфікацією стають у чергу ПІСЛЯ delete —
+     тож модулі просто отримають свіжі порожні бази. */
+  (function(){
+    const FLAG='__flow_wipe_idb__';
+    try{
+      if(!localStorage.getItem(FLAG)) return;
+      localStorage.removeItem(FLAG);
+      ['flow_photos','flow_books','flow_docs'].forEach(n=>{
+        try{ indexedDB.deleteDatabase(n); }catch(_){}
+      });
+    }catch(_){}
+  })();
+
   (function(){
     const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
     /* Telegram більше не використовується (SDK прибрано 2026-08-29, лежить
@@ -530,7 +549,9 @@
             try{ await sbPrefetchAll(); }catch(_){}
             // сесія жива — доштовхнути незлиті правки з попереднього (можливо офлайн) запуску
             try{ if(window.sbFlushWrites && localStorage.getItem('flowapp___sb_outbox')) window.sbFlushWrites(); }catch(_){}
-            try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){} };
+            try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
+            // фото: доштовхнути незлиті + разовий backfill старих знімків
+            try{ if(window.sbPhotoSync) window.sbPhotoSync(); }catch(_){} };
           if(typeof window.__load==='function') refetch();
           else setTimeout(refetch, 300); // load() ще міг не встигнути визначитись на цьому етапі скрипта
         }
@@ -558,7 +579,9 @@
     async function sbPrefetchAll(){
       if(!sb || !sbUserCache) return false;
       try{
-        const { data, error } = await sb.from('user_data').select('key,value,updated_at').eq('user_id', sbUserCache.id);
+        // фото (ключі 'photo:…') сюди не тягнемо: вони великі й потрібні
+        // ліниво — їх дотягує sbPhotoFetch при промаху в IndexedDB
+        const { data, error } = await sb.from('user_data').select('key,value,updated_at').eq('user_id', sbUserCache.id).not('key','like','photo:%');
         if(error || !data) return false;
         const c={}, ts={}; data.forEach(r=>{ c[r.key]=JSON.stringify(r.value); ts[r.key]=Date.parse(r.updated_at)||0; });
         sbBatchCache=c; sbBatchTs=ts;
@@ -642,6 +665,7 @@
           try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
           try{ await sbPrefetchAll(); }catch(_){}
           try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
+          try{ if(window.sbPhotoSync) window.sbPhotoSync(); }catch(_){}
           try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
           const who = (sbUserCache && sbUserCache.email) ? sbUserCache.email : '';
           say('Вхід виконано' + (who ? ' · ' + who : ''));
@@ -810,6 +834,152 @@
     try{ window.addEventListener('online', ()=>{ if(Object.keys(sbWriteQueue).length && !sbWriteTimer) sbWriteTimer=setTimeout(sbFlushWrites,300); }); }catch(_){}
     // при старті підхопити незлиті правки з попередньої сесії (відправляться, коли буде сесія)
     try{ sbOutboxLoad(); sbSyncPending(); }catch(_){}
+
+    /* ── СВІЖІСТЬ МІЖ ПРИСТРОЯМИ ──
+       Хмара досі читалась лише при запуску та по ручному «↻» — застосунок,
+       що висить відкритим на Маку, не бачив правок з телефона, доки його не
+       перезапустиш. Тепер: (а) при поверненні до вкладки/застосунку і
+       (б) тихим кроком раз на ~2 хв, поки він видимий, робимо ОДИН пакетний
+       запит і, ТІЛЬКИ якщо в хмарі зʼявилось щось новіше за локальне,
+       перечитуємо дані тим самим __load(), що й кнопка «↻». Порожні звірки
+       екран не смикають узагалі. */
+    let sbLastPull = 0;
+    async function sbPullFresh(){
+      if(!sb || !sbUserCache) return;
+      if(document.visibilityState !== 'visible') return;
+      if(Date.now() - sbLastPull < 30000) return;   // не частіше, ніж раз на 30 с
+      // людина щось друкує — не висмикувати поле з-під пальців; наступний крок добере
+      try{
+        const ae = document.activeElement;
+        if(ae && (ae.tagName==='INPUT' || ae.tagName==='TEXTAREA' || ae.isContentEditable)) return;
+      }catch(_){}
+      sbLastPull = Date.now();
+      const before = Object.assign({}, sbBatchTs);  // час-мітки хмари ДО звірки
+      let ok=false; try{ ok = await sbPrefetchAll(); }catch(_){}
+      if(!ok) return;
+      try{ sbPhotoSync(); }catch(_){}   // заразом доштовхнути фото, що чекають
+      let changed = false;
+      for(const k in sbBatchTs){
+        const cloudTs = sbBatchTs[k]||0;
+        // новим вважаємо лише те, чого ми ще не бачили І що свіжіше за локальну копію
+        if(cloudTs > (before[k]||0) && cloudTs > sbLocalVersion(k)){ changed = true; break; }
+      }
+      if(!changed) return;
+      try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
+      try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
+      try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
+      try{ if(window.__setSync){ window.__flowSync.last=Date.now(); window.__setSync('synced'); } }catch(_){}
+    }
+    window.sbPullFresh = sbPullFresh;
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState==='visible') sbPullFresh();
+    });
+    setInterval(sbPullFresh, 120000);
+
+    /* ── ФОТО В ХМАРІ ──
+       Знімки папок і Карти бажань лежать в IndexedDB (PhotoDB), а в конфіги
+       йде лише посилання `idb:ph_…` — тому досі на іншому пристрої фото були
+       порожні. Тут їхній власний шлях у ту саму таблицю user_data під ключами
+       `photo:<id>`. НАВМИСНО повз чергу-outbox: вона зберігається в
+       localStorage, і один знімок міг би переповнити його 5-МБ ліміт. Замість
+       цього — прямий upsert, а при невдачі запам'ятовуємо лише СПИСОК id
+       (самі дані й так живуть в IndexedDB) і доштовхуємо при наступній
+       звірці свіжості чи появі мережі. */
+    const PH_KEY = 'photo:';
+    const PH_PENDING = 'flowapp___ph_push';   // id-шники, що чекають на відправку
+    function phPendingGet(){ try{ const a=JSON.parse(localStorage.getItem(PH_PENDING)||'[]'); return Array.isArray(a)?a:[]; }catch(_){ return []; } }
+    function phPendingSet(a){ try{ a.length?localStorage.setItem(PH_PENDING,JSON.stringify(a)):localStorage.removeItem(PH_PENDING); }catch(_){} }
+    function phPendingAdd(id){ const a=phPendingGet(); if(!a.includes(id)){ a.push(id); phPendingSet(a); } }
+    function phPendingDrop(id){ phPendingSet(phPendingGet().filter(x=>x!==id)); }
+    /* Час-мітки НАШОЇ копії кожного знімка ({id: мс}). Потрібні, бо id фото
+       стабільні (ph_<папка>, wi_<бажання>): заміна обкладинки на іншому
+       пристрої переписує ТОЙ САМИЙ id, і без мітки локальний кеш ніколи б
+       не дізнався, що його копія застаріла. Карта крихітна — лише числа. */
+    const PH_TS = 'flowapp___ph_ts';
+    function phTsGet(){ try{ const o=JSON.parse(localStorage.getItem(PH_TS)||'{}'); return (o&&typeof o==='object')?o:{}; }catch(_){ return {}; } }
+    function phTsSet(id, ts){ try{ const o=phTsGet(); o[id]=ts; localStorage.setItem(PH_TS, JSON.stringify(o)); }catch(_){} }
+    function phTsDrop(id){ try{ const o=phTsGet(); delete o[id]; localStorage.setItem(PH_TS, JSON.stringify(o)); }catch(_){} }
+
+    window.sbPhotoPush = async function(id){
+      if(!id) return false;
+      if(!sb || !sbUserCache){ phPendingAdd(id); return false; }
+      try{
+        const dataUrl = await window.PhotoDB.get(id);
+        if(!dataUrl){ phPendingDrop(id); return false; }   // знімок уже стерто — нема чого штовхати
+        const now = Date.now();
+        const { error } = await sb.from('user_data').upsert(
+          { user_id:sbUserCache.id, key:PH_KEY+id, value:dataUrl, updated_at:new Date(now).toISOString() },
+          { onConflict:'user_id,key' });
+        if(error) throw error;
+        phPendingDrop(id); phTsSet(id, now);
+        return true;
+      }catch(_){ phPendingAdd(id); return false; }
+    };
+    window.sbPhotoFetch = async function(id){
+      if(!id || !sb || !sbUserCache) return null;
+      try{
+        const { data, error } = await sb.from('user_data').select('value,updated_at').eq('user_id', sbUserCache.id).eq('key', PH_KEY+id).maybeSingle();
+        if(error || !data || typeof data.value!=='string') return null;
+        phTsSet(id, Date.parse(data.updated_at)||Date.now());
+        return data.value;
+      }catch(_){ return null; }
+    };
+    window.sbPhotoDel = async function(id){
+      phPendingDrop(id); phTsDrop(id);
+      if(!id || !sb || !sbUserCache) return;
+      try{ await sb.from('user_data').delete().eq('user_id', sbUserCache.id).eq('key', PH_KEY+id); }catch(_){}
+    };
+    /* Повний фото-цикл: (1) одноразово на пристрій+акаунт поставити в чергу
+       знімки, збережені ще ДО появи цієї синхронізації; (2) доштовхнути
+       чергу — по одному, послідовно, щоб не зліпити мегабайтний запит;
+       (3) освіжити локальні копії, які інший пристрій встиг замінити
+       (звірка йде легким запитом лише id + час-мітка, без самих фото). */
+    let phSyncBusy=false;
+    async function sbPhotoSync(){
+      if(phSyncBusy || !sb || !sbUserCache) return;
+      phSyncBusy=true;
+      try{
+        const { data, error } = await sb.from('user_data').select('key,updated_at').eq('user_id', sbUserCache.id).like('key', PH_KEY+'%');
+        if(error) throw error;
+        const cloud={}; (data||[]).forEach(r=>{ cloud[r.key.slice(PH_KEY.length)]=Date.parse(r.updated_at)||0; });
+        // (1) backfill старих знімків
+        const doneKey='flowapp___ph_backfill_'+sbUserCache.id;
+        let backfillDone=false; try{ backfillDone=!!localStorage.getItem(doneKey); }catch(_){}
+        if(!backfillDone){
+          const local = await window.PhotoDB.all();
+          Object.keys(local).forEach(id=>{ if(!(id in cloud)) phPendingAdd(id); });
+          try{ localStorage.setItem(doneKey,'1'); }catch(_){}
+        }
+        // (2) відправка черги
+        for(const id of phPendingGet()){ await window.sbPhotoPush(id); }
+        // (3) застарілі локальні копії; відсутні локально не чіпаємо —
+        //     їх дотягне photoSrc ліниво, коли вони знадобляться рендеру
+        const ts=phTsGet(); let refreshed=false;
+        for(const id in cloud){
+          if(cloud[id] <= (ts[id]||0)) continue;
+          if(!(window.__photoCache && window.__photoCache[id])) continue;
+          const v = await window.sbPhotoFetch(id);
+          if(v){ try{ await window.PhotoDB.put(id, v); }catch(_){} window.__photoCache[id]=v; refreshed=true; }
+        }
+        if(refreshed){ try{ __photoPoke(); }catch(_){} }
+      }catch(_){}
+      phSyncBusy=false;
+    }
+    window.sbPhotoSync = sbPhotoSync;
+    try{ window.addEventListener('online', ()=>{ setTimeout(sbPhotoSync, 1000); }); }catch(_){}
+
+    /* Стерти ВСІ дані акаунта в хмарі (разом із фото). Викликається лише
+       з «Стерти все з акаунта» — після обовʼязкового бекапу у файл. */
+    window.sbWipeAll = async function(){
+      if(!sb || !sbUserCache) return false;
+      try{
+        const { error } = await sb.from('user_data').delete().eq('user_id', sbUserCache.id);
+        if(error) throw error;
+        sbBatchCache={}; sbBatchTs={}; sbWriteQueue={};
+        sbOutboxSave(); sbSyncPending();
+        return true;
+      }catch(_){ return false; }
+    };
     window.storage.set = async function(key, value){
       // Запобіжник від затирання порожнечею: якщо ключ не прочитався при старті
       // (пошкоджений), не даємо його ПОРОЖНІМ дефолтом стерти добру копію. Щойно
@@ -980,6 +1150,48 @@
     window.flowBackup = { collect, stats, exportToFile, importFromFile, snapshot, restoreSnapshot, FORMAT };
   })();
 
+  /* ============ СКИДАННЯ ДО ЗАВОДСЬКИХ ============
+     Дві дії з екрана «Ще»:
+       • «Скинути цей пристрій» (wipeCloud:false) — чистить усе локальне,
+         але ЛИШАЄ сесію Google: після перезапуску дані повертаються з
+         хмари чистим дзеркалом акаунта.
+       • «Стерти все з акаунта» (wipeCloud:true) — плюс видаляє всі рядки
+         в хмарі й виходить з акаунта. Незворотно.
+     Обидві починаються з експорту бекапу у файл — без нього не рушаємо.
+     IndexedDB тут лише позначається прапорцем: бази видаляє ранній хук
+     на наступному старті (див. верх файлу), бо відкриті зʼєднання
+     блокують deleteDatabase. ============ */
+  window.flowFactoryReset = async function(opts){
+    const o=opts||{};
+    // 1) страховка: бекап у файл. Не вдався — зупиняємось.
+    const bk = window.flowBackup.exportToFile();
+    if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
+    // 2) хмара — доки сесія ще жива
+    if(o.wipeCloud){
+      const u = window.sbUser && window.sbUser();
+      if(u){
+        const wiped = await (window.sbWipeAll ? window.sbWipeAll() : false);
+        if(!wiped) return { ok:false, step:'cloud', error:'хмару не вдалося стерти — дані не чіпав' };
+        try{ if(window.sbSignOut) await window.sbSignOut(); }catch(_){}
+      }
+    }
+    // 3) localStorage: усе, крім сесії Supabase (ключі 'sb-…') при скиданні
+    //    лише пристрою — інакше довелося б входити в Google заново
+    try{
+      const drop=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i); if(!k) continue;
+        if(!o.wipeCloud && k.slice(0,3)==='sb-') continue;
+        drop.push(k);
+      }
+      drop.forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
+    }catch(_){}
+    // 4) прапорець для дочистки IndexedDB + перезапуск
+    try{ localStorage.setItem('__flow_wipe_idb__','1'); }catch(_){}
+    setTimeout(()=>{ try{ location.reload(); }catch(_){} }, 600);
+    return { ok:true };
+  };
+
   /* ============ PhotoDB — знімки папок і Карти бажань в IndexedDB ============
      Раніше фото лежали base64-рядком просто в folders_cfg / wishes_board. Через
      це один знімок роздував увесь JSON, а кожна дрібна зміна (перейменував
@@ -1053,7 +1265,15 @@
     if(!__phPending.has(id) && window.PhotoDB && window.PhotoDB.available()){
       __phPending.add(id);
       window.PhotoDB.get(id)
-        .then(v=>{ if(v){ window.__photoCache[id]=v; __photoPoke(); } })
+        .then(async v=>{
+          // нема локально — можливо, знімок зроблено на іншому пристрої:
+          // дотягуємо з хмари й кладемо в IndexedDB, далі він уже рідний
+          if(!v && window.sbPhotoFetch){
+            try{ v = await window.sbPhotoFetch(id); }catch(_){ v=null; }
+            if(v){ try{ await window.PhotoDB.put(id, v); }catch(_){} }
+          }
+          if(v){ window.__photoCache[id]=v; __photoPoke(); }
+        })
         .catch(()=>{})
         .then(()=>__phPending.delete(id));
     }
@@ -1071,6 +1291,7 @@
       if(!window.PhotoDB||!window.PhotoDB.available()) return dataUrl;
       await window.PhotoDB.put(id, dataUrl);
       window.__photoCache[id]=dataUrl;
+      try{ if(window.sbPhotoPush) window.sbPhotoPush(id); }catch(_){}   // у хмару — фоном
       return 'idb:'+id;
     }catch(_){ return dataUrl; }
   };
@@ -1080,6 +1301,7 @@
       const id=String(ref).slice(4);
       delete window.__photoCache[id];
       if(window.PhotoDB&&window.PhotoDB.available()) await window.PhotoDB.del(id);
+      try{ if(window.sbPhotoDel) window.sbPhotoDel(id); }catch(_){}
     }catch(_){}
   };
 
