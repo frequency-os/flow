@@ -39,14 +39,14 @@
     'folders_cfg','folders_order','folder_widgets','switcher_style',
     'spaces_map_v2','active_space_map_v2',
     'goals_data','values_state','wishes_board',
-    'envelopes','debts','fin_ops','fin_recurring','fin_challenges',
-    'income_cards','income_cfg','fx_cfg','finlit_state','spend',
+    'envelopes','debts','fin_ops','fin_recurring',
+    'income_cards','fx_cfg','spend',
     'work_sessions','work_cfg','work_extras','work_blocks',
     'board','customboards','blockusage',
     'spaceview','spacewide','spacecanvas','spacecanvaszoom',
     'readerCfg',
     'patterns_chains','patterns_score','patterns_transform',
-    'vision_v1','vault_cfg','custom_avatar_v1','diary_entries_v1','upgrade_profile_v1',
+    'vision_v1','vault_cfg','custom_avatar_v1','diary_entries_v1','diary_insights_v1','diary_books_v1','upgrade_profile_v1',
     'lang_pref','i18n_content_cache'
   ];
 

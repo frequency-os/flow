@@ -7,7 +7,7 @@
       let nm=''; try{ nm=br&&br.folderName()||''; }catch(_){}
       return {key:'page',label:'📁 '+(nm||'Простір'),canWrite:!!br};
     }
-    if(/^scr-(finance|values|debts|income|analytics|finlit|spend|work)$/.test(scr)) return {key:'fin',label:'💰 Гроші'};
+    if(/^scr-(finance|values|debts|spend|work)$/.test(scr)) return {key:'fin',label:'💰 Гроші'};
     if(scr==='scr-planner') return {key:'plan',label:'📅 Планер'};
     if(scr==='scr-vision') return {key:'vision',label:'🧭 Візія'};
     if(scr==='scr-goals') return {key:'goals',label:'🎯 Цілі'};
@@ -418,7 +418,51 @@
         <button class="no" data-decline="${mi}">Відхилити</button>
       </div></div>`;
   }
+  /* ── слід агента: жива картка кроків (поки думає), згорнутий рядок у
+     відповіді (тап розгортає), полиця розділів і цифри ── */
+  function aiTraceLiveHTML(){
+    if(!aiTrace||!aiTrace.steps.length) return '';
+    return `<div class="ai-trace"><div class="tr-h">Флоу працює з твоїми даними<i>${aiTrace.steps.filter(s=>!s.run).length}/${aiTrace.steps.length}</i></div>`
+      +aiTrace.steps.map(s=>`<div class="tr-st${s.run?' run':''}"><span class="tx">${esc(s.t)}</span>${s.n?`<span class="n">${esc(s.n)}</span>`:''}${s.run?'<span class="spin"></span>':'<span class="ok">✓</span>'}</div>`).join('')
+      +`</div>`;
+  }
+  function aiTraceRowHTML(tr){
+    const names=(tr.shelf||[]).map(x=>x.name).slice(0,3).join(' · ');
+    return `<div class="ai-tracerow" data-trx="1">⚡ <b>${aiPlz(tr.steps.length,'крок','кроки','кроків')}</b>${names?' · '+esc(names):''}
+      <div class="tr-full">${tr.steps.map(s=>`<div class="tr-st"><span class="tx">${esc(s.t)}</span>${s.n?`<span class="n">${esc(s.n)}</span>`:''}<span class="ok">✓</span></div>`).join('')}</div></div>`;
+  }
+  const AI_SHELF_GO={day:'navPlanner',backlog:'navPlanner',fin:'navFinance',folders:'navProjects'};
+  function aiShelfHTML(tr){
+    if(!tr.shelf||!tr.shelf.length) return '';
+    return `<div class="ai-sect">Флоу переглянув</div><div class="ai-shelf">`
+      +tr.shelf.map(x=>{
+        const go=AI_SHELF_GO[x.k];
+        return `<div class="ai-shc sh-${esc(x.k)}"${go?` data-shgo="${go}"`:''}>
+          <div class="th"><i class="l1"></i><i class="l2"></i><i class="bk"></i><span>${x.e||'📄'}</span></div>
+          <b>${esc(x.name)}</b><small>${esc(x.meta||'розділ')}</small></div>`;
+      }).join('')+`</div>`;
+  }
+  function aiTraceKpisHTML(tr){
+    if(!tr.kpi||(!tr.kpi.day&&!tr.kpi.fin)) return '';
+    const cells=[];
+    if(tr.kpi.day){
+      const d=aiDayPct();
+      cells.push(`<div class="ai-kpi g"><b>${d.tot?d.pct+'%':'—'}</b><small>день</small></div>`);
+      cells.push(`<div class="ai-kpi"><b>${plStreak()}</b><small>стрік</small></div>`);
+    }
+    if(tr.kpi.fin){
+      const n=aiFinMonthNet();
+      if(n!==null) cells.push(`<div class="ai-kpi${n<0?' r':''}"><b>${(n>0?'+':'')+fmt(n)}</b><small>місяць</small></div>`);
+    }
+    if(!cells.length) return '';
+    return `<div class="ai-kpis">${cells.join('')}</div>`;
+  }
   function aiWireBody(el){
+    el.querySelectorAll('[data-trx]').forEach(b=>b.onclick=()=>b.classList.toggle('open'));
+    el.querySelectorAll('[data-shgo]').forEach(c=>c.onclick=()=>{
+      const n=document.getElementById(c.dataset.shgo);
+      aiClose(); if(n) n.click();
+    });
     el.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>aiUndo(+b.dataset.undo));
     el.querySelectorAll('[data-commit]').forEach(b=>b.onclick=()=>{
       const m=aiChatMsgs[+b.dataset.commit]; if(!m||m.applied) return;
@@ -682,18 +726,25 @@
       const m=aiChatMsgs[i];
       if(m.role==='assistant'&&!m.streaming&&aiOpsCount(aiParseBlocks(m.content))){ lastOpsIdx=i; break; }
     }
+    // цифри малюємо лише під найсвіжішим слідом: для старих вони б показували теперішнє, а не тодішнє
+    let lastTraceIdx=-1;
+    for(let i=aiChatMsgs.length-1;i>=0;i--){
+      if(aiChatMsgs[i].role==='assistant'&&aiChatMsgs[i].trace){ lastTraceIdx=i; break; }
+    }
     html+=`<div class="ai-clog">${aiChatMsgs.map((m,mi)=>{
       if(m.role==='user') return `<div class="ai-msg u" data-i18n-skip="1">${esc(m.content)}</div>`;
       if(m.streaming) return '';
       const pr=aiParseBlocks(m.content);
       const cnt=aiOpsCount(pr);
-      let s=`<div class="ai-msg a">${aiMD(pr.text)}`;
+      let s=m.trace?aiTraceRowHTML(m.trace):'';
+      s+=`<div class="ai-msg a">${aiMD(pr.text)}`;
       if(cnt&&m.applied&&mi!==lastOpsIdx) s+=`<span class="ai-done">✓ застосовано (${cnt})</span>`;
       if(cnt&&m.declined) s+=`<span class="ai-done off">відхилено</span>`;
       s+=`</div>`;
+      if(m.trace){ s+=aiShelfHTML(m.trace); if(mi===lastTraceIdx) s+=aiTraceKpisHTML(m.trace); }
       if(cnt&&mi===lastOpsIdx&&!m.declined) s+=aiPlanCardHTML(pr,mi,m);
       return s;
-    }).join('')}${aiBusy?'<div class="ai-msg a"><span id="aiStreamTxt">'+aiBusyHTML()+'</span></div>':''}</div>`;
+    }).join('')}${aiBusy?'<div id="aiTraceLive">'+aiTraceLiveHTML()+'</div><div class="ai-msg a"><span id="aiStreamTxt">'+aiBusyHTML()+'</span></div>':''}</div>`;
     el.innerHTML=html;
     aiWireBody(el);
     el.scrollTop=el.scrollHeight;
@@ -790,6 +841,7 @@
           sysDyn+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
         }
         txt=await aiAgentTurn(sysStable,sysDyn,msgs,shown,onDelta);
+        const tr=aiTraceFinish(); if(tr) m.trace=tr;
       } else {
         txt=await aiCall(sys,msgs,onDelta);
       }
@@ -799,6 +851,7 @@
       aiSpeak(pr.text);
       if(aiAuto&&aiOpsCount(pr)){ aiCommit(pr); m.applied=true; }
     }catch(e){
+      try{ aiTraceFinish(); }catch(_){}   // обірваний хід не має лишати живу картку
       console.error('aiChat',e);
       /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
          а не «поганий URL»; на native поле проксі взагалі приховане. */

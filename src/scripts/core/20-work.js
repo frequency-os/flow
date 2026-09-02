@@ -465,7 +465,7 @@
     const sym=CUR[w.cur]||w.cur;
     const opId=Date.now()+'_'+Math.random().toString(36).slice(2,6);
     const lbl='Робота · '+fmt(w.hours)+' год'+(w.cur!=='UAH'?(' ('+fmt(w.amount)+' '+sym+')'):'')+(w.note?' · '+w.note:'');
-    finOps.push({ id:opId, type:'in', amount:w.amount, label:lbl, date:w.date });
+    finOps.push({ id:opId, type:'in', amount:w.amount, label:lbl, date:w.date, card:WALLET_ID });
     w.pushed=true; w.opId=opId;
     saveFinOps(); saveWork();
     if(!batch){ renderWork(); try{ renderFinance(); }catch(_){} 

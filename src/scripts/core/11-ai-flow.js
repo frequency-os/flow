@@ -38,7 +38,11 @@
   }
   function aiChatSave(){
     try{
-      aiChatMsgs=aiChatMsgs.slice(-30).map(m=>({role:m.role,content:String(m.content||'').slice(0,2000),applied:!!m.applied,declined:!!m.declined}));
+      aiChatMsgs=aiChatMsgs.slice(-30).map(m=>{
+        const o={role:m.role,content:String(m.content||'').slice(0,2000),applied:!!m.applied,declined:!!m.declined};
+        if(m.trace) o.trace=m.trace;   // слід агента: вже компактний (aiTraceFinish обрізає)
+        return o;
+      });
       aiLog=aiLog.slice(0,15);
       window.storage.set('ai_chat', JSON.stringify({v:3,msgs:aiChatMsgs,log:aiLog,view:aiView,auto:aiAuto,sum:aiSum.slice(0,1600)}));
     }catch(e){ console.error('aiChatSave',e); }
