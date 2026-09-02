@@ -872,14 +872,18 @@
     const __RAW = await (async ()=>{
       const keys=[KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,CBKEY,UKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,VAULT_KEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,
-        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
+        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
           r=>[k,(r&&typeof r.value!=='undefined')?r.value:null],
           ()=>[k,null]
         )
       ));
-      const m={}; pairs.forEach(([k,v])=>{ m[k]=v; }); return m;
+      const m={}; pairs.forEach(([k,v])=>{ m[k]=v;
+        // Запобіжник: непорожній рядок, що НЕ парситься — це пошкоджені дані.
+        // Позначаємо ключ, щоб наступний saveX() не затер добру копію порожнечею.
+        if(typeof v==='string' && v.length){ try{ JSON.parse(v); }catch(_){ (window.__storeCorrupt=window.__storeCorrupt||new Set()).add(k); } }
+      }); return m;
     })();
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
@@ -1035,6 +1039,8 @@
     try{ const raw=__RAW[CARDKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) cards=d; }catch(_){}
     try{ migrateSpendsToFin(); }catch(_){}   // одна книга: старі spends → finOps (ідемпотентно)
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}
+    try{ const raw=__RAW[DIAINS_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaInsights=Object.assign({mood:{},weeks:{}},d); }catch(_){}
+    try{ const raw=__RAW[DIABOOKS_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object'&&Array.isArray(d.books)) diaBooks=Object.assign({books:[],entries:{}},d); }catch(_){}
     // спершу міграція — їй потрібні СТАРІ картки й курси, які ensureCards() затирає
     try{ migrateToWallet(__RAW[CARDKEY], __RAW['fx_cfg']); }catch(e){ console.error('migrateToWallet',e); }
     try{ ensureCards(); }catch(_){}

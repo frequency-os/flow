@@ -715,27 +715,86 @@
       <h2><span class="em" style="background:color-mix(in srgb,#7c8cff 16%,transparent)">📔</span>Як пройшов день</h2>
     </div>
 
-    <div class="rit-cal" id="diaCal"></div>
-    <div class="rit-streak" id="diaStreakLine"></div>
-
-    <div class="dia-today">
-      <div class="dia-date-row">
-        <div class="dia-date" id="diaTodayDate"></div>
-        <button class="dia-mic" id="diaMicBtn" title="Голосовий запис">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
-          <span class="dia-mic-tm" id="diaRecTm"></span>
-        </button>
-      </div>
-      <textarea class="dia-input" id="diaInput" rows="6" placeholder="Опиши сьогоднішній день: що зробив, що вдалось, що зачепило, як почувався..."></textarea>
-      <div class="dia-audio" id="diaAudioRow" style="display:none"></div>
-      <div class="dia-savehint" id="diaSaveHint">Зберігається автоматично</div>
+    <div class="dia-tabs" id="diaTabs">
+      <button class="dia-tab on" data-diatab="write">✍️ Запис</button>
+      <button class="dia-tab" data-diatab="view">🧠 Огляд</button>
+      <button class="dia-tab" data-diatab="books">📚 Зошити</button>
     </div>
 
-    <button class="dia-ai-btn" id="diaAnalyzeBtn">🧠 Проаналізувати останні записи</button>
-    <div class="dia-ai-out" id="diaAiOut" style="display:none"></div>
+    <!-- ── вкладка «Запис» ── -->
+    <div id="diaPaneWrite">
+      <div class="rit-cal" id="diaCal"></div>
+      <div class="rit-streak" id="diaStreakLine"></div>
 
-    <div class="dia-list-head">Попередні записи</div>
-    <div class="dia-list" id="diaList"></div>
+      <div class="dia-today">
+        <div class="dia-date-row">
+          <div class="dia-date" id="diaTodayDate"></div>
+          <div class="dia-mood" id="diaMoodRow"></div>
+        </div>
+        <textarea class="dia-input" id="diaInput" rows="6" placeholder="Опиши сьогоднішній день: що зробив, що вдалось, що зачепило, як почувався..."></textarea>
+        <div class="dia-audio" id="diaAudioRow" style="display:none"></div>
+        <div class="dia-mic-row">
+          <button class="dia-mic-big" id="diaMicBtn" title="Голосовий запис">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+          </button>
+          <div class="dia-mic-hint">Або просто натисни<br>і розкажи голосом <b class="dia-mic-tm" id="diaRecTm"></b></div>
+          <div class="dia-savehint" id="diaSaveHint">Зберігається автоматично</div>
+        </div>
+      </div>
+
+      <div class="dia-list-head">Попередні записи</div>
+      <div class="dia-list" id="diaList"></div>
+    </div>
+
+    <!-- ── вкладка «Огляд» ── -->
+    <div id="diaPaneView" style="display:none">
+      <div class="dia-week-card">
+        <div class="dia-week-head">
+          <div class="dia-week-title" id="diaWeekTitle"></div>
+          <div class="dia-week-trend" id="diaWeekTrend"></div>
+        </div>
+        <div class="dia-week-bars" id="diaWeekBars"></div>
+        <div class="dia-week-days"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
+        <div class="dia-ai-out" id="diaWeekOut" style="display:none"></div>
+        <button class="dia-ai-btn" id="diaWeekBtn" style="margin:0">🧠 Повний аналіз тижня</button>
+      </div>
+      <div class="dia-month-card">
+        <div class="dia-month-head">
+          <div class="dia-list-head" style="margin:0">Настрій за 30 днів</div>
+          <div class="dia-month-note" id="diaMoodNote"></div>
+        </div>
+        <div class="dia-month-bars" id="diaMonthBars"></div>
+      </div>
+      <div class="dia-list-head">Минулі тижні</div>
+      <div class="dia-weeks-list" id="diaWeeksList"></div>
+    </div>
+
+    <!-- ── вкладка «Зошити» ── -->
+    <div id="diaPaneBooks" style="display:none">
+      <div id="diaBooksHome">
+        <div class="dia-books-grid" id="diaBooksGrid"></div>
+        <button class="dia-book-new" id="diaBookNewBtn">+ Новий зошит</button>
+        <div class="dia-book-form" id="diaBookForm" style="display:none">
+          <input class="dia-input dia-book-name" id="diaBookName" maxlength="24" placeholder="Назва зошита">
+          <div class="dia-book-picker" id="diaBookEmojis"></div>
+          <div class="dia-book-picker" id="diaBookColors"></div>
+          <button class="dia-ai-btn" id="diaBookCreate" style="margin:0">Створити зошит</button>
+        </div>
+        <div class="dia-empty" style="padding:14px 20px">Щоденник дня живе на вкладці «Запис» — тут окремі зошити під свої теми: вдячність, ідеї, сни…</div>
+      </div>
+      <div id="diaBookView" style="display:none">
+        <div class="dia-book-head">
+          <button class="dia-book-back" id="diaBookBack">‹ Зошити</button>
+          <div class="dia-book-title" id="diaBookTitle"></div>
+          <button class="dia-book-menu" id="diaBookMenu">⋯</button>
+        </div>
+        <div class="dia-today">
+          <textarea class="dia-input" id="diaBookInput" rows="3" placeholder="Новий запис…"></textarea>
+          <button class="dia-ai-btn" id="diaBookAdd" style="margin:10px 0 0">Додати запис</button>
+        </div>
+        <div class="dia-list" id="diaBookList"></div>
+      </div>
+    </div>
   </section>
 
   <!-- ===== SCREEN: PAGE EDITOR (Notion-стиль) ===== -->

@@ -744,6 +744,44 @@
   @keyframes aitl{from{transform:scaleY(.2);opacity:0}}
   .ai-tl em{position:absolute;top:-2px;bottom:-2px;width:2px;background:#ffb84d;border-radius:2px;box-shadow:0 0 8px rgba(255,184,77,.8)}
   .ai-tl span{position:absolute;bottom:-13px;font-size:8px;font-weight:800;color:#666d95}
+  /* ── слід агента: картка процесу (наживо), згорнутий рядок, полиця розділів ── */
+  .ai-trace{align-self:stretch;display:flex;flex-direction:column;gap:7px;border-radius:16px;padding:11px 13px;
+    background:linear-gradient(180deg,rgba(125,141,255,.10),rgba(168,121,255,.05));
+    border:1px solid rgba(139,123,255,.4);box-shadow:0 12px 38px rgba(120,110,255,.16);animation:actin .22s ease}
+  .ai-trace .tr-h{display:flex;justify-content:space-between;font-size:9px;font-weight:800;color:#9aa0c8;
+    letter-spacing:.1em;text-transform:uppercase;margin-bottom:1px}
+  .ai-trace .tr-h i{font-style:normal;color:#c3b4ff}
+  .tr-st{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;color:#c3cbff;min-width:0}
+  .tr-st .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tr-st .n{flex:none;font-size:9.5px;font-weight:800;color:#9aa0c8;background:rgba(255,255,255,.07);border-radius:7px;padding:2px 6px}
+  .tr-st .ok{margin-left:auto;flex:none;color:#3ddc97;font-size:11px;font-weight:800}
+  .tr-st.run{color:#f4f5ff}
+  .tr-st.run .spin{margin-left:auto;flex:none;width:11px;height:11px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.15);border-top-color:#a08bff;animation:aispin 1s linear infinite}
+  .ai-tracerow{align-self:flex-start;font-size:10px;font-weight:800;color:#9aa0c8;cursor:pointer;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:5px 10px}
+  .ai-tracerow b{color:#c3b4ff}
+  .ai-tracerow .tr-full{display:none;margin-top:7px;flex-direction:column;gap:5px}
+  .ai-tracerow.open{align-self:stretch}
+  .ai-tracerow.open .tr-full{display:flex}
+  .ai-shelf{align-self:stretch;display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+  .ai-shelf::-webkit-scrollbar{display:none}
+  .ai-shc{flex:none;width:104px;border-radius:14px;padding:8px;cursor:pointer;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);animation:actin .3s ease}
+  .ai-shc .th{position:relative;height:56px;border-radius:9px;background:rgba(10,12,26,.8);
+    border:1px solid rgba(255,255,255,.06);padding:7px;overflow:hidden}
+  .ai-shc .th i{display:block;height:4px;border-radius:2px;background:rgba(255,255,255,.12);margin-bottom:5px}
+  .ai-shc .th i.l1{width:78%;background:rgba(255,255,255,.22)}
+  .ai-shc .th i.l2{width:52%}
+  .ai-shc .th i.bk{height:14px;border-radius:4px;width:100%;background:rgba(125,141,255,.28)}
+  .ai-shc.sh-fin .th i.bk{background:rgba(78,205,196,.26)}
+  .ai-shc.sh-goals .th i.bk{background:rgba(160,107,255,.3)}
+  .ai-shc.sh-diary .th i.bk{background:rgba(255,184,77,.22)}
+  .ai-shc.sh-wishes .th i.bk{background:rgba(237,147,177,.24)}
+  .ai-shc .th span{position:absolute;right:5px;bottom:3px;font-size:11px;opacity:.85}
+  .ai-shc b{font-size:10.5px;font-weight:700;display:block;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ai-shc small{font-size:9px;font-weight:700;color:#9aa0c8;display:block;margin-top:1px}
+  .ai-kpi.r b{color:#ff9d7d}
   /* «＋» меню */
   .ai-plusb{color:#c3cbff !important}
   .ai-plus{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;margin:0 2px 6px;border-radius:18px;

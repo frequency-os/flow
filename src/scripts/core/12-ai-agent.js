@@ -340,6 +340,78 @@
     return '🔧 працюю…';
   }
 
+  /* ── слід ходу: які інструменти агент реально викликав. Живе один хід;
+     у повідомлення лягає компактна копія (m.trace) — з неї малюються
+     згорнутий рядок, полиця розділів і цифри. Кроки видно наживо в картці
+     #aiTraceLive, поки Флоу думає. ── */
+  let aiTrace=null;
+  function aiPlz(n,one,few,many){
+    const m10=n%10,m100=n%100;
+    return n+' '+(m10===1&&m100!==11?one:(m10>=2&&m10<=4&&(m100<10||m100>=20)?few:many));
+  }
+  const AI_TRACE_READ={
+    day:{k:'day',name:'Планер',e:'🗓'}, range:{k:'day',name:'Планер',e:'🗓'},
+    backlog:{k:'backlog',name:'Беклог',e:'📥'}, goals:{k:'goals',name:'Цілі',e:'🎯'},
+    finance:{k:'fin',name:'Гаманець',e:'💰'}, folders:{k:'folders',name:'Папки',e:'🗂'},
+    diary:{k:'diary',name:'Щоденник',e:'📓'}, vision:{k:'vision',name:'Візія',e:'🔭'},
+    wishes:{k:'wishes',name:'Карта бажань',e:'✨'}
+  };
+  function aiTraceReadMeta(what,inp){
+    try{
+      if(what==='day'){
+        const l=plBlocksFor(/^\d{4}-\d{2}-\d{2}$/.test(inp.ds||'')?inp.ds:plTodayStr())||[];
+        return l.length?aiPlz(l.length,'блок','блоки','блоків'):'';
+      }
+      if(what==='goals'){ const n=((goalsData||{}).goals||[]).length; return n?aiPlz(n,'ціль','цілі','цілей'):''; }
+      if(what==='folders'){ const n=Object.keys(folders||{}).length; return n?aiPlz(n,'папка','папки','папок'):''; }
+      if(what==='diary'){
+        const s=(typeof diaryEntries==='object'&&diaryEntries)?diaryEntries:{};
+        const n=Object.keys(s).filter(k=>s[k]&&s[k].text&&String(s[k].text).trim()).length;
+        return n?aiPlz(Math.min(n,10),'запис','записи','записів'):'';
+      }
+      if(what==='backlog'){ const n=(plData().tasks||[]).filter(x=>!x.done).length; return n?aiPlz(n,'задача','задачі','задач'):''; }
+    }catch(_){}
+    return '';
+  }
+  function aiTraceStart(){ aiTrace={steps:[],shelf:[],kpi:{}}; }
+  function aiTraceStep(name,inp){
+    if(!aiTrace) return -1;
+    inp=inp||{};
+    const st={t:String(aiAgentStatusFor(name,inp)).replace(/…+$/,''),n:'',run:1};
+    if(name==='get_data'){
+      st.n=aiTraceReadMeta(inp.what,inp);
+      const r=AI_TRACE_READ[inp.what];
+      if(r&&!aiTrace.shelf.some(x=>x.k===r.k)) aiTrace.shelf.push({k:r.k,name:r.name,e:r.e,meta:st.n});
+      if(inp.what==='day'||inp.what==='range'||inp.what==='backlog') aiTrace.kpi.day=1;
+      if(inp.what==='finance') aiTrace.kpi.fin=1;
+    }
+    if(name==='planner') aiTrace.kpi.day=1;
+    if(name==='finance') aiTrace.kpi.fin=1;
+    aiTrace.steps.push(st);
+    aiTraceRepaint();
+    return aiTrace.steps.length-1;
+  }
+  function aiTraceEnd(i){
+    if(!aiTrace||!aiTrace.steps[i]) return;
+    aiTrace.steps[i].run=0;
+    aiTraceRepaint();
+  }
+  function aiTraceRepaint(){
+    if(typeof document==='undefined') return;
+    const el=document.getElementById('aiTraceLive'); if(!el) return;
+    el.innerHTML=aiTraceLiveHTML();
+    const b=document.getElementById('aiChatBody'); if(b) b.scrollTop=b.scrollHeight;
+  }
+  function aiTraceFinish(){
+    const t=aiTrace; aiTrace=null;
+    if(!t||!t.steps.length) return null;
+    return {
+      steps:t.steps.slice(0,10).map(s=>({t:String(s.t).slice(0,60),n:String(s.n||'').slice(0,24)})),
+      shelf:t.shelf.slice(0,6).map(x=>({k:x.k,name:x.name,e:x.e,meta:String(x.meta||'').slice(0,24)})),
+      kpi:t.kpi
+    };
+  }
+
   const FLOW_TOOLS=[
     { name:'get_data',
       description:'Прочитати живі дані Frequency. Клич, коли потрібних даних немає в КОНТЕКСТІ (минулі дні, деталі цілей, фінанси, беклог, папки, щоденник, Візія, Карта бажань). Повертає стислий текст.',
@@ -951,6 +1023,7 @@
     const dev=aiDevOn();
     const TOOLS=dev?FLOW_TOOLS.concat(DEV_TOOLS):FLOW_TOOLS;
     let toolsUsed=0;
+    aiTraceStart();
     for(let hop=0;hop<6;hop++){
       const resp=await aiCallRaw({
         model:dev?'claude-sonnet-4-6':aiPickModel(userQ,hop), system:system, tools:TOOLS,
@@ -966,8 +1039,9 @@
       for(const b of resp.content){
         if(b.type!=='tool_use') continue;
         toolsUsed++;
-        aiAgentSetStatus(aiAgentStatusFor(b.name,b.input));
+        const ti=aiTraceStep(b.name,b.input);
         const out=await flowToolExec(b.name,b.input);
+        aiTraceEnd(ti);
         results.push({type:'tool_result',tool_use_id:b.id,
           content:String(out).slice(0,1500)});
       }
@@ -980,6 +1054,14 @@
   }
 
   /* ── контекст ── */
+  function aiFinMonthNet(){
+    try{
+      const ym=ymLocal(); let inc=0,out=0;
+      (finOps||[]).forEach(o=>{ if(o.envSpend) return; if(String(o.date||'').slice(0,7)!==ym) return;
+        if(o.type==='in') inc+=o.amount; else out+=o.amount; });
+      return inc-out;
+    }catch(_){ return null; }
+  }
   function aiFinCtx(){
     const parts=[];
     try{

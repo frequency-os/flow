@@ -473,6 +473,7 @@
     const SB_KEY = 'sb_publishable_T7L_IuX2intaDOUrU7H94w_fVBdKQfD';
     let sb = null, sbUserCache = null, sbInitPromise = null;
     let sbBatchCache = null; // {key: rawJsonString} — заповнюється одним пакетним запитом
+    let sbBatchTs = {};      // {key: час оновлення в хмарі, мс} — для звірки «що новіше»
     window.__sbReady = false; // стає true, коли перевірку сесії завершено (успішно чи ні)
 
     /* Спершу локальна копія з vendor/ (працює без інтернету), потім CDN.
@@ -527,6 +528,8 @@
             // без цього кожне відкриття/перечитування «Ще» шле десятки послідовних
             // запитів у Supabase, і синхронізація виглядає повільною.
             try{ await sbPrefetchAll(); }catch(_){}
+            // сесія жива — доштовхнути незлиті правки з попереднього (можливо офлайн) запуску
+            try{ if(window.sbFlushWrites && localStorage.getItem('flowapp___sb_outbox')) window.sbFlushWrites(); }catch(_){}
             try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){} };
           if(typeof window.__load==='function') refetch();
           else setTimeout(refetch, 300); // load() ще міг не встигнути визначитись на цьому етапі скрипта
@@ -555,12 +558,22 @@
     async function sbPrefetchAll(){
       if(!sb || !sbUserCache) return false;
       try{
-        const { data, error } = await sb.from('user_data').select('key,value').eq('user_id', sbUserCache.id);
+        const { data, error } = await sb.from('user_data').select('key,value,updated_at').eq('user_id', sbUserCache.id);
         if(error || !data) return false;
-        const c={}; data.forEach(r=>{ c[r.key]=JSON.stringify(r.value); });
-        sbBatchCache=c;
+        const c={}, ts={}; data.forEach(r=>{ c[r.key]=JSON.stringify(r.value); ts[r.key]=Date.parse(r.updated_at)||0; });
+        sbBatchCache=c; sbBatchTs=ts;
         return true;
       }catch(_){ return false; }
+    }
+    /* час останнього ЛОКАЛЬНОГО запису ключа (з обгортки _v), 0 якщо нема —
+       потрібен, щоб при читанні звірити, що новіше: локальне чи хмарне. */
+    function sbLocalVersion(key){
+      try{
+        const raw = localStorage.getItem('flowapp_'+key);
+        if(!raw) return 0;
+        const o = JSON.parse(raw);
+        return (o && typeof o==='object' && typeof o._v==='number') ? o._v : 0;
+      }catch(_){ return 0; }
     }
     window.sbPrefetchAll = sbPrefetchAll;
     let sbSigningIn=false;
@@ -688,15 +701,27 @@
     window.storage.get = async function(key){
       const u = sbUserCache;
       if(u && sb){
+        // 1) незлитий локальний запис у черзі — він найсвіжіший
         if(typeof sbWriteQueue!=='undefined' && sbWriteQueue && Object.prototype.hasOwnProperty.call(sbWriteQueue,key)){
           return { key, value: sbWriteQueue[key], shared:false };
         }
+        const localTs = sbLocalVersion(key);
+        // 2) є в кеші хмари: віддаємо ХМАРНЕ, тільки якщо воно НЕ старіше за локальне.
+        //    Раніше хмара перемагала завжди — і свіжа локальна правка, що не встигла
+        //    синхронізуватись, «поверталась назад». Тепер новіше перемагає.
         if(sbBatchCache && Object.prototype.hasOwnProperty.call(sbBatchCache,key)){
+          const cloudTs = sbBatchTs[key]||0;
+          if(localTs > cloudTs) return origGet(key);          // локальна свіжіша
           return { key, value: sbBatchCache[key], shared:false };
         }
+        // 3) немає в кеші — точковий запит, теж зі звіркою свіжості
         try{
-          const { data, error } = await sb.from('user_data').select('value').eq('user_id', u.id).eq('key', key).maybeSingle();
-          if(!error && data) return { key, value: JSON.stringify(data.value), shared:false };
+          const { data, error } = await sb.from('user_data').select('value,updated_at').eq('user_id', u.id).eq('key', key).maybeSingle();
+          if(!error && data){
+            const cloudTs = Date.parse(data.updated_at)||0;
+            if(localTs > cloudTs) return origGet(key);         // локальна свіжіша
+            return { key, value: JSON.stringify(data.value), shared:false };
+          }
         }catch(_){}
         // хмара порожня/недоступна — фолбек на локальну копію, щоб дані не «зникали»
         return origGet(key);
@@ -706,11 +731,27 @@
     // ── групування записів: кілька set() поспіль (напр. під час швидкого
     //    редагування різних розділів) об'єднуються в ОДИН upsert-запит із
     //    кількома рядками замість окремого запиту на кожен ключ ──
-    let sbWriteQueue = {}; // {key: rawValueString}
+    let sbWriteQueue = {}; // {key: rawValueString} — очікують відправки в хмару
     let sbWriteTimer = null;
+    /* «Вихідний кошик» у localStorage: незлиті записи мають пережити перезапуск,
+       інакше офлайн-правка, зроблена перед закриттям, губиться назавжди. */
+    function sbOutboxSave(){
+      try{
+        if(Object.keys(sbWriteQueue).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(sbWriteQueue));
+        else localStorage.removeItem('flowapp___sb_outbox');
+      }catch(_){}
+    }
+    function sbOutboxLoad(){
+      try{
+        const raw=localStorage.getItem('flowapp___sb_outbox'); if(!raw) return;
+        const o=JSON.parse(raw);
+        if(o && typeof o==='object') Object.keys(o).forEach(k=>{ if(!(k in sbWriteQueue)) sbWriteQueue[k]=o[k]; });
+      }catch(_){}
+    }
+    function sbSyncPending(){ try{ window.__flowSync.sbPending = Object.keys(sbWriteQueue).length; }catch(_){} }
     function sbScheduleWrite(key, value){
       sbWriteQueue[key] = value;
-      window.__flowSync.sbPending = (window.__flowSync.sbPending||0) + 1;
+      sbOutboxSave(); sbSyncPending();
       try{ if(window.__setSync) window.__setSync('syncing'); }catch(_){}
       if(sbWriteTimer) return;
       sbWriteTimer = setTimeout(sbFlushWrites, 500);
@@ -718,39 +759,66 @@
     async function sbFlushWrites(){
       sbWriteTimer = null;
       const u = sbUserCache;
-      const q = sbWriteQueue; sbWriteQueue = {};
+      const q = sbWriteQueue; sbWriteQueue = {};   // знімаємо поточну партію
       const keys = Object.keys(q);
-      if(!keys.length) return;
-      let failed=false;
+      if(!keys.length){ sbOutboxSave(); return; }
+      let ok=false;
       if(u && sb){
         try{
+          const now = Date.now();
           const rows = keys.map(k=>{
             let parsed; try{ parsed = JSON.parse(q[k]); }catch(_){ parsed = q[k]; }
-            return { user_id:u.id, key:k, value:parsed, updated_at:new Date().toISOString() };
+            return { user_id:u.id, key:k, value:parsed, updated_at:new Date(now).toISOString() };
           });
-          await sb.from('user_data').upsert(rows, { onConflict:'user_id,key' });
+          // ВАЖЛИВО: supabase-js повертає {error}, а не кидає — перевіряємо явно,
+          // інакше зірваний запис вважався б успішним і правка зникала б.
+          const { error } = await sb.from('user_data').upsert(rows, { onConflict:'user_id,key' });
+          if(error) throw error;
           if(sbBatchCache) keys.forEach(k=>{ sbBatchCache[k]=q[k]; });
-        }catch(_){ failed=true; /* локальна копія вже збережена — хмара підтягне пізніше */ }
-      } else failed=true;
-      window.__flowSync.sbPending = Math.max(0, (window.__flowSync.sbPending||keys.length) - keys.length);
-      if(failed) window.__flowSync.sbHadError = true;
-      if(window.__flowSync.sbPending<=0){
-        window.__flowSync.sbPending=0;
-        try{
-          if(window.__flowSync.sbHadError){ window.__flowSync.sbHadError=false; if(window.__setSync) window.__setSync('error'); }
-          else if(window.__setSync){ window.__flowSync.last=Date.now(); window.__setSync('synced'); }
-        }catch(_){}
+          keys.forEach(k=>{ sbBatchTs[k]=now; });   // свіжість хмари тепер відома точно
+          ok=true;
+        }catch(_){ ok=false; }
       }
-      // якщо за час запиту накопичились нові зміни — розпланувати ще один заліт
-      if(Object.keys(sbWriteQueue).length && !sbWriteTimer) sbWriteTimer=setTimeout(sbFlushWrites,500);
+      if(!ok){
+        // НЕ втрачаємо партію: повертаємо ключі в чергу (не затираючи новіші),
+        // зберігаємо в outbox і повторюємо з паузою — і одразу коли з'явиться мережа.
+        keys.forEach(k=>{ if(!(k in sbWriteQueue)) sbWriteQueue[k]=q[k]; });
+        sbOutboxSave(); sbSyncPending();
+        window.__flowSync.sbHadError = true;
+        try{ if(window.__setSync) window.__setSync('error'); }catch(_){}
+        if(!sbWriteTimer) sbWriteTimer=setTimeout(sbFlushWrites, 5000);   // бекоф замість тісного циклу
+        return;
+      }
+      // успіх
+      sbOutboxSave(); sbSyncPending();
+      if(Object.keys(sbWriteQueue).length){
+        if(!sbWriteTimer) sbWriteTimer=setTimeout(sbFlushWrites,500);
+      } else {
+        try{ if(window.__setSync){ window.__flowSync.sbHadError=false; window.__flowSync.last=Date.now(); window.__setSync('synced'); } }catch(_){}
+      }
     }
+    // віддаємо на випадок, якщо треба «доштовхнути» outbox ззовні (напр. після входу)
+    window.sbFlushWrites = sbFlushWrites;
     document.addEventListener('visibilitychange', ()=>{
       if(document.visibilityState==='hidden' && Object.keys(sbWriteQueue).length){
+        sbOutboxSave();
         if(sbWriteTimer){ clearTimeout(sbWriteTimer); sbWriteTimer=null; }
         try{ sbFlushWrites(); }catch(_){}
       }
     });
+    // щойно повернулась мережа — спробувати відправити те, що чекає
+    try{ window.addEventListener('online', ()=>{ if(Object.keys(sbWriteQueue).length && !sbWriteTimer) sbWriteTimer=setTimeout(sbFlushWrites,300); }); }catch(_){}
+    // при старті підхопити незлиті правки з попередньої сесії (відправляться, коли буде сесія)
+    try{ sbOutboxLoad(); sbSyncPending(); }catch(_){}
     window.storage.set = async function(key, value){
+      // Запобіжник від затирання порожнечею: якщо ключ не прочитався при старті
+      // (пошкоджений), не даємо його ПОРОЖНІМ дефолтом стерти добру копію. Щойно
+      // прийдуть реальні дані — знімаємо позначку й зберігаємо як звичайно.
+      if(window.__storeCorrupt && window.__storeCorrupt.has(key)){
+        const empty = value==null || value==='' || value==='[]' || value==='{}';
+        if(empty){ try{ console.warn('[Flow storage] пропущено запис порожнечею в пошкоджений ключ:', key); }catch(_){} return { key, value, shared:false, _skipped:true }; }
+        window.__storeCorrupt.delete(key);
+      }
       // ЗАВЖДИ пишемо локально одразу (синхронно всередині origSet) — це страховка
       // на випадок, якщо сторінку закриють до завершення мережевого запиту в Supabase
       const localResult = await origSet(key, value);
