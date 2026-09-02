@@ -8,6 +8,23 @@
       console.error=function(){ try{ if(mute(arguments[0])) return; }catch(_){ } return _e.apply(console,arguments); };
     }catch(_){}
   })();
+  /* ── Service Worker: офлайн + швидкий повторний старт ──
+     На localhost не реєструємо без ?sw=1 — інакше дев-цикл
+     «правка → збірка → перезавантаження» показував би кеш на крок позаду. */
+  (function(){
+    try{
+      if(!('serviceWorker' in navigator)) return;
+      if(location.protocol!=='https:' && location.protocol!=='http:') return; // file:// (Electron) — не треба
+      const dev=(location.hostname==='localhost'||location.hostname==='127.0.0.1');
+      if(dev && !/[?&]sw=1/.test(location.search)) return;
+      window.addEventListener('load', ()=>{
+        navigator.serviceWorker.register('sw.js')
+          .then(reg=>{ try{ reg.update(); }catch(_){} }) // з кожним стартом — перевірка свіжої збірки
+          .catch(()=>{});
+      });
+    }catch(_){}
+  })();
+
   /* ============ ХЕЛПЕРИ ДАТ: локальний час, не UTC ============
      toISOString() дає UTC: в Амстердамі між 00:00 і 02:00 «сьогодні» = вчора.
      Всюди, де треба «сьогодні/поточний місяць» — тільки ці функції. */

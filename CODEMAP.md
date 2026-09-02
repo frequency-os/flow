@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 53 |
-| Рядків JS | 27145 |
+| Рядків JS | 27162 |
 | Файлів CSS | 30 |
 | Рядків CSS | 9079 |
 | Сутностей верхнього рівня | 1639 |
@@ -36,7 +36,7 @@
 | `src/scripts/44-week.js` | 329 | 0 |
 | `src/scripts/45-month.js` | 661 | 0 |
 | `src/scripts/46-mx.js` | 215 | 0 |
-| `src/scripts/core/01-base.js` | 314 | 37 |
+| `src/scripts/core/01-base.js` | 331 | 37 |
 | `src/scripts/core/02-storage.js` | 1308 | 118 |
 | `src/scripts/core/03-platform.js` | 101 | 16 |
 | `src/scripts/core/04-folders-nav.js` | 355 | 54 |
@@ -201,43 +201,43 @@
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `ymdLocal` | функція | `src/scripts/core/01-base.js:14` |
-| `ymLocal` | функція | `src/scripts/core/01-base.js:16` |
-| `window.ymdLocal` | значення | `src/scripts/core/01-base.js:17` |
-| `pluralUk` | функція | `src/scripts/core/01-base.js:22` |
-| `window.pluralUk` | значення | `src/scripts/core/01-base.js:29` |
-| `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:37` |
-| `getLang` | функція | `src/scripts/core/01-base.js:64` |
-| `setLang` | функція | `src/scripts/core/01-base.js:65` |
-| `window.__flowLang` | значення | `src/scripts/core/01-base.js:66` |
-| `window.flowLang` | значення | `src/scripts/core/01-base.js:67` |
-| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:68` |
-| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:73` |
-| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:125` |
-| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:149` |
-| `UI_CACHE_KEY` | значення | `src/scripts/core/01-base.js:166` |
-| `uiHash` | функція | `src/scripts/core/01-base.js:167` |
-| `uiCacheGet` | функція | `src/scripts/core/01-base.js:168` |
-| `uiCacheSet` | функція | `src/scripts/core/01-base.js:169` |
-| `uiInFlight` | обʼєкт | `src/scripts/core/01-base.js:170` |
-| `uiQueue` | масив | `src/scripts/core/01-base.js:171` |
-| `uiPump` | функція | `src/scripts/core/01-base.js:172` |
-| `HAS_CYR` | значення | `src/scripts/core/01-base.js:178` |
-| `autoTranslateNode` | функція | `src/scripts/core/01-base.js:179` |
-| `translateNode` | функція | `src/scripts/core/01-base.js:203` |
-| `i18nApply` | функція | `src/scripts/core/01-base.js:221` |
-| `window.i18nApply` | значення | `src/scripts/core/01-base.js:225` |
-| `raf` | значення | `src/scripts/core/01-base.js:228` |
-| `mo` | функція | `src/scripts/core/01-base.js:229` |
-| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:246` |
-| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:249` |
-| `hash` | функція | `src/scripts/core/01-base.js:250` |
-| `cacheGet` | функція | `src/scripts/core/01-base.js:251` |
-| `cacheSet` | функція | `src/scripts/core/01-base.js:252` |
-| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:257` |
-| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:284` |
-| `push` | функція | `src/scripts/core/01-base.js:285` |
-| `window.flowErrors` | функція | `src/scripts/core/01-base.js:294` |
+| `ymdLocal` | функція | `src/scripts/core/01-base.js:31` |
+| `ymLocal` | функція | `src/scripts/core/01-base.js:33` |
+| `window.ymdLocal` | значення | `src/scripts/core/01-base.js:34` |
+| `pluralUk` | функція | `src/scripts/core/01-base.js:39` |
+| `window.pluralUk` | значення | `src/scripts/core/01-base.js:46` |
+| `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:54` |
+| `getLang` | функція | `src/scripts/core/01-base.js:81` |
+| `setLang` | функція | `src/scripts/core/01-base.js:82` |
+| `window.__flowLang` | значення | `src/scripts/core/01-base.js:83` |
+| `window.flowLang` | значення | `src/scripts/core/01-base.js:84` |
+| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:85` |
+| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:90` |
+| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:142` |
+| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:166` |
+| `UI_CACHE_KEY` | значення | `src/scripts/core/01-base.js:183` |
+| `uiHash` | функція | `src/scripts/core/01-base.js:184` |
+| `uiCacheGet` | функція | `src/scripts/core/01-base.js:185` |
+| `uiCacheSet` | функція | `src/scripts/core/01-base.js:186` |
+| `uiInFlight` | обʼєкт | `src/scripts/core/01-base.js:187` |
+| `uiQueue` | масив | `src/scripts/core/01-base.js:188` |
+| `uiPump` | функція | `src/scripts/core/01-base.js:189` |
+| `HAS_CYR` | значення | `src/scripts/core/01-base.js:195` |
+| `autoTranslateNode` | функція | `src/scripts/core/01-base.js:196` |
+| `translateNode` | функція | `src/scripts/core/01-base.js:220` |
+| `i18nApply` | функція | `src/scripts/core/01-base.js:238` |
+| `window.i18nApply` | значення | `src/scripts/core/01-base.js:242` |
+| `raf` | значення | `src/scripts/core/01-base.js:245` |
+| `mo` | функція | `src/scripts/core/01-base.js:246` |
+| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:263` |
+| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:266` |
+| `hash` | функція | `src/scripts/core/01-base.js:267` |
+| `cacheGet` | функція | `src/scripts/core/01-base.js:268` |
+| `cacheSet` | функція | `src/scripts/core/01-base.js:269` |
+| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:274` |
+| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:301` |
+| `push` | функція | `src/scripts/core/01-base.js:302` |
+| `window.flowErrors` | функція | `src/scripts/core/01-base.js:311` |
 
 ### `src/scripts/core/02-storage.js` — 118 сутностей
 

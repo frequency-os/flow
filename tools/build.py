@@ -5,7 +5,7 @@ build.py — збирає src/ назад в один файл dist/index.html.
 Це і є «готова програма»: саме її відкриває браузер, Telegram, iPhone, Android.
 Правиш файли в src/ → запускаєш build → отримуєш dist/index.html.
 """
-import os, re, shutil, sys
+import os, re, shutil, subprocess, sys, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC  = os.path.join(ROOT, 'src')
@@ -14,6 +14,15 @@ DIST = os.path.join(ROOT, 'dist')
 def read(p):
     with open(p, 'r', encoding='utf-8', newline='') as f:
         return f.read()
+
+def build_stamp():
+    """Дата збірки + короткий git-хеш, напр. 2026-09-03-0142-50f7fc9."""
+    try:
+        h = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'],
+                                    cwd=ROOT, stderr=subprocess.DEVNULL).decode().strip()
+    except Exception:
+        h = 'nogit'
+    return time.strftime('%Y-%m-%d-%H%M') + '-' + h
 
 def main():
     html = read(os.path.join(SRC, 'index.html'))
@@ -60,7 +69,13 @@ def main():
     if os.path.isdir(wsrc):
         names = sorted(os.listdir(wsrc))
         for n in names:
-            shutil.copy2(os.path.join(wsrc, n), os.path.join(DIST, n))
+            if n == 'sw.js':
+                # версія збірки → новий кеш воркера, старі чистяться самі
+                sw = read(os.path.join(wsrc, n)).replace('@@BUILD@@', build_stamp())
+                with open(os.path.join(DIST, n), 'w', encoding='utf-8', newline='') as f:
+                    f.write(sw)
+            else:
+                shutil.copy2(os.path.join(wsrc, n), os.path.join(DIST, n))
         print('Скопійовано в dist/: %s' % ', '.join(names))
 
     # Бібліотеки (PDF, EPUB, вхід через Google) кладемо поруч, а не всередину:
