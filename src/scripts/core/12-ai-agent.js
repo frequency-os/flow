@@ -324,7 +324,7 @@
       return (M[inp.action]||'🎯 працюю з цілями')+'…';
     }
     if(name==='finance'){
-      const M={add_expense:'💸 записую витрату',add_income:'💰 записую дохід',env_deposit:'📩 відкладаю в конверт',env_spend:'📤 списую з конверта',env_create:'✉️ створюю конверт',debt_add:'🤝 записую борг',debt_pay:'🤝 фіксую погашення',debt_list:'🤝 дивлюсь борги',del_last:'↩️ прибираю запис'};
+      const M={add_expense:'💸 записую витрату',add_income:'💰 записую дохід',env_deposit:'📩 відкладаю в конверт',env_spend:'📤 списую з конверта',env_create:'✉️ створюю конверт',debt_add:'🤝 записую борг',debt_pay:'🤝 фіксую погашення',debt_edit:'✏️ правлю борг',debt_delete:'🗑 видаляю борг',debt_list:'🤝 дивлюсь борги',del_last:'↩️ прибираю запис'};
       return (M[inp.action]||'💶 працюю з фінансами')+'…';
     }
     if(name==='patterns') return '🧠 працюю з патернами…';
@@ -442,14 +442,15 @@
         emoji:{ type:'string', description:'емодзі для create_goal' }
       }, required:['action','goal'] } },
     { name:'finance',
-      description:'Весь блок Гроші: add_expense (витрата), add_income (дохід), env_deposit/env_spend (конверти), env_create (новий конверт), debt_add (записати борг), debt_pay (погасити борг повністю/частково), debt_list (хто кому винен), del_last (видалити останній AI-запис витрати/доходу — для виправлень). Грошові записи людина підтверджує шторкою — просто викликай; якщо скасувала, не повторюй.',
+      description:'Весь блок Гроші: add_expense (витрата), add_income (дохід), env_deposit/env_spend (конверти), env_create (новий конверт), debt_add (записати борг), debt_pay (погасити борг повністю/частково), debt_edit (виправити борг: імʼя та/або залишок), debt_delete (видалити борг повністю, з історією), debt_list (хто кому винен), del_last (видалити останній AI-запис витрати/доходу — для виправлень). Грошові записи людина підтверджує шторкою — просто викликай; якщо скасувала, не повторюй.',
       input_schema:{ type:'object', properties:{
-        action:{ type:'string', enum:['add_expense','add_income','env_deposit','env_spend','env_create','debt_add','debt_pay','debt_list','del_last'] },
-        amount:{ type:'number', description:'сума (не потрібна для debt_list/del_last)' },
+        action:{ type:'string', enum:['add_expense','add_income','env_deposit','env_spend','env_create','debt_add','debt_pay','debt_edit','debt_delete','debt_list','del_last'] },
+        amount:{ type:'number', description:'сума (не потрібна для debt_list/del_last; для debt_edit — правильний ЗАЛИШОК боргу; для debt_delete — опційна звірка залишку)' },
         label:{ type:'string', description:'на що / звідки / коментар' },
         envelope:{ type:'string', description:'назва конверта: фрагмент наявного (env_deposit/env_spend) або назва нового (env_create)' },
         goal:{ type:'number', description:'ціль накопичення для env_create, опційно' },
-        who:{ type:'string', description:'імʼя людини для debt_add/debt_pay' },
+        who:{ type:'string', description:'імʼя людини для debt_add/debt_pay/debt_edit/debt_delete (фрагмент наявного імені)' },
+        new_who:{ type:'string', description:'нове імʼя для debt_edit, опційно' },
         direction:{ type:'string', enum:['owe','owed'], description:'debt_add: owe = я винен, owed = мені винні' },
         cur:{ type:'string', enum:['UAH','USD','EUR','PLN'], description:'валюта боргу, дефолт EUR' }
       }, required:['action'] } },
@@ -490,16 +491,18 @@
   ];
 
   const AI_AGENT_ADDON='\n\nАГЕНТНИЙ РЕЖИМ: у тебе є інструменти get_data, planner, goals, finance, patterns, memory, folders, agency. '
-    +'Дії з блоками планера — ЛИШЕ інструмент planner. Кроки/цілі — інструмент goals. ВЕСЬ блок Гроші — інструмент finance: витрати, доходи, конверти (env_deposit/env_spend/env_create), борги (debt_add/debt_pay/debt_list) і виправлення (del_last). Ніколи не кажи, що не можеш редагувати борги чи конверти — можеш, викликом finance. '
+    +'Дії з блоками планера — ЛИШЕ інструмент planner. Кроки/цілі — інструмент goals. ВЕСЬ блок Гроші — інструмент finance: витрати, доходи, конверти (env_deposit/env_spend/env_create), борги (debt_add/debt_pay/debt_edit/debt_delete/debt_list) і виправлення (del_last). Помилково записаний борг можна виправити (debt_edit: імʼя/залишок) або видалити (debt_delete). Ніколи не кажи, що не можеш редагувати борги чи конверти — можеш, викликом finance. '
     +'Цикли заміни звичок — інструмент patterns (перемога=mark_new, зрив=mark_old, без осуду). '
     +'Довготривалі факти про людину — інструмент memory (save/forget), а НЕ FLOW_MEM-рядок. '
     +'Папки й проєкти на головному екрані — інструмент folders (create/rename/set_role/delete). '
     +'Захист.SK, клієнти агенції, платежі — інструмент agency (list/add_client/set_stage/add_payment). '
     +'FLOW_OPS використовуй лише для pages. '
     +'ПІДТВЕРДЖЕННЯ: майже кожен інструмент, що щось МІНЯЄ (не читає), сам питає людину підтвердити дію шторкою знизу — просто викликай його, шторка зʼявиться автоматично. Якщо результат каже "людина скасувала" — прийми це, не повторюй той самий виклик і не наполягай. '
+    +'ЛІМІТ БЕЗПЕКИ: не більше 5 змін даних за одне повідомлення людини (читання не рахується). Якщо просять більше — зроби найважливіші 5, поясни і попроси решту окремим повідомленням. Масове «видали все» не виконуй одним махом — лише поштучно, з переліком. '
     +'Перед плануванням дня, якого немає в КОНТЕКСТІ, спершу подивись його через get_data. '
     +'get_data також читає щоденник (diary), Візію (vision: куди йду / навіщо / фокус) і Карту бажань (wishes). Коли треба дати пораду «з душею» чи ранковий бриф — зазирни туди, щоб спиратись на те, що людині справді важливо, а не радити абстрактно. '
     +'Після кожного інструмента прочитай результат: якщо конфлікт чи ⚠️ — виправ наступним викликом або чесно скажи, що не вийшло. '
+    +'ЧЕСНІСТЬ ДІЙ: НІКОЛИ не кажи «записав/виправив/видалив/зробив», якщо в цій відповіді не було успішного виклику інструмента. Просять щось змінити — спершу виклич інструмент, потім звітуй. Без виклику — чесно скажи, що ще не зробив. '
     +'Не переказуй сирі дані з інструментів — лише висновок. Максимум стислості. '
     +'ГОЛОСОВИЙ ДАМП: повідомлення з 🎙 — надиктоване. Якщо в ньому кілька думок/задач/фактів — сам розклади все по місцях інструментами (задачі з часом → planner, кроки цілей → goals, витрати/доходи → finance, довготривалі факти → memory) і підсумуй одним рядком, що куди поклав. Не перепитуй, якщо зрозуміло з контексту.';
 
@@ -720,6 +723,50 @@
         return 'запис видалено: '+(fo.type==='in'?'+':'-')+fo.amount+' («'+(fo.label||'')+'»)';
       }catch(e){ return '⚠️ '+String(e.message||e); }
     }
+    if(a==='debt_delete'){
+      const frag=String(inp.who||label||'').toLowerCase().trim();
+      if(!frag) return '⚠️ вкажи who — чий борг видаляємо';
+      try{
+        const cand=items.map(i=>({i,b:balance(i)})).filter(x=>String(x.i.name||'').toLowerCase().includes(frag));
+        if(!cand.length) return '⚠️ борг не знайдено. '+await flowToolFinance({action:'debt_list'});
+        if(cand.length>1) return '⚠️ під «'+frag+'» підпадає кілька боргів: '+cand.map(x=>x.i.name).join('; ')+' — уточни імʼя';
+        const x=cand[0], CURS={UAH:'₴',USD:'$',EUR:'€',PLN:'zł'}, cs=CURS[x.i.cur]||x.i.cur||'';
+        if(amt>0&&Math.abs(amt-x.b)>0.01)
+          return '⚠️ у '+x.i.name+' залишок '+x.b+' '+cs+', а не '+amt+' — перепитай людину, чи той це борг';
+        const ok=await aiFinConfirm('ВИДАЛИТИ борг '+(x.i.kind==='owe'?'(я винен) ':'(мені винні) ')+x.i.name+': '+x.b+' '+cs+' · разом з історією, без вороття');
+        if(!ok) return 'людина скасувала — не повторюй';
+        const idx=items.indexOf(x.i); if(idx>=0) items.splice(idx,1);
+        save(); try{ render(); }catch(_){}
+        try{ plToast('🤖 борг '+x.i.name+' видалено'); }catch(_){}
+        return 'борг '+x.i.name+' видалено повністю (разом з історією операцій)';
+      }catch(e){ return '⚠️ '+String(e.message||e); }
+    }
+    if(a==='debt_edit'){
+      const frag=String(inp.who||label||'').toLowerCase().trim();
+      if(!frag) return '⚠️ вкажи who — який борг правимо';
+      const nw=String(inp.new_who||'').trim().slice(0,40);
+      if(!nw&&!(amt>0)) return '⚠️ дай new_who (нове імʼя) та/або amount (правильний залишок)';
+      try{
+        const cand=items.map(i=>({i,b:balance(i)})).filter(x=>String(x.i.name||'').toLowerCase().includes(frag));
+        if(!cand.length) return '⚠️ борг не знайдено. '+await flowToolFinance({action:'debt_list'});
+        if(cand.length>1) return '⚠️ під «'+frag+'» підпадає кілька боргів: '+cand.map(x=>x.i.name).join('; ')+' — уточни імʼя';
+        const x=cand[0], CURS={UAH:'₴',USD:'$',EUR:'€',PLN:'zł'}, cs=CURS[x.i.cur]||x.i.cur||'';
+        const chg=[];
+        if(nw&&nw!==x.i.name) chg.push('імʼя «'+x.i.name+'» → «'+nw+'»');
+        if(amt>0&&Math.abs(amt-x.b)>0.005) chg.push('залишок '+x.b+' → '+amt+' '+cs);
+        if(!chg.length) return 'нічого міняти — все вже так і записано';
+        const ok=await aiFinConfirm('Виправити борг '+x.i.name+': '+chg.join('; '));
+        if(!ok) return 'людина скасувала — не повторюй';
+        if(nw) x.i.name=nw;
+        if(amt>0&&Math.abs(amt-x.b)>0.005){
+          const d=Math.round((amt-x.b)*100)/100;
+          x.i.ops.push({ id:Date.now(), type:d>0?'borrow':'repay', amount:Math.abs(d), date:ymdLocal(), note:'коригування (AI)' });
+        }
+        save(); try{ render(); }catch(_){}
+        try{ plToast('🤖 борг оновлено: '+x.i.name); }catch(_){}
+        return 'борг виправлено: '+x.i.name+', залишок тепер '+balance(x.i)+' '+cs;
+      }catch(e){ return '⚠️ '+String(e.message||e); }
+    }
     /* ── грошові дії ── */
     if(!(amt>0)) return '⚠️ сума має бути > 0';
     if(amt>100000) return '⚠️ неправдоподібна сума, уточни в людини';
@@ -938,7 +985,7 @@
     q=String(q||'');
     if(hop>=3) return 'claude-sonnet-4-6';
     if(q.length>220) return 'claude-sonnet-4-6';
-    if(/розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй/i.test(q)) return 'claude-sonnet-4-6';
+    if(/розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй|виправ|видали|видал|перейменуй/i.test(q)) return 'claude-sonnet-4-6';
     return 'claude-haiku-4-5';
   }
 
@@ -1000,7 +1047,7 @@
       blocks=blocks.filter(Boolean).map(b=>{
         if(b.type==='tool_use'){ try{ b.input=b._json?JSON.parse(b._json):{}; }catch(_){ b.input={}; } delete b._json; }
         return b;
-      });
+      }).filter(b=>!(b.type==='text'&&!String(b.text||'').trim())); // порожній text-блок (модель одразу пішла в tool_use) валить наступний хоп 400-кою
       aiUsageAdd(payload.model,_u);
       return {content:blocks, stop_reason:stop||'end_turn'};
     }
@@ -1014,6 +1061,16 @@
     return {content:data.content||[], stop_reason:data.stop_reason||'end_turn'};
   }
 
+  /* Запобіжник: чи МІНЯЄ виклик інструмента дані (а не читає). Для ліміту змін за повідомлення. */
+  function aiToolIsWrite(name,inp){
+    const a=(inp&&inp.action)||'';
+    if(name==='get_data'||name==='memory') return false;
+    if(/^dev_/.test(name)) return false;                    // dev-режим має власні підтвердження
+    if(name==='finance') return a!=='debt_list';
+    if(name==='patterns'||name==='agency') return a!=='list';
+    return true;                                            // planner, goals, folders
+  }
+  const AI_WRITE_LIMIT=5;                                   // змін даних за одне повідомлення людини
   async function aiAgentTurn(sysStable,sysDynamic,msgs,userQ,onDelta){
     const system=[
       {type:'text',text:sysStable,cache_control:{type:'ephemeral'}},
@@ -1022,7 +1079,7 @@
     const conv=msgs.slice();
     const dev=aiDevOn();
     const TOOLS=dev?FLOW_TOOLS.concat(DEV_TOOLS):FLOW_TOOLS;
-    let toolsUsed=0;
+    let toolsUsed=0, writesUsed=0;
     aiTraceStart();
     for(let hop=0;hop<6;hop++){
       const resp=await aiCallRaw({
@@ -1039,6 +1096,11 @@
       for(const b of resp.content){
         if(b.type!=='tool_use') continue;
         toolsUsed++;
+        if(aiToolIsWrite(b.name,b.input)&&++writesUsed>AI_WRITE_LIMIT){
+          results.push({type:'tool_result',tool_use_id:b.id,
+            content:'⚠️ ліміт безпеки: не більше '+AI_WRITE_LIMIT+' змін даних за одне повідомлення. Підсумуй людині, що вже зроблено, і попроси надіслати решту окремим повідомленням.'});
+          continue;
+        }
         const ti=aiTraceStep(b.name,b.input);
         const out=await flowToolExec(b.name,b.input);
         aiTraceEnd(ti);
