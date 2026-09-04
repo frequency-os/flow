@@ -512,6 +512,32 @@
       }
     },120);
   }
+  /* ── містки для глобального пошуку (32-global-search.js) ── */
+  // всі блоки всіх дошок; bk може бути під-простором виду 'папка__sp_id'
+  window.flowSearchBoards=function(){
+    const out=[];
+    try{
+      Object.keys(boards||{}).forEach(bk=>{
+        const base=String(bk).split('__sp_')[0];
+        const f=folders&&folders[base];
+        if(base!=='all' && !f) return;                    // осиротілі дошки видалених папок
+        try{ if(f&&f.secret&&!vaultOpen) return; }catch(_){} // прихований vault не світимо
+        const fname=(f&&f.name)||(base==='all'?'Простір':base);
+        const femo=(f&&f.emoji)||'📁';
+        const all=[]; collectBlocks(boards[bk]||[],[],all);
+        all.forEach(it=>{ const b=it.block;
+          out.push({bk, id:b.id, folder:fname, emoji:femo, title:b.title||'', text:blockSearchText(b)}); });
+      });
+    }catch(e){ console.error('flowSearchBoards',e); }
+    return out;
+  };
+  window.flowOpenBlock=function(bk,id){
+    const base=String(bk).split('__sp_')[0];
+    // коренева дошка не є папкою — відкривається екраном простору
+    try{ if(base==='all') goSpace(); else goFolder(base); }catch(e){ console.error('flowOpenBlock',e); }
+    // дочекатись рендера папки, тоді перемкнутись на потрібну дошку і стрибнути
+    setTimeout(()=>{ try{ if(boards[bk]){ boardKey=bk; syncBlocks(); } jumpToBlock(id); }catch(e){ console.error('flowOpenBlock jump',e); } },300);
+  };
   function openSearch(){
     const ov=document.getElementById('srchOv');
     const inp=document.getElementById('srchInput');
@@ -532,7 +558,7 @@
     if(ov && ov.classList.contains('show') && t===ov){ closeSearch(); }
   }
   document.addEventListener('click',srchDelegate,true);
-  // pointerup-страховка: окремі WebView (Telegram iOS) не шлють click у fixed+backdrop-filter
+  // pointerup-страховка: окремі WebView на iOS не шлють click у fixed+backdrop-filter
   document.addEventListener('pointerup',function(e){
     const t=e.target;
     if(t.closest && (t.closest('#boardSearchBtn')||t.closest('#srchClose'))){ srchDelegate(e); }

@@ -1,7 +1,7 @@
   /* ============ ЩОДЕННИК ============ */
   const DIARY_KEY='diary_entries_v1';
   const DIAINS_KEY='diary_insights_v1';   // кеш AI: настрій по днях + збережені аналізи тижнів
-  const DIABOOKS_KEY='diary_books_v1';    // зошити: {books:[{id,name,emoji,color}], entries:{bookId:[{id,text,ts}]}}
+  const DIABOOKS_KEY='diary_books_v1';    // зошити: {books:[{id,name,emoji,color}], entries:{bookId:[{id,text,ts,audio?}]}}
   let diaryEntries={};              // { 'YYYY-MM-DD': {text, ts, mood?, audio?} } — mood 1..5, поставлений рукою
   let diaInsights={mood:{},weeks:{}}; // mood: {'YYYY-MM-DD': 1..5 (оцінка AI)}, weeks: {'пн тижня': {text,ts}}
   let diaBooks={books:[],entries:{}};
@@ -68,8 +68,17 @@
     }
     return cal.join('');
   }
-  function goDiary(){ diaSelDate=plTodayStr(); diaViewWeek=diaMonday(diaSelDate); renderDiary(); diaShowTab('write'); show('scr-diary'); }
+  // ds — необовʼязкова дата 'YYYY-MM-DD' (глобальний пошук); onclick передає Event — відсіюємо
+  function goDiary(ds){ diaSelDate=(typeof ds==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(ds))?ds:plTodayStr();
+    diaViewWeek=diaMonday(diaSelDate); renderDiary(); diaShowTab('write'); show('scr-diary'); }
   window.goDiary=goDiary;
+  // місток для глобального пошуку: всі записи (щоденник + зошити)
+  window.flowSearchDiary=function(){
+    const out=[];
+    try{ Object.keys(diaryEntries||{}).forEach(ds=>{ const e=diaryEntries[ds]; if(e&&e.text) out.push({date:ds, book:'', text:e.text}); }); }catch(_){}
+    try{ (diaBooks.books||[]).forEach(b=>{ (diaBooks.entries[b.id]||[]).forEach(e=>{ if(e&&e.text) out.push({date:'', book:b.name||'Зошит', text:e.text}); }); }); }catch(_){}
+    return out;
+  };
 
   /* ── вкладки: Запис / Огляд / Зошити ── */
   function diaShowTab(t){
@@ -145,6 +154,25 @@
       }
     }
     diaRenderStreak();
+    // спільна стрічка: записи зошитів за відкритий день (джерело даних — самі зошити)
+    const dbEl=document.getElementById('diaDayBooks');
+    if(dbEl){
+      const rows=[];
+      (diaBooks.books||[]).forEach(b=>{
+        (diaBooks.entries[b.id]||[]).forEach(e=>{
+          if(diaFmtYmd(new Date(e.ts))!==diaSelDate) return;
+          rows.push({b,e});
+        });
+      });
+      rows.sort((x,y)=>x.e.ts-y.e.ts);
+      dbEl.innerHTML=rows.length ? '<div class="dia-list-head">Із зошитів цього дня</div><div class="dia-list">'
+        +rows.map(r=>'<div class="dia-entry" data-diagobook="'+r.b.id+'"><div class="de-date" style="color:'+diaEsc(r.b.color)+'">'
+          +diaEsc(r.b.emoji+' '+r.b.name)+(r.e.audio?' · 🎙 '+diaFmtDur(r.e.audio.dur||0):'')+'</div>'
+          +'<div class="de-txt">'+diaEsc(r.e.text||'')+'</div></div>').join('')+'</div>' : '';
+      dbEl.querySelectorAll('[data-diagobook]').forEach(el=>{
+        el.onclick=()=>{ diaCurBook=el.dataset.diagobook; diaShowTab('books'); };
+      });
+    }
     // голосовий запис, прикріплений до відкритого дня
     const rec=diaryEntries[diaSelDate]&&diaryEntries[diaSelDate].audio;
     if(auEl){
@@ -354,10 +382,17 @@
     const arr=(diaBooks.entries[book.id]||[]).slice().sort((a,b)=>b.ts-a.ts);
     l.innerHTML=arr.length?arr.map(e=>{
       const d=new Date(e.ts);
+      const au=e.audio?'<button class="db-play" data-dbplay="'+e.id+'" style="background:none;border:0;color:'+diaEsc(book.color)+';cursor:pointer;padding:0;font-size:13px">▶ 🎙 '+diaFmtDur(e.audio.dur||0)+'</button>':'';
       return '<div class="dia-entry db-entry"><div><div class="de-date" style="color:'+diaEsc(book.color)+'">'+d.getDate()+' '+DIA_MONTHS[d.getMonth()]+'</div>'
-        +'<div class="de-txt db-txt">'+diaEsc(e.text)+'</div></div>'
+        +'<div class="de-txt db-txt">'+diaEsc(e.text)+'</div>'+au+'</div>'
         +'<button class="db-del" data-dbdel="'+e.id+'" title="Видалити запис">✕</button></div>';
     }).join(''):'<div class="dia-empty">Перший запис — у полі зверху.</div>';
+    l.querySelectorAll('[data-dbplay]').forEach(b=>{
+      b.onclick=()=>{
+        const e=(diaBooks.entries[book.id]||[]).find(x=>x.id===b.dataset.dbplay);
+        if(e&&e.audio) diaPlayAudio(e.audio.a);
+      };
+    });
     l.querySelectorAll('[data-dbdel]').forEach(b=>{
       b.onclick=()=>{
         confirmSheet({title:'Видалити запис?',okLabel:'Видалити',onOk:()=>{
@@ -444,7 +479,47 @@
   }
   window.diaRecord=diaRecord;
   { const b=document.getElementById('diaMicBtn'); if(b) b.onclick=diaRecord; }
+
+  // 🎙 голос у зошиті: стоп → НОВИЙ запис зошита з аудіо (+текст з поля, якщо був)
+  let diaBookRec=null, diaBookRecT=null, diaBookRecSec=0;
+  async function diaBookRecord(){
+    if(diaBookRec){ try{ diaBookRec.stop(); }catch(_){} return; }
+    if(!diaBooks.books.find(x=>x.id===diaCurBook)) return;
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      const mime=MediaRecorder.isTypeSupported('audio/mp4')?'audio/mp4':(MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'');
+      const bookId=diaCurBook;
+      diaBookRec=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);
+      const chunks=[]; diaBookRecSec=0;
+      diaBookRec.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
+      diaBookRec.onstop=()=>{
+        stream.getTracks().forEach(t=>t.stop());
+        clearInterval(diaBookRecT); const sec=diaBookRecSec; const mt=diaBookRec.mimeType||'audio/mp4'; diaBookRec=null;
+        const tm=document.getElementById('diaBookRecTm'); if(tm) tm.textContent='';
+        const mb=document.getElementById('diaBookMicBtn'); if(mb) mb.classList.remove('live');
+        const blob=new Blob(chunks,{type:mt});
+        if(blob.size<1200){ try{ flowAlert('🎙 Закоротко, спробуй ще раз.'); }catch(_){} return; }
+        const fr=new FileReader();
+        fr.onload=()=>{
+          const inp=document.getElementById('diaBookInput');
+          const txt=((inp&&inp.value)||'').trim();
+          (diaBooks.entries[bookId]=diaBooks.entries[bookId]||[]).push({id:'e'+Date.now(),text:txt,ts:Date.now(),audio:{a:fr.result,dur:sec}});
+          if(inp) inp.value='';
+          saveDiaBooks(); renderDiaBooks();
+          try{ window.platform.haptic('medium'); }catch(_){}
+        };
+        fr.readAsDataURL(blob);
+      };
+      diaBookRec.start();
+      diaBookRecT=setInterval(()=>{ diaBookRecSec++; const t=document.getElementById('diaBookRecTm'); if(t) t.textContent='● '+diaFmtDur(diaBookRecSec); },1000);
+      const mb=document.getElementById('diaBookMicBtn'); if(mb) mb.classList.add('live');
+      try{ flowAlert('🎙 Говори — тап ще раз, щоб зупинити'); }catch(_){}
+    }catch(e){ diaBookRec=null; try{ flowAlert('⚠️ Нема доступу до мікрофона'); }catch(_){} }
+  }
+  { const b=document.getElementById('diaBookMicBtn'); if(b) b.onclick=diaBookRecord; }
+
   // безпека: не пишемо тихо у фоні, якщо застосунок згорнули
   document.addEventListener('visibilitychange',function(){
     if(document.hidden&&diaRec){ try{ diaRec.stop(); }catch(_){} }
+    if(document.hidden&&diaBookRec){ try{ diaBookRec.stop(); }catch(_){} }
   });

@@ -22,7 +22,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0c0e14">
 <script>@@INC:scripts/01-crash-screen.js@@</script>
-<script>@@INC:scripts/02-vendor-lz-string.js@@</script>
 <!-- шрифти вбудовані в код (див. tools/build-fonts.py) — інтернет не потрібен -->
 <style>@@INC:styles/00-fonts.css@@</style>
 <style>@@INCDIR:styles/core@@</style>
@@ -133,6 +132,7 @@
     <div class="top">
       <div class="brand"><div class="logo lg-glass" id="brandMark" title="Frequency"><i class="lg-spec"></i><i class="lg-sweep"></i><svg viewBox="0 0 24 24" fill="none"><path class="lg-w" d="M2 12h3.2l2.4-6.6 3.8 13.2 2.9-8.4 1.9 3.8H22"/></svg></div><div><h1>Frequency</h1><span>сценарій пишеш ти</span></div></div>
       <div style="display:flex;gap:8px;">
+        <div class="icon-btn" id="homeSearchBtn" title="Пошук (⌘K)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.2 4.2"/></svg></div>
         <div class="icon-btn" id="themeToggle" title="Тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 019.5 3.5a8.5 8.5 0 1011 11z"/></svg></div>
         <div class="icon-btn space-layout-toggle" id="homeWidgetsToggle" title="Панель віджетів"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.2"/><path d="M14 4v16"/></svg></div>
         <div class="icon-btn" id="dashSettingsBtn" title="Налаштування"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg></div>
@@ -489,45 +489,6 @@
     </div>
   </div>
 
-  <section class="screen" id="scr-agency">
-    <div class="ag-headrow">
-      <button class="back" id="agencyBack" style="--c:#6a7dff">‹ Назад</button>
-      <button class="wk-spaces-btn" id="agencySpacesBtn">📋 Блоки</button>
-    </div>
-    <div class="ph" style="--c:#6a7dff">
-      <div class="ey">Проєкт · <b>Словаччина</b></div>
-      <h2><span class="em" style="background:color-mix(in srgb,#6a7dff 16%,transparent)">🇸🇰</span>Агенція</h2>
-    </div>
-    <div class="ag-seg" id="agTabs">
-      <div class="segpill" id="agSegPill"></div>
-      <button class="ag-tab on" data-agp="home">🏠 Огляд</button>
-      <button class="ag-tab" data-agp="ptr">🤝 Партнерство</button>
-      <button class="ag-tab" data-agp="fin">💰 Фінанси</button>
-      <button class="ag-tab" data-agp="cli">👥 Клієнти</button>
-      <button class="ag-tab" data-agp="doc">📁 Документи</button>
-      <button class="ag-tab" data-agp="mkt">📣 Маркетинг</button>
-      <button class="ag-tab" data-agp="ops">⚙️ Операційка</button>
-    </div>
-    <div class="ag-pane on" data-agpane="home" id="agPaneHome"></div>
-    <div class="ag-pane" data-agpane="ptr" id="agPanePtr"></div>
-    <div class="ag-pane" data-agpane="fin" id="agPaneFin"></div>
-    <div class="ag-pane" data-agpane="cli" id="agPaneCli"></div>
-    <div class="ag-pane" data-agpane="doc" id="agPaneDoc"></div>
-    <div class="ag-pane" data-agpane="mkt" id="agPaneMkt"></div>
-    <div class="ag-pane" data-agpane="ops" id="agPaneOps"></div>
-  </section>
-
-  <section class="screen" id="scr-client">
-    <div class="ag-headrow">
-      <button class="back" id="clientBack" style="--c:#6a7dff">‹ Клієнти</button>
-    </div>
-    <div class="ph" style="--c:#6a7dff">
-      <div class="ey">Клієнт · <b>Агенція SK</b></div>
-      <h2 id="clientName">—</h2>
-    </div>
-    <div id="clientBody"></div>
-  </section>
-
   <section class="screen" id="scr-space">
     <button class="back" id="spaceBack" style="display:none">‹ Папки</button>
     <div class="top">
@@ -750,6 +711,8 @@
         </div>
       </div>
 
+      <div id="diaDayBooks"></div>
+
       <div class="dia-list-head">Попередні записи</div>
       <div class="dia-list" id="diaList"></div>
     </div>
@@ -798,7 +761,13 @@
         </div>
         <div class="dia-today">
           <textarea class="dia-input" id="diaBookInput" rows="3" placeholder="Новий запис…"></textarea>
-          <button class="dia-ai-btn" id="diaBookAdd" style="margin:10px 0 0">Додати запис</button>
+          <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+            <button class="dia-ai-btn" id="diaBookAdd" style="margin:0;flex:1">Додати запис</button>
+            <button class="dia-mic-big" id="diaBookMicBtn" title="Голосовий запис">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+            </button>
+            <b class="dia-mic-tm" id="diaBookRecTm"></b>
+          </div>
         </div>
         <div class="dia-list" id="diaBookList"></div>
       </div>
@@ -999,7 +968,6 @@
 <script>@@INCDIR:scripts/page-editor@@</script>
 
 <style id="fd26css">@@INC:styles/10-fd26.css@@</style>
-<style id="fd26css-agency">@@INC:styles/11-agency.css@@</style>
 <script id="fd26js">@@INC:scripts/40-pets-3d.js@@</script>
 
 <style id="fd26tcss">@@INC:styles/12-theme-nightfire.css@@</style>

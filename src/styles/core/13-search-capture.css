@@ -1,3 +1,6 @@
+  /* заголовок групи в глобальному пошуку (⌘K) */
+  .gs-lbl{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    margin:10px 2px 2px;}
   /* ===== ПОШУК ПО ДОШЦІ ===== */
   .srch-ov{position:fixed;inset:0;z-index:340;background:rgba(8,10,16,.97);pointer-events:auto;
     display:none;flex-direction:column;align-items:center;padding:14px 14px calc(14px + env(safe-area-inset-bottom));}

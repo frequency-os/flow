@@ -51,6 +51,8 @@
   let finOps=[]; // {id,type:'in'|'out',amount,label,date}
   const FINOPKEY='fin_ops';
   function saveFinOps(){ try{ const p=window.storage.set(FINOPKEY,JSON.stringify(finOps),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+  // місток для глобального пошуку: всі операції
+  window.flowSearchFin=function(){ try{ return finOps.map(o=>({id:o.id,type:o.type,amount:o.amount,label:o.label||'',date:o.date||''})); }catch(_){ return []; } };
   // recurring payments
   let recurring=[]; // {id,name,emoji,amount,period}
   const RECKEY='fin_recurring';
@@ -61,7 +63,7 @@
 
   /* ============ ГАМАНЕЦЬ · єдиний рахунок ============
      Замість набору віртуальних карток — один гаманець у гривні.
-     Імена функцій лишились ті самі: їх кличуть агенція, робота, борги,
+     Імена функцій лишились ті самі: їх кличуть робота, борги,
      витрати й AI-агент. Тепер вони всі повертають один і той самий
      гаманець. */
   const WALLET_ID='wallet';
@@ -531,7 +533,7 @@
   }
   function fmtDate(iso){ if(!iso) return ''; const p=iso.split('-'); return p.length===3?`${p[2]}.${p[1]}`:iso; }
 
-  /* ═══════════ ПРОЄКТНІ БЛОКИ з макета «Агенція»: канбан · контакти · таймлайн · подія ═══════════ */
+  /* ═══════════ ПРОЄКТНІ БЛОКИ: канбан · контакти · таймлайн · подія ═══════════ */
   // ── КАНБАН: колонки й картки ──
   function kanbanWidgetHtml(b, sz, head){
     const cols=Array.isArray(b.cols)?b.cols:[];
@@ -607,7 +609,7 @@
       <div class="tadd" data-ctadd="${b.id}">+ контакт</div></div>`;
   }
   function ctwAdd(b){
-    inputModal({title:'Ім’я або назва', placeholder:'Напр. Notár Trnavská 8', onOk:(nm)=>{
+    inputModal({title:'Ім’я або назва', placeholder:'Напр. Юрист Олена', onOk:(nm)=>{
       if(!(nm||'').trim()) return;
       inputModal({title:'Примітка (необов’язково)', placeholder:'Напр. підписи · пн–пт до 16:00', onOk:(note)=>{
         (b.people=b.people||[]).push({id:'ct'+Date.now(),name:nm.trim(),note:(note||'').trim(),link:'',
@@ -724,7 +726,7 @@
       {ic:'🎪', label:'Емодзі', sub:b.emojiF||'🎪', onClick:()=>inputModal({title:'Емодзі події', value:b.emojiF||'🎪', onOk:(v)=>{ const e=(v||'').trim().slice(0,4); if(e){ b.emojiF=e; saveBoard(); renderBoard(); } }})},
       {ic:'📅', label:'Дата початку', sub:b.date||'РРРР-ММ-ДД', onClick:()=>inputModal({title:'Початок (РРРР-ММ-ДД)', value:b.date||'', onOk:(v)=>{ v=(v||'').trim(); if(!v||/^\d{4}-\d{2}-\d{2}$/.test(v)){ b.date=v; saveBoard(); renderBoard(); } else flowAlert('Формат дати: РРРР-ММ-ДД'); }})},
       {ic:'🏁', label:'Дата завершення', sub:b.dateEnd||'необов’язково', onClick:()=>inputModal({title:'Завершення (РРРР-ММ-ДД)', value:b.dateEnd||'', onOk:(v)=>{ v=(v||'').trim(); if(!v||/^\d{4}-\d{2}-\d{2}$/.test(v)){ b.dateEnd=v; saveBoard(); renderBoard(); } else flowAlert('Формат дати: РРРР-ММ-ДД'); }})},
-      {ic:'📍', label:'Місце', sub:b.place||'додати', onClick:()=>inputModal({title:'Місце події', value:b.place||'', placeholder:'Напр. Bratislava', onOk:(v)=>{ b.place=(v||'').trim(); saveBoard(); renderBoard(); }})},
+      {ic:'📍', label:'Місце', sub:b.place||'додати', onClick:()=>inputModal({title:'Місце події', value:b.place||'', placeholder:'Напр. Київ', onOk:(v)=>{ b.place=(v||'').trim(); saveBoard(); renderBoard(); }})},
       {ic:'💶', label:'Бюджет', sub:(+b.budget||0)+' '+(b.cur||'€'), onClick:()=>inputModal({title:'Бюджет ('+(b.cur||'€')+')', value:String(+b.budget||''), placeholder:'Напр. 800', onOk:(v)=>{ b.budget=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,''))||0; saveBoard(); renderBoard(); }})},
       {ic:'🧾', label:'Журнал витрат', sub:(b.ops||[]).length+' записів', onClick:()=>fstwOpsSheet(b)},
     ]});
