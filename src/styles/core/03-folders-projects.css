@@ -103,8 +103,6 @@
   .fdrag-handle:active{cursor:grabbing;transform:scale(.9);background:rgba(0,0,0,.5);color:#fff;}
   .fcard.fdrag-src .fdrag-handle{opacity:0;}
   .fbanner .fpin{position:absolute;top:9px;right:40px;font-size:12px;z-index:4;}
-  .fbanner .fpin.fsecret{right:62px;opacity:.85;}
-  @keyframes vshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
   .fbanner .fsub{position:absolute;top:8px;left:8px;z-index:4;font-size:11px;font-weight:700;
     background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:2px 7px;backdrop-filter:blur(4px);}
   .wcard.subfolder{cursor:pointer;}
@@ -220,7 +218,6 @@
   .fc2 .fproj{margin-top:6px;}
   .fc2 .fmenu,.fc2 .fdrag-handle{z-index:5;}
   .fc2 .fpin{font-size:13px;z-index:5;}
-  .fc2 .fpin.fsecret{opacity:.85;}
   .fc2 .fsub{z-index:5;font-size:11px;font-weight:700;background:rgba(0,0,0,.5);color:#fff;
     border-radius:8px;padding:2px 7px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
 
@@ -467,6 +464,22 @@
   /* велика картка Огляду: рівна поверхня, без фіолетового «генератора» */
   html.t-flat #scr-home .summary,
   html.t-flat .summary{background:var(--card);border:1px solid var(--line);box-shadow:none;}
+  /* ── живий Огляд: три віджети під hero (аудит Ф1) ── */
+  #homeWidgetsRow{display:flex;flex-direction:column;gap:10px;margin:14px 0 4px;}
+  #homeWidgetsRow .hw-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .hw-card{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:13px 14px;cursor:pointer;font-family:inherit;color:var(--text);transition:.13s;}
+  .hw-card:active{transform:scale(.985);}
+  .hw-card .hw-h{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+  .hw-card .hw-big{font-size:21px;font-weight:800;line-height:1.1;}
+  .hw-card .hw-sub{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.35;}
+  .hw-card .hw-blk{display:flex;align-items:center;gap:8px;font-size:13px;padding:3px 0;min-width:0;}
+  .hw-card .hw-blk i{flex:0 0 auto;width:7px;height:7px;border-radius:50%;}
+  .hw-card .hw-blk b{flex:0 0 auto;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700;}
+  .hw-card .hw-blk span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hw-card .hw-empty{font-size:12.5px;color:var(--muted);}
+  .hw-card .hw-cta{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:99px;padding:5px 11px;}
   html.t-flat #scr-home .summary .wishgen{display:none;}
   html.t-flat.home-glass #scr-home .summary{box-shadow:none;}
 
