@@ -216,6 +216,8 @@
   html[data-theme="light"]{ --sel:rgba(109,92,240,.10); }
   html[data-theme="black"]{ --sel:rgba(148,138,255,.16); }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  /* клавіатурна навігація: видимий фокус лише від клавіатури, тапів не чіпає (аудит Т1) */
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   html{height:100%;background:var(--bg);overflow:hidden;}
   html{background:#0b0d12;min-height:100%;}
   body{background:var(--bg);color:var(--text);font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;

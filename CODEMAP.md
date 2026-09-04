@@ -16,7 +16,7 @@
 | Файлів JS | 53 |
 | Рядків JS | 27232 |
 | Файлів CSS | 30 |
-| Рядків CSS | 9079 |
+| Рядків CSS | 9081 |
 | Сутностей верхнього рівня | 1641 |
 | Ключів сховища (FLOW_KEYS) | 45 |
 
@@ -95,7 +95,7 @@
 | `src/styles/17-horizon.css` | 363 | 1 |
 | `src/styles/18-standalone.css` | 43 | 1 |
 | `src/styles/19-themes-flat.css` | 416 | 3 |
-| `src/styles/core/01-tokens-base.css` | 341 | 8 |
+| `src/styles/core/01-tokens-base.css` | 343 | 8 |
 | `src/styles/core/02-page-editor.css` | 1299 | 10 |
 | `src/styles/core/03-folders-projects.css` | 555 | 0 |
 | `src/styles/core/04-menus.css` | 61 | 0 |
