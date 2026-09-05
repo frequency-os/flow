@@ -773,6 +773,16 @@
     'linear-gradient(135deg,#141a33,#31418f 55%,#7c8cff)'
   ];
   var covEl=document.getElementById('pgCover');
+  /* міст для Каналу папки (core/35-channel.js): та сама обкладинка, той самий ключ —
+     що поставив у Каналі, те й бачиш у документі, і навпаки */
+  try{
+    window.__pgCovers={
+      grads:COV_GRADS,
+      get:function(k){ return covers[k]||null; },
+      set:function(k,c){ covers[k]=c; saveCovers(); try{ renderCover(); }catch(_){} },
+      clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} }
+    };
+  }catch(_){}
   function pgHasCov(){ try{ return !!covers[covKey()]; }catch(_){ return false; } }
   function covKey(){ try{ return (bridge()&&bridge().curKey())||''; }catch(_){ return ''; } }
   function covMenuHTML(){

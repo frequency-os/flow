@@ -587,31 +587,11 @@
     return {arr:arr,cont:cont};
   }
   function pgHeaStrip(){
-    /* чипи просторів (лише на корені) + хлібний рядок при вкладеності */
+    /* Лише хлібний рядок при вкладеності.
+       Чипи «Сторінка · N блоків · ред. дата · + обкладинка» і рядок просторів
+       прибрано 05.09.2026: теми й обкладинка тепер живуть у Каналі папки
+       (core/35-channel.js), а тут вони дублювали назву і займали верх аркуша. */
     var out=document.createDocumentFragment();
-    try{
-      var _mr=document.createElement('div'); _mr.className='pgmeta';
-      var _mn=(pgResolve().arr||[]).length;
-      var _md=new Date();
-      var _mw=(_mn%10===1&&_mn%100!==11)?'блок':((_mn%10>=2&&_mn%10<=4&&(_mn%100<10||_mn%100>=20))?'блоки':'блоків');
-      _mr.innerHTML='<span class="pgm-c acc">'+(pgPath.length?'Вкладена':'Сторінка')+'</span>'
-        +'<span class="pgm-c">'+_mn+' '+_mw+'</span>'
-        +'<span class="pgm-c">ред. '+String(_md.getDate()).padStart(2,'0')+'.'+String(_md.getMonth()+1).padStart(2,'0')+'</span>'
-        +'<span class="pgm-c cov'+(pgHasCov()?' set':'')+'" data-pgcovopen>'+(pgHasCov()?'обкладинка':'＋ обкладинка')+'</span>';
-      out.appendChild(_mr);
-    }catch(_){}
-    if(!pgPath.length&&bridge().spaces){
-      var sps=bridge().spaces()||[];
-      if(sps.length){
-        var row=document.createElement('div'); row.className='pgsg';
-        row.innerHTML='<span class="pgsg-ind"></span>'+sps.map(function(s){
-          return '<button class="pgsg-b'+(s.on?' on':'')+'" data-pgspace="'+s.id+'">'
-            +'<span class="e">'+(s.emoji||'🧩')+'</span><span class="t">'+esc(s.name)+'</span>'
-            +(s.n?'<span class="bdg">'+s.n+'</span>':'')+'</button>';
-        }).join('')+'<button class="pgsg-b plus" data-pgspadd>＋</button>';
-        out.appendChild(row);
-      }
-    }
     if(pgPath.length){
       var r=pgResolve(), c=r.cont;
       var nav=document.createElement('div'); nav.className='pgnav';

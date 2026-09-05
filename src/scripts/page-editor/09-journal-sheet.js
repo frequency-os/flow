@@ -436,7 +436,8 @@
 
   // ── публічний вхід ──
   try{ window.__pgRender=render; }catch(_){}
-  window.openFlowPage=function(){
+  // opts.focusId — прокрутити до блока й підсвітити (стрибок із Каналу папки)
+  window.openFlowPage=function(opts){
     if(!bridge()){ if(window.__show)window.__show('scr-space'); return; }
     applyTheme(savedTheme);
     pgPath=[];
@@ -446,5 +447,18 @@
     renderCover();
     cdTick();
     if(window.__show)window.__show('scr-page');
+    var fid=opts&&opts.focusId;
+    if(fid){
+      // __show скидає прокрутку ще й через 80 мс — стрибаємо після цього
+      setTimeout(function(){
+        try{
+          var el=editor.querySelector('.pgb[data-id="'+String(fid).replace(/["\\]/g,'')+'"]');
+          if(!el) return;
+          el.scrollIntoView({block:'center'});
+          el.classList.add('pg-flash');
+          setTimeout(function(){ el.classList.remove('pg-flash'); },1600);
+        }catch(_){}
+      },140);
+    }
   };
 })();

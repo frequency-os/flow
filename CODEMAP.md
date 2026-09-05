@@ -69,15 +69,16 @@
 | `src/scripts/core/32-global-search.js` | 143 | 13 |
 | `src/scripts/core/33-home-widgets.js` | 84 | 8 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
+| `src/scripts/core/35-channel.js` | 563 | 53 |
 | `src/scripts/page-editor/01-palette.js` | 204 | 18 |
-| `src/scripts/page-editor/02-block-styles.js` | 924 | 47 |
+| `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 590 | 27 |
 | `src/scripts/page-editor/04-w-journal.js` | 107 | 9 |
 | `src/scripts/page-editor/05-w-decisions.js` | 112 | 4 |
 | `src/scripts/page-editor/06-w-project.js` | 100 | 6 |
 | `src/scripts/page-editor/07-w-habits.js` | 69 | 4 |
-| `src/scripts/page-editor/08-w-projects-hub.js` | 927 | 41 |
-| `src/scripts/page-editor/09-journal-sheet.js` | 450 | 36 |
+| `src/scripts/page-editor/08-w-projects-hub.js` | 937 | 41 |
+| `src/scripts/page-editor/09-journal-sheet.js` | 464 | 36 |
 | `src/scripts/page-editor/10-mic.js` | 155 | 10 |
 
 ## Файли CSS
@@ -112,6 +113,7 @@
 | `src/styles/core/15-vision.css` | 172 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
+| `src/styles/core/18-channel.css` | 176 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (44)
 
@@ -1703,6 +1705,64 @@
 | `sheetHTML` | функція | `src/scripts/core/34-shortcuts.js:20` |
 | `sheetToggle` | функція | `src/scripts/core/34-shortcuts.js:32` |
 
+### `src/scripts/core/35-channel.js` — 53 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `chKey` | значення | `src/scripts/core/35-channel.js:14` |
+| `chTopic` | значення | `src/scripts/core/35-channel.js:15` |
+| `chMode` | значення | `src/scripts/core/35-channel.js:16` |
+| `chRec` | значення | `src/scripts/core/35-channel.js:17` |
+| `chLongPressed` | значення | `src/scripts/core/35-channel.js:18` |
+| `chAiBusy` | значення | `src/scripts/core/35-channel.js:19` |
+| `CH_I` | обʼєкт | `src/scripts/core/35-channel.js:21` |
+| `chI` | функція | `src/scripts/core/35-channel.js:38` |
+| `chToast` | функція | `src/scripts/core/35-channel.js:39` |
+| `chHaptic` | функція | `src/scripts/core/35-channel.js:40` |
+| `chFolder` | функція | `src/scripts/core/35-channel.js:41` |
+| `chSpaces` | функція | `src/scripts/core/35-channel.js:42` |
+| `chBk` | функція | `src/scripts/core/35-channel.js:43` |
+| `chTargetBk` | функція | `src/scripts/core/35-channel.js:45` |
+| `chUid` | функція | `src/scripts/core/35-channel.js:47` |
+| `chPlain` | функція | `src/scripts/core/35-channel.js:49` |
+| `chTxt` | функція | `src/scripts/core/35-channel.js:54` |
+| `chTimeOf` | функція | `src/scripts/core/35-channel.js:57` |
+| `chDayLabel` | функція | `src/scripts/core/35-channel.js:67` |
+| `chHM` | функція | `src/scripts/core/35-channel.js:78` |
+| `chItems` | функція | `src/scripts/core/35-channel.js:81` |
+| `chPhotos` | функція | `src/scripts/core/35-channel.js:93` |
+| `goChannel` | функція | `src/scripts/core/35-channel.js:107` |
+| `chBack` | функція | `src/scripts/core/35-channel.js:118` |
+| `chScrollBottom` | функція | `src/scripts/core/35-channel.js:126` |
+| `chFitFeed` | функція | `src/scripts/core/35-channel.js:132` |
+| `renderChannel` | функція | `src/scripts/core/35-channel.js:137` |
+| `chCoverApi` | функція | `src/scripts/core/35-channel.js:146` |
+| `renderChCover` | функція | `src/scripts/core/35-channel.js:147` |
+| `chCoverSheet` | функція | `src/scripts/core/35-channel.js:167` |
+| `chMoreSheet` | функція | `src/scripts/core/35-channel.js:181` |
+| `chOpenTopicSettings` | функція | `src/scripts/core/35-channel.js:194` |
+| `renderChChips` | функція | `src/scripts/core/35-channel.js:200` |
+| `chAttachLongPress` | функція | `src/scripts/core/35-channel.js:222` |
+| `chAddTopic` | функція | `src/scripts/core/35-channel.js:230` |
+| `renderChFeed` | функція | `src/scripts/core/35-channel.js:243` |
+| `chBubble` | функція | `src/scripts/core/35-channel.js:267` |
+| `chAiSync` | функція | `src/scripts/core/35-channel.js:308` |
+| `chAiCollect` | функція | `src/scripts/core/35-channel.js:325` |
+| `chAiSummarize` | функція | `src/scripts/core/35-channel.js:351` |
+| `chBindFeed` | функція | `src/scripts/core/35-channel.js:393` |
+| `chOpenInDoc` | функція | `src/scripts/core/35-channel.js:409` |
+| `chInitComposer` | функція | `src/scripts/core/35-channel.js:418` |
+| `chAutoGrow` | функція | `src/scripts/core/35-channel.js:463` |
+| `chSyncSend` | функція | `src/scripts/core/35-channel.js:464` |
+| `chSetMode` | функція | `src/scripts/core/35-channel.js:470` |
+| `chToggleTray` | функція | `src/scripts/core/35-channel.js:476` |
+| `chPushBlock` | функція | `src/scripts/core/35-channel.js:482` |
+| `chSend` | функція | `src/scripts/core/35-channel.js:489` |
+| `chPickFile` | функція | `src/scripts/core/35-channel.js:502` |
+| `chShrink` | функція | `src/scripts/core/35-channel.js:508` |
+| `chVoice` | функція | `src/scripts/core/35-channel.js:519` |
+| `chSheet` | функція | `src/scripts/core/35-channel.js:550` |
+
 ### `src/scripts/page-editor/01-palette.js` — 18 сутностей
 
 | Імʼя | Вид | Де |
@@ -1766,17 +1826,17 @@
 | `pgPath` | масив | `src/scripts/page-editor/02-block-styles.js:578` |
 | `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:579` |
 | `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:589` |
-| `render` | функція | `src/scripts/page-editor/02-block-styles.js:625` |
-| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:683` |
-| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:694` |
-| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:700` |
-| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:703` |
-| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:796` |
-| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:798` |
-| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:799` |
-| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:800` |
-| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:810` |
-| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:819` |
+| `render` | функція | `src/scripts/page-editor/02-block-styles.js:605` |
+| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:663` |
+| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:674` |
+| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:680` |
+| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:683` |
+| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:776` |
+| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:778` |
+| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:779` |
+| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:780` |
+| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:790` |
+| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:799` |
 
 ### `src/scripts/page-editor/03-premium-pack.js` — 27 сутностей
 
@@ -1887,17 +1947,17 @@
 | `saveCovers` | функція | `src/scripts/page-editor/08-w-projects-hub.js:765` |
 | `COV_GRADS` | масив | `src/scripts/page-editor/08-w-projects-hub.js:769` |
 | `covEl` | значення | `src/scripts/page-editor/08-w-projects-hub.js:775` |
-| `pgHasCov` | функція | `src/scripts/page-editor/08-w-projects-hub.js:776` |
-| `covKey` | функція | `src/scripts/page-editor/08-w-projects-hub.js:777` |
-| `covMenuHTML` | функція | `src/scripts/page-editor/08-w-projects-hub.js:778` |
-| `renderCover` | функція | `src/scripts/page-editor/08-w-projects-hub.js:785` |
-| `covPickPhoto` | функція | `src/scripts/page-editor/08-w-projects-hub.js:815` |
-| `covEdBox` | значення | `src/scripts/page-editor/08-w-projects-hub.js:856` |
-| `covEdState` | функція | `src/scripts/page-editor/08-w-projects-hub.js:857` |
-| `covEdSync` | функція | `src/scripts/page-editor/08-w-projects-hub.js:863` |
-| `covEdBuild` | функція | `src/scripts/page-editor/08-w-projects-hub.js:876` |
-| `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:925` |
-| `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:926` |
+| `pgHasCov` | функція | `src/scripts/page-editor/08-w-projects-hub.js:786` |
+| `covKey` | функція | `src/scripts/page-editor/08-w-projects-hub.js:787` |
+| `covMenuHTML` | функція | `src/scripts/page-editor/08-w-projects-hub.js:788` |
+| `renderCover` | функція | `src/scripts/page-editor/08-w-projects-hub.js:795` |
+| `covPickPhoto` | функція | `src/scripts/page-editor/08-w-projects-hub.js:825` |
+| `covEdBox` | значення | `src/scripts/page-editor/08-w-projects-hub.js:866` |
+| `covEdState` | функція | `src/scripts/page-editor/08-w-projects-hub.js:867` |
+| `covEdSync` | функція | `src/scripts/page-editor/08-w-projects-hub.js:873` |
+| `covEdBuild` | функція | `src/scripts/page-editor/08-w-projects-hub.js:886` |
+| `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:935` |
+| `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:936` |
 
 ### `src/scripts/page-editor/09-journal-sheet.js` — 36 сутностей
 
@@ -1938,7 +1998,7 @@
 | `jeAiHTML` | функція | `src/scripts/page-editor/09-journal-sheet.js:319` |
 | `jeRec` | значення | `src/scripts/page-editor/09-journal-sheet.js:401` |
 | `jeMic` | функція | `src/scripts/page-editor/09-journal-sheet.js:402` |
-| `window.openFlowPage` | функція | `src/scripts/page-editor/09-journal-sheet.js:439` |
+| `window.openFlowPage` | функція | `src/scripts/page-editor/09-journal-sheet.js:440` |
 
 ### `src/scripts/page-editor/10-mic.js` — 10 сутностей
 

@@ -341,7 +341,9 @@
       if(key==='pat'){ goPatterns(); return; }
       if(key===VISION_FKEY){ goVision(); return; }
       if(key===AGENCY_KEY){ goAgency(); return; }
-      // ЧИСТА ПАПКА: завжди відкриваємо простір напряму, без проміжного екрана вибору дошки
+      // ЧИСТА ПАПКА: відкривається як Канал (стрічка + рядок вводу, 35-channel.js);
+      // документ-редактор — звідти, тапом по запису або через «⋯»
+      if(typeof goChannel==='function'){ goChannel(key); return; }
       goSpaceFor(key); return;
     }catch(e){ console.error('goFolder', key, e); flowAlert('Не вдалося відкрити папку: '+e.message); }
   }

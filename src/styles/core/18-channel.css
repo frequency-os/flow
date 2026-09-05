@@ -1,0 +1,176 @@
+  /* ============ КАНАЛ ПАПКИ (35-channel.js) ============
+     Папка як стрічка повідомлень: обкладинка → чипи-теми → бульбашки → рядок вводу.
+     Кольори — з токенів теми; колір папки приходить як --fc на #scr-channel. */
+  /* екран гасить відступи оболонки (.phone{padding:26px 18px … 124px}) — обкладинка від краю до краю;
+     від'ємний низ — щоб останній запис лягав одразу над рядком вводу */
+  #scr-channel{margin:-26px -18px -60px;padding:0;--fc:var(--accent);}
+  #scr-channel [hidden]{display:none!important;}
+  /* усередині папки нижня панель, котик і плаваючий «+» ховаються — їхнє місце займає рядок вводу */
+  body.in-channel .nav,body.in-channel #flowCap,body.in-channel #fcSay,body.in-channel #fab{display:none!important;}
+
+  /* ── обкладинка ── */
+  .ch-cover{position:relative;height:calc(168px + env(safe-area-inset-top));overflow:hidden;
+    border-radius:0 0 22px 22px;background:var(--card);}
+  .ch-cov-bg{position:absolute;inset:0;}
+  .ch-cov-bg::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,0) 38%,rgba(0,0,0,.66) 100%);}
+  .ch-cov-top{position:absolute;left:12px;right:12px;top:calc(12px + env(safe-area-inset-top));
+    display:flex;align-items:center;gap:8px;z-index:2;}
+  .ch-sp{flex:1;}
+  .ch-ghost{width:40px;height:40px;border-radius:20px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(10,12,18,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#fff;display:grid;place-items:center;padding:0;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .ch-ghost svg{width:20px;height:20px;}
+  .ch-chip-photo{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.14);background:rgba(10,12,18,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .ch-chip-photo svg{width:15px;height:15px;}
+  .ch-cov-title{position:absolute;left:16px;right:16px;bottom:14px;display:flex;align-items:center;gap:12px;z-index:2;}
+  .ch-av{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;font-size:22px;line-height:1;flex:none;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;}
+  .ch-cov-title h1{margin:0;min-width:0;font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1.05;color:#fff;
+    text-shadow:0 2px 14px rgba(0,0,0,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* ── чипи-теми: липнуть до верху при прокрутці ── */
+  .ch-chips{position:sticky;top:0;z-index:5;display:flex;gap:6px;padding:10px 12px 8px;overflow-x:auto;scrollbar-width:none;
+    background:var(--bg);}
+  .ch-chips::-webkit-scrollbar{display:none;}
+  .ch-chip{flex:none;display:flex;align-items:center;gap:6px;height:34px;padding:0 13px;border-radius:17px;
+    border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:13px;font-weight:700;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:pan-x;}
+  .ch-chip .e{font-size:14px;line-height:1;}
+  .ch-chip svg{width:16px;height:16px;}
+  .ch-chip.on{background:var(--fc);border-color:var(--fc);color:#0f1115;}
+  .ch-chip.add{width:34px;padding:0;justify-content:center;color:var(--muted);}
+
+  /* ── стрічка ── */
+  .ch-feed{display:flex;flex-direction:column;gap:10px;padding:6px 12px 0;}
+  .ch-day{align-self:center;padding:4px 10px;border-radius:12px;background:var(--hair);
+    font-size:11.5px;font-weight:700;color:var(--muted);margin-top:4px;}
+  .ch-msg{position:relative;align-self:flex-start;max-width:88%;display:flex;flex-direction:column;gap:6px;
+    padding:10px 12px 8px;border-radius:18px;background:var(--card);border:1px solid var(--line);
+    cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .ch-msg:active{background:var(--card-2);}
+  .ch-msg.photo{max-width:100%;width:290px;padding:6px 6px 8px;}
+  .ch-tag{font-size:11px;font-weight:700;color:var(--sc,var(--accent));}
+  .ch-time{align-self:flex-end;font-size:11px;color:var(--muted);}
+  .ch-text{font-size:15.5px;line-height:1.45;color:var(--text);white-space:pre-wrap;word-break:break-word;}
+  .ch-head{font-size:18px;font-weight:800;letter-spacing:-.02em;}
+  .ch-quote{font-style:italic;color:var(--muted);border-left:2px solid var(--line);padding-left:10px;}
+  .ch-mut{color:var(--muted);font-style:normal;}
+  .ch-task{display:flex;align-items:flex-start;gap:10px;}
+  .ch-task.done .ch-text{color:var(--muted);text-decoration:line-through;}
+  .ch-box{flex:none;width:22px;height:22px;margin-top:1px;border-radius:7px;border:1.8px solid var(--muted);
+    background:transparent;color:#0f1115;display:grid;place-items:center;padding:0;cursor:pointer;}
+  .ch-task.done .ch-box{background:#34c77b;border-color:#34c77b;}
+  .ch-box svg{width:14px;height:14px;}
+  .ch-card{display:flex;flex-direction:column;gap:8px;}
+  .ch-card-t{font-size:12px;font-weight:700;color:var(--muted);}
+  .ch-li{display:flex;gap:8px;}
+  .ch-li span{color:var(--muted);flex:none;}
+  .ch-photo img{display:block;width:100%;max-height:340px;object-fit:cover;border-radius:13px;}
+  .ch-cap{padding:0 6px;}
+  .ch-link-card{display:flex;align-items:center;gap:10px;color:var(--text);min-width:0;}
+  .ch-lc-ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none;font-size:17px;
+    background:color-mix(in srgb,var(--sc,var(--fc)) 14%,transparent);}
+  .ch-link-card>div{min-width:0;}
+  .ch-link-card b{display:block;font-size:14.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ch-link-card small{display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ch-link-card>svg{width:18px;height:18px;color:var(--muted);margin-left:auto;flex:none;}
+  .ch-empty{align-self:center;text-align:center;margin-top:60px;max-width:260px;display:flex;flex-direction:column;gap:6px;}
+  .ch-empty b{font-size:17px;color:var(--text);}
+  .ch-empty span{font-size:13.5px;color:var(--muted);line-height:1.45;}
+  .ch-media{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;}
+  .ch-mi{aspect-ratio:1;border:0;padding:0;border-radius:10px;overflow:hidden;background:var(--card);cursor:pointer;}
+  .ch-mi img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* ── рядок вводу ── */
+  .ch-composer{position:fixed;left:0;right:0;bottom:0;z-index:210;display:flex;flex-direction:column;gap:8px;
+    padding:14px 12px calc(10px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,transparent,var(--bg) 34%);}
+  .ch-row{display:flex;align-items:flex-end;gap:8px;max-width:456px;margin:0 auto;width:100%;}
+  .ch-plus{flex:none;width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--text);
+    display:grid;place-items:center;padding:0;cursor:pointer;transition:transform .2s,background .2s;-webkit-tap-highlight-color:transparent;}
+  .ch-plus svg{width:22px;height:22px;}
+  .ch-plus.on{background:var(--accent);border-color:var(--accent);color:#fff;transform:rotate(45deg);}
+  .ch-field{flex:1;min-width:0;display:flex;align-items:flex-end;gap:6px;min-height:44px;padding:6px 6px 6px 14px;
+    border-radius:22px;background:var(--card-2);border:1px solid var(--line);}
+  .ch-input{flex:1;min-width:0;min-height:32px;max-height:140px;padding:6px 0;border:0;background:transparent;color:var(--text);
+    font:inherit;font-size:15px;line-height:1.35;resize:none;outline:none;}
+  .ch-input::placeholder{color:var(--muted);}
+  .ch-mic,.ch-send{flex:none;width:32px;height:32px;border-radius:16px;border:0;display:grid;place-items:center;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .ch-mic{background:transparent;color:var(--muted);}
+  .ch-mic svg{width:20px;height:20px;}
+  .ch-send{background:var(--accent);color:#fff;}
+  .ch-send svg{width:18px;height:18px;}
+  /* йде запис — червоне пульсування, щоб мікрофон не лишився ввімкненим непомітно */
+  .ch-composer.live .ch-mic,.ch-composer.live .ch-plus{background:#e0453f;border-color:#e0453f;color:#fff;animation:chPulse 1.1s ease-in-out infinite;}
+  @keyframes chPulse{0%,100%{box-shadow:0 0 0 0 rgba(224,69,63,.55)}50%{box-shadow:0 0 0 6px rgba(224,69,63,0)}}
+  @media (prefers-reduced-motion: reduce){ .ch-composer.live .ch-mic,.ch-composer.live .ch-plus{animation:none;} }
+  .ch-modechip{flex:none;display:flex;align-items:center;gap:5px;height:28px;padding:0 9px;margin-bottom:2px;border-radius:9px;
+    border:1px solid color-mix(in srgb,#e8843c 40%,transparent);background:color-mix(in srgb,#e8843c 14%,transparent);
+    color:#e8843c;font:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+  .ch-modechip svg{width:14px;height:14px;}
+  /* AI-чип над рядком вводу: підсумок тижня через агента Флоу */
+  .ch-aiwrap{display:flex;max-width:456px;margin:0 auto;width:100%;padding-left:52px;}
+  .ch-aichip{display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:15px;
+    border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);background:color-mix(in srgb,var(--accent) 12%,transparent);
+    color:var(--accent);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .ch-aichip svg{width:14px;height:14px;}
+  .ch-aichip:disabled{opacity:.6;}
+  .ch-ai-out{min-height:84px;max-height:50vh;overflow:auto;padding:6px 10px 10px;font-size:15px;line-height:1.5;color:var(--text);
+    white-space:pre-wrap;word-break:break-word;}
+  .ch-ai-wait{color:var(--muted);}
+  .ch-ai-err{color:#ff5a5f;}
+  .ch-ai-acts{display:flex;gap:8px;padding:4px 10px 0;}
+  .ch-ai-btn{flex:1;height:46px;border-radius:14px;border:0;background:var(--accent);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;}
+  .ch-ai-btn:disabled{opacity:.45;}
+  .ch-ai-btn.ghost{background:var(--card-2);color:var(--text);border:1px solid var(--line);}
+  /* бульбашка-підсумок від AI */
+  .ch-msg.ai{border-color:color-mix(in srgb,var(--accent) 45%,transparent);background:color-mix(in srgb,var(--accent) 8%,var(--card));}
+  .ch-tag.ai{display:flex;align-items:center;gap:4px;color:var(--accent);}
+  .ch-tag.ai svg{width:12px;height:12px;}
+  .ch-tray{display:flex;justify-content:space-around;max-width:456px;margin:0 auto;width:100%;padding:12px 8px;border-radius:20px;
+    background:var(--card);border:1px solid var(--line);box-shadow:0 16px 40px var(--shadow);}
+  .ch-tray button{display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;border:0;background:transparent;
+    color:var(--muted);font:inherit;font-size:11px;font-weight:600;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;}
+  .ch-tray button i{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:var(--card-2);border:1px solid var(--line);color:var(--text);}
+  .ch-tray button i svg{width:22px;height:22px;}
+
+  /* ── шторка Каналу (обкладинка, «⋯») ── */
+  /* blur тут не лише краса: без backdrop-filter Chrome малює шторку ПІД прокручуваною
+     стрічкою (body — fixed-скролер), і вона виглядає прозорою. Рідний .imodal має так само. */
+  /* Сам оверлей НЕ анімуємо: backdrop-filter + transition прозорості в Chrome лишає
+     шторку намальованою під стрічкою. Виїжджає лише панель — як у рідного .imodal. */
+  .ch-sheet-ov{position:fixed;inset:0;z-index:1300;background:var(--scrim);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+    display:flex;align-items:flex-end;}
+  .ch-sheet{width:100%;max-width:480px;margin:0 auto;padding:10px 12px calc(22px + env(safe-area-inset-bottom));
+    border-radius:26px 26px 0 0;background:var(--sheet);border-top:1px solid var(--line);
+    display:flex;flex-direction:column;gap:4px;animation:chSheetUp .22s var(--ease-out,ease);}
+  @keyframes chSheetUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+  @media (prefers-reduced-motion: reduce){ .ch-sheet{animation:none;} }
+  .ch-grip{align-self:center;width:40px;height:4px;border-radius:2px;background:var(--hair-2);margin-bottom:8px;}
+  .ch-sheet-t{padding:0 10px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .ch-sheet-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 10px;border-radius:14px;border:0;background:transparent;
+    color:var(--text);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .ch-sheet-row:active{background:var(--hair);}
+  .ch-sheet-row .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none;font-size:17px;
+    background:color-mix(in srgb,var(--fc,var(--accent)) 14%,transparent);}
+  .ch-sheet-row .ic svg{width:19px;height:19px;color:var(--fc,var(--accent));}
+  .ch-sheet-row.danger{color:#ff5a5f;}
+  .ch-sheet-row.danger .ic{background:rgba(255,90,95,.12);}
+  .ch-sheet-row.danger .ic svg{color:#ff5a5f;}
+  .ch-sw-row{display:flex;gap:10px;padding:6px 10px 10px;}
+  .ch-sw{width:44px;height:44px;border-radius:14px;border:1px solid var(--hair-2);padding:0;cursor:pointer;}
+  .ch-sw.on{outline:2px solid var(--fc,var(--accent));outline-offset:2px;}
+
+  /* блок, до якого стрибнули з Каналу, коротко підсвічується в документі */
+  .pgb.pg-flash{background:color-mix(in srgb,var(--pg-acc,#7c8cff) 18%,transparent);transition:background .6s;}
+
+  /* десктоп: оболонка має інші відступи (11-spaces-desktop.css), а зліва — сайдбар */
+  @media (min-width:1024px){
+    #scr-channel{margin:-34px -56px -20px;}
+    .ch-composer{left:248px;}
+    .ch-cover{border-radius:22px;}
+  }
+  @media (min-width:1380px){ #scr-channel{margin-left:-72px;margin-right:-72px;} }

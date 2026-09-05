@@ -1297,7 +1297,8 @@
     ov.querySelectorAll('[data-spdel]').forEach(btn=>btn.onclick=()=>{ close(); deleteSpace(btn.dataset.spdel); });
   }
 
-  function goSpaceFor(key){
+  // opts.focusId — відкрити документ прокрученим до цього блока (стрибок із Каналу папки)
+  function goSpaceFor(key, opts){
     try{
       boardKey=key;
       if(!boards[key]) boards[key]=[];
@@ -1311,7 +1312,7 @@
       // НОВИЙ РЕДАКТОР: папки відкриваються у Notion-стилі. Fallback — стара дошка.
       if(typeof window.openFlowPage==='function'){
         window.__flowExitPage=function(){ try{ if(typeof goHome==='function'){ goHome(); return; } }catch(_){} if(window.__show)window.__show('scr-home'); };
-        window.openFlowPage();
+        window.openFlowPage(opts||null);
       } else {
         renderBoard();
         show('scr-space');
@@ -1345,6 +1346,8 @@
       document.body.classList.toggle('folder-clean', !!fromFolder); }
     document.body.classList.toggle('in-home', id==='scr-home');
     document.body.classList.toggle('in-reader', id==='scr-reader');
+    // Канал папки: ховає нижню панель і котика (18-channel.css)
+    document.body.classList.toggle('in-channel', id==='scr-channel');
     if(id==='scr-space'){ try{ renderSpaceSwitcher(); }catch(_){} }
     if(id==='scr-reader'){ try{ initReader(); applyRdrCfg(); }catch(_){} }
     if(id==='scr-nyc'){ try{ if(window.__nycRefresh) window.__nycRefresh(); }catch(_){} }
