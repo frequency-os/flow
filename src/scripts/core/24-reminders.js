@@ -1,5 +1,5 @@
-  /* ═══════════ НАГАДУВАННЯ (на завданнях через Telegram-бота) ═══════════ */
-  // зберігаємо у блоці task: b.remindAt (ISO). Нотифікація — через платформу/бота, якщо доступно.
+  /* ═══════════ НАГАДУВАННЯ (на завданнях) ═══════════ */
+  // зберігаємо у блоці task: b.remindAt (ISO). Нотифікація — системна, якщо дозволена, інакше шторка.
   function setTaskReminder(id){
     const b=getBlock(id); if(!b) return;
     const cur=b.remindAt? new Date(b.remindAt): null;
@@ -41,15 +41,13 @@
     const when=new Date(b.remindAt).getTime();
     const delay=when-Date.now();
     if(reminderTimers[b.id]){ clearTimeout(reminderTimers[b.id]); delete reminderTimers[b.id]; }
-    if(delay<=0||delay>24*3600e3) return; // далеке — спрацює при наступному відкритті/боті
+    if(delay<=0||delay>24*3600e3) return; // далеке — спрацює при наступному відкритті
     reminderTimers[b.id]=setTimeout(()=>{ fireReminder(b); },delay);
   }
   function fireReminder(b){
     const msg='⏰ '+(b.title||'Нагадування');
     try{
-      if(window.platform.kind==='telegram'){
-        window.platform.popup({ title:'Нагадування', message:b.title||'Завдання', buttons:[{type:'ok'}] });
-      } else if('Notification'in window && Notification.permission==='granted'){
+      if('Notification'in window && Notification.permission==='granted'){
         new Notification('Frequency',{ body:msg });
       } else { flowAlert(msg); }
     }catch(_){ try{ flowAlert(msg); }catch(__){} }
@@ -105,9 +103,7 @@
   function plFireReminder(b){
     const msg='⏰ '+(b.t||'Блок часу')+(b.h!=null?' · '+plHM(b.h):'');
     try{
-      if(window.platform.kind==='telegram'){
-        window.platform.popup({ title:'Планер', message:b.t||'Блок часу', buttons:[{type:'ok'}] });
-      } else if('Notification'in window && Notification.permission==='granted'){
+      if('Notification'in window && Notification.permission==='granted'){
         new Notification('Frequency — Планер',{ body:msg });
       } else { flowAlert(msg); }
     }catch(_){ try{ flowAlert(msg); }catch(__){} }

@@ -187,7 +187,7 @@ html.fd26t[data-theme="light"] #scr-home .summary{background:linear-gradient(162
    ══════════════════════════════════════════════════════════════════ */
 /* Максимальний підйом: .phone має padding-top:26px, тому знімаємо всі 26
    і повертаємо рівно стільки, скільки вимагає виріз/статус-бар.
-   У міні-застосунку Telegram inset = 0, тож лишається 4px повітря;
+   У браузері без вирізу inset = 0, тож лишається 4px повітря;
    у нативній збірці — повний env(safe-area-inset-top), під чубчик не залізе. */
 #scr-home{margin-top:calc(max(4px,env(safe-area-inset-top)) - 26px);}
 #scr-home .top{margin-top:0;margin-bottom:-96px;}

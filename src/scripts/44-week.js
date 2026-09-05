@@ -296,7 +296,7 @@ try{
       }).join(''):'<div style="font-size:12.5px;color:var(--muted,#8f8aa8);font-weight:700;padding:8px 2px">Фокус — це те, заради чого існує цей тиждень. Максимум 3.</div>';
       ov.innerHTML='<div class="pl-sheet"><div class="pl-sheet-grab"></div>'+
         '<div class="pl-sheet-h">🔥 Фокуси тижня</div>'+rows+
-        (fxs.length<MAXFX?'<div class="fd-addrow" style="margin-top:12px"><input id="f26wFxNew" placeholder="Напр. Запуск агенції — 3 ліди" enterkeyhint="done"><button class="go" id="f26wFxGo">＋</button></div>':'')+
+        (fxs.length<MAXFX?'<div class="fd-addrow" style="margin-top:12px"><input id="f26wFxNew" placeholder="Напр. Запуск проєкту — 3 кроки" enterkeyhint="done"><button class="go" id="f26wFxGo">＋</button></div>':'')+
         '<button class="pl-weekbtn" id="f26wFxOk" style="margin-top:12px">Готово</button></div>';
       ov.querySelectorAll('[data-fxrm]').forEach(function(b){ b.onclick=function(){
         var f=fxs[+b.dataset.fxrm]; if(!f) return;

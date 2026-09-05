@@ -1,5 +1,5 @@
 #!/bin/sh
-# Публікує свіжу версію: Mac → GitHub → Telegram на телефоні.
+# Публікує свіжу версію: Mac → GitHub → сайт на телефоні.
 cd "$(dirname "$0")/.." || exit 1
 set -e
 

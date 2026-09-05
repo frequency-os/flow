@@ -80,119 +80,8 @@
   ];
   try{ window.folderIconFor=folderIconFor; }catch(_){}
 
-  /* ===== 🕶️ VAULT: приховані папки за PIN =====
-     У коді та сховищі НЕМає самого PIN — лише SHA-256(salt+pin).
-     vaultOpen живе тільки в памʼяті сесії: закрив/згорнув апку — все знову приховано. */
-  const VAULT_KEY='vault_cfg';
-  let vaultCfg=null;      // {s:'salt', h:'sha256hex'}
-  let vaultOpen=false;    // сесійний стан, НЕ зберігається
-  function saveVaultCfg(){ try{ const p=window.storage.set(VAULT_KEY,JSON.stringify(vaultCfg||{}),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
-  async function vaultHash(salt,pin){
-    const msg=String(salt)+':'+String(pin);
-    try{
-      if(window.crypto&&crypto.subtle){
-        const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-        return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-      }
-    }catch(_){}
-    // fallback (слабший, лише якщо WebCrypto недоступний)
-    let h1=5381,h2=52711;
-    for(let i=0;i<msg.length;i++){ const c=msg.charCodeAt(i); h1=(h1*33+c)>>>0; h2=(h2*31+c)>>>0; }
-    let out=(h1.toString(16)+h2.toString(16));
-    for(let r=0;r<6;r++){ let x=0; for(let i=0;i<out.length;i++){ x=(x*131+out.charCodeAt(i))>>>0; } out+=x.toString(16); }
-    return 'fb_'+out;
-  }
-  function vaultRandSalt(){
-    try{ const a=new Uint8Array(12); crypto.getRandomValues(a); return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-    catch(_){ return 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,10); }
-  }
-  function vaultLock(){ if(!vaultOpen) return; vaultOpen=false;
-    try{ renderDashboard(); }catch(_){}
-    try{ if(typeof renderProjects==='function') renderProjects(); }catch(_){}
-    // якщо зараз відкрито Агенцію — виходимо на Проєкти
-    try{ const scr=document.querySelector('.screen.active');
-      if(scr&&(scr.id==='scr-agency'||scr.id==='scr-client')&&typeof goProjects==='function') goProjects(); }catch(_){}
-  }
-  // автолок: згорнув Mini App / переключив вкладку — приховані папки зникають
-  try{ document.addEventListener('visibilitychange',()=>{ if(document.hidden) vaultLock(); }); }catch(_){}
-
-  // PIN-шторка. mode: 'unlock' | 'setup' | 'change'
-  function vaultPinSheet(mode,onOk){
-    const old=document.getElementById('vaultSheet'); if(old) old.remove();
-    const ov=document.createElement('div'); ov.className='imodal'; ov.id='vaultSheet';
-    const isSetup=(mode==='setup');
-    ov.innerHTML=`<div class="im-in">
-      <div class="im-grip"></div>
-      <div class="im-title">${isSetup?'Створи код доступу':'Код доступу'}</div>
-      ${isSetup?'<div class="im-label">Цим кодом відкриватимуться приховані папки. Він ніде не зберігається у відкритому вигляді.</div>':''}
-      <input class="im-input vlt-in1" type="password" inputmode="numeric" autocomplete="off" placeholder="${isSetup?'Новий код (4+ цифр)':'Введи код'}">
-      ${isSetup?'<input class="im-input vlt-in2" type="password" inputmode="numeric" autocomplete="off" placeholder="Повтори код" style="margin-top:8px">':''}
-      <div class="im-btns">
-        <button type="button" class="im-cancel">Скасувати</button>
-        <button type="button" class="im-ok">${isSetup?'Створити':'Відкрити'}</button>
-      </div>
-    </div>`;
-    document.body.appendChild(ov);
-    const in1=ov.querySelector('.vlt-in1'), in2=ov.querySelector('.vlt-in2');
-    setTimeout(()=>{ try{ in1.focus(); }catch(_){} },60);
-    const close=()=>ov.remove();
-    ov.querySelector('.im-cancel').onclick=close;
-    ov.onclick=e=>{ if(e.target===ov) close(); };
-    const shake=()=>{ const box=ov.querySelector('.im-in'); box.style.animation='none'; void box.offsetWidth; box.style.animation='vshake .3s'; try{ window.platform.haptic('error'); }catch(_){} };
-    const submit=async()=>{
-      const v1=(in1.value||'').trim();
-      if(isSetup){
-        const v2=(in2.value||'').trim();
-        if(v1.length<4){ shake(); return; }
-        if(v1!==v2){ shake(); in2.value=''; return; }
-        const s=vaultRandSalt();
-        vaultCfg={ s, h: await vaultHash(s,v1) };
-        saveVaultCfg(); close();
-        vaultOpen=true; try{ renderDashboard(); }catch(_){}
-        try{ if(typeof renderProjects==='function') renderProjects(); }catch(_){}
-        try{ window.platform.haptic('success'); }catch(_){}
-        if(onOk) onOk();
-        flowAlert('Код створено. Довге утримання на «Нова папка» — відкрити/сховати приховані папки.\nУ меню папки (коли розблоковано) зʼявився пункт «Сховати папку».');
-        return;
-      }
-      if(!vaultCfg||!vaultCfg.h){ close(); return; }
-      const h=await vaultHash(vaultCfg.s,v1);
-      if(h===vaultCfg.h){
-        close(); vaultOpen=true;
-        try{ renderDashboard(); }catch(_){}
-        try{ if(typeof renderProjects==='function') renderProjects(); }catch(_){}
-        try{ window.platform.haptic('success'); }catch(_){}
-        if(onOk) onOk();
-      } else { shake(); in1.value=''; }
-    };
-    ov.querySelector('.im-ok').onclick=submit;
-    in1.onkeydown=e=>{ if(e.key==='Enter'){ if(isSetup&&in2){ in2.focus(); } else submit(); } };
-    if(in2) in2.onkeydown=e=>{ if(e.key==='Enter') submit(); };
-  }
-
-  // Довге утримання на картці «Нова папка» — єдиний непомітний вхід у Vault
-  function vaultAttachLongPress(el){
-    let t=null, fired=false;
-    const start=(e)=>{
-      fired=false;
-      t=setTimeout(()=>{
-        fired=true;
-        try{ window.platform.haptic('medium'); }catch(_){}
-        if(vaultOpen){ vaultLock(); return; }
-        if(vaultCfg&&vaultCfg.h) vaultPinSheet('unlock');
-        else vaultPinSheet('setup');
-      },650);
-    };
-    const stop=()=>{ if(t){ clearTimeout(t); t=null; } };
-    el.addEventListener('pointerdown',start);
-    el.addEventListener('pointerup',stop);
-    el.addEventListener('pointerleave',stop);
-    el.addEventListener('pointercancel',stop);
-    el.addEventListener('click',(e)=>{ if(fired){ e.stopImmediatePropagation(); e.preventDefault(); fired=false; } },true);
-    el.addEventListener('contextmenu',(e)=>{ e.preventDefault(); },false);
-  }
-  // фільтр видимості: приховані папки видно лише коли vault відкрито
-  function folderVisible(k){ const f=folders[k]; return !!f && !(f.secret && !vaultOpen); }
+  // видимість папки: Vault (сховані папки за PIN) вирізано 04.09.2026 — усі папки видимі
+  function folderVisible(k){ return !!folders[k]; }
 
   // persist folder customizations (photo, color, emoji, name, layout, pinned) + custom folders + order
   function saveFolders(){
@@ -200,7 +89,7 @@
       const cfg={};
       Object.keys(folders).forEach(k=>{
         const f=folders[k];
-        cfg[k]={c:f.c,emoji:f.emoji,icon:f.icon||folderIconFor(f.emoji),iconSet:f.iconSet?1:0,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||'',secret:!!f.secret};
+        cfg[k]={c:f.c,emoji:f.emoji,icon:f.icon||folderIconFor(f.emoji),iconSet:f.iconSet?1:0,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||''};
       });
       const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
       const p2=window.storage.set(FOKEY,JSON.stringify(order),false); if(p2&&p2.catch)p2.catch(()=>{});
@@ -330,8 +219,6 @@
   function goHome(){ show('scr-home'); }
   function goFolder(key){
     try{
-      // 🕶️ прихована папка при заблокованому vault — спершу код
-      if(folders[key] && folders[key].secret && !vaultOpen){ vaultPinSheet('unlock',()=>goFolder(key)); return; }
       currentFolderKey=key;
       // роль «Сторінка»: одразу відкриваємо аркуш цієї папки
       if(folders[key] && folders[key].role==='page'){ goSpaceFor(key); return; }
@@ -340,7 +227,6 @@
       if(key==='work'){ goWork(); return; }
       if(key==='pat'){ goPatterns(); return; }
       if(key===VISION_FKEY){ goVision(); return; }
-      if(key===AGENCY_KEY){ goAgency(); return; }
       // ЧИСТА ПАПКА: відкривається як Канал (стрічка + рядок вводу, 35-channel.js);
       // документ-редактор — звідти, тапом по запису або через «⋯»
       if(typeof goChannel==='function'){ goChannel(key); return; }

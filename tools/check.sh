@@ -40,8 +40,11 @@ for f in jszip.min.js pdf.min.js supabase.min.js; do
 done
 
 echo "4) Що змінилось відносно оригіналу (original/index11.html):"
-echo "   рядків додано/прибрано: $(diff original/index11.html dist/index.html | grep -c '^[<>]')"
-echo "   (це шрифти, вбудовані всередину замість Google Fonts — так і має бути)"
+if [ -f original/index11.html ]; then
+  echo "   рядків додано/прибрано: $(diff original/index11.html dist/index.html | grep -c '^[<>]')"
+else
+  echo "   (еталона нема на цьому Mac — крок пропущено; з 04.09.2026 він лежить поза git)"
+fi
 
 echo "5) Карта коду (CODEMAP.md):"
 if out=$(python3 tools/codemap.py --check 2>&1); then

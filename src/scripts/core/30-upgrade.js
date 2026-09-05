@@ -1,10 +1,12 @@
   /* ════════ АПГРЕЙД (dev): персонаж, сфери життя, заявлений шлях ════════
      Оболонка над наявними системами: власних даних мінімум (профіль сфер +
      заявлений шлях + зрізи), решту читаємо з планера/цілей/щоденника.
-     Екран видно лише в dev-режимі: акаунт Ярослава або прапорець flow_dev. */
+     Екран видно лише в dev-режимі: акаунт власника або прапорець flow_dev. */
   (function(){
     const UPKEY='upgrade_profile_v1';
-    const UP_DEV_EMAIL='life.yaroslav.kril@gmail.com';
+    // SHA-256 від email власника: сам email у коді не лежить (репозиторій публічний)
+    const UP_DEV_HASH='2c3a0426ff1f3cd97c70282b6601962b293ccb35731f0208819c94f286fb199c';
+    let upDevProbe=null;   // {email, ok} — результат перевірки поточного акаунта
     const UP_XP_LEVEL=100; // досвіду на рівень сфери
     const UP_DEF_SPHERES=[
       {id:'health', name:'Здоровʼя', emo:'💪', c:'#34c77b'},
@@ -47,9 +49,24 @@
     /* dev-ворота: бачить лише власник акаунта або пристрій із flow_dev=1 */
     function upDevOn(){
       try{ if(localStorage.getItem('flow_dev')==='1') return true; }catch(_){}
-      try{ const u=window.sbUser&&window.sbUser(); if(u&&String(u.email||'').toLowerCase()===UP_DEV_EMAIL) return true; }catch(_){}
+      try{
+        const u=window.sbUser&&window.sbUser(); const em=u?String(u.email||'').toLowerCase():'';
+        if(!em) return false;
+        if(upDevProbe&&upDevProbe.email===em) return !!upDevProbe.ok;
+        // хеш рахується асинхронно: перший виклик каже «ні», а коли відповідь
+        // готова і збіглась — перемальовує «Ще», щоб плитка зʼявилась сама
+        upDevProbe={email:em, ok:false};
+        upSha256(em).then(h=>{ if(upDevProbe&&upDevProbe.email===em){ upDevProbe.ok=(h===UP_DEV_HASH);
+          if(upDevProbe.ok){ try{ if(typeof window.renderMore==='function') window.renderMore(); }catch(_){} } } }).catch(()=>{});
+      }catch(_){}
       return false;
     }
+    async function upSha256(s){
+      const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+    // запускаємо перевірку заздалегідь, щойно синк повідомить про живу сесію
+    try{ document.addEventListener('flowsync', ()=>{ try{ upDevOn(); }catch(_){} }); }catch(_){}
     window.upDevOn=upDevOn;
     /* профіль сфер для сусідніх dev-модулів («Мій рік»): читати, не мутувати */
     window.upProfile=async function(){ await upLoad(); return upData; };

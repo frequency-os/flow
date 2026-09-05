@@ -1,6 +1,6 @@
   /* ============================================================
      ЧИТАЛКА КНИГ  (TXT, MD, EPUB, PDF)
-     — файли книг лежать у IndexedDB (мегабайти, офлайн, не в CloudStorage)
+     — файли книг лежать у IndexedDB (мегабайти, офлайн, не в localStorage)
      — у блоці board зберігаються лише метадані: прогрес, закладки, налаштування
      ============================================================ */
   const BookDB=(function(){
@@ -22,105 +22,6 @@
     };
   })();
 
-  /* ============ DocDB — сховище файлів документів агенції (IndexedDB) ============ */
-  const DocDB=(function(){
-    const DB='flow_docs', STORE='docs'; let _db=null;
-    function open(){
-      return new Promise((res,rej)=>{
-        if(_db) return res(_db);
-        if(!window.indexedDB) return rej(new Error('no-idb'));
-        const r=indexedDB.open(DB,1);
-        r.onupgradeneeded=()=>{ const db=r.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
-        r.onsuccess=()=>{ _db=r.result; res(_db); };
-        r.onerror=()=>rej(r.error||new Error('idb-open'));
-      });
-    }
-    return {
-      async put(id,blob){ const db=await open(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(blob,id); tx.oncomplete=()=>res(true); tx.onerror=()=>rej(tx.error); }); },
-      async get(id){ const db=await open(); return new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readonly'); const rq=tx.objectStore(STORE).get(id); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>rej(rq.error); }); },
-      async del(id){ try{ const db=await open(); return new Promise(res=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(id); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false); }); }catch(_){ return false; } }
-    };
-  })();
-
-  // прикріпити файл до документа клієнта: doc — обʼєкт {id,text,done,...}
-  function agAttachFile(c, doc){
-    const inp=document.createElement('input'); inp.type='file';
-    inp.accept='image/*,application/pdf,.doc,.docx';
-    inp.onchange=async()=>{
-      const f=inp.files&&inp.files[0]; if(!f) return;
-      if(f.size>12*1024*1024){ try{flowAlert('Файл завеликий (макс 12 МБ)');}catch(_){}; return; }
-      const fid='doc_'+c.id+'_'+doc.id+'_'+Date.now();
-      try{
-        await DocDB.put(fid, f);
-        doc.fileId=fid; doc.fileName=f.name; doc.fileType=f.type||''; doc.fileSize=f.size;
-        if(!doc.done) doc.done=true; // прикріпив файл → документ вважається наданим
-        saveBoard(); renderClient();
-        try{ window.platform.haptic('success'); }catch(_){}
-      }catch(e){ try{flowAlert('Не вдалося зберегти файл');}catch(_){} }
-    };
-    inp.click();
-  }
-  // прикріпити файл із бібліотеки: створює новий документ у цього клієнта + завантажує файл
-  function agAttachFromLibrary(c){
-    // збираємо всі файли з усіх ІНШИХ клієнтів
-    const pool=[];
-    agClients().forEach(oc=>{ (oc.docs||[]).forEach(d=>{ if(d.fileId){ pool.push({oc, d}); } }); });
-    const items=[{ic:'⬆️', label:'Завантажити новий файл', onClick:()=>{
-      inputModal({title:'Назва документа', placeholder:'Напр. Паспорт', onOk:(t)=>{ if(!(t||'').trim())return;
-        const nd={id:'d'+Date.now(),text:t.trim(),done:false}; (c.docs=c.docs||[]).push(nd); saveBoard(); agAttachFile(c,nd); }});
-    }}];
-    // додаємо посилання на наявні (копіює метадані, файл шариться за тим самим fileId)
-    pool.slice(0,15).forEach(({oc,d})=>{ if(oc.id===c.id) return;
-      items.push({ic:agFileIcon(d.fileType), label:(d.fileName||'файл')+' — '+oc.name, onClick:()=>{
-        const nd={id:'d'+Date.now()+Math.random().toString(36).slice(2,4), text:d.text||d.fileName||'документ', done:true,
-          fileId:d.fileId, fileName:d.fileName, fileType:d.fileType, fileSize:d.fileSize, sharedFrom:oc.id};
-        (c.docs=c.docs||[]).push(nd); saveBoard(); renderClient();
-        try{ window.platform.haptic('success'); }catch(_){}
-      }});
-    });
-    actionSheet({title:'Прикріпити файл', sub:'Новий або з бібліотеки', items});
-  }
-  // відкрити / скачати файл документа
-  async function agOpenFile(doc){
-    if(!doc.fileId) return;
-    try{
-      const blob=await DocDB.get(doc.fileId);
-      if(!blob){ try{flowAlert('Файл не знайдено');}catch(_){}; return; }
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a'); a.href=url; a.download=doc.fileName||'document';
-      // спершу пробуємо відкрити у новій вкладці (для перегляду), інакше — завантаження
-      const isImg=/^image\//.test(doc.fileType||''); const isPdf=/pdf/i.test(doc.fileType||'');
-      if(isImg||isPdf){ window.open(url,'_blank'); } else { a.click(); }
-      setTimeout(()=>URL.revokeObjectURL(url), 60000);
-    }catch(e){ try{flowAlert('Помилка відкриття файлу');}catch(_){} }
-  }
-  async function agRemoveFile(c, doc){
-    if(!doc.fileId) return;
-    const fid=doc.fileId;
-    delete doc.fileId; delete doc.fileName; delete doc.fileType; delete doc.fileSize; delete doc.sharedFrom;
-    // видаляємо blob лише якщо його більше ніхто не використовує
-    let stillUsed=false;
-    agClients().forEach(cl=>{ (cl.docs||[]).forEach(d=>{ if(d.fileId===fid) stillUsed=true; }); });
-    if(!stillUsed){ try{ await DocDB.del(fid); }catch(_){} }
-    saveBoard(); renderClient();
-  }
-  function agFileMenu(c, doc){
-    actionSheet({title:esc(doc.fileName||'Файл'), sub:agFileSizeStr(doc.fileSize), items:[
-      {ic:'👁', label:'Відкрити / переглянути', onClick:()=>agOpenFile(doc)},
-      {ic:'⬇️', label:'Скачати', onClick:()=>agDownloadFile(doc)},
-      {ic:'🔄', label:'Замінити файл', onClick:()=>agAttachFile(c,doc)},
-      {ic:'🗑', label:'Видалити файл', danger:true, onClick:()=>agRemoveFile(c,doc)},
-    ]});
-  }
-  async function agDownloadFile(doc){
-    if(!doc.fileId) return;
-    try{ const blob=await DocDB.get(doc.fileId); if(!blob)return;
-      const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=doc.fileName||'document'; a.click();
-      setTimeout(()=>URL.revokeObjectURL(url),60000);
-    }catch(_){}
-  }
-  function agFileSizeStr(b){ if(!b)return ''; if(b<1024)return b+' Б'; if(b<1048576)return Math.round(b/1024)+' КБ'; return (b/1048576).toFixed(1)+' МБ'; }
-  function agFileIcon(t){ if(/^image\//.test(t||''))return '🖼'; if(/pdf/i.test(t||''))return '📕'; if(/word|doc/i.test(t||''))return '📘'; return '📎'; }
   /* Вантажить бібліотеку. Приймає список адрес і пробує їх по черзі:
      спершу локальну копію з vendor/ (працює без інтернету), і лише якщо
      її нема — CDN. Так читалка живе і в застосунку, і в браузері. */
@@ -356,7 +257,7 @@
     try{ await loadScriptOnce(['vendor/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js']); }
     catch(_){ throw new Error('Для PDF потрібен інтернет (перший раз). TXT, MD та EPUB працюють офлайн.'); }
     const pdfjsLib=window.pdfjsLib;
-    // У Telegram WebView воркер pdf.js блокується політикою безпеки → працюємо в основному
+    // В окремих WebView воркер pdf.js блокується політикою безпеки → працюємо в основному
     // потоці (disableWorker). Щоб pdf.js не писав "Deprecated API: no workerSrc", задаємо
     // валідний URL воркера (його НЕ вантажать через disableWorker, але попередження зникає).
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';

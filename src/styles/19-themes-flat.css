@@ -3,7 +3,7 @@
    із правилами, що живуть у 16-mx.css чи 13-planner.css: досить того самого
    селектора з префіксом html.t-flat.
 
-   Два прапорці на <html> ставить applyTheme() у scripts/core/05-agency.js:
+   Два прапорці на <html> ставить applyTheme() у scripts/core/05-spaces.js:
      .t-flat   — активний один із нових наборів (desk / studio);
      .t-light  — і при цьому він світлий.
    Старі три теми (dark / black / light) сюди не потрапляють.

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 build.py — збирає src/ назад в один файл dist/index.html.
-Це і є «готова програма»: саме її відкриває браузер, Telegram, iPhone, Android.
+Це і є «готова програма»: саме її відкриває браузер, Mac, iPhone, Android.
 Правиш файли в src/ → запускаєш build → отримуєш dist/index.html.
 """
 import os, re, shutil, subprocess, sys, time

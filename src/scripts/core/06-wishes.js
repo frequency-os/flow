@@ -15,7 +15,7 @@
   };
   function icoHtml(name){ return WICONS[name] || (name||'') ; }
 
-  // універсальне нижнє меню дій (працює там, де confirm/alert заблоковані, напр. Telegram WebApp)
+  // універсальне нижнє меню дій (працює там, де confirm/alert заблоковані, напр. у WebView)
   function actionSheet(opts){
     const o=opts||{}; const items=o.items||[];
     const ov=document.createElement('div'); ov.className='asheet';
@@ -50,7 +50,7 @@
     });
   }
 
-  // проста заміна нативного alert (ламається в Telegram WebView)
+  // проста заміна нативного alert (ламається в деяких WebView)
   function flowAlert(msg, title){
     actionSheet({
       title:title||'Повідомлення',

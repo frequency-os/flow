@@ -172,7 +172,7 @@
       const active = (f.widgets||[]).filter(w=>w.ready).length;
       const subCount = childFolderKeys(k).length;
       const emojiShow = (f.emoji && f.emoji.trim()) ? f.emoji : esc((f.name||'?').trim().charAt(0).toUpperCase());
-      const pinDot = (f.secret&&vaultOpen ? `<span class="fpin fsecret">🕶️</span>` : '') + (f.pinned ? `<span class="fpin">📌</span>` : '');
+      const pinDot = f.pinned ? `<span class="fpin">📌</span>` : '';
       const subBadge = subCount ? `<span class="fsub">📁 ${subCount}</span>` : '';
       // метарядок залежно від ролі папки
       let metaHtml;
@@ -235,7 +235,6 @@
     add.className='fc2 fc2-add '+(homeFolderView==='grid'?'fc2-tile-add':homeFolderView==='deck'?'fc2-deck-add':homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
     add.innerHTML=`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
     add.onclick=createFolder;
-    vaultAttachLongPress(add); // 🕶️ довге утримання — вхід у приховані папки
     grid.appendChild(add);
     // bind menus
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
@@ -412,7 +411,6 @@
         ${['a','b','c','d'].map(L=>`<button class="flay-opt ${(f.flayout||'a')===L?'on':''}" data-lay="${L}">
           <span class="flay-ic flay-ic-${L}"></span><span>${({a:'Збоку',b:'Зверху',c:'На всю',d:'Перехід'})[L]}</span></button>`).join('')}
       </div>
-      ${vaultOpen?`<button class="fmi" data-act="secret">🕶️ ${f.secret?'Зробити видимою':'Сховати папку'}</button>`:''}
       <button class="fmi" data-act="pin">📌 ${f.pinned?'Відкріпити':'Закріпити зверху'}</button>
       <button class="fmi" data-act="rename">✏️ Перейменувати</button>
       <button class="fmi" data-act="move">📂 ${f.parent?'Перемістити / на головну':'Перемістити в папку'}</button>
@@ -508,7 +506,6 @@
     }
     if(act==='rmphoto'){ const prev=f.photo; f.photo=''; f.photoPos=null;
       window.photoDel(prev); saveFolders(); renderDashboard(); closeFolderMenu(); return; }
-    if(act==='secret'){ if(!vaultOpen) return; f.secret=!f.secret; saveFolders(); renderDashboard(); closeFolderMenu(); try{ window.platform.haptic('select'); }catch(_){} return; }
     if(act==='pin'){ f.pinned=!f.pinned; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='rename'){ closeFolderMenu(); inputModal({title:'Перейменувати папку',value:f.name,placeholder:'Назва папки',onOk:(v)=>{ if(v){f.name=v;saveFolders();renderDashboard();} }}); return; }
     if(act==='move'){ closeFolderMenu(); openFolderMovePicker(key); return; }

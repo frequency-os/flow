@@ -78,10 +78,10 @@
 
   /* ── редагування ── */
   function vzEditStatement(){ inputModal({title:'Куди я йду — одним реченням', value:vzData.statement,
-    placeholder:'Напр.: Братислава, агенція €3k/міс, Frequency — 100 користувачів',
+    placeholder:'Напр.: своя справа, дохід €3k/міс, Frequency — 100 користувачів',
     onOk:v=>{ vzData.statement=v; vzSave(); renderVision(); }}); }
   function vzEditTags(){ inputModal({title:'Теги напрямку (через кому)', value:vzData.tags.join(', '),
-    placeholder:'Напр.: 🇸🇰 Переїзд, 💼 Агенція, 📱 Frequency',
+    placeholder:'Напр.: 🏡 Переїзд, 💼 Справа, 📱 Frequency',
     onOk:v=>{ vzData.tags=v.split(',').map(s=>s.trim()).filter(Boolean).slice(0,6); vzSave(); renderVision(); }}); }
   function vzEditWhy(side){ const cur=side==='b'?vzData.why2:vzData.why;
     inputModal({title:side==='b'?'Нагадування собі (зворот картки)':'Для чого мені це',
@@ -89,7 +89,7 @@
       onOk:v=>{ if(side==='b')vzData.why2=v; else vzData.why=v; vzSave(); renderVision(); }}); }
   function vzEditFocus(){
     inputModal({title:'Мій фокус зараз (одна річ)', value:vzData.focus.title,
-      placeholder:'Напр.: Запуск агенції — 5 угод', onOk:t=>{
+      placeholder:'Напр.: Запуск проєкту — 5 угод', onOk:t=>{
         vzData.focus.title=t;
         inputModal({title:'Початок фокусу (РРРР-ММ-ДД)', value:vzData.focus.start||ymdLocal(),
           placeholder:ymdLocal(), onOk:s=>{
@@ -256,7 +256,7 @@
     actionSheet({title:'✍️ Контракт із собою', sub:kt.text?'':'Одне чесне зобовʼязання + щоденне Так/Ні', items:[
       {ic:'edit', label:kt.text?'Текст контракту':'Скласти контракт', sub:kt.text||'«Я щодня … навіть у поганий день»', primary:!kt.text,
         onClick:()=>inputModal({title:'Текст контракту (одне речення)', value:kt.text,
-          placeholder:'Я щодня роблю мінімум один крок до агенції — навіть на 10 хв', onOk:v=>{
+          placeholder:'Я щодня роблю мінімум один крок до мети — навіть на 10 хв', onOk:v=>{
             kt.text=v; if(v && !kt.signed) kt.signed=plTodayStr(); vzSave(); renderVision(); }})},
       {ic:'edit', label:'Дедлайн', sub:kt.deadline||'РРРР-ММ-ДД', onClick:()=>inputModal({title:'Дедлайн контракту (РРРР-ММ-ДД)', value:kt.deadline,
         placeholder:new Date().getFullYear()+'-09-30', onOk:v=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(v)||v==='') kt.deadline=v; vzSave(); renderVision(); }})},

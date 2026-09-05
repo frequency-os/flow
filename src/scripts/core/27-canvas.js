@@ -773,51 +773,46 @@
     });
   }
 
-  function seedAgencySlovakia(){
-    var FK="f_agsk_seed", EID="env_agsk_tax", EID2="env_agsk_re";
-    try{ if(folders&&folders[FK]) return; }catch(_){ return; }
-    var FOLDER={"key":"f_agsk_seed","c":"#5b8def","emoji":"🇸🇰","name":"Агенція Словаччина","pct":0,"photo":"","flayout":"a","pinned":true,"custom":true,"widgets":[],"parent":"","role":"project","status":"active","due":"2026-07-15","secret":true};
-    var BOARD=[{"id":"b_agsk_1","type":"h1","title":"Заголовок 1","text":"Агенція · Словаччина 🇸🇰"},{"id":"b_agsk_2","type":"callout","tone":"tip","text":"Адмін-супровід українців: тимчасовий захист (dočasné útočisko), živnosť і pobyt. Чек 500 € з клієнта. Партнерство 50/50."},{"id":"b_agsk_3","type":"countdown","title":"До нового закону","target":"2026-07-15","label":"TP → prechodný pobyt (6 міс. діяльності)"},{"id":"b_agsk_4","type":"head","title":"Клієнти"},{"id":"b_agsk_5","type":"kanban","title":"Воронка клієнтів","cols":[{"id":"kc_agsk_z","name":"Заявка","cards":[{"id":"kd_a1","t":"Наталя — TP","m":"дзвінок пт"}]},{"id":"kc_agsk_k","name":"Консультація","cards":[{"id":"kd_a2","t":"Роман — živnosť","m":""}]},{"id":"kc_agsk_o","name":"Оплата 500€","cards":[]},{"id":"kc_agsk_r","name":"В роботі","cards":[]},{"id":"kc_agsk_p","name":"Подано","cards":[]},{"id":"kc_agsk_g","name":"Готово","cards":[]}]},{"id":"b_agsk_6","type":"contacts","title":"База клієнтів","people":[{"id":"ct_a1","name":"Приклад клієнта","note":"TP · оплачено 500€ · подано 00.00","link":"","color":"#5b8def"}]},{"id":"b_agsk_7","type":"table","title":"Реєстр справ","cols":["Клієнт","Послуга","Подано","Дедлайн","Хто веде","€"],"rows":[["Приклад","TP","","","Партнерка","500"],["","živnosť","","","Я",""],["","pobyt","","","",""]]},{"id":"b_agsk_8","type":"check","title":"Документи клієнта · шаблон","items":[{"id":"dc1","text":"Закордонний паспорт (скан)","done":false},{"id":"dc2","text":"Фото 3×3.5","done":false},{"id":"dc3","text":"Адреса проживання / ubytovanie","done":false},{"id":"dc4","text":"Довіреність / plná moc","done":false},{"id":"dc5","text":"Заява на dočasné útočisko","done":false},{"id":"dc6","text":"Реєстрація живності (za studena)","done":false},{"id":"dc7","text":"Договір з клієнтом підписано","done":false}]},{"id":"b_agsk_9","type":"head","title":"Фінанси"},{"id":"b_agsk_10","type":"fin","title":"Фінанси агенції"},{"id":"b_agsk_11","type":"project","title":"Прибуток агенції","ops":[],"expected":0,"cur":"€","deadline":"","unlocked":true,"pview":1,"splitPreset":{"amount":500,"cur":"€","label":"Клієнт","rules":[{"envId":"env_agsk_tax","pct":0.2},{"envId":"env_agsk_re","pct":0.15}]}},{"id":"b_agsk_12","type":"envelope","title":"Податки / Резерв","envId":"env_agsk_tax"},{"id":"b_agsk_13","type":"envelope","title":"Reinvest · Реклама","envId":"env_agsk_re"},{"id":"b_agsk_14","type":"callout","tone":"warn","text":"Правило з кожного клієнта: 20% у «Податки/Резерв», 15% у «Reinvest». Решта — 50/50 з партнеркою."},{"id":"b_agsk_15","type":"head","title":"Маркетинг і контент"},{"id":"b_agsk_16","type":"kanban","title":"Контент-план","cols":[{"id":"kc_agsk_mi","name":"Ідея","cards":[{"id":"kd_m1","t":"Reels: 3 помилки при TP","m":""}]},{"id":"kc_agsk_ms","name":"Сценарій","cards":[]},{"id":"kc_agsk_mz","name":"Знято","cards":[]},{"id":"kc_agsk_mm","name":"Монтаж","cards":[]},{"id":"kc_agsk_mp","name":"Опубліковано","cards":[]}]},{"id":"b_agsk_17","type":"check","title":"Канали залучення","items":[{"id":"ch1","text":"Instagram (reels)","done":false},{"id":"ch2","text":"Telegram-канал","done":false},{"id":"ch3","text":"Групи українців у SK","done":false},{"id":"ch4","text":"Сарафан / відгуки","done":false},{"id":"ch5","text":"Партнерства (юрист, HR, житло)","done":false}]},{"id":"b_agsk_18","type":"note","title":"Офер і скрипт","text":"УТП: «Отримаєш захист і живність без стресу — ми ведемо всі папери».\nСкрипт консультації: біль → рішення → пакет 500€ → наступний крок.\nЗаперечення: «дорого» → рахуємо ризик самостійних помилок і час."},{"id":"b_agsk_19","type":"head","title":"Операційка й розвиток"},{"id":"b_agsk_20","type":"caseline","title":"Таймлайн запуску","events":[{"id":"ev1","d":"2026-07-13","t":"Сайт готовий ✅"},{"id":"ev2","d":"2026-07-13","t":"Договори UA/SK готові ✅"},{"id":"ev3","d":"2026-07-15","t":"Старт нового закону — реєструю власну živnosť"}]},{"id":"b_agsk_21","type":"contacts","title":"Партнери й сервіси","people":[{"id":"pt1","name":"Юрист","note":"","link":"","color":"#34c77b"},{"id":"pt2","name":"Бухгалтер","note":"","link":"","color":"#e8843c"},{"id":"pt3","name":"Нотаріус","note":"","link":"","color":"#c77dff"},{"id":"pt4","name":"Житло / ubytovanie","note":"","link":"","color":"#5b8def"}]},{"id":"b_agsk_22","type":"note","title":"Розвиток · гіпотези","text":"• Пакетні тарифи (базовий/під ключ/сімʼя)\n• Найм асистента при 8+ клієнтах/міс\n• Другий напрямок: pobyt для бізнесу\n• База знань → міні-курс як апсел"}];
-    var ENVS=[{"id":"env_agsk_tax","name":"Податки / Резерв","emoji":"🛟","color":"#f0b429","goal":3000,"saved":0,"ops":[],"kind":"ціль","link":"f_agsk_seed","linkLabel":"Агенція SK"},{"id":"env_agsk_re","name":"Reinvest · Реклама","emoji":"📣","color":"#5b8def","goal":1500,"saved":0,"ops":[],"kind":"ціль","link":"f_agsk_seed","linkLabel":"Агенція SK"}];
-    try{ folders[FK]=FOLDER; if(order.indexOf(FK)<0) order.push(FK); saveFolders(); }catch(_){}
-    try{ boards[FK]=BOARD; saveBoard(); }catch(_){}
-    try{ var have={}; envelopes.forEach(function(e){have[e.id]=1;}); ENVS.forEach(function(e){ if(!have[e.id]) envelopes.push(e); }); saveEnvelopes(); }catch(_){}
-    try{ window.__agencySeeded=true; }catch(_){}
-  }
-
-  // Одноразове тихе очищення старих тестових оплат агенції (спрацьовує рівно раз).
-  function agskCleanupOnce(){
-    var FLAG='flowapp_agsk_cleaned_v2';
+  /* ── Одноразове прибирання після видалення Агенції (04.09.2026) ──
+     Її папка, дошки, конверти, конфіг Vault і база документів клієнтів більше
+     не мають власника в коді — прибираємо зі сховища. Сховані папки НЕ
+     видаляємо: прапорець secret просто перестав читатися (applyFolderCfgRaw),
+     тож вони знову видимі на Огляді; saveFolders() нижче закріплює це і в хмарі.
+     Виконується рівно раз на пристрої. */
+  function agencyPurgeOnce(){
+    var FLAG='flowapp_agency_purged_v1', FK='f_agsk_seed';
     try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
     try{
-      // клієнти: обнулити платежі
-      if(typeof agClients==='function'){ agClients().forEach(function(c){ c.payments=[]; }); }
-      // проєкт агенції: повністю обнулити всі рухи (старі тапи «Клієнт +500» без міток теж)
-      var projId=null;
-      if(typeof agProjBlock==='function'){ var proj=agProjBlock();
-        if(proj){ projId=proj.id; proj.ops=[]; } }
-      // агенційні конверти: повністю обнулити ops і saved
-      var agEnvIds={}; if(typeof agFindAll==='function'){ agFindAll('envelope').forEach(function(eb){ agEnvIds[String(eb.envId)]=1; }); }
-      if(Array.isArray(envelopes)) envelopes.forEach(function(e){
-        if(agEnvIds[String(e.id)]){ e.ops=[]; e.saved=0; }
-        else if(Array.isArray(e.ops)){ e.ops=e.ops.filter(function(o){ return !o.payId; });
-          try{ e.saved=(e.ops||[]).reduce(function(s,o){ return s+(o.t==='in'?+o.amount:-(+o.amount)); },0); }catch(_){}
+      var hadAgency=false;
+      Object.keys(folders).forEach(function(k){
+        var f=folders[k]; if(!f) return;
+        if(k===FK || f.parent===FK){
+          try{ if(f.photo && window.photoDel) window.photoDel(f.photo); }catch(_){}
+          delete folders[k]; hadAgency=true;
         }
       });
-      // finOps: прибрати все, що стосується агенції (payId, clientId, агенційний проєкт, агенційні конверти, резерви)
-      try{ if(Array.isArray(finOps)) finOps=finOps.filter(function(f){
-        if(f.payId||f.clientId) return false;
-        if(projId&&f.proj===projId) return false;
-        if(f.env&&agEnvIds[String(f.env)]) return false;
-        if(/^Клієнт:|^Проєкт: Прибуток агенції|^Виплата партнеру|^Резерв:/i.test(f.label||'')) return false;
-        return true;
-      }); }catch(_){}
-      // виплати партнерам
-      try{ if(typeof agPartnersBlock==='function'){ var pb=agPartnersBlock(); if(pb) pb.payouts=[]; } }catch(_){}
-      try{ saveBoard(); }catch(_){}
-      try{ saveFinOps(); }catch(_){}
-      try{ saveEnvelopes(); }catch(_){}
-    }catch(_){}
+      for(var i=order.length-1;i>=0;i--){ if(!folders[order[i]]) order.splice(i,1); }
+      try{ if(folderWidgets && folderWidgets[FK]) delete folderWidgets[FK]; }catch(_){}
+      // дошки: головна + додаткові простори папки
+      var hadBoards=false;
+      Object.keys(boards).forEach(function(k){ if(k===FK || k.indexOf(FK+'__sp_')===0){ delete boards[k]; hadBoards=true; } });
+      // конверти агенції (Податки/Резерв, Reinvest)
+      var hadEnv=false;
+      for(var j=envelopes.length-1;j>=0;j--){ var e=envelopes[j];
+        if(e && (/^env_agsk_/.test(String(e.id||'')) || e.link===FK)){ envelopes.splice(j,1); hadEnv=true; } }
+      // мета просторів у контексті агенції
+      try{ if(typeof spacesMap!=='undefined' && spacesMap && spacesMap[FK]){ delete spacesMap[FK];
+        if(typeof activeSpaceMap!=='undefined' && activeSpaceMap) delete activeSpaceMap[FK];
+        if(typeof saveSpacesMeta==='function') saveSpacesMeta(); } }catch(_){}
+      saveFolders();                       // завжди: знімає secret з усіх папок і в хмарі
+      if(hadBoards) saveBoard();
+      if(hadEnv) saveEnvelopes();
+      // конфіг Vault, база документів клієнтів, старий прапорець очищення
+      try{ var p=window.storage.delete('vault_cfg'); if(p&&p.catch) p.catch(function(){}); }catch(_){}
+      try{ indexedDB.deleteDatabase('flow_docs'); }catch(_){}
+      try{ localStorage.removeItem('flowapp_agsk_cleaned_v2'); }catch(_){}
+      if(hadAgency) console.log('[Flow] Агенцію прибрано зі сховища');
+    }catch(e){ console.error('agencyPurge', e); }
     try{ localStorage.setItem(FLAG,'1'); }catch(_){}
   }
 
@@ -831,8 +826,8 @@
         // його з емодзі на льоту. У сховище воно потрапить при першому ж
         // saveFolders(); доти емодзі лишається єдиним джерелом правди.
         const ic=c.icon||folderIconFor(c.emoji);
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}); }
-        else if(c.custom){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',secret:!!c.secret}; }
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||''}); }
+        else if(c.custom){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||''}; }
       });
     }
   }
@@ -846,13 +841,12 @@
        одна транзакція, десятки записів. Якщо IndexedDB нема — photoWarm
        поверне false, і все працюватиме на старих data-URL. */
     try{ await window.photoWarm(); }catch(_){}
-    // ⚡ МИТТЄВИЙ ПЕРШИЙ РЕНДЕР: папки з локального кешу ДО очікування хмари Telegram.
+    // ⚡ МИТТЄВИЙ ПЕРШИЙ РЕНДЕР: папки з локального кешу ДО очікування хмари.
     //    Прибирає «порожні папки на пару секунд» при старті. Повний load нижче все оновить.
     try{
       if(window.storage.getLocal){
         const rawf=window.storage.getLocal(FKEY); if(rawf) applyFolderCfgRaw(rawf);
         const rawo=window.storage.getLocal(FOKEY); if(rawo) applyFolderOrderRaw(rawo);
-        try{ if(folders[AGENCY_KEY]) folders[AGENCY_KEY].secret=true; }catch(_){}
         renderDashboard();
       }
     }catch(e){ console.warn('fast-render skip', e); }
@@ -871,7 +865,7 @@
     // застосування значень нижче лишається в тому самому порядку, що й раніше.
     const __RAW = await (async ()=>{
       const keys=[KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,CBKEY,UKEY,RDR_CFG_KEY,
-        FKEY,FOKEY,FWKEY,VAULT_KEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,
+        FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,
         WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
@@ -929,14 +923,6 @@
       const raww=__RAW[FWKEY];
       const fw=raww?JSON.parse(raww):null; if(fw&&typeof fw==='object') folderWidgets=fw;
     }catch(e){ /* перше завантаження — сховища ще нема, це нормально */ }
-    // 🕶️ vault: лише хеш коду, ніколи не сам код
-    try{
-      const rawv=__RAW[VAULT_KEY];
-      const vc=rawv?JSON.parse(rawv):null;
-      if(vc&&vc.h&&vc.s) vaultCfg=vc;
-    }catch(_){}
-    // 🇸🇰 Агенція завжди під кодом: навіть якщо в сховищі прапорця ще нема
-    try{ if(folders[AGENCY_KEY]){ folders[AGENCY_KEY].secret=true; } }catch(_){}
     // ── ОЧИЩЕННЯ: «Простір» видалено повністю разом із даними.
     //    Прибираємо: кореневі дошки ('all' + 'all__sp_*'), додаткові простори
     //    кореня та колись перенесені папки «🧩 Простір» ('f_space_*').
@@ -1000,14 +986,6 @@
         if(typeof goalsData.pointB!=='string') goalsData.pointB='';
         if(goalsData.pathMode!=='flow'&&goalsData.pathMode!=='bridge') goalsData.pathMode='flow';
         if(goalsData.wishTheme!=='classic'&&goalsData.wishTheme!=='ai') goalsData.wishTheme='classic';
-        if(!goalsData.pointA.trim() && !goalsData._paInit){
-          goalsData.pointA='Сплю 4–5 год — і через це не маю волі обирати головне. Хапаюся за все, не доводжу нічого, 0/7 днів за планом, 3–5 год на день згорають у соцмережах. Вдома бардак, харчуюся абияк, є борги. Хочу дохід і бренд — але це поки мрія без жодного конкретного кроку. Тікаю в швидкі стрибки (крипта) замість системи. Корінь один: недосип + звичка щоразу обирати легке зараз замість потрібного потім.';
-          goalsData._paInit=true;
-        }
-        if(!goalsData.pointB.trim() && !goalsData._pbInit){
-          goalsData.pointB='Сплю 7+ год, лягаю до 00:00. Не курю — кинув, сон чистий. Живу 5/7 днів за планом, бо щовечора планую завтрашній день. Соцмережі ≤1 год/день. Щодня 15 хв на порядок — дім не захаращений. Три прийоми їжі, готую ввечері на завтра. Фінанси сплановані наперед: бюджет, конверти, борги під контролем — щомісяця мінус фіксована сума, відома дата «вільний». Навчання рознесене: англійська пн/ср/сб, AI-відео вт/чт/пт/нд. Контент build-in-public 3–4 рази/тиждень. Frequency зарелізений до Нового року. Гроші вкладаю лише в те, що розумію; спершу подушка, потім ризик. Один пріоритет за раз, доводжу до кінця. Горизонт: кінець 2026.';
-          goalsData._pbInit=true;
-        }
       }
     }catch(_){}
     // vision
@@ -1046,8 +1024,7 @@
     try{ ensureCards(); }catch(_){}
     try{ migrateFolderPhotosOnce(); }catch(e){ console.error('migratePhotos',e); }
     try{ removeSystemSeedFoldersOnce(); }catch(e){ console.error('removeSeedFolders',e); }
-    try{ seedAgencySlovakia(); }catch(e){ console.error('seedAgency',e); }
-    try{ agskCleanupOnce(); }catch(e){ console.error('agskCleanup',e); }
+    try{ agencyPurgeOnce(); }catch(e){ console.error('agencyPurge',e); }
     syncBlocks();
     try{ migrate(); }catch(e){ console.error('migrate',e); }
     try{ buildAddSheet(); }catch(e){ console.error('addsheet',e); }

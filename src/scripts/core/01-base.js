@@ -63,7 +63,7 @@
     'spaceview','spacewide','spacecanvas','spacecanvaszoom',
     'readerCfg',
     'patterns_chains','patterns_score','patterns_transform',
-    'vision_v1','vault_cfg','custom_avatar_v1','diary_entries_v1','diary_insights_v1','diary_books_v1','upgrade_profile_v1',
+    'vision_v1','custom_avatar_v1','diary_entries_v1','diary_insights_v1','diary_books_v1','upgrade_profile_v1',
     'lang_pref','i18n_content_cache'
   ];
 
@@ -295,7 +295,7 @@
   })();
 
   /* ============ ГЛОБАЛЬНИЙ ЛОВЕЦЬ ПОМИЛОК ============
-     У Telegram WebView немає консолі — помилки зникали безслідно.
+     У WebView на телефоні немає консолі — помилки зникали безслідно.
      Тримаємо останні 30 у window.__flowErrors; подивитись: flowErrors(). */
   (function(){
     window.__flowErrors = [];
@@ -309,23 +309,5 @@
     window.addEventListener('error', e=>push('error', e && e.message, e && e.filename, e && e.lineno));
     window.addEventListener('unhandledrejection', e=>push('promise', (e && e.reason && e.reason.message) || (e && e.reason)));
     window.flowErrors = function(){ return window.__flowErrors.slice(); };
-  })();
-
-  /* ============ TELEGRAM WEBAPP INIT ============ */
-  (function(){
-    try{
-      const tg = window.Telegram && window.Telegram.WebApp;
-      if(!tg) return;
-      tg.ready();
-      tg.expand();
-      try{ tg.disableVerticalSwipes && tg.disableVerticalSwipes(); }catch(_){}
-      const applyVH = ()=>{
-        const h = tg.viewportStableHeight || tg.viewportHeight || window.innerHeight;
-        document.documentElement.style.setProperty('--tg-viewport-stable-height', h+'px');
-      };
-      applyVH();
-      tg.onEvent && tg.onEvent('viewportChanged', applyVH);
-      window.addEventListener('resize', applyVH);
-    }catch(_){}
   })();
 

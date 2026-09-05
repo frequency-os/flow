@@ -1421,7 +1421,7 @@
       e.stopPropagation(); const b=getBlock(el.dataset.linkdone);
       if(b){ b.editing=false; saveBoard(); renderBoard(); }
     });
-    // відкривати посилання через Telegram, якщо доступно (інакше — звичайна вкладка)
+    // відкривати посилання через платформу (звичайна вкладка або системний браузер)
     (window.__btRoot||board).querySelectorAll('[data-linkopen]').forEach(el=>el.onclick=e=>{
       const b=getBlock(el.dataset.linkopen); if(!b||!b.url) return;
       e.preventDefault(); window.platform.openLink(b.url);
@@ -1706,7 +1706,7 @@
     }catch(_){}
 
     /* ═══ PREMIUM PACK V1 · події ═══ */
-    // мінішторка вводу (prompt у Telegram WebView заблоковано)
+    // мінішторка вводу (prompt у WebView часто заблоковано)
     function ppAsk(title, ph, val, cb){
       const ov=document.createElement('div'); ov.className='pp-ov';
       ov.innerHTML=`<div class="pp-sheet"><div class="pp-tt">${esc(title)}</div>

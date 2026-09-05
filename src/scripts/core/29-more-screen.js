@@ -42,7 +42,7 @@
       const host=document.getElementById('moreHybrid'); if(!host) return;
       const _m=(window.uiMode||'pro');
       host.innerHTML=
-        `<div class="mh-rows mh-projects">${rowHTML({k:'projects', emo:'🗂️', c:'139,124,255', t:'Проєкти', d:'Агенція, клієнти й робочі проєкти'})}</div>
+        `<div class="mh-rows mh-projects">${rowHTML({k:'projects', emo:'🗂️', c:'139,124,255', t:'Проєкти', d:'Робота й твої проєкти'})}</div>
          <div class="mh-mode">
            <div class="mh-mode-tx"><b>Режим Frequency</b><span>${_m==='lite'
              ?'Lite — ядро: Планер · Гроші · Проєкти. Решта чекає тут.'
@@ -91,7 +91,6 @@
     /* ── АКАУНТ + статус синхрону + діагностика ── */
     function escA(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function safeImgA(u){ u=String(u==null?'':u).trim(); if(/^https?:\/\//i.test(u)||/^data:image\//i.test(u)) return u.replace(/'/g,'%27').replace(/"/g,'%22'); return ''; }
-    function tgUser(){ return window.platform.user(); }
     // читає обране фото і стискає в маленький квадрат (щоб влізло в хмарний ліміт)
     function readAvatarFile(file){
       return new Promise((resolve,reject)=>{
@@ -160,30 +159,27 @@
 
     function renderAccount(){
       const host=document.getElementById('accountCard'); if(!host) return;
-      const u=tgUser();
       const gUser=(window.sbUser && window.sbUser())||null;
       const cloud=window.__flowSync?.cloud;
       // поки Supabase ще перевіряє сесію (перша мить після відкриття сайту) —
       // НЕ стверджуємо «Гість», щоб не блимати хибним станом, який сам собою виправляється
-      const checking = !u && !gUser && !window.FLOW_NATIVE && window.__sbReady===false;
-      const name=checking?'Перевіряємо…':(u?((u.first_name||'')+(u.last_name?' '+u.last_name:'')).trim()||'Користувач'
-        :(gUser?((gUser.user_metadata&&gUser.user_metadata.full_name)||gUser.email||'Google'):'Гість'));
-      const sub=checking?'':(u?('@'+(u.username||('id'+u.id))+(cloud?' · Telegram':''))
-        :(gUser?(gUser.email||'Google'):'без входу · дані лише тут'));
+      const checking = !gUser && !window.FLOW_NATIVE && window.__sbReady===false;
+      const name=checking?'Перевіряємо…'
+        :(gUser?((gUser.user_metadata&&gUser.user_metadata.full_name)||gUser.email||'Google'):'Гість');
+      const sub=checking?'':(gUser?(gUser.email||'Google'):'без входу · дані лише тут');
       const gPic=gUser&&gUser.user_metadata&&gUser.user_metadata.avatar_url;
       const av=checking?'⏳':(customAvatar?`<img src="${customAvatar}" alt="">`
-        :(u&&u.photo_url?`<img src="${safeImgA(u.photo_url)}" alt="">`
-        :(gUser&&gPic?`<img src="${safeImgA(gPic)}" alt="">`:(name||'F').trim().charAt(0).toUpperCase())));
+        :(gUser&&gPic?`<img src="${safeImgA(gPic)}" alt="">`:(name||'F').trim().charAt(0).toUpperCase()));
       const [cls,txt]=syncLabel(window.__flowSync?.state||'idle');
-      const loggedIn=!!(u||gUser);
+      const loggedIn=!!gUser;
 
       // рядок «Вхід»: показує поточний стан; якщо не увійдено — тап розкриває варіанти
-      const loginSub=checking?'Перевіряємо сесію…':(u?('Telegram · @'+(u.username||('id'+u.id)))
+      const loginSub=checking?'Перевіряємо сесію…'
         :gUser?('Google · '+(gUser.email||''))
-        :'Не увійдено · дані лише на цьому пристрої');
-      const loginIco=checking?'⏳':(u?'✈️':(gUser?'🔵':'🔑'));
-      // «Вийти» доступне лише для Google — з Telegram-ідентичності вийти нема куди
-      const loginAction=(gUser&&!u)
+        :'Не увійдено · дані лише на цьому пристрої';
+      const loginIco=checking?'⏳':(gUser?'🔵':'🔑');
+      // «Вийти» доступне лише коли є Google-сесія
+      const loginAction=gUser
         ? `<button class="acc-row-out" data-acc-out>Вийти</button>`
         : `<span class="acc-chev">›</span>`;
       const loginExpand=(!loggedIn && !window.FLOW_NATIVE && !checking) ? `
@@ -261,12 +257,11 @@
       if(syncBtn) syncBtn.onclick=async (e)=>{
         e.stopPropagation();
         syncBtn.disabled=true; const old=syncBtn.textContent; syncBtn.textContent='…';
-        try{ window.__flowSync.warmed=false; await window.storage.pullAll(ALL_KEYS()); }catch(_){}
-        // pullAll вище — лише для Telegram CloudStorage; для Google-акаунта
-        // тягнемо все одним пакетним запитом, інакше load() нижче знову піде
-        // по ключах окремо (десятки послідовних запитів замість одного)
+        try{ window.__flowSync.warmed=false; }catch(_){}
+        // для Google-акаунта тягнемо все одним пакетним запитом, інакше load() нижче
+        // знову піде по ключах окремо (десятки послідовних запитів замість одного)
         try{ if(typeof window.sbPrefetchAll==='function' && window.sbUser && window.sbUser()) await window.sbPrefetchAll(); }catch(_){}
-        // мʼяке оновлення без reload (reload у Telegram викидає в меню)
+        // мʼяке оновлення без reload
         try{ const ld=window.__load; if(typeof ld==='function') await ld(); }catch(_){}
         try{ const rd=window.__renderDashboard; if(typeof rd==='function') rd(); }catch(_){}
         try{ if(typeof renderMore==='function') renderMore(); }catch(_){}

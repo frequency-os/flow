@@ -13,7 +13,7 @@
     if(el){ el.innerHTML=aiBusyHTML(); const b=document.getElementById('aiChatBody'); if(b) b.scrollTop=b.scrollHeight; }
   }
   /* ═══ DEV-РЕЖИМ (Нокс): технічний асистент розробника ═══ */
-  /* Dev-режим існує ТІЛЬКИ у web/Telegram-збірці. У native (Capacitor) він
+  /* Dev-режим існує ТІЛЬКИ у web-збірці. У native (Capacitor) він
      вимкнений на рівні прапорця, а сам код вирізається build-ios.mjs — щоб у
      бандлі App Store фізично не було ні виконання коду, ні прихованих входів.
      Прапорець з storage міг приїхати з веб-версії, тому native має пріоритет. */
@@ -60,7 +60,7 @@
   }
   window.devContentTranslateToggleSheet = devContentTranslateToggleSheet;
   const AI_DEV_SYS='Ти — Нокс, технічний dev-асистент розробника Flow. Це службовий режим для власника апки, НЕ для користувачів: без мотивації, персон і FLOW_OPS. '
-    +'Flow — односторінкова HTML/JS-апка (Mac через Electron + сайт/iPhone; Telegram прибрано): дані в localStorage + Supabase (Google-вхід) + IndexedDB для важкого (реєстр window.FLOW_KEYS), AI — через Cloudflare Worker до Anthropic (Haiku 4.5 / Sonnet 5 / Opus 5, prompt caching, агентний цикл на клієнті). '
+    +'Flow — односторінкова HTML/JS-апка (Mac через Electron + сайт/iPhone): дані в localStorage + Supabase (Google-вхід) + IndexedDB для важкого (реєстр window.FLOW_KEYS), AI — через Cloudflare Worker до Anthropic (Haiku 4.5 / Sonnet 5 / Opus 5, prompt caching, агентний цикл на клієнті). '
     +'Твої dev-інструменти: dev_storage (keys/get/check), dev_errors (помилки JS), dev_cost (токени і $), dev_selftest (воркер+storage+парсинг), dev_data (backup/restore storage), dev_eval (JS у живій апці — з підтвердженням і авто-бекапом; для фіксів даних: змінив → save-функція → перевір check-ом). '
     +'Коли просять довідку/«що вмієш» — стисло перелічи ці можливості з прикладами запитів, без викликів інструментів. '
     +'Також доступні звичайні інструменти (get_data, planner, goals, finance, patterns, memory) — для перевірки поведінки. '
@@ -316,7 +316,7 @@
       return '🔍 '+(M[inp.what]||'читаю дані')+'…';
     }
     if(name==='planner'){
-      const M={create:'📦 створюю блоки',move:'↔️ переношу блоки',done:'✅ відмічаю виконане',delete:'🗑 видаляю блоки'};
+      const M={create:'📦 створюю блоки',move:'↔️ переношу блоки',done:'✅ відмічаю виконане',delete:'🗑 видаляю блоки',remind:'⏰ ставлю нагадування'};
       return (M[inp.action]||'🔧 змінюю планер')+'…';
     }
     if(name==='goals'){
@@ -328,6 +328,10 @@
       return (M[inp.action]||'💶 працюю з фінансами')+'…';
     }
     if(name==='patterns') return '🧠 працюю з патернами…';
+    if(name==='diary'){
+      const M={add_entry:'📓 пишу в щоденник',book_entry:'📓 пишу в зошит',book_list:'📓 дивлюсь зошити'};
+      return (M[inp.action]||'📓 працюю зі щоденником')+'…';
+    }
     /* @dev-only:start */
     if(name==='dev_storage') return '🗄 читаю storage…';
     if(name==='dev_errors') return '🐞 читаю лог помилок…';
@@ -422,15 +426,16 @@
         to:{ type:'string', description:'YYYY-MM-DD, для what=range (до 31 дня)' }
       }, required:['what'] } },
     { name:'planner',
-      description:'Змінити планер: create (нові блоки), move (перенести), done (закрити), delete (видалити). Для move/done/delete поле t — фрагмент назви НАЯВНОГО блоку. Відповідь містить результат і конфлікти — прочитай її та виправ, якщо треба.',
+      description:'Змінити планер: create (нові блоки), move (перенести), done (закрити), delete (видалити), remind (поставити/зняти нагадування на блок). Для move/done/delete/remind поле t — фрагмент назви НАЯВНОГО блоку. «Нагадай мені о 9 про X»: якщо блока X ще нема — create з полем remind; якщо є — action=remind. Відповідь містить результат і конфлікти — прочитай її та виправ, якщо треба.',
       input_schema:{ type:'object', properties:{
-        action:{ type:'string', enum:['create','move','done','delete'] },
+        action:{ type:'string', enum:['create','move','done','delete','remind'] },
         blocks:{ type:'array', items:{ type:'object', properties:{
           ds:{type:'string',description:'YYYY-MM-DD'},
           h:{type:'number',description:'початок 0-24, можна 19.5'},
           endH:{type:'number'},
-          t:{type:'string',description:'назва (create) або фрагмент назви наявного (move/done/delete)'},
-          goal:{type:'string',description:'фрагмент назви цілі, лише для create'}
+          t:{type:'string',description:'назва (create) або фрагмент назви наявного (move/done/delete/remind)'},
+          goal:{type:'string',description:'фрагмент назви цілі, лише для create'},
+          remind:{type:'string',description:'час нагадування "HH:MM" (у день ds); порожньо — на початок блоку; "off" — зняти. Для create і remind'}
         }, required:['t'] } }
       }, required:['action','blocks'] } },
     { name:'goals',
@@ -477,25 +482,22 @@
         role:{ type:'string', enum:['project','area'], description:'project — проєкт з дедлайном, area — звичайна папка' },
         due:{ type:'string', description:'YYYY-MM-DD, лише якщо role=project' }
       }, required:['action'] } },
-    { name:'agency',
-      description:'Захист.SK — клієнти агенції: list (усі клієнти й стан), add_client (новий клієнт), set_stage (перевести стадію), add_payment (записати платіж клієнта — автоматично відображається у Фінансах). client — фрагмент імені.',
+    { name:'diary',
+      description:'Щоденник: add_entry (додати запис за день, дефолт сьогодні — дописується до наявного тексту дня), book_entry (запис у зошит-папку: Стосунки, Вдячність тощо), book_list (зошити з кількістю записів і останнім). Читання записів — через get_data what=diary. Записи людина підтверджує шторкою.',
       input_schema:{ type:'object', properties:{
-        action:{ type:'string', enum:['list','add_client','set_stage','add_payment'] },
-        name:{ type:'string', description:'імʼя нового клієнта, лише для add_client' },
-        client:{ type:'string', description:'фрагмент імені наявного клієнта' },
-        service:{ type:'string', enum:['TP','živnosť','pobyt'] },
-        stage:{ type:'string', enum:['Заявка','Консультація','Оплата','В роботі','Подано','Готово'] },
-        amount:{ type:'number', description:'сума платежу, лише для add_payment' },
-        label:{ type:'string', description:'підпис платежу (напр. Аванс/Доплата)' }
-      }, required:['action'] } }
+        action:{ type:'string', enum:['add_entry','book_entry','book_list'] },
+        text:{ type:'string', description:'текст запису (add_entry/book_entry)' },
+        ds:{ type:'string', description:'YYYY-MM-DD для add_entry, дефолт сьогодні' },
+        book:{ type:'string', description:'фрагмент назви зошита для book_entry' }
+      }, required:['action'] } },
   ];
 
-  const AI_AGENT_ADDON='\n\nАГЕНТНИЙ РЕЖИМ: у тебе є інструменти get_data, planner, goals, finance, patterns, memory, folders, agency. '
-    +'Дії з блоками планера — ЛИШЕ інструмент planner. Кроки/цілі — інструмент goals. ВЕСЬ блок Гроші — інструмент finance: витрати, доходи, конверти (env_deposit/env_spend/env_create), борги (debt_add/debt_pay/debt_edit/debt_delete/debt_list) і виправлення (del_last). Помилково записаний борг можна виправити (debt_edit: імʼя/залишок) або видалити (debt_delete). Ніколи не кажи, що не можеш редагувати борги чи конверти — можеш, викликом finance. '
+  const AI_AGENT_ADDON='\n\nАГЕНТНИЙ РЕЖИМ: у тебе є інструменти get_data, planner, goals, finance, patterns, memory, folders, diary. '
+    +'Дії з блоками планера — ЛИШЕ інструмент planner. «Нагадай мені о X про Y» — теж planner: на наявний блок action=remind, для нового — create з полем remind (короткий блок на той час). Кроки/цілі — інструмент goals. ВЕСЬ блок Гроші — інструмент finance: витрати, доходи, конверти (env_deposit/env_spend/env_create), борги (debt_add/debt_pay/debt_edit/debt_delete/debt_list) і виправлення (del_last). Помилково записаний борг можна виправити (debt_edit: імʼя/залишок) або видалити (debt_delete). Ніколи не кажи, що не можеш редагувати борги чи конверти — можеш, викликом finance. '
     +'Цикли заміни звичок — інструмент patterns (перемога=mark_new, зрив=mark_old, без осуду). '
     +'Довготривалі факти про людину — інструмент memory (save/forget), а НЕ FLOW_MEM-рядок. '
     +'Папки й проєкти на головному екрані — інструмент folders (create/rename/set_role/delete). '
-    +'Захист.SK, клієнти агенції, платежі — інструмент agency (list/add_client/set_stage/add_payment). '
+    +'Щоденник — інструмент diary: «запиши в щоденник…» → add_entry (за день), «запиши в Стосунки/Вдячність/зошит…» → book_entry, перелік зошитів → book_list. Запис у зошит автоматично видно і в дні щоденника. '
     +'FLOW_OPS використовуй лише для pages. '
     +'ПІДТВЕРДЖЕННЯ: майже кожен інструмент, що щось МІНЯЄ (не читає), сам питає людину підтвердити дію шторкою знизу — просто викликай його, шторка зʼявиться автоматично. Якщо результат каже "людина скасувала" — прийми це, не повторюй той самий виклик і не наполягай. '
     +'ЛІМІТ БЕЗПЕКИ: не більше 5 змін даних за одне повідомлення людини (читання не рахується). Якщо просять більше — зроби найважливіші 5, поясни і попроси решту окремим повідомленням. Масове «видали все» не виконуй одним махом — лише поштучно, з переліком. '
@@ -515,7 +517,7 @@
       if(name==='patterns') return await flowToolPatterns(inp||{});
       if(name==='memory')   return await flowToolMemory(inp||{});
       if(name==='folders')  return await flowToolFolders(inp||{});
-      if(name==='agency')   return await flowToolAgency(inp||{});
+      if(name==='diary')    return await flowToolDiary(inp||{});
       /* @dev-only:start */
       if(name==='dev_storage'||name==='dev_errors'||name==='dev_cost'){
         if(!aiDevOn()) return '⚠️ доступно лише в dev-режимі';
@@ -575,12 +577,20 @@
       }catch(_){ return 'папок немає'; }
     }
     if(inp.what==='diary'){
-      // останні до 10 записів щоденника; кожен обрізаємо, щоб не роздути контекст
+      // останні до 10 записів щоденника + зошити; кожен обрізаємо, щоб не роздути контекст
       try{
         const src=(typeof diaryEntries==='object'&&diaryEntries)?diaryEntries:{};
         const keys=Object.keys(src).filter(k=>src[k]&&src[k].text&&String(src[k].text).trim()).sort().reverse().slice(0,10);
-        if(!keys.length) return 'щоденник порожній';
-        return keys.map(k=>{ let t=String(src[k].text).trim(); if(t.length>500) t=t.slice(0,500)+'…'; return k+': '+t; }).join('\n\n');
+        const out=keys.map(k=>{ let t=String(src[k].text).trim(); if(t.length>500) t=t.slice(0,500)+'…'; return k+': '+t; });
+        try{
+          const bs=(typeof diaBooks==='object'&&diaBooks&&diaBooks.books)||[];
+          if(bs.length) out.push('ЗОШИТИ (окремі теми; читати/писати — інструмент diary): '+bs.map(b=>{
+            const arr=(diaBooks.entries[b.id]||[]);
+            return b.emoji+' '+b.name+' ('+arr.length+')';
+          }).join('; '));
+        }catch(_){}
+        if(!out.length) return 'щоденник порожній';
+        return out.join('\n\n');
       }catch(_){ return 'щоденник недоступний'; }
     }
     if(inp.what==='vision'){
@@ -614,9 +624,43 @@
     }
     return '⚠️ невідомий what';
   }
+  // час нагадування: 'HH:MM' у день ds; порожньо — початок блоку bl
+  function aiRemindWhen(remind,ds,bl){
+    const m=String(remind||'').match(/^(\d{1,2}):(\d{2})$/);
+    const p=String(ds).split('-').map(Number);
+    if(m) return new Date(p[0],p[1]-1,p[2],+m[1],+m[2]);
+    if(bl&&bl.h!=null){ const h=Math.floor(bl.h); return new Date(p[0],p[1]-1,p[2],h,Math.round((bl.h-h)*60)); }
+    return null;
+  }
   async function flowToolPlanner(inp){
     const arr=Array.isArray(inp.blocks)?inp.blocks:[];
     if(!arr.length) return '⚠️ порожній blocks';
+    if(inp.action==='remind'){
+      const jobs=[];
+      for(const b of arr){
+        const ds=/^\d{4}-\d{2}-\d{2}$/.test(b.ds||'')?b.ds:plTodayStr();
+        const frag=String(b.t||'').toLowerCase().trim();
+        const bl=(plBlocksFor(ds)||[]).find(x=>frag&&String(x.t||'').toLowerCase().includes(frag));
+        if(!bl) return '⚠️ блок «'+(b.t||'')+'» за '+ds+' не знайдено. День: '+flowToolRead({what:'day',ds:ds});
+        const off=String(b.remind||'').toLowerCase()==='off';
+        const dt=off?null:aiRemindWhen(b.remind,ds,bl);
+        if(!off&&!dt) return '⚠️ не зрозумів час «'+(b.remind||'')+'» — формат HH:MM';
+        jobs.push({bl,ds,off,dt});
+      }
+      const sub=jobs.map(j=>j.off?'зняти нагадування з «'+j.bl.t+'»':'«'+j.bl.t+'» — '+remindLabel(j.dt.toISOString())).join('; ');
+      const ok=await aiToolConfirm(sub,{title:'⏰ Frequency хоче нагадування'});
+      if(!ok) return 'людина скасувала — не повторюй';
+      jobs.forEach(j=>{
+        if(j.off){ delete j.bl.remindAt; delete j.bl.remindFired; return; }
+        j.bl.remindAt=j.dt.toISOString(); delete j.bl.remindFired;
+        try{ plScheduleReminder(j.bl); }catch(_){}
+      });
+      saveGoals();
+      try{ plRerender(); }catch(_){}
+      try{ plToast('🤖 ⏰ '+(jobs.length===1?(jobs[0].off?'нагадування знято':'нагадаю '+remindLabel(jobs[0].bl.remindAt)):jobs.length+' нагадувань')); }catch(_){}
+      return jobs.map(j=>j.off?'нагадування для «'+j.bl.t+'» знято':'нагадаю про «'+j.bl.t+'» '+remindLabel(j.bl.remindAt)).join('\n')
+        +'\n(спрацює, коли апка відкрита або через сповіщення; далеке — при наступному відкритті)';
+    }
     const pr={text:'',mem:[],blocks:[],move:[],done:[],del:[],steps:[],folders:[],pages:[]};
     if(inp.action==='create')      pr.blocks=arr;
     else if(inp.action==='move')   pr.move=arr;
@@ -635,6 +679,19 @@
     let msg='виконано '+okN+' із '+before;
     if(okN<before) msg+='; не знайдено/конфлікт: перевір назви (t — фрагмент наявного блоку) і чи вільний час';
     if(inp.action==='create'){
+      // нагадування на щойно створені блоки (поле remind)
+      let remN=0;
+      arr.forEach(b=>{
+        if(!b.remind||String(b.remind).toLowerCase()==='off') return;
+        const ds=/^\d{4}-\d{2}-\d{2}$/.test(b.ds||'')?b.ds:plTodayStr();
+        const bl=(plBlocksFor(ds)||[]).find(x=>String(x.t||'')===String(b.t||''));
+        const dt=bl&&aiRemindWhen(b.remind,ds,bl);
+        if(!dt) return;
+        bl.remindAt=dt.toISOString(); delete bl.remindFired;
+        try{ plScheduleReminder(bl); }catch(_){}
+        remN++; msg+='\n⏰ нагадаю про «'+bl.t+'» '+remindLabel(bl.remindAt);
+      });
+      if(remN){ saveGoals(); try{ plRerender(); }catch(_){} }
       const ds=(arr[0]&&arr[0].ds)||plTodayStr();
       msg+='\nдень '+ds+' тепер: '+flowToolRead({what:'day',ds:ds});
     }
@@ -846,6 +903,56 @@
     }
     return '⚠️ невідома дія';
   }
+  async function flowToolDiary(inp){
+    const a=inp.action;
+    if(a==='book_list'){
+      try{
+        const bs=(diaBooks&&diaBooks.books)||[];
+        if(!bs.length) return 'зошитів немає — людина може створити їх у Щоденник → Зошити';
+        return bs.map(b=>{
+          const arr=(diaBooks.entries[b.id]||[]).slice().sort((x,y)=>y.ts-x.ts);
+          const last=arr[0]?new Date(arr[0].ts).toISOString().slice(0,10)+': '+(String(arr[0].text||'').trim()||'🎙 аудіо').slice(0,80):'порожньо';
+          return b.emoji+' '+b.name+' ('+arr.length+') · останній — '+last;
+        }).join('\n');
+      }catch(e){ return '⚠️ '+String(e.message||e); }
+    }
+    const text=String(inp.text||'').trim().slice(0,2000);
+    if(!text) return '⚠️ дай text — текст запису';
+    if(a==='add_entry'){
+      const ds=/^\d{4}-\d{2}-\d{2}$/.test(inp.ds||'')?inp.ds:plTodayStr();
+      const ok=await aiToolConfirm('Запис за '+ds+': '+text.slice(0,140),{title:'📓 Frequency хоче записати в Щоденник'});
+      if(!ok) return 'людина скасувала — не повторюй';
+      try{
+        const e=diaryEntries[ds]||{text:'',ts:Date.now()};
+        const had=!!(e.text&&e.text.trim());
+        e.text=had?(e.text.replace(/\s+$/,'')+'\n\n'+text):text;
+        e.ts=Date.now(); diaryEntries[ds]=e; saveDiaryEntries();
+        try{ if(diaInsights.mood&&diaInsights.mood[ds]){ delete diaInsights.mood[ds]; saveDiaInsights(); } }catch(_){}
+        try{ renderDiary(); }catch(_){}
+        try{ plToast('🤖 запис у щоденник за '+ds); }catch(_){}
+        return 'запис за '+ds+' додано'+(had?' (дописано до наявного тексту дня)':'');
+      }catch(e){ return '⚠️ '+String(e.message||e); }
+    }
+    if(a==='book_entry'){
+      const frag=String(inp.book||'').toLowerCase().trim();
+      if(!frag) return '⚠️ вкажи book — назву зошита';
+      try{
+        const cand=((diaBooks&&diaBooks.books)||[]).filter(b=>String(b.name||'').toLowerCase().includes(frag));
+        if(!cand.length) return '⚠️ зошит не знайдено. '+await flowToolDiary({action:'book_list'});
+        if(cand.length>1) return '⚠️ під «'+frag+'» підпадає кілька зошитів: '+cand.map(b=>b.name).join('; ')+' — уточни назву';
+        const b=cand[0];
+        const ok=await aiToolConfirm('У зошит «'+b.emoji+' '+b.name+'»: '+text.slice(0,140),{title:'📓 Frequency хоче записати в Щоденник'});
+        if(!ok) return 'людина скасувала — не повторюй';
+        (diaBooks.entries[b.id]=diaBooks.entries[b.id]||[]).push({id:'e'+Date.now(),text:text,ts:Date.now()});
+        saveDiaBooks();
+        try{ renderDiaBooks(); }catch(_){}
+        try{ if(typeof renderDiary==='function') renderDiary(); }catch(_){}
+        try{ plToast('🤖 запис у «'+b.name+'»'); }catch(_){}
+        return 'запис додано в зошит «'+b.name+'» — видно і в зошиті, і в дні щоденника';
+      }catch(e){ return '⚠️ '+String(e.message||e); }
+    }
+    return '⚠️ невідома дія';
+  }
   async function flowToolPatterns(inp){
     if(inp.action==='list'){
       if(!patTrans.length) return 'активних циклів заміни немає';
@@ -937,55 +1044,11 @@
     }
     return '⚠️ невідома дія';
   }
-  async function flowToolAgency(inp){
-    if(typeof agClients!=='function') return '⚠️ агенція недоступна';
-    const a=inp.action;
-    if(a==='list'){
-      const cs=agClients();
-      if(!cs.length) return 'клієнтів немає';
-      return cs.map(c=>c.name+' · '+(c.stage||'')+' · '+(c.service||'—')+' · борг '+agClientOwe(c)+'€ · '+agClientNext(c)).join('\n');
-    }
-    const findClient=frag=>{
-      frag=String(frag||'').toLowerCase().trim();
-      if(!frag) return null;
-      return agClients().find(c=>String(c.name||'').toLowerCase().includes(frag));
-    };
-    if(a==='add_client'){
-      const nm=String(inp.name||'').trim(); if(!nm) return '⚠️ потрібне name';
-      const service=AG_SERVICES.includes(inp.service)?inp.service:'';
-      const stage=AG_STAGES.includes(inp.stage)?inp.stage:'Заявка';
-      const ok=await aiToolConfirm('Новий клієнт «'+nm+'»'+(service?' · '+service:'')+' · '+stage,{title:'🧑\u200d💼 Frequency хоче додати клієнта'});
-      if(!ok) return 'людина скасувала — не повторюй';
-      agCreateClient(nm,service,stage);
-      return 'клієнта «'+nm+'» додано, стадія '+stage;
-    }
-    if(a==='set_stage'){
-      const c=findClient(inp.client); if(!c) return '⚠️ клієнта не знайдено: '+inp.client;
-      const stage=AG_STAGES.includes(inp.stage)?inp.stage:null; if(!stage) return '⚠️ невідома стадія. Доступні: '+AG_STAGES.join(', ');
-      const ok=await aiToolConfirm('«'+c.name+'»: '+c.stage+' → '+stage,{title:'🧑\u200d💼 Frequency хоче змінити стадію клієнта'});
-      if(!ok) return 'людина скасувала — не повторюй';
-      c.stage=stage; saveBoard(); try{ renderAgOps(); }catch(_){} try{ renderClient(); }catch(_){}
-      return '«'+c.name+'» тепер на стадії '+stage;
-    }
-    if(a==='add_payment'){
-      const c=findClient(inp.client); if(!c) return '⚠️ клієнта не знайдено: '+inp.client;
-      const amt=Math.round((+inp.amount||0)*100)/100; if(!(amt>0)) return '⚠️ сума має бути > 0';
-      const label=String(inp.label||((c.payments||[]).length===0?'Аванс':'Доплата')).slice(0,40);
-      const ok=await aiToolConfirm('Платіж від «'+c.name+'»: '+amt+'€ · '+label,{title:'💶 Frequency хоче записати платіж клієнта'});
-      if(!ok) return 'людина скасувала — не повторюй';
-      const pay={id:'p'+Date.now()+Math.random().toString(36).slice(2,4), amount:amt, label:label, date:ymdLocal()};
-      (c.payments=c.payments||[]).push(pay);
-      try{ agApplyPaymentEffects(c, pay); }catch(_){}
-      saveBoard(); try{saveFinOps();}catch(_){} try{renderFinance();}catch(_){} try{ renderClient(); }catch(_){}
-      return 'платіж '+amt+'€ від «'+c.name+'» записано, залишок боргу '+agClientOwe(c)+'€';
-    }
-    return '⚠️ невідома дія';
-  }
   function aiPickModel(q,hop){
     q=String(q||'');
     if(hop>=3) return 'claude-sonnet-4-6';
     if(q.length>220) return 'claude-sonnet-4-6';
-    if(/розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй|виправ|видали|видал|перейменуй/i.test(q)) return 'claude-sonnet-4-6';
+    if(/розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй|виправ|видали|видал|перейменуй|нагадай/i.test(q)) return 'claude-sonnet-4-6';
     return 'claude-haiku-4-5';
   }
 
@@ -1067,7 +1130,8 @@
     if(name==='get_data'||name==='memory') return false;
     if(/^dev_/.test(name)) return false;                    // dev-режим має власні підтвердження
     if(name==='finance') return a!=='debt_list';
-    if(name==='patterns'||name==='agency') return a!=='list';
+    if(name==='patterns') return a!=='list';
+    if(name==='diary') return a!=='book_list';
     return true;                                            // planner, goals, folders
   }
   const AI_WRITE_LIMIT=5;                                   // змін даних за одне повідомлення людини

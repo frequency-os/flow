@@ -184,7 +184,7 @@
   .tproj .pj-acts{margin-top:13px;}
   .tproj .pj-acts .pj-in{color:var(--hab);} .tproj .pj-acts .pj-out{color:var(--owe);} .tproj .pj-acts .pj-got{color:#fff;background:linear-gradient(135deg,var(--hab),#1f8f56);border-color:transparent;}
   .tproj .pj-acts .pj-env{flex:0 0 56px;font-size:15px;}
-  /* ===== ПРОЄКТНІ БЛОКИ (з макета «Агенція»): канбан, контакти, таймлайн, подія ===== */
+  /* ===== ПРОЄКТНІ БЛОКИ: канбан, контакти, таймлайн, подія ===== */
   .tkbw .kbw-wrap{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
   .tkbw .kbw-col{flex:0 0 138px;background:color-mix(in srgb,var(--text) 4%,transparent);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;}
   .tkbw .kbw-ch{display:flex;justify-content:space-between;align-items:center;font:800 10px Manrope;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;cursor:pointer;padding:2px 2px 4px;}

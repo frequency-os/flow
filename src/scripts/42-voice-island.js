@@ -34,7 +34,7 @@ try{
     try{ var P=G('FLOW_PETS'), c=Gf('petCur'); if(P&&c&&P[c()]&&P[c()].name) return P[c()].name; }catch(_){}
     return 'Спарк';
   }
-  function haptic(){ try{ var T=window.Telegram; T&&T.WebApp&&T.WebApp.HapticFeedback&&T.WebApp.HapticFeedback.impactOccurred('light'); }catch(_){ } try{ navigator.vibrate&&navigator.vibrate(25); }catch(_){}}
+  function haptic(){ try{ navigator.vibrate&&navigator.vibrate(25); }catch(_){}}
 
   /* ═══ Професійний голос Флоу: нейронний TTS через воркер (/tts, Edge-нейроголоси uk-UA),
      фолбек — системний. Перехоплюємо speechSynthesis.speak/cancel, тому працює для всіх

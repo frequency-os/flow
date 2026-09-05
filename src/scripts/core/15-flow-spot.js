@@ -11,7 +11,7 @@
     if(scr==='scr-planner') return {key:'plan',label:'📅 Планер'};
     if(scr==='scr-vision') return {key:'vision',label:'🧭 Візія'};
     if(scr==='scr-goals') return {key:'goals',label:'🎯 Цілі'};
-    if(scr==='scr-projects'||scr==='scr-agency'||scr==='scr-client') return {key:'projects',label:'🚀 Проєкти'};
+    if(scr==='scr-projects') return {key:'projects',label:'🚀 Проєкти'};
     return {key:'home',label:'🏠 Огляд'};
   }
   function spotChips(key){
@@ -20,7 +20,7 @@
     if(key==='plan') return ['Заповни мій день','Встав перерву 30 хв','Що встигну сьогодні?'];
     if(key==='vision') return ['Що просідає у моїй візії?','Додай у планер блок до Точки Б','Оціни мій фокус кварталу'];
     if(key==='goals') return ['Розбий ціль на кроки','Що головне цього тижня?'];
-    if(key==='projects') return ['Який проєкт зараз просідає?','Наступний крок по агенції','Розбий проєкт на кроки'];
+    if(key==='projects') return ['Який проєкт зараз просідає?','Наступний крок по проєкту','Розбий проєкт на кроки'];
     return ['Що зараз головне?','План на сьогодні','Додай блок у планер'];
   }
   function spotAddon(ctx){

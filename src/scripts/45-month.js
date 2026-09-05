@@ -302,7 +302,7 @@ try{
       '<div class="pl-sheet-grab"></div>'+
       '<div class="pl-sheet-h">'+(f?'Фокус місяця':'Новий фокус місяця')+'</div>'+
       '<label class="pl-sheet-l">Що головне цього місяця?</label>'+
-      '<input class="pl-sheet-in" id="mfName" placeholder="Напр. Запустити агенцію" value="'+escA(f?f.name:'')+'">'+
+      '<input class="pl-sheet-in" id="mfName" placeholder="Напр. Запустити проєкт" value="'+escA(f?f.name:'')+'">'+
       '<label class="pl-sheet-l">🔗 Ціль (звідки береться сенс)</label>'+
       '<select class="pl-sheet-in" id="mfGoal"><option value="">— без цілі —</option>'+
         goals.map(function(g){ var k=g.id||g.name;

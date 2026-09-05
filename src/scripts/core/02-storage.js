@@ -1,7 +1,7 @@
-  /* ============ STORAGE: Telegram CloudStorage + localStorage кеш + версіонування ============ */
+  /* ============ STORAGE: localStorage кеш + Capacitor Preferences + Supabase + версіонування ============ */
 
   /* ── Дочистка IndexedDB після «Скинути до заводських» ──
-     deleteDatabase не проходить, поки живі зʼєднання (PhotoDB/BookDB/DocDB
+     deleteDatabase не проходить, поки живі зʼєднання (PhotoDB/BookDB
      тримають свої постійно) — тому скидання лише ставить прапорець і
      перезапускає сторінку, а СПРАВЖНЄ видалення робимо тут: на самому
      старті, до того, як будь-хто встиг відкрити базу. Запити open,
@@ -19,17 +19,10 @@
   })();
 
   (function(){
-    const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-    /* Telegram більше не використовується (SDK прибрано 2026-08-29, лежить
-       в original/telegram/). window.Telegram тепер просто не існує, тому TG=null,
-       isRealTG=false, CS=null — уся гілка Telegram мертва й ніколи не виконується.
-       Перевірки лишені навмисно: вони нічого не коштують, а якщо колись
-       знадобиться повернути Telegram — досить повернути тег SDK у каркас. */
-    const isRealTG = !!(TG && TG.initData && TG.initData.length > 0 && TG.platform && TG.platform !== 'unknown');
-    const CS = (isRealTG && TG.CloudStorage) ? TG.CloudStorage : null;
+    /* Telegram CloudStorage вирізано 04.09.2026: хмара тепер — Supabase (нижче),
+       локальний кеш — localStorage, на native — ще й Capacitor Preferences. */
     const LP = 'flowapp_';
-    const cloudTimers = {};
-    window.__flowSync = { state:'idle', last:0, pending:0, cloud: !!CS, warmed:false };
+    window.__flowSync = { state:'idle', last:0, pending:0, cloud:false, warmed:false };
 
     function setSync(state){ window.__flowSync.state=state; try{ document.dispatchEvent(new CustomEvent('flowsync',{detail:window.__flowSync})); }catch(_){} }
     try{ window.__setSync = setSync; }catch(_){}
@@ -176,7 +169,7 @@
          запис  → localStorage негайно + Preferences з дебаунсом
          старт  → якщо localStorage порожній/старіший, піднімаємо з Preferences
        Значення зберігаються вже обгорнутими (_v), тож порівняння версій
-       працює так само, як із хмарою Telegram. */
+       працює так само, як із хмарою. */
     const NP = (function(){
       try{
         const C = window.Capacitor;
@@ -240,7 +233,7 @@
       }catch(_){}
       return { restored, checked };
     }
-    /* Перший запуск native після Telegram-версії: усе, що вже лежить у
+    /* Перший запуск native після веб-версії: усе, що вже лежить у
        localStorage, треба один раз перелити в Preferences, інакше перша ж
        чистка кешу з'їсть дані, які ніколи там не були. */
     async function npSeed(){
@@ -260,92 +253,11 @@
       }catch(_){}
       return seeded;
     }
-    function byteLen(s){ try{ return new Blob([s]).size; }catch(_){ return (s||'').length; } }
-
-    // --- стиснення: безпечні обгортки навколо LZString (якщо раптом нема — повертаємо як є) ---
-    const LZ = (typeof LZString!=='undefined') ? LZString : null;
-    function compress(str){ try{ return LZ ? LZ.compressToUTF16(str) : str; }catch(_){ return str; } }
-    function decompress(str){ try{ return LZ ? (LZ.decompressFromUTF16(str)||str) : str; }catch(_){ return str; } }
-
-    // межа одного значення в Telegram CloudStorage (з запасом від 4096)
-    const CHUNK_LIMIT = 3800;
-    const CHUNK_TAG = 'LZCHUNK:'; // маркер у головному ключі: "LZCHUNK:<n>:<stamp>"
-
-    // низькорівневі сирі операції з одним ключем
-    function cloudGet(key){
-      return new Promise(res=>{
-        if(!CS) return res(null);
-        let done=false; const finish=v=>{ if(!done){done=true;res(v);} };
-        const to=setTimeout(()=>finish(null),4000);
-        try{ CS.getItem(key,(err,val)=>{ clearTimeout(to); finish(err?null:(val||null)); }); }catch(_){ clearTimeout(to); finish(null); }
-      });
-    }
-    function cloudSet(key,raw){
-      return new Promise(res=>{
-        if(!CS) return res(false);
-        let done=false; const finish=v=>{ if(!done){done=true;res(v);} };
-        const to=setTimeout(()=>finish(false),5000);
-        try{ CS.setItem(key,raw,(err,ok)=>{ clearTimeout(to); finish(!err&&ok); }); }catch(_){ clearTimeout(to); finish(false); }
-      });
-    }
-    function cloudRemove(key){ return new Promise(res=>{ if(!CS) return res(false); try{ CS.removeItem(key,()=>res(true)); }catch(_){ res(false); } }); }
-
-    // РОЗУМНИЙ запис: стиснути → влізло в один ключ? якщо ні — порізати на чанки
-    async function cloudSetSmart(key, raw){
-      const packed = compress(raw);
-      // прибираємо можливі старі чанки від попереднього збереження (щоб не лишалось сміття)
-      const prevMain = await cloudGet(key);
-      if(prevMain && prevMain.indexOf(CHUNK_TAG)===0){
-        const n = parseInt(prevMain.slice(CHUNK_TAG.length).split(':')[0],10)||0;
-        for(let i=1;i<=n;i++) await cloudRemove(key+'__c'+i);
-      }
-      if(byteLen(packed) <= CHUNK_LIMIT){
-        // вліз одним шматком
-        return await cloudSet(key, packed);
-      }
-      // не вліз — ріжемо стиснутий рядок на частини
-      const parts = [];
-      for(let i=0;i<packed.length;i+=CHUNK_LIMIT) parts.push(packed.slice(i,i+CHUNK_LIMIT));
-      let allOk = true;
-      for(let i=0;i<parts.length;i++){ const ok = await cloudSet(key+'__c'+(i+1), parts[i]); if(!ok) allOk=false; }
-      // у головний ключ кладемо маркер скільки частин
-      const markOk = await cloudSet(key, CHUNK_TAG+parts.length+':'+Date.now());
-      return allOk && markOk;
-    }
-
-    // РОЗУМНЕ читання: зібрати чанки якщо треба → розпакувати
-    async function cloudGetSmart(key){
-      const main = await cloudGet(key);
-      if(main==null) return null;
-      if(main.indexOf(CHUNK_TAG)===0){
-        const n = parseInt(main.slice(CHUNK_TAG.length).split(':')[0],10)||0;
-        let packed='';
-        for(let i=1;i<=n;i++){ const part = await cloudGet(key+'__c'+i); if(part==null) return null; packed+=part; }
-        return decompress(packed);
-      }
-      return decompress(main);
-    }
-
-    function scheduleCloud(key,raw){
-      if(!CS) return;
-      // ліміту 4КБ більше не боїмося: великі дані підуть чанками. прапорець tooBig прибираємо.
-      if(window.__flowSync.tooBig){ delete window.__flowSync.tooBig[key]; }
-      window.__flowSync.pending++;
-      clearTimeout(cloudTimers[key]);
-      cloudTimers[key]=setTimeout(async ()=>{
-        setSync('syncing');
-        const ok=await cloudSetSmart(key,raw);
-        window.__flowSync.pending=Math.max(0,window.__flowSync.pending-1);
-        window.__flowSync.last=Date.now();
-        setSync(ok?'synced':'error');
-      }, 700);
-    }
-
     window.storage = {
       /* Native-довговічність. nativeBoot() треба викликати ОДИН раз на старті,
          до першого рендеру: спершу піднімає дані з Preferences (якщо система
          вичистила localStorage), потім одноразово засіває Preferences тим, що
-         вже було локально (перехід з Telegram-версії). */
+         вже було локально (перехід з веб-версії). */
       async nativeBoot(){
         const h = await npHydrate();
         const s = await npSeed();
@@ -359,8 +271,8 @@
         const m = migrateParsed(key, parsed);
         const cleanStr = JSON.stringify(m.data);
         if(m.changed){
-          // тихо перезберігаємо вже у новій версії (і локально, і в хмару)
-          try{ const stamped = stampSv(key, cleanStr); const raw = wrap(stamped); lcSet(key, raw); scheduleCloud(key, raw); }catch(_){}
+          // тихо перезберігаємо вже у новій версії (локально; Supabase-обгортка нижче підхопить)
+          try{ const stamped = stampSv(key, cleanStr); const raw = wrap(stamped); lcSet(key, raw); }catch(_){}
         }
         return cleanStr; // модулю — чисті дані без __sv
       },
@@ -371,12 +283,6 @@
       async get(key){
         const localRaw = lcGet(key);
         const local = unwrap(localRaw);
-        if(CS && (!window.__flowSync.warmed || !local)){
-          const cRaw = await cloudGetSmart(key);   // ← розпаковує + збирає чанки
-          const cloud = unwrap(cRaw);
-          if(cloud && (!local || cloud.v > local.v)){ lcSet(key, cRaw); return { key, value: this._out(key, unstampSv(cloud.value)), shared:false }; }
-          if(local && cloud && local.v > cloud.v){ scheduleCloud(key, localRaw); }
-        }
         if(local) return { key, value: this._out(key, unstampSv(local.value)), shared:false };
         throw new Error('not found');
       },
@@ -384,22 +290,10 @@
         const stamped = stampSv(key, value);     // позначити версією схеми (якщо ключ версіонований)
         const raw = wrap(stamped);
         const okLocal = lcSet(key, raw);
-        scheduleCloud(key, raw);                  // хмара (chunked) — страховка навіть якщо локально не влізло
         return { key, value, shared:false, _local:okLocal };
       },
       async delete(key){
         lcDel(key);
-        if(CS){
-          try{
-            // якщо це були чанковані дані — приберемо й частини
-            const main = await cloudGet(key);
-            if(main && main.indexOf(CHUNK_TAG)===0){
-              const n = parseInt(main.slice(CHUNK_TAG.length).split(':')[0],10)||0;
-              for(let i=1;i<=n;i++) await cloudRemove(key+'__c'+i);
-            }
-            CS.removeItem(key,()=>{});
-          }catch(_){}
-        }
         return { key, deleted:true, shared:false };
       },
       async list(prefix){
@@ -408,83 +302,15 @@
         try{ keys = Object.keys(localStorage).filter(k=>k.startsWith(p)).map(k=>k.slice(LP.length)); }catch(_){}
         return { keys, prefix, shared:false };
       },
-      async pullAll(keys){
-        if(!CS) return false;
-        setSync('syncing');
-        // той самий принцип, що й для Supabase: один пакетний запит (CS.getItems)
-        // замість CS.getItem по одному на кожен ключ — поштучно лишаємо тільки
-        // чанковані (великі) записи, їх getItems все одно не збере.
-        let toFetchOneByOne = keys;
-        if(typeof CS.getItems==='function'){
-          const got = await new Promise(res=>{
-            let done=false; const finish=v=>{ if(!done){done=true;res(v);} };
-            const to=setTimeout(()=>finish(null),5000);
-            try{ CS.getItems(keys,(err,vals)=>{ clearTimeout(to); finish(err?null:vals); }); }
-            catch(_){ clearTimeout(to); finish(null); }
-          });
-          if(got){
-            toFetchOneByOne=[];
-            keys.forEach(k=>{
-              let cRaw=got[k]; if(!cRaw) return;
-              if(cRaw.indexOf(CHUNK_TAG)===0){ toFetchOneByOne.push(k); return; }
-              cRaw=decompress(cRaw);
-              const c=unwrap(cRaw), l=unwrap(lcGet(k)); if(!l||c.v>=l.v) lcSet(k,cRaw);
-            });
-          }
-        }
-        for(const k of toFetchOneByOne){ const cRaw=await cloudGetSmart(k); if(cRaw!=null){ const c=unwrap(cRaw),l=unwrap(lcGet(k)); if(!l||c.v>=l.v) lcSet(k,cRaw); } }
-        window.__flowSync.last=Date.now(); setSync('synced'); return true;
-      },
-      async prefetchAll(keys){
-        if(!CS) return false;
-        return new Promise(res=>{
-          let done=false; const finish=v=>{ if(!done){done=true;res(v);} };
-          const to=setTimeout(()=>finish(false),5000);
-          try{
-            if(typeof CS.getItems==='function'){
-              CS.getItems(keys,(err,vals)=>{ clearTimeout(to);
-                if(!err&&vals){ keys.forEach(k=>{ let cRaw=vals[k]; if(cRaw){
-                  // чанковані дані тут не зібрати — лишаємо, їх дотягне get() поштучно
-                  if(cRaw.indexOf(CHUNK_TAG)===0) return;
-                  cRaw = decompress(cRaw);
-                  const c=unwrap(cRaw),l=unwrap(lcGet(k)); if(!l||c.v>=l.v) lcSet(k,cRaw);
-                } }); }
-                finish(true);
-              });
-            } else { clearTimeout(to); finish(false); }
-          }catch(_){ clearTimeout(to); finish(false); }
-        }).then(r=>{ if(r) window.__flowSync.warmed=true; return r; });
-      },
-      // ДІАГНОСТИКА: наочна картина того, як дані лягають у хмару
-      async diagnose(keys){
-        const out = { lzAlive: !!LZ, cloud: !!CS, items: [], totalLocal: 0, totalPacked: 0, chunkedCount: 0 };
-        for(const k of keys){
-          const localRaw = lcGet(k);
-          if(localRaw==null){ continue; } // ключа взагалі немає — пропускаємо
-          const localBytes = byteLen(localRaw);
-          const packed = compress(localRaw);
-          const packedBytes = byteLen(packed);
-          const willChunk = packedBytes > CHUNK_LIMIT;
-          let cloudState = '—';
-          if(CS){
-            const main = await cloudGet(k);
-            if(main==null) cloudState = 'немає в хмарі';
-            else if(main.indexOf(CHUNK_TAG)===0){ const n=parseInt(main.slice(CHUNK_TAG.length).split(':')[0],10)||0; cloudState = n+' чанк.'; }
-            else cloudState = 'цілий';
-          }
-          out.items.push({ key:k, localBytes, packedBytes, ratio: localBytes? (localBytes/Math.max(1,packedBytes)) : 1, willChunk, cloudState, sv: (SCHEMAS[k]||0) });
-          out.totalLocal += localBytes; out.totalPacked += packedBytes; if(willChunk) out.chunkedCount++;
-        }
-        out.items.sort((a,b)=>b.localBytes-a.localBytes); // найбільші зверху
-        return out;
-      }
+      // pullAll/prefetchAll лишились від старої хмари: для Supabase є sbPrefetchAll і sbPullFresh
+      async pullAll(){ return false; },
+      async prefetchAll(){ return false; },
     };
   })();
 
   /* ============ WEB AUTH: Supabase (Google OAuth) ============
-     Активується ЛИШЕ поза Telegram і поза native (Capacitor) — тобто
-     тільки коли Frequency відкритий як звичайний сайт. Не чіпає жодну
-     існуючу логіку Telegram CloudStorage чи iOS Preferences: якщо
+     Активується ЛИШЕ поза native (Capacitor) — тобто коли Frequency
+     відкритий як звичайний сайт. Не чіпає логіку iOS Preferences: якщо
      Google-сесії немає, window.storage.get/set/delete/list просто
      викликають старий код як і раніше. ============ */
   (function(){
@@ -539,7 +365,7 @@
         if(sbUserCache){
           // старий індикатор міг застрягнути на "Помилка синхрону" ще з часів, коли
           // ключ переповнив localStorage (це позначалось назавжди, бо код очищення
-          // статусу раніше існував лише для Telegram CloudStorage) — тепер, коли
+          // статусу раніше існував лише для старої хмари) — тепер, коли
           // знаємо, що Google-сесія жива, одразу показуємо коректний стан
           try{ if(window.__setSync){ window.__flowSync.quota=false; window.__setSync('synced'); } }catch(_){}
           const refetch=async ()=>{ try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
@@ -683,13 +509,9 @@
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
     };
 
-    // ініціалізуємо тільки в чистому web-режимі (не Telegram, не native)
-    // Telegram прибрано — isRealTG тепер завжди false, тож sbInit() викликається
-    // у web-режимі завжди (крім native, де свій шлях входу через frequency://auth).
+    // ініціалізуємо тільки в web-режимі (native має свій шлях входу через frequency://auth)
     try{
-      const TG = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-      const isRealTG = !!(TG && TG.initData && TG.initData.length > 0 && TG.platform && TG.platform !== 'unknown');
-      if(!window.FLOW_NATIVE && !isRealTG) sbInit();
+      if(!window.FLOW_NATIVE) sbInit();
       else window.__sbReady = true; // тут Google взагалі не задіяний — нема на що чекати
     }catch(_){ window.__sbReady = true; }
 
@@ -1198,8 +1020,8 @@
      папку) переписувала всі фото разом з нею. localStorage має жорсткий ліміт
      у кілька мегабайтів — саме туди впирався банер «памʼять заповнена».
 
-     Тут той самий підхід, що вже працює для книжок (BookDB) і документів
-     (DocDB): важке лежить в IndexedDB, у конфігу — лише посилання виду
+     Тут той самий підхід, що вже працює для книжок (BookDB):
+     важке лежить в IndexedDB, у конфігу — лише посилання виду
      `idb:ph_<id>`. Старі записи з `data:` читаються як раніше й переїжджають
      самі при першому збереженні. ============================================ */
   window.PhotoDB = (function(){

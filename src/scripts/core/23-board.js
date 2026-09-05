@@ -328,7 +328,7 @@
   };
   // which block types are "widgets" (shown under separate Widgets icon)
   const WIDGET_TYPES=['fin','envelope','project','progress','calendar','countdown','wpult','wstack','wpipe','wtline','wportal','wplanday','wplanmonth','wfocus','heatmap','kpi'];
-  // проєктні блоки — окрема вкладка «Проєкти» у шторці «＋» (з макета «Агенція»)
+  // проєктні блоки — окрема вкладка «Проєкти» у шторці «＋»
   const PROJECT_BLOCKS=['project','festival','kanban','contacts','caseline','wpult','wstack','wpipe','wtline'];
   const PROJECT_ONLY=['kanban','contacts','caseline','festival']; // не показувати серед простих блоків
 
@@ -521,7 +521,6 @@
         const base=String(bk).split('__sp_')[0];
         const f=folders&&folders[base];
         if(base!=='all' && !f) return;                    // осиротілі дошки видалених папок
-        try{ if(f&&f.secret&&!vaultOpen) return; }catch(_){} // прихований vault не світимо
         const fname=(f&&f.name)||(base==='all'?'Простір':base);
         const femo=(f&&f.emoji)||'📁';
         const all=[]; collectBlocks(boards[bk]||[],[],all);
