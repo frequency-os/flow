@@ -1,3 +1,11 @@
+  /* шпаргалка клавіатурних скорочень (?) */
+  .ks-ov{position:fixed;inset:0;z-index:340;background:rgba(8,10,16,.75);display:none;place-items:center;padding:20px;}
+  .ks-ov.show{display:grid;animation:fadeIn .16s ease;}
+  .ks-in{width:100%;max-width:340px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;}
+  .ks-h{font-size:14px;font-weight:800;margin-bottom:10px;}
+  .ks-row{display:flex;align-items:center;gap:12px;padding:6px 0;font-size:13px;color:var(--muted);}
+  .ks-row kbd{flex:0 0 auto;min-width:34px;text-align:center;background:var(--bg-2);border:1px solid var(--line);
+    border-radius:7px;padding:3px 8px;font:700 12px Manrope,monospace;color:var(--text);}
   /* заголовок групи в глобальному пошуку (⌘K) */
   .gs-lbl{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
     margin:10px 2px 2px;}

@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 54 |
-| Рядків JS | 26016 |
+| Файлів JS | 55 |
+| Рядків JS | 26070 |
 | Файлів CSS | 28 |
-| Рядків CSS | 8718 |
-| Сутностей верхнього рівня | 1559 |
+| Рядків CSS | 8726 |
+| Сутностей верхнього рівня | 1564 |
 | Ключів сховища (FLOW_KEYS) | 44 |
 
 ## Файли JS
@@ -68,6 +68,7 @@
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 143 | 13 |
 | `src/scripts/core/33-home-widgets.js` | 84 | 8 |
+| `src/scripts/core/34-shortcuts.js` | 54 | 5 |
 | `src/scripts/page-editor/01-palette.js` | 204 | 18 |
 | `src/scripts/page-editor/02-block-styles.js` | 924 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 590 | 27 |
@@ -107,7 +108,7 @@
 | `src/styles/core/10-reader-blocks.css` | 529 | 4 |
 | `src/styles/core/11-spaces-desktop.css` | 336 | 5 |
 | `src/styles/core/12-pets-more-planner.css` | 1189 | 0 |
-| `src/styles/core/13-search-capture.css` | 72 | 0 |
+| `src/styles/core/13-search-capture.css` | 80 | 0 |
 | `src/styles/core/15-vision.css` | 172 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
@@ -1691,6 +1692,16 @@
 | `cardHTML` | функція | `src/scripts/core/33-home-widgets.js:30` |
 | `render` | функція | `src/scripts/core/33-home-widgets.js:32` |
 | `window.renderHomeWidgets` | значення | `src/scripts/core/33-home-widgets.js:68` |
+
+### `src/scripts/core/34-shortcuts.js` — 5 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `MAP` | обʼєкт | `src/scripts/core/34-shortcuts.js:6` |
+| `typing` | функція | `src/scripts/core/34-shortcuts.js:14` |
+| `ks` | значення | `src/scripts/core/34-shortcuts.js:19` |
+| `sheetHTML` | функція | `src/scripts/core/34-shortcuts.js:20` |
+| `sheetToggle` | функція | `src/scripts/core/34-shortcuts.js:32` |
 
 ### `src/scripts/page-editor/01-palette.js` — 18 сутностей
 
