@@ -334,3 +334,34 @@
   /* перемикач лейауту Простору — кнопка в шапці, тільки десктоп */
   .space-layout-toggle{display:none;}
   @media (min-width:1024px){ .space-layout-toggle{display:inline-flex;} }
+
+  /* ── «мертва зона» 760–1023 (аудит З4): іконковий сайдбар без підписів ──
+     Планшет в альбомі, вікно впівекрана, ноут із бічною панеллю: замість
+     вузького мобільного стовпчика з пустками — компактний сайдбар 68px
+     і контент на всю решту ширини. Десктоп ≥1024 і мобільний <760 не чіпаються. */
+  @media (min-width:760px) and (max-width:1023.98px){
+    .dsb{display:flex;flex-direction:column;align-items:center;position:fixed;left:0;top:0;bottom:0;width:68px;z-index:50;
+      background:var(--bg-2);border-right:1px solid var(--line);padding:14px 10px;}
+    .dsb-brand{padding:4px 0 14px;}
+    .dsb-nm{display:none;}
+    .dsb-logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#6a7dff,#a06bff);
+      display:grid;place-items:center;box-shadow:0 4px 16px rgba(106,125,255,.4);}
+    .dsb-collapse{display:none;}
+    .dsb-nav{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;width:100%;align-items:center;overflow-y:auto;min-height:0;}
+    .dsb-i{display:grid;place-items:center;width:44px;height:44px;padding:0;border-radius:12px;color:var(--muted);
+      background:none;border:none;cursor:pointer;transition:.15s;}
+    .dsb-i svg{width:21px;height:21px;}
+    .dsb-i span{display:none;}
+    .dsb-i.on{background:linear-gradient(135deg,rgba(106,125,255,.22),rgba(160,107,255,.12));color:var(--nav-ink-on,#fff);}
+    .dsb-i:not(.on):hover{background:var(--hair);color:var(--text);}
+    .dsb-foot{margin-top:auto;padding:10px 0 4px;border-top:1px solid var(--line);width:100%;display:flex;justify-content:center;cursor:pointer;}
+    .dsb-fnm{display:none;}
+    .dsb-gear{display:none;}
+    .dsb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e8843c,#ff6b9d);flex-shrink:0;}
+    #sidebarReveal{display:none;}
+    .phone{max-width:none;margin:0 0 0 68px;padding:26px 34px calc(60px + env(safe-area-inset-bottom));}
+    .nav{display:none!important;}
+    #scr-home .grid{grid-template-columns:repeat(2,1fr);}
+    #scr-home #folderGrid.fv-grid{grid-template-columns:repeat(2,1fr);}
+    #flowCap{right:20px;bottom:20px;}
+  }
