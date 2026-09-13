@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 56 |
-| Рядків JS | 26642 |
+| Рядків JS | 26720 |
 | Файлів CSS | 29 |
-| Рядків CSS | 8933 |
-| Сутностей верхнього рівня | 1617 |
+| Рядків CSS | 8935 |
+| Сутностей верхнього рівня | 1622 |
 | Ключів сховища (FLOW_KEYS) | 44 |
 
 ## Файли JS
@@ -39,7 +39,7 @@
 | `src/scripts/core/02-storage.js` | 1130 | 102 |
 | `src/scripts/core/03-platform.js` | 60 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 243 | 45 |
-| `src/scripts/core/05-spaces.js` | 919 | 75 |
+| `src/scripts/core/05-spaces.js` | 920 | 75 |
 | `src/scripts/core/06-wishes.js` | 1191 | 92 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 935 | 99 |
@@ -57,11 +57,11 @@
 | `src/scripts/core/20-work.js` | 506 | 55 |
 | `src/scripts/core/21-patterns.js` | 191 | 21 |
 | `src/scripts/core/22-diary.js` | 525 | 54 |
-| `src/scripts/core/23-board.js` | 658 | 85 |
+| `src/scripts/core/23-board.js` | 663 | 86 |
 | `src/scripts/core/24-reminders.js` | 627 | 35 |
-| `src/scripts/core/25-reader.js` | 502 | 35 |
-| `src/scripts/core/26-blocks-render.js` | 1891 | 25 |
-| `src/scripts/core/27-canvas.js` | 1137 | 27 |
+| `src/scripts/core/25-reader.js` | 508 | 36 |
+| `src/scripts/core/26-blocks-render.js` | 1901 | 26 |
+| `src/scripts/core/27-canvas.js` | 1179 | 28 |
 | `src/scripts/core/28-vision.js` | 533 | 43 |
 | `src/scripts/core/29-more-screen.js` | 385 | 22 |
 | `src/scripts/core/30-upgrade.js` | 291 | 30 |
@@ -69,7 +69,7 @@
 | `src/scripts/core/32-global-search.js` | 143 | 13 |
 | `src/scripts/core/33-home-widgets.js` | 84 | 8 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
-| `src/scripts/core/35-channel.js` | 563 | 53 |
+| `src/scripts/core/35-channel.js` | 577 | 54 |
 | `src/scripts/page-editor/01-palette.js` | 204 | 18 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 590 | 27 |
@@ -113,7 +113,7 @@
 | `src/styles/core/15-vision.css` | 172 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
-| `src/styles/core/18-channel.css` | 176 | 0 |
+| `src/styles/core/18-channel.css` | 178 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (44)
 
@@ -1296,7 +1296,7 @@
 | `diaBookRec` | значення | `src/scripts/core/22-diary.js:484` |
 | `diaBookRecord` | функція | `src/scripts/core/22-diary.js:485` |
 
-### `src/scripts/core/23-board.js` — 85 сутностей
+### `src/scripts/core/23-board.js` — 86 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1371,20 +1371,21 @@
 | `jumpToBlock` | функція | `src/scripts/core/23-board.js:491` |
 | `window.flowSearchBoards` | функція | `src/scripts/core/23-board.js:517` |
 | `window.flowOpenBlock` | функція | `src/scripts/core/23-board.js:533` |
-| `openSearch` | функція | `src/scripts/core/23-board.js:540` |
-| `closeSearch` | функція | `src/scripts/core/23-board.js:548` |
-| `srchDelegate` | функція | `src/scripts/core/23-board.js:550` |
-| `undoSnapshot` | значення | `src/scripts/core/23-board.js:574` |
-| `snapshotForUndo` | функція | `src/scripts/core/23-board.js:575` |
-| `hideUndo` | функція | `src/scripts/core/23-board.js:585` |
-| `doUndo` | функція | `src/scripts/core/23-board.js:586` |
-| `INBOX_TITLE` | значення | `src/scripts/core/23-board.js:600` |
-| `ensureInboxFolder` | функція | `src/scripts/core/23-board.js:601` |
-| `openQuickCapture` | функція | `src/scripts/core/23-board.js:611` |
-| `closeQuickCapture` | функція | `src/scripts/core/23-board.js:617` |
-| `saveQuickCapture` | функція | `src/scripts/core/23-board.js:618` |
-| `window.flowQuickCapture` | значення | `src/scripts/core/23-board.js:646` |
-| `window.flowOpenInbox` | функція | `src/scripts/core/23-board.js:648` |
+| `openSearch` | функція | `src/scripts/core/23-board.js:543` |
+| `closeSearch` | функція | `src/scripts/core/23-board.js:551` |
+| `srchDelegate` | функція | `src/scripts/core/23-board.js:553` |
+| `undoSnapshot` | значення | `src/scripts/core/23-board.js:577` |
+| `snapshotForUndo` | функція | `src/scripts/core/23-board.js:578` |
+| `hideUndo` | функція | `src/scripts/core/23-board.js:588` |
+| `doUndo` | функція | `src/scripts/core/23-board.js:589` |
+| `INBOX_TITLE` | значення | `src/scripts/core/23-board.js:605` |
+| `INBOX_FKEY` | значення | `src/scripts/core/23-board.js:606` |
+| `ensureInboxFolder` | функція | `src/scripts/core/23-board.js:607` |
+| `openQuickCapture` | функція | `src/scripts/core/23-board.js:619` |
+| `closeQuickCapture` | функція | `src/scripts/core/23-board.js:625` |
+| `saveQuickCapture` | функція | `src/scripts/core/23-board.js:626` |
+| `window.flowQuickCapture` | значення | `src/scripts/core/23-board.js:654` |
+| `window.flowOpenInbox` | функція | `src/scripts/core/23-board.js:656` |
 
 ### `src/scripts/core/24-reminders.js` — 35 сутностей
 
@@ -1426,7 +1427,7 @@
 | `bentoTarget` | значення | `src/scripts/core/24-reminders.js:624` |
 | `BENTO_SEC_TYPES` | обʼєкт | `src/scripts/core/24-reminders.js:626` |
 
-### `src/scripts/core/25-reader.js` — 35 сутностей
+### `src/scripts/core/25-reader.js` — 36 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1439,34 +1440,35 @@
 | `saveRdrCfg` | функція | `src/scripts/core/25-reader.js:79` |
 | `applyRdrCfg` | функція | `src/scripts/core/25-reader.js:80` |
 | `rdrBook` | значення | `src/scripts/core/25-reader.js:97` |
-| `pdfPages` | масив | `src/scripts/core/25-reader.js:98` |
-| `rdrChapters` | масив | `src/scripts/core/25-reader.js:99` |
-| `rdrRestoreTo` | значення | `src/scripts/core/25-reader.js:100` |
-| `setRdrLoading` | функція | `src/scripts/core/25-reader.js:102` |
-| `openReader` | функція | `src/scripts/core/25-reader.js:108` |
-| `renderTextBook` | функція | `src/scripts/core/25-reader.js:142` |
-| `mdToHtml` | функція | `src/scripts/core/25-reader.js:161` |
-| `inlineMd` | функція | `src/scripts/core/25-reader.js:180` |
-| `renderEpub` | функція | `src/scripts/core/25-reader.js:189` |
-| `readZipText` | функція | `src/scripts/core/25-reader.js:229` |
-| `normalizeZipPath` | функція | `src/scripts/core/25-reader.js:230` |
-| `stripEpubHtml` | функція | `src/scripts/core/25-reader.js:231` |
-| `embedEpubImages` | функція | `src/scripts/core/25-reader.js:237` |
-| `renderPdf` | функція | `src/scripts/core/25-reader.js:255` |
-| `repaintPdfZoom` | функція | `src/scripts/core/25-reader.js:297` |
-| `buildToc` | функція | `src/scripts/core/25-reader.js:317` |
-| `scrollFraction` | функція | `src/scripts/core/25-reader.js:329` |
-| `restoreScroll` | функція | `src/scripts/core/25-reader.js:334` |
-| `rdrSaveTimer` | значення | `src/scripts/core/25-reader.js:340` |
-| `rdrTotalWords` | значення | `src/scripts/core/25-reader.js:341` |
-| `RDR_WPM` | значення | `src/scripts/core/25-reader.js:342` |
-| `updateRdrProgressUI` | функція | `src/scripts/core/25-reader.js:343` |
-| `initReader` | функція | `src/scripts/core/25-reader.js:382` |
-| `openBmSheet` | функція | `src/scripts/core/25-reader.js:449` |
-| `renderMarks` | функція | `src/scripts/core/25-reader.js:467` |
-| `addBookmark` | функція | `src/scripts/core/25-reader.js:487` |
+| `rdrFrom` | значення | `src/scripts/core/25-reader.js:98` |
+| `pdfPages` | масив | `src/scripts/core/25-reader.js:99` |
+| `rdrChapters` | масив | `src/scripts/core/25-reader.js:100` |
+| `rdrRestoreTo` | значення | `src/scripts/core/25-reader.js:101` |
+| `setRdrLoading` | функція | `src/scripts/core/25-reader.js:103` |
+| `openReader` | функція | `src/scripts/core/25-reader.js:109` |
+| `renderTextBook` | функція | `src/scripts/core/25-reader.js:145` |
+| `mdToHtml` | функція | `src/scripts/core/25-reader.js:164` |
+| `inlineMd` | функція | `src/scripts/core/25-reader.js:183` |
+| `renderEpub` | функція | `src/scripts/core/25-reader.js:192` |
+| `readZipText` | функція | `src/scripts/core/25-reader.js:232` |
+| `normalizeZipPath` | функція | `src/scripts/core/25-reader.js:233` |
+| `stripEpubHtml` | функція | `src/scripts/core/25-reader.js:234` |
+| `embedEpubImages` | функція | `src/scripts/core/25-reader.js:240` |
+| `renderPdf` | функція | `src/scripts/core/25-reader.js:258` |
+| `repaintPdfZoom` | функція | `src/scripts/core/25-reader.js:300` |
+| `buildToc` | функція | `src/scripts/core/25-reader.js:320` |
+| `scrollFraction` | функція | `src/scripts/core/25-reader.js:332` |
+| `restoreScroll` | функція | `src/scripts/core/25-reader.js:337` |
+| `rdrSaveTimer` | значення | `src/scripts/core/25-reader.js:343` |
+| `rdrTotalWords` | значення | `src/scripts/core/25-reader.js:344` |
+| `RDR_WPM` | значення | `src/scripts/core/25-reader.js:345` |
+| `updateRdrProgressUI` | функція | `src/scripts/core/25-reader.js:346` |
+| `initReader` | функція | `src/scripts/core/25-reader.js:385` |
+| `openBmSheet` | функція | `src/scripts/core/25-reader.js:455` |
+| `renderMarks` | функція | `src/scripts/core/25-reader.js:473` |
+| `addBookmark` | функція | `src/scripts/core/25-reader.js:493` |
 
-### `src/scripts/core/26-blocks-render.js` — 25 сутностей
+### `src/scripts/core/26-blocks-render.js` — 26 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1484,19 +1486,20 @@
 | `sdStats` | функція | `src/scripts/core/26-blocks-render.js:87` |
 | `spaceDashHTML` | функція | `src/scripts/core/26-blocks-render.js:105` |
 | `board` | значення | `src/scripts/core/26-blocks-render.js:143` |
-| `renderBoard` | функція | `src/scripts/core/26-blocks-render.js:175` |
-| `defaultSize` | функція | `src/scripts/core/26-blocks-render.js:281` |
-| `autoSize` | функція | `src/scripts/core/26-blocks-render.js:287` |
-| `szClass` | функція | `src/scripts/core/26-blocks-render.js:301` |
-| `headBar` | функція | `src/scripts/core/26-blocks-render.js:307` |
-| `BENTO_SKIP` | обʼєкт | `src/scripts/core/26-blocks-render.js:330` |
-| `renderTileFull` | функція | `src/scripts/core/26-blocks-render.js:332` |
-| `bentoSectionsHtml` | функція | `src/scripts/core/26-blocks-render.js:353` |
-| `renderTile` | функція | `src/scripts/core/26-blocks-render.js:383` |
-| `focusItem` | функція | `src/scripts/core/26-blocks-render.js:1053` |
-| `bindTiles` | функція | `src/scripts/core/26-blocks-render.js:1062` |
+| `renderBoard` | функція | `src/scripts/core/26-blocks-render.js:178` |
+| `renderBoardOld` | функція | `src/scripts/core/26-blocks-render.js:185` |
+| `defaultSize` | функція | `src/scripts/core/26-blocks-render.js:291` |
+| `autoSize` | функція | `src/scripts/core/26-blocks-render.js:297` |
+| `szClass` | функція | `src/scripts/core/26-blocks-render.js:311` |
+| `headBar` | функція | `src/scripts/core/26-blocks-render.js:317` |
+| `BENTO_SKIP` | обʼєкт | `src/scripts/core/26-blocks-render.js:340` |
+| `renderTileFull` | функція | `src/scripts/core/26-blocks-render.js:342` |
+| `bentoSectionsHtml` | функція | `src/scripts/core/26-blocks-render.js:363` |
+| `renderTile` | функція | `src/scripts/core/26-blocks-render.js:393` |
+| `focusItem` | функція | `src/scripts/core/26-blocks-render.js:1063` |
+| `bindTiles` | функція | `src/scripts/core/26-blocks-render.js:1072` |
 
-### `src/scripts/core/27-canvas.js` — 27 сутностей
+### `src/scripts/core/27-canvas.js` — 28 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1514,19 +1517,20 @@
 | `escAttr` | функція | `src/scripts/core/27-canvas.js:740` |
 | `migrate` | функція | `src/scripts/core/27-canvas.js:743` |
 | `normalizeBlocks` | функція | `src/scripts/core/27-canvas.js:749` |
-| `agencyPurgeOnce` | функція | `src/scripts/core/27-canvas.js:782` |
-| `applyFolderCfgRaw` | функція | `src/scripts/core/27-canvas.js:820` |
-| `applyFolderOrderRaw` | функція | `src/scripts/core/27-canvas.js:834` |
-| `load` | функція | `src/scripts/core/27-canvas.js:838` |
-| `vv` | значення | `src/scripts/core/27-canvas.js:1047` |
-| `FIELD` | значення | `src/scripts/core/27-canvas.js:1048` |
-| `isField` | функція | `src/scripts/core/27-canvas.js:1050` |
-| `kbHeight` | функція | `src/scripts/core/27-canvas.js:1053` |
-| `syncKb` | функція | `src/scripts/core/27-canvas.js:1057` |
-| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:1064` |
-| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:1100` |
-| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:1107` |
-| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:1124` |
+| `inboxMigrateOnce` | функція | `src/scripts/core/27-canvas.js:782` |
+| `agencyPurgeOnce` | функція | `src/scripts/core/27-canvas.js:823` |
+| `applyFolderCfgRaw` | функція | `src/scripts/core/27-canvas.js:861` |
+| `applyFolderOrderRaw` | функція | `src/scripts/core/27-canvas.js:875` |
+| `load` | функція | `src/scripts/core/27-canvas.js:879` |
+| `vv` | значення | `src/scripts/core/27-canvas.js:1089` |
+| `FIELD` | значення | `src/scripts/core/27-canvas.js:1090` |
+| `isField` | функція | `src/scripts/core/27-canvas.js:1092` |
+| `kbHeight` | функція | `src/scripts/core/27-canvas.js:1095` |
+| `syncKb` | функція | `src/scripts/core/27-canvas.js:1099` |
+| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:1106` |
+| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:1142` |
+| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:1149` |
+| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:1166` |
 
 ### `src/scripts/core/28-vision.js` — 43 сутностей
 
@@ -1705,7 +1709,7 @@
 | `sheetHTML` | функція | `src/scripts/core/34-shortcuts.js:20` |
 | `sheetToggle` | функція | `src/scripts/core/34-shortcuts.js:32` |
 
-### `src/scripts/core/35-channel.js` — 53 сутностей
+### `src/scripts/core/35-channel.js` — 54 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1750,18 +1754,19 @@
 | `chAiCollect` | функція | `src/scripts/core/35-channel.js:325` |
 | `chAiSummarize` | функція | `src/scripts/core/35-channel.js:351` |
 | `chBindFeed` | функція | `src/scripts/core/35-channel.js:393` |
-| `chOpenInDoc` | функція | `src/scripts/core/35-channel.js:409` |
-| `chInitComposer` | функція | `src/scripts/core/35-channel.js:418` |
-| `chAutoGrow` | функція | `src/scripts/core/35-channel.js:463` |
-| `chSyncSend` | функція | `src/scripts/core/35-channel.js:464` |
-| `chSetMode` | функція | `src/scripts/core/35-channel.js:470` |
-| `chToggleTray` | функція | `src/scripts/core/35-channel.js:476` |
-| `chPushBlock` | функція | `src/scripts/core/35-channel.js:482` |
-| `chSend` | функція | `src/scripts/core/35-channel.js:489` |
-| `chPickFile` | функція | `src/scripts/core/35-channel.js:502` |
-| `chShrink` | функція | `src/scripts/core/35-channel.js:508` |
-| `chVoice` | функція | `src/scripts/core/35-channel.js:519` |
-| `chSheet` | функція | `src/scripts/core/35-channel.js:550` |
+| `chJumpTo` | функція | `src/scripts/core/35-channel.js:410` |
+| `chOpenInDoc` | функція | `src/scripts/core/35-channel.js:423` |
+| `chInitComposer` | функція | `src/scripts/core/35-channel.js:432` |
+| `chAutoGrow` | функція | `src/scripts/core/35-channel.js:477` |
+| `chSyncSend` | функція | `src/scripts/core/35-channel.js:478` |
+| `chSetMode` | функція | `src/scripts/core/35-channel.js:484` |
+| `chToggleTray` | функція | `src/scripts/core/35-channel.js:490` |
+| `chPushBlock` | функція | `src/scripts/core/35-channel.js:496` |
+| `chSend` | функція | `src/scripts/core/35-channel.js:503` |
+| `chPickFile` | функція | `src/scripts/core/35-channel.js:516` |
+| `chShrink` | функція | `src/scripts/core/35-channel.js:522` |
+| `chVoice` | функція | `src/scripts/core/35-channel.js:533` |
+| `chSheet` | функція | `src/scripts/core/35-channel.js:564` |
 
 ### `src/scripts/page-editor/01-palette.js` — 18 сутностей
 

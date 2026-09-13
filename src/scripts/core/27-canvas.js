@@ -773,6 +773,47 @@
     });
   }
 
+  /* ── Переїзд із Простору (14.09.2026) ──
+     Загальний Простір (коренева дошка 'all' і її простори 'all__sp_*') видалено.
+     Якщо там щось лежало — переносимо у звичайну папку «Вхідні» (f_inbox):
+     блоки кореня → головна дошка папки, групи «Вхідні» розкриваємо (їхні діти
+     стають записами), додаткові простори кореня → теми папки, обкладинка — за ними.
+     Порожні джерела просто видаляємо. Виконується рівно раз на пристрої. */
+  function inboxMigrateOnce(){
+    var FLAG='flowapp_space_removed_v1';
+    try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
+    try{
+      var srcKeys=Object.keys(boards||{}).filter(function(k){ return k==='all'||k.indexOf('all__sp_')===0; });
+      var hasBlocks=srcKeys.some(function(k){ return Array.isArray(boards[k])&&boards[k].length; });
+      if(hasBlocks){
+        ensureInboxFolder();
+        srcKeys.forEach(function(k){
+          var flat=[];
+          (boards[k]||[]).forEach(function(b){ if(!b) return;
+            if(b.type==='group'&&b.title===INBOX_TITLE){ (b.children||[]).forEach(function(c){ if(c) flat.push(c); }); }
+            else flat.push(b); });
+          if(!flat.length) return;
+          var dst = k==='all' ? INBOX_FKEY : INBOX_FKEY+'__sp_'+k.slice('all__sp_'.length);
+          boards[dst]=(boards[dst]||[]).concat(flat);
+        });
+        try{
+          var extra=(spacesMap['__root__']||[]).filter(function(s){ return s&&s.id!=='main'; });
+          if(extra.length){ spacesMap[INBOX_FKEY]=(spacesMap[INBOX_FKEY]||[]).concat(extra.map(function(s){ return Object.assign({},s); })); }
+        }catch(_){}
+        try{
+          var c=JSON.parse(localStorage.getItem('flowPgCovers')||'{}')||{};
+          if(c.all){ c[INBOX_FKEY]=c[INBOX_FKEY]||c.all; delete c.all;
+            localStorage.setItem('flowPgCovers',JSON.stringify(c));
+            var p=window.storage&&window.storage.set&&window.storage.set('flowPgCovers',JSON.stringify(c),false); if(p&&p.catch)p.catch(function(){}); }
+        }catch(_){}
+        console.log('[Flow] Простір перенесено у «Вхідні»:', srcKeys.join(', '));
+      }
+      srcKeys.forEach(function(k){ delete boards[k]; });
+      try{ delete spacesMap['__root__']; delete activeSpaceMap['__root__']; saveSpacesMeta(); }catch(_){}
+      saveBoard();
+    }catch(e){ console.error('inboxMigrateOnce',e); }
+    try{ localStorage.setItem(FLAG,'1'); }catch(_){}
+  }
   /* ── Одноразове прибирання після видалення Агенції (04.09.2026) ──
      Її папка, дошки, конверти, конфіг Vault і база документів клієнтів більше
      не мають власника в коді — прибираємо зі сховища. Сховані папки НЕ
@@ -1025,6 +1066,7 @@
     try{ migrateFolderPhotosOnce(); }catch(e){ console.error('migratePhotos',e); }
     try{ removeSystemSeedFoldersOnce(); }catch(e){ console.error('removeSeedFolders',e); }
     try{ agencyPurgeOnce(); }catch(e){ console.error('agencyPurge',e); }
+    try{ inboxMigrateOnce(); }catch(e){ console.error('inboxMigrate',e); }
     syncBlocks();
     try{ migrate(); }catch(e){ console.error('migrate',e); }
     try{ buildAddSheet(); }catch(e){ console.error('addsheet',e); }

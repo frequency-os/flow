@@ -95,6 +95,7 @@
 
   // ── стан активної книги в читалці ──
   let rdrBook=null;      // посилання на блок
+  let rdrFrom=null;      // {scr,key}: екран, з якого відкрили книгу
   let pdfPages=[], pdfRenderDpr=2, pdfZoom=1;  // стан PDF-рендеру (оголошено заздалегідь)
   let rdrChapters=[];    // [{title, el}] для TOC
   let rdrRestoreTo=0;    // частка прокрутки для відновлення
@@ -108,6 +109,8 @@
   async function openReader(blockId){
     const b=getBlock(blockId); if(!b||!b.bookId){ pickBookFile(blockId); return; }
     rdrBook=b; rdrChapters=[];
+    // звідки відкрили — туди й повернемось кнопкою «назад» (документ або Канал папки)
+    rdrFrom={ scr:((document.querySelector('.screen.active')||{}).id)||'scr-home', key:(typeof chKey!=='undefined'?chKey:null) };
     pdfPages=[]; pdfZoom=1;
     const _zc=document.getElementById('rdrZoom'); if(_zc) _zc.style.display='none';
     document.getElementById('scr-reader').classList.remove('rdr-immersive');
@@ -387,8 +390,11 @@
     document.getElementById('rdrBack').onclick=()=>{
       if(rdrBook){ try{ saveBoard(); }catch(_){} }
       const bid=rdrBook?rdrBook.id:null; rdrBook=null;
-      // повертаємось на дошку, де лежить книга
-      show('scr-space'); renderBoard();
+      // повертаємось туди, звідки відкрили книгу (Простору більше нема)
+      const from=rdrFrom||{}; rdrFrom=null;
+      if(from.scr==='scr-channel' && from.key && typeof goChannel==='function'){ goChannel(from.key); return; }
+      if(from.scr==='scr-page'){ show('scr-page'); try{ if(window.__pgRender) window.__pgRender(); }catch(_){} return; }
+      goHome();
     };
     document.getElementById('rdrSeek').oninput=e=>{
       const f=parseInt(e.target.value)/1000;

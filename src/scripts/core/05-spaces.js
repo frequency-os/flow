@@ -910,10 +910,11 @@
   document.getElementById('debtsBack').onclick = () => goFolder('fin');
   document.getElementById('spendBack').onclick = () => goFolder('fin');
   { const wb=document.getElementById('workBack'); if(wb) wb.onclick=()=>{
-      if(!workOrigin || workOrigin==='work') goProjects();
-      else { renderFolder(workOrigin); show('scr-folder'); }
+      // «назад» веде в Канал папки, з якої прийшли (старого екрана папки з віджетами більше нема)
+      if(!workOrigin || workOrigin==='work' || !folders[workOrigin]) goProjects();
+      else goFolder(workOrigin);
   }; }
-  { const sb=document.getElementById('wkSpacesBtn'); if(sb) sb.onclick=()=>{ renderFolder(workOrigin||'work'); show('scr-folder'); }; }
+  { const sb=document.getElementById('wkSpacesBtn'); if(sb) sb.onclick=()=>{ if(workOrigin&&workOrigin!=='work'&&folders[workOrigin]) goFolder(workOrigin); else goProjects(); }; }
   document.getElementById('finBack').onclick = () => { currentFolderKey=null; goHome(); };
   (function(){ const d=document.getElementById('e2Dim'); if(d) d.onclick=()=>{ try{closeEnvSheet();}catch(_){}}; })();
 

@@ -164,6 +164,8 @@
   .ch-sw{width:44px;height:44px;border-radius:14px;border:1px solid var(--hair-2);padding:0;cursor:pointer;}
   .ch-sw.on{outline:2px solid var(--fc,var(--accent));outline-offset:2px;}
 
+  /* бульбашка, до якої стрибнули з пошуку */
+  .ch-msg.ch-flash{box-shadow:0 0 0 2px var(--accent);transition:box-shadow .6s;}
   /* блок, до якого стрибнули з Каналу, коротко підсвічується в документі */
   .pgb.pg-flash{background:color-mix(in srgb,var(--pg-acc,#7c8cff) 18%,transparent);transition:background .6s;}
 

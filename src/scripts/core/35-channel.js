@@ -405,6 +405,20 @@
       const [bk,id]=el.dataset.chopen.split('|'); chOpenInDoc(bk,id);
     });
   }
+  // стрибок до бульбашки (глобальний пошук). false — блока в стрічці не видно
+  // (вкладений або не з цієї папки), тоді той, хто кликав, відкриє документ.
+  function chJumpTo(bk,id){
+    const scr=document.getElementById('scr-channel');
+    if(!chKey||!scr||!scr.classList.contains('active')) return false;
+    if(String(bk).split('__sp_')[0]!==chKey) return false;
+    const sid = bk===chKey ? 'main' : (String(bk).split('__sp_')[1]||'main');
+    if(chTopic!=='all' && chTopic!==sid){ chTopic='all'; renderChChips(); renderChFeed(); }
+    const el=document.querySelector('#chFeed [data-chopen="'+bk+'|'+String(id).replace(/["\\]/g,'')+'"]');
+    if(!el) return false;
+    chFitFeed(); el.scrollIntoView({block:'center'});
+    el.classList.add('ch-flash'); setTimeout(()=>el.classList.remove('ch-flash'),1600);
+    return true;
+  }
   // документ на цьому блоці; «‹ Папки» в документі повертає в Канал, не на Огляд
   function chOpenInDoc(bk,id){
     const key=chKey;

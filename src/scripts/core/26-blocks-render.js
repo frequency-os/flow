@@ -172,7 +172,17 @@
     });
   })();
 
+  /* Простір видалено (14.09.2026). renderBoard лишився як «перемалюй те, що відкрито»:
+     його кличуть віджети фінансів, нагадування, агент і швидка думка після зміни блоків.
+     Старий рендер дошки нижче (renderBoardOld) більше ніхто не викликає — крок 2 його видалить. */
   function renderBoard(){
+    try{
+      const scr=document.querySelector('.screen.active'); const id=scr?scr.id:'';
+      if(id==='scr-page'){ if(typeof window.__pgRender==='function') window.__pgRender(); }
+      else if(id==='scr-channel'){ if(typeof renderChannel==='function') renderChannel(); }
+    }catch(e){ console.error('renderBoard',e); }
+  }
+  function renderBoardOld(){
     syncBlocks();
     try{ renderSpaceSwitcher(); }catch(_){}
     const fromFolderList = !!spaceFromFolder && spaceFromFolder!=='__general__';

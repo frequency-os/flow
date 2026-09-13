@@ -531,7 +531,7 @@
     c.querySelectorAll('[data-plgofolder]').forEach(el=>el.onclick=(e)=>{
       e.stopPropagation();
       const k=el.dataset.plgofolder;
-      if(typeof folders!=='undefined' && folders[k]){ try{ renderFolder(k); show('scr-folder'); }catch(err){ console.error('goFolder',err); } }
+      if(typeof folders!=='undefined' && folders[k]){ try{ goFolder(k); }catch(err){ console.error('goFolder',err); } }
     });
     c.querySelectorAll('[data-plcoll]').forEach(el=>el.onclick=()=>{ const k=el.dataset.plcoll; p.collapsed[k]=!p.collapsed[k]; saveGoals(); plRerender(); });
     { const it=c.querySelector('[data-plintask]'); if(it) it.onclick=()=>{

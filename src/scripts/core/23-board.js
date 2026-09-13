@@ -520,8 +520,8 @@
       Object.keys(boards||{}).forEach(bk=>{
         const base=String(bk).split('__sp_')[0];
         const f=folders&&folders[base];
-        if(base!=='all' && !f) return;                    // осиротілі дошки видалених папок
-        const fname=(f&&f.name)||(base==='all'?'Простір':base);
+        if(!f) return;                    // осиротілі дошки видалених папок і колишній корінь Простору
+        const fname=f.name||base;
         const femo=(f&&f.emoji)||'📁';
         const all=[]; collectBlocks(boards[bk]||[],[],all);
         all.forEach(it=>{ const b=it.block;
@@ -532,10 +532,13 @@
   };
   window.flowOpenBlock=function(bk,id){
     const base=String(bk).split('__sp_')[0];
-    // коренева дошка не є папкою — відкривається екраном простору
-    try{ if(base==='all') goSpace(); else goFolder(base); }catch(e){ console.error('flowOpenBlock',e); }
-    // дочекатись рендера папки, тоді перемкнутись на потрібну дошку і стрибнути
-    setTimeout(()=>{ try{ if(boards[bk]){ boardKey=bk; syncBlocks(); } jumpToBlock(id); }catch(e){ console.error('flowOpenBlock jump',e); } },300);
+    try{ goFolder(base); }catch(e){ console.error('flowOpenBlock',e); }
+    // папка відкрилась Каналом: стрибнути до бульбашки; блок вкладений або з іншого
+    // екрана — відкрити документ на ньому. Затримка більша за автопрокрутку Каналу (360 мс).
+    setTimeout(()=>{ try{
+      if(!document.getElementById('scr-channel').classList.contains('active')) return;
+      if(!(typeof chJumpTo==='function' && chJumpTo(bk,id))) chOpenInDoc(bk,id);
+    }catch(e){ console.error('flowOpenBlock jump',e); } },450);
   };
   function openSearch(){
     const ov=document.getElementById('srchOv');
@@ -596,17 +599,22 @@
   }
   { const b=document.getElementById('undoBtn'); if(b) b.onclick=doUndo; }
 
-  /* ═══════════ ШВИДКЕ ЗАХОПЛЕННЯ (Вхідні) ═══════════ */
+  /* ═══════════ ШВИДКЕ ЗАХОПЛЕННЯ (Вхідні) ═══════════
+     «Вхідні» — звичайна папка (Канал), а не група в кореневій дошці Простору:
+     Простір видалено 14.09.2026. Папка створюється лише при першому записі. */
   const INBOX_TITLE='Вхідні';
+  const INBOX_FKEY='f_inbox';
   function ensureInboxFolder(){
-    const root=curBoard();
-    let fol=root.find(b=>b.type==='group'&&b.title===INBOX_TITLE);
-    if(!fol){
-      fol={ id:Date.now()+Math.random(), type:'group', title:INBOX_TITLE, emoji:'📥', color:'#6a7dff', children:[] };
-      root.unshift(fol);
+    let f=folders[INBOX_FKEY];
+    if(!f){
+      f=folders[INBOX_FKEY]={ key:INBOX_FKEY, c:'#6a7dff', emoji:'📥', icon:'fo-mail', name:INBOX_TITLE,
+        pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
+      if(order.indexOf(INBOX_FKEY)<0) order.unshift(INBOX_FKEY);
+      saveFolders();
+      try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
     }
-    if(!Array.isArray(fol.children)) fol.children=[];
-    return fol;
+    if(!boards[INBOX_FKEY]) boards[INBOX_FKEY]=[];
+    return f;
   }
   function openQuickCapture(){
     const ov=document.getElementById('qcapOv');
@@ -619,11 +627,11 @@
     const ta=document.getElementById('qcapTa');
     const txt=(ta.value||'').trim();
     if(!txt){ closeQuickCapture(); return; }
-    const fol=ensureInboxFolder();
-    const firstLine=txt.split('\n')[0].slice(0,60);
-    fol.children.push({ id:Date.now()+Math.random(), type:'note', title:firstLine, text:txt });
+    ensureInboxFolder();
+    // той самий формат id і поле `at`, що й у Каналі — запис одразу має час у стрічці
+    boards[INBOX_FKEY].push({ id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), type:'note', title:'', text:txt, at:Date.now() });
     syncBlocks(); saveBoard();
-    if(document.getElementById('scr-space').classList.contains('on')||document.body.classList.contains('in-space')) renderBoard();
+    renderBoard(); // перемалює Канал або документ, якщо відкриті саме «Вхідні»
     closeQuickCapture();
     window.platform.haptic('light');
   }
@@ -644,15 +652,12 @@
   }; }
   // експонуємо для прив'язки до кнопки (напр. довгий тап на FAB або пункт меню)
   window.flowQuickCapture=openQuickCapture;
-  // відкрити простір і зайти у «Вхідні»
+  // «Ще → Вхідні»: Канал папки «Вхідні»; папки ще нема — нічого не створюємо, лише пропонуємо записати
   window.flowOpenInbox=function(){
     try{
-      const fol=ensureInboxFolder(); saveBoard();
-      folderPath=[fol.id];
-      const sh=window.__show||window.show||(typeof show==='function'?show:null);
-      renderBoard();
-      if(sh) sh('scr-space');
-      document.body.classList.add('in-space');
-    }catch(_){}
+      if(folders[INBOX_FKEY]){ goChannel(INBOX_FKEY); return; }
+      try{ (window.__flowToast||function(){})('Вхідних ще нема — запиши першу думку'); }catch(_){}
+      openQuickCapture();
+    }catch(e){ console.error('flowOpenInbox',e); }
   };
 
