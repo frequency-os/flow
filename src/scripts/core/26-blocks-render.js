@@ -1,5 +1,5 @@
   function pickPhoto(targetArr){
-    const dest = Array.isArray(targetArr) ? targetArr : currentLevelArr();
+    const dest = Array.isArray(targetArr) ? targetArr : curBoard();
     const inp=document.createElement('input');
     inp.type='file'; inp.accept='image/*';
     inp.onchange=()=>{
@@ -59,119 +59,6 @@
   }
   function getBlock(id){ return findBlockDeep(curBoard(),id); }
 
-  function renderBoardTabs(){
-    const t=document.getElementById('boardTabs');
-    t.innerHTML=allTabs().map(tb=>{
-      const n=(boards[tb.key]||[]).length;
-      return `<button class="${tb.key===boardKey?'on':''}" style="--tbc:${tb.color}" data-board="${tb.key}">
-        ${tb.emoji} ${esc(tb.label)}${n?` <span class="cnt">${n}</span>`:''}</button>`;
-    }).join('');
-    t.querySelectorAll('[data-board]').forEach(el=>el.onclick=()=>{
-      boardKey=el.dataset.board; syncBlocks(); renderBoard();
-    });
-  }
-
-  // ── дашборд простору ──
-  var SD_GRADS=[
-    'radial-gradient(120% 100% at 15% 0%,#41508f 0%,transparent 55%),radial-gradient(110% 90% at 85% 15%,#7b4a9e 0%,transparent 50%),radial-gradient(130% 120% at 60% 100%,#173a5e 0%,#0f1115 78%)',
-    'linear-gradient(135deg,#0f2b1e,#1f6f4a 60%,#4ee69a)',
-    'linear-gradient(135deg,#3a1f14,#a4502a 55%,#ffb37c)',
-    'linear-gradient(135deg,#141a33,#31418f 55%,#7c8cff)'
-  ];
-  function sdCovers(){ try{ return JSON.parse(localStorage.getItem('flowPgCovers')||'{}')||{}; }catch(_){ return {}; } }
-  function sdSaveCovers(c){
-    try{ localStorage.setItem('flowPgCovers',JSON.stringify(c)); }catch(_){}
-    try{ const p=window.storage&&window.storage.set&&window.storage.set('flowPgCovers',JSON.stringify(c),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){}
-  }
-  function sdDashOpen(){ try{ return localStorage.getItem('flowSpaceDash')!=='0'; }catch(_){ return true; } }
-  function sdStats(arr){
-    let tot=0,tDone=0,tAll=0,pgs=0,prSum=0,prN=0,cdTarget=null;
-    const now=Date.now();
-    (function walk(a){ a.forEach(b=>{ if(!b)return; tot++;
-      if(b.type==='task'){ tAll++; if(b.done)tDone++; }
-      if(b.type==='check'&&Array.isArray(b.items)) b.items.forEach(it=>{ if(it&&(it.text||'').trim()){ tAll++; if(it.done)tDone++; } });
-      if(b.type==='progress'&&typeof b.value==='number'){ prSum+=b.value; prN++; }
-      if(b.type==='countdown'&&b.target){
-        const t=new Date(b.target+'T23:59:59').getTime();
-        if(!isNaN(t)&&t>now&&(cdTarget==null||t<cdTarget)) cdTarget=t;
-      }
-      if(b.type==='page'||b.type==='group') pgs++;
-      if(isContainer(b)&&Array.isArray(b.children)) walk(b.children);
-    }); })(arr);
-    const prog = prN? Math.round(prSum/prN) : (tAll? Math.round(tDone/tAll*100) : null);
-    const cdDays = cdTarget!=null ? Math.max(0,Math.ceil((cdTarget-now)/864e5)) : null;
-    return {tot,tDone,tAll,pgs,prog,cdDays};
-  }
-  function spaceDashHTML(levelArr){
-    let sp=null;
-    try{ const ctx=curCtx(); sp=spaceByIdIn(ctx,activeSpaceFor(ctx)); }catch(_){}
-    const name=sp?sp.name:'Простір', emoji=sp?sp.emoji:'🧩';
-    const cov=sdCovers()[boardKey];
-    const st=sdStats(levelArr);
-    const open=sdDashOpen();
-    let bg;
-    if(cov&&cov.img) bg='background-image:url('+cov.img+')';
-    else bg='background:'+SD_GRADS[(cov&&cov.g)||0];
-    const sw=SD_GRADS.map((g,i)=>'<button class="sw" data-sdgrad="'+i+'" style="background:'+g+'"></button>').join('');
-    const pages=levelArr.filter(b=>b&&(b.type==='page'||b.type==='group'));
-    const pagesHtml=pages.length?'<div class="sdash-pages">'+pages.map(p=>{
-      const kids=(p.children||[]).length;
-      const e=p.emoji||(p.type==='page'?'📄':'📁');
-      return '<div class="sdash-pg" data-sdopen="'+p.id+'"><span class="e">'+e+'</span><div class="t">'+esc(p.title||(p.type==='page'?'Сторінка':'Папка'))+'</div><div class="n">'+(p.type==='page'?'сторінка':'папка')+(kids?' · '+kids:'')+'</div></div>';
-    }).join('')+'</div>':'';
-    return '<div class="sdash'+(open?'':' closed')+'">'
-      +'<button class="sdash-toggle" data-sdtoggle><i>▾</i> Дашборд</button>'
-      +'<div class="sdash-body">'
-      +'<div class="sdash-hero" data-sdcov><div class="bgc" style="'+bg+'"></div>'
-      +'<div class="in"><span class="sdash-emo">'+emoji+'</span>'
-      +'<div><h2>'+esc(name)+'</h2><div class="d">'+st.tot+' блок(ів)'+(st.pgs?' · '+st.pgs+' стор.':'')+'</div></div>'
-      +(st.cdDays!=null?'<div class="sdash-cd"><b>'+st.cdDays+'</b><span>дн лишилось</span></div>':'')
-      +'</div>'
-      +'<div class="sdash-covmenu" data-sdmenu><div class="row">'+sw+'</div>'
-      +'<div class="acts"><button data-sdphoto>Фото</button><button data-sdclear>Прибрати</button></div></div>'
-      +'</div>'
-      +'<div class="sdash-stats">'
-      +'<div class="sdash-st"><b>'+(st.prog!=null?st.prog+'%':'—')+'</b><span>Прогрес</span><div class="bar"><i style="width:'+(st.prog||0)+'%"></i></div></div>'
-      +'<div class="sdash-st"><b>'+(st.tAll?st.tDone+'/'+st.tAll:'—')+'</b><span>Задачі</span><div class="bar"><i style="width:'+(st.tAll?Math.round(st.tDone/st.tAll*100):0)+'%"></i></div></div>'
-      +'<div class="sdash-st"><b>'+st.pgs+'</b><span>Сторінки</span><div class="bar"><i style="width:'+Math.min(100,st.pgs*20)+'%;background:#f0b429"></i></div></div>'
-      +'<div class="sdash-st"><b>'+st.tot+'</b><span>Блоки</span><div class="bar"><i style="width:'+Math.min(100,st.tot*8)+'%;background:#7c8cff"></i></div></div>'
-      +'</div>'
-      +pagesHtml
-      +'</div></div>';
-  }
-  (function bindSdash(){
-    const board=document.getElementById('board'); if(!board||board.__sdBound)return; board.__sdBound=true;
-    board.addEventListener('click',function(e){
-      const dash=e.target.closest&&e.target.closest('.sdash'); if(!dash)return;
-      if(e.target.closest('[data-sdtoggle]')){
-        try{ localStorage.setItem('flowSpaceDash', sdDashOpen()?'0':'1'); }catch(_){}
-        renderBoard(); return;
-      }
-      const op=e.target.closest('[data-sdopen]');
-      if(op){ folderPath.push(op.dataset.sdopen); board.scrollTop=0; renderBoard(); return; }
-      const menu=dash.querySelector('[data-sdmenu]');
-      const g=e.target.closest('[data-sdgrad]');
-      if(g){ const c=sdCovers(); c[boardKey]={g:+g.dataset.sdgrad}; sdSaveCovers(c); renderBoard(); return; }
-      if(e.target.closest('[data-sdclear]')){ const c=sdCovers(); delete c[boardKey]; sdSaveCovers(c); renderBoard(); return; }
-      if(e.target.closest('[data-sdphoto]')){
-        if(menu)menu.classList.remove('on');
-        const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
-        inp.onchange=()=>{ const f=inp.files&&inp.files[0]; if(!f)return;
-          const rd=new FileReader();
-          rd.onload=()=>{ const img=new Image();
-            img.onload=()=>{ const mw=1200,mh=700; let w=img.width,hh=img.height;
-              const r=Math.min(1,mw/w,mh/hh); w=Math.round(w*r); hh=Math.round(hh*r);
-              const cv=document.createElement('canvas'); cv.width=w; cv.height=hh;
-              cv.getContext('2d').drawImage(img,0,0,w,hh);
-              const c=sdCovers(); c[boardKey]={img:cv.toDataURL('image/jpeg',0.72)}; sdSaveCovers(c); renderBoard();
-            }; img.src=rd.result; };
-          rd.readAsDataURL(f); };
-        inp.click(); return;
-      }
-      if(e.target.closest('[data-sdcov]')){ if(menu)menu.classList.toggle('on'); }
-    });
-  })();
-
   /* Простір видалено (14.09.2026). renderBoard лишився як «перемалюй те, що відкрито»:
      його кличуть віджети фінансів, нагадування, агент і швидка думка після зміни блоків.
      Старий рендер дошки нижче (renderBoardOld) більше ніхто не викликає — крок 2 його видалить. */
@@ -181,110 +68,6 @@
       if(id==='scr-page'){ if(typeof window.__pgRender==='function') window.__pgRender(); }
       else if(id==='scr-channel'){ if(typeof renderChannel==='function') renderChannel(); }
     }catch(e){ console.error('renderBoard',e); }
-  }
-  function renderBoardOld(){
-    syncBlocks();
-    try{ renderSpaceSwitcher(); }catch(_){}
-    const fromFolderList = !!spaceFromFolder && spaceFromFolder!=='__general__';
-    const tabsEl=document.getElementById('boardTabs');
-    const sb=document.getElementById('spaceBack');
-    const vt=document.getElementById('viewToggle');
-    const board=document.getElementById('board');
-
-    // активний масив: корінь або вміст відкритої папки
-    const levelArr=currentLevelArr();
-    const curFolder=currentFolderObj();
-    const inFolder=folderPath.length>0;
-
-    // tabs removed everywhere — clean board; view switcher visible
-    tabsEl.style.display='none'; tabsEl.innerHTML='';
-    vt.style.display=''; applyViewIcon();
-    board.classList.remove('listview','docview','shelfview','gridview');
-    if(viewMode==='merged') board.classList.add('docview');
-    else if(viewMode==='shelf') board.classList.add('shelfview');
-    else board.classList.add('gridview');
-
-    // ШИРОКА ДОШКА: лише в сітці; ширше за екран → горизонтальна прокрутка
-    const wideActive = (viewMode==='grid' && boardCols>4 && !isCanvasMode());
-    board.classList.toggle('wideboard', wideActive);
-    document.body.classList.toggle('wide-on', wideActive);
-    if(wideActive){ board.style.setProperty('--bcols', boardCols); }
-    else { board.style.removeProperty('--bcols'); }
-    try{ applyWideIcon(); }catch(_){}
-
-    // ВІЛЬНЕ ПОЛОТНО: режим canvas (блоки за X/Y)
-    const canvasActive = isCanvasMode();
-    board.classList.toggle('canvasboard', canvasActive);
-    document.body.classList.toggle('canvas-on', canvasActive);
-    try{ const ct=document.getElementById('canvasToggle'); if(ct) ct.classList.toggle('on', canvasActive); }catch(_){}
-
-    // кнопка «Назад»: усередині папки — на рівень вище; інакше — стара логіка
-    if(inFolder){
-      sb.style.display=''; sb.textContent='‹ Назад';
-      sb.style.setProperty('--c', (BLOCK_TYPES.group.color));
-    } else if(fromFolderList && currentFolderKey){
-      sb.style.display=''; sb.textContent='‹ Папки'; sb.style.setProperty('--c', (folders[currentFolderKey]||{}).c||'var(--accent)');
-    } else {
-      sb.style.display='none';
-    }
-
-    // заголовок: ім'я відкритої вкладеної папки/сторінки, або назва активного простору контексту
-    if(inFolder && curFolder){
-      const isPg=curFolder.type==='page';
-      const h1=document.querySelector('#scr-space .brand h1'); if(h1) h1.textContent=curFolder.title||(isPg?'Сторінка':'Папка');
-      const lg=document.querySelector('#scr-space .brand .logo'); if(lg) lg.textContent=isPg?'📄':'📁';
-    } else {
-      const ctx=(typeof curCtx==='function')?curCtx():'__root__';
-      const a=(typeof activeSpaceFor==='function')?activeSpaceFor(ctx):'main';
-      const sp=(typeof spaceByIdIn==='function')?spaceByIdIn(ctx,a):null;
-      const h1=document.querySelector('#scr-space .brand h1'); if(h1) h1.textContent=sp?sp.name:'Простір';
-      const lg=document.querySelector('#scr-space .brand .logo'); if(lg) lg.textContent=sp?sp.emoji:'🧩';
-    }
-    const totalBlocks=(arr)=>arr.reduce((n,b)=>n+1+(isContainer(b)&&Array.isArray(b.children)?totalBlocks(b.children):0),0);
-    const tot=totalBlocks(levelArr);
-    const inPage = inFolder && curFolder && curFolder.type==='page';
-    document.getElementById('spaceSub').textContent = inFolder
-      ? (tot? `${tot} ${inPage?'на аркуші':'всередині'}` : (inPage?'порожній аркуш':'порожня папка'))
-      : (tot? `${tot} блок(ів)` : 'чистий аркуш');
-
-    // хлібні крихти при вкладеності
-    let crumbHtml='';
-    if(folderPath.length){
-      const parts=['<span data-crumb="-1">Простір</span>'];
-      let arr=curBoard();
-      folderPath.forEach((id,idx)=>{
-        const g=arr.find(b=>String(b.id)===String(id));
-        if(g){ parts.push(`<span data-crumb="${idx}">${esc(g.title||'Папка')}</span>`); arr=g.children||[]; }
-      });
-      crumbHtml=`<div class="grp-crumbs">${parts.join('<i>›</i>')}</div>`;
-    }
-
-    const dashHtml=(!inFolder && !isCanvasMode()) ? spaceDashHTML(levelArr) : '';
-    if(!levelArr.length){
-      if(document.body.classList.contains('folder-clean')){ board.innerHTML=dashHtml+crumbHtml; return; }
-      const isPg = inFolder && curFolder && curFolder.type==='page';
-      const ico = isPg ? '📄' : (inFolder ? '📂' : '📄');
-      const lbl = isPg ? 'Порожній аркуш.' : (inFolder?'Папка порожня.':'Чистий аркуш.');
-      board.innerHTML=dashHtml+crumbHtml+`<div class="board-empty"><div class="e">${ico}</div>
-        <p>${lbl}<br>Тисни «+», щоб додати блок${inFolder?' сюди':''}.</p></div>`;
-      return;
-    }
-    try{
-      const tilesHtml=levelArr.map(b=>{ try{ return renderTileFull(b); }catch(e){ console.error('renderTile',b&&b.type,e); return ''; } }).join('');
-      if(board.classList.contains('wideboard')){
-        board.innerHTML=dashHtml+crumbHtml+`<div class="board-inner">${tilesHtml}</div>`;
-      } else if(board.classList.contains('canvasboard')){
-        board.innerHTML=crumbHtml+`<div class="canvas-inner">${tilesHtml}</div>`;
-      } else {
-        board.innerHTML=dashHtml+crumbHtml+tilesHtml;
-      }
-      bindTiles();
-      try{ if(window.__pgWidgetsSync) window.__pgWidgetsSync(); }catch(_){}
-    }catch(e){
-      console.error('renderBoard failed',e);
-      board.innerHTML='<div class="board-empty"><div class="e">⚠️</div><p>Не вдалося показати дошку. Спробуй оновити.</p></div>';
-    }
-    try{ if(document.body.classList.contains('space-3pane')) renderPaneList(); }catch(_){}
   }
 
   // default size per type, used until user changes it
@@ -342,14 +125,6 @@
   function renderTileFull(b){
     let html=renderTile(b);
     if(!html || !b) return html;
-    // CANVAS: одразу вшити координати/розмір у НАЯВНИЙ style плитки,
-    // щоб вона з'являлась РІВНО на місці (без стрибка в кут і без невидимого drag)
-    if(isCanvasMode() && b.fx!=null && b.fy!=null){
-      const fhCss = (b.fh!=null) ? `--fh:${Math.round(b.fh)}px;` : '';
-      const inline = `--fx:${Math.round(b.fx)}px;--fy:${Math.round(b.fy)}px;--fw:${Math.round(b.fw||260)}px;${fhCss}`;
-      html = html.replace(/style="/, `style="${inline}`);
-      if(b.fh!=null) html = html.replace(/^(\s*<div class="tile)/, '$1 has-fh');
-    }
     if(BENTO_SKIP[b.type]) return html;
     // знаходимо позицію останнього </div> (кінець плитки) і вставляємо перед ним
     const idx=html.lastIndexOf('</div>');
@@ -1070,7 +845,9 @@
   }
 
   function bindTiles(){
-    const board=document.getElementById('board');
+    // плитки живуть лише всередині документа (bridge.bindWidgets задає __btRoot); дошки більше нема
+    const board=window.__btRoot||null;
+    if(!board) return;
     // menu toggle (⋮) — open/close control bar
     (window.__btRoot||board).querySelectorAll('[data-menu]').forEach(el=>el.onclick=e=>{
       e.stopPropagation();
@@ -1705,7 +1482,7 @@
     // PRO-тема: перший закріплений блок стає bento-«героєм» (ширший, з сяйвом)
     try{
       (window.__btRoot||board).querySelectorAll('.tile.is-hero').forEach(t=>t.classList.remove('is-hero'));
-      if(document.body.classList.contains('theme-pro') && !isCanvasMode() && viewMode==='grid'){
+      if(document.body.classList.contains('theme-pro')){
         const tiles=[...(window.__btRoot||board).querySelectorAll('.tile[data-tileid]')];
         const heroTile=tiles.find(t=>{
           const b=getBlock(t.dataset.tileid);
@@ -1893,9 +1670,5 @@
       },1000);
     }
 
-    applyFreeSizes(board);
-    enableTileResize(board);
-    enableTileDrag(board);
-    if(isCanvasMode()){ setZoom(getZoom(), false); enableCanvasZoom(board); }
   }
 

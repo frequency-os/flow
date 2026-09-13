@@ -5,10 +5,6 @@
   /* ============ ДОДАТКОВІ ПРОСТОРИ (листки) ============ */
   // Простори існують у КОНТЕКСТІ: загальний Простір (ctx='__root__') або всередині папки (ctx=folderKey).
   // Кожен простір контексту має свій boardKey: головний = baseKey, додаткові = baseKey+'__sp_'+id.
-  let switcherStyle=(window.innerWidth<640?'stories':'cards'); // pills | segment | cards | dropdown | foldertabs | stories
-  const SWKEY='switcher_style';
-  try{ const s=localStorage.getItem(SWKEY); if(s) switcherStyle=s; }catch(_){}
-  prefCatchup(SWKEY, v=>{ if(v) switcherStyle=v; });
 
   // мапа просторів: { ctx: [ {id,name,emoji,color} ] }, та активні: { ctx: id }
   let spacesMap={}, activeSpaceMap={};
@@ -19,7 +15,7 @@
   prefCatchup(ACMKEY, v=>{ try{ const p=JSON.parse(v); if(p&&typeof p==='object') activeSpaceMap=p; }catch(_){} });
 
 
-  function saveSpacesMeta(){ try{ prefSet(SPMKEY,JSON.stringify(spacesMap)); prefSet(ACMKEY,JSON.stringify(activeSpaceMap)); prefSet(SWKEY,switcherStyle); }catch(_){} }
+  function saveSpacesMeta(){ try{ prefSet(SPMKEY,JSON.stringify(spacesMap)); prefSet(ACMKEY,JSON.stringify(activeSpaceMap)); }catch(_){} }
 
   // який зараз контекст: загальний Простір чи папка
   function curCtx(){
@@ -43,15 +39,7 @@
   function keyForSpaceIn(ctx,id){ const base=ctxBaseKey(ctx); return id==='main'?base:(base+'__sp_'+id); }
   function spaceCountIn(ctx,id){ const arr=boards[keyForSpaceIn(ctx,id)]; return Array.isArray(arr)?arr.length:0; }
 
-  // перейти в активний простір ЗАГАЛЬНОГО простору (з нав-кнопки)
-  function goActiveSpace(){
-    spaceFromFolder='__general__'; currentFolderKey=null; folderPath=[];
-    const a=activeSpaceFor('__root__');
-    boardKey=keyForSpaceIn('__root__',a);
-    if(!boards[boardKey]) boards[boardKey]=[];
-    syncBlocks(); renderBoard(); show('scr-space');
-  }
-  // перемкнути простір у поточному контексті
+  // перемкнути простір у поточному контексті (теми папки; Простору більше нема)
   function switchSpace(id){
     const ctx=curCtx();
     activeSpaceMap[ctx]=id; saveSpacesMeta();
@@ -87,60 +75,16 @@
     }});
   }
 
-  // РЕНДЕР перемикача в обраному стилі (для поточного контексту: Простір або папка)
-  function renderSpaceSwitcher(){
-    const host=document.getElementById('spaceSwitcher');
-    if(!host) return;
-    // ховаємо, якщо ми заглибились у вкладену папку/сторінку (не на корені простору)
-    const inNested = (typeof folderPath!=='undefined') && folderPath.length>0;
-    const ctx=curCtx();
-    const isFinVal = boardKey==='fin'||boardKey==='val';
-    if(inNested || isFinVal){ host.style.display='none'; host.innerHTML=''; return; }
-    host.style.display='';
-    host.className='space-switcher sw-'+switcherStyle;
-    const list=spacesFor(ctx);
-    const A=activeSpaceFor(ctx);
-    const cnt=id=>spaceCountIn(ctx,id);
-    if(switcherStyle==='pills'){
-      host.innerHTML=list.map(s=>`<button class="sw-pill ${s.id===A?'on':''}" style="--sc:${s.color}" data-sp="${s.id}">${s.emoji} ${esc(s.name)}</button>`).join('')
-        +`<button class="sw-pill add" data-spadd>＋</button>`;
-    } else if(switcherStyle==='segment'){
-      host.innerHTML=`<div class="sw-seg">${list.map(s=>`<button class="${s.id===A?'on':''}" data-sp="${s.id}">${s.emoji} ${esc(s.name)}</button>`).join('')}<button class="sw-plus" data-spadd>＋</button></div>`;
-    } else if(switcherStyle==='cards'){
-      host.innerHTML=`<div class="sw-cards">${list.map(s=>`<button class="sw-card ${s.id===A?'on':''}" style="--sc:${s.color}" data-sp="${s.id}">
-        <span class="sc-e">${s.emoji}</span><span class="sc-n">${esc(s.name)}</span><span class="sc-c">${cnt(s.id)} блок.</span></button>`).join('')}
-        <button class="sw-card add" data-spadd><span class="pl">＋</span><span>Новий</span></button></div>`;
-    } else if(switcherStyle==='dropdown'){
-      const cur=spaceByIdIn(ctx,A);
-      host.innerHTML=`<button class="sw-dd-btn" data-spdd style="--sc:${cur.color}"><span class="dd-e">${cur.emoji}</span><span class="dd-n">${esc(cur.name)}</span><span class="dd-car">▾</span></button>
-        <div class="sw-dd-menu" id="swDdMenu">${list.map(s=>`<button class="sw-dd-item ${s.id===A?'on':''}" data-sp="${s.id}"><span>${s.emoji}</span><span class="ddi-n">${esc(s.name)}</span><span class="ddi-c">${cnt(s.id)}</span></button>`).join('')}
-        <button class="sw-dd-item add" data-spadd><span>＋</span><span class="ddi-n">Новий простір</span></button></div>`;
-    } else if(switcherStyle==='stories'){
-      host.innerHTML=list.map(s=>`<button class="sw-story ${s.id===A?'on':''}" style="--sc:${s.color}" data-sp="${s.id}">
-        <span class="ring"><span class="in">${s.emoji}</span></span><small>${esc(s.name)}</small></button>`).join('')
-        +`<button class="sw-story add" data-spadd><span class="ring"><span class="in">＋</span></span><small>Новий</small></button>`;
-    } else if(switcherStyle==='foldertabs'){
-      host.innerHTML=`<div class="sw-ftabs">${list.map(s=>`<button class="sw-ftab ${s.id===A?'on':''}" style="--sc:${s.color}" data-sp="${s.id}">${s.emoji} ${esc(s.name)}</button>`).join('')}<button class="sw-ftab add" data-spadd>＋</button></div>`;
-    }
-    host.querySelectorAll('[data-sp]').forEach(el=>el.onclick=()=>{ const id=el.dataset.sp; if(id!==A) switchSpace(id); });
-    host.querySelectorAll('[data-spadd]').forEach(el=>el.onclick=()=>addSpace());
-    const ddBtn=host.querySelector('[data-spdd]');
-    if(ddBtn){ ddBtn.onclick=()=>{ const m=document.getElementById('swDdMenu'); if(m) m.classList.toggle('open'); ddBtn.classList.toggle('open'); }; }
-  }
-
-  // НАЛАШТУВАННЯ просторів поточного контексту
+  // НАЛАШТУВАННЯ просторів (тем) папки — відкриває Канал через «⋯ → Теми папки» і довге утримання чипа
   function openSpaceSettings(focusId){
     document.querySelectorAll('.spcfg-ov').forEach(o=>o.remove());
     const ctx=curCtx();
     const list=spacesFor(ctx);
     const ctxName = ctx==='__root__' ? 'Простір' : ((folders[ctx]&&folders[ctx].name)||'Папка');
-    const STYLES=[['stories','Сторі','◉ ◉'],['pills','Піл-таби','● ● ●'],['segment','Сегмент','▭▭▭'],['cards','Картки','▢ ▢'],['dropdown','Дропдаун','▾'],['foldertabs','Вкладки','◳◳']];
     const ov=document.createElement('div'); ov.className='spcfg-ov';
     ov.innerHTML=`<div class="spcfg-in">
       <div class="spcfg-grip"></div>
       <div class="spcfg-h">Простори · ${esc(ctxName)}</div>
-      <div class="spcfg-sec">Стиль перемикача</div>
-      <div class="spcfg-styles">${STYLES.map(([k,n,p])=>`<button class="spcfg-style ${switcherStyle===k?'on':''}" data-style="${k}"><span class="ss-p">${p}</span><span class="ss-n">${n}</span></button>`).join('')}</div>
       <div class="spcfg-sec">Стиль карток</div>
       <div class="spcfg-styles" style="grid-template-columns:repeat(3,1fr)">${[['classic','Класика','▢'],['glass','Скло','◇'],['bento','Бенто','▧']].map(([k,n,p])=>`<button class="spcfg-style ${cardSkin===k?'on':''}" data-cardskin="${k}"><span class="ss-p">${p}</span><span class="ss-n">${n}</span></button>`).join('')}</div>
       <div class="spcfg-sec">Простори тут</div>
@@ -159,48 +103,33 @@
     ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
     ov.querySelector('[data-spclose]').onclick=close;
     ov.querySelector('[data-spaddnew]').onclick=()=>{ close(); addSpace(); };
-    ov.querySelectorAll('[data-style]').forEach(b=>b.onclick=()=>{
-      switcherStyle=b.dataset.style; saveSpacesMeta();
-      ov.querySelectorAll('[data-style]').forEach(x=>x.classList.toggle('on',x===b));
-      renderSpaceSwitcher();
-      window.platform.haptic('select');
-    });
     ov.querySelectorAll('[data-cardskin]').forEach(b=>b.onclick=()=>{
       setCardSkin(b.dataset.cardskin);
       ov.querySelectorAll('[data-cardskin]').forEach(x=>x.classList.toggle('on',x===b));
       renderBoard();
     });
     ov.querySelectorAll('[data-spname]').forEach(inp=>inp.onblur=()=>{
-      const sp=spaceByIdIn(ctx,inp.dataset.spname); if(sp){ sp.name=inp.value.trim()||sp.name; saveSpacesMeta(); renderSpaceSwitcher(); renderBoard(); }
+      const sp=spaceByIdIn(ctx,inp.dataset.spname); if(sp){ sp.name=inp.value.trim()||sp.name; saveSpacesMeta(); renderBoard(); }
     });
     ov.querySelectorAll('[data-spemoji]').forEach(btn=>btn.onclick=()=>{
       const sp=spaceByIdIn(ctx,btn.dataset.spemoji); if(!sp) return;
-      inputModal({title:'Емодзі простору', value:sp.emoji, placeholder:'напр. 🌌', onOk:(v)=>{ const pick=(v||'').trim().slice(0,2); if(pick){ sp.emoji=pick; btn.textContent=sp.emoji; saveSpacesMeta(); renderSpaceSwitcher(); } }});
+      inputModal({title:'Емодзі простору', value:sp.emoji, placeholder:'напр. 🌌', onOk:(v)=>{ const pick=(v||'').trim().slice(0,2); if(pick){ sp.emoji=pick; btn.textContent=sp.emoji; saveSpacesMeta(); renderBoard(); } }});
     });
     ov.querySelectorAll('[data-spdel]').forEach(btn=>btn.onclick=()=>{ close(); deleteSpace(btn.dataset.spdel); });
   }
 
   // opts.focusId — відкрити документ прокрученим до цього блока (стрибок із Каналу папки)
+  // відкрити дошку папки (або її теми) документом-редактором; key — ключ дошки
   function goSpaceFor(key, opts){
     try{
       boardKey=key;
       if(!boards[key]) boards[key]=[];
       if(typeof syncBlocks==='function') syncBlocks();
-      const tb=(typeof tabByKey==='function')?tabByKey(key):null;
-      const isFolderBuiltin = (typeof BUILTIN_TABS!=='undefined') && BUILTIN_TABS.some(t=>t.key===key) && key!=='all';
-      spaceFromFolder = (tb && tb.folder) ? tb.folder : (isFolderBuiltin ? key : (currentFolderKey||null));
-      // ЧИСТА ПАПКА: виставляємо клас ДО renderBoard, щоб порожній аркуш не показував «Тисни +»
-      { const fromFolder = spaceFromFolder && spaceFromFolder!=='__general__' && spaceFromFolder!=='__root__';
-        document.body.classList.toggle('folder-clean', !!fromFolder); }
-      // НОВИЙ РЕДАКТОР: папки відкриваються у Notion-стилі. Fallback — стара дошка.
-      if(typeof window.openFlowPage==='function'){
-        window.__flowExitPage=function(){ try{ if(typeof goHome==='function'){ goHome(); return; } }catch(_){} if(window.__show)window.__show('scr-home'); };
-        window.openFlowPage(opts||null);
-      } else {
-        renderBoard();
-        show('scr-space');
-      }
-    }catch(e){ console.error('goSpaceFor', e); renderBoard(); show('scr-space'); }
+      spaceFromFolder = String(key).split('__sp_')[0] || (currentFolderKey||null);
+      if(typeof window.openFlowPage!=='function'){ goHome(); return; }
+      window.__flowExitPage=function(){ try{ if(typeof goHome==='function'){ goHome(); return; } }catch(_){} if(window.__show)window.__show('scr-home'); };
+      window.openFlowPage(opts||null);
+    }catch(e){ console.error('goSpaceFor', e); goHome(); }
   }
   let spaceFromFolder=null;
 
@@ -208,7 +137,6 @@
   function show(id){
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    document.getElementById('fab').classList.toggle('show', id==='scr-space');
     document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('on'));
     if(id==='scr-home'){ document.getElementById('navHome').classList.add('on');
       const bm=document.getElementById('brandMark');
@@ -218,23 +146,16 @@
     if(id==='scr-planner'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
     if(id==='scr-more'||id==='scr-projects'||id==='scr-work'){ const nmr=document.getElementById('navMore'); if(nmr) nmr.classList.add('on'); }
     // синхронізація десктопного сайдбару
-    const dmap={'scr-home':'home','scr-folder':'home','scr-space':'home','scr-goals':'planner','scr-projects':'projects',
+    const dmap={'scr-home':'home','scr-goals':'planner','scr-projects':'projects',
                 'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home'};
     const dkey=dmap[id]||'home';
     document.querySelectorAll('.dsb-i').forEach(b=>b.classList.toggle('on', b.dataset.dnav===dkey));
-    // прапорець для 3-панельного режиму Простору
-    document.body.classList.toggle('in-space', id==='scr-space');
-    // ЧИСТА ПАПКА: якщо простір відкрито з папки (а не з головного Огляду) — ховаємо всі панелі
-    { const fromFolder = id==='scr-space' && spaceFromFolder && spaceFromFolder!=='__general__' && spaceFromFolder!=='__root__';
-      document.body.classList.toggle('folder-clean', !!fromFolder); }
     document.body.classList.toggle('in-home', id==='scr-home');
     document.body.classList.toggle('in-reader', id==='scr-reader');
     // Канал папки: ховає нижню панель і котика (18-channel.css)
     document.body.classList.toggle('in-channel', id==='scr-channel');
-    if(id==='scr-space'){ try{ renderSpaceSwitcher(); }catch(_){} }
     if(id==='scr-reader'){ try{ initReader(); applyRdrCfg(); }catch(_){} }
     if(id==='scr-nyc'){ try{ if(window.__nycRefresh) window.__nycRefresh(); }catch(_){} }
-    if(id==='scr-space') renderPaneList();
     if(id==='scr-home'){ try{ renderRightRail(); }catch(_){} }
     // ВАЖЛИВО: <html> має overflow:hidden, а <body> — position:fixed зі своїм
     // overflow-y:auto. Тобто реальний скрол — на body, а не на window/html.
@@ -249,34 +170,7 @@
   document.getElementById('navHome').onclick = goHome;
   document.getElementById('navFinance').onclick = goFinance;
   document.getElementById('navPlanner').onclick = ()=>{ goPlanner(); };
-  { const b=document.getElementById('spaceCfgBtn'); if(b) b.onclick=()=>openSpaceSettings(); }
 
-  // ── меню «⋯» Простору: другорядні дії однією шторкою ──
-  function openSpaceMore(){
-    document.querySelectorAll('#spaceMoreSheet').forEach(x=>x.remove());
-    const items=[
-      ['zenToggle','⛶','Повний екран (zen)'],
-      ['spaceFullToggle','🖥️','Простір на весь екран'],
-      ['spaceLayoutToggle','◫','Лейаут: класичний / три панелі'],
-      ['canvasToggle','🧲','Вільне полотно'],
-      ['boardWideToggle','↔️','Ширина дошки'],
-      ['proThemeToggle','✨','Pro-стиль'],
-      ['spaceClear','🗑️','Очистити дошку'],
-    ];
-    const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='spaceMoreSheet';
-    m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
-      <div class="fmenu-title">Дії простору</div>
-      ${items.map(([id,e,t])=>`<button class="fmi ${id==='spaceClear'?'danger':''}" data-proxy="${id}">${e} ${t}</button>`).join('')}
-    </div>`;
-    m.onclick=e=>{ if(e.target===m) m.remove(); };
-    document.body.appendChild(m);
-    m.querySelectorAll('[data-proxy]').forEach(b=>b.onclick=()=>{
-      m.remove();
-      const t=document.getElementById(b.dataset.proxy);
-      if(t) t.click();
-    });
-  }
-  { const b=document.getElementById('spaceMoreBtn'); if(b) b.onclick=openSpaceMore; }
 
   // ── профіль у футері сайдбара: Google-акаунт + меню функцій ──
   function dsbFillUser(){
@@ -495,21 +389,6 @@
     else if(k==='more') goMore();
   });
 
-  // ── перемикач лейауту Простору (класичний ↔ три панелі), лише десктоп ──
-  let spaceLayout='classic';
-  try{ const sl=localStorage.getItem('spacelayout'); if(sl) spaceLayout=sl; }catch(_){}
-  prefCatchup('spacelayout', v=>{ if(v) spaceLayout=v; });
-  function applySpaceLayout(){
-    document.body.classList.toggle('space-3pane', spaceLayout==='3pane');
-    const btn=document.getElementById('spaceLayoutToggle');
-    if(btn) btn.title = spaceLayout==='3pane' ? 'Лейаут: три панелі (тап → класичний)' : 'Лейаут: класичний (тап → три панелі)';
-    if(spaceLayout==='3pane') renderPaneList();
-  }
-  { const b=document.getElementById('spaceLayoutToggle');
-    if(b) b.onclick=()=>{ spaceLayout = spaceLayout==='3pane'?'classic':'3pane';
-      try{ prefSet('spacelayout', spaceLayout); }catch(_){}
-      applySpaceLayout(); renderBoard(); }; }
-
   // ── ЗГОРТАННЯ ЛІВОЇ ПАНЕЛІ + ПОВНОЕКРАННИЙ ПРОСТІР (десктоп) ──
   let sidebarCollapsed=false, spaceFull=false;
   try{ sidebarCollapsed = localStorage.getItem('sidebarcol')==='1'; }catch(_){}
@@ -531,37 +410,6 @@
       applyChrome(); try{window.platform.haptic('select');}catch(_){} }; }
   try{ applyChrome(); }catch(_){}
 
-  // список блоків поточного рівня для лівої панелі (3-pane)
-  function renderPaneList(){
-    const el=document.getElementById('paneList'); if(!el) return;
-    if(typeof currentLevelArr!=='function'){ el.innerHTML=''; return; }
-    const arr=currentLevelArr();
-    const ico=(t)=> (typeof blockIcon==='function')? blockIcon(t,16) : '';
-    const subFor=(b)=>{
-      if(isContainer(b)) return (b.children||[]).length+' елем.';
-      if(b.type==='link') return (b.url||'').replace(/^https?:\/\//,'').split('/')[0]||'посилання';
-      if(b.type==='check'||b.type==='list') return ((b.items||[]).length)+' пункт.';
-      if(b.type==='note'||b.type==='quick') return 'текст';
-      return (BLOCK_TYPES[b.type]||{}).title||'';
-    };
-    el.innerHTML = `<div class="pane-list-h">${folderPath&&folderPath.length?'У папці':'Блоки простору'}</div>`+
-      arr.map(b=>{
-        const t=BLOCK_TYPES[b.type]||{color:'#5b8def',title:'Блок'};
-        const title = b.title || (b.text? String(b.text).slice(0,24) : t.title);
-        return `<div class="pane-item" data-panejump="${b.id}" style="--pc:${t.color}">
-          <span class="pi-ico">${ico(b.type)}</span>
-          <span style="min-width:0"><span class="pi-nm">${esc(title)}</span><span class="pi-sub">${esc(subFor(b))}</span></span>
-        </div>`;
-      }).join('');
-    el.querySelectorAll('[data-panejump]').forEach(it=>it.onclick=()=>{
-      const b=getBlock(it.dataset.panejump);
-      if(b&&isContainer(b)){ folderPath.push(it.dataset.panejump); renderBoard(); }
-      else {
-        const node=document.querySelector('[data-tileid="'+it.dataset.panejump+'"]');
-        if(node) node.scrollIntoView({behavior:'smooth',block:'center'});
-      }
-    });
-  }
   // ── Варіант 3: панель віджетів на Огляді (десктоп) ──
   let homeWidgets=false;
   try{ homeWidgets = localStorage.getItem('homewidgets')==='1'; }catch(_){}
@@ -715,56 +563,6 @@
   try{ applyCardSkin(); }catch(_){}
   try{ applyProTheme(); }catch(_){}
 
-  // ── ZEN / повноекранний Простір (моб+десктоп): ховає хедер, перемикач, нав-бар ──
-  let zenMode=false;
-  function applyZen(){
-    document.body.classList.toggle('space-zen', zenMode);
-    const b=document.getElementById('zenToggle');
-    if(b) b.classList.toggle('on', zenMode);
-    // розгорнути на повну висоту, якщо платформа вміє
-    try{ if(zenMode) window.platform.expand(); }catch(_){}
-  }
-  function setZen(on){ zenMode=on; applyZen(); try{ window.platform.haptic(on?'medium':'light'); }catch(_){}
-    try{ if(document.body.classList.contains('in-space')) renderBoard(); }catch(_){} }
-  { const b=document.getElementById('zenToggle'); if(b) b.onclick=()=>setZen(!zenMode); }
-  { const x=document.getElementById('zenExit'); if(x) x.onclick=()=>setZen(false); }
-
-  // кнопки панелі полотна
-  { const zi=document.getElementById('czIn'); if(zi) zi.onclick=()=>{ setZoom(getZoom()+0.2,true); try{window.platform.haptic('select');}catch(_){} }; }
-  { const zo=document.getElementById('czOut'); if(zo) zo.onclick=()=>{ setZoom(getZoom()-0.2,true); try{window.platform.haptic('select');}catch(_){} }; }
-  { const zv=document.getElementById('czVal'); if(zv) zv.onclick=()=>{ setZoom(1,true); try{window.platform.haptic('light');}catch(_){} }; }
-  { const zf=document.getElementById('czFit'); if(zf) zf.onclick=()=>{ fitAll(); }; }
-  { const zt=document.getElementById('czTidy'); if(zt) zt.onclick=()=>{ tidyCanvas(); }; }
-  { const zs=document.getElementById('czSnap'); if(zs) zs.onclick=()=>{ toggleSnap(); }; }
-  { const sk=document.getElementById('czSkin'); if(sk) sk.onclick=()=>{ cycleCanvasSkin(); }; }
-  { const ze=document.getElementById('czExit'); if(ze) ze.onclick=()=>{ if(isCanvasMode()) toggleCanvasMode(); }; }
-  // міні-мапа: тап → стрибок у відповідну точку полотна
-  { const mm=document.getElementById('canvasMinimap'); if(mm) mm.onclick=e=>{
-      const board=document.getElementById('board'); if(!board||!mm._scale) return;
-      const r=mm.getBoundingClientRect();
-      const px=(e.clientX-r.left)/mm._scale, py=(e.clientY-r.top)/mm._scale; // лог. координати
-      const z=getZoom();
-      board.scrollLeft = px*z - board.clientWidth/2;
-      board.scrollTop  = py*z - board.clientHeight/2;
-      flashMinimap();
-    }; }
-  // вихід із Простору автоматично знімає zen
-  try{
-    document.querySelectorAll('.nav a').forEach(a=>{
-      a.addEventListener('click',()=>{ if(zenMode) setZen(false); });
-    });
-  }catch(_){}
-
-  // ЗІБРАТИ ВСЕ: акуратно скласти блоки в стрічку (скидає ручні позиції)
-  function tidyCanvas(){
-    if(!isCanvasMode()) return;
-    confirmSheet({title:'Зібрати всі блоки в акуратну стрічку?', sub:'Поточні позиції скинуться.', okLabel:'Зібрати', onOk:()=>{
-    currentLevelArr().forEach(b=>{ b.fx=null; b.fy=null; });
-    saveBoard(); renderBoard();
-    try{ window.platform.haptic('medium'); }catch(_){}
-    }});
-  }
-  window.__fitAll=fitAll; window.__tidyCanvas=tidyCanvas;
 
   // ── фічу «ручний десктопний режим» видалено; чистимо старі збережені прапорці,
   //    щоб у користувачів не лишався зламаний viewport зі старих версій ──
@@ -900,13 +698,6 @@
   window.goWishes=goWishes;
   document.getElementById('wishBack').onclick = goHome;
   { const sc=document.getElementById('summaryCard'); if(sc) sc.onclick=goWishes; }
-  document.getElementById('spaceBack').onclick = ()=>{
-    if(folderPath.length){ folderPath.pop(); renderBoard(); return; }  // вийти на рівень вище
-    // ЧИСТА ПАПКА: назад одразу до списку папок
-    spaceFromFolder=null; currentFolderKey=null;
-    goHome();
-  };
-  document.getElementById('folderBack').onclick = goHome;
   document.getElementById('debtsBack').onclick = () => goFolder('fin');
   document.getElementById('spendBack').onclick = () => goFolder('fin');
   { const wb=document.getElementById('workBack'); if(wb) wb.onclick=()=>{

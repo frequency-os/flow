@@ -4,6 +4,7 @@
       widgets:[ { id:'worktrack', emoji:'⏱', t:'Години та заробіток', d:'Календар змін + зарплата', ready:true } ]},
   };
   let order = ['work'];
+  let currentFolderKey=null;  // яка папка відкрита (Канал / документ / Робота)
 
   /* ── власна іконка профілю (необов'язково): data-URL, стисле фото ── */
   const CUSTOM_AV_KEY='custom_avatar_v1';
@@ -125,11 +126,10 @@
     if(!folderWidgets[key].includes(id) && !((folders[key]&&folders[key].widgets||[]).some(w=>w.id===id))){
       folderWidgets[key].push(id); saveFolderWidgets();
     }
-    renderFolder(key);
   }
   function removeWidgetFromFolder(key,id){
     if(folderWidgets[key]) folderWidgets[key]=folderWidgets[key].filter(x=>x!==id);
-    saveFolderWidgets(); renderFolder(key);
+    saveFolderWidgets();
   }
 
   function orderedFolderKeys(){
@@ -239,5 +239,4 @@
   function goSpend(){ renderSpend(); show('scr-spend'); }
   let workOrigin='work';
   function goWork(){ workOrigin=currentFolderKey||'work'; renderWork(); show('scr-work'); }
-  function goSpace(){ renderBoard(); show('scr-space'); }
 

@@ -1,6 +1,5 @@
   /* ===== КНИГА — картка ===== */
   .tile.book-card{padding:0;position:relative;overflow:visible;}
-  .board.gridview .tile.book-card{grid-column:span 4;}
   .tile.book-card .bookc-main{display:flex;align-items:center;gap:14px;padding:14px 52px 14px 14px;cursor:pointer;user-select:none;}
   .bookc-cover{flex-shrink:0;width:54px;height:74px;border-radius:8px;background-size:cover;background-position:center;
     box-shadow:0 4px 14px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;
@@ -195,11 +194,6 @@
   #rdrFull{font-size:15px;}
 
   /* хлібні крихти */
-  .grp-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:0 2px 14px;font-size:13px;color:var(--muted);}
-  .grp-crumbs span{cursor:pointer;font-weight:600;padding:3px 8px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line);transition:.15s;}
-  .grp-crumbs span:last-child{color:var(--text);border-color:color-mix(in srgb,var(--accent) 40%,var(--line));}
-  .grp-crumbs span:hover{color:var(--text);}
-  .grp-crumbs i{color:var(--muted);font-style:normal;opacity:.6;}
 
   /* collapsed: show only header */
   .tile.collapsed > *:not(.th){display:none!important;}
@@ -209,9 +203,6 @@
   .tile.pinned .ti::after{content:"📌";position:absolute;margin-left:-8px;margin-top:-18px;font-size:10px;}
 
   /* ===== СТОРІНКА (page-card) ===== */
-  .board .tile.page-card{grid-column:span 2;padding:0;overflow:hidden;cursor:pointer;
-    background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 16%,var(--card)),var(--card));}
-  .board.gridview .tile.page-card{grid-column:span 2;}
   .tile.page-card .pgc-main{display:flex;flex-direction:column;height:100%;}
   .tile.page-card .pgc-sheet{flex:1;min-height:64px;padding:11px 13px 6px;display:flex;flex-direction:column;gap:6px;
     background:repeating-linear-gradient(transparent,transparent 21px,color-mix(in srgb,var(--tc) 8%,transparent) 22px);
@@ -231,7 +222,6 @@
   .tile.page-card .pgc-arrow{font-size:22px;color:var(--tc);opacity:.7;line-height:1;flex:0 0 auto;}
   .tile.page-card .pgc-menu{position:absolute;top:10px;right:10px;z-index:2;background:rgba(0,0,0,.25);backdrop-filter:blur(4px);}
   .tile.page-card:active{transform:scale(.99);}
-  .board.docview .tile.page-card,.board.shelfview .tile.page-card{grid-column:auto!important;}
 
   /* ===== DRAG-TO-REORDER ===== */
   .tile .draghandle{display:grid;place-items:center;width:24px;height:26px;flex:0 0 auto;cursor:grab;touch-action:none;
@@ -273,8 +263,6 @@
     background:var(--tc);color:#fff;padding:3px 8px;border-radius:7px;pointer-events:none;
     box-shadow:0 4px 14px rgba(0,0,0,.4);}
   /* у суцільному вигляді кутик не потрібен */
-  .board.docview .tile .rzhandle{display:none;}
-  .board.docview .tile{padding-bottom:16px;}
 
   /* авто-розмір: кнопка */
   .szbtn[data-size$="|auto"]{font-weight:800;}
@@ -327,21 +315,9 @@
   .bn-waterplus:active{transform:scale(.9);}
 
   /* поповер водяного «＋»: 4 типи секцій */
-  .bnpop{position:fixed;z-index:4500;display:none;flex-direction:column;gap:3px;padding:5px;
-    background:var(--card-2);border:1px solid var(--line);border-radius:14px;
-    box-shadow:0 12px 36px rgba(0,0,0,.5);min-width:178px;animation:bnpop-in .15s ease forwards;}
-  .bnpop.on{display:flex;opacity:1;}
   @keyframes bnpop-in{from{transform:translateY(6px) scale(.97)}to{transform:none}}
-  .bnpop button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;
-    background:none;border:none;color:var(--text);font:600 13.5px Manrope;padding:9px 11px;border-radius:9px;
-    cursor:pointer;transition:background .12s;}
-  .bnpop button:hover{background:color-mix(in srgb,var(--accent) 16%,transparent);}
-  .bnpop button:active{transform:scale(.97);}
-  .bnpop-backdrop{position:fixed;inset:0;z-index:4400;display:none;}
-  .bnpop-backdrop.on{display:block;}
   /* трохи місця знизу плитки під водяний плюс */
   .tile:not(.tbento):not(.thead):not(.tdivider){padding-bottom:46px;}
-  .board.docview .tile:not(.tbento):not(.thead){padding-bottom:46px;}
 
   /* NOTE rich toolbar */
   .rt-bar{display:flex;gap:5px;margin-bottom:9px;flex-wrap:wrap;
@@ -459,48 +435,13 @@
   .tcd .due{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
   .tcd .due input{background:var(--field);border:1px solid var(--line);border-radius:9px;padding:7px 10px;color:var(--text);font-family:inherit;font-size:13px;}
   /* add-sheet tabs */
-  .ash-tabs{display:flex;gap:8px;margin-bottom:14px;}
-  .ash-tabs button{flex:1;border:1px solid var(--line);background:var(--field);color:var(--muted);border-radius:12px;
-    padding:11px;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;transition:all .16s;}
-  .ash-tabs button.on{background:linear-gradient(135deg,#6a7dff,#a06bff);color:#fff;border-color:transparent;}
-  .ash-pane{display:none;} .ash-pane.on{display:block;animation:pop .2s ease;}
   /* colored widget icons in widgets tab */
-  .ash-rest .wcell .gico{background:color-mix(in srgb,var(--ac) 22%,transparent);border-color:transparent;}
-  .ash-rest .wcell .gico svg{stroke:var(--ac);opacity:1;}
 
   /* перемикач стилю шторки «Додати блок»: стандартний / галерея */
-  .ash-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .ash-style-sw{display:flex;gap:4px;background:var(--field);border:1px solid var(--line);border-radius:11px;padding:3px;}
-  .ash-style-sw button{border:none;background:none;color:var(--muted);border-radius:8px;padding:6px 9px;
-    font-family:inherit;font-weight:700;font-size:12px;cursor:pointer;}
-  .ash-style-sw button.on{background:linear-gradient(135deg,#6a7dff,#a06bff);color:#fff;}
 
   /* GALLERY: великі картки з описом */
-  .ash-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .ash-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px;cursor:pointer;
-    text-align:left;transition:transform .14s;}
-  .ash-card:active{transform:scale(.97);}
-  .ash-card .ac-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;
-    background:color-mix(in srgb,var(--ac) 20%,transparent);}
-  .ash-card .ac-ico svg{stroke:var(--ac);}
-  .ash-card .ac-nm{font-size:13.5px;font-weight:800;margin-bottom:2px;}
-  .ash-card .ac-ds{font-size:10.5px;color:var(--muted);line-height:1.35;}
 
   /* GALLERY: вкладка налаштувань — зовнішні (простір) / внутрішні (блок) */
-  .ash-set-sec{margin-bottom:20px;}
-  .ash-set-sec .tt{font-size:12px;font-weight:800;margin-bottom:2px;display:flex;align-items:center;gap:7px;}
-  .ash-set-sec .tt .badge{font-size:8.5px;font-weight:800;border-radius:6px;padding:2px 6px;}
-  .ash-set-sec .tt .badge.ext{color:#8b9bff;background:rgba(106,125,255,.14);}
-  .ash-set-sec .tt .badge.int{color:#5edb95;background:rgba(52,199,123,.14);}
-  .ash-set-sec .st{font-size:10.5px;color:var(--muted);margin-bottom:11px;}
-  .ash-set-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
-    border-radius:13px;padding:11px 13px;margin-bottom:8px;}
-  .ash-set-row .nm{flex:1;font-size:13px;font-weight:700;}
-  .ash-set-row .val{font-size:12px;color:var(--muted);font-weight:700;}
-  .ash-toggle{width:34px;height:20px;border-radius:99px;background:var(--card-2);position:relative;cursor:pointer;flex:0 0 auto;transition:.16s;}
-  .ash-toggle.on{background:linear-gradient(135deg,#6a7dff,#a06bff);}
-  .ash-toggle i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.16s;}
-  .ash-toggle.on i{left:16px;}
 
   /* table block */
   .ttable .tablescroll{overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;margin-top:4px;}
@@ -515,15 +456,6 @@
   .trdel{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;} .trdel:hover{color:var(--owe);}
   .tablebtns{display:flex;gap:14px;margin-top:10px;}
 
-  .board-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 20px;}
-  .board-empty .e{font-size:40px;margin-bottom:14px;}
-  .board-empty p{font-size:14px;line-height:1.5;}
-
   /* FAB */
-  .fab{position:fixed;right:calc(50% - 240px + 20px);bottom:96px;width:56px;height:56px;border-radius:18px;border:none;
-    background:linear-gradient(135deg,#6a7dff,#a06bff);color:#fff;font-size:28px;font-weight:300;cursor:pointer;z-index:35;
-    box-shadow:0 10px 28px rgba(106,125,255,.45);display:none;align-items:center;justify-content:center;transition:transform .15s;}
-  @media (max-width:480px){.fab{right:24px;}}
-  .fab:active{transform:scale(.92);}
-  .fab.show{display:flex;}
+  @media (max-width:480px){}
 

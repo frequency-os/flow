@@ -89,10 +89,6 @@
 
   /* ===== мобільна шапка Простору: не тиснемо, даємо перенос ===== */
   @media (max-width:640px){
-    #scr-space .top{flex-wrap:wrap;row-gap:10px;}
-    #scr-space .top .brand{min-width:0;}
-    #scr-space .top .brand h1{font-size:19px;}
-    #scr-space .top>div:last-child{margin-left:auto;}
   }
   .fmenu{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:8px;background:rgba(0,0,0,.4);
     border:1px solid rgba(255,255,255,.18);color:#fff;font-size:14px;cursor:pointer;display:grid;place-items:center;padding:0;z-index:5;}
@@ -105,10 +101,6 @@
   .fbanner .fpin{position:absolute;top:9px;right:40px;font-size:12px;z-index:4;}
   .fbanner .fsub{position:absolute;top:8px;left:8px;z-index:4;font-size:11px;font-weight:700;
     background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:2px 7px;backdrop-filter:blur(4px);}
-  .wcard.subfolder{cursor:pointer;}
-  .wcard.subfolder .fsub-mini{font-size:11px;font-weight:700;color:var(--c,#6a7dff);
-    background:color-mix(in srgb,var(--c,#6a7dff) 14%,transparent);border-radius:8px;padding:2px 8px;margin-right:4px;}
-  .fld-subs{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
   /* drag & drop папок */
   #folderGrid.fdragging{touch-action:none;}
   .fcard.fdrag-src{opacity:.32;}

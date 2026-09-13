@@ -3,7 +3,7 @@
   function spotCtx(){
     const scr=(document.querySelector('.screen.active')||{}).id||'scr-home';
     const br=window.__flowPageBridge;
-    if(scr==='scr-page'||scr==='scr-space'){
+    if(scr==='scr-page'||scr==='scr-channel'){
       let nm=''; try{ nm=br&&br.folderName()||''; }catch(_){}
       return {key:'page',label:'📁 '+(nm||'Простір'),canWrite:!!br};
     }

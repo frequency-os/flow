@@ -8,10 +8,6 @@
    🌙 Ніч (фіолет) · ⚫ AMOLED (та сама ніч, вимкнене світло) · ☀️ День (та сама ніч у денному світлі)
    Шар активний лише з класом html.fd26t. Вимикач: localStorage.fd26t='0'. */
 
-
-
-
-
 /* ── 2. СКЛО (рецепт Glassmorphism 2.0: alpha-градієнт + blur + бордер + inset-грань) ──
    Лише 2 нові blur-поверхні (nav уже має свій blur). */
 html.fd26t:not([data-theme]) .summary,
@@ -58,7 +54,6 @@ html.fd26t .nyc::after{background:radial-gradient(circle, color-mix(in srgb,var(
 html.fd26t .nyc-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--skl) 12%,var(--card)),var(--card));}
 html.fd26t[data-theme="light"] .incx-src .bar,
 html.fd26t[data-theme="light"] .lit-next .bar{background:var(--field);}
-html.fd26t[data-theme="light"] .sdash-st .bar{background:rgba(32,24,72,.08);}
 
 /* ── 3. ЧИТАБЕЛЬНІСТЬ ──
    muted підняли в токенах; тут — точкові підсилення дрібного тексту на картках. */
@@ -142,7 +137,6 @@ html.fd26t .fuz-sec .lnk svg{width:12px;height:12px;vertical-align:-2px;margin-r
 html.fd26t .fuz-all span svg{width:20px;height:20px;display:block;}
 html.fd26t .incx-exp .ic svg,html.fd26t .lit-act .ic svg{width:19px;height:19px;display:block;color:var(--muted);}
 
-
 /* ── 9. ЛІЧИЛЬНИК «ДО НОВОГО РОКУ» · компактний рядок ПІД картою бажань ──
    Вузол #nyCountdown лишається там, де він у розмітці — сусідом одразу під
    #summaryCard. Клас .nyc-strip навішує fd26tjs (41-theme-layer.js).
@@ -169,7 +163,6 @@ html.fd26t #nyCountdown.nyc-strip .nyc-cell{background:none;border:0;padding:0;
   display:flex;align-items:baseline;gap:3px;text-align:left;}
 html.fd26t #nyCountdown.nyc-strip .nyc-cell b{font-size:14.5px;color:var(--text);}
 html.fd26t #nyCountdown.nyc-strip .nyc-cell span{font-size:9px;letter-spacing:.04em;}
-
 
 /* ── 10. КАРТА БАЖАНЬ · тема «Вітрина» (фокус-колода) ──
    Свідомо БЕЗ префікса html.fd26t: тема має працювати навіть із вимкненим шаром. */
@@ -232,7 +225,6 @@ html[data-theme="light"] .wdk-add{border-color:rgba(32,24,72,.2);}
 html[data-theme="light"] .wdk-dots i{background:rgba(32,24,72,.16);}
 html[data-theme="light"] .wdk-dots i.on{background:#6d5cf0;}
 html[data-theme="light"] .wdk-ritual{background:#fff;border-color:rgba(32,24,72,.1);box-shadow:0 4px 14px rgba(38,30,80,.08);}
-
 
 /* ── 11. КОЛАЖ «Мудборд» + банер входу на Вітрині ── */
 .clg-banner{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;border-radius:18px;cursor:pointer;
@@ -300,7 +292,6 @@ html[data-theme="light"] .clg-banner .stack i{border-color:#fff;}
 html[data-theme="light"] .clg-bar{background:rgba(255,255,255,.9);border-color:var(--line);box-shadow:0 10px 30px rgba(38,30,80,.14);}
 html[data-theme="light"] .clg-bar button.hot{color:#fff;}
 html[data-theme="light"] .clg-ph{border-color:rgba(32,24,72,.14);box-shadow:0 8px 20px rgba(38,30,80,.14);}
-
 
 /* ── 12. РАНКОВИЙ РИТУАЛ «Стрічка дня» ── */
 .rit-cal{display:flex;gap:6px;overflow-x:auto;margin:0 -18px 10px;padding:2px 18px 6px;scrollbar-width:none;}

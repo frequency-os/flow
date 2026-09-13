@@ -54,13 +54,7 @@ html.t-flat .pgsz-bar{background:var(--accent);background-image:none;}  /* 04-me
 html.t-flat .wt-btn.on{background:var(--accent);background-image:none;}  /* 05-values-wishes.css */
 html.t-flat .pth-seg button.on{background:var(--accent);background-image:none;}  /* 06-goals.css */
 html.t-flat .gtab.on{background:var(--accent);background-image:none;}  /* 06-goals.css */
-html.t-flat .nav #navAI .ni{background:var(--accent);background-image:none;box-shadow:none;}  /* 07-finance.css */
-html.t-flat .sw-story.on .ring{background:var(--accent);background-image:none;}  /* 09-board-canvas.css */
-html.t-flat #mobileDock .dk-plus{background:var(--accent);background-image:none;}  /* 09-board-canvas.css */
-html.t-flat .ash-tabs button.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
-html.t-flat .ash-style-sw button.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
-html.t-flat .ash-toggle.on{background:var(--accent);background-image:none;}  /* 10-reader-blocks.css */
-html.t-flat .fab{background:var(--accent);background-image:none;box-shadow:none;}  /* 10-reader-blocks.css */
+html.t-flat .nav #navAI .ni{background:var(--accent);background-image:none;box-shadow:none;}  /* 07-finance.css */  /* 09-board-canvas.css */  /* 09-board-canvas.css */  /* 10-reader-blocks.css */  /* 10-reader-blocks.css */  /* 10-reader-blocks.css */  /* 10-reader-blocks.css */
 html.t-flat .dsb-logo{background:var(--accent);background-image:none;box-shadow:none;}  /* 11-spaces-desktop.css */
 html.t-flat .dpr-av{background:var(--accent);background-image:none;}  /* 11-spaces-desktop.css */
 html.t-flat #flowSpot .fs-msg.u{background:var(--accent);background-image:none;}  /* 12-pets-more-planner.css */
@@ -190,8 +184,6 @@ html.t-light .wkcal-d.today .dn{color:color-mix(in srgb,var(--owe) 70%,var(--tex
 
 /* ── плитки статистики Простору ──
    Темне напівпрозоре скло під світлим фоном читалось сірою плямою. */
-html.t-flat .sdash-st{background:var(--card-2);border:1px solid var(--line);box-shadow:none;}
-html.t-flat .sdash-st b{color:var(--text);}
 
 /* ── календар ритуалу (шар fd26t) ── */
 html.t-light .rit-cal .cd.today s{color:color-mix(in srgb,var(--fin) 65%,var(--text));}

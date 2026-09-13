@@ -122,7 +122,6 @@
 </aside>
 <button id="sidebarReveal" title="Показати панель"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <!-- список блоків для 3-панельного режиму Простору (десктоп) -->
-<div class="pane-list" id="paneList"></div>
 <!-- права панель віджетів для Огляду (десктоп, Варіант 3) -->
 <aside class="rrail" id="rightRail"></aside>
 <div class="phone">
@@ -184,17 +183,6 @@
   </section>
 
   <!-- ===== SCREEN: FOLDER ===== -->
-  <section class="screen" id="scr-folder">
-    <button class="back" id="folderBack">‹ Папки</button>
-    <div class="ph" id="folderHead" style="display:flex;align-items:flex-end;justify-content:space-between;">
-      <div>
-        <div class="ey">Папка · <b id="fEy"></b></div>
-        <h2><span class="em" id="fEm"></span><span id="fName"></span></h2>
-      </div>
-      <div class="icon-btn" id="folderView" title="Вигляд" style="margin-bottom:6px;">🔲</div>
-    </div>
-    <div id="folderBody"></div>
-  </section>
 
   <!-- ===== SCREEN: DEBTS WIDGET ===== -->
   <section class="screen" id="scr-debts">
@@ -483,31 +471,6 @@
     </div>
   </div>
 
-  <!-- ===== modal: вибір віджета для папки ===== -->
-  <div class="wkm-back" id="wpkBack">
-    <div class="wkm" style="max-width:380px">
-      <div class="wkm-date"><span class="ic">🧩</span><span id="wpkTitle">Додати віджет</span></div>
-      <div id="wpkList"></div>
-      <button class="wkm-cancel" id="wpkCancel" style="margin-top:8px">Закрити</button>
-    </div>
-  </div>
-
-  <section class="screen" id="scr-space">
-    <button class="back" id="spaceBack" style="display:none">‹ Папки</button>
-    <div class="top">
-      <div class="brand"><div class="logo">🧩</div><div><h1>Простір</h1><span id="spaceSub">твоя дошка</span></div></div>
-      <div style="display:flex;gap:8px;">
-        <div class="icon-btn" id="spaceCfgBtn" title="Налаштування просторів"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-        <div class="icon-btn" id="viewToggle" title="Вигляд">🔲</div>
-        <div class="icon-btn" id="boardSearchBtn" title="Пошук по дошці"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
-        <div class="icon-btn" id="spaceMoreBtn" title="Ще дії"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></div>
-        <div id="spaceHiddenBtns" style="display:none"><div class="icon-btn space-layout-toggle" id="spaceFullToggle" title="Простір на весь екран"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg></div><div class="icon-btn space-layout-toggle" id="spaceLayoutToggle" title="Лейаут: класичний / три панелі"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6" height="16" rx="1.5"/><rect x="11" y="4" width="10" height="16" rx="1.5"/></svg></div><div class="icon-btn" id="boardWideToggle" title="Ширина дошки">↔️</div><div class="icon-btn" id="canvasToggle" title="Вільне полотно: блоки будь-де"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="3" width="8" height="10" rx="1.5"/><rect x="3" y="12" width="8" height="9" rx="1.5"/><rect x="13" y="16" width="8" height="5" rx="1.5"/></svg></div><div class="icon-btn" id="proThemeToggle" title="Pro-стиль">✨</div><div class="icon-btn" id="zenToggle" title="Повний екран (zen)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></div><div class="icon-btn" id="spaceClear" title="Очистити"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></div></div>
-      </div>
-    </div>
-    <div class="space-switcher" id="spaceSwitcher"></div>
-    <div class="boardtabs" id="boardTabs"></div>
-    <div class="board" id="board"></div>
-  </section>
 
   <!-- ============ ЧИТАЛКА КНИГ ============ -->
   <section class="screen" id="scr-reader">
@@ -860,26 +823,6 @@
   </div>
 </div>
 
-<!-- add-block FAB + sheet (space only) -->
-<button class="fab" id="fab">+</button>
-<div id="mobileDock">
-  <button data-dk="note"><b>📝</b><small>НОТАТКА</small></button>
-  <button data-dk="check"><b>✅</b><small>ЧЕКЛІСТ</small></button>
-  <button data-dk="photo"><b>📷</b><small>ФОТО</small></button>
-  <button data-dk="__more" class="dk-plus"><b>＋</b><small>ЩЕ</small></button>
-</div>
-
-<!-- ПОШУК ПО ДОШЦІ -->
-<div class="srch-ov" id="srchOv">
-  <div class="srch-box">
-    <div class="srch-head">
-      <input class="srch-input" id="srchInput" placeholder="Шукати по блоках…" autocomplete="off">
-      <button class="srch-x" id="srchClose" title="Закрити">×</button>
-    </div>
-    <div class="srch-res" id="srchRes"></div>
-  </div>
-</div>
-
 <!-- ШВИДКЕ ЗАХОПЛЕННЯ -->
 <div class="qcap-ov" id="qcapOv">
   <div class="qcap-in">
@@ -899,20 +842,6 @@
   <span class="ut-msg" id="undoMsg">Видалено</span>
   <button class="ut-btn" id="undoBtn">↩ Повернути</button>
 </div>
-<div class="addsheet" id="addsheet">
-  <div class="addsheet-in">
-    <div class="grip"></div>
-    <div class="ash-head">
-      <div class="ash-title" style="margin:0">Додати блок</div>
-      <div class="ash-style-sw" id="ashStyleSw">
-        <button data-ashstyle="standard" title="Стандартний вигляд">☰</button>
-        <button data-ashstyle="gallery" title="Галерея з описами та налаштуваннями">▦</button>
-      </div>
-    </div>
-    <div class="ash-grid" id="ashGrid"></div>
-  </div>
-</div>
-
 <nav class="nav">
   <a class="on" id="navHome"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10.5V19a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19v-8.5"/><path d="M10 20.5v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/></svg></span>Огляд</a>
   <a id="navPlanner"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M8 3v3M16 3v3"/></svg></span>Планер</a>
@@ -922,36 +851,8 @@
 </nav>
 <div id="flowCap" style="display:none"></div>
 <div id="fcSay" class="tail-r"></div>
-<button id="zenExit" title="Вийти з повного екрана"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M4 20L20 4"/></svg></button>
-
-<!-- ВІЛЬНЕ ПОЛОТНО: міні-мапа + нижня панель навігації -->
-<div id="canvasMinimap" title="Тапни, щоб перейти"></div>
-<div id="canvasBar">
-  <button id="czExit" class="cb-exit" title="Вийти з полотна"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M4 20L20 4"/></svg></button>
-  <span class="cb-sep"></span>
-  <button id="czOut" title="Зменшити">−</button>
-  <button id="czVal" class="cb-val" title="Скинути на 100%">100%</button>
-  <button id="czIn" title="Збільшити">+</button>
-  <span class="cb-sep"></span>
-  <button id="czFit" title="Вписати все"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg></button>
-  <button id="czTidy" title="Зібрати все в стрічку"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="5" rx="1.5"/><rect x="4" y="11" width="16" height="5" rx="1.5"/><rect x="4" y="18" width="10" height="2.5" rx="1"/></svg></button>
-  <button id="czSkin" title="Стиль полотна">🎨</button>
-  <button id="czSnap" class="on" title="Прилипання до сітки"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
-</div>
 
 <script>@@INCDIR:scripts/core@@</script>
-<div class="bnpop" id="bnpop" aria-hidden="true">
-  <button data-bnpop="text">📄 Текст</button>
-  <button data-bnpop="check">☑️ Чек-лист</button>
-  <button data-bnpop="link">🔗 Посилання</button>
-  <button data-bnpop="divider">➖ Розділювач</button>
-</div>
-<div class="rmenu" id="rmenu" aria-hidden="true">
-  <div class="rmenu-ring" id="rmenuRing">
-    <div class="rmenu-center" id="rmenuCenter"></div>
-  </div>
-</div>
-<script>@@INC:scripts/20-radial-menu.js@@</script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
   <div class="pg-sgrip"></div>

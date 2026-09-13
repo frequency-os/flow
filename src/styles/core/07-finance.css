@@ -266,35 +266,7 @@
 
   /* ---------- folder inner: widget list ---------- */
   .wlist{display:flex;flex-direction:column;gap:12px;}
-  .wcard{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:18px;
-    padding:18px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:transform .18s,border-color .18s;}
-  .wcard:hover{transform:translateY(-2px);}
-  .wcard .wem{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;font-size:24px;flex-shrink:0;
-    background:color-mix(in srgb,var(--c) 16%,transparent);}
-  .wcard .wmid{flex:1;}
-  .wcard .wt{font-size:17px;font-weight:800;}
-  .wcard .wd{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;}
-  .wcard .wv{font-size:16px;font-weight:800;color:var(--c);white-space:nowrap;}
-  .wcard .chev{color:var(--muted);font-size:18px;}
-  .wcard.soon{cursor:default;opacity:.55;}
-  .wcard.soon:hover{transform:none;}
-  .wcard.boardcard{background:linear-gradient(135deg,var(--card),var(--card-2));}
-  .wcard.boardcard .wv{font-weight:800;}
-  .wcard.customboard{position:relative;}
-  .wcard .cbdel{background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;padding:0 4px;opacity:.5;}
-  .wcard .cbdel:hover{color:var(--owe);opacity:1;}
-  .wcard.newboard{border-style:dashed;border-left:1px dashed var(--line);border:1.5px dashed var(--line);cursor:pointer;opacity:.85;}
-  .wcard.newboard:hover{opacity:1;border-color:var(--c);}
-  .wcard.newboard .wem{background:color-mix(in srgb,var(--c) 14%,transparent);}
   /* grid (tile) view for folder widgets */
-  .wlist.gridview{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .wlist.gridview .wcard{flex-direction:column;align-items:flex-start;gap:12px;min-height:150px;border-left:1px solid var(--line);border-top:4px solid var(--c);}
-  .wlist.gridview .wcard .wmid{width:100%;}
-  .wlist.gridview .wcard .wv{margin-top:auto;font-size:20px;}
-  .wlist.gridview .wcard .chev{display:none;}
-  .wlist.gridview .wcard.boardcard,.wlist.gridview .wcard.soon{grid-column:1/-1;}
-  .wlist.gridview .wcard.soon{flex-direction:row;min-height:auto;}
-  .wlist.gridview .soon-tag{margin-left:auto;}
   .soon-tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
     border:1px solid var(--line);border-radius:99px;padding:4px 9px;}
 
@@ -585,7 +557,6 @@
   .tfocus .fc-hint{ font-weight:500; font-size:11px; color:var(--muted); }
   .tfocus.run .fc-ring{ animation:fc-pulse 2.4s ease-in-out infinite; }
   @keyframes fc-pulse{ 50%{ filter:drop-shadow(0 0 10px color-mix(in srgb, var(--tc) 45%, transparent)); } }
-
 
   /* ── Гаманець: головний екран Фінансів ── */
   .wal-head{padding:6px 2px 2px;}
