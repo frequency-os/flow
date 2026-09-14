@@ -366,7 +366,10 @@
     font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;}
 
   /* ---------- bottom nav · liquid glass ---------- */
-  .nav{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+  /* Відступ знизу: на iPhone env(safe-area-inset-bottom) ≈ 34pt (зона індикатора «додому»),
+     і колишні +14px піднімали панель майже на 50pt від краю. Тепер вона стоїть на 4pt над
+     індикатором, як плаваючі панелі iOS; там, де зони нема (Mac, Android, Safari з тулбаром) — 10px. */
+  .nav{position:fixed;bottom:max(10px, calc(env(safe-area-inset-bottom) + 4px));left:50%;transform:translateX(-50%);
     width:calc(100% - 28px);max-width:452px;z-index:200;display:flex;justify-content:space-around;
     padding:10px 6px;border-radius:30px;
     background:var(--nav-bg);

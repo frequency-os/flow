@@ -16,7 +16,7 @@
 | Файлів JS | 55 |
 | Рядків JS | 24461 |
 | Файлів CSS | 29 |
-| Рядків CSS | 8283 |
+| Рядків CSS | 8286 |
 | Сутностей верхнього рівня | 1497 |
 | Ключів сховища (FLOW_KEYS) | 44 |
 
@@ -102,7 +102,7 @@
 | `src/styles/core/04-menus.css` | 61 | 0 |
 | `src/styles/core/05-values-wishes.css` | 186 | 0 |
 | `src/styles/core/06-goals.css` | 228 | 0 |
-| `src/styles/core/07-finance.css` | 594 | 0 |
+| `src/styles/core/07-finance.css` | 597 | 0 |
 | `src/styles/core/08-work.css` | 202 | 0 |
 | `src/styles/core/09-board-canvas.css` | 193 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 461 | 4 |
