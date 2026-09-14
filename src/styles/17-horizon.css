@@ -54,7 +54,9 @@
 
   /* ══════════ ВЕРХ «КАПСУЛА» ══════════ */
   #scr-page{padding-top:8px;}
-  #scr-page .pg-top{position:sticky;top:0;z-index:20;padding:10px 12px 8px;gap:8px;
+  /* верхній відступ = смуга годинника на iPhone (у Safari env() = 0): інакше «‹ Папки»
+     і капсула лягають під годинник і назад повернутись не можна */
+  #scr-page .pg-top{position:sticky;top:0;z-index:20;padding:calc(12px + env(safe-area-inset-top)) 12px 8px;gap:8px;
     background:transparent !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
     border-bottom:0 !important;box-shadow:none !important;}
   #scr-page .pg-doc{margin-top:-46px;}
@@ -88,6 +90,10 @@
   /* смужка зверху — прибрана, аркуш починається одразу */
   /* сторінка гасить відступи оболонки (.phone{padding:26px 18px}) — як екран картки */
   #scr-page{margin:-26px -18px 0 !important;padding:0 !important;}
+  /* поки відкритий документ, оболонка фарбується в його колір: сам #scr-page має висоту
+     вмісту, і без цього нижче за останній блок світила біла (або темна) підлога застосунку */
+  body:has(#scr-page.active),body:has(#scr-page.active) .phone{background:#0f1115 !important;background-image:none !important;}
+  body:has(#scr-page.active.pg-paper),body:has(#scr-page.active.pg-paper) .phone{background:#faf9f6 !important;}
   #scr-page .pg-doc{padding-left:13px !important;padding-right:13px !important;}
   /* жолоби ＋ і ⠿ ідуть у поля — текст отримує повну ширину */
   #scr-page .pgb{padding-left:0;padding-right:0;gap:2px;}

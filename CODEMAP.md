@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 55 |
-| Рядків JS | 24450 |
+| Рядків JS | 24461 |
 | Файлів CSS | 29 |
-| Рядків CSS | 8277 |
+| Рядків CSS | 8283 |
 | Сутностей верхнього рівня | 1497 |
 | Ключів сховища (FLOW_KEYS) | 44 |
 
@@ -71,7 +71,7 @@
 | `src/scripts/core/35-channel.js` | 577 | 54 |
 | `src/scripts/page-editor/01-palette.js` | 204 | 18 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
-| `src/scripts/page-editor/03-premium-pack.js` | 590 | 27 |
+| `src/scripts/page-editor/03-premium-pack.js` | 601 | 27 |
 | `src/scripts/page-editor/04-w-journal.js` | 107 | 9 |
 | `src/scripts/page-editor/05-w-decisions.js` | 112 | 4 |
 | `src/scripts/page-editor/06-w-project.js` | 100 | 6 |
@@ -93,7 +93,7 @@
 | `src/styles/14-week.css` | 157 | 0 |
 | `src/styles/15-month.css` | 227 | 2 |
 | `src/styles/16-mx.css` | 242 | 2 |
-| `src/styles/17-horizon.css` | 363 | 1 |
+| `src/styles/17-horizon.css` | 369 | 1 |
 | `src/styles/18-standalone.css` | 43 | 1 |
 | `src/styles/19-themes-flat.css` | 408 | 3 |
 | `src/styles/core/01-tokens-base.css` | 343 | 8 |
@@ -1735,14 +1735,14 @@
 | `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:458` |
 | `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:459` |
 | `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:493` |
-| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:535` |
-| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:536` |
-| `savedTheme` | значення | `src/scripts/page-editor/03-premium-pack.js:547` |
-| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:550` |
-| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:560` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:569` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:570` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:575` |
+| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:539` |
+| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:540` |
+| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:543` |
+| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:561` |
+| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:571` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:580` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:581` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:586` |
 
 ### `src/scripts/page-editor/04-w-journal.js` — 9 сутностей
 

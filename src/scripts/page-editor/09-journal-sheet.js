@@ -439,7 +439,7 @@
   // opts.focusId — прокрутити до блока й підсвітити (стрибок із Каналу папки)
   window.openFlowPage=function(opts){
     if(!bridge()){ if(window.__show)window.__show('scr-space'); return; }
-    applyTheme(savedTheme);
+    applyTheme(pageThemeDefault());
     pgPath=[];
     undoStack.length=0; redoStack.length=0; syncUndoBtn(); // не переносити історію між різними сторінками
     pgTitle.value=bridge().folderName()||'Сторінка';

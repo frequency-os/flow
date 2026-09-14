@@ -532,11 +532,23 @@
   });
 
   // ── тема ──
-  var THKEY='flowPageTheme';
-  function applyTheme(t){scr.classList.toggle('pg-paper',t==='paper');
+  /* Тема документа йде за темою застосунку (світла → «paper», темна → «ink»), поки людина
+     сама не тапне перемикач у капсулі — тоді вибір запамʼятовується. Старий ключ
+     flowPageTheme навмисно не читається: він записувався при КОЖНОМУ відкритті, тож не
+     відрізняв «обрав сам» від «так вийшло», і документ лишався темним у світлій темі. */
+  var THKEY='flowPageThemeChoice';
+  function applyTheme(t,persist){scr.classList.toggle('pg-paper',t==='paper');
     document.querySelectorAll('#pgTheme [data-pgtheme]').forEach(function(b){b.classList.toggle('on',b.dataset.pgtheme===t);});
-    try{localStorage.setItem(THKEY,t);}catch(_){}}
-  document.getElementById('pgTheme').addEventListener('click',function(e){var b=e.target.closest('[data-pgtheme]');if(b)applyTheme(b.dataset.pgtheme);});
+    if(persist){ try{localStorage.setItem(THKEY,t);}catch(_){} }}
+  function pageThemeDefault(){
+    var c=null; try{ c=localStorage.getItem(THKEY); }catch(_){}
+    if(c==='ink'||c==='paper') return c;
+    var dark=true;
+    try{ var t=document.documentElement.getAttribute('data-theme')||'dark';
+      dark = !(t==='light'||t==='desk-light'||t==='studio-light'); }catch(_){}
+    return dark?'ink':'paper';
+  }
+  document.getElementById('pgTheme').addEventListener('click',function(e){var b=e.target.closest('[data-pgtheme]');if(b)applyTheme(b.dataset.pgtheme,true);});
   document.getElementById('pgUndoBtn').onclick=function(){doUndo();};
   document.getElementById('pgShowHiddenBtn').onclick=function(){
     pgShowHidden=!pgShowHidden;
@@ -544,7 +556,6 @@
     this.title=pgShowHidden?'Ховати блоки з умовою знову':'Показати сховані умовою блоки';
     render();
   };
-  var savedTheme='ink';try{savedTheme=localStorage.getItem(THKEY)||'ink';}catch(_){}
 
   // ── назва сторінки → назва папки ──
   var pgTitle=document.getElementById('pgTitle');
