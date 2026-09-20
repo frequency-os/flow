@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 55 |
-| Рядків JS | 24461 |
-| Файлів CSS | 29 |
-| Рядків CSS | 8286 |
-| Сутностей верхнього рівня | 1497 |
+| Рядків JS | 24463 |
+| Файлів CSS | 30 |
+| Рядків CSS | 8415 |
+| Сутностей верхнього рівня | 1498 |
 | Ключів сховища (FLOW_KEYS) | 44 |
 
 ## Файли JS
@@ -66,7 +66,7 @@
 | `src/scripts/core/30-upgrade.js` | 291 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 143 | 13 |
-| `src/scripts/core/33-home-widgets.js` | 84 | 8 |
+| `src/scripts/core/33-home-widgets.js` | 86 | 9 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
 | `src/scripts/core/35-channel.js` | 577 | 54 |
 | `src/scripts/page-editor/01-palette.js` | 204 | 18 |
@@ -96,6 +96,7 @@
 | `src/styles/17-horizon.css` | 369 | 1 |
 | `src/styles/18-standalone.css` | 43 | 1 |
 | `src/styles/19-themes-flat.css` | 408 | 3 |
+| `src/styles/20-depth.css` | 129 | 8 |
 | `src/styles/core/01-tokens-base.css` | 343 | 8 |
 | `src/styles/core/02-page-editor.css` | 1253 | 10 |
 | `src/styles/core/03-folders-projects.css` | 560 | 0 |
@@ -1555,7 +1556,7 @@
 | `window.flowGlobalSearch` | значення | `src/scripts/core/32-global-search.js:132` |
 | `hb` | значення | `src/scripts/core/32-global-search.js:142` |
 
-### `src/scripts/core/33-home-widgets.js` — 8 сутностей
+### `src/scripts/core/33-home-widgets.js` — 9 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1565,8 +1566,9 @@
 | `nextBlocks` | функція | `src/scripts/core/33-home-widgets.js:11` |
 | `diaryStreak` | функція | `src/scripts/core/33-home-widgets.js:20` |
 | `cardHTML` | функція | `src/scripts/core/33-home-widgets.js:30` |
-| `render` | функція | `src/scripts/core/33-home-widgets.js:32` |
-| `window.renderHomeWidgets` | значення | `src/scripts/core/33-home-widgets.js:68` |
+| `hwIco` | функція | `src/scripts/core/33-home-widgets.js:32` |
+| `render` | функція | `src/scripts/core/33-home-widgets.js:34` |
+| `window.renderHomeWidgets` | значення | `src/scripts/core/33-home-widgets.js:70` |
 
 ### `src/scripts/core/34-shortcuts.js` — 5 сутностей
 

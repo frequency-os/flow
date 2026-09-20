@@ -1,0 +1,129 @@
+/* ════════ «ГЛИБИНА» · матеріальність поверх плоского вигляду (21.09.2026) ════════
+   Напрямок обрано з трьох варіантів, згенерованих поверх справжнього знімка
+   Огляду. Структура, порядок блоків, палітри й акцент не міняються — міняється
+   лише відчуття матеріалу: картки трохи піднесені над тлом, у них світлий
+   верхній край в 1px і м'яка розсіяна тінь; банер Карти бажань — глибший
+   тон із домішкою акценту; нижня панель стає матовим склом, крізь яке видно
+   сторінку; кнопки мають легкий підсвіт зверху, щоб читались натискними.
+
+   Правила навмисно лежать в окремому файлі, а не в 19-themes-flat.css:
+   він підключається останнім, тож тут не треба воювати за специфічність —
+   досить того самого селектора, і він переможе. Усе матове: жодних
+   градієнтів-смуг і світіння. Токени нижче — єдине місце, де задається
+   сила ефекту; компоненти лише посилаються на них. */
+
+/* ── токени глибини ─────────────────────────────────────────────────────── */
+html.t-flat{
+  /* світлий край зверху картки — імітує ребро, на яке падає світло */
+  --dp-edge:rgba(255,255,255,.055);
+  /* тінь картки: близька щільна + далека розсіяна */
+  --dp-shadow:0 1px 2px rgba(0,0,0,.35),0 12px 28px -12px rgba(0,0,0,.55);
+  /* тінь дрібних елементів (кнопки шапки, сегменти) */
+  --dp-shadow-s:0 1px 2px rgba(0,0,0,.3),0 4px 10px -6px rgba(0,0,0,.45);
+  /* поверхня картки — на пів тону світліша за базову */
+  --dp-card:color-mix(in srgb,var(--card) 96%,#fff 4%);
+  /* банер Карти бажань: графіт із домішкою акценту, плоский */
+  --dp-hero:color-mix(in srgb,var(--card) 87%,var(--accent) 13%);
+  --dp-hero-line:color-mix(in srgb,var(--line) 70%,var(--accent) 30%);
+  /* підвал банера (кнопки + лічильник) — на тон глибший за сам банер */
+  --dp-hero-foot:color-mix(in srgb,var(--dp-hero) 84%,#000 16%);
+  /* нижня панель: напівпрозора, щоб працювало розмиття */
+  --dp-nav:color-mix(in srgb,var(--nav-bg) 78%,transparent);
+  --dp-nav-shadow:0 1px 0 var(--dp-edge) inset,0 2px 6px rgba(0,0,0,.28),0 18px 40px -14px rgba(0,0,0,.65);
+}
+/* світлі палітри: ребро на білому не видно, тому працює лише тінь —
+   м'якша й холодніша; домішка акценту в банері ледь помітна */
+html.t-flat.t-light{
+  --dp-edge:rgba(255,255,255,.9);
+  --dp-shadow:0 1px 2px rgba(20,24,32,.05),0 12px 28px -12px rgba(20,24,32,.18);
+  --dp-shadow-s:0 1px 2px rgba(20,24,32,.05),0 4px 10px -6px rgba(20,24,32,.14);
+  --dp-card:var(--card);
+  --dp-hero:color-mix(in srgb,var(--card) 93%,var(--accent) 7%);
+  --dp-hero-line:color-mix(in srgb,var(--line) 60%,var(--accent) 40%);
+  --dp-hero-foot:color-mix(in srgb,var(--dp-hero) 96%,#000 4%);
+  --dp-nav:color-mix(in srgb,var(--nav-bg) 82%,transparent);
+  --dp-nav-shadow:0 1px 0 var(--dp-edge) inset,0 2px 6px rgba(20,24,32,.08),0 18px 40px -14px rgba(20,24,32,.22);
+}
+
+/* ── картки: домашні віджети, плитки папок, конверти Грошей ────────────── */
+html.t-flat .hw-card,
+html.t-flat .fc2-tile.nocover,
+html.t-flat .env2{
+  background:var(--dp-card);
+  box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow);}
+/* плитка з фото: ребро лягло б на знімок, тож лишається тільки тінь */
+html.t-flat .fc2-tile:not(.nocover){box-shadow:var(--dp-shadow);}
+/* пунктирна «Нова папка» — привид, а не предмет: без тіні */
+html.t-flat .fc2-add{box-shadow:none;}
+/* натиснута картка сідає на тло — тінь коротшає */
+html.t-flat .hw-card:active{box-shadow:0 1px 0 var(--dp-edge) inset,0 1px 2px rgba(0,0,0,.3);}
+
+/* ── банер Карти бажань (без фото) ──────────────────────────────────────── */
+/* другий селектор повторює правило «один вигляд для світлих тем» у
+   19-themes-flat.css (html.t-flat.t-light.fd26t …) — інакше воно переможе */
+html.t-flat #scr-home .summary:not(.has-wish),
+html.t-flat.t-light.fd26t #scr-home .summary:not(.has-wish){
+  background:var(--dp-hero);background-image:none;
+  border:1px solid var(--dp-hero-line);
+  box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow);}
+/* підвал банера: полиця кнопок і лічильник — один глибший поверх */
+html.t-flat #scr-home .summary:not(.has-wish) .herocap,
+html.t-flat #scr-home .summary:not(.has-wish) .nyc{
+  background:var(--dp-hero-foot);border-top:1px solid var(--dp-hero-line);}
+html.t-flat #scr-home .summary:not(.has-wish) .hc-tab+.hc-tab{border-left:1px solid var(--dp-hero-line);}
+/* смуга прогресу: доріжка ледь темніша за банер, а не сіра */
+html.t-flat #scr-home .summary:not(.has-wish) .bar{background:color-mix(in srgb,var(--dp-hero) 80%,#000 20%);}
+html.t-flat.t-light #scr-home .summary:not(.has-wish) .bar{background:color-mix(in srgb,var(--dp-hero) 92%,#000 8%);}
+
+/* ── шапка Огляду: кнопки й логотип як маленькі предмети ────────────────── */
+html.t-flat #scr-home .top .icon-btn,
+html.t-flat #scr-home .top .logo.lg-glass{
+  box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow-s);}
+/* на фото шапка скляна — там своя тінь не потрібна */
+html.t-flat #scr-home:has(.summary.has-wish) .top .icon-btn,
+html.t-flat #scr-home:has(.summary.has-wish) .top .logo.lg-glass{box-shadow:none;}
+
+/* ── кнопки-пігулки: підсвіт зверху = «можна натиснути» ─────────────────── */
+html.t-flat .hw-card .hw-cta{box-shadow:0 1px 0 rgba(255,255,255,.09) inset;}
+html.t-flat.t-light .hw-card .hw-cta{box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(20,24,32,.06);}
+/* сегмент режимів папок і лічильник — той самий підсвіт */
+html.t-flat .fvseg,
+html.t-flat .count{box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow-s);}
+
+/* ── іконки замість емодзі в шапках домашніх віджетів ───────────────────── */
+/* Емодзі були трьома різними стилями малювання в одному ряду; лінійна іконка
+   зі спрайта в кольорі акценту тримає ряд рівним і повторює мову папок. */
+.hw-card .hw-h{display:flex;align-items:center;gap:7px;}
+.hw-card .hw-ico{width:14px;height:14px;flex:none;color:var(--accent);
+  fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── нижня панель: матове скло, крізь яке видно сторінку ────────────────── */
+/* Позиція та відступ від краю не чіпаються (fe56549). Поверхня стає
+   напівпрозорою — розмиття в .nav уже є, але на суцільному фоні воно не
+   працювало. Радіальний відблиск ::before міняємо на рівне ребро. */
+html.t-flat .nav{background:var(--dp-nav);box-shadow:var(--dp-nav-shadow);}
+html.t-flat .nav::before{display:none;}
+/* активна вкладка: без градієнта й світіння, рівна підкладка з ребром */
+html.t-flat .nav a.on::after{
+  background:var(--sel);border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);
+  box-shadow:0 1px 0 var(--dp-edge) inset;}
+/* центральна кнопка AI: рівний акцент + коротка тінь, щоб стояла над панеллю */
+html.t-flat .nav #navAI .ni{box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 4px 10px -4px rgba(0,0,0,.5);}
+/* тінь під іконками панелі більше не потрібна — панель сама має об'єм */
+html.t-flat .nav .ni svg{filter:none;}
+
+/* ── інші екрани: та сама мова матеріалу ────────────────────────────────── */
+/* Планер: «скляні» картки тижня мали градієнтну підкладку (14-week.css) —
+   під рівним виглядом це ледь помітна смуга. Стає та ж поверхня, що й у
+   віджетів Огляду, з тим же ребром і тінню. */
+html.t-flat #scr-planner .f26w-glass{
+  background:var(--dp-card);background-image:none;border-color:var(--line);
+  box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow);}
+html.t-flat #scr-planner .f26w-rit{box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow-s);}
+/* Гроші: рядки гаманця — низькі, тож тінь коротка, інакше список важчає */
+html.t-flat .wal-row{background:var(--dp-card);box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow-s);}
+/* «Ще»: профіль, групи рядків, плитки й перемикач режиму */
+html.t-flat .acc-wrap,
+html.t-flat .mh-rows,
+html.t-flat .mh-mode,
+html.t-flat .mh-tile{background:var(--dp-card);box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow);}

@@ -28,26 +28,28 @@
     }
 
     function cardHTML(cls,go,inner){ return `<button class="hw-card ${cls}" data-hw="${go}">${inner}</button>`; }
+    // лінійна іконка зі спрайта index.html замість емодзі — один стиль малювання в ряду шапок
+    function hwIco(id){ return `<svg class="hw-ico" aria-hidden="true"><use href="#${id}"/></svg>`; }
 
     function render(){
       const host=document.getElementById('homeWidgetsRow'); if(!host) return;
       // планер
       const nb=nextBlocks();
       const plInner = nb.length
-        ? `<div class="hw-h">📅 Далі сьогодні</div>`+nb.map(b=>
+        ? `<div class="hw-h">${hwIco('fo-calendar')}Далі сьогодні</div>`+nb.map(b=>
             `<div class="hw-blk"><i style="background:${(typeof PL_COL!=='undefined'&&PL_COL[b.c])||'#5b8def'}"></i><b>${hwHour(b.h||0)}</b><span>${hwEsc(b.t||'Блок')}</span></div>`).join('')
-        : `<div class="hw-h">📅 План на сьогодні</div><div class="hw-empty">День ще порожній</div><div class="hw-cta">＋ Додати перший блок</div>`;
+        : `<div class="hw-h">${hwIco('fo-calendar')}План на сьогодні</div><div class="hw-empty">День ще порожній</div><div class="hw-cta">＋ Додати перший блок</div>`;
       // гаманець
       let bal=null, spent=0;
       try{ bal=finBalance(); const m=monthAgg(ymLocal()); spent=m.out; }catch(_){}
       const finInner = (bal!==null && (bal!==0||spent>0))
-        ? `<div class="hw-h">💰 Гаманець</div><div class="hw-big">${hwFmt(bal)} ₴</div><div class="hw-sub">витрачено цього місяця: ${hwFmt(spent)} ₴</div>`
-        : `<div class="hw-h">💰 Гаманець</div><div class="hw-empty">Ще без записів</div><div class="hw-cta">＋ Записати витрату</div>`;
+        ? `<div class="hw-h">${hwIco('fo-coin')}Гаманець</div><div class="hw-big">${hwFmt(bal)} ₴</div><div class="hw-sub">витрачено цього місяця: ${hwFmt(spent)} ₴</div>`
+        : `<div class="hw-h">${hwIco('fo-coin')}Гаманець</div><div class="hw-empty">Ще без записів</div><div class="hw-cta">＋ Записати витрату</div>`;
       // щоденник
       const st=diaryStreak();
       const diaInner = st>0
-        ? `<div class="hw-h">📔 Щоденник</div><div class="hw-big">${st} ${pluralUk(st,'день','дні','днів')}</div><div class="hw-sub">пишеш підряд — тримай хвилю</div>`
-        : `<div class="hw-h">📔 Щоденник</div><div class="hw-empty">Стрік ще не почався</div><div class="hw-cta">＋ Перший запис</div>`;
+        ? `<div class="hw-h">${hwIco('fo-book')}Щоденник</div><div class="hw-big">${st} ${pluralUk(st,'день','дні','днів')}</div><div class="hw-sub">пишеш підряд — тримай хвилю</div>`
+        : `<div class="hw-h">${hwIco('fo-book')}Щоденник</div><div class="hw-empty">Стрік ще не почався</div><div class="hw-cta">＋ Перший запис</div>`;
 
       host.innerHTML =
         cardHTML('hw-wide','planner',plInner)
