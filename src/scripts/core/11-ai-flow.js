@@ -130,7 +130,7 @@
   async function aiCall(sys,messages,onDelta){
     try{ if((window.flowLang&&window.flowLang())==='en'){ sys = (sys||'') + ' \n\nВАЖЛИВО: користувач переключив мову інтерфейсу на англійську — відповідай ТІЛЬКИ англійською мовою, незалежно від мови його повідомлення.'; } }catch(_){}
     const wantStream=typeof onDelta==='function';
-    const res=await fetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
       body:JSON.stringify(wantStream?{system:sys,messages:messages,stream:true}:{system:sys,messages:messages})});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const ctype=String(res.headers.get('content-type')||'');

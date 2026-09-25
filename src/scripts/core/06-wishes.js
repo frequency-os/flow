@@ -762,7 +762,7 @@
   // проста обгортка з таймаутом, щоб офлайн/повільна мережа не тримала людину в очікуванні
   function fetchWithTimeout(url,opts,ms){
     return Promise.race([
-      fetch(url,opts),
+      aiFetch(url,opts),   // кличеться лише для воркера (/upload-photo) — з пропуском
       new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms||9000))
     ]);
   }

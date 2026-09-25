@@ -400,6 +400,16 @@
     }
 
     window.sbUser = function(){ return sbUserCache; };
+    /* Токен сесії для AI-воркера (див. aiFetch у 09-goals.js): воркер може
+       вимагати вхід, щоб чужі не ганяли платну модель. getSession сам оновлює
+       прострочений токен. Чекаємо не довше 1.5 с — AI не має висіти через Supabase. */
+    window.sbAccessToken = async function(){
+      if(!sb || !sbUserCache) return '';
+      try{
+        const got = await Promise.race([ sb.auth.getSession(), new Promise(r=>setTimeout(()=>r(null),1500)) ]);
+        return (got && got.data && got.data.session && got.data.session.access_token) || '';
+      }catch(_){ return ''; }
+    };
     // ОДИН запит на весь список даних користувача — замість того, щоб кожен
     // window.storage.get(key) під час load() ходив у мережу окремо.
     async function sbPrefetchAll(){

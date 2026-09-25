@@ -217,7 +217,7 @@
     for(const m of ['claude-haiku-4-5','claude-sonnet-4-6']){
       const t0=Date.now();
       try{
-        const r=await fetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+        const r=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
           body:JSON.stringify({model:m,max_tokens:1,messages:[{role:'user',content:'ping'}]})});
         out.push((r.ok?'✅':'❌ HTTP '+r.status)+' '+m+' · '+(Date.now()-t0)+'мс');
       }catch(e){ out.push('❌ '+m+' · '+String(e.message||e)); }
@@ -1065,7 +1065,7 @@
   }
   try{ window.__flowAiRaw=aiCallRaw; }catch(_){}
   async function aiCallRaw(payload,onDelta){
-    const res=await fetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
       body:JSON.stringify(Object.assign({stream:true},payload))});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const _u={i:0,o:0,cr:0,cw:0};

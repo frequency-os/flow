@@ -206,7 +206,7 @@
         try{
           const ep=(typeof aiEndpoint==='function' ? aiEndpoint() : (window.AI_ENDPOINT||''));
           if(!ep) return;
-          const r=await fetch(ep.replace(/\/$/,'')+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:original,target:'en'})});
+          const r=await (typeof aiFetch==='function'?aiFetch:fetch)(ep.replace(/\/$/,'')+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:original,target:'en'})});
           if(!r.ok) return;
           const data=await r.json();
           const en=(data&&data.text)?String(data.text):original;
@@ -281,7 +281,7 @@
       try{
         const ep = (typeof aiEndpoint==='function' ? aiEndpoint() : (window.AI_ENDPOINT||''));
         if(!ep) return src;
-        const r = await fetch(ep.replace(/\/$/,'')+'/translate', {
+        const r = await (typeof aiFetch==='function'?aiFetch:fetch)(ep.replace(/\/$/,'')+'/translate', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ text: src, target:'en' })
         });

@@ -919,7 +919,7 @@
         r.onerror=()=>rej(new Error('read'));
         r.readAsDataURL(blob);
       });
-      const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},
+      const res=await aiFetch(url,{method:'POST',headers:{'content-type':'application/json'},
         body:JSON.stringify({audio_b64:b64, mime:blob.type||''})});
       let j={}; try{ j=await res.json(); }catch(_){}
       if(!res.ok){ plToast('⚠️ Розпізнавання: '+((j&&j.error)||('HTTP '+res.status))+' — онови воркер'); return ''; }

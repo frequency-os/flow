@@ -889,7 +889,7 @@
         +(d.topMiss?('\nНайчастіше зривається: «'+d.topMiss[0]+'» ('+d.topMiss[1]+'× за 3 тижні)'):'')
         +(d.worstDow?('\nНайслабший день: '+d.worstDow):'')
         +'\nПо днях (done/total): '+d.wk.map(x=>x.ds.slice(5)+' '+x.done+'/'+x.total).join(', ');
-      const res=await fetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
+      const res=await aiFetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
         body:JSON.stringify({ system:sys, messages:[{role:'user',content:usr}] }) });
       if(!res.ok) throw new Error('HTTP '+res.status);
       const data=await res.json();

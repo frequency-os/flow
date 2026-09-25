@@ -4,13 +4,13 @@
    Живе в Cloudflare Workers. Застосунок ніколи не звертається до
    Anthropic напряму: ключ лежить тут і в браузер не потрапляє.
 
-   Три адреси:
+   Три адреси (решта — 404):
      POST /            — розмова з моделлю (з інструментами, стрімом)
      POST /transcribe  — голос у текст (Whisper через Workers AI)
      POST /tts         — текст у голос
 
-   Оновлено 30.08.2026. Що змінилось проти попередньої версії —
-   у worker/README.md.
+   Оновлено 25.09.2026: замок (Origin, ліміт, Opus, вхід Supabase) і
+   правильна системна підказка агента. Подробиці — у worker/README.md.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Моделі ──────────────────────────────────────────────────────
@@ -22,6 +22,9 @@ const MODEL_ALIAS = {
   // Sonnet 4.6 → Sonnet 5: новіша модель, і водночас ДЕШЕВША
   // ($2/$10 за млн замість $3/$15). Міняти застосунок не треба.
   "claude-sonnet-4-6": "claude-sonnet-5",
+  // Щотижневе зведення щоденника просить Haiku з датою в назві.
+  // Без цього рядка назва «невідома» і запит мовчки йшов у дорожчий Sonnet.
+  "claude-haiku-4-5-20251001": "claude-haiku-4-5",
 };
 
 const MODELS = {
@@ -36,6 +39,116 @@ const MODELS = {
 const MODEL_DEFAULT = "claude-sonnet-5";
 
 const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
+
+/* Opus — найдорожча модель ($25 за млн вихідних токенів). Застосунок
+   її не просить, тож за замовчуванням вона зачинена: інакше будь-хто
+   з адресою воркера ганяв би її за наш рахунок. Відчинити — змінна
+   ALLOW_OPUS=1. */
+const OPUS_MODELS = ["claude-opus-5"];
+
+/* Стеля відповіді для будь-якої моделі. Застосунок просить 2048;
+   8192 вистачає на довгий план. Раніше зі стрімом дозволялось 64000 —
+   це близько $1.6 за один запит Opus. */
+const MAX_TOKENS_CAP = 8192;
+
+/* ── Замок: хто може кликати воркер ─────────────────────────────
+   Адреса воркера лежить у публічному репо, а платимо ми. Тому:
+   1) пускаємо лише сторінки зі списку (Origin);
+   2) рахуємо запити з кожної IP-адреси;
+   3) за бажання — вимагаємо вхід у застосунок (Supabase).
+
+   Список Origin можна замінити змінною ALLOWED_ORIGINS (через кому).
+   «:*» у кінці — будь-який порт. «null» — сторінка, відкрита з диска
+   (file://). «none» — дозволити запити зовсім без Origin (curl).
+   Чесне застереження: Origin легко підробити скриптом. Це замок від
+   чужих САЙТІВ; від скриптів — ліміт частоти і вхід Supabase.       */
+const ORIGINS_DEFAULT = [
+  "https://frequency-os.github.io", // сайт (GitHub Pages)
+  "null",                           // file:// — збірка, відкрита з диска
+  "app://frequency",                // десктоп (Electron, desktop/main.js)
+  "capacitor://localhost",          // iOS-обгортка
+  "http://localhost:*",             // локальна перевірка dist/
+  "http://127.0.0.1:*",
+  // Без Origin: сторінка з диска в Electron (перевірено 25.09 — file://
+  // там не шле Origin взагалі), нативні клієнти, curl. Закрити їх Origin-ом
+  // однаково не вийде (скрипт підставить будь-який), а зламати живий
+  // застосунок — легко. Від скриптів — ліміт, Opus-замок і вхід Supabase.
+  "none",
+];
+
+function originAllowed(origin, env) {
+  const list = env.ALLOWED_ORIGINS
+    ? String(env.ALLOWED_ORIGINS).split(",").map((s) => s.trim()).filter(Boolean)
+    : ORIGINS_DEFAULT;
+  if (list.includes("*")) return true;
+  // Чужий САЙТ у браузері завжди має Origin — його відсіє список нижче.
+  // Без Origin приходять не-сайти; їх пускає слово «none» у списку.
+  if (!origin) return list.includes("none");
+  return list.some((p) => p.endsWith(":*")
+    ? origin === p.slice(0, -2) || origin.startsWith(p.slice(0, -1))
+    : origin === p);
+}
+
+/* Ліміт частоти: лічильник на IP у пам'яті воркера. Cloudflare тримає
+   кілька копій воркера, і кожна рахує сама, тож ліміт приблизний, але
+   цикл «тисяча запитів підряд» він зупиняє. Один хід агента — до 6
+   запитів, тож 30 на хвилину людині не заважають. Розмова і голос
+   рахуються окремо, щоб озвучка не з'їдала ліміт розмови.          */
+const RATE_WINDOW_MS = 60000;
+const RATE_PER_MIN_DEFAULT = 30;
+const rateHits = new Map();
+
+function rateWait(ip, kind, env) {
+  const limit = +env.RATE_PER_MIN || RATE_PER_MIN_DEFAULT;
+  const now = Date.now();
+  const key = kind + ":" + ip;
+  let e = rateHits.get(key);
+  if (!e || now - e.t0 >= RATE_WINDOW_MS) {
+    e = { t0: now, n: 0 };
+    rateHits.set(key, e);
+  }
+  e.n++;
+  // прибирання, щоб пам'ять не росла від тисяч різних адрес
+  if (rateHits.size > 5000) {
+    for (const [k, v] of rateHits) if (now - v.t0 >= RATE_WINDOW_MS) rateHits.delete(k);
+  }
+  return e.n > limit ? Math.max(1, Math.ceil((e.t0 + RATE_WINDOW_MS - now) / 1000)) : 0;
+}
+
+/* Вхід через Supabase — вмикається лише коли задані SUPABASE_URL і
+   SUPABASE_ANON. Застосунок шле «Authorization: Bearer <токен сесії>»,
+   ми питаємо Supabase, чи токен живий. Перевірений токен пам'ятаємо
+   5 хвилин, щоб не питати на кожен крок агента.
+   ALLOWED_USERS (необов'язково) — пошти або id через кому: тоді
+   пускаємо лише цих людей, а не будь-кого, хто увійшов через Google. */
+const AUTH_TTL_MS = 5 * 60000;
+const authSeen = new Map();
+
+async function authProblem(request, env) {
+  const m = /^Bearer\s+(\S+)/i.exec(request.headers.get("authorization") || "");
+  if (!m) return { status: 401, error: "Щоб користуватись AI, увійди в застосунок (Ще → Акаунт)" };
+  const tok = m[1];
+  const now = Date.now();
+  if ((authSeen.get(tok) || 0) > now) return null;
+  let r;
+  try {
+    r = await fetch(String(env.SUPABASE_URL).replace(/\/+$/, "") + "/auth/v1/user", {
+      headers: { apikey: env.SUPABASE_ANON, authorization: "Bearer " + tok },
+    });
+  } catch (_) {
+    return { status: 503, error: "Не вдалося перевірити вхід: Supabase не відповів" };
+  }
+  if (!r.ok) return { status: 401, error: "Сесія застаріла — увійди в застосунок ще раз" };
+  if (env.ALLOWED_USERS) {
+    const u = await r.json().catch(() => null);
+    const allow = String(env.ALLOWED_USERS).split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+    const who = [u && u.id, u && u.email].filter(Boolean).map((s) => String(s).toLowerCase());
+    if (!who.some((w) => allow.includes(w))) return { status: 403, error: "Цьому акаунту AI не відкрито" };
+  }
+  if (authSeen.size > 1000) authSeen.clear();
+  authSeen.set(tok, now + AUTH_TTL_MS);
+  return null;
+}
 
 /* ── Голос ────────────────────────────────────────────────────── */
 /* Голос ElevenLabs за замовчуванням. Замінюється змінною
@@ -55,22 +168,48 @@ const UPSTREAM_TIMEOUT_MS = 180000;
 
 export default {
   async fetch(request, env) {
+    env = env || {};
+    /* CORS: замість «*» віддзеркалюємо лише дозволену сторінку —
+       тоді браузер на чужому сайті не прочитає відповідь. */
+    const origin = request.headers.get("origin") || "";
+    const originOk = originAllowed(origin, env);
     const cors = {
-      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "content-type, x-flow-key",
+      // authorization — для токена сесії Supabase (див. authProblem)
+      "Access-Control-Allow-Headers": "content-type, authorization, x-flow-key",
+      "Vary": "Origin",
     };
-    const json = (obj, status = 200) =>
-      new Response(JSON.stringify(obj), { status, headers: { ...cors, "content-type": "application/json" } });
+    if (originOk && origin) cors["Access-Control-Allow-Origin"] = origin;
+    const json = (obj, status = 200, extra) =>
+      new Response(JSON.stringify(obj), { status, headers: { ...cors, "content-type": "application/json", ...(extra || {}) } });
 
+    if (!originOk) return json({ error: "Цій сторінці не дозволено звертатись до воркера" }, 403);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
     if (request.method !== "POST") return json({ error: "POST only" }, 405);
 
-    /* ── Захист від чужих ──────────────────────────────────────────
-       Адреса воркера відкрита всьому інтернету, а платиш за виклики
-       ти. Якщо у змінних оточення заданий FLOW_SECRET — вимагаємо
-       його в заголовку. Якщо не заданий — працюємо як раніше, щоб
-       нічого не зламалось у день оновлення.                        */
+    /* Явні адреси. Раніше будь-який шлях (напр. /translate, якого тут
+       нема) провалювався в розмову з моделлю. Тепер — чесне 404, і
+       такі запити не з'їдають ліміт частоти. «//tts» від зайвої
+       скісної риски в адресі теж розуміємо. */
+    const url = new URL(request.url);
+    const path = url.pathname.replace(/\/{2,}/g, "/").replace(/(.)\/$/, "$1");
+    const kind = path === "/" ? "chat" : (path === "/transcribe" || path === "/tts") ? "voice" : "";
+    if (!kind) return json({ error: "Невідома адреса воркера: " + path }, 404);
+
+    const wait = rateWait(request.headers.get("cf-connecting-ip") || "?", kind, env);
+    if (wait) {
+      return json({ error: "Забагато запитів. Спробуй за " + wait + " с" }, 429, { "Retry-After": String(wait) });
+    }
+
+    if (env.SUPABASE_URL && env.SUPABASE_ANON) {
+      const bad = await authProblem(request, env);
+      if (bad) return json({ error: bad.error }, bad.status);
+    }
+
+    /* ── Старий пароль FLOW_SECRET ─────────────────────────────────
+       Лишився для сумісності. Справжнім захистом він не є: щоб
+       застосунок його слав, пароль довелось би покласти в публічний
+       код. Справжній замок — вхід Supabase вище.                   */
     if (env.FLOW_SECRET) {
       const given = request.headers.get("x-flow-key") || "";
       if (given !== env.FLOW_SECRET) {
@@ -78,10 +217,8 @@ export default {
       }
     }
 
-    const url = new URL(request.url);
-
     /* ═══ ГОЛОС → ТЕКСТ ═══ */
-    if (url.pathname === "/transcribe") {
+    if (path === "/transcribe") {
       try {
         if (!env.AI) return json({ text: "", error: "Workers AI binding (AI) не підключений" }, 500);
         let bytes;
@@ -122,7 +259,7 @@ export default {
        Потрібні змінні: AZURE_SPEECH_KEY і AZURE_SPEECH_REGION.
        Без них повертаємо зрозумілу відмову — застосунок сам перейде
        на системний голос. */
-    if (url.pathname === "/tts") {
+    if (path === "/tts") {
       try {
         const body = await request.json();
         const text = String(body.text || "").trim().slice(0, 800);
@@ -300,14 +437,16 @@ export default {
       let model = String(body.model || "");
       if (MODEL_ALIAS[model]) model = MODEL_ALIAS[model];
       if (!MODELS[model]) model = MODEL_DEFAULT;
+      if (OPUS_MODELS.includes(model) && String(env.ALLOW_OPUS || "") !== "1") {
+        return json({ error: "Opus на цьому воркері вимкнений (відкрити — змінна ALLOW_OPUS=1)", model }, 403);
+      }
       const caps = MODELS[model];
 
-      /* Стеля відповіді. Раніше тут стояло жорстке 4096 — через це
-         довгі плани й розбори обривались на півслові. Тепер стеля
-         залежить від моделі, а великі значення дозволені лише зі
-         стрімом: без нього запит просто не встигне за таймаут. */
+      /* Стеля відповіді. Колись тут стояло жорстке 4096 — довгі плани
+         обривались на півслові; потім зі стрімом дозволялось 64000 —
+         це вже дірка в гаманці. Тепер: не більше MAX_TOKENS_CAP. */
       const asked = +body.max_tokens || 2048;
-      const ceiling = wantStream ? caps.maxOut : Math.min(caps.maxOut, 8192);
+      const ceiling = Math.min(caps.maxOut, MAX_TOKENS_CAP);
       const maxTok = Math.min(Math.max(asked, 256), ceiling);
 
       const payload = {
@@ -320,8 +459,21 @@ export default {
          Системна підказка й опис 14 інструментів однакові з ходу в
          хід, але досі летіли в модель щоразу заново. Позначаємо їх
          як кешовані: повторне читання коштує близько десятої частини
-         ціни. В агентному циклі, де ходів буває 3-5, це помітно.    */
-      if (body.system) {
+         ціни. В агентному циклі, де ходів буває 3-5, це помітно.
+
+         Агент шле підказку вже готовими блоками: незмінна частина з
+         позначкою кешу + свіжа (дата, контекст). Раніше воркер робив з
+         масиву String(...) і модель отримувала «[object Object],[object
+         Object]» замість персони, правил і сьогоднішньої дати. Тепер
+         масив проходить як є (лише текстові блоки), рядок — як раніше. */
+      if (Array.isArray(body.system)) {
+        const blocks = body.system
+          .filter((b) => b && b.type === "text" && typeof b.text === "string" && b.text)
+          .map((b) => (b.cache_control
+            ? { type: "text", text: b.text, cache_control: b.cache_control }
+            : { type: "text", text: b.text }));
+        if (blocks.length) payload.system = blocks;
+      } else if (body.system) {
         payload.system = [{
           type: "text",
           text: String(body.system),
