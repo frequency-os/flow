@@ -141,8 +141,21 @@
     });
     return Math.round(s*100)/100;
   }
-  function migrateToWallet(rawCards, rawFx){
-    const rep={ ops:0, converted:0, orphan:0, before:0, after:0, diff:0 };
+  /* Прапорець «виконано» — на пристрій, як інші разові міграції (flowapp_*_v1).
+     Без нього міграція йшла при КОЖНОМУ load() (старт, фокус, кожні 2 хв)
+     і щоразу переписувала fin_ops та income_cards у хмару зі свіжою міткою:
+     інший пристрій бачив «новіше», перечитувався, сам переписував — і так
+     по колу, а в кожному колі могла загубитись свіжа витрата з іншого
+     пристрою. Тепер пишемо лише те, що справді змінилось, а прапорець
+     ставимо, коли операції вже побачено і переведено в гаманець. */
+  const WALLET_MIG_FLAG='flowapp_wallet_migrated_v1';
+  // const, а не function — щоб НЕ висіла в window: файли core/ склеєні в один
+  // <script> без обгортки, і кожна function верхнього рівня сама стає window.*.
+  // Кличе її лише завантажувач (27-canvas.js, той самий скрипт); ззовні вона
+  // нікому не потрібна, а зайві двері до переписування всієї книги краще зачинити.
+  const migrateToWallet=function(rawCards, rawFx){
+    const rep={ ops:0, moved:0, converted:0, orphan:0, before:0, after:0, diff:0 };
+    try{ if(localStorage.getItem(WALLET_MIG_FLAG)) return rep; }catch(_){ return rep; }
     if(!Array.isArray(finOps)) return rep;
     const rates=migRates(rawFx), curBy=migCurByCard(rawCards);
     rep.before=walletSumUAH(rates, curBy);
@@ -158,16 +171,24 @@
         o.label=(o.label||'Операція')+' · '+fmt(o._fx.was)+' '+(CUR[cur]||cur)+' × '+r;
         rep.converted++;
       }
-      o.card=WALLET_ID;
+      if(o.card!==WALLET_ID){ o.card=WALLET_ID; rep.moved++; }
     });
-    cards=[walletCard()];
+    // картки вже = один гаманець — не чіпаємо (і не затираємо його назву/колір)
+    const isWallet=Array.isArray(cards) && cards.length===1 && cards[0] && cards[0].id===WALLET_ID;
+    if(!isWallet){ cards=[walletCard()]; saveCards(); }
     rep.after=walletSumUAH(rates, {});      // після міграції все у гривні
     rep.diff=Math.round((rep.after-rep.before)*100)/100;
-    if(rep.ops){ saveFinOps(); saveCards(); }
-    try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
+    if(rep.moved || rep.converted) saveFinOps();
+    // Порожня книга — прапорець НЕ ставимо: на новому пристрої чи без мережі
+    // операції ще можуть не дійти, і міграція має спрацювати, коли дійдуть.
+    // Повтор без прапорця нічого не пише — записи вище лише за реальної зміни.
+    if(rep.ops){ try{ localStorage.setItem(WALLET_MIG_FLAG,'1'); }catch(_){} }
+    if(rep.moved || rep.converted || !isWallet){
+      try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
+    }
     return rep;
-  }
-  try{ window.migrateToWallet=migrateToWallet; window.walletSumUAH=walletSumUAH; window.walletBalance=walletBalance; }catch(_){}
+  };
+  try{ window.walletSumUAH=walletSumUAH; window.walletBalance=walletBalance; }catch(_){}
 
   /* ==== FX: курси валют (НБУ → er-api → офлайн), автооновлення раз на добу ==== */
 
