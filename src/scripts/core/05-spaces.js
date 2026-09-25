@@ -667,7 +667,7 @@
       const bits=[];
       if(pr.total) bits.push(pr.done+'/'+pr.total+' · '+pr.pct+'%');
       if(dl&&dl.t) bits.push(dl.t);
-      return {k:'f:'+k, emo:(f.emoji||'🚀'), c:prjHexToRgb(f.c), t:esc(f.name||'Проєкт'),
+      return {k:'f:'+k, emo:esc(f.emoji||'🚀'), c:prjHexToRgb(f.c), t:esc(f.name||'Проєкт'),
         d:bits.length?bits.join(' · '):'ще без кроків', badge:st[1], badgeC:st[2]};
     });
     host.innerHTML=

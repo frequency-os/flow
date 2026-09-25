@@ -52,7 +52,8 @@
       if(it.type==='table'){ b.cols=Array.isArray(it.cols)&&it.cols.length?it.cols.map(String):['Назва','Значення'];
         b.rows=Array.isArray(it.rows)?it.rows.map(r=>Array.isArray(r)?r.map(String):[String(r)]):[]; b.title=it.text||''; }
       else if(it.type==='divider'){}
-      else { b.text=String(it.text||''); if(it.type==='callout') b.emo=it.emo||'💡'; if(it.type==='task') b.done=false; }
+      // значок виноски пише модель — пропускаємо лише емодзі, не HTML (див. safeEmoji)
+      else { b.text=String(it.text||''); if(it.type==='callout') b.emo=safeEmoji(it.emo,'💡'); if(it.type==='task') b.done=false; }
       arr.push(b); ids.push(b.id);
     });
     if(!ids.length) return {n:0,ids:[]};
@@ -123,7 +124,7 @@
       const pg=aiParsePage(raw);
       const pr=aiParseBlocks(pg.text);
       let done='';
-      if(pg.list.length){ const r=applyPageBlocks(pg.list); if(r.n) done+=`<div class="fs-done">✨ Додав ${r.n} блок(и) → ${ctx.label}</div>`; }
+      if(pg.list.length){ const r=applyPageBlocks(pg.list); if(r.n) done+=`<div class="fs-done">✨ Додав ${r.n} блок(и) → ${esc(ctx.label)}</div>`; }
       if(pr.blocks.length||pr.steps.length||(pr.folders&&pr.folders.length)){
         try{ aiCommit(pr); done+=`<div class="fs-done">📅 Оновив планер</div>`; }catch(e){ console.error(e); }
       }
@@ -1263,7 +1264,7 @@
         <button class="fps-rdel" data-fpsrdel="${t.id}">✕</button></div>`).join('')
         :`<div class="fps-empty">Нема ритму. Створи точку з повтором (напр. Вт·Чт 19:00) — і вона сама з'являтиметься щотижня.</div>`;
       ov.querySelector('#fpsBody').innerHTML=`
-        <div class="pl-sheet-h">${f.emoji||'📁'} ${esc(f.name)} · сьогодні</div>
+        <div class="pl-sheet-h">${esc(f.emoji||'📁')} ${esc(f.name)} · сьогодні</div>
         <div class="fps-toggle">
           <button class="${showAll?'':'on'}" data-fpsall="0">Тільки проєкт</button>
           <button class="${showAll?'on':''}" data-fpsall="1">Весь день</button>
@@ -1334,7 +1335,7 @@
           <div class="fps-tx"><b>${esc(b.t)}</b><span>${plHM(b.h)}–${plHM(Math.min(plBlockEnd(b),24))}${b.fromRecur?' · 🔁':''}</span></div></div>`;
       }).join(''):`<div class="fps-empty">Найближчих точок нема</div>`;
       ov.querySelector('#fpmBody').innerHTML=`
-        <div class="pl-sheet-h">${f.emoji||'📁'} ${esc(f.name)} · ${PL_MONTH_NAMES[m-1]} ${y}</div>
+        <div class="pl-sheet-h">${esc(f.emoji||'📁')} ${esc(f.name)} · ${PL_MONTH_NAMES[m-1]} ${y}</div>
         <div class="fpm-sub">${n} точок · ${Math.round(hrs)} год за місяць</div>
         <div class="fpm-nav"><button data-fpmnav="-1">‹</button><button data-fpmnav="1">›</button></div>
         <div class="fpm-grid">${DOW_UA.slice(1).concat(DOW_UA[0]).map(l=>`<div class="fpm-dw">${l}</div>`).join('')}${grid}</div>
@@ -1489,7 +1490,7 @@
       }
       if(b.folder && typeof folders!=='undefined' && folders[b.folder]){
         const f=folders[b.folder];
-        linksHtml+=`<span class="pl-blk-link-chip folder" data-plgofolder="${esc(b.folder)}">${f.emoji||'📁'} ${esc(f.name||'Папка')}</span>`;
+        linksHtml+=`<span class="pl-blk-link-chip folder" data-plgofolder="${esc(b.folder)}">${esc(f.emoji||'📁')} ${esc(f.name||'Папка')}</span>`;
       }
       if(b.tag) linksHtml+=`<span class="pl-blk-link-chip">#${esc(b.tag)}</span>`;
       if(b.link && b.link.type==='fin') linksHtml+=`<span class="pl-blk-link-chip fin">💰 ${esc(b.link.envName||'Фінанси')}</span>`;
@@ -1964,10 +1965,10 @@
       const curLink=(b&&b.link)||{};
       if(tp==='goalstep' || tp==='habit'){
         linkExtra.innerHTML=`<label class="pl-sheet-l">Яка ціль?</label>
-          <select class="pl-sheet-in" id="pbLinkGoal">${goals.map(g=>`<option value="${esc(g.id||g.name||'')}" ${curLink.goalId===(g.id||g.name)?'selected':''}>${g.emoji||'🎯'} ${esc(g.name||'Ціль')}</option>`).join('')||'<option value="">(нема цілей — створи в Цілях)</option>'}</select>`;
+          <select class="pl-sheet-in" id="pbLinkGoal">${goals.map(g=>`<option value="${esc(g.id||g.name||'')}" ${curLink.goalId===(g.id||g.name)?'selected':''}>${esc(g.emoji||'🎯')} ${esc(g.name||'Ціль')}</option>`).join('')||'<option value="">(нема цілей — створи в Цілях)</option>'}</select>`;
       } else if(tp==='fin'){
         linkExtra.innerHTML=`<label class="pl-sheet-l">У який конверт</label>
-          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${e.id}" ${curLink.envId===e.id?'selected':''}>${e.emoji||'✉️'} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
+          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${e.id}" ${curLink.envId===e.id?'selected':''}>${esc(e.emoji||'✉️')} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
           <label class="pl-sheet-l">Сума доходу, ₴</label>
           <input class="pl-sheet-in" id="pbLinkAmt" inputmode="numeric" placeholder="напр. 1200" value="${curLink.amount||''}">`;
       } else { linkExtra.innerHTML=''; }

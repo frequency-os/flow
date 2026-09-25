@@ -168,7 +168,7 @@ try{
     var goalsHtml=goals.length? goals.map(function(g){
       var key=g.id||g.name, h=st.byGoal[key]||0, cc=g.color||'#5b8def';
       return '<div class="f26m-g'+(h?'':' zero')+'" data-f26m-goal="'+escA(key)+'">'+
-        '<div class="e" style="background:color-mix(in srgb,'+cc+' 20%,transparent);color:'+cc+'">'+(g.emoji||ic('compass',14))+'</div>'+
+        '<div class="e" style="background:color-mix(in srgb,'+cc+' 20%,transparent);color:'+cc+'">'+(g.emoji?esc2(g.emoji):ic('compass',14))+'</div>'+
         '<div class="m"><h6>'+esc2(g.name||'Ціль')+'</h6>'+
         '<div class="f26m-bar"><i style="width:'+(h/maxG*100).toFixed(0)+'%;background:'+cc+'"></i></div></div>'+
         '<span class="v">'+nz(h)+' год</span></div>';
@@ -306,7 +306,7 @@ try{
       '<label class="pl-sheet-l">🔗 Ціль (звідки береться сенс)</label>'+
       '<select class="pl-sheet-in" id="mfGoal"><option value="">— без цілі —</option>'+
         goals.map(function(g){ var k=g.id||g.name;
-          return '<option value="'+escA(k)+'"'+((f&&f.goalId===k)?' selected':'')+'>'+(g.emoji||'🎯')+' '+esc2(g.name||'Ціль')+'</option>';
+          return '<option value="'+escA(k)+'"'+((f&&f.goalId===k)?' selected':'')+'>'+esc2(g.emoji||'🎯')+' '+esc2(g.name||'Ціль')+'</option>';
         }).join('')+'</select>'+
       '<label class="pl-sheet-l">Скільки годин віддаєш цього місяця</label>'+
       '<input class="pl-sheet-in" id="mfHours" type="number" inputmode="numeric" placeholder="Напр. 40" value="'+(f&&f.hours?f.hours:'')+'">'+
@@ -473,7 +473,7 @@ try{
         var chips='';
         (goalsData.goals||[]).forEach(function(g){
           var k=g.id||g.name; if(used[k]) return;
-          chips+='<button data-c data-rzgoal="'+escA(k)+'" style="--fc:'+(g.color||'#8b7cff')+'">'+(g.emoji||'')+' '+esc2(g.name||'Ціль')+'</button>';
+          chips+='<button data-c data-rzgoal="'+escA(k)+'" style="--fc:'+(g.color||'#8b7cff')+'">'+esc2(g.emoji||'')+' '+esc2(g.name||'Ціль')+'</button>';
         });
         if(chips) h+='<div class="pl-sheet-l" style="margin-top:14px">З твоїх цілей</div><div class="f26m-dsel">'+chips+'</div>';
         h+='<button class="f26m-ghost" data-rzown style="margin-top:12px">'+ic('plus',13)+'Свій фокус</button>';

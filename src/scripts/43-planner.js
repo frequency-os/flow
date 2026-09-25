@@ -33,7 +33,7 @@ try{
     var fkeys=(typeof order!=='undefined'&&Array.isArray(order))?order:Object.keys(typeof folders!=='undefined'?folders:{});
     var chips='<button class="'+(!b.folder?'on':'')+'" style="--fc:#6f7890" data-fdfol="">— без папки</button>'+
       fkeys.filter(function(k){return !!folders[k]}).map(function(k){ var f=folders[k];
-        return '<button class="'+(b.folder===k?'on':'')+'" style="--fc:'+(f.c||'#8b7cff')+'" data-fdfol="'+escAttr(k)+'">'+(f.emoji||'📁')+' '+esc(f.name||k)+'</button>';
+        return '<button class="'+(b.folder===k?'on':'')+'" style="--fc:'+(f.c||'#8b7cff')+'" data-fdfol="'+escAttr(k)+'">'+esc(f.emoji||'📁')+' '+esc(f.name||k)+'</button>';
       }).join('');
     var tds=b.subtasks.map(function(s,i){ var txt=s.text||s.t||'';
       return '<div class="fd-tdrow'+(s.done?' dn':'')+'"><button class="ck" data-fdtd="'+i+'">✓</button><div class="tt" data-i18n-skip="1">'+esc(txt)+'</div><button class="del" data-fdtddel="'+i+'">✕</button></div>';
@@ -108,7 +108,7 @@ try{
           var dn=b.subtasks.filter(function(s){return s.done}).length;
           var chips='';
           if(b.folder&&typeof folders!=='undefined'&&folders[b.folder]){ var f=folders[b.folder];
-            chips+='<span class="fd-ncchip fd-ncfol" style="--fc:'+(f.c||'#8b7cff')+'">'+(f.emoji||'📁')+' '+esc(f.name||'Папка')+'</span>'; }
+            chips+='<span class="fd-ncchip fd-ncfol" style="--fc:'+(f.c||'#8b7cff')+'">'+esc(f.emoji||'📁')+' '+esc(f.name||'Папка')+'</span>'; }
           if(b.subtasks.length) chips+='<span class="fd-ncchip">☑ '+dn+'/'+b.subtasks.length+'</span>';
           if(b.note) chips+='<span class="fd-ncchip">📝 нотатка</span>';
           chips+='<span class="fd-ncchip fd-nchint">відкрити ›</span>';

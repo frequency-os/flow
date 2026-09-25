@@ -14,12 +14,26 @@
   }
   /* ═══ DEV-РЕЖИМ (Нокс): технічний асистент розробника ═══ */
   /* Dev-режим існує ТІЛЬКИ у web-збірці. У native (Capacitor) він
-     вимкнений на рівні прапорця, а сам код вирізається build-ios.mjs — щоб у
-     бандлі App Store фізично не було ні виконання коду, ні прихованих входів.
-     Прапорець з storage міг приїхати з веб-версії, тому native має пріоритет. */
+     вимкнений на рівні прапорця. Блоки @dev-only задумані, щоб їх вирізав
+     скрипт збірки під App Store (build-ios.mjs), але такого скрипта ПОКИ НЕМА
+     і tools/build.py маркери не обробляє — код лежить у будь-якому бандлі.
+     Тож захист зараз тримають лише прапорці нижче; перед App Store вирізання
+     треба дописати. Прапорець з storage міг приїхати з веб-версії, тому
+     native має пріоритет. */
   function aiDevOn(){
     try{ if(window.FLOW_NATIVE) return false; }catch(_){}
     try{ return localStorage.getItem('ai_dev')==='1'; }catch(_){ return false; }
+  }
+  /* dev_eval виконує JS, який написала модель. Dev-режим вмикає будь-хто
+     довгим натиском на аватар, тож одного його мало: отруєний текст
+     (вкладення, пам'ять) міг би підштовхнути Нокса запропонувати шкідливий
+     код, а людина — натиснути «Виконати». Тому dev_eval — лише для власника:
+     акаунт розробника або пристрій із flow_dev=1 (ті самі ворота upDevOn, що
+     й в екрана «Апгрейд»). Для решти інструмента нема навіть у списку, який
+     бачить модель, і виклик відхиляється ще й у виконавці. */
+  function aiDevEvalOn(){
+    if(!aiDevOn()) return false;
+    try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; }
   }
   /* @dev-only:start */
   function aiDevToggleSheet(){
@@ -161,7 +175,10 @@
       return rows.map(r=>r.k+' · '+(r.b>2048?Math.round(r.b/1024)+'КБ':r.b+'Б')+(r.reg?'':' · ПОЗА FLOW_KEYS')).join('\n')||'порожньо';
     }
     if(inp.action==='get'){
-      const k=String(inp.key||''); const v=localStorage.getItem(k);
+      const k=String(inp.key||'');
+      // токен входу Supabase моделі не віддаємо: він пішов би через воркер в історію чату
+      if(/^sb-|auth-token/i.test(k)) return '⚠️ «'+k+'» — токен входу, його не показую';
+      const v=localStorage.getItem(k);
       if(v==null) return '⚠️ ключа «'+k+'» немає';
       return k+' ('+v.length+'Б):\n'+v.slice(0,1300)+(v.length>1300?'\n…(обрізано)':'');
     }
@@ -262,6 +279,7 @@
     return '⚠️ невідома дія';
   }
   async function devToolEval(inp){
+    if(!aiDevEvalOn()) return '⚠️ dev_eval доступний лише власнику (акаунт розробника або flow_dev=1)';
     const code=String(inp.code||'').trim();
     if(!code) return '⚠️ порожній code';
     if(code.length>3000) return '⚠️ код задовгий (>3000) — розбий на кроки';
@@ -724,7 +742,7 @@
       const ok=await aiToolConfirm('Нова ціль «'+nm+'»',{title:'🎯 Frequency хоче створити ціль'});
       if(!ok) return 'людина скасувала — не повторюй';
       const colors=['#5b8def','#34c77b','#e8843c','#c77dff','#f0b429','#4ecdc4'];
-      goalsData.goals.push({ id:'g_'+Date.now(), name:nm, emoji:(inp.emoji||'⭐'),
+      goalsData.goals.push({ id:'g_'+Date.now(), name:nm, emoji:safeEmoji(inp.emoji,'⭐'),
         color:colors[goalsData.goals.length%colors.length], steps:[], track:{}, days:{},
         folderKey:null, open:true });
       saveGoals(); try{ renderGoals(); }catch(_){}
@@ -1008,7 +1026,7 @@
       const used=order.length;
       const due=/^\d{4}-\d{2}-\d{2}$/.test(inp.due||'')?inp.due:'';
       folders[key]={key:key, c:(typeof FOLDER_COLORS!=='undefined'?FOLDER_COLORS[used%FOLDER_COLORS.length]:'#6a7dff'),
-        emoji:(inp.emoji||(role==='project'?'🚀':'📁')), name:nm, pct:0, photo:'', flayout:'a',
+        emoji:safeEmoji(inp.emoji, role==='project'?'🚀':'📁'), name:nm, pct:0, photo:'', flayout:'a',
         pinned:false, custom:true, widgets:[], parent:'', role:role, status:role==='project'?'active':'', due:due};
       order.push(key);
       saveFolders(); try{ renderDashboard(); }catch(_){}
@@ -1142,7 +1160,8 @@
     ];
     const conv=msgs.slice();
     const dev=aiDevOn();
-    const TOOLS=dev?FLOW_TOOLS.concat(DEV_TOOLS):FLOW_TOOLS;
+    // dev_eval моделі показуємо лише власнику (див. aiDevEvalOn)
+    const TOOLS=dev?FLOW_TOOLS.concat(aiDevEvalOn()?DEV_TOOLS:DEV_TOOLS.filter(t=>t.name!=='dev_eval')):FLOW_TOOLS;
     let toolsUsed=0, writesUsed=0;
     aiTraceStart();
     for(let hop=0;hop<6;hop++){
@@ -1390,7 +1409,7 @@
         const role=(f.role==='project')?'project':'area';
         const due=/^\d{4}-\d{2}-\d{2}$/.test(f.due||'')?f.due:'';
         folders[key]={key:key, c:(typeof FOLDER_COLORS!=='undefined'?FOLDER_COLORS[used%FOLDER_COLORS.length]:'#6a7dff'),
-          emoji:(f.emoji||(role==='project'?'🚀':'📁')), name:String(f.name).slice(0,40), pct:0, photo:'', flayout:'a',
+          emoji:safeEmoji(f.emoji, role==='project'?'🚀':'📁'), name:String(f.name).slice(0,40), pct:0, photo:'', flayout:'a',
           pinned:false, custom:true, widgets:[], parent:'', role:role, status:role==='project'?'active':'', due:due};
         order.push(key);
         // віджети з каталогу
