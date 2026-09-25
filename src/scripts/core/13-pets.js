@@ -94,6 +94,10 @@
           <div><b>Фрази Спарка</b><small>короткі репліки на дії</small></div>
           <span class="fx-toggle" id="fxSay"></span>
         </label>
+        <label class="fx-row" id="fxShowRow">
+          <div><b>Показувати на екрані</b><small>вимкнеш — напарник зникне з Огляду</small></div>
+          <span class="fx-toggle" id="fxShow"></span>
+        </label>
         <button class="fx-test" id="fxTest">Показати приклад</button>
       </div>
       <div class="ai-actions"><button class="sec" data-petclose>Готово</button></div></div>`;
@@ -124,6 +128,9 @@
       sayRow.style.opacity=(m==='full')?'1':'.4';
       sayRow.style.pointerEvents=(m==='full')?'auto':'none';
       ov.querySelector('#fxTest').style.display=(m==='off')?'none':'block';
+      // «Показувати на екрані»: увімкнено = напарник видимий (pet_hidden порожній)
+      const showT=ov.querySelector('#fxShow');
+      if(showT) showT.classList.toggle('on', !(window.petHidden&&window.petHidden()));
     }
     ov.querySelectorAll('#fxSeg button').forEach(b=>b.onclick=()=>{
       frModeSet(b.dataset.fx); fxSync();
@@ -131,6 +138,9 @@
       if(b.dataset.fx!=='off') setTimeout(()=>flowReact('done',{say:false,force:true}),80);
     });
     ov.querySelector('#fxSay').onclick=()=>{ frSaySet(!frSayOn()); fxSync(); };
+    { const sh=ov.querySelector('#fxShow');
+      if(sh) sh.onclick=()=>{ try{ window.petHiddenSet(!window.petHidden()); }catch(_){} fxSync();
+        window.platform&&window.platform.haptic&&window.platform.haptic('light'); }; }
     ov.querySelector('#fxTest').onclick=()=>flowReact('celebrate',{say:true,big:true,force:true});
     fxSync();
     ov.querySelectorAll('[data-pet]').forEach(el=>el.onclick=()=>{

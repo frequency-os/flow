@@ -293,7 +293,9 @@
   }
   function flowCapRender(){
     const el=document.getElementById('flowCap'); if(!el) return;
-    if(petSleeping()){ el.style.display='none'; fcSayHide(); return; }
+    // напарника можна вимкнути зовсім (шторка «Твій напарник» → «Показувати на екрані»):
+    // рішення Ярослава 25.09.2026 — хай краще його зовсім нема, ніж він пригасає над картками
+    if(petHidden()||petSleeping()){ el.style.display='none'; fcSayHide(); return; }
     const p=FLOW_PETS[petCur()];
     el.style.display='grid';
     el.style.setProperty('--pet-halo', p.glow+'4d');
@@ -311,40 +313,23 @@
       }
     }
     el.onclick=null; // тап обробляє pointer-логіка, щоб не конфліктувати з драгом
-    fcCheckOverlap();
   }
-  /* ── улюбленець «поступається місцем»: якщо його плаваюча позиція
-     візуально накрила плитку «Нова папка» (чи будь-яку папку) на Огляді —
-     ховаємо його на цей момент, інакше тап зʼїдає пітомець замість кнопки.
-     Те саме для вкладки «Чати» (36-chats.js): рядки чатів і «Новий чат». ── */
-  function fcCheckOverlap(){
-    try{
-      const el=document.getElementById('flowCap');
-      if(!el || el.style.display==='none' || el.classList.contains('fc-drag')) return;
-      const scr=document.getElementById('scr-home');
-      const onHome = scr && scr.classList.contains('active');
-      if(!onHome){ document.body.classList.remove('fc-yield'); return; }
-      const r1=el.getBoundingClientRect();
-      const targets=[];
-      const grid=document.getElementById('folderGrid');
-      if(grid) targets.push.apply(targets, grid.querySelectorAll('.fc2'));
-      const clist=document.getElementById('chatList');
-      if(clist && !clist.hidden) targets.push.apply(targets, clist.querySelectorAll('.chl-row,.chl-add'));
-      // поки котик уже поступився — повертаємо його, лише коли картка відійшла
-      // на цей запас. Інакше на самій межі прокрутка вмикала б і вимикала його підряд.
-      const pad = document.body.classList.contains('fc-yield') ? 10 : 0;
-      let hit=false;
-      for(const t of targets){
-        const r2=t.getBoundingClientRect();
-        if(!(r1.right<r2.left-pad||r1.left>r2.right+pad||r1.bottom<r2.top-pad||r1.top>r2.bottom+pad)){ hit=true; break; }
-      }
-      document.body.classList.toggle('fc-yield', hit);
-    }catch(_){}
-  }
+  /* ── напарник завжди спереду (рішення Ярослава 25.09.2026) ──
+     Було «поступається місцем»: коли він накривав картку на Огляді, його
+     ховали. Через це при прокрутці він то зникав, то зʼявлявся, а потім, коли
+     замість зникнення зробили пригасання, — блід над папками. Ярослав хоче
+     бачити його завжди попереду. Тому автоматичного відступання більше нема:
+     заважає — його можна перетягнути пальцем або вимкнути зовсім у шторці
+     «Твій напарник». fcCheckOverlap лишається порожньою заглушкою, бо її
+     кличуть Огляд (16-dashboard.js) і список чатів (36-chats.js). */
+  function fcCheckOverlap(){ try{ document.body.classList.remove('fc-yield'); }catch(_){} }
   window.fcCheckOverlap=fcCheckOverlap;
+  // показувати напарника на екрані взагалі (окремо від сну)
+  function petHidden(){ try{ return localStorage.getItem('pet_hidden')==='1'; }catch(_){ return false; } }
+  function petHiddenSet(v){ try{ prefSet('pet_hidden', v?'1':'0'); }catch(_){} flowCapRender(); }
+  try{ window.petHidden=petHidden; window.petHiddenSet=petHiddenSet; }catch(_){}
   (function(){
     let t=null;
     const sched=()=>{ if(t) return; t=requestAnimationFrame(()=>{ t=null; fcCheckOverlap(); }); };
-    window.addEventListener('scroll', sched, {passive:true, capture:true});
     window.addEventListener('resize', sched);
   })();
