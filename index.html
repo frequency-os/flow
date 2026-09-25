@@ -4467,15 +4467,8 @@
   #flowCap.busy{animation:petGlow 1s ease-in-out infinite;}
   body.ai-open #flowCap, body.in-reader #flowCap, body.kb-open #flowCap,
   body.space-zen.in-space #flowCap, body.spot-open #flowCap{display:none!important;}
-  /* «поступається місцем» (fcCheckOverlap у 14-react.js) — НЕ display:none:
-     схований display'ом котик має нульовий прямокутник, перевірка вирішує, що
-     перекриття зникло, і повертає його — при прокрутці це виглядало як моргання.
-     Тепер він лише пригасає: прямокутник лишається на місці (перевірка не
-     передумує), тап проходить крізь нього до картки, а сам котик нікуди не
-     зникає з Огляду — видно, що він просто відступив. */
-  body.fc-yield #flowCap{opacity:.32;pointer-events:none;}
-  #flowCap{transition:transform .2s ease,opacity .18s ease;}
-  @media (prefers-reduced-motion: reduce){ #flowCap{transition:none;} }
+  /* Напарник більше не пригасає над картками — він завжди спереду (25.09.2026).
+     Заважає — перетягнути пальцем або вимкнути в шторці «Твій напарник». */
   @media (min-width:1024px){ #flowCap{right:22px;bottom:22px;} }
   /* ── Спарк: драг, сон, зона «додому» ── */
   #flowCap{touch-action:none;-webkit-user-select:none;user-select:none;}
@@ -6580,10 +6573,13 @@
       <div class="wishslides" id="wishSlides" style="display:none"></div>
       <div class="wishbg-ov" id="wishBgOv" style="display:none"></div>
       <div class="wishlink">Карта бажань ›</div>
-      <div class="label">Прогрес місяця</div>
-      <div class="big" id="heroPctBig">0<small>%</small></div>
+      <div class="label">Цього тижня</div>
+      <div class="big" id="heroPctBig">0<small>/7</small></div>
       <div class="hint" id="heroPctHint">Ще нема даних цього місяця.</div>
       <div class="bar"><i id="heroBarFill"></i></div>
+      <!-- сім крапок Пн→Нд: дні, коли був запис у Щоденнику або дотик до
+           Карти бажань. Наповнює renderHeroStreak() у 15-flow-spot.js -->
+      <div class="hweek" id="heroWeek"></div>
       <div class="herocap" id="heroCap">
         <button class="hc-tab wish" id="btnWishMap" onclick="event.stopPropagation();window.goWishes&&window.goWishes();">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></svg>
@@ -15426,6 +15422,10 @@
           <div><b>Фрази Спарка</b><small>короткі репліки на дії</small></div>
           <span class="fx-toggle" id="fxSay"></span>
         </label>
+        <label class="fx-row" id="fxShowRow">
+          <div><b>Показувати на екрані</b><small>вимкнеш — напарник зникне з Огляду</small></div>
+          <span class="fx-toggle" id="fxShow"></span>
+        </label>
         <button class="fx-test" id="fxTest">Показати приклад</button>
       </div>
       <div class="ai-actions"><button class="sec" data-petclose>Готово</button></div></div>`;
@@ -15456,6 +15456,9 @@
       sayRow.style.opacity=(m==='full')?'1':'.4';
       sayRow.style.pointerEvents=(m==='full')?'auto':'none';
       ov.querySelector('#fxTest').style.display=(m==='off')?'none':'block';
+      // «Показувати на екрані»: увімкнено = напарник видимий (pet_hidden порожній)
+      const showT=ov.querySelector('#fxShow');
+      if(showT) showT.classList.toggle('on', !(window.petHidden&&window.petHidden()));
     }
     ov.querySelectorAll('#fxSeg button').forEach(b=>b.onclick=()=>{
       frModeSet(b.dataset.fx); fxSync();
@@ -15463,6 +15466,9 @@
       if(b.dataset.fx!=='off') setTimeout(()=>flowReact('done',{say:false,force:true}),80);
     });
     ov.querySelector('#fxSay').onclick=()=>{ frSaySet(!frSayOn()); fxSync(); };
+    { const sh=ov.querySelector('#fxShow');
+      if(sh) sh.onclick=()=>{ try{ window.petHiddenSet(!window.petHidden()); }catch(_){} fxSync();
+        window.platform&&window.platform.haptic&&window.platform.haptic('light'); }; }
     ov.querySelector('#fxTest').onclick=()=>flowReact('celebrate',{say:true,big:true,force:true});
     fxSync();
     ov.querySelectorAll('[data-pet]').forEach(el=>el.onclick=()=>{
@@ -15831,7 +15837,9 @@
   }
   function flowCapRender(){
     const el=document.getElementById('flowCap'); if(!el) return;
-    if(petSleeping()){ el.style.display='none'; fcSayHide(); return; }
+    // напарника можна вимкнути зовсім (шторка «Твій напарник» → «Показувати на екрані»):
+    // рішення Ярослава 25.09.2026 — хай краще його зовсім нема, ніж він пригасає над картками
+    if(petHidden()||petSleeping()){ el.style.display='none'; fcSayHide(); return; }
     const p=FLOW_PETS[petCur()];
     el.style.display='grid';
     el.style.setProperty('--pet-halo', p.glow+'4d');
@@ -15849,41 +15857,24 @@
       }
     }
     el.onclick=null; // тап обробляє pointer-логіка, щоб не конфліктувати з драгом
-    fcCheckOverlap();
   }
-  /* ── улюбленець «поступається місцем»: якщо його плаваюча позиція
-     візуально накрила плитку «Нова папка» (чи будь-яку папку) на Огляді —
-     ховаємо його на цей момент, інакше тап зʼїдає пітомець замість кнопки.
-     Те саме для вкладки «Чати» (36-chats.js): рядки чатів і «Новий чат». ── */
-  function fcCheckOverlap(){
-    try{
-      const el=document.getElementById('flowCap');
-      if(!el || el.style.display==='none' || el.classList.contains('fc-drag')) return;
-      const scr=document.getElementById('scr-home');
-      const onHome = scr && scr.classList.contains('active');
-      if(!onHome){ document.body.classList.remove('fc-yield'); return; }
-      const r1=el.getBoundingClientRect();
-      const targets=[];
-      const grid=document.getElementById('folderGrid');
-      if(grid) targets.push.apply(targets, grid.querySelectorAll('.fc2'));
-      const clist=document.getElementById('chatList');
-      if(clist && !clist.hidden) targets.push.apply(targets, clist.querySelectorAll('.chl-row,.chl-add'));
-      // поки котик уже поступився — повертаємо його, лише коли картка відійшла
-      // на цей запас. Інакше на самій межі прокрутка вмикала б і вимикала його підряд.
-      const pad = document.body.classList.contains('fc-yield') ? 10 : 0;
-      let hit=false;
-      for(const t of targets){
-        const r2=t.getBoundingClientRect();
-        if(!(r1.right<r2.left-pad||r1.left>r2.right+pad||r1.bottom<r2.top-pad||r1.top>r2.bottom+pad)){ hit=true; break; }
-      }
-      document.body.classList.toggle('fc-yield', hit);
-    }catch(_){}
-  }
+  /* ── напарник завжди спереду (рішення Ярослава 25.09.2026) ──
+     Було «поступається місцем»: коли він накривав картку на Огляді, його
+     ховали. Через це при прокрутці він то зникав, то зʼявлявся, а потім, коли
+     замість зникнення зробили пригасання, — блід над папками. Ярослав хоче
+     бачити його завжди попереду. Тому автоматичного відступання більше нема:
+     заважає — його можна перетягнути пальцем або вимкнути зовсім у шторці
+     «Твій напарник». fcCheckOverlap лишається порожньою заглушкою, бо її
+     кличуть Огляд (16-dashboard.js) і список чатів (36-chats.js). */
+  function fcCheckOverlap(){ try{ document.body.classList.remove('fc-yield'); }catch(_){} }
   window.fcCheckOverlap=fcCheckOverlap;
+  // показувати напарника на екрані взагалі (окремо від сну)
+  function petHidden(){ try{ return localStorage.getItem('pet_hidden')==='1'; }catch(_){ return false; } }
+  function petHiddenSet(v){ try{ prefSet('pet_hidden', v?'1':'0'); }catch(_){} flowCapRender(); }
+  try{ window.petHidden=petHidden; window.petHiddenSet=petHiddenSet; }catch(_){}
   (function(){
     let t=null;
     const sched=()=>{ if(t) return; t=requestAnimationFrame(()=>{ t=null; fcCheckOverlap(); }); };
-    window.addEventListener('scroll', sched, {passive:true, capture:true});
     window.addEventListener('resize', sched);
   })();
   /* ════════ ФЛОУ-СПОТ: міні-простір поверх поточного екрана ════════ */
@@ -16863,36 +16854,43 @@
     }
     return out;
   }
-  // ── хіро-картка Огляду: «Серія» замість статичного «12/100%» ──
-  function heroMonthPct(){
-    const now=new Date(), y=now.getFullYear(), m=now.getMonth(), daysElapsed=now.getDate();
-    let filled=0;
-    for(let d=1; d<=daysElapsed; d++){
-      const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  /* ── хіро-картка Огляду: тиждень присутності ──
+     Було «Прогрес місяця — 10%»: частка днів місяця, що вже минули, коли був
+     запис у Щоденнику або дотик до Карти бажань. Напис нічого не пояснював, а
+     знаменник ріс щодня — тож число саме повзло вниз за кожен пропуск, і
+     щопершого числа обнулялось. Рішення Ярослава 25.09.2026: показувати
+     поточний тиждень — «скільки з семи» і сім крапок Пн→Нд, де видно і
+     пропуски, і що вихідні ще попереду.
+
+     Правило дня лишилось те саме (Щоденник АБО Карта бажань). Сусідні
+     plWeekDots()/plStreak() сюди не годяться: вони рахують виконані блоки
+     Планера, а це інша річ. */
+  function heroWeekDays(){
+    const labels=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+    const today=new Date(); today.setHours(0,0,0,0);
+    // понеділок цього тижня: у JS неділя = 0, тому зсуваємо на (day+6)%7
+    const monday=new Date(today); monday.setDate(today.getDate()-((today.getDay()+6)%7));
+    const out=[]; let filled=0;
+    for(let i=0;i<7;i++){
+      const d=new Date(monday); d.setDate(monday.getDate()+i);
+      const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       const hasDiary=!!(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim());
       const hasWish=!!(typeof wishActiveDays!=='undefined'&&wishActiveDays[ds]);
-      if(hasDiary||hasWish) filled++;
+      const on=hasDiary||hasWish; if(on) filled++;
+      out.push({ l:labels[i], on, future:+d>+today, today:+d===+today });
     }
-    return { pct: daysElapsed?Math.round(filled/daysElapsed*100):0, filled, total:daysElapsed };
-  }
-  function heroDayWord(n){
-    const n10=n%10, n100=n%100;
-    if(n10===1&&n100!==11) return 'день';
-    if(n10>=2&&n10<=4&&(n100<10||n100>=20)) return 'дні';
-    return 'днів';
+    return { days:out, filled };
   }
   function renderHeroStreak(){
     try{
       const bigEl=document.getElementById('heroPctBig');
-      const hintEl=document.getElementById('heroPctHint');
-      const barEl=document.getElementById('heroBarFill');
-      if(!bigEl||!hintEl||!barEl) return;
-      const st=heroMonthPct();
-      bigEl.innerHTML=st.pct+'<small>%</small>';
-      hintEl.textContent = st.filled===0
-        ? 'Ще нема даних цього місяця.'
-        : st.filled+' з '+st.total+' '+heroDayWord(st.total)+' — хоч щось у Карті бажань чи Щоденнику';
-      barEl.style.width=st.pct+'%';
+      const weekEl=document.getElementById('heroWeek');
+      if(!bigEl) return;
+      const st=heroWeekDays();
+      bigEl.innerHTML=st.filled+'<small>/7</small>';
+      if(weekEl) weekEl.innerHTML=st.days.map(d=>
+        '<i class="'+(d.on?'on':'')+(d.future?' fut':'')+(d.today?' now':'')+'">'
+        +'<span>'+d.l+'</span><b></b></i>').join('');
     }catch(_){}
   }
   function plRolloverHTML(){
@@ -34477,6 +34475,119 @@ html.t-flat .acc-wrap,
 html.t-flat .mh-rows,
 html.t-flat .mh-mode,
 html.t-flat .mh-tile{background:var(--dp-card);box-shadow:0 1px 0 var(--dp-edge) inset,var(--dp-shadow);}
+</style>
+<style id="hero-week">
+/* ════════════════════════════════════════════════════════════════════
+   БАНЕР ОГЛЯДУ · тиждень + дзеркальний підвал (25.09.2026)
+   Обрано з полотна: композиція «Центр», підвал «Дзеркало», напис «Тиждень».
+
+   Що міняється проти 19-themes-flat.css / 20-depth.css:
+   1. Підвал (полиця кнопок + лічильник) більше не розмиває фото. Розмиття
+      перетворювало нижню смугу знімка на сіру пляму; тепер там темний тон
+      і світло, що ковзає по склу згори — ребро в 1px, спад білого від
+      верхнього краю і слабкий відблиск у лівому куті. Фото видно наскрізь.
+   2. Текст картки — по центру, а не вздовж лівого краю.
+   3. Замість відсотка місяця — «скільки з семи» і сім крапок Пн→Нд;
+      пояснювальний рядок і смужка прогресу більше не потрібні.
+   4. Крапки слайдшоу прибрано: під тижневими крапками вони читались як
+      другий ряд того самого індикатора.
+
+   Файл підключається ОСТАННІМ (21- після 20-), тому воювати за
+   специфічність не треба — досить того самого селектора.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Дзеркальний підвал ─────────────────────────────────────────── */
+/* Тільки під фото: на рівній поверхні банера (без знімка) дзеркалити нічого,
+   там лишається матовий поверх із 20-depth.css. */
+html.t-flat #scr-home .summary.has-wish .herocap,
+html.t-flat #scr-home .summary.has-wish .nyc{
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.17) 0%,rgba(255,255,255,.055) 30%,rgba(255,255,255,0) 64%),
+    radial-gradient(120% 150% at 12% -30%,rgba(255,255,255,.16),transparent 58%),
+    linear-gradient(180deg,rgba(6,8,12,.5),rgba(6,8,12,.62));
+  border-top:1px solid rgba(255,255,255,.32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
+html.t-flat #scr-home .summary.has-wish .nyc{border-top-color:rgba(255,255,255,.2);}
+html.t-flat #scr-home .summary.has-wish .hc-tab+.hc-tab{border-left-color:rgba(255,255,255,.2);}
+
+/* Без розмиття текст лежить просто на знімку — тінь під написами мусить
+   бути щільнішою, інакше на світлому фото (сніг, небо) він пливе. */
+html.t-flat #scr-home .summary.has-wish .herocap .hc-tab b,
+html.t-flat #scr-home .summary.has-wish .nyc-title,
+html.t-flat #scr-home .summary.has-wish .nyc-cell,
+html.t-flat #scr-home .summary.has-wish .nyc-cell span{text-shadow:0 1px 6px rgba(0,0,0,.75);}
+html.t-flat #scr-home .summary.has-wish .hc-tab svg,
+html.t-flat #scr-home .summary.has-wish .nyc-emoji svg{filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));}
+
+/* Цифри лічильника у СВІТЛІЙ темі поверх фото.
+   12-theme-nightfire.css:164 фарбує їх у var(--text) селектором із
+   #nyCountdown — той б'є правило «на фото все біле» з 19-themes-flat.css,
+   бо має на один тип більше. У світлій темі var(--text) майже чорний, а
+   підвал поверх знімка темний завжди — цифри зникали. Раніше це залежало
+   від знімка (старий підвал був майже прозорий), із дзеркалом стало
+   помітно щоразу. Двох id вистачає, щоб перекрити. */
+html.t-flat #scr-home .summary.has-wish #nyCountdown .nyc-cell b{color:#fff;}
+
+/* ── 2. Вуаль поверх фото ──────────────────────────────────────────── */
+/* Була діагональна — під текстовим стовпчиком зліва. Текст переїхав у центр
+   і вниз, тож вуаль тепер: вузька смуга під шапкою, м'яка пляма під числом
+   і тижнем, легкий спад під підвалом. Середина й краї знімка чисті. */
+html.t-flat #scr-home .summary.has-wish .wishbg-ov{
+  background:
+    radial-gradient(78% 26% at 50% 72%,rgba(6,8,12,.48),rgba(6,8,12,0) 76%),
+    linear-gradient(180deg,rgba(6,8,12,.54) 0%,rgba(6,8,12,.2) 20%,rgba(6,8,12,0) 36%),
+    linear-gradient(0deg,rgba(6,8,12,.5) 0%,rgba(6,8,12,.22) 20%,rgba(6,8,12,0) 44%);}
+
+/* ── 3. Композиція: назва вгорі, блок тижня внизу, усе по центру ───── */
+html.t-flat #scr-home .summary>.wishlink,
+html.t-flat #scr-home .summary>.label,
+html.t-flat #scr-home .summary>.big,
+html.t-flat #scr-home .summary>.hweek{text-align:center;}
+/* margin-top:auto на .big уже стоїть у 19-themes-flat.css — саме він
+   притискає групу до низу картки. Тут лише порядок і розміри. */
+html.t-flat #scr-home .summary>.big{font-size:46px;}
+/* «/7» лізло впритул до цифри: велике число має letter-spacing:-.04em, і
+   дрібний текст успадковував той самий притиск — скіс і сімка зливались
+   в одну закарлючку. Повертаємо нормальний розряд і відсуваємо на 3px. */
+html.t-flat #scr-home .summary>.big small{font-size:21px;letter-spacing:normal;margin-left:3px;}
+html.t-flat #scr-home .summary>.label{order:3;margin-top:6px;}
+/* z-index обов'язковий: вуаль поверх фото (#wishBgOv) лежить на z-index:1, і
+   в 16-mx.css над нею підняті лише діти, що були на той момент. Новий блок
+   у тому списку не значиться — без цього рядка крапки ховаються під вуаллю. */
+html.t-flat #scr-home .summary>.hweek{order:4;position:relative;z-index:2;}
+/* пояснювальний рядок і смужка місяця — їх роль перебрали сім крапок */
+html.t-flat #scr-home .summary>.hint,
+html.t-flat #scr-home .summary>.bar{display:none;}
+/* крапки слайдшоу: другий ряд крапок поруч із тижневими зливався в кашу */
+html.t-flat #scr-home .summary .wishdots,
+html.t-flat #scr-home .summary .wishdots.on{display:none;}
+
+/* ── 4. Сім крапок Пн→Нд ───────────────────────────────────────────── */
+.hweek{display:flex;justify-content:center;gap:9px;margin:11px 0 0;}
+.hweek i{display:flex;flex-direction:column;align-items:center;gap:5px;font-style:normal;}
+.hweek i span{font-size:8.5px;font-weight:800;letter-spacing:.06em;
+  color:rgba(255,255,255,.66);text-shadow:0 1px 4px rgba(0,0,0,.7);}
+.hweek i b{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.26);
+  box-shadow:0 1px 3px rgba(0,0,0,.5);}
+/* день, коли щось було */
+.hweek i.on b{background:#fff;}
+/* дні, що ще не настали — пропуском не рахуються */
+.hweek i.fut span{color:rgba(255,255,255,.34);}
+.hweek i.fut b{background:rgba(255,255,255,.12);box-shadow:none;}
+/* сьогодні: обвідка, щоб було видно, де ти зараз */
+.hweek i.now b{box-shadow:0 0 0 2px rgba(255,255,255,.4),0 1px 3px rgba(0,0,0,.5);}
+.hweek i.now span{color:#fff;}
+
+/* На банері без фото (знімків ще нема) крапки лежать на рівній поверхні —
+   там світлі тіні зайві, а кольори беремо з теми. */
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i span{color:var(--muted);text-shadow:none;}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i b{background:color-mix(in srgb,var(--text) 22%,transparent);box-shadow:none;}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.on b{background:var(--text);}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.fut b{background:color-mix(in srgb,var(--text) 10%,transparent);}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.now b{box-shadow:0 0 0 2px color-mix(in srgb,var(--text) 32%,transparent);}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.now span{color:var(--text);}
+html.t-flat.t-light #scr-home .summary:not(.has-wish) .hweek i.on b{background:var(--text);}
 </style>
 </body>
 </html>

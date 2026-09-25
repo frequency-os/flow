@@ -1,0 +1,112 @@
+
+/* ════════════════════════════════════════════════════════════════════
+   БАНЕР ОГЛЯДУ · тиждень + дзеркальний підвал (25.09.2026)
+   Обрано з полотна: композиція «Центр», підвал «Дзеркало», напис «Тиждень».
+
+   Що міняється проти 19-themes-flat.css / 20-depth.css:
+   1. Підвал (полиця кнопок + лічильник) більше не розмиває фото. Розмиття
+      перетворювало нижню смугу знімка на сіру пляму; тепер там темний тон
+      і світло, що ковзає по склу згори — ребро в 1px, спад білого від
+      верхнього краю і слабкий відблиск у лівому куті. Фото видно наскрізь.
+   2. Текст картки — по центру, а не вздовж лівого краю.
+   3. Замість відсотка місяця — «скільки з семи» і сім крапок Пн→Нд;
+      пояснювальний рядок і смужка прогресу більше не потрібні.
+   4. Крапки слайдшоу прибрано: під тижневими крапками вони читались як
+      другий ряд того самого індикатора.
+
+   Файл підключається ОСТАННІМ (21- після 20-), тому воювати за
+   специфічність не треба — досить того самого селектора.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Дзеркальний підвал ─────────────────────────────────────────── */
+/* Тільки під фото: на рівній поверхні банера (без знімка) дзеркалити нічого,
+   там лишається матовий поверх із 20-depth.css. */
+html.t-flat #scr-home .summary.has-wish .herocap,
+html.t-flat #scr-home .summary.has-wish .nyc{
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.17) 0%,rgba(255,255,255,.055) 30%,rgba(255,255,255,0) 64%),
+    radial-gradient(120% 150% at 12% -30%,rgba(255,255,255,.16),transparent 58%),
+    linear-gradient(180deg,rgba(6,8,12,.5),rgba(6,8,12,.62));
+  border-top:1px solid rgba(255,255,255,.32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
+html.t-flat #scr-home .summary.has-wish .nyc{border-top-color:rgba(255,255,255,.2);}
+html.t-flat #scr-home .summary.has-wish .hc-tab+.hc-tab{border-left-color:rgba(255,255,255,.2);}
+
+/* Без розмиття текст лежить просто на знімку — тінь під написами мусить
+   бути щільнішою, інакше на світлому фото (сніг, небо) він пливе. */
+html.t-flat #scr-home .summary.has-wish .herocap .hc-tab b,
+html.t-flat #scr-home .summary.has-wish .nyc-title,
+html.t-flat #scr-home .summary.has-wish .nyc-cell,
+html.t-flat #scr-home .summary.has-wish .nyc-cell span{text-shadow:0 1px 6px rgba(0,0,0,.75);}
+html.t-flat #scr-home .summary.has-wish .hc-tab svg,
+html.t-flat #scr-home .summary.has-wish .nyc-emoji svg{filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));}
+
+/* Цифри лічильника у СВІТЛІЙ темі поверх фото.
+   12-theme-nightfire.css:164 фарбує їх у var(--text) селектором із
+   #nyCountdown — той б'є правило «на фото все біле» з 19-themes-flat.css,
+   бо має на один тип більше. У світлій темі var(--text) майже чорний, а
+   підвал поверх знімка темний завжди — цифри зникали. Раніше це залежало
+   від знімка (старий підвал був майже прозорий), із дзеркалом стало
+   помітно щоразу. Двох id вистачає, щоб перекрити. */
+html.t-flat #scr-home .summary.has-wish #nyCountdown .nyc-cell b{color:#fff;}
+
+/* ── 2. Вуаль поверх фото ──────────────────────────────────────────── */
+/* Була діагональна — під текстовим стовпчиком зліва. Текст переїхав у центр
+   і вниз, тож вуаль тепер: вузька смуга під шапкою, м'яка пляма під числом
+   і тижнем, легкий спад під підвалом. Середина й краї знімка чисті. */
+html.t-flat #scr-home .summary.has-wish .wishbg-ov{
+  background:
+    radial-gradient(78% 26% at 50% 72%,rgba(6,8,12,.48),rgba(6,8,12,0) 76%),
+    linear-gradient(180deg,rgba(6,8,12,.54) 0%,rgba(6,8,12,.2) 20%,rgba(6,8,12,0) 36%),
+    linear-gradient(0deg,rgba(6,8,12,.5) 0%,rgba(6,8,12,.22) 20%,rgba(6,8,12,0) 44%);}
+
+/* ── 3. Композиція: назва вгорі, блок тижня внизу, усе по центру ───── */
+html.t-flat #scr-home .summary>.wishlink,
+html.t-flat #scr-home .summary>.label,
+html.t-flat #scr-home .summary>.big,
+html.t-flat #scr-home .summary>.hweek{text-align:center;}
+/* margin-top:auto на .big уже стоїть у 19-themes-flat.css — саме він
+   притискає групу до низу картки. Тут лише порядок і розміри. */
+html.t-flat #scr-home .summary>.big{font-size:46px;}
+/* «/7» лізло впритул до цифри: велике число має letter-spacing:-.04em, і
+   дрібний текст успадковував той самий притиск — скіс і сімка зливались
+   в одну закарлючку. Повертаємо нормальний розряд і відсуваємо на 3px. */
+html.t-flat #scr-home .summary>.big small{font-size:21px;letter-spacing:normal;margin-left:3px;}
+html.t-flat #scr-home .summary>.label{order:3;margin-top:6px;}
+/* z-index обов'язковий: вуаль поверх фото (#wishBgOv) лежить на z-index:1, і
+   в 16-mx.css над нею підняті лише діти, що були на той момент. Новий блок
+   у тому списку не значиться — без цього рядка крапки ховаються під вуаллю. */
+html.t-flat #scr-home .summary>.hweek{order:4;position:relative;z-index:2;}
+/* пояснювальний рядок і смужка місяця — їх роль перебрали сім крапок */
+html.t-flat #scr-home .summary>.hint,
+html.t-flat #scr-home .summary>.bar{display:none;}
+/* крапки слайдшоу: другий ряд крапок поруч із тижневими зливався в кашу */
+html.t-flat #scr-home .summary .wishdots,
+html.t-flat #scr-home .summary .wishdots.on{display:none;}
+
+/* ── 4. Сім крапок Пн→Нд ───────────────────────────────────────────── */
+.hweek{display:flex;justify-content:center;gap:9px;margin:11px 0 0;}
+.hweek i{display:flex;flex-direction:column;align-items:center;gap:5px;font-style:normal;}
+.hweek i span{font-size:8.5px;font-weight:800;letter-spacing:.06em;
+  color:rgba(255,255,255,.66);text-shadow:0 1px 4px rgba(0,0,0,.7);}
+.hweek i b{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.26);
+  box-shadow:0 1px 3px rgba(0,0,0,.5);}
+/* день, коли щось було */
+.hweek i.on b{background:#fff;}
+/* дні, що ще не настали — пропуском не рахуються */
+.hweek i.fut span{color:rgba(255,255,255,.34);}
+.hweek i.fut b{background:rgba(255,255,255,.12);box-shadow:none;}
+/* сьогодні: обвідка, щоб було видно, де ти зараз */
+.hweek i.now b{box-shadow:0 0 0 2px rgba(255,255,255,.4),0 1px 3px rgba(0,0,0,.5);}
+.hweek i.now span{color:#fff;}
+
+/* На банері без фото (знімків ще нема) крапки лежать на рівній поверхні —
+   там світлі тіні зайві, а кольори беремо з теми. */
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i span{color:var(--muted);text-shadow:none;}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i b{background:color-mix(in srgb,var(--text) 22%,transparent);box-shadow:none;}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.on b{background:var(--text);}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.fut b{background:color-mix(in srgb,var(--text) 10%,transparent);}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.now b{box-shadow:0 0 0 2px color-mix(in srgb,var(--text) 32%,transparent);}
+html.t-flat #scr-home .summary:not(.has-wish) .hweek i.now span{color:var(--text);}
+html.t-flat.t-light #scr-home .summary:not(.has-wish) .hweek i.on b{background:var(--text);}

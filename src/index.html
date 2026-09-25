@@ -142,10 +142,13 @@
       <div class="wishslides" id="wishSlides" style="display:none"></div>
       <div class="wishbg-ov" id="wishBgOv" style="display:none"></div>
       <div class="wishlink">Карта бажань ›</div>
-      <div class="label">Прогрес місяця</div>
-      <div class="big" id="heroPctBig">0<small>%</small></div>
+      <div class="label">Цього тижня</div>
+      <div class="big" id="heroPctBig">0<small>/7</small></div>
       <div class="hint" id="heroPctHint">Ще нема даних цього місяця.</div>
       <div class="bar"><i id="heroBarFill"></i></div>
+      <!-- сім крапок Пн→Нд: дні, коли був запис у Щоденнику або дотик до
+           Карти бажань. Наповнює renderHeroStreak() у 15-flow-spot.js -->
+      <div class="hweek" id="heroWeek"></div>
       <div class="herocap" id="heroCap">
         <button class="hc-tab wish" id="btnWishMap" onclick="event.stopPropagation();window.goWishes&&window.goWishes();">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></svg>
@@ -920,5 +923,6 @@
 <style id="standalone-top">@@INC:styles/18-standalone.css@@</style>
 <style id="themes-flat">@@INC:styles/19-themes-flat.css@@</style>
 <style id="depth">@@INC:styles/20-depth.css@@</style>
+<style id="hero-week">@@INC:styles/21-hero-week.css@@</style>
 </body>
 </html>

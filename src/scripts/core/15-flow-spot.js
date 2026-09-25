@@ -975,36 +975,43 @@
     }
     return out;
   }
-  // ── хіро-картка Огляду: «Серія» замість статичного «12/100%» ──
-  function heroMonthPct(){
-    const now=new Date(), y=now.getFullYear(), m=now.getMonth(), daysElapsed=now.getDate();
-    let filled=0;
-    for(let d=1; d<=daysElapsed; d++){
-      const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  /* ── хіро-картка Огляду: тиждень присутності ──
+     Було «Прогрес місяця — 10%»: частка днів місяця, що вже минули, коли був
+     запис у Щоденнику або дотик до Карти бажань. Напис нічого не пояснював, а
+     знаменник ріс щодня — тож число саме повзло вниз за кожен пропуск, і
+     щопершого числа обнулялось. Рішення Ярослава 25.09.2026: показувати
+     поточний тиждень — «скільки з семи» і сім крапок Пн→Нд, де видно і
+     пропуски, і що вихідні ще попереду.
+
+     Правило дня лишилось те саме (Щоденник АБО Карта бажань). Сусідні
+     plWeekDots()/plStreak() сюди не годяться: вони рахують виконані блоки
+     Планера, а це інша річ. */
+  function heroWeekDays(){
+    const labels=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+    const today=new Date(); today.setHours(0,0,0,0);
+    // понеділок цього тижня: у JS неділя = 0, тому зсуваємо на (day+6)%7
+    const monday=new Date(today); monday.setDate(today.getDate()-((today.getDay()+6)%7));
+    const out=[]; let filled=0;
+    for(let i=0;i<7;i++){
+      const d=new Date(monday); d.setDate(monday.getDate()+i);
+      const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       const hasDiary=!!(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim());
       const hasWish=!!(typeof wishActiveDays!=='undefined'&&wishActiveDays[ds]);
-      if(hasDiary||hasWish) filled++;
+      const on=hasDiary||hasWish; if(on) filled++;
+      out.push({ l:labels[i], on, future:+d>+today, today:+d===+today });
     }
-    return { pct: daysElapsed?Math.round(filled/daysElapsed*100):0, filled, total:daysElapsed };
-  }
-  function heroDayWord(n){
-    const n10=n%10, n100=n%100;
-    if(n10===1&&n100!==11) return 'день';
-    if(n10>=2&&n10<=4&&(n100<10||n100>=20)) return 'дні';
-    return 'днів';
+    return { days:out, filled };
   }
   function renderHeroStreak(){
     try{
       const bigEl=document.getElementById('heroPctBig');
-      const hintEl=document.getElementById('heroPctHint');
-      const barEl=document.getElementById('heroBarFill');
-      if(!bigEl||!hintEl||!barEl) return;
-      const st=heroMonthPct();
-      bigEl.innerHTML=st.pct+'<small>%</small>';
-      hintEl.textContent = st.filled===0
-        ? 'Ще нема даних цього місяця.'
-        : st.filled+' з '+st.total+' '+heroDayWord(st.total)+' — хоч щось у Карті бажань чи Щоденнику';
-      barEl.style.width=st.pct+'%';
+      const weekEl=document.getElementById('heroWeek');
+      if(!bigEl) return;
+      const st=heroWeekDays();
+      bigEl.innerHTML=st.filled+'<small>/7</small>';
+      if(weekEl) weekEl.innerHTML=st.days.map(d=>
+        '<i class="'+(d.on?'on':'')+(d.future?' fut':'')+(d.today?' now':'')+'">'
+        +'<span>'+d.l+'</span><b></b></i>').join('');
     }catch(_){}
   }
   function plRolloverHTML(){
