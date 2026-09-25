@@ -43,7 +43,12 @@
     function applyOv(){
       const head=document.getElementById('homeOvHead'), row=document.getElementById('homeWidgetsRow'),
             mini=document.getElementById('homeOvMini');
-      if(!head||!row) return;
+      if(!row) return;
+      /* Заголовка «Огляд» більше немає в розмітці (рішення Ярослава 25.09.2026:
+         на Огляді й так купа). Разом із ним пішло й згортання — а в сховищі
+         могло лишитись 'closed' із минулих сесій. Без цієї гілки секція
+         лишилась би схованою назавжди, і відкрити її було б нічим. */
+      if(!head){ row.hidden=false; return; }
       head.classList.toggle('closed', !ovOpen);
       head.setAttribute('aria-expanded', ovOpen?'true':'false');
       row.hidden=!ovOpen;

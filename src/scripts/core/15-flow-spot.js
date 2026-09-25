@@ -1002,16 +1002,46 @@
     }
     return { days:out, filled };
   }
+  /* Місяць — другий, тихіший показник під тижнем. Рахує те саме правило дня,
+     але по днях місяця, що вже минули: 8 днів із 25 = 32%. */
+  function heroMonthDays(){
+    const now=new Date(), y=now.getFullYear(), m=now.getMonth(), total=now.getDate();
+    let filled=0;
+    for(let d=1; d<=total; d++){
+      const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      const hasDiary=!!(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim());
+      const hasWish=!!(typeof wishActiveDays!=='undefined'&&wishActiveDays[ds]);
+      if(hasDiary||hasWish) filled++;
+    }
+    return { pct: total?Math.round(filled/total*100):0, filled, total };
+  }
+  function heroDayWord(n){
+    const n10=n%10, n100=n%100;
+    if(n10===1&&n100!==11) return 'день';
+    if(n10>=2&&n10<=4&&(n100<10||n100>=20)) return 'дні';
+    return 'днів';
+  }
   function renderHeroStreak(){
     try{
       const bigEl=document.getElementById('heroPctBig');
+      const labEl=document.getElementById('heroLab');
       const weekEl=document.getElementById('heroWeek');
+      const hintEl=document.getElementById('heroPctHint');
+      const barEl=document.getElementById('heroBarFill');
       if(!bigEl) return;
-      const st=heroWeekDays();
-      bigEl.innerHTML=st.filled+'<small>/7</small>';
-      if(weekEl) weekEl.innerHTML=st.days.map(d=>
+      const w=heroWeekDays();
+      bigEl.innerHTML=Math.round(w.filled/7*100)+'<small>%</small>';
+      /* «3 з 7» тут не годиться: підпис іде у ВЕРХНЬОМУ регістрі, а там
+         українське «з» не відрізнити від цифри 3 — виходило «3 З 7». */
+      if(labEl) labEl.innerHTML='Цього тижня · <b>'+w.filled+'/7</b>';
+      if(weekEl) weekEl.innerHTML=w.days.map(d=>
         '<i class="'+(d.on?'on':'')+(d.future?' fut':'')+(d.today?' now':'')+'">'
         +'<span>'+d.l+'</span><b></b></i>').join('');
+      const m=heroMonthDays();
+      if(hintEl) hintEl.innerHTML = m.filled===0
+        ? 'За місяць поки жодного дня'
+        : 'За місяць — <b>'+m.pct+'%</b>, це <b>'+m.filled+'</b> '+heroDayWord(m.filled)+' із '+m.total;
+      if(barEl) barEl.style.width=m.pct+'%';
     }catch(_){}
   }
   function plRolloverHTML(){

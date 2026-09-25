@@ -57,36 +57,57 @@ html.t-flat #scr-home .summary.has-wish #nyCountdown .nyc-cell b{color:#fff;}
    і тижнем, легкий спад під підвалом. Середина й краї знімка чисті. */
 html.t-flat #scr-home .summary.has-wish .wishbg-ov{
   background:
-    radial-gradient(78% 26% at 50% 72%,rgba(6,8,12,.48),rgba(6,8,12,0) 76%),
+    radial-gradient(86% 30% at 28% 74%,rgba(6,8,12,.5),rgba(6,8,12,0) 78%),
     linear-gradient(180deg,rgba(6,8,12,.54) 0%,rgba(6,8,12,.2) 20%,rgba(6,8,12,0) 36%),
     linear-gradient(0deg,rgba(6,8,12,.5) 0%,rgba(6,8,12,.22) 20%,rgba(6,8,12,0) 44%);}
 
-/* ── 3. Композиція: назва вгорі, блок тижня внизу, усе по центру ───── */
+/* ── 3. Композиція: назва в лівому верхньому куті, показники внизу ──── */
+/* Усе вздовж лівого краю: назва вгорі, під нею вільний кадр, унизу —
+   великий відсоток тижня, підпис, сім крапок, і найтихішим рядком місяць. */
 html.t-flat #scr-home .summary>.wishlink,
 html.t-flat #scr-home .summary>.label,
 html.t-flat #scr-home .summary>.big,
-html.t-flat #scr-home .summary>.hweek{text-align:center;}
+html.t-flat #scr-home .summary>.hweek,
+html.t-flat #scr-home .summary>.hint{text-align:left;}
 /* margin-top:auto на .big уже стоїть у 19-themes-flat.css — саме він
    притискає групу до низу картки. Тут лише порядок і розміри. */
-html.t-flat #scr-home .summary>.big{font-size:46px;}
-/* «/7» лізло впритул до цифри: велике число має letter-spacing:-.04em, і
-   дрібний текст успадковував той самий притиск — скіс і сімка зливались
-   в одну закарлючку. Повертаємо нормальний розряд і відсуваємо на 3px. */
-html.t-flat #scr-home .summary>.big small{font-size:21px;letter-spacing:normal;margin-left:3px;}
-html.t-flat #scr-home .summary>.label{order:3;margin-top:6px;}
+/* Повітря між назвою і числом. У 19-themes-flat.css картка має
+   padding-top:72px, і з усім, що тепер стоїть унизу (число, підпис, сім
+   крапок, рядок місяця, смужка) на проміжок лишалось 2px — назва і число
+   злипались. Піднімаємо верх на 16px і трохи тиснемо групу: висота картки
+   не росте, а між назвою і числом з'являється майже 30px. */
+html.t-flat #scr-home .summary{padding-top:56px;}
+html.t-flat #scr-home .summary>.big{font-size:40px;}
+/* «%» лізло впритул до цифри: велике число має letter-spacing:-.04em, і
+   дрібний текст успадковував той самий притиск. Повертаємо нормальний
+   розряд і відсуваємо на 2px. */
+html.t-flat #scr-home .summary>.big small{font-size:19px;letter-spacing:normal;margin-left:2px;}
+/* ⚠️ padding-right:104px приходить із 02-page-editor.css:1186 — місце під
+   лінк «Карта бажань ›», який колись висів у правому верхньому куті
+   картки. Лінка там немає давно, а відступ лишився і зсував центрований
+   підпис на 52px уліво. Саме це було видно оком. */
+html.t-flat #scr-home .summary>.label{order:3;margin-top:6px;padding-right:0;}
+html.t-flat #scr-home .summary>.label b{font-weight:800;color:#fff;}
 /* z-index обов'язковий: вуаль поверх фото (#wishBgOv) лежить на z-index:1, і
-   в 16-mx.css над нею підняті лише діти, що були на той момент. Новий блок
-   у тому списку не значиться — без цього рядка крапки ховаються під вуаллю. */
+   в 16-mx.css над нею підняті лише діти, що були на той момент. Нові блоки
+   у тому списку не значаться — без цього рядка вони ховаються під вуаллю. */
 html.t-flat #scr-home .summary>.hweek{order:4;position:relative;z-index:2;}
-/* пояснювальний рядок і смужка місяця — їх роль перебрали сім крапок */
-html.t-flat #scr-home .summary>.hint,
-html.t-flat #scr-home .summary>.bar{display:none;}
+/* ── місяць: другий показник, навмисно тихіший за тиждень ── */
+html.t-flat #scr-home .summary>.hint{order:5;display:block;position:relative;z-index:2;
+  font-size:11.5px;margin:10px 0 0;color:rgba(255,255,255,.82);}
+html.t-flat #scr-home .summary>.hint b{font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
+html.t-flat #scr-home .summary>.bar{order:6;display:block;position:relative;z-index:2;
+  width:150px;max-width:150px;height:2.5px;margin:6px 0 0;background:rgba(255,255,255,.22);}
+/* без фото рядок місяця і смужка беруть кольори теми */
+html.t-flat #scr-home .summary:not(.has-wish)>.hint{color:var(--muted);text-shadow:none;}
+html.t-flat #scr-home .summary:not(.has-wish)>.hint b,
+html.t-flat #scr-home .summary:not(.has-wish)>.label b{color:var(--text);}
 /* крапки слайдшоу: другий ряд крапок поруч із тижневими зливався в кашу */
 html.t-flat #scr-home .summary .wishdots,
 html.t-flat #scr-home .summary .wishdots.on{display:none;}
 
 /* ── 4. Сім крапок Пн→Нд ───────────────────────────────────────────── */
-.hweek{display:flex;justify-content:center;gap:9px;margin:11px 0 0;}
+.hweek{display:flex;justify-content:flex-start;gap:9px;margin:9px 0 0;}
 .hweek i{display:flex;flex-direction:column;align-items:center;gap:5px;font-style:normal;}
 .hweek i span{font-size:8.5px;font-weight:800;letter-spacing:.06em;
   color:rgba(255,255,255,.66);text-shadow:0 1px 4px rgba(0,0,0,.7);}
