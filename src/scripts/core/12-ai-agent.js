@@ -911,7 +911,7 @@
         if(!bs.length) return 'зошитів немає — людина може створити їх у Щоденник → Зошити';
         return bs.map(b=>{
           const arr=(diaBooks.entries[b.id]||[]).slice().sort((x,y)=>y.ts-x.ts);
-          const last=arr[0]?new Date(arr[0].ts).toISOString().slice(0,10)+': '+(String(arr[0].text||'').trim()||'🎙 аудіо').slice(0,80):'порожньо';
+          const last=arr[0]?ymdLocal(new Date(arr[0].ts))+': '+(String(arr[0].text||'').trim()||'🎙 аудіо').slice(0,80):'порожньо';
           return b.emoji+' '+b.name+' ('+arr.length+') · останній — '+last;
         }).join('\n');
       }catch(e){ return '⚠️ '+String(e.message||e); }

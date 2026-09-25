@@ -142,7 +142,7 @@
       if(typeof inputModal!=='function') return;
       inputModal({title:'Мій шлях — куди я йду', value:upData.path, onOk:v=>{
         upData.path=String(v||'').trim();
-        if(upData.path&&!upData.pathDate) upData.pathDate=new Date().toISOString().slice(0,10);
+        if(upData.path&&!upData.pathDate) upData.pathDate=ymdLocal();
         upSave(); renderUpgrade();
       }});
     }

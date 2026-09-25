@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 56 |
-| Рядків JS | 25105 |
+| Рядків JS | 25107 |
 | Файлів CSS | 32 |
 | Рядків CSS | 8637 |
 | Сутностей верхнього рівня | 1561 |
@@ -42,7 +42,7 @@
 | `src/scripts/core/06-wishes.js` | 1191 | 92 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 956 | 100 |
-| `src/scripts/core/09-goals.js` | 610 | 23 |
+| `src/scripts/core/09-goals.js` | 612 | 23 |
 | `src/scripts/core/10-planner.js` | 903 | 49 |
 | `src/scripts/core/11-ai-flow.js` | 168 | 14 |
 | `src/scripts/core/12-ai-agent.js` | 1508 | 68 |
@@ -726,7 +726,7 @@
 | `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:274` |
 | `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:326` |
 | `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:365` |
-| `currentWeekDates` | функція | `src/scripts/core/09-goals.js:602` |
+| `currentWeekDates` | функція | `src/scripts/core/09-goals.js:604` |
 
 ### `src/scripts/core/10-planner.js` — 49 сутностей
 

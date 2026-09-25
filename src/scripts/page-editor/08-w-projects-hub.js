@@ -305,7 +305,7 @@
     if(ka){pgAsk('Нове значення KPI','число, напр. 1250','',function(v){
       var l=locate(ka.dataset.pgkpiadd);if(!l)return;
       l.block.points=l.block.points||[];
-      l.block.points.push({d:new Date().toISOString().slice(0,10),v:parseFloat(v.replace(',','.'))||0});
+      l.block.points.push({d:ymdLocal(),v:parseFloat(v.replace(',','.'))||0});
       save();render();});return;}
     var ca=e.target.closest&&e.target.closest('[data-pgchadd]');
     if(ca){pgAsk('Точка графіка','мітка | число (напр. Пн | 4)','',function(v){

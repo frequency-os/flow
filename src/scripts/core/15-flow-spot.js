@@ -943,7 +943,7 @@
     const hasDone=ds=>Array.isArray(p.blocksByDay[ds])&&p.blocksByDay[ds].some(b=>b.done);
     let n=hasDone(plTodayStr())?1:0;
     for(let i=1;i<=365;i++){ const d=new Date(); d.setDate(d.getDate()-i);
-      if(hasDone(d.toISOString().slice(0,10))) n++; else break; }
+      if(hasDone(ymdLocal(d))) n++; else break; }
     return n;
   }
   // найдовша серія за всю історію (не лише поточна) — для хіро-картки «Серія»
@@ -971,7 +971,7 @@
     const out=[];
     for(let i=0;i<7;i++){
       const d=new Date(monday); d.setDate(monday.getDate()+i);
-      out.push({ l:labels[i], on:hasDone(d.toISOString().slice(0,10)), future:d>today });
+      out.push({ l:labels[i], on:hasDone(ymdLocal(d)), future:d>today });
     }
     return out;
   }
@@ -1048,7 +1048,7 @@
     const p=plData(); const td=plTodayStr();
     if((p.selDate||td)!==td) return '';
     if(p.rolloverDismissed===td) return '';
-    const y=new Date(); y.setDate(y.getDate()-1); const yds=y.toISOString().slice(0,10);
+    const y=new Date(); y.setDate(y.getDate()-1); const yds=ymdLocal(y);
     const yl=Array.isArray(p.blocksByDay[yds])?p.blocksByDay[yds]:[];
     const undone=yl.filter(b=>!b.done && !b.fromRecur && !b.rolled);
     if(!undone.length) return '';
@@ -1169,7 +1169,7 @@
     let cells='';
     for(let i=0;i<7;i++){
       const d=new Date(monday); d.setDate(monday.getDate()+i);
-      const ds=d.toISOString().slice(0,10);
+      const ds=ymdLocal(d);
       const blocks=Array.isArray(p.blocksByDay[ds])?p.blocksByDay[ds]:[];
       const cols=[...new Set(blocks.map(b=>PL_COL[b.c]||'#5b8def'))].slice(0,3);
       const dots=cols.map(c=>`<i style="background:${c}"></i>`).join('');
@@ -1184,7 +1184,7 @@
     const MON=['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
     if(ds===plTodayStr()) return 'Сьогодні';
     const tmr=new Date(); tmr.setDate(tmr.getDate()+1);
-    if(ds===tmr.toISOString().slice(0,10)) return 'Завтра';
+    if(ds===ymdLocal(tmr)) return 'Завтра';
     const d=new Date(ds+'T12:00:00');
     const DOW=['Неділя','Понеділок','Вівторок','Середа','Четвер','П\u2019ятниця','Субота'];
     return `${DOW[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`;
