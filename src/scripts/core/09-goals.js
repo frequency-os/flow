@@ -244,10 +244,10 @@
   }
 
   /* ===== ЦІЛІ ДНЯ (денний чекліст усередині цілі, варіант 3) ===== */
-  function dgDateStr(offset){ const d=new Date(); d.setDate(d.getDate()+(offset||0)); return d.toISOString().slice(0,10); }
+  function dgDateStr(offset){ const d=new Date(); d.setDate(d.getDate()+(offset||0)); return ymdLocal(d); }
   function dgWeekDates(){ const out=[]; const now=new Date(); const dow=(now.getDay()+6)%7; // Mon=0
     const mon=new Date(now); mon.setDate(now.getDate()-dow);
-    for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(d.toISOString().slice(0,10)); } return out; }
+    for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(ymdLocal(d)); } return out; }
   function dgListFor(gl,ds){ if(!gl.days) gl.days={}; if(!Array.isArray(gl.days[ds])) gl.days[ds]=[]; return gl.days[ds]; }
   // синхронізація: коли ВСІ денні цілі дня виконані → засвітити трекер today + 1 авто-крок (раз)
   function dgSync(gl,ds,todayStr){
@@ -386,7 +386,9 @@
     const mo=[];
     for(let d=1;d<=daysInMonth;d++){
       const dt=new Date(my,mm,d);
-      mo.push({ day:d, dow:dowShort[dt.getDay()], ds:dt.toISOString().slice(0,10) });
+      // ymdLocal, а не toISOString: dt — місцева північ, у Києві це ще вчорашній день за UTC,
+      // і вся сітка з'їжджала на день (галочка «сьогодні» стояла на завтрашній клітинці)
+      mo.push({ day:d, dow:dowShort[dt.getDay()], ds:ymdLocal(dt) });
     }
 
     const goalsHtml=g.goals.map(gl=>{
@@ -604,7 +606,7 @@
     const dow=(now.getDay()+6)%7; // Mon=0
     const monday=new Date(now); monday.setDate(now.getDate()-dow);
     const out=[];
-    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(d.toISOString().slice(0,10)); }
+    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(ymdLocal(d)); }
     return out;
   }
 

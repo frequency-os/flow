@@ -113,7 +113,7 @@
   function plRescheduleReminders(){
     try{
       const p=plData();
-      [plTodayStr(), (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); })()].forEach(ds=>{
+      [plTodayStr(), (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return ymdLocal(d); })()].forEach(ds=>{
         (p.blocksByDay[ds]||[]).forEach(b=>{ if(b&&b.remindAt&&!b.done) plScheduleReminder(b); });
       });
     }catch(_){}

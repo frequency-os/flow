@@ -648,14 +648,14 @@
         const td=plTodayStr(); const list=plBlocksFor(td);
         const i=list.findIndex(b=>b.id===nt.dataset.plnowtmr); if(i<0) return;
         const b=list.splice(i,1)[0];
-        const tm=new Date(); tm.setDate(tm.getDate()+1); const tds=tm.toISOString().slice(0,10);
+        const tm=new Date(); tm.setDate(tm.getDate()+1); const tds=ymdLocal(tm);
         plBlocksFor(tds).push(Object.assign({},b,{id:'b_'+Date.now(),done:false,remindAt:null}));
         saveGoals(); plRerender();
         plToast('→ «'+b.t+'» завтра о '+plHM(b.h));
       };
     }
     { const ro=c.querySelector('[data-plrook]'); if(ro) ro.onclick=()=>{
-        const td=plTodayStr(); const y=new Date(); y.setDate(y.getDate()-1); const yds=y.toISOString().slice(0,10);
+        const td=plTodayStr(); const y=new Date(); y.setDate(y.getDate()-1); const yds=ymdLocal(y);
         const yl=Array.isArray(p.blocksByDay[yds])?p.blocksByDay[yds]:[];
         const undone=yl.filter(b=>!b.done && !b.fromRecur && !b.rolled);
         const list=plBlocksFor(td);
@@ -814,7 +814,7 @@
     const p=plData(); const out=[];
     for(let i=days-1;i>=0;i--){
       const d=new Date(); d.setDate(d.getDate()-i);
-      const ds=d.toISOString().slice(0,10);
+      const ds=ymdLocal(d);
       const list=Array.isArray(p.blocksByDay[ds])?p.blocksByDay[ds]:[];
       out.push({ ds, dow:d.getDay(), total:list.length,
         done:list.filter(b=>b.done).length,

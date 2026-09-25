@@ -53,4 +53,15 @@ else
   echo "   ❌ $out"; bad=$((bad+1))
 fi
 
+echo "6) Дати (toISOString().slice(0,10) — це день за UTC, вночі в Україні він ще «вчора»):"
+# Вартовий, щоб баг «галочка на завтра» не повернувся. Де справді потрібен UTC —
+# допиши в рядок коментар // utc-ok, і перевірка його пропустить.
+utc=$(grep -rnE 'toISOString\(\)\.(slice|substr|substring)\(0, *10\)' src/scripts | grep -v 'utc-ok')
+if [ -z "$utc" ]; then
+  echo "   ✅ усі дні рахуються за місцевим часом (ymdLocal)"
+else
+  echo "   ❌ UTC-дата замість місцевої — заміни на ymdLocal(d) або познач // utc-ok:"
+  echo "$utc" | sed 's/^/      /'; bad=$((bad+1))
+fi
+
 [ "$bad" = 0 ] && echo "\nВсе гаразд." || echo "\nПроблем: $bad"

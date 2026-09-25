@@ -340,7 +340,7 @@
         var data={_flow_backup:1, ts:new Date().toISOString(), keys:{}};
         for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); data.keys[k]=localStorage.getItem(k); }
         var json=JSON.stringify(data);
-        var name='flow-backup-'+new Date().toISOString().slice(0,10)+'.json';
+        var name='flow-backup-'+ymdLocal()+'.json';
         var blob=new Blob([json],{type:'application/json'});
         var file=null; try{ file=new File([blob],name,{type:'application/json'}); }catch(_){}
         if(file && navigator.canShare && navigator.canShare({files:[file]})){
