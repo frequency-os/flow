@@ -777,10 +777,14 @@
     covSaveT=setTimeout(saveCovers,400);
   }
   function flushCovers(){ if(covSaveT) saveCovers(); }
-  // застосунок ховають/закривають посеред жесту — відкладене не губимо
+  // застосунок ховають/закривають посеред жесту — відкладене не губимо.
+  // visibilitychange слухаємо на window у фазі перехоплення (true): так він
+  // спрацює РАНІШЕ за sbOnHide (той на document, зареєстрований раніше), і
+  // обкладинка потрапить у партію, яку sbOnHide одразу шле в хмару. Інакше
+  // вона чекала б 500 мс таймера, якого у фоні iOS може вже не бути.
   try{
     window.addEventListener('pagehide',flushCovers);
-    document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')flushCovers(); });
+    window.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')flushCovers(); },true);
   }catch(_){}
   var COV_GRADS=[
     'radial-gradient(120% 100% at 15% 0%,#41508f 0%,transparent 55%),radial-gradient(110% 90% at 85% 15%,#7b4a9e 0%,transparent 50%),radial-gradient(130% 120% at 60% 100%,#173a5e 0%,#0f1115 78%)',

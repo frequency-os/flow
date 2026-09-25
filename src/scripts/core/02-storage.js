@@ -617,12 +617,19 @@
     //    кількома рядками замість окремого запиту на кожен ключ ──
     let sbWriteQueue = {}; // {key: rawValueString} — очікують відправки в хмару
     let sbWriteTimer = null;
+    /* Партія, яку sbFlushWrites уже забрав із черги, але хмара ще не відповіла.
+       Вона теж мусить лежати в кошику: інакше будь-яке збереження кошика під час
+       польоту (відкладений таймер, згортання, set іншого ключа) бачить порожню
+       чергу і стирає кошик — і якщо iOS уб'є застосунок до відповіді, правка
+       в хмару вже не піде. Прибираємо ключ звідси лише після відповіді. */
+    let sbInFlight = {};
     /* «Вихідний кошик» у localStorage: незлиті записи мають пережити перезапуск,
        інакше офлайн-правка, зроблена перед закриттям, губиться назавжди. */
     function sbOutboxSave(){
       if(sbOutboxTimer){ clearTimeout(sbOutboxTimer); sbOutboxTimer=null; }
       try{
-        if(Object.keys(sbWriteQueue).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(sbWriteQueue));
+        const all = Object.assign({}, sbInFlight, sbWriteQueue);   // новіше з черги перемагає
+        if(Object.keys(all).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(all));
         else localStorage.removeItem('flowapp___sb_outbox');
       }catch(_){}
     }
@@ -661,6 +668,7 @@
       const q = sbWriteQueue; sbWriteQueue = {};   // знімаємо поточну партію
       const keys = Object.keys(q);
       if(!keys.length){ sbOutboxSave(); return; }
+      keys.forEach(k=>{ sbInFlight[k]=q[k]; });
       let ok=false;
       if(u && sb){
         try{
@@ -677,6 +685,9 @@
           ok=true;
         }catch(_){ ok=false; }
       }
+      // відповідь є — ця партія більше не «в польоті» (якщо ключ уже летить
+      // новішим значенням в іншій партії, його не чіпаємо)
+      keys.forEach(k=>{ if(sbInFlight[k]===q[k]) delete sbInFlight[k]; });
       if(!ok){
         // НЕ втрачаємо партію: повертаємо ключі в чергу (не затираючи новіші),
         // зберігаємо в outbox і повторюємо з паузою — і одразу коли з'явиться мережа.
@@ -887,7 +898,7 @@
       try{
         const { error } = await sb.from('user_data').delete().eq('user_id', sbUserCache.id);
         if(error) throw error;
-        sbBatchCache={}; sbBatchTs={}; sbWriteQueue={};
+        sbBatchCache={}; sbBatchTs={}; sbWriteQueue={}; sbInFlight={};
         sbOutboxSave(); sbSyncPending();
         return true;
       }catch(_){ return false; }
@@ -914,7 +925,7 @@
       if(u && sb){
         try{ await sb.from('user_data').delete().eq('user_id', u.id).eq('key', key); }catch(_){}
         if(sbBatchCache) delete sbBatchCache[key];
-        if(sbWriteQueue && key in sbWriteQueue){ delete sbWriteQueue[key]; sbOutboxSaveSoon(); }   // інакше стертий ключ воскрес би з кошика після перезапуску
+        if((sbWriteQueue && key in sbWriteQueue) || key in sbInFlight){ delete sbWriteQueue[key]; delete sbInFlight[key]; sbOutboxSaveSoon(); }   // інакше стертий ключ воскрес би з кошика після перезапуску
       }
       return localResult;
     };
