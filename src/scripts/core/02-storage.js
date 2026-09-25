@@ -400,6 +400,21 @@
     }
 
     window.sbUser = function(){ return sbUserCache; };
+    /* Рядок ↔ хмара. У локальному сховищі значення — це РЯДОК: здебільшого JSON
+       (JSON.stringify обʼєкта), але деякі ключі пишуть сирий текст (аватарка —
+       data-URL, ui_mode — 'lite', тема, вкладка). У jsonb сирий текст лягає як
+       JSON-рядок, а назад ми завжди робили JSON.stringify — і 'data:…'
+       поверталось як '"data:…"' (з лапками): після перезапуску з входом
+       аватарка ламалась, '' ставало '""'. Правило тепер одне:
+       jsonb-рядок = саме той рядок, що записали; решта — JSON.stringify.
+       Старі рядки в хмарі (сирий текст) читаються правильно без міграції,
+       а старі версії застосунку на інших пристроях бачать те саме, що й раніше. */
+    function sbFromCloud(v){ return typeof v==='string' ? v : JSON.stringify(v); }
+    function sbToCloud(raw){
+      let parsed; try{ parsed = JSON.parse(raw); }catch(_){ return raw; }
+      // JSON-рядок ('"abc"') кладемо як є, інакше при читанні він втратив би лапки
+      return typeof parsed==='string' ? raw : parsed;
+    }
     // ОДИН запит на весь список даних користувача — замість того, щоб кожен
     // window.storage.get(key) під час load() ходив у мережу окремо.
     async function sbPrefetchAll(){
@@ -409,7 +424,7 @@
         // ліниво — їх дотягує sbPhotoFetch при промаху в IndexedDB
         const { data, error } = await sb.from('user_data').select('key,value,updated_at').eq('user_id', sbUserCache.id).not('key','like','photo:%');
         if(error || !data){ window.__sbCloudOk=false; return false; }
-        const c={}, ts={}; data.forEach(r=>{ c[r.key]=JSON.stringify(r.value); ts[r.key]=Date.parse(r.updated_at)||0; });
+        const c={}, ts={}; data.forEach(r=>{ c[r.key]=sbFromCloud(r.value); ts[r.key]=Date.parse(r.updated_at)||0; });
         sbBatchCache=c; sbBatchTs=ts;
         window.__sbCloudOk=true;
         return true;
@@ -579,7 +594,7 @@
           if(!error && data){
             const cloudTs = Date.parse(data.updated_at)||0;
             if(localTs > cloudTs) return origGet(key);         // локальна свіжіша
-            return { key, value: JSON.stringify(data.value), shared:false };
+            return { key, value: sbFromCloud(data.value), shared:false };
           }
         }catch(_){}
         // хмара порожня/недоступна — фолбек на локальну копію, щоб дані не «зникали»
@@ -626,8 +641,7 @@
         try{
           const now = Date.now();
           const rows = keys.map(k=>{
-            let parsed; try{ parsed = JSON.parse(q[k]); }catch(_){ parsed = q[k]; }
-            return { user_id:u.id, key:k, value:parsed, updated_at:new Date(now).toISOString() };
+            return { user_id:u.id, key:k, value:sbToCloud(q[k]), updated_at:new Date(now).toISOString() };
           });
           // ВАЖЛИВО: supabase-js повертає {error}, а не кидає — перевіряємо явно,
           // інакше зірваний запис вважався б успішним і правка зникала б.
@@ -926,18 +940,56 @@
       }, null, 0);
     }
 
-    // Експорт: завантажити файл flow-backup-YYYY-MM-DD.json
-    function exportToFile(){
+    // Експорт: зберегти файл flow-backup-YYYY-MM-DD.json і сказати ПРАВДУ,
+    // чи він є. Раніше після a.click() відповідь завжди була ok:true — хоча
+    // в iPhone-обгортці <a download> нічого не пише, а на Mac діалог
+    // збереження можна скасувати. «Стерти все» спиралось на цей «бекап».
+    //   { ok:true,  saved:true }  — файл точно віддано: діалог «Зберегти як…»
+    //                               чи аркуш «Поділитися» завершились успіхом
+    //   { ok:true,  saved:false } — віддали браузеру на завантаження; чи
+    //                               файл з'явився, сторінка знати не може
+    //   { ok:false, cancelled:true } — людина закрила діалог: файлу НЕМА
+    async function exportToFile(){
       const json = makeEnvelope();
       const stamp = ymdLocal();
       const name = `flow-backup-${stamp}.json`;
+      const cancelled = { ok:false, cancelled:true, name, error:'збереження скасовано — файл не записано' };
+      // 1) діалог «Зберегти як…» (Chrome, Edge, застосунок на Mac): результат відомий напевно
+      if(typeof window.showSaveFilePicker==='function'){
+        try{
+          const h = await window.showSaveFilePicker({ suggestedName:name,
+            types:[{ description:'Frequency backup', accept:{'application/json':['.json']} }] });
+          const w = await h.createWritable(); await w.write(json); await w.close();
+          return { ok:true, saved:true, how:'picker', name:h.name||name };
+        }catch(e){
+          if(e && e.name==='AbortError') return cancelled;
+          // інша відмова (нема дозволу тощо) — пробуємо наступний спосіб
+        }
+      }
+      // 2) iPhone/iPad і native-обгортка: там <a download> файл не пише,
+      //    а в аркуші «Поділитися» є «Зберегти у Файли»
+      const ios = window.FLOW_NATIVE || /iPad|iPhone|iPod/.test(navigator.userAgent||'') ||
+                  (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+      if(ios && navigator.share && typeof File==='function'){
+        try{
+          const f = new File([json], name, {type:'application/json'});
+          if(!navigator.canShare || navigator.canShare({files:[f]})){
+            await navigator.share({ files:[f], title:name });
+            return { ok:true, saved:true, how:'share', name };
+          }
+        }catch(e){
+          if(e && e.name==='AbortError') return cancelled;
+        }
+      }
+      // 3) звичайне завантаження — останній варіант, результат невідомий
       try{
         const blob = new Blob([json], {type:'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = name; document.body.appendChild(a); a.click();
-        setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(_){} }, 0);
-        return { ok:true, name };
+        // не 0 мс: Safari читає blob асинхронно і з миттєвим revoke міг лишитись без файла
+        setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(_){} }, 1500);
+        return { ok:true, saved:false, how:'download', name };
       }catch(e){ return { ok:false, error:String(e) }; }
     }
 
@@ -998,9 +1050,15 @@
      блокують deleteDatabase. ============ */
   window.flowFactoryReset = async function(opts){
     const o=opts||{};
-    // 1) страховка: бекап у файл. Не вдався — зупиняємось.
-    const bk = window.flowBackup.exportToFile();
-    if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
+    // 1) страховка: бекап у файл. Не вдався чи скасовано — зупиняємось.
+    //    Якщо файл лише віддано на завантаження (saved:false), сторінка не знає,
+    //    чи він є, — повертаємо крок 'backup-confirm': екран спитає людину і
+    //    викличе нас знову з backupConfirmed:true (без повторного експорту).
+    if(!o.backupConfirmed){
+      const bk = await window.flowBackup.exportToFile();
+      if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
+      if(!bk.saved) return { ok:false, step:'backup-confirm', name:bk.name, error:'не видно, чи файл бекапу збережено' };
+    }
     // 2) хмара — доки сесія ще жива
     if(o.wipeCloud){
       const u = window.sbUser && window.sbUser();

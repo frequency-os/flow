@@ -162,60 +162,28 @@
       ['конверти','envelopes'],['Конверти','Envelopes'],['задач','tasks'],['задачі','tasks'],
       ['задача','task'],['тижня','week'],['тижні','week'],['місяця','month'],['днів','days'],
       ['дні','days'],['дн','d'],
-    ].sort((a,b)=>b[0].length-a[0].length); // довші рядки — першими, щоб не ламати коротшими підрядками
+    ].sort((a,b)=>b[0].length-a[0].length) // довші рядки — першими, щоб не ламати коротшими підрядками
+     // регулярки будуємо один раз: i18nApply бігає по DOM після кожної зміни
+     // (лічильник НР тікає щосекунди), і ~70 new RegExp на кожен вузол їли батарею
+     .map(([uk,en])=>{ try{ return [new RegExp('(?<![\\p{L}\\p{N}])'+uk.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}\\p{N}])','gu'), en]; }catch(_){ return null; } })
+     .filter(Boolean);
 
     function wordLevelTranslate(text){
       let out=text;
-      for(let i=0;i<I18N_WORDS.length;i++){
-        const uk=I18N_WORDS[i][0], en=I18N_WORDS[i][1];
-        try{
-          const re=new RegExp('(?<![\\p{L}\\p{N}])'+uk.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}\\p{N}])','gu');
-          out = out.replace(re, en);
-        }catch(_){}
-      }
+      for(let i=0;i<I18N_WORDS.length;i++) out = out.replace(I18N_WORDS[i][0], I18N_WORDS[i][1]);
       return out;
     }
 
-    // ═══ автопереклад того, чого нема у словнику (запасний варіант) ═══
-    // Працює тільки для тексту ПОЗА зонами data-i18n-skip (контент
-    // користувача — папки/сторінки/задачі/клієнти — вже позначені).
-    // Кешується назавжди в localStorage, повторний виклик /translate
-    // для того самого рядка більше не робиться.
-    const UI_CACHE_KEY='i18n_ui_cache';
-    function uiHash(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return 'u'+h; }
-    function uiCacheGet(){ try{ return JSON.parse(localStorage.getItem(UI_CACHE_KEY)||'{}'); }catch(_){ return {}; } }
-    function uiCacheSet(m){ try{ localStorage.setItem(UI_CACHE_KEY, JSON.stringify(m)); }catch(_){} }
-    const uiInFlight = new Set();
-    const uiQueue = []; let uiActive = 0; const UI_MAX_CONCURRENT = 4;
-    function uiPump(){
-      while(uiActive<UI_MAX_CONCURRENT && uiQueue.length){
-        const job=uiQueue.shift(); uiActive++;
-        job().catch(()=>{}).finally(()=>{ uiActive--; uiPump(); });
-      }
-    }
-    const HAS_CYR = /[а-яА-ЯіїєґІЇЄҐ]/;
-    function autoTranslateNode(node, original){
-      const cache=uiCacheGet(), key=uiHash(original);
-      if(cache[key] && cache[key].src===original){
-        try{ if(node.nodeValue && node.nodeValue.indexOf(original)>=0) node.nodeValue = node.nodeValue.replace(original, cache[key].en); }catch(_){}
-        return;
-      }
-      if(uiInFlight.has(key)) return;
-      uiInFlight.add(key);
-      uiQueue.push(async ()=>{
-        try{
-          const ep=(typeof aiEndpoint==='function' ? aiEndpoint() : (window.AI_ENDPOINT||''));
-          if(!ep) return;
-          const r=await fetch(ep.replace(/\/$/,'')+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:original,target:'en'})});
-          if(!r.ok) return;
-          const data=await r.json();
-          const en=(data&&data.text)?String(data.text):original;
-          const c2=uiCacheGet(); c2[key]={src:original,en,ts:Date.now()}; uiCacheSet(c2);
-          if(node.isConnected!==false){ try{ if(node.nodeValue && node.nodeValue.indexOf(original)>=0) node.nodeValue = node.nodeValue.replace(original, en); }catch(_){} }
-        }finally{ uiInFlight.delete(key); }
-      });
-      uiPump();
-    }
+    // Мережевий автопереклад (POST <воркер>/translate) прибрано 25.09.2026:
+    // такого маршруту у воркері ніколи не було, кожен запит падав, невдачі не
+    // кешувались, і в режимі EN застосунок безкінечно смикав спільний воркер
+    // (щосекунди, бо лічильник НР міняє DOM). Чого нема у словнику — лишається
+    // українським; повернемо, лише коли /translate справді з'явиться у воркері.
+
+    // Теги, чий текст — це ДАНІ, а не підпис: textarea/input віддають його
+    // як value (а oninput одразу зберігає), <option> без value — як значення
+    // select, script/style — код. Переклад тут переписав би дані користувача.
+    const I18N_NO_TOUCH = { TEXTAREA:1, INPUT:1, SCRIPT:1, STYLE:1 };
 
     // атрибути, які теж перекладаємо (title/placeholder/aria-label)
     function translateNode(node){
@@ -224,12 +192,17 @@
         if(!key) return;
         if(I18N_DICT[key]!==undefined){ node.nodeValue = t.replace(key, I18N_DICT[key]); return; }
         const wl = wordLevelTranslate(t);
-        if(wl!==t){ node.nodeValue = wl; return; }
-        if(HAS_CYR.test(key)) autoTranslateNode(node, key);
+        if(wl!==t){ node.nodeValue = wl; }
         return;
       }
       if(node.nodeType!==1) return;
       if(node.hasAttribute && node.hasAttribute('data-i18n-skip')) return; // явно виключені зони (контент користувача)
+      // Гарантія «переклад лише показує, а не переписує»: усе, що редагується
+      // (contenteditable — журнал, сторінки; поля вводу), не чіпаємо взагалі.
+      // Звідти текст читають назад і зберігають (jeFlush бере innerHTML),
+      // тож «три дні» перетворилось би на «три days» назавжди.
+      if(I18N_NO_TOUCH[node.tagName] || node.isContentEditable) return;
+      if(node.tagName==='OPTION' && !node.hasAttribute('value')) return;
       ['title','placeholder','aria-label'].forEach(a=>{
         const v=node.getAttribute && node.getAttribute(a);
         if(v && I18N_DICT[v]!==undefined) node.setAttribute(a, I18N_DICT[v]);
@@ -267,7 +240,6 @@
     window.flowContentTranslateOn = contentTranslateOn;
     function hash(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return 'h'+h; }
     function cacheGet(){ try{ return JSON.parse(localStorage.getItem('i18n_content_cache')||'{}'); }catch(_){ return {}; } }
-    function cacheSet(map){ try{ localStorage.setItem('i18n_content_cache', JSON.stringify(map)); }catch(_){} }
 
     // Публічний хелпер: переклад одного шматка тексту користувача з кешем.
     // Використання в render-функціях (тільки там, де показуємо контент
@@ -278,20 +250,9 @@
       const cache = cacheGet();
       const key = hash(src);
       if(cache[key] && cache[key].src===src) return cache[key].en;
-      try{
-        const ep = (typeof aiEndpoint==='function' ? aiEndpoint() : (window.AI_ENDPOINT||''));
-        if(!ep) return src;
-        const r = await fetch(ep.replace(/\/$/,'')+'/translate', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ text: src, target:'en' })
-        });
-        if(!r.ok) return src;
-        const data = await r.json();
-        const en = (data && data.text) ? String(data.text) : src;
-        cache[key] = { src, en, ts: Date.now() };
-        cacheSet(cache);
-        return en;
-      }catch(_){ return src; }
+      // У мережу не ходимо: маршруту /translate у воркері нема (див. i18n вище),
+      // тож кожен виклик лише марно смикав би воркер. Повертаємо оригінал.
+      return src;
     };
   })();
 
