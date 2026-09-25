@@ -193,10 +193,11 @@
     try{
       Object.keys(boards||{}).forEach(bk=>{
         const base=String(bk).split('__sp_')[0];
-        const f=folders&&folders[base];
-        if(!f) return;                    // осиротілі дошки видалених папок і колишній корінь Простору
-        const fname=f.name||base;
-        const femo=(f&&f.emoji)||'📁';
+        let fname, femo;
+        if(base.indexOf('chat_')===0){ const c=chatById(base.slice(5)); if(!c) return; fname=c.name||'Чат'; femo=c.emoji||'💬'; }
+        else { const f=folders&&folders[base];
+          if(!f) return;                  // осиротілі дошки видалених папок і колишній корінь Простору
+          fname=f.name||base; femo=f.emoji||'📁'; }
         const all=[]; collectBlocks(boards[bk]||[],[],all);
         all.forEach(it=>{ const b=it.block;
           out.push({bk, id:b.id, folder:fname, emoji:femo, title:b.title||'', text:blockSearchText(b)}); });
@@ -205,14 +206,22 @@
     return out;
   };
   window.flowOpenBlock=function(bk,id){
-    const base=String(bk).split('__sp_')[0];
+    const s=String(bk), base=s.split('__sp_')[0];
+    // запис чату: відкрити чат і підсвітити бульбашку (затримка більша за автопрокрутку — 360 мс)
+    if(base.indexOf('chat_')===0){
+      const cid=base.slice(5); if(!chatById(cid)) return;
+      goChat(cid,{from:'home'});
+      setTimeout(()=>{ try{ if(typeof chJumpTo==='function') chJumpTo(bk,id); }catch(e){ console.error('flowOpenBlock jump',e); } },450);
+      return;
+    }
+    // блок папки: документ одразу на цьому блоці (тема — через activeSpaceMap, як колись робив Канал)
+    if(folders[base] && typeof goSpaceFor==='function'){
+      try{ const sid = bk===base ? 'main' : (s.split('__sp_')[1]||'main'); activeSpaceMap[base]=sid; saveSpacesMeta(); }catch(_){}
+      currentFolderKey=base;
+      try{ goSpaceFor(bk, id?{focusId:id}:null); }catch(e){ console.error('flowOpenBlock',e); }
+      return;
+    }
     try{ goFolder(base); }catch(e){ console.error('flowOpenBlock',e); }
-    // папка відкрилась Каналом: стрибнути до бульбашки; блок вкладений або з іншого
-    // екрана — відкрити документ на ньому. Затримка більша за автопрокрутку Каналу (360 мс).
-    setTimeout(()=>{ try{
-      if(!document.getElementById('scr-channel').classList.contains('active')) return;
-      if(!(typeof chJumpTo==='function' && chJumpTo(bk,id))) chOpenInDoc(bk,id);
-    }catch(e){ console.error('flowOpenBlock jump',e); } },450);
   };
 
   let undoSnapshot=null, undoTimer=null;
@@ -241,8 +250,9 @@
   { const b=document.getElementById('undoBtn'); if(b) b.onclick=doUndo; }
 
   /* ═══════════ ШВИДКЕ ЗАХОПЛЕННЯ (Вхідні) ═══════════
-     «Вхідні» — звичайна папка (Канал), а не група в кореневій дошці Простору:
-     Простір видалено 14.09.2026. Папка створюється лише при першому записі. */
+     «Вхідні» — ЧАТ (36-chats.js, з 21.09.2026); доти — папка-Канал f_inbox.
+     ensureInboxFolder лишається лише для старої міграції Простору (27-canvas.js):
+     створену нею папку одразу переносить у чат chatsMigrateInboxOnce. */
   const INBOX_TITLE='Вхідні';
   const INBOX_FKEY='f_inbox';
   function ensureInboxFolder(){
@@ -268,9 +278,9 @@
     const ta=document.getElementById('qcapTa');
     const txt=(ta.value||'').trim();
     if(!txt){ closeQuickCapture(); return; }
-    ensureInboxFolder();
-    // той самий формат id і поле `at`, що й у Каналі — запис одразу має час у стрічці
-    boards[INBOX_FKEY].push({ id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), type:'note', title:'', text:txt, at:Date.now() });
+    // у чат «Вхідні»; той самий формат id і поле `at`, що й у стрічці — запис одразу має час
+    ensureInboxChat();
+    boards[chatBk(INBOX_CHAT)].push({ id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), type:'note', title:'', text:txt, at:Date.now(), by:'me' });
     syncBlocks(); saveBoard();
     renderBoard(); // перемалює Канал або документ, якщо відкриті саме «Вхідні»
     closeQuickCapture();
@@ -293,12 +303,9 @@
   }; }
   // експонуємо для прив'язки до кнопки (напр. довгий тап на FAB або пункт меню)
   window.flowQuickCapture=openQuickCapture;
-  // «Ще → Вхідні»: Канал папки «Вхідні»; папки ще нема — нічого не створюємо, лише пропонуємо записати
+  // «Ще → Вхідні»: чат «Вхідні» (створюється, якщо його ще нема)
   window.flowOpenInbox=function(){
-    try{
-      if(folders[INBOX_FKEY]){ goChannel(INBOX_FKEY); return; }
-      try{ (window.__flowToast||function(){})('Вхідних ще нема — запиши першу думку'); }catch(_){}
-      openQuickCapture();
-    }catch(e){ console.error('flowOpenInbox',e); }
+    try{ ensureInboxChat(); goChat(INBOX_CHAT,{from:'home'}); }
+    catch(e){ console.error('flowOpenInbox',e); }
   };
 

@@ -315,7 +315,8 @@
   }
   /* ── улюбленець «поступається місцем»: якщо його плаваюча позиція
      візуально накрила плитку «Нова папка» (чи будь-яку папку) на Огляді —
-     ховаємо його на цей момент, інакше тап зʼїдає пітомець замість кнопки. ── */
+     ховаємо його на цей момент, інакше тап зʼїдає пітомець замість кнопки.
+     Те саме для вкладки «Чати» (36-chats.js): рядки чатів і «Новий чат». ── */
   function fcCheckOverlap(){
     try{
       const el=document.getElementById('flowCap');
@@ -323,15 +324,19 @@
       const scr=document.getElementById('scr-home');
       const onHome = scr && scr.classList.contains('active');
       if(!onHome){ document.body.classList.remove('fc-yield'); return; }
-      const grid=document.getElementById('folderGrid');
       const r1=el.getBoundingClientRect();
+      const targets=[];
+      const grid=document.getElementById('folderGrid');
+      if(grid) targets.push.apply(targets, grid.querySelectorAll('.fc2'));
+      const clist=document.getElementById('chatList');
+      if(clist && !clist.hidden) targets.push.apply(targets, clist.querySelectorAll('.chl-row,.chl-add'));
+      // поки котик уже поступився — повертаємо його, лише коли картка відійшла
+      // на цей запас. Інакше на самій межі прокрутка вмикала б і вимикала його підряд.
+      const pad = document.body.classList.contains('fc-yield') ? 10 : 0;
       let hit=false;
-      if(grid){
-        const tiles=grid.querySelectorAll('.fc2');
-        for(const t of tiles){
-          const r2=t.getBoundingClientRect();
-          if(!(r1.right<r2.left||r1.left>r2.right||r1.bottom<r2.top||r1.top>r2.bottom)){ hit=true; break; }
-        }
+      for(const t of targets){
+        const r2=t.getBoundingClientRect();
+        if(!(r1.right<r2.left-pad||r1.left>r2.right+pad||r1.bottom<r2.top-pad||r1.top>r2.bottom+pad)){ hit=true; break; }
       }
       document.body.classList.toggle('fc-yield', hit);
     }catch(_){}

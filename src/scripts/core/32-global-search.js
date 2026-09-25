@@ -42,6 +42,7 @@
         close();
         try{
           if(act==='folder')     goFolder(a);
+          else if(act==='chat')  goChat(a,{from:'home'});
           else if(act==='block') window.flowOpenBlock(a,b);
           else if(act==='diary') window.goDiary(a);
           else if(act==='fin')   goFinance();
@@ -85,6 +86,13 @@
         const hits=fl.filter(f=>String(f.name||'').toLowerCase().includes(ql)).slice(0,LIM);
         if(hits.length) html+=`<div class="gs-lbl">Папки</div>`+hits.map(f=>
           hitHTML('folder',f.key,'',f.emoji||'📁','#6a7dff',gsMark(f.name,q),'')).join('');
+      }catch(_){}
+
+      // 1б) чати за назвою (36-chats.js)
+      try{
+        const hits=chats.filter(c=>String(c.name||'').toLowerCase().includes(ql)).slice(0,LIM);
+        if(hits.length) html+=`<div class="gs-lbl">Чати</div>`+hits.map(c=>
+          hitHTML('chat',c.id,'',c.emoji||'💬',c.c||'#8b7cff',gsMark(c.name,q),'')).join('');
       }catch(_){}
 
       // 2) блоки всіх дошок

@@ -31,6 +31,42 @@
     // лінійна іконка зі спрайта index.html замість емодзі — один стиль малювання в ряду шапок
     function hwIco(id){ return `<svg class="hw-ico" aria-hidden="true"><use href="#${id}"/></svg>`; }
 
+    /* ── згортання секції (рішення Ярослава 25.09.2026) ──
+       Три картки їдять пів-екрана, а потрібні не щодня. Тап по заголовку «Огляд»
+       їх ховає; щоб не втратити суть, числа переїжджають у сам заголовок збоку.
+       Стан лежить у ключі 'homeov' поруч з іншими дрібними налаштуваннями. */
+    const OV_KEY='homeov';
+    let ovOpen=true;
+    try{ ovOpen = localStorage.getItem(OV_KEY)!=='closed'; }catch(_){}
+    try{ prefCatchup(OV_KEY, v=>{ ovOpen = v!=='closed'; applyOv(); }); }catch(_){}
+
+    function applyOv(){
+      const head=document.getElementById('homeOvHead'), row=document.getElementById('homeWidgetsRow'),
+            mini=document.getElementById('homeOvMini');
+      if(!head||!row) return;
+      head.classList.toggle('closed', !ovOpen);
+      head.setAttribute('aria-expanded', ovOpen?'true':'false');
+      row.hidden=!ovOpen;
+      if(mini) mini.hidden=ovOpen;
+    }
+    function toggleOv(){
+      ovOpen=!ovOpen;
+      try{ prefSet(OV_KEY, ovOpen?'open':'closed'); }catch(_){}
+      try{ window.platform.haptic('light'); }catch(_){}
+      applyOv();
+      // сітка/список нижче зсунулись — котик має перерахувати, чи не накрив картку
+      try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
+    }
+    // числа в заголовку: лише те, де справді є що показати
+    function miniHTML(nb,bal,spent,st){
+      const chip=(ic,val,tone)=>`<span class="ovm" style="--ovc:${tone}">${hwIco(ic)}${hwEsc(val)}</span>`;
+      let h='';
+      if(nb.length) h+=chip('fo-calendar', nb.length+' '+pluralUk(nb.length,'блок','блоки','блоків'), 'var(--val)');
+      if(bal!==null && (bal!==0||spent>0)) h+=chip('fo-coin', hwFmt(bal)+' ₴', 'var(--fin)');
+      if(st>0) h+=chip('fo-book', st+' '+pluralUk(st,'день','дні','днів'), 'var(--hab)');
+      return h || `<span class="ovm ovm-mut">нічого нового</span>`;
+    }
+
     function render(){
       const host=document.getElementById('homeWidgetsRow'); if(!host) return;
       // планер
@@ -66,6 +102,12 @@
           else if(k==='diary') window.goDiary();
         }catch(e){ console.error('homeWidget',e); }
       });
+      // ті самі дані — у заголовок, щоб згорнутий «Огляд» лишався інформативним
+      const mini=document.getElementById('homeOvMini');
+      if(mini) mini.innerHTML=miniHTML(nb,bal,spent,st);
+      const head=document.getElementById('homeOvHead');
+      if(head&&!head.__init){ head.__init=true; head.onclick=toggleOv; }
+      applyOv();
     }
     window.renderHomeWidgets=render;
 

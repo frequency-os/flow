@@ -129,7 +129,7 @@
       try{ if(typeof spacesMap!=='undefined' && spacesMap && spacesMap[FK]){ delete spacesMap[FK];
         if(typeof activeSpaceMap!=='undefined' && activeSpaceMap) delete activeSpaceMap[FK];
         if(typeof saveSpacesMeta==='function') saveSpacesMeta(); } }catch(_){}
-      saveFolders();                       // завжди: знімає secret з усіх папок і в хмарі
+      saveFolders({auto:true});            // знімає secret з усіх папок і в хмарі (під запобіжником)
       if(hadBoards) saveBoard();
       if(hadEnv) saveEnvelopes();
       // конфіг Vault, база документів клієнтів, старий прапорець очищення
@@ -160,7 +160,19 @@
     const ord=rawo?JSON.parse(rawo):null;
     if(Array.isArray(ord)&&ord.length){ order=ord.filter(k=>folders[k]); Object.keys(folders).forEach(k=>{ if(!order.includes(k)) order.push(k); }); }
   }
+  /* ── ЗАМОК НА load() ──
+     load() смикають із шести місць: старт сторінки, підтвердження Google-сесії,
+     повернення з OAuth, звірка свіжості (кожні 2 хв і при фокусі) та екран «Ще».
+     Досі вони могли йти внахлест — два проходи одночасно читали сховище і
+     застосовували результат наввипередки. Тепер другий виклик не стартує новий
+     прохід, а чекає на той, що вже йде. */
+  let loadInFlight = null;
   async function load(){
+    if(loadInFlight) return loadInFlight;
+    loadInFlight = loadOnce().finally(()=>{ loadInFlight = null; });
+    return loadInFlight;
+  }
+  async function loadOnce(){
     /* Знімки лежать в IndexedDB (PhotoDB) — вичитуємо їх у памʼятний кеш ДО
        першого рендеру, інакше картки блиснуть без фото. Читання швидке:
        одна транзакція, десятки записів. Якщо IndexedDB нема — photoWarm
@@ -171,6 +183,7 @@
     try{
       if(window.storage.getLocal){
         const rawf=window.storage.getLocal(FKEY); if(rawf) applyFolderCfgRaw(rawf);
+        const rawch=window.storage.getLocal('chats_v1'); if(rawch) applyChatsRaw(rawch);
         const rawo=window.storage.getLocal(FOKEY); if(rawo) applyFolderOrderRaw(rawo);
         renderDashboard();
       }
@@ -190,7 +203,7 @@
     // застосування значень нижче лишається в тому самому порядку, що й раніше.
     const __RAW = await (async ()=>{
       const keys=[KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
-        FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,
+        FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',
         WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
@@ -240,6 +253,24 @@
       const raww=__RAW[FWKEY];
       const fw=raww?JSON.parse(raww):null; if(fw&&typeof fw==='object') folderWidgets=fw;
     }catch(e){ /* перше завантаження — сховища ще нема, це нормально */ }
+    /* Чи можна вважати, що папки цієї сесії справді прочитані? Так, якщо конфіг
+       прийшов — або якщо сховище чесно сказало «порожньо» і ми впевнені, що це
+       не збій зв'язку (sbDataTrusted). Доти жоден автоматичний запис не має
+       права чіпати папки: інакше заводська заглушка поїде в хмару. */
+    try{
+      const gotCfg = !!__RAW[FKEY];
+      const trustedEmpty = (typeof window.sbDataTrusted==='function') ? window.sbDataTrusted() : true;
+      markFoldersLoaded(gotCfg || trustedEmpty);
+      if(!gotCfg && !trustedEmpty){
+        console.warn('[Flow] папки не прочитано (сховище мовчить) — автозапис заблоковано');
+        // Порожній Огляд без пояснення виглядає як «усе пропало». Кажемо прямо,
+        // що це збій зв'язку і дані на місці — і що чіпати нічого не треба.
+        try{ if(typeof window.showQuotaBanner==='function')
+          window.showQuotaBanner('Сховище не відповіло, тому папки не показані. Нічого не видалено — дані чекають. Перевір зв\'язок і онови сторінку.',
+                                 'Папки не завантажились'); }catch(_){}
+      }
+    }catch(_){}
+    try{ applyChatsRaw(__RAW['chats_v1']); }catch(e){ console.error('chats load',e); }
     // ── ОЧИЩЕННЯ: «Простір» видалено повністю разом із даними.
     //    Прибираємо: кореневі дошки ('all' + 'all__sp_*'), додаткові простори
     //    кореня та колись перенесені папки «🧩 Простір» ('f_space_*').
@@ -265,7 +296,7 @@
             changed=true;
           }
         }catch(_){}
-        if(changed){ try{ saveFolders(); }catch(_){} try{ saveBoard(); }catch(_){} }
+        if(changed){ try{ saveFolders({auto:true}); }catch(_){} try{ saveBoard(); }catch(_){} }
         localStorage.setItem('space_purge_v1','1');
       }
     }catch(e){ console.error('space purge', e); }
@@ -343,9 +374,11 @@
     try{ removeSystemSeedFoldersOnce(); }catch(e){ console.error('removeSeedFolders',e); }
     try{ agencyPurgeOnce(); }catch(e){ console.error('agencyPurge',e); }
     try{ inboxMigrateOnce(); }catch(e){ console.error('inboxMigrate',e); }
+    try{ chatsMigrateInboxOnce(); }catch(e){ console.error('chatsMigrate',e); }   // папка «Вхідні» → чат (36-chats.js)
     syncBlocks();
     try{ migrate(); }catch(e){ console.error('migrate',e); }
     try{ render(); }catch(e){ console.error('render',e); }
+    try{ chatsInit(); }catch(e){ console.error('chatsInit',e); }
     try{ renderDashboard(); }catch(e){ console.error('dashboard',e); }
     try{ if(window.uiMode==='lite') goPlanner(); }catch(_){}
     try{ updateSummaryBg(); }catch(_){}
@@ -432,7 +465,7 @@
         const ref=await window.photoPut('ph_'+k, folders[k].photo);
         if(ref && String(ref).slice(0,4)==='idb:') folders[k].photo=ref;
       }
-      saveFolders();
+      saveFolders({auto:true});
       try{ renderDashboard(); }catch(_){}
       console.log('[Flow] знімків перенесено в PhotoDB:', keys.length);
     }catch(e){ console.error('migrateFolderPhotos', e); }
@@ -446,7 +479,7 @@
         if(folders && folders[k]){ delete folders[k]; changed=true; }
         var i=order.indexOf(k); if(i>=0){ order.splice(i,1); changed=true; }
       });
-      if(changed) saveFolders();
+      if(changed) saveFolders({auto:true});
     }catch(_){}
     try{ localStorage.setItem(FLAG,'1'); }catch(_){}
   }

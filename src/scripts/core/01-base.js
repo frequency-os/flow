@@ -64,7 +64,8 @@
     'readerCfg',
     'patterns_chains','patterns_score','patterns_transform',
     'vision_v1','custom_avatar_v1','diary_entries_v1','diary_insights_v1','diary_books_v1','upgrade_profile_v1',
-    'lang_pref','i18n_content_cache'
+    'lang_pref','i18n_content_cache',
+    'chats_v1'
   ];
 
   /* ═══════════════════════════════════════════════════════════════════

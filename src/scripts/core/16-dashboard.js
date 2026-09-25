@@ -166,6 +166,8 @@
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag');
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
+    // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
+    try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
     topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).forEach((k,idx)=>{
       const f=folders[k]; if(!f) return;

@@ -1,18 +1,19 @@
-  /* ============ КАНАЛ ПАПКИ ============
-     Папка відкривається як стрічка повідомлень (варіант «Канал», обрано 05.09.2026):
-     обкладинка з назвою → чипи-теми (простори папки) → бульбашки за часом →
-     рядок вводу знизу, як у месенджері.
+  /* ============ ЧАТ (екран стрічки) ============
+     До 21.09.2026 це був «Канал папки». Тепер стрічкою відкривається ЧАТ —
+     окрема від папок сутність (реєстр і зв'язки — 36-chats.js): обкладинка →
+     чипи прикріплених папок → записи за часом → рядок вводу, як у месенджері.
 
-     Дані ТІ САМІ, що й у документі-редакторі: boards[key] (головний простір)
-     і boards[key+'__sp_'+id] (теми). Нового сховища немає. Новим блокам
-     дописуємо `at` (мс); старим час відновлюємо з id — редактор зашиває в id
-     Date.now() у base36 ('pg' + 8 символів), стара дошка — Date.now()+random.
-     Що не датується — іде вгору під підписом «Раніше».
+     Записи чату лежать у boards['chat_'+id] у форматі блоків документа
+     (note/task/photo/…) з `at` (мс) і `by` (автор; поки завжди 'me', підсумок
+     Флоу — 'flow'). Старим записам час відновлюємо з id — редактор зашиває в id
+     Date.now() у base36 ('pg' + 8 символів). Що не датується — іде вгору під
+     «Раніше». Записи, перенесені з тем колишньої папки «Вхідні», несуть `topic`.
 
-     Документ лишається: тап по бульбашці відкриває його на цьому блоці,
-     «⋯ → Відкрити як документ» — цілком. */
-  let chKey=null;          // ключ відкритої папки
-  let chTopic='all';       // 'all' | 'media' | id простору
+     Тап по запису — шторка дій (редагувати, завдання, скопіювати в папку,
+     видалити). Прикріплені папки відкриваються документом і повертають сюди. */
+  let chKey=null;          // id відкритого чату
+  let chTopic='all';       // 'all' | 'media' (лише фото чату)
+  let chOrigin=null;       // звідки прийшли: {scr:'home'} | {scr:'page', key:папка}
   let chMode='note';       // що створить рядок вводу: 'note' | 'task'
   let chRec=null, chStream=null; // диктування
   let chLongPressed=false; // довге утримання чипа: не вважати тапом
@@ -34,15 +35,23 @@
     menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
     trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
     spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>',
+    folder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    folderPlus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/></svg>',
+    link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1"/><path d="M14 10a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1"/></svg>',
+    chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H8l-4 3v-5.5A8 8 0 1 1 21 12z"/></svg>',
+    close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
   };
   function chI(n){ return CH_I[n]||''; }
   function chToast(m){ try{ (window.__flowToast||function(){})(m); }catch(_){} }
   function chHaptic(k){ try{ window.platform.haptic(k||'light'); }catch(_){} }
-  function chFolder(){ return chKey?folders[chKey]:null; }
-  function chSpaces(){ return spacesFor(chKey); }
-  function chBk(id){ return keyForSpaceIn(chKey,id); }
-  // куди лягає новий запис: у поточну тему; в «Усе» і «Медіа» — у головний простір
-  function chTargetBk(){ return chBk((chTopic==='all'||chTopic==='media')?'main':chTopic); }
+  function chChat(){ return chKey?chatById(chKey):null; }
+  function chBoardKey(){ return chKey?chatBk(chKey):''; }
+  // куди лягає новий запис: у дошку чату (тем у чата нема)
+  function chTargetBk(){ return chBoardKey(); }
+  // прикріплені папки чату — лише ті, що існують
+  function chFolders(){ const c=chChat(); return c?chatFolders(c):[]; }
   // той самий формат id, що й у редакторі сторінки — з нього потім читається час
   function chUid(){ return 'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
   // текст блока без HTML (редактор зберігає textContent, але старі дані бувають різні)
@@ -77,45 +86,48 @@
   }
   function chHM(t){ const d=new Date(t); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 
-  /* записи стрічки: блоки верхнього рівня обраних тем, за часом */
+  /* записи стрічки: блоки верхнього рівня дошки чату, за часом */
   function chItems(){
-    const sps=chSpaces();
-    const list = chTopic==='all' ? sps : sps.filter(s=>s.id===chTopic);
-    const out=[];
-    list.forEach(s=>{
-      const bk=chBk(s.id);
-      (boards[bk]||[]).forEach((b,i)=>{ if(b) out.push({b,bk,sp:s,at:chTimeOf(b),i}); });
-    });
+    const bk=chBoardKey(), out=[];
+    (boards[bk]||[]).forEach((b,i)=>{ if(b) out.push({b,bk,at:chTimeOf(b),i}); });
     out.sort((a,b)=>(a.at-b.at)||(a.i-b.i));
     return out;
   }
-  /* усі фото папки, включно з вкладеними — для чипа «Медіа» */
+  /* усі фото чату, включно з вкладеними — для режиму «Медіа» */
   function chPhotos(){
-    const out=[];
-    chSpaces().forEach(s=>{
-      const bk=chBk(s.id);
-      const walk=(arr)=>{ (arr||[]).forEach(b=>{ if(!b) return;
-        if(b.type==='photo'&&b.data) out.push({b,bk,sp:s,at:chTimeOf(b)});
-        if(Array.isArray(b.children)) walk(b.children); }); };
-      walk(boards[bk]);
-    });
+    const bk=chBoardKey(), out=[];
+    const walk=(arr)=>{ (arr||[]).forEach(b=>{ if(!b) return;
+      if(b.type==='photo'&&b.data) out.push({b,bk,at:chTimeOf(b)});
+      if(Array.isArray(b.children)) walk(b.children); }); };
+    walk(boards[bk]);
     out.sort((a,b)=>b.at-a.at);
     return out;
   }
 
   /* ── вхід ── */
-  function goChannel(key){
-    const f=folders[key]; if(!f){ goHome(); return; }
-    if(goChannel._last!==key){ chTopic='all'; }
-    goChannel._last=key;
-    chKey=key; currentFolderKey=key; spaceFromFolder=key; folderPath=[];
-    boardKey=chBk('main'); if(!boards[boardKey]) boards[boardKey]=[]; syncBlocks();
+  // відкрити чат; o.from: 'home' (типово) або 'page' з o.key — папка, куди повертає «назад»
+  function goChat(id, o){
+    const c=chatById(id); if(!c){ goHome(); return; }
+    if(goChat._last!==id){ chTopic='all'; }
+    goChat._last=id;
+    chKey=id; chOrigin=(o&&o.from==='page'&&o.key)?{scr:'page',key:o.key}:{scr:'home'};
+    currentFolderKey=null; spaceFromFolder=null; folderPath=[];
+    boardKey=chBoardKey(); if(!boards[boardKey]) boards[boardKey]=[]; syncBlocks();
     chSetMode('note'); chToggleTray(false);
     renderChannel();
     show('scr-channel');
     chScrollBottom(false);
   }
+  // сумісність зі старими викликами (читалка тощо): id чату — чат, ключ папки — документ
+  function goChannel(key){
+    if(chatById(key)){ goChat(key); return; }
+    if(folders[key]){ goSpaceFor(key); return; }
+    goHome();
+  }
   function chBack(){
+    const o=chOrigin||{}; chOrigin=null;
+    if(o.scr==='page' && folders[o.key]){ currentFolderKey=o.key; goSpaceFor(o.key); return; }
+    homeTab='chats'; try{ prefSet(HTAB_KEY,'chats'); }catch(_){}
     try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
     goHome();
   }
@@ -135,89 +147,112 @@
     feed.style.paddingBottom=Math.max(0,comp.offsetHeight-62)+'px';
   }
   function renderChannel(){
-    const f=chFolder(); if(!f) return;
-    if(chTopic!=='all'&&chTopic!=='media'&&!chSpaces().some(s=>s.id===chTopic)) chTopic='all';
+    const c=chChat(); if(!c) return;
+    if(chTopic!=='all'&&chTopic!=='media') chTopic='all';
     const scr=document.getElementById('scr-channel');
-    scr.style.setProperty('--fc', f.c||'var(--accent)');
+    scr.style.setProperty('--fc', c.c||'var(--accent)');
     renderChCover(); renderChChips(); renderChFeed();
   }
 
   /* ── обкладинка: той самий механізм, що й у документі (window.__pgCovers) ── */
   function chCoverApi(){ return window.__pgCovers||null; }
+  // підпис під назвою: учасники · папки · записи (картки «прикріплено папку» не рахуємо)
+  function chSubText(){
+    const c=chChat(); if(!c) return '';
+    const nf=chFolders().length, nr=chItems().filter(it=>it.b.type!=='flink').length, nm=(c.members||[]).length;
+    return ['Чат', nm>1?(nm+' '+pluralUk(nm,'учасник','учасники','учасників')):'лише ти',
+      nf?(nf+' '+pluralUk(nf,'папка','папки','папок')):'', nr?(nr+' '+pluralUk(nr,'запис','записи','записів')):''].filter(Boolean).join(' · ');
+  }
+  // оновити лише підпис — без перемальовування обкладинки (фото не блимає)
+  function chSyncSub(){ const el=document.querySelector('#chCover .ch-sub'); if(el) el.textContent=chSubText(); }
   function renderChCover(){
-    const f=chFolder(), el=document.getElementById('chCover'); if(!f||!el) return;
-    const api=chCoverApi(); const cov=api?api.get(chKey):null;
+    const c=chChat(), el=document.getElementById('chCover'); if(!c||!el) return;
+    const api=chCoverApi(); const cov=api?api.get(chBoardKey()):null;
     let bg;
     if(cov&&cov.img) bg=`background-image:url('${cov.img}');background-size:cover;background-position:50% ${cov.pos==null?50:cov.pos}%;`;
     else if(cov&&api&&api.grads[cov.g||0]) bg='background:'+api.grads[cov.g||0]+';';
-    else bg=`background:linear-gradient(160deg,color-mix(in srgb,${f.c} 60%,#0f1115),color-mix(in srgb,${f.c} 14%,var(--bg)));`;
-    const em=(f.emoji&&f.emoji.trim())?f.emoji:esc((f.name||'?').trim().charAt(0).toUpperCase());
+    else bg=`background:linear-gradient(160deg,color-mix(in srgb,${c.c} 60%,#0f1115),color-mix(in srgb,${c.c} 14%,var(--bg)));`;
+    const em=(c.emoji&&c.emoji.trim())?c.emoji:esc((c.name||'?').trim().charAt(0).toUpperCase());
+    const sub=chSubText();
     el.innerHTML=`<div class="ch-cov-bg" style="${bg}"></div>
       <div class="ch-cov-top">
-        <button class="ch-ghost" id="chBack" aria-label="Назад до папок">${chI('back')}</button>
+        <button class="ch-ghost" id="chBack" aria-label="Назад">${chI('back')}</button>
         <span class="ch-sp"></span>
         <button class="ch-chip-photo" id="chPhotoBtn">${chI('camera')}<span>Фото</span></button>
+        <button class="ch-ghost acc" id="chAdd" aria-label="Додати папку">${chI('plus')}</button>
         <button class="ch-ghost" id="chMore" aria-label="Ще дії">${chI('dots')}</button>
       </div>
-      <div class="ch-cov-title"><span class="ch-av">${em}</span><h1>${esc(f.name)}</h1></div>`;
+      <div class="ch-cov-title"><span class="ch-av">${em}</span><div class="ch-cov-txt"><h1 data-i18n-skip="1">${esc(c.name)}</h1><div class="ch-sub">${sub}</div></div></div>`;
     el.querySelector('#chBack').onclick=chBack;
     el.querySelector('#chPhotoBtn').onclick=chCoverSheet;
+    el.querySelector('#chAdd').onclick=()=>chatAddSheet(chKey);
     el.querySelector('#chMore').onclick=chMoreSheet;
   }
   function chCoverSheet(){
     const api=chCoverApi(); if(!api){ chToast('⚠️ Обкладинки недоступні'); return; }
-    const cov=api.get(chKey);
+    const cov=api.get(chBoardKey());
     const sw=api.grads.map((g,i)=>`<button class="ch-sw ${cov&&!cov.img&&(cov.g||0)===i?'on':''}" data-chgrad="${i}" style="background:${g}" aria-label="Градієнт ${i+1}"></button>`).join('');
-    chSheet('Обкладинка папки',
+    chSheet('Обкладинка чату',
       `<button class="ch-sheet-row" data-chcov="photo"><span class="ic">${chI('camera')}</span><span>Вибрати фото</span></button>
        <div class="ch-sw-row">${sw}</div>
        ${cov?`<button class="ch-sheet-row danger" data-chcov="clear"><span class="ic">${chI('trash')}</span><span>Прибрати обкладинку</span></button>`:''}`,
       (ov,close)=>{
-        ov.querySelectorAll('[data-chgrad]').forEach(b=>b.onclick=()=>{ api.set(chKey,{g:+b.dataset.chgrad}); renderChCover(); chHaptic('select'); close(); });
-        const ph=ov.querySelector('[data-chcov="photo"]'); if(ph) ph.onclick=()=>{ close(); chPickFile(f=>chShrink(f,1200,760,data=>{ const prev=api.get(chKey)||{}; api.set(chKey,{img:data,pos:prev.pos==null?50:prev.pos,dark:prev.dark==null?30:prev.dark,h:prev.h||176}); renderChCover(); })); };
-        const cl=ov.querySelector('[data-chcov="clear"]'); if(cl) cl.onclick=()=>{ api.clear(chKey); renderChCover(); close(); };
+        ov.querySelectorAll('[data-chgrad]').forEach(b=>b.onclick=()=>{ api.set(chBoardKey(),{g:+b.dataset.chgrad}); renderChCover(); chHaptic('select'); close(); });
+        const ph=ov.querySelector('[data-chcov="photo"]'); if(ph) ph.onclick=()=>{ close(); chPickFile(f=>chShrink(f,1200,760,data=>{ const prev=api.get(chBoardKey())||{}; api.set(chBoardKey(),{img:data,pos:prev.pos==null?50:prev.pos,dark:prev.dark==null?30:prev.dark,h:prev.h||176}); renderChCover(); })); };
+        const cl=ov.querySelector('[data-chcov="clear"]'); if(cl) cl.onclick=()=>{ api.clear(chBoardKey()); renderChCover(); close(); };
       });
   }
   function chMoreSheet(){
+    const c=chChat(); if(!c) return;
+    const media=chTopic==='media';
     chSheet('',
-      `<button class="ch-sheet-row" data-chm="doc"><span class="ic">${chI('doc')}</span><span>Відкрити як документ</span></button>
+      `<button class="ch-sheet-row" data-chm="media"><span class="ic">${chI('image')}</span><span>${media?'Усі записи':'Медіа'}</span></button>
+       <button class="ch-sheet-row" data-chm="folders"><span class="ic">${chI('folder')}</span><span>Папки чату</span></button>
        <button class="ch-sheet-row" data-chm="cover"><span class="ic">${chI('camera')}</span><span>Обкладинка</span></button>
-       <button class="ch-sheet-row" data-chm="topics"><span class="ic">${chI('menu')}</span><span>Теми папки</span></button>`,
+       <button class="ch-sheet-row" data-chm="rename"><span class="ic">${chI('edit')}</span><span>Перейменувати</span></button>
+       ${chKey!==INBOX_CHAT?`<button class="ch-sheet-row danger" data-chm="delete"><span class="ic">${chI('trash')}</span><span>Видалити чат</span></button>`:''}`,
       (ov,close)=>{
-        ov.querySelector('[data-chm="doc"]').onclick=()=>{ close(); chOpenInDoc(chTargetBk(),null); };
+        ov.querySelector('[data-chm="media"]').onclick=()=>{ close(); chTopic=media?'all':'media'; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); };
+        ov.querySelector('[data-chm="folders"]').onclick=()=>{ close(); setTimeout(()=>chatAddSheet(chKey),200); };
         ov.querySelector('[data-chm="cover"]').onclick=()=>{ close(); setTimeout(chCoverSheet,200); };
-        ov.querySelector('[data-chm="topics"]').onclick=()=>{ close(); chOpenTopicSettings(); };
+        ov.querySelector('[data-chm="rename"]').onclick=()=>{ close(); setTimeout(()=>chatRename(chKey),200); };
+        const d=ov.querySelector('[data-chm="delete"]'); if(d) d.onclick=()=>{ close(); setTimeout(()=>chatDelete(chKey),200); };
       });
   }
-  // налаштування просторів (перейменувати / емодзі / видалити) — наявна шторка;
-  // curCtx() уже дорівнює нашій папці, бо goChannel виставив spaceFromFolder
-  function chOpenTopicSettings(focusId){
-    try{ openSpaceSettings(focusId); }catch(e){ console.error('chOpenTopicSettings',e); return; }
-    const wait=setInterval(()=>{ if(!document.querySelector('.spcfg-ov')){ clearInterval(wait); if(chKey) renderChannel(); } },400);
-  }
 
-  /* ── чипи-теми ── */
+  /* ── чипи: прикріплені папки чату (тап — документ папки, довгий тап — дії) ── */
   function renderChChips(){
     const host=document.getElementById('chChips'); if(!host) return;
-    const sps=chSpaces();
-    let h=`<button class="ch-chip ${chTopic==='all'?'on':''}" data-chtopic="all">Усе</button>`;
-    // головний простір не показуємо окремо: його записи і так у «Усе», туди ж іде рядок вводу
-    sps.filter(s=>s.id!=='main').forEach(s=>{
-      h+=`<button class="ch-chip ${chTopic===s.id?'on':''}" data-chtopic="${s.id}" data-chsp="${s.id}"><span class="e">${s.emoji||'📄'}</span>${esc(s.name)}</button>`;
-    });
-    h+=`<button class="ch-chip ${chTopic==='media'?'on':''}" data-chtopic="media">${chI('image')}Медіа</button>`;
-    h+=`<button class="ch-chip add" data-chadd aria-label="Нова тема">${chI('plus')}</button>`;
+    const fl=chFolders();
+    let h='';
+    if(chTopic==='media') h+=`<button class="ch-chip on" data-chall>${chI('back')}Усі записи</button>`;
+    h+=`<span class="ch-lbl">Папки</span>`;
+    fl.forEach(f=>{ h+=`<button class="ch-chip fold" data-chfold="${esc(f.key)}" data-i18n-skip="1"><span class="e">${esc(f.emoji||'📁')}</span>${esc(f.name)}</button>`; });
+    h+=`<button class="ch-chip add" data-chadd aria-label="Додати папку">${chI('plus')}</button>`;
     host.innerHTML=h;
-    host.querySelectorAll('[data-chtopic]').forEach(b=>{
-      b.onclick=()=>{ if(chLongPressed){ chLongPressed=false; return; } chTopic=b.dataset.chtopic; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); };
-      if(b.dataset.chsp) chAttachLongPress(b,()=>chOpenTopicSettings(b.dataset.chsp));
+    const all=host.querySelector('[data-chall]'); if(all) all.onclick=()=>{ chTopic='all'; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); };
+    host.querySelectorAll('[data-chfold]').forEach(b=>{
+      b.onclick=()=>{ if(chLongPressed){ chLongPressed=false; return; } chOpenFolder(b.dataset.chfold); };
+      chAttachLongPress(b,()=>chFolderChipSheet(b.dataset.chfold));
     });
-    host.querySelector('[data-chadd]').onclick=chAddTopic;
-    // активний чип — у видиму частину ряду. НЕ scrollIntoView: рядок липкий (sticky),
-    // і браузер тоді прокручує body до його «паперового» місця — стрічка стрибає вгору
-    const on=host.querySelector('.ch-chip.on');
-    if(on){ const l=on.offsetLeft-12, r=on.offsetLeft+on.offsetWidth+12-host.clientWidth;
-      if(host.scrollLeft>l) host.scrollLeft=Math.max(0,l); else if(host.scrollLeft<r) host.scrollLeft=r; }
+    host.querySelector('[data-chadd]').onclick=()=>chatAddSheet(chKey);
+  }
+  // документ прикріпленої папки; «‹ Папки» в документі повертає в цей чат
+  function chOpenFolder(fkey){
+    if(!folders[fkey]) return;
+    const id=chKey; currentFolderKey=fkey;
+    goSpaceFor(fkey);
+    window.__flowExitPage=function(){ goChat(id); };
+  }
+  function chFolderChipSheet(fkey){
+    const f=folders[fkey]; if(!f) return;
+    chSheet(esc(f.name),
+      `<button class="ch-sheet-row" data-cf="open"><span class="ic">${chI('doc')}</span><span>Відкрити документ</span></button>
+       <button class="ch-sheet-row danger" data-cf="unlink"><span class="ic">${chI('close')}</span><span>Відкріпити від чату</span></button>`,
+      (ov,close)=>{
+        ov.querySelector('[data-cf="open"]').onclick=()=>{ close(); chOpenFolder(fkey); };
+        ov.querySelector('[data-cf="unlink"]').onclick=()=>{ close(); chatUnlinkFolder(chKey,fkey); };
+      });
   }
   function chAttachLongPress(el,fn){
     let t=null;
@@ -227,17 +262,6 @@
     ['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,stop));
     el.addEventListener('contextmenu',e=>e.preventDefault());
   }
-  function chAddTopic(){
-    inputModal({ title:'Нова тема', placeholder:'Назва теми', emoji:true, emojiVal:'📄',
-      onOk:(name,em)=>{
-        const list=spacesFor(chKey);
-        const palette=['#ff6b9d','#34c77b','#f0b429','#c77dff','#4ecdc4','#e8843c','#9b8cff','#5b8def'];
-        const id='s'+Date.now().toString(36), n=list.length;
-        list.push({id, name:(name||'').trim()||('Тема '+n), emoji:((em||'').trim().slice(0,2))||'📄', color:palette[n%palette.length]});
-        boards[chBk(id)]=[]; activeSpaceMap[chKey]=id; saveSpacesMeta(); saveBoard();
-        chTopic=id; chHaptic('medium'); renderChannel();
-      }});
-  }
 
   /* ── стрічка ── */
   function renderChFeed(){
@@ -246,12 +270,12 @@
       const ph=chPhotos();
       host.innerHTML = ph.length
         ? `<div class="ch-media">${ph.map(p=>`<button class="ch-mi" data-chopen="${p.bk}|${p.b.id}"><img src="${p.b.data}" alt="" loading="lazy"></button>`).join('')}</div>`
-        : `<div class="ch-empty"><b>Фото ще немає</b><span>Додай через «+» → Фото — і всі знімки папки збиратимуться тут.</span></div>`;
+        : `<div class="ch-empty"><b>Фото ще немає</b><span>Додай через «+» → Фото — і всі знімки чату збиратимуться тут.</span></div>`;
       chBindFeed(host); return;
     }
     const items=chItems();
     if(!items.length){
-      host.innerHTML=`<div class="ch-empty"><b>Поки порожньо</b><span>Напиши перше повідомлення внизу — воно стане записом у папці.</span></div>`;
+      host.innerHTML=`<div class="ch-empty"><b>Поки порожньо</b><span>Напиши перше повідомлення внизу — воно стане першим записом чату.</span></div>`;
       return;
     }
     let h='', lastDay=null;
@@ -267,7 +291,7 @@
   function chBubble(it){
     const b=it.b, t=b.type||'note';
     if(t==='divider') return '';
-    let tag=(chTopic==='all'&&it.sp&&it.sp.id!=='main') ? `<div class="ch-tag" style="--sc:${it.sp.color||'var(--accent)'}">${it.sp.emoji||''} ${esc(it.sp.name)}</div>` : '';
+    let tag=(b.topic&&b.topic.name) ? `<div class="ch-tag" style="--sc:${b.topic.color||'var(--accent)'}">${esc(b.topic.emoji||'')} ${esc(b.topic.name)}</div>` : '';
     if(b.ai) tag+=`<div class="ch-tag ai">${chI('spark')}Підсумок</div>`;
     const time=it.at ? `<div class="ch-time">${chHM(it.at)}</div>` : '';
     const meta=(typeof BLOCK_TYPES!=='undefined'&&BLOCK_TYPES[t])||{};
@@ -293,14 +317,20 @@
       // підрощувала стрічку і ховала останній запис під рядком вводу
       body = b.data
         ? `<div class="ch-photo"><img src="${b.data}" alt=""${b.h?` style="height:${Math.min(340,Math.max(80,+b.h||0))}px"`:''}></div>${b.title?`<div class="ch-text ch-cap">${esc(b.title)}</div>`:''}`
-        : `<div class="ch-link-card"><span class="ch-lc-ic">🖼️</span><div><b>Фото</b><small>ще не вибрано · відкрити в документі</small></div>${chI('chev')}</div>`;
+        : `<div class="ch-link-card"><span class="ch-lc-ic">🖼️</span><div><b>Фото</b><small>без зображення</small></div>${chI('chev')}</div>`;
+    } else if(t==='flink'){
+      // картка «прикріплено папку» — момент, коли це сталось; тап відкриває документ папки
+      const f=folders[b.folder];
+      body = f
+        ? `<div class="ch-link-card" style="--sc:${f.c||'var(--fc)'}"><span class="ch-lc-ic">${esc(f.emoji||'📁')}</span><div><b data-i18n-skip="1">${esc(f.name)}</b><small>прикріплено папку · відкрити документ</small></div>${chI('chev')}</div>`
+        : `<div class="ch-link-card"><span class="ch-lc-ic">📁</span><div><b>Папка</b><small>уже видалена</small></div></div>`;
     } else if(t==='page'||t==='group'){
       const n=(b.children||[]).length;
       body=`<div class="ch-link-card" style="--sc:${t==='page'?'#7c8cff':'#f0b429'}"><span class="ch-lc-ic">${b.emoji||(t==='page'?'📄':'📁')}</span><div><b>${esc(b.title||(t==='page'?'Сторінка':'Папка'))}</b><small>${t==='page'?'сторінка':'папка'}${n?' · '+n+' бл.':''}</small></div>${chI('chev')}</div>`;
     } else if(t==='link'){
       body=`<div class="ch-link-card"><span class="ch-lc-ic">🔗</span><div><b>${esc(b.label||b.title||b.url||'Посилання')}</b><small>${esc(b.url||'')}</small></div>${chI('chev')}</div>`;
     } else {
-      body=`<div class="ch-link-card"><span class="ch-lc-ic">${meta.emoji||'🧩'}</span><div><b>${esc(b.title||meta.title||t)}</b><small>${esc(meta.title||t)} · відкрити в документі</small></div>${chI('chev')}</div>`;
+      body=`<div class="ch-link-card"><span class="ch-lc-ic">${meta.emoji||'🧩'}</span><div><b>${esc(b.title||meta.title||t)}</b><small>${esc(meta.title||t)}</small></div>${chI('chev')}</div>`;
     }
     return `<div class="ch-msg${cls}${b.ai?' ai':''}" data-chopen="${it.bk}|${b.id}">${tag}${body}${time}</div>`;
   }
@@ -313,7 +343,7 @@
       if(on){
         const items=chItems().filter(it=>!it.b.ai&&it.b.type!=='divider');
         if(!items.length) on=false;
-        else { const weekAgo=Date.now()-7*864e5; if(!items.some(it=>it.at>=weekAgo)) label='Підсумувати папку'; }
+        else { const weekAgo=Date.now()-7*864e5; if(!items.some(it=>it.at>=weekAgo)) label='Підсумувати чат'; }
       }
     }catch(_){ on=false; }
     wrap.hidden=!on;
@@ -338,7 +368,7 @@
       else txt=chTxt(b)||b.title||'';
       txt=String(txt||'').replace(/\s+/g,' ').trim(); if(!txt) return;
       const when=it.at?(chDayLabel(it.at)+' '+chHM(it.at)):'без дати';
-      const topic=(it.sp&&it.sp.id!=='main')?(' · '+it.sp.name):'';
+      const topic=(it.b.topic&&it.b.topic.name)?(' · '+it.b.topic.name):'';
       lines.push(when+topic+' — '+txt.slice(0,400));
     });
     // ліміт ~6000 символів: лишаємо найновіші
@@ -353,16 +383,16 @@
     if(typeof aiCall!=='function'){ chToast('⚠️ AI недоступний'); return; }
     const col=chAiCollect();
     if(!col.body){ chToast('Поки нема що підсумовувати'); return; }
-    const f=chFolder(); const fname=(f&&f.name)||'папка';
+    const c=chChat(); const fname=(c&&c.name)||'чат';
     const isWeek=col.mode==='week';
-    const sys='Ти — уважний і чесний помічник, який підсумовує записи людини в її особистій папці «'+fname+'». '
-      +'Тобі дають записи '+(isWeek?'за останній тиждень':'з усієї папки')+' (від старіших до новіших): нотатки, завдання з позначкою виконано чи не виконано, підписи фото. '
+    const sys='Ти — уважний і чесний помічник, який підсумовує записи людини в її чаті «'+fname+'». '
+      +'Тобі дають записи '+(isWeek?'за останній тиждень':'з усього чату')+' (від старіших до новіших): нотатки, завдання з позначкою виконано чи не виконано, підписи фото. '
       +'Напиши 3–5 коротких рядків: що сталось, що лишилось відкритим, і одну конкретну пораду на наступний тиждень — лише з того, що є в записах, без вигаданих фактів і цифр. '
       +'Українською, без вступних фраз, без заголовків і markdown.';
     const targetBk=chTargetBk(); // куди ляже підсумок, якщо натиснуть «У стрічку»
     let result='', done=false, closed=false;
     chAiBusy=true; chAiSync();
-    const ov=chSheet(isWeek?'Підсумок тижня':'Підсумок папки',
+    const ov=chSheet(isWeek?'Підсумок тижня':'Підсумок чату',
       `<div class="ch-ai-out" id="chAiOut"><span class="ch-ai-wait">Думаю…</span></div>
        <div class="ch-ai-acts"><button class="ch-ai-btn" data-chai="save" disabled>У стрічку</button><button class="ch-ai-btn ghost" data-chai="close">Закрити</button></div>`,
       (ov,close)=>{
@@ -373,7 +403,7 @@
           if(save.dataset.retry){ closed=true; close(); setTimeout(chAiSummarize,220); return; }
           if(!done||!result) return;
           if(!boards[targetBk]) boards[targetBk]=[];
-          boards[targetBk].push({id:chUid(),type:'note',text:result,title:'',ai:true,at:Date.now()});
+          boards[targetBk].push({id:chUid(),type:'note',text:result,title:'',ai:true,at:Date.now(),by:'flow'});
           saveBoard(); if(boardKey===targetBk) syncBlocks();
           closed=true; close(); renderChFeed(); chScrollBottom(); chHaptic('medium');
         };
@@ -402,7 +432,10 @@
     });
     host.querySelectorAll('[data-chopen]').forEach(el=>el.onclick=(e)=>{
       if(e.target.closest('[data-chtodo]')) return;
-      const [bk,id]=el.dataset.chopen.split('|'); chOpenInDoc(bk,id);
+      const [bk,id]=el.dataset.chopen.split('|');
+      const b=(boards[bk]||[]).find(x=>x&&String(x.id)===id); if(!b) return;
+      if(b.type==='flink'){ if(folders[b.folder]) chOpenFolder(b.folder); else chToast('Цю папку вже видалено'); return; }
+      chRecordSheet(bk,b);
     });
   }
   // стрибок до бульбашки (глобальний пошук). false — блока в стрічці не видно
@@ -410,22 +443,77 @@
   function chJumpTo(bk,id){
     const scr=document.getElementById('scr-channel');
     if(!chKey||!scr||!scr.classList.contains('active')) return false;
-    if(String(bk).split('__sp_')[0]!==chKey) return false;
-    const sid = bk===chKey ? 'main' : (String(bk).split('__sp_')[1]||'main');
-    if(chTopic!=='all' && chTopic!==sid){ chTopic='all'; renderChChips(); renderChFeed(); }
+    if(bk!==chBoardKey()) return false;
+    if(chTopic!=='all'){ chTopic='all'; renderChChips(); renderChFeed(); }
     const el=document.querySelector('#chFeed [data-chopen="'+bk+'|'+String(id).replace(/["\\]/g,'')+'"]');
     if(!el) return false;
     chFitFeed(); el.scrollIntoView({block:'center'});
     el.classList.add('ch-flash'); setTimeout(()=>el.classList.remove('ch-flash'),1600);
     return true;
   }
-  // документ на цьому блоці; «‹ Папки» в документі повертає в Канал, не на Огляд
-  function chOpenInDoc(bk,id){
-    const key=chKey;
-    if(!boards[bk]) boards[bk]=[];
-    try{ const sid = bk===key ? 'main' : (String(bk).split('__sp_')[1]||'main'); activeSpaceMap[key]=sid; saveSpacesMeta(); }catch(_){}
-    goSpaceFor(bk, id?{focusId:id}:null);
-    window.__flowExitPage=function(){ goChannel(key); };
+  /* ── шторка запису: чат — не документ, тож правки тут, а не в редакторі ── */
+  function chRecordSheet(bk,b){
+    const t=b.type||'note';
+    const canText=(t==='note'||t==='quick'||t==='task'||t==='head'||t==='quote'||t==='photo');
+    const fl=chFolders();
+    chSheet(t==='photo'?'Фото':(t==='task'?'Завдання':'Запис'),
+      `${canText?`<button class="ch-sheet-row" data-cr="edit"><span class="ic">${chI('edit')}</span><span>${t==='photo'?'Підпис':'Редагувати'}</span></button>`:''}
+       ${(t==='note'||t==='quick')?`<button class="ch-sheet-row" data-cr="totask"><span class="ic">${chI('task')}</span><span>Зробити завданням</span></button>`:''}
+       ${t==='task'?`<button class="ch-sheet-row" data-cr="tonote"><span class="ic">${chI('doc')}</span><span>Зробити нотаткою</span></button>`:''}
+       <button class="ch-sheet-row" data-cr="copy"><span class="ic">${chI('copy')}</span><span>Скопіювати в папку${fl.length===1?' «'+esc(fl[0].name)+'»':'…'}</span></button>
+       <button class="ch-sheet-row danger" data-cr="del"><span class="ic">${chI('trash')}</span><span>Видалити</span></button>`,
+      (ov,close)=>{
+        const q=s=>ov.querySelector(s);
+        const e=q('[data-cr="edit"]'); if(e) e.onclick=()=>{ close(); setTimeout(()=>chEditRecord(bk,b),200); };
+        const tt=q('[data-cr="totask"]'); if(tt) tt.onclick=()=>{ b.type='task'; b.title='Завдання'; if(b.done==null) b.done=false; saveBoard(); close(); renderChFeed(); chHaptic('light'); };
+        const tn=q('[data-cr="tonote"]'); if(tn) tn.onclick=()=>{ b.type='note'; b.title=''; saveBoard(); close(); renderChFeed(); chHaptic('light'); };
+        q('[data-cr="copy"]').onclick=()=>{ close(); if(fl.length===1) chCopyToFolder(b,fl[0].key); else setTimeout(()=>chPickCopyTarget(b),200); };
+        q('[data-cr="del"]').onclick=()=>{ close(); chDeleteRecord(bk,b); };
+      });
+  }
+  function chEditRecord(bk,b){
+    const isPhoto=b.type==='photo';
+    const cur=isPhoto?(b.title||''):(b.text!=null?b.text:(b.title||''));
+    chSheet(isPhoto?'Підпис до фото':'Редагувати запис',
+      `<textarea class="ch-edit" id="chEditTa" rows="4" placeholder="${isPhoto?'Підпис…':'Текст запису…'}"></textarea>
+       <div class="ch-ai-acts"><button class="ch-ai-btn" data-ce="save">Зберегти</button><button class="ch-ai-btn ghost" data-ce="cancel">Скасувати</button></div>`,
+      (ov,close)=>{
+        const ta=ov.querySelector('#chEditTa'); ta.value=cur;
+        setTimeout(()=>{ try{ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); }catch(_){} },60);
+        ov.querySelector('[data-ce="cancel"]').onclick=close;
+        ov.querySelector('[data-ce="save"]').onclick=()=>{
+          const v=ta.value.replace(/\s+$/,'');
+          if(isPhoto) b.title=v.trim();
+          else if(b.text!=null||b.type==='note'||b.type==='task'||b.type==='quick') b.text=v;
+          else b.title=v;
+          b.edited=Date.now(); saveBoard(); if(boardKey===bk) syncBlocks();
+          close(); renderChFeed(); chHaptic('light');
+        };
+      });
+  }
+  // копія запису → головна дошка папки (стане блоком документа); оригінал лишається в чаті
+  function chCopyToFolder(b,fkey){
+    const f=folders[fkey]; if(!f) return;
+    if(!boards[fkey]) boards[fkey]=[];
+    const copy=JSON.parse(JSON.stringify(b)); copy.id=chUid(); copy.at=Date.now(); delete copy.by; delete copy.topic;
+    boards[fkey].push(copy); saveBoard();
+    chHaptic('medium'); chToast('Скопійовано в «'+f.name+'»');
+  }
+  function chPickCopyTarget(b){
+    const fl=chFolders(); const skip={fin:1,val:1,work:1,pat:1}; const vz=(typeof VISION_FKEY!=='undefined')?VISION_FKEY:'';
+    const rest=orderedFolderKeys().filter(k=>folders[k]&&!skip[k]&&k!==vz&&!fl.some(f=>f.key===k));
+    const row=k=>{ const f=folders[k]; return `<button class="ch-sheet-row" data-pick="${esc(k)}"><span class="ic e">${esc(f.emoji||'📁')}</span><span data-i18n-skip="1">${esc(f.name)}</span></button>`; };
+    if(!fl.length&&!rest.length){ chToast('Папок ще нема'); return; }
+    chSheet('Скопіювати в папку',
+      `<div class="ch-pick">${fl.length?`<div class="ch-sheet-t">Папки чату</div>`+fl.map(f=>row(f.key)).join(''):''}${rest.length?`<div class="ch-sheet-t">Інші</div>`+rest.map(row).join(''):''}</div>`,
+      (ov,close)=>{ ov.querySelectorAll('[data-pick]').forEach(x=>x.onclick=()=>{ close(); chCopyToFolder(b,x.dataset.pick); }); });
+  }
+  function chDeleteRecord(bk,b){
+    confirmSheet({ title:'Видалити запис?', onOk:()=>{
+      const arr=boards[bk]||[]; const i=arr.indexOf(b); if(i>=0) arr.splice(i,1);
+      saveBoard(); if(boardKey===bk) syncBlocks();
+      renderChFeed(); chHaptic('medium'); chSyncSub();
+    }});
   }
 
   /* ── рядок вводу ── */
@@ -436,7 +524,7 @@
         <button data-chtray="photo"><i>${chI('image')}</i><span>Фото</span></button>
         <button data-chtray="task"><i>${chI('task')}</i><span>Завдання</span></button>
         <button data-chtray="voice"><i>${chI('mic')}</i><span>Голос</span></button>
-        <button data-chtray="topic"><i>${chI('page')}</i><span>Тема</span></button>
+        <button data-chtray="folder"><i>${chI('folder')}</i><span>Папка</span></button>
       </div>
       <div class="ch-aiwrap" id="chAiWrap" hidden>
         <button class="ch-aichip" id="chAiChip">${chI('spark')}<span>Підсумувати тиждень</span></button>
@@ -463,10 +551,10 @@
     try{ if(window.ResizeObserver) new ResizeObserver(chFitFeed).observe(comp); }catch(_){}
     comp.querySelectorAll('[data-chtray]').forEach(b=>b.onclick=()=>{
       const a=b.dataset.chtray; chToggleTray(false);
-      if(a==='photo') chPickFile(f=>chShrink(f,1100,1100,data=>chPushBlock({id:chUid(),type:'photo',title:'',data,at:Date.now()})));
+      if(a==='photo') chPickFile(f=>chShrink(f,1100,1100,data=>chPushBlock({id:chUid(),type:'photo',title:'',data,at:Date.now(),by:'me'})));
       else if(a==='task'){ chSetMode('task'); inp.focus(); }
       else if(a==='voice') chVoice();
-      else if(a==='topic') chAddTopic();
+      else if(a==='folder') chatAddSheet(chKey);
     });
     // клавіатура: composer тримається над нею (iOS не зсуває fixed-елементи сам)
     const vv=window.visualViewport;
@@ -498,7 +586,7 @@
     boards[bk].push(b); saveBoard();
     if(boardKey===bk) syncBlocks();
     if(chTopic==='media'&&b.type!=='photo'){ chTopic='all'; renderChChips(); }
-    renderChFeed(); chScrollBottom(true); chHaptic('light');
+    renderChFeed(); chScrollBottom(true); chHaptic('light'); chSyncSub();
   }
   function chSend(){
     const inp=document.getElementById('chInput'); if(!inp) return;
@@ -507,8 +595,8 @@
     let text=raw, type=chMode;
     const m=/^\s*(\[\s?\]|-\s\[\s?\])\s+/.exec(raw); if(m){ type='task'; text=raw.slice(m[0].length); }
     const b = type==='task'
-      ? {id:chUid(),type:'task',text:text.trim(),title:'Завдання',done:false,due:'',prio:'none',at:Date.now()}
-      : {id:chUid(),type:'note',text:text.trim(),title:'',at:Date.now()};
+      ? {id:chUid(),type:'task',text:text.trim(),title:'Завдання',done:false,due:'',prio:'none',at:Date.now(),by:'me'}
+      : {id:chUid(),type:'note',text:text.trim(),title:'',at:Date.now(),by:'me'};
     inp.value=''; chAutoGrow(); chSetMode('note'); chSyncSend();
     chPushBlock(b);
     try{ inp.focus(); }catch(_){}
@@ -564,8 +652,8 @@
   function chSheet(title, rowsHtml, bind){
     document.querySelectorAll('.ch-sheet-ov').forEach(x=>x.remove());
     const ov=document.createElement('div'); ov.className='ch-sheet-ov';
-    const f=chFolder();
-    ov.innerHTML=`<div class="ch-sheet" style="--fc:${(f&&f.c)||'var(--accent)'}"><div class="ch-grip"></div>${title?`<div class="ch-sheet-t">${title}</div>`:''}${rowsHtml}</div>`;
+    const c=chChat();
+    ov.innerHTML=`<div class="ch-sheet" style="--fc:${(c&&c.c)||'var(--accent)'}"><div class="ch-grip"></div>${title?`<div class="ch-sheet-t">${title}</div>`:''}${rowsHtml}</div>`;
     document.body.appendChild(ov);
     const close=()=>ov.remove();
     ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
@@ -574,4 +662,4 @@
   }
 
   chInitComposer();
-  try{ window.goChannel=goChannel; }catch(_){}
+  try{ window.goChannel=goChannel; window.goChat=goChat; }catch(_){}

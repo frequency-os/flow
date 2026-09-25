@@ -12,7 +12,16 @@
     background:#7fe0a8;border:2px solid #0e1120;animation:petGlow 2s ease-in-out infinite;}
   #flowCap.busy{animation:petGlow 1s ease-in-out infinite;}
   body.ai-open #flowCap, body.in-reader #flowCap, body.kb-open #flowCap,
-  body.space-zen.in-space #flowCap, body.spot-open #flowCap, body.fc-yield #flowCap{display:none!important;}
+  body.space-zen.in-space #flowCap, body.spot-open #flowCap{display:none!important;}
+  /* «поступається місцем» (fcCheckOverlap у 14-react.js) — НЕ display:none:
+     схований display'ом котик має нульовий прямокутник, перевірка вирішує, що
+     перекриття зникло, і повертає його — при прокрутці це виглядало як моргання.
+     Тепер він лише пригасає: прямокутник лишається на місці (перевірка не
+     передумує), тап проходить крізь нього до картки, а сам котик нікуди не
+     зникає з Огляду — видно, що він просто відступив. */
+  body.fc-yield #flowCap{opacity:.32;pointer-events:none;}
+  #flowCap{transition:transform .2s ease,opacity .18s ease;}
+  @media (prefers-reduced-motion: reduce){ #flowCap{transition:none;} }
   @media (min-width:1024px){ #flowCap{right:22px;bottom:22px;} }
   /* ── Спарк: драг, сон, зона «додому» ── */
   #flowCap{touch-action:none;-webkit-user-select:none;user-select:none;}

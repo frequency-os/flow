@@ -1,0 +1,69 @@
+  /* ============ ЧАТИ (36-chats.js) ============
+     Вкладки Огляду «Папки · Чати», список чатів, блок «Чати папки» в документі
+     і дрібні доповнення екрана чату (база екрана — 18-channel.css). */
+  /* ── вкладки на Огляді ── */
+  .sec-htabs{align-items:flex-end;}
+  .htabs{display:flex;align-items:flex-end;gap:16px;}
+  .htab{display:flex;align-items:center;gap:7px;padding:0 0 7px;border:0;border-bottom:2px solid transparent;background:transparent;
+    color:var(--muted);font:inherit;font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .htab .e{letter-spacing:0;font-size:15px;line-height:1;opacity:.6;}
+  .htab.on{color:var(--text);border-bottom-color:var(--accent);}
+  .htab.on .e{opacity:1;}
+  .htab .count{padding:2px 8px;font-size:11.5px;letter-spacing:0;}
+  .sec-htabs .sec-actions{padding-bottom:4px;}
+  .htab-add{width:32px;height:30px;border-radius:10px;border:1px solid var(--line);background:var(--bg-2);color:var(--muted);display:grid;place-items:center;padding:0;cursor:pointer;}
+  .htab-add svg{width:16px;height:16px;}
+  .htab-add[hidden]{display:none;}
+  /* ── список чатів ── */
+  .chat-list{display:flex;flex-direction:column;}
+  .chat-list[hidden]{display:none!important;}
+  .chl-row{display:flex;align-items:center;gap:12px;width:100%;padding:9px 4px;border:0;border-bottom:1px solid var(--hair);background:transparent;
+    color:var(--text);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
+  .chl-row:active{background:var(--hair);}
+  .chl-av{width:44px;height:44px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:21px;line-height:1;
+    background:color-mix(in srgb,var(--cc,var(--accent)) 28%,var(--card));border:1px solid var(--line);}
+  .chl-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .chl-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+  .chl-top b{font-size:15px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chl-top small{font-size:11.5px;color:var(--muted);font-weight:600;flex:none;}
+  .chl-sub{display:flex;align-items:center;gap:8px;min-width:0;}
+  .chl-pill{flex:none;height:20px;padding:0 8px;border-radius:10px;background:var(--hair-2);color:var(--muted);font-size:11px;font-weight:700;
+    display:flex;align-items:center;white-space:nowrap;max-width:46%;overflow:hidden;text-overflow:ellipsis;}
+  .chl-prev{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chl-add{margin:10px 0 0;height:56px;border-radius:18px;border:1px dashed var(--hair-2);background:transparent;color:var(--muted);
+    display:flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+  .chl-add svg{width:20px;height:20px;}
+  .chl-empty{display:flex;flex-direction:column;gap:6px;padding:26px 8px 10px;text-align:center;}
+  .chl-empty b{font-size:17px;}
+  .chl-empty span{font-size:13.5px;color:var(--muted);line-height:1.45;}
+  /* ── екран чату: доповнення ── */
+  .ch-ghost.acc{background:var(--accent);border-color:var(--accent);}
+  .ch-cov-txt{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px;}
+  .ch-sub{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.82);text-shadow:0 1px 8px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ch-chips .ch-lbl{flex:none;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 4px 0 2px;}
+  .ch-sheet-row span small{display:block;font-size:12.5px;color:var(--muted);font-weight:500;margin-top:1px;}
+  .ch-sheet-row .ic.e{font-size:18px;color:var(--text);}
+  .ch-sheet-row.static{cursor:default;}
+  .ch-sheet-row.static:active{background:transparent;}
+  .ch-sheet-row .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ch-x{flex:none;width:32px;height:32px;border-radius:16px;border:1px solid var(--line);background:transparent;color:var(--muted);display:grid;place-items:center;padding:0;cursor:pointer;}
+  .ch-x svg{width:16px;height:16px;}
+  .ch-pick{max-height:52vh;overflow:auto;display:flex;flex-direction:column;gap:2px;}
+  .ch-edit{width:100%;box-sizing:border-box;min-height:110px;max-height:40vh;margin:2px 0 8px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);
+    background:var(--card-2);color:var(--text);font:inherit;font-size:15.5px;line-height:1.45;resize:vertical;outline:none;}
+  /* ── документ папки: «+» у шапці і блок «Чати папки» ── */
+  /* вага вища за #scr-page .pg-widebtn (теми ставлять йому прозорий фон з !important) */
+  #scr-page .pg-widebtn.pg-addlink{background:var(--accent)!important;border:1px solid var(--accent)!important;color:#fff!important;font-size:18px;line-height:1;}
+  .pg-addlink[hidden]{display:none!important;}
+  .pg-links{display:flex;flex-direction:column;margin:10px 0 14px;border-radius:18px;background:var(--pg-field,var(--card));border:1px solid var(--pg-line,var(--line));overflow:hidden;}
+  .pg-links[hidden]{display:none!important;}
+  .pgl-head{display:flex;align-items:center;gap:6px;padding:10px 12px 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--pg-mut,var(--muted));font-weight:700;}
+  .pgl-head span{letter-spacing:0;font-size:13px;}
+  .pgl-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:0;border-top:1px solid var(--pg-line,var(--line));background:transparent;
+    color:var(--pg-fg,var(--text));font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .pgl-row:active{background:var(--hair);}
+  .pgl-av{width:34px;height:34px;border-radius:11px;flex:none;display:grid;place-items:center;font-size:17px;line-height:1;background:color-mix(in srgb,var(--cc,var(--accent)) 28%,transparent);}
+  .pgl-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .pgl-body b{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgl-body small{font-size:12.5px;color:var(--pg-mut,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgl-time{font-size:11px;color:var(--pg-mut,var(--muted));flex:none;}

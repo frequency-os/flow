@@ -36,7 +36,7 @@
   <div style="display:flex;align-items:flex-start;gap:11px;">
     <span style="font-size:20px;line-height:1">⚠️</span>
     <div style="flex:1;min-width:0">
-      <div style="font-weight:800;font-size:13.5px;color:#fff;">Пам'ять пристрою заповнена</div>
+      <div id="quotaBannerTitle" style="font-weight:800;font-size:13.5px;color:#fff;">Пам'ять пристрою заповнена</div>
       <div id="quotaBannerMsg" style="font-size:12px;color:rgba(255,255,255,.82);margin-top:3px;line-height:1.45">
         Локальна памʼять заповнена — нові зміни могли не зберегтись на цей пристрій. Якщо ти увійшов через Google, вони в хмарі. Звільни місце: прибери великі фото або старі дані.</div>
     </div>
@@ -168,18 +168,29 @@
       <div class="wishdots" id="wishDots"></div>
     </div>
 
-    <!-- живий Огляд: план дня · гаманець · щоденник (аудит Ф1) -->
+    <!-- живий Огляд: план дня · гаманець · щоденник (аудит Ф1).
+         Згортається одним тапом; у згорнутому вигляді числа переїжджають у сам заголовок -->
+    <button class="ovhead" id="homeOvHead" aria-expanded="true" aria-controls="homeWidgetsRow">
+      <span class="ovhead-t">Огляд</span>
+      <span class="ovhead-mini" id="homeOvMini" hidden></span>
+      <svg class="ovhead-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
     <div id="homeWidgetsRow"></div>
 
-    <div class="sec"><h3>📁 Папки</h3><div class="sec-actions"><div class="fvseg" id="folderViewSeg">
+    <!-- Огляд: дві вкладки — 📁 Папки (сітка) і 💬 Чати (список, 36-chats.js) -->
+    <div class="sec sec-htabs"><div class="htabs" id="homeTabs">
+      <button class="htab on" data-htab="folders"><span class="e">📁</span>Папки<span class="count" id="folderCountBadge">5</span></button>
+      <button class="htab" data-htab="chats"><span class="e">💬</span>Чати<span class="count" id="chatCountBadge">0</span></button>
+    </div><div class="sec-actions"><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><div class="fvseg" id="folderViewSeg">
       <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></button>
       <button data-fv="mag" title="Журнал"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 5v6M8 14v6"/></svg></button>
-    </div><div class="count" id="folderCountBadge">5</div></div></div>
+    </div></div></div>
     <div class="foh-row">
       <div class="proj-rail" id="projRail"></div>
       <div class="grid" id="folderGrid"></div>
     </div>
+    <div class="chat-list" id="chatList" hidden></div>
   </section>
 
   <!-- ===== SCREEN: FOLDER ===== -->
@@ -752,11 +763,13 @@
         <button class="pg-widebtn" id="pgShowHiddenBtn" title="Показати сховані умовою блоки">◐</button>
         <button class="pg-widebtn pg-micbtn" id="pgMicBtn" title="Диктувати в блок" aria-label="Диктувати в блок"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></button>
       </div>
+      <button class="pg-widebtn pg-addlink" id="pgAddLink" title="Додати чат до папки" aria-label="Додати чат до папки" hidden>＋</button>
       <button class="pg-widebtn" id="pgWideBtn" title="На весь екран">⛶</button>
     </div>
     <div class="pg-doc">
       <div class="pg-cover" id="pgCover"></div>
       <input class="pg-pagetitle" id="pgTitle" placeholder="Без назви">
+      <div class="pg-links" id="pgLinks" hidden></div>
       <div id="pgEditor" data-i18n-skip="1"></div>
       <button class="pg-addblock" id="pgAddBlock">＋ Додати блок</button>
     </div>
