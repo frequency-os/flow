@@ -408,11 +408,12 @@
         // фото (ключі 'photo:…') сюди не тягнемо: вони великі й потрібні
         // ліниво — їх дотягує sbPhotoFetch при промаху в IndexedDB
         const { data, error } = await sb.from('user_data').select('key,value,updated_at').eq('user_id', sbUserCache.id).not('key','like','photo:%');
-        if(error || !data) return false;
+        if(error || !data){ window.__sbCloudOk=false; return false; }
         const c={}, ts={}; data.forEach(r=>{ c[r.key]=JSON.stringify(r.value); ts[r.key]=Date.parse(r.updated_at)||0; });
         sbBatchCache=c; sbBatchTs=ts;
+        window.__sbCloudOk=true;
         return true;
-      }catch(_){ return false; }
+      }catch(_){ window.__sbCloudOk=false; return false; }
     }
     /* час останнього ЛОКАЛЬНОГО запису ключа (з обгортки _v), 0 якщо нема —
        потрібен, щоб при читанні звірити, що новіше: локальне чи хмарне. */
@@ -425,6 +426,18 @@
       }catch(_){ return 0; }
     }
     window.sbPrefetchAll = sbPrefetchAll;
+    /* ── ЧИ МОЖНА ВІРИТИ ПОРОЖНЬОМУ ЧИТАННЮ? ──
+       Головне питання перед будь-яким автоматичним записом: «у сховищі справді
+       нічого нема» чи «сховище не відповіло»? Досі обидва випадки виглядали
+       однаково (null) — і застосунок міг записати заводську заглушку з однією
+       папкою поверх справжніх даних, а тоді розігнати її на всі пристрої через
+       хмару (мітка ж свіжа). Тепер порожнечі віримо лише тоді, коли точно
+       знаємо, що її ніхто не підмінив збоєм зв'язку. */
+    window.sbDataTrusted = function(){
+      if(!window.__sbReady) return false;      // сесію ще перевіряють — рано щось вирішувати
+      if(!sbUserCache) return true;            // хмари нема взагалі: локальне сховище і є джерело істини
+      return window.__sbCloudOk === true;      // сесія є — віримо, лише коли хмара реально відповіла
+    };
     let sbSigningIn=false;
     window.sbSignInGoogle = async function(){
       if(sbSigningIn) return;            // захист від подвійного натискання

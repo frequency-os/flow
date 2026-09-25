@@ -84,8 +84,48 @@
   // видимість папки: Vault (сховані папки за PIN) вирізано 04.09.2026 — усі папки видимі
   function folderVisible(k){ return !!folders[k]; }
 
+  /* ═══════ ЗАПОБІЖНИК ВІД ВТРАТИ ПАПОК ═══════
+     Історія бага: якщо локальної копії не було (iOS вичистив кеш, інший
+     пристрій, очищені дані сайту), а хмара тієї миті не відповіла, то load()
+     не мав чого застосувати — і `folders` лишався заводською заглушкою з
+     однією «Роботою». Далі будь-яка разова міграція кликала saveFolders(),
+     ця заглушка лягала в сховище зі свіжою міткою і через хмару затирала
+     справжні папки на ВСІХ пристроях. Назавжди.
+
+     Лікування — два незалежні замки, обидва тільки для АВТОМАТИЧНИХ записів
+     ({auto:true} — міграції й разові прибирання). Те, що робить людина
+     руками, проходить завжди: вона бачить екран і відповідає за свій вибір.
+       1) не писати, поки load() не підтвердив, що дані справді прочитані;
+       2) не писати заводську заглушку поверх сховища, де папок більше. */
+  let foldersLoaded = false;               // load() успішно застосував конфіг папок
+  function markFoldersLoaded(ok){ foldersLoaded = !!ok; }
+  // у памʼяті рівно те, з чим модуль стартує (04-folders-nav.js:2) — тобто нічого не прочитано
+  function foldersLookFactory(){
+    const ks=Object.keys(folders);
+    return ks.length===0 || (ks.length===1 && ks[0]==='work');
+  }
+  // скільки папок зараз лежить у локальному сховищі (0 — якщо порожньо чи не читається)
+  function storedFolderCount(){
+    try{
+      const raw = window.storage.getLocal ? window.storage.getLocal(FKEY) : null;
+      if(!raw) return 0;
+      const o = JSON.parse(raw);
+      return (o && typeof o==='object') ? Object.keys(o).length : 0;
+    }catch(_){ return 0; }
+  }
   // persist folder customizations (photo, color, emoji, name, layout, pinned) + custom folders + order
-  function saveFolders(){
+  function saveFolders(opts){
+    const auto = !!(opts && opts.auto);
+    if(auto){
+      if(!foldersLoaded){
+        try{ console.warn('[Flow] saveFolders пропущено: дані папок цієї сесії не прочитані'); }catch(_){}
+        return false;
+      }
+      if(foldersLookFactory() && storedFolderCount() > 1){
+        try{ console.warn('[Flow] saveFolders пропущено: у памʼяті заводська заглушка, а у сховищі', storedFolderCount(), 'папок'); }catch(_){}
+        return false;
+      }
+    }
     try{
       const cfg={};
       Object.keys(folders).forEach(k=>{
@@ -94,7 +134,8 @@
       });
       const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
       const p2=window.storage.set(FOKEY,JSON.stringify(order),false); if(p2&&p2.catch)p2.catch(()=>{});
-    }catch(_){}
+      return true;
+    }catch(_){ return false; }
   }
 
   /* ===== додані віджети папок (спільні дані, різні входи) ===== */
@@ -227,9 +268,8 @@
       if(key==='work'){ goWork(); return; }
       if(key==='pat'){ goPatterns(); return; }
       if(key===VISION_FKEY){ goVision(); return; }
-      // ЧИСТА ПАПКА: відкривається як Канал (стрічка + рядок вводу, 35-channel.js);
-      // документ-редактор — звідти, тапом по запису або через «⋯»
-      if(typeof goChannel==='function'){ goChannel(key); return; }
+      // ЗВИЧАЙНА ПАПКА: одразу документ. Стрічка «як у месенджері» — це окрема
+      // сутність Чат (36-chats.js); папки нею більше не відкриваються (21.09.2026)
       goSpaceFor(key); return;
     }catch(e){ console.error('goFolder', key, e); flowAlert('Не вдалося відкрити папку: '+e.message); }
   }
