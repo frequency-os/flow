@@ -124,8 +124,14 @@
       const pr=aiParseBlocks(pg.text);
       let done='';
       if(pg.list.length){ const r=applyPageBlocks(pg.list); if(r.n) done+=`<div class="fs-done">✨ Додав ${r.n} блок(и) → ${ctx.label}</div>`; }
-      if(pr.blocks.length||pr.steps.length||(pr.folders&&pr.folders.length)){
-        try{ aiCommit(pr); done+=`<div class="fs-done">📅 Оновив планер</div>`; }catch(e){ console.error(e); }
+      /* Додане (блоки, кроки, папки) — одразу, як і було. Перенести/закрити/видалити НАЯВНЕ —
+         лише через шторку з реальними блоками і в межах ліміту: раніше голосове «прибери
+         зайве» видаляло блоки мовчки (AI-3). */
+      if(aiOpsCount(pr)){
+        const g=await aiGateOps(pr);
+        if(!g.pr) done+=`<div class="fs-done">✋ Скасовано — нічого не змінив</div>`;
+        else if(aiOpsCount(g.pr)){ try{ aiCommit(g.pr); done+=`<div class="fs-done">📅 Оновив планер</div>`; }catch(e){ console.error(e); } }
+        g.notes.forEach(n=>{ done+=`<div class="fs-done">⚠️ ${esc(n)}</div>`; });
       }
       const g=document.getElementById('fsGen'); if(g) g.remove();
       const say=(pr.text||pg.text||'Готово.').trim();
@@ -396,16 +402,16 @@
       rows.push(`<div class="ai-act goal"><span class="ic">${aiIco(isP?'target':'folder',13)}</span><span class="tx">${isP?'Проєкт':'Папка'} «${esc(f.name||'')}»<small>${meta}</small></span></div>`);
     });
     (pr.move||[]).forEach(mv=>{
-      const b=aiFindBlockByT(/^\d{4}-\d{2}-\d{2}$/.test(mv.ds||'')?mv.ds:plTodayStr(),mv.t);
-      rows.push(`<div class="ai-act mv"><span class="ic">${aiIco('move',13)}</span><span class="tx">${esc(b?b.t:mv.t||'Блок')}<small>${b?plHM(b.h)+'–'+plHM(plBlockEnd(b))+' → ':''}${plHM(+mv.h||0)}–${plHM(+mv.endH||0)}${b?'':' · ⚠️ не знайдено'}</small></span></div>`);
+      const b=aiOpBlock(mv);
+      rows.push(`<div class="ai-act mv"><span class="ic">${aiIco('move',13)}</span><span class="tx">${esc(b?b.t:mv.t||'Блок')}<small>${b?plHM(b.h)+'–'+plHM(plBlockEnd(b))+' → ':''}${plHM(+mv.h||0)}–${plHM(+mv.endH||0)}${b?'':aiOpWarn(mv)}</small></span></div>`);
     });
     (pr.done||[]).forEach(dn=>{
-      const b=aiFindBlockByT(/^\d{4}-\d{2}-\d{2}$/.test(dn.ds||'')?dn.ds:plTodayStr(),dn.t);
-      rows.push(`<div class="ai-act dn"><span class="ic">${aiIco('check',13)}</span><span class="tx">${esc(b?b.t:dn.t||'Блок')}<small>відмітити виконаним${b?'':' · ⚠️ не знайдено'}</small></span></div>`);
+      const b=aiOpBlock(dn);
+      rows.push(`<div class="ai-act dn"><span class="ic">${aiIco('check',13)}</span><span class="tx">${esc(b?b.t:dn.t||'Блок')}<small>відмітити виконаним${b?'':aiOpWarn(dn)}</small></span></div>`);
     });
     (pr.del||[]).forEach(dl=>{
-      const b=aiFindBlockByT(/^\d{4}-\d{2}-\d{2}$/.test(dl.ds||'')?dl.ds:plTodayStr(),dl.t);
-      rows.push(`<div class="ai-act rm"><span class="ic">${aiIco('x',13)}</span><span class="tx">${esc(b?b.t:dl.t||'Блок')}<small>видалити з дня${b?'':' · ⚠️ не знайдено'}</small></span></div>`);
+      const b=aiOpBlock(dl);
+      rows.push(`<div class="ai-act rm"><span class="ic">${aiIco('x',13)}</span><span class="tx">${esc(b?b.t:dl.t||'Блок')}<small>видалити з дня${b?'':aiOpWarn(dl)}</small></span></div>`);
     });
     (pr.pages||[]).forEach(pg=>{
       const fk=aiFindFolderKey(pg.folder);
@@ -466,7 +472,9 @@
     el.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>aiUndo(+b.dataset.undo));
     el.querySelectorAll('[data-commit]').forEach(b=>b.onclick=()=>{
       const m=aiChatMsgs[+b.dataset.commit]; if(!m||m.applied) return;
-      aiCommit(aiParseBlocks(m.content)); m.applied=true; aiChatSave(); aiRenderHead(); aiRenderBody();
+      // applied — ДО aiCommit: той усередині викликає aiChatSave, а він підміняє повідомлення
+      // копіями, тож позначка на старому об'єкті губилась і кнопка лишалась (повторне застосування)
+      m.applied=true; aiCommit(aiParseBlocks(m.content)); aiChatSave(); aiRenderHead(); aiRenderBody();
     });
     el.querySelectorAll('[data-decline]').forEach(b=>b.onclick=()=>{
       const m=aiChatMsgs[+b.dataset.decline]; if(!m) return;
@@ -825,7 +833,7 @@
         if(el){ el.innerHTML=aiBusyHTML(); const b=document.getElementById('aiChatBody'); if(b) b.scrollTop=b.scrollHeight; }
         else aiRenderBody();
       };
-      let txt;
+      let txt, usedW=0;
       if(aiAgentOn()){
         // стабільний шар (кешується) окремо від динамічного (персона+контекст)
         let sysStable, sysDyn;
@@ -841,6 +849,7 @@
           sysDyn+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
         }
         txt=await aiAgentTurn(sysStable,sysDyn,msgs,shown,onDelta);
+        usedW=aiTurnWrites;
         const tr=aiTraceFinish(); if(tr) m.trace=tr;
       } else {
         txt=await aiCall(sys,msgs,onDelta);
@@ -849,7 +858,14 @@
       const pr=aiParseBlocks(m.content);
       if(pr.mem.length) aiMemAdd(pr.mem);
       aiSpeak(pr.text);
-      if(aiAuto&&aiOpsCount(pr)){ aiCommit(pr); m.applied=true; }
+      /* «Авто» довіряє додаванню, але не знищенню: перенос/закриття/видалення наявного —
+         через шторку і в залишок ліміту цього повідомлення (AI-3). Скасувала — пакет відхилено. */
+      if(aiAuto&&aiOpsCount(pr)){
+        const g=await aiGateOps(pr,{room:AI_WRITE_LIMIT-usedW});
+        // позначка ДО aiCommit: його aiChatSave підміняє повідомлення копіями
+        if(g.pr){ m.applied=true; if(aiOpsCount(g.pr)) aiCommit(g.pr); } else m.declined=true;
+        if(g.notes.length) try{ plToast('⚠️ '+g.notes[0]+(g.notes.length>1?' (+'+(g.notes.length-1)+')':'')); }catch(_){}
+      }
     }catch(e){
       try{ aiTraceFinish(); }catch(_){}   // обірваний хід не має лишати живу картку
       console.error('aiChat',e);

@@ -435,6 +435,7 @@
           endH:{type:'number'},
           t:{type:'string',description:'назва (create) або фрагмент назви наявного (move/done/delete/remind)'},
           goal:{type:'string',description:'фрагмент назви цілі, лише для create'},
+          at:{type:'number',description:'час початку НАЯВНОГО блоку — лише щоб розрізнити однакові назви (move/done/delete)'},
           remind:{type:'string',description:'час нагадування "HH:MM" (у день ds); порожньо — на початок блоку; "off" — зняти. Для create і remind'}
         }, required:['t'] } }
       }, required:['action','blocks'] } },
@@ -667,14 +668,19 @@
     else if(inp.action==='done')   pr.done=arr;
     else if(inp.action==='delete') pr.del=arr;
     else return '⚠️ невідома дія';
-    if(inp.action!=='done'){
-      const names=arr.map(b=>b.t||'').filter(Boolean).slice(0,4).join(', ');
-      const verb=inp.action==='create'?'Створити':(inp.action==='move'?'Перенести':'Видалити');
-      const ok=await aiToolConfirm(verb+' блок(и): '+(names||arr.length+' шт.'),{title:'🗓️ Frequency хоче змінити планер'});
-      if(!ok) return 'людина скасувала — не повторюй';
+    /* Спершу знаходимо РЕАЛЬНІ блоки, і лише потім шторка — саме з ними (назва, день, час).
+       Раніше шторка показувала фрагмент від моделі («зал»), а видалявся перший збіг
+       («Зала переговорів» замість «Спортзалу»). Неоднозначне повертаємо моделі з кандидатами,
+       як debt_delete. done теж через шторку: він може записати дохід у Гаманець. */
+    if(inp.action!=='create'){
+      const R=aiResolveOps(pr);
+      if(R.miss.length) return '⚠️ '+R.miss.map(x=>aiMissText(x,true)).join('\n')
+        +'\nНічого не змінено. День '+flowToolRead({what:'day',ds:aiOpDs(R.miss[0].it)});
     }
+    const g=await aiGateOps(pr,{always:true,room:Infinity});   // ліміт уже перевірив aiAgentTurn
+    if(!g.pr) return 'людина скасувала — не повторюй';
     const before=arr.length;
-    const r=aiCommit(pr);
+    const r=aiCommit(g.pr);
     const okN=(r.nb||0)+(r.nop||0);
     let msg='виконано '+okN+' із '+before;
     if(okN<before) msg+='; не знайдено/конфлікт: перевір назви (t — фрагмент наявного блоку) і чи вільний час';
@@ -712,6 +718,9 @@
       const frag=String(inp.t||'').toLowerCase().trim();
       const st=(gl.steps||[]).find(s=>s&&!s.done&&String(s.name||s.t||'').toLowerCase().includes(frag)&&frag);
       if(!st) return '⚠️ невиконаний крок «'+(inp.t||'')+'» не знайдено. Кроки: '+(gl.steps||[]).filter(s=>s&&!s.done).map(s=>s.name||s.t).slice(0,5).join('; ');
+      // закриття кроку міняє прогрес цілі — як і done у планері, лише після шторки (SEC-4)
+      const ok=await aiToolConfirm('Відмітити виконаним крок «'+(st.name||st.t)+'» у цілі «'+(gl.name||'')+'»',{title:'🎯 Frequency хоче змінити ціль'});
+      if(!ok) return 'людина скасувала — не повторюй';
       st.done=true; saveGoals();
       try{ renderGoals(); }catch(_){}
       try{ plToast('🤖 крок виконано: '+(st.name||st.t)); }catch(_){}
@@ -740,7 +749,7 @@
         const ov=document.createElement('div'); ov.className='asheet';
         ov.innerHTML='<div class="asheet-in"><div class="asheet-grip"></div>'
           +'<div class="asheet-title">'+esc(opts.title||'🤖 Frequency хоче внести зміну')+'</div>'
-          +'<div class="asheet-sub">'+esc(sub)+'</div>'
+          +'<div class="asheet-sub"'+(String(sub).indexOf('\n')>=0?' style="text-align:left;white-space:pre-line;max-height:40vh;overflow:auto"':'')+'>'+esc(sub)+'</div>'
           +'<button class="asheet-item primary" data-ok="1"><span class="tx"><span class="lab2">'+esc(opts.okLabel||'Підтвердити')+'</span></span></button>'
           +'<button class="asheet-cancel">Скасувати</button></div>';
         document.body.appendChild(ov);
@@ -1135,6 +1144,16 @@
     return true;                                            // planner, goals, folders
   }
   const AI_WRITE_LIMIT=5;                                   // змін даних за одне повідомлення людини
+  let aiTurnWrites=0;                                       // скільки змін уже зробив останній хід агента
+  /* «Ціна» виклику для ліміту. planner move/done/delete/remind чіпає НАЯВНІ блоки — кожен
+     рахується окремо (раніше один виклик із 15 видаленнями був «1 зміною з 5»). Створення —
+     1 за виклик: нове нічого не знищує, шторка й так показує весь перелік, а «сплануй день»
+     на 6–8 блоків не мусить упиратись у ліміт. Решта інструментів — 1 за виклик. */
+  function aiToolWriteCost(name,inp){
+    if(!aiToolIsWrite(name,inp)) return 0;
+    if(name==='planner'&&inp&&inp.action!=='create'&&Array.isArray(inp.blocks)) return Math.max(1,inp.blocks.length);
+    return 1;
+  }
   async function aiAgentTurn(sysStable,sysDynamic,msgs,userQ,onDelta){
     const system=[
       {type:'text',text:sysStable,cache_control:{type:'ephemeral'}},
@@ -1144,6 +1163,7 @@
     const dev=aiDevOn();
     const TOOLS=dev?FLOW_TOOLS.concat(DEV_TOOLS):FLOW_TOOLS;
     let toolsUsed=0, writesUsed=0;
+    aiTurnWrites=0;
     aiTraceStart();
     for(let hop=0;hop<6;hop++){
       const resp=await aiCallRaw({
@@ -1160,11 +1180,13 @@
       for(const b of resp.content){
         if(b.type!=='tool_use') continue;
         toolsUsed++;
-        if(aiToolIsWrite(b.name,b.input)&&++writesUsed>AI_WRITE_LIMIT){
+        const cost=aiToolWriteCost(b.name,b.input);
+        if(cost&&writesUsed+cost>AI_WRITE_LIMIT){
           results.push({type:'tool_result',tool_use_id:b.id,
-            content:'⚠️ ліміт безпеки: не більше '+AI_WRITE_LIMIT+' змін даних за одне повідомлення. Підсумуй людині, що вже зроблено, і попроси надіслати решту окремим повідомленням.'});
+            content:'⚠️ ліміт безпеки: не більше '+AI_WRITE_LIMIT+' змін даних за одне повідомлення (цей виклик — '+cost+', лишилось '+Math.max(0,AI_WRITE_LIMIT-writesUsed)+'). Нічого не змінено. Підсумуй людині, що вже зроблено, і попроси надіслати решту окремим повідомленням.'});
           continue;
         }
+        writesUsed+=cost; aiTurnWrites=writesUsed;
         const ti=aiTraceStep(b.name,b.input);
         const out=await flowToolExec(b.name,b.input);
         aiTraceEnd(ti);
@@ -1292,10 +1314,83 @@
     const cut=Math.min(...['FLOW_OPS:','FLOW_BLOCKS:','FLOW_MEM:','FLOW_'].map(k=>{ const i=t.indexOf(k); return i<0?Infinity:i; }));
     return (cut===Infinity?t:t.slice(0,cut)).trim();
   }
-  function aiFindBlockByT(ds,q){
-    q=String(q||'').toLowerCase().trim(); if(!q) return null;
-    const list=plBlocksFor(ds)||[];
-    return list.find(b=>String(b.t||'').toLowerCase().includes(q))||null;
+  /* Пошук НАЯВНОГО блоку за пунктом від моделі {ds,t,at?,id?}. Раніше брали перший збіг
+     через includes, і «зал» знаходив «Зала переговорів», коли людина мала на увазі «Спортзал».
+     Тепер: id (його ставлять ворота нижче) → точна назва → фрагмент; at звужує за часом
+     початку. Блок вважається знайденим лише тоді, коли збіг РІВНО один — краще не зробити
+     нічого й перепитати, ніж зачепити чуже. */
+  function aiOpDs(it){ return /^\d{4}-\d{2}-\d{2}$/.test(it&&it.ds||'')?it.ds:plTodayStr(); }
+  function aiOpMatches(it){
+    const list=plBlocksFor(aiOpDs(it))||[];
+    if(it&&it.id) return list.filter(b=>b.id===it.id);
+    const q=String(it&&it.t||'').toLowerCase().trim(); if(!q) return [];
+    let m=list.filter(b=>String(b.t||'').toLowerCase().trim()===q);
+    if(!m.length) m=list.filter(b=>String(b.t||'').toLowerCase().includes(q));
+    const at=parseFloat(it&&it.at);
+    if(!isNaN(at)) m=m.filter(b=>Math.abs((+b.h)-at)<0.01);
+    return m;
+  }
+  function aiOpBlock(it){ const m=aiOpMatches(it); return m.length===1?m[0]:null; }
+  function aiFindBlockByT(ds,q){ return aiOpBlock({ds:ds,t:q}); }
+  // хвіст для картки пропозицій, коли блок не визначено
+  function aiOpWarn(it){ return aiOpMatches(it).length>1?' · ⚠️ кілька збігів — уточни':' · ⚠️ не знайдено'; }
+
+  /* ── Ворота для змін НАЯВНИХ блоків (move/done/del) ──
+     Спот, голос і режим «Авто» застосовували FLOW_OPS разом із видаленням мовчки
+     і повз AI_WRITE_LIMIT (AI-3, SEC-4). Тепер будь-який перенос/закриття/видалення:
+     1) розв'язується в реальний блок, і в пункт пишеться його id — змінюється саме те, що показали;
+     2) рахується в ліміт поштучно; зайве відкидається з поясненням;
+     3) іде через одну шторку з повним переліком (назва, день, час; дохід — окремою позначкою).
+     Додавання (нові блоки, кроки, папки, сторінки) нічого не знищує, одразу видно і має
+     відкат у журналі — тому без шторки, як і задумано; у шторці воно лише перелічене,
+     якщо поруч є руйнівні зміни. Перезапису наявного FLOW_OPS не вміє (сторінки й
+     FLOW_PAGE лише дописують). */
+  function aiResolveOps(pr){
+    const out={pr:Object.assign({},pr,{move:[],done:[],del:[]}),rows:[],miss:[]};
+    ['move','done','del'].forEach(k=>(pr[k]||[]).forEach(it=>{
+      if(!it) return;
+      const m=aiOpMatches(it), ds=aiOpDs(it);
+      if(m.length!==1){ out.miss.push({k:k,it:it,cand:m}); return; }
+      const b=m[0];
+      if(k==='done'&&b.done){ out.miss.push({k:k,it:it,cand:m,already:true}); return; }
+      out.pr[k].push(Object.assign({},it,{ds:ds,id:b.id}));
+      out.rows.push({k:k,ds:ds,b:b,it:it});
+    }));
+    return out;
+  }
+  // forModel — підказка моделі, як уточнити (людині в шторці вона ні до чого)
+  function aiMissText(x,forModel){
+    const t='«'+String(x.it.t||'')+'»'+(forModel?' ('+aiOpDs(x.it)+')':'');
+    if(x.already) return t+': блок «'+x.cand[0].t+'» уже виконано';
+    if(!x.cand.length) return t+': блок не знайдено';
+    return t+': кілька збігів — '+x.cand.slice(0,5).map(b=>'«'+b.t+'» '+plHM(b.h)+'–'+plHM(plBlockEnd(b))).join('; ')
+      +(forModel?'. Повтори з точною назвою в t (для однакових назв додай at — час початку)':'');
+  }
+  function aiOpRow(r){
+    const td=plTodayStr(), b=r.b;
+    const when=(r.ds===td?'':r.ds+', ')+plHM(b.h)+'–'+plHM(plBlockEnd(b));
+    if(r.k==='move') return '↔ Перенести «'+b.t+'» ('+when+') → '+plHM(+r.it.h||0)+'–'+plHM(+r.it.endH||0);
+    if(r.k==='done') return '✓ Відмітити виконаним «'+b.t+'» ('+when+')'+(b.link&&b.link.type==='fin'?' — запише дохід у Гаманець':'');
+    return '✕ Видалити «'+b.t+'» ('+when+')';
+  }
+  async function aiGateOps(pr,opts){
+    opts=opts||{};
+    const R=aiResolveOps(pr), notes=R.miss.map(x=>aiMissText(x)+' — не чіпаю');
+    const room=Math.max(0,opts.room==null?AI_WRITE_LIMIT:opts.room);
+    if(R.rows.length>room){
+      const cut=R.rows.splice(room);
+      cut.forEach(r=>{ const a=R.pr[r.k]; const i=a.findIndex(x=>x.id===r.b.id); if(i>=0) a.splice(i,1); });
+      notes.push('ліміт безпеки: не більше '+AI_WRITE_LIMIT+' змін наявних блоків за повідомлення — ще '+cut.length+' не зроблено, попроси окремо');
+    }
+    const td=plTodayStr();
+    const adds=(R.pr.blocks||[]).filter(b=>b&&b.t).map(b=>'＋ «'+b.t+'» ('+(aiOpDs(b)===td?'':aiOpDs(b)+', ')+plHM(+b.h||0)+'–'+plHM(+b.endH||0)+')')
+      .concat((R.pr.steps||[]).filter(s=>s&&s.t).map(s=>'＋ крок «'+s.t+'» у ціль «'+(s.goal||'')+'»'))
+      .concat((R.pr.folders||[]).filter(f=>f&&f.name).map(f=>'＋ папка «'+f.name+'»'))
+      .concat((R.pr.pages||[]).filter(p=>p&&p.title).map(p=>'＋ сторінка «'+p.title+'»'));
+    if(!R.rows.length&&!(opts.always&&adds.length)) return {pr:R.pr,notes:notes};
+    const lines=R.rows.map(aiOpRow).concat(adds).concat(notes.map(n=>'⚠️ '+n));
+    const ok=await aiToolConfirm(lines.join('\n'),{title:opts.title||'🗓️ Frequency хоче змінити планер'});
+    return ok?{pr:R.pr,notes:notes}:{pr:null,notes:notes};
   }
   // знайти папку за фрагментом назви (для сторінок)
   function aiFindFolderKey(q){
@@ -1352,8 +1447,8 @@
     let nb=0,ns=0,nf=0,nop=0,np=0; const undo={blocks:[],steps:[],folders:[],moves:[],dones:[],dels:[],pages:[]};
     // перенос наявних блоків
     (pr.move||[]).forEach(mv=>{
-      const ds=/^\d{4}-\d{2}-\d{2}$/.test(mv.ds||'')?mv.ds:plTodayStr();
-      const b=aiFindBlockByT(ds,mv.t); if(!b) return;
+      const ds=aiOpDs(mv);
+      const b=aiOpBlock(mv); if(!b) return;
       const h=+mv.h, endH=+mv.endH;
       if(!(h>=0&&h<24)||!(endH>h&&endH<=24)) return;
       undo.moves.push({ds:ds,id:b.id,h:b.h,endH:b.endH});
@@ -1361,8 +1456,8 @@
     });
     // відмітити виконання
     (pr.done||[]).forEach(dn=>{
-      const ds=/^\d{4}-\d{2}-\d{2}$/.test(dn.ds||'')?dn.ds:plTodayStr();
-      const b=aiFindBlockByT(ds,dn.t); if(!b||b.done) return;
+      const ds=aiOpDs(dn);
+      const b=aiOpBlock(dn); if(!b||b.done) return;
       const p=plData();
       undo.dones.push({ds:ds,id:b.id});
       if((p.selDate||plTodayStr())===ds){ plCompleteBlock(b.id); }   // повні ефекти (ціль/звичка/дохід)
@@ -1371,11 +1466,10 @@
     });
     // видалити блоки
     (pr.del||[]).forEach(dl=>{
-      const ds=/^\d{4}-\d{2}-\d{2}$/.test(dl.ds||'')?dl.ds:plTodayStr();
+      const ds=aiOpDs(dl);
       const list=plBlocksFor(ds);
-      const bi=list.findIndex(b=>String(b.t||'').toLowerCase().includes(String(dl.t||'').toLowerCase().trim())&&dl.t);
+      const b=aiOpBlock(dl); const bi=b?list.indexOf(b):-1;   // рівно той блок, що в шторці/картці
       if(bi<0) return;
-      const b=list[bi];
       if(b.done){ try{ plUncompleteEffects(b,ds); }catch(_){} }
       undo.dels.push({ds:ds,idx:bi,block:JSON.parse(JSON.stringify(b))});
       list.splice(bi,1); nop++;
