@@ -38,7 +38,7 @@
         : 'ще без кроків';
 
       var row='<div class="ph-row" data-phrow="'+id+'|'+p.id+'">'
-        +'<span class="ph-emo" style="--pc:'+c+'" data-phemo="'+id+'|'+p.id+'">'+(p.emoji||'🎯')+'</span>'
+        +'<span class="ph-emo" style="--pc:'+c+'" data-phemo="'+id+'|'+p.id+'">'+esc(p.emoji||'🎯')+'</span>'
         +'<div class="ph-body"><div class="ph-name">'+esc(p.name||'Проєкт')+'  '+badge+'</div>'
         +'<div class="ph-bar"><i style="width:'+pr.pct+'%;background:'+c+'"></i></div>'
         +'<div class="ph-meta">'+meta+'</div></div>'
@@ -58,7 +58,7 @@
           ? '<button class="ph-unlink" data-phunlink="'+id+'|'+p.id+'">🔗 «'+esc(linkName)+'» — відв\u2019язати</button>'
           : (phPick[id+'|'+p.id]
               ? '<div class="pt-picker">'+((br&&br.folderList?br.folderList():[]).map(function(f){
-                  return '<button class="pt-pick-i" data-phlink="'+id+'|'+p.id+'|'+f.key+'"><span>'+(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
+                  return '<button class="pt-pick-i" data-phlink="'+id+'|'+p.id+'|'+f.key+'"><span>'+esc(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
                 }).join('')||'<div class="pt-none">Немає папок</div>')
                 +'<button class="pt-pick-x" data-phpickclose="'+id+'|'+p.id+'">Скасувати</button></div>'
               : '<button class="pt-linkbtn" data-phpick="'+id+'|'+p.id+'"><svg viewBox="0 0 24 24"><path d="M9 15 15 9M8 12a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M16 12a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4" stroke-linecap="round"/></svg> Прив\u2019язати папку</button>');

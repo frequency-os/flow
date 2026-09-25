@@ -228,7 +228,7 @@
         <label class="pl-sheet-l">🔗 Зв'язок з ціллю (необов'язково)</label>
         <select class="pl-sheet-in" id="ntGoal">
           <option value="">— без цілі —</option>
-          ${goals.map(g=>`<option value="${esc(g.id||g.name||'')}">${g.emoji||'🎯'} ${esc(g.name||'Ціль')}</option>`).join('')}
+          ${goals.map(g=>`<option value="${esc(g.id||g.name||'')}">${esc(g.emoji||'🎯')} ${esc(g.name||'Ціль')}</option>`).join('')}
         </select>
         <div class="pl-sheet-btns">
           <button class="pl-sheet-cancel" id="ntCancel">Скасувати</button>
@@ -373,7 +373,7 @@
 
     // рівень цілей
     const goalsSub = goals.length ? `<div class="flw-sub"><div class="flw-sub-in">${
-      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${gl.id}"><span class="d"></span><span>${gl.emoji||'🎯'} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
+      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${gl.id}"><span class="d"></span><span>${esc(gl.emoji||'🎯')} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
     }</div></div>` : `<div class="flw-sub"><div class="flw-empty">Цілей ще нема. Додай нижче.</div></div>`;
 
     // рівень "сьогодні" — денні цілі з усіх goals на сьогодні

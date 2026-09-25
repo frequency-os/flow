@@ -30,7 +30,7 @@
         var on=h.marks[ymd]?'on':'', today=i===todayIdx?'today':'';
         return '<button class="pt-hd '+on+' '+today+'" data-hbmark="'+id+'|'+h.id+'|'+ymd+'" style="'+(on?'--hc:'+hc:'')+'">'+PT_WD[i][0]+'</button>';
       }).join('');
-      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'" data-hbemo="'+id+'|'+h.id+'">'+(h.emoji||'✅')+'</span>'
+      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'" data-hbemo="'+id+'|'+h.id+'">'+esc(h.emoji||'✅')+'</span>'
         +'<div class="pt-hbody"><div class="pt-hname">'+esc(h.name)+'</div>'
         +'<div class="pt-hsub">'+sub+' · '+weekN+'/7 тиждень</div></div>'
         +'<div class="pt-hweek">'+cells+'</div>'
