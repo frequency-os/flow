@@ -6542,7 +6542,8 @@
     <button class="dsb-i" data-dnav="folders" title="Папки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5a2 2 0 0 1 2-2h3.2a1.5 1.5 0 0 1 1.2.6l1 1.3a1.5 1.5 0 0 0 1.2.6H18.5a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/></svg><span>Папки</span></button>
     <button class="dsb-i" data-dnav="planner" title="Планер"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M8 3v3M16 3v3"/></svg><span>Планер</span></button>
     <button class="dsb-i" data-dnav="finance" title="Гроші"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg><span>Гроші</span></button>
-    <button class="dsb-i" data-dnav="projects" title="Проєкти"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 20 8l-8 4.5L4 8z"/><path d="M4 12.2l8 4.5 8-4.5"/><path d="M4 16.4l8 4.5 8-4.5"/></svg><span>Проєкти</span></button>
+    <!-- «Проєкти» прибрано з панелі 25.09.2026: пункт лягав у ряд некоректно.
+         Сам екран лишився — гарячі клавіші (⌘5) і шторка «Ще» ведуть туди. -->
     <button class="dsb-i" data-dnav="more" title="Ще"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span>Ще</span></button>
   </nav>
   <div class="dsb-foot" id="dsbFoot" title="Профіль">
@@ -6573,8 +6574,10 @@
       <div class="wishslides" id="wishSlides" style="display:none"></div>
       <div class="wishbg-ov" id="wishBgOv" style="display:none"></div>
       <div class="wishlink">Карта бажань ›</div>
-      <div class="label">Цього тижня</div>
-      <div class="big" id="heroPctBig">0<small>/7</small></div>
+      <div class="label" id="heroLab">Цього тижня</div>
+      <div class="big" id="heroPctBig">0<small>%</small></div>
+      <!-- рядок і смужка під ним показують МІСЯЦЬ; тиждень — це велике
+           число, підпис і сім крапок. Обидва наповнює renderHeroStreak() -->
       <div class="hint" id="heroPctHint">Ще нема даних цього місяця.</div>
       <div class="bar"><i id="heroBarFill"></i></div>
       <!-- сім крапок Пн→Нд: дні, коли був запис у Щоденнику або дотик до
@@ -6603,12 +6606,10 @@
     </div>
 
     <!-- живий Огляд: план дня · гаманець · щоденник (аудит Ф1).
-         Згортається одним тапом; у згорнутому вигляді числа переїжджають у сам заголовок -->
-    <button class="ovhead" id="homeOvHead" aria-expanded="true" aria-controls="homeWidgetsRow">
-      <span class="ovhead-t">Огляд</span>
-      <span class="ovhead-mini" id="homeOvMini" hidden></span>
-      <svg class="ovhead-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-    </button>
+         Заголовка «Огляд» над цим рядом більше немає (25.09.2026): картки
+         самі себе називають, а слово над ними робило сторінку купою. Разом
+         із заголовком пішло й згортання — applyOv() у 33-home-widgets.js
+         тримає ряд відкритим, якщо кнопки в розмітці нема. -->
     <div id="homeWidgetsRow"></div>
 
     <!-- Огляд: дві вкладки — 📁 Папки (сітка) і 💬 Чати (список, 36-chats.js) -->
@@ -7346,6 +7347,18 @@
   }
   window.pluralUk = pluralUk;
 
+  /* Значок (емодзі) для папки, цілі, виноски. Його часто пише модель, а
+     рядок з моделі може бути отруєний: замість «📁» прийде HTML з кодом,
+     який потім вставиться в сторінку. Значок — це 1–2 символи-картинки
+     (з ZWJ-склейками й прапорцями), тож усе довше за 16 знаків або з
+     «HTML-символами» відкидаємо і ставимо запасний значок. */
+  function safeEmoji(s, def){
+    const t = String(s==null?'':s).trim();
+    if(t && t.length<=16 && !/[<>&"'`=\\/\s]/.test(t)) return t;
+    return def==null ? '' : def;
+  }
+  window.safeEmoji = safeEmoji;
+
   /* ============ РЕЄСТР КЛЮЧІВ СХОВИЩА — єдине джерело правди ============
      Новий ключ додаєш ТУТ (і за потреби версію в SCHEMAS).
      Звідси беруться prefetchAll на старті та ALL_KEYS для бекапу.
@@ -7463,60 +7476,28 @@
       ['конверти','envelopes'],['Конверти','Envelopes'],['задач','tasks'],['задачі','tasks'],
       ['задача','task'],['тижня','week'],['тижні','week'],['місяця','month'],['днів','days'],
       ['дні','days'],['дн','d'],
-    ].sort((a,b)=>b[0].length-a[0].length); // довші рядки — першими, щоб не ламати коротшими підрядками
+    ].sort((a,b)=>b[0].length-a[0].length) // довші рядки — першими, щоб не ламати коротшими підрядками
+     // регулярки будуємо один раз: i18nApply бігає по DOM після кожної зміни
+     // (лічильник НР тікає щосекунди), і ~70 new RegExp на кожен вузол їли батарею
+     .map(([uk,en])=>{ try{ return [new RegExp('(?<![\\p{L}\\p{N}])'+uk.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}\\p{N}])','gu'), en]; }catch(_){ return null; } })
+     .filter(Boolean);
 
     function wordLevelTranslate(text){
       let out=text;
-      for(let i=0;i<I18N_WORDS.length;i++){
-        const uk=I18N_WORDS[i][0], en=I18N_WORDS[i][1];
-        try{
-          const re=new RegExp('(?<![\\p{L}\\p{N}])'+uk.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}\\p{N}])','gu');
-          out = out.replace(re, en);
-        }catch(_){}
-      }
+      for(let i=0;i<I18N_WORDS.length;i++) out = out.replace(I18N_WORDS[i][0], I18N_WORDS[i][1]);
       return out;
     }
 
-    // ═══ автопереклад того, чого нема у словнику (запасний варіант) ═══
-    // Працює тільки для тексту ПОЗА зонами data-i18n-skip (контент
-    // користувача — папки/сторінки/задачі/клієнти — вже позначені).
-    // Кешується назавжди в localStorage, повторний виклик /translate
-    // для того самого рядка більше не робиться.
-    const UI_CACHE_KEY='i18n_ui_cache';
-    function uiHash(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return 'u'+h; }
-    function uiCacheGet(){ try{ return JSON.parse(localStorage.getItem(UI_CACHE_KEY)||'{}'); }catch(_){ return {}; } }
-    function uiCacheSet(m){ try{ localStorage.setItem(UI_CACHE_KEY, JSON.stringify(m)); }catch(_){} }
-    const uiInFlight = new Set();
-    const uiQueue = []; let uiActive = 0; const UI_MAX_CONCURRENT = 4;
-    function uiPump(){
-      while(uiActive<UI_MAX_CONCURRENT && uiQueue.length){
-        const job=uiQueue.shift(); uiActive++;
-        job().catch(()=>{}).finally(()=>{ uiActive--; uiPump(); });
-      }
-    }
-    const HAS_CYR = /[а-яА-ЯіїєґІЇЄҐ]/;
-    function autoTranslateNode(node, original){
-      const cache=uiCacheGet(), key=uiHash(original);
-      if(cache[key] && cache[key].src===original){
-        try{ if(node.nodeValue && node.nodeValue.indexOf(original)>=0) node.nodeValue = node.nodeValue.replace(original, cache[key].en); }catch(_){}
-        return;
-      }
-      if(uiInFlight.has(key)) return;
-      uiInFlight.add(key);
-      uiQueue.push(async ()=>{
-        try{
-          const ep=(typeof aiEndpoint==='function' ? aiEndpoint() : (window.AI_ENDPOINT||''));
-          if(!ep) return;
-          const r=await fetch(ep.replace(/\/$/,'')+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:original,target:'en'})});
-          if(!r.ok) return;
-          const data=await r.json();
-          const en=(data&&data.text)?String(data.text):original;
-          const c2=uiCacheGet(); c2[key]={src:original,en,ts:Date.now()}; uiCacheSet(c2);
-          if(node.isConnected!==false){ try{ if(node.nodeValue && node.nodeValue.indexOf(original)>=0) node.nodeValue = node.nodeValue.replace(original, en); }catch(_){} }
-        }finally{ uiInFlight.delete(key); }
-      });
-      uiPump();
-    }
+    // Мережевий автопереклад (POST <воркер>/translate) прибрано 25.09.2026:
+    // такого маршруту у воркері ніколи не було, кожен запит падав, невдачі не
+    // кешувались, і в режимі EN застосунок безкінечно смикав спільний воркер
+    // (щосекунди, бо лічильник НР міняє DOM). Чого нема у словнику — лишається
+    // українським; повернемо, лише коли /translate справді з'явиться у воркері.
+
+    // Теги, чий текст — це ДАНІ, а не підпис: textarea/input віддають його
+    // як value (а oninput одразу зберігає), <option> без value — як значення
+    // select, script/style — код. Переклад тут переписав би дані користувача.
+    const I18N_NO_TOUCH = { TEXTAREA:1, INPUT:1, SCRIPT:1, STYLE:1 };
 
     // атрибути, які теж перекладаємо (title/placeholder/aria-label)
     function translateNode(node){
@@ -7525,12 +7506,17 @@
         if(!key) return;
         if(I18N_DICT[key]!==undefined){ node.nodeValue = t.replace(key, I18N_DICT[key]); return; }
         const wl = wordLevelTranslate(t);
-        if(wl!==t){ node.nodeValue = wl; return; }
-        if(HAS_CYR.test(key)) autoTranslateNode(node, key);
+        if(wl!==t){ node.nodeValue = wl; }
         return;
       }
       if(node.nodeType!==1) return;
       if(node.hasAttribute && node.hasAttribute('data-i18n-skip')) return; // явно виключені зони (контент користувача)
+      // Гарантія «переклад лише показує, а не переписує»: усе, що редагується
+      // (contenteditable — журнал, сторінки; поля вводу), не чіпаємо взагалі.
+      // Звідти текст читають назад і зберігають (jeFlush бере innerHTML),
+      // тож «три дні» перетворилось би на «три days» назавжди.
+      if(I18N_NO_TOUCH[node.tagName] || node.isContentEditable) return;
+      if(node.tagName==='OPTION' && !node.hasAttribute('value')) return;
       ['title','placeholder','aria-label'].forEach(a=>{
         const v=node.getAttribute && node.getAttribute(a);
         if(v && I18N_DICT[v]!==undefined) node.setAttribute(a, I18N_DICT[v]);
@@ -7568,7 +7554,6 @@
     window.flowContentTranslateOn = contentTranslateOn;
     function hash(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return 'h'+h; }
     function cacheGet(){ try{ return JSON.parse(localStorage.getItem('i18n_content_cache')||'{}'); }catch(_){ return {}; } }
-    function cacheSet(map){ try{ localStorage.setItem('i18n_content_cache', JSON.stringify(map)); }catch(_){} }
 
     // Публічний хелпер: переклад одного шматка тексту користувача з кешем.
     // Використання в render-функціях (тільки там, де показуємо контент
@@ -7579,20 +7564,9 @@
       const cache = cacheGet();
       const key = hash(src);
       if(cache[key] && cache[key].src===src) return cache[key].en;
-      try{
-        const ep = (typeof aiEndpoint==='function' ? aiEndpoint() : (window.AI_ENDPOINT||''));
-        if(!ep) return src;
-        const r = await fetch(ep.replace(/\/$/,'')+'/translate', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ text: src, target:'en' })
-        });
-        if(!r.ok) return src;
-        const data = await r.json();
-        const en = (data && data.text) ? String(data.text) : src;
-        cache[key] = { src, en, ts: Date.now() };
-        cacheSet(cache);
-        return en;
-      }catch(_){ return src; }
+      // У мережу не ходимо: маршруту /translate у воркері нема (див. i18n вище),
+      // тож кожен виклик лише марно смикав би воркер. Повертаємо оригінал.
+      return src;
     };
   })();
 
@@ -8015,6 +7989,21 @@
     }
 
     window.sbUser = function(){ return sbUserCache; };
+    /* Рядок ↔ хмара. У локальному сховищі значення — це РЯДОК: здебільшого JSON
+       (JSON.stringify обʼєкта), але деякі ключі пишуть сирий текст (аватарка —
+       data-URL, ui_mode — 'lite', тема, вкладка). У jsonb сирий текст лягає як
+       JSON-рядок, а назад ми завжди робили JSON.stringify — і 'data:…'
+       поверталось як '"data:…"' (з лапками): після перезапуску з входом
+       аватарка ламалась, '' ставало '""'. Правило тепер одне:
+       jsonb-рядок = саме той рядок, що записали; решта — JSON.stringify.
+       Старі рядки в хмарі (сирий текст) читаються правильно без міграції,
+       а старі версії застосунку на інших пристроях бачать те саме, що й раніше. */
+    function sbFromCloud(v){ return typeof v==='string' ? v : JSON.stringify(v); }
+    function sbToCloud(raw){
+      let parsed; try{ parsed = JSON.parse(raw); }catch(_){ return raw; }
+      // JSON-рядок ('"abc"') кладемо як є, інакше при читанні він втратив би лапки
+      return typeof parsed==='string' ? raw : parsed;
+    }
     // ОДИН запит на весь список даних користувача — замість того, щоб кожен
     // window.storage.get(key) під час load() ходив у мережу окремо.
     async function sbPrefetchAll(){
@@ -8024,7 +8013,7 @@
         // ліниво — їх дотягує sbPhotoFetch при промаху в IndexedDB
         const { data, error } = await sb.from('user_data').select('key,value,updated_at').eq('user_id', sbUserCache.id).not('key','like','photo:%');
         if(error || !data){ window.__sbCloudOk=false; return false; }
-        const c={}, ts={}; data.forEach(r=>{ c[r.key]=JSON.stringify(r.value); ts[r.key]=Date.parse(r.updated_at)||0; });
+        const c={}, ts={}; data.forEach(r=>{ c[r.key]=sbFromCloud(r.value); ts[r.key]=Date.parse(r.updated_at)||0; });
         sbBatchCache=c; sbBatchTs=ts;
         window.__sbCloudOk=true;
         return true;
@@ -8194,7 +8183,7 @@
           if(!error && data){
             const cloudTs = Date.parse(data.updated_at)||0;
             if(localTs > cloudTs) return origGet(key);         // локальна свіжіша
-            return { key, value: JSON.stringify(data.value), shared:false };
+            return { key, value: sbFromCloud(data.value), shared:false };
           }
         }catch(_){}
         // хмара порожня/недоступна — фолбек на локальну копію, щоб дані не «зникали»
@@ -8241,8 +8230,7 @@
         try{
           const now = Date.now();
           const rows = keys.map(k=>{
-            let parsed; try{ parsed = JSON.parse(q[k]); }catch(_){ parsed = q[k]; }
-            return { user_id:u.id, key:k, value:parsed, updated_at:new Date(now).toISOString() };
+            return { user_id:u.id, key:k, value:sbToCloud(q[k]), updated_at:new Date(now).toISOString() };
           });
           // ВАЖЛИВО: supabase-js повертає {error}, а не кидає — перевіряємо явно,
           // інакше зірваний запис вважався б успішним і правка зникала б.
@@ -8541,18 +8529,56 @@
       }, null, 0);
     }
 
-    // Експорт: завантажити файл flow-backup-YYYY-MM-DD.json
-    function exportToFile(){
+    // Експорт: зберегти файл flow-backup-YYYY-MM-DD.json і сказати ПРАВДУ,
+    // чи він є. Раніше після a.click() відповідь завжди була ok:true — хоча
+    // в iPhone-обгортці <a download> нічого не пише, а на Mac діалог
+    // збереження можна скасувати. «Стерти все» спиралось на цей «бекап».
+    //   { ok:true,  saved:true }  — файл точно віддано: діалог «Зберегти як…»
+    //                               чи аркуш «Поділитися» завершились успіхом
+    //   { ok:true,  saved:false } — віддали браузеру на завантаження; чи
+    //                               файл з'явився, сторінка знати не може
+    //   { ok:false, cancelled:true } — людина закрила діалог: файлу НЕМА
+    async function exportToFile(){
       const json = makeEnvelope();
       const stamp = ymdLocal();
       const name = `flow-backup-${stamp}.json`;
+      const cancelled = { ok:false, cancelled:true, name, error:'збереження скасовано — файл не записано' };
+      // 1) діалог «Зберегти як…» (Chrome, Edge, застосунок на Mac): результат відомий напевно
+      if(typeof window.showSaveFilePicker==='function'){
+        try{
+          const h = await window.showSaveFilePicker({ suggestedName:name,
+            types:[{ description:'Frequency backup', accept:{'application/json':['.json']} }] });
+          const w = await h.createWritable(); await w.write(json); await w.close();
+          return { ok:true, saved:true, how:'picker', name:h.name||name };
+        }catch(e){
+          if(e && e.name==='AbortError') return cancelled;
+          // інша відмова (нема дозволу тощо) — пробуємо наступний спосіб
+        }
+      }
+      // 2) iPhone/iPad і native-обгортка: там <a download> файл не пише,
+      //    а в аркуші «Поділитися» є «Зберегти у Файли»
+      const ios = window.FLOW_NATIVE || /iPad|iPhone|iPod/.test(navigator.userAgent||'') ||
+                  (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+      if(ios && navigator.share && typeof File==='function'){
+        try{
+          const f = new File([json], name, {type:'application/json'});
+          if(!navigator.canShare || navigator.canShare({files:[f]})){
+            await navigator.share({ files:[f], title:name });
+            return { ok:true, saved:true, how:'share', name };
+          }
+        }catch(e){
+          if(e && e.name==='AbortError') return cancelled;
+        }
+      }
+      // 3) звичайне завантаження — останній варіант, результат невідомий
       try{
         const blob = new Blob([json], {type:'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = name; document.body.appendChild(a); a.click();
-        setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(_){} }, 0);
-        return { ok:true, name };
+        // не 0 мс: Safari читає blob асинхронно і з миттєвим revoke міг лишитись без файла
+        setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(_){} }, 1500);
+        return { ok:true, saved:false, how:'download', name };
       }catch(e){ return { ok:false, error:String(e) }; }
     }
 
@@ -8613,9 +8639,15 @@
      блокують deleteDatabase. ============ */
   window.flowFactoryReset = async function(opts){
     const o=opts||{};
-    // 1) страховка: бекап у файл. Не вдався — зупиняємось.
-    const bk = window.flowBackup.exportToFile();
-    if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
+    // 1) страховка: бекап у файл. Не вдався чи скасовано — зупиняємось.
+    //    Якщо файл лише віддано на завантаження (saved:false), сторінка не знає,
+    //    чи він є, — повертаємо крок 'backup-confirm': екран спитає людину і
+    //    викличе нас знову з backupConfirmed:true (без повторного експорту).
+    if(!o.backupConfirmed){
+      const bk = await window.flowBackup.exportToFile();
+      if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
+      if(!bk.saved) return { ok:false, step:'backup-confirm', name:bk.name, error:'не видно, чи файл бекапу збережено' };
+    }
     // 2) хмара — доки сесія ще жива
     if(o.wipeCloud){
       const u = window.sbUser && window.sbUser();
@@ -9440,7 +9472,7 @@
         var data={_flow_backup:1, ts:new Date().toISOString(), keys:{}};
         for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); data.keys[k]=localStorage.getItem(k); }
         var json=JSON.stringify(data);
-        var name='flow-backup-'+new Date().toISOString().slice(0,10)+'.json';
+        var name='flow-backup-'+ymdLocal()+'.json';
         var blob=new Blob([json],{type:'application/json'});
         var file=null; try{ file=new File([blob],name,{type:'application/json'}); }catch(_){}
         if(file && navigator.canShare && navigator.canShare({files:[file]})){
@@ -9767,7 +9799,7 @@
       const bits=[];
       if(pr.total) bits.push(pr.done+'/'+pr.total+' · '+pr.pct+'%');
       if(dl&&dl.t) bits.push(dl.t);
-      return {k:'f:'+k, emo:(f.emoji||'🚀'), c:prjHexToRgb(f.c), t:esc(f.name||'Проєкт'),
+      return {k:'f:'+k, emo:esc(f.emoji||'🚀'), c:prjHexToRgb(f.c), t:esc(f.name||'Проєкт'),
         d:bits.length?bits.join(' · '):'ще без кроків', badge:st[1], badgeC:st[2]};
     });
     host.innerHTML=
@@ -11345,8 +11377,21 @@
     });
     return Math.round(s*100)/100;
   }
-  function migrateToWallet(rawCards, rawFx){
-    const rep={ ops:0, converted:0, orphan:0, before:0, after:0, diff:0 };
+  /* Прапорець «виконано» — на пристрій, як інші разові міграції (flowapp_*_v1).
+     Без нього міграція йшла при КОЖНОМУ load() (старт, фокус, кожні 2 хв)
+     і щоразу переписувала fin_ops та income_cards у хмару зі свіжою міткою:
+     інший пристрій бачив «новіше», перечитувався, сам переписував — і так
+     по колу, а в кожному колі могла загубитись свіжа витрата з іншого
+     пристрою. Тепер пишемо лише те, що справді змінилось, а прапорець
+     ставимо, коли операції вже побачено і переведено в гаманець. */
+  const WALLET_MIG_FLAG='flowapp_wallet_migrated_v1';
+  // const, а не function — щоб НЕ висіла в window: файли core/ склеєні в один
+  // <script> без обгортки, і кожна function верхнього рівня сама стає window.*.
+  // Кличе її лише завантажувач (27-canvas.js, той самий скрипт); ззовні вона
+  // нікому не потрібна, а зайві двері до переписування всієї книги краще зачинити.
+  const migrateToWallet=function(rawCards, rawFx){
+    const rep={ ops:0, moved:0, converted:0, orphan:0, before:0, after:0, diff:0 };
+    try{ if(localStorage.getItem(WALLET_MIG_FLAG)) return rep; }catch(_){ return rep; }
     if(!Array.isArray(finOps)) return rep;
     const rates=migRates(rawFx), curBy=migCurByCard(rawCards);
     rep.before=walletSumUAH(rates, curBy);
@@ -11362,16 +11407,24 @@
         o.label=(o.label||'Операція')+' · '+fmt(o._fx.was)+' '+(CUR[cur]||cur)+' × '+r;
         rep.converted++;
       }
-      o.card=WALLET_ID;
+      if(o.card!==WALLET_ID){ o.card=WALLET_ID; rep.moved++; }
     });
-    cards=[walletCard()];
+    // картки вже = один гаманець — не чіпаємо (і не затираємо його назву/колір)
+    const isWallet=Array.isArray(cards) && cards.length===1 && cards[0] && cards[0].id===WALLET_ID;
+    if(!isWallet){ cards=[walletCard()]; saveCards(); }
     rep.after=walletSumUAH(rates, {});      // після міграції все у гривні
     rep.diff=Math.round((rep.after-rep.before)*100)/100;
-    if(rep.ops){ saveFinOps(); saveCards(); }
-    try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
+    if(rep.moved || rep.converted) saveFinOps();
+    // Порожня книга — прапорець НЕ ставимо: на новому пристрої чи без мережі
+    // операції ще можуть не дійти, і міграція має спрацювати, коли дійдуть.
+    // Повтор без прапорця нічого не пише — записи вище лише за реальної зміни.
+    if(rep.ops){ try{ localStorage.setItem(WALLET_MIG_FLAG,'1'); }catch(_){} }
+    if(rep.moved || rep.converted || !isWallet){
+      try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
+    }
     return rep;
-  }
-  try{ window.migrateToWallet=migrateToWallet; window.walletSumUAH=walletSumUAH; window.walletBalance=walletBalance; }catch(_){}
+  };
+  try{ window.walletSumUAH=walletSumUAH; window.walletBalance=walletBalance; }catch(_){}
 
   /* ==== FX: курси валют (НБУ → er-api → офлайн), автооновлення раз на добу ==== */
 
@@ -12383,10 +12436,10 @@
   }
 
   /* ===== ЦІЛІ ДНЯ (денний чекліст усередині цілі, варіант 3) ===== */
-  function dgDateStr(offset){ const d=new Date(); d.setDate(d.getDate()+(offset||0)); return d.toISOString().slice(0,10); }
+  function dgDateStr(offset){ const d=new Date(); d.setDate(d.getDate()+(offset||0)); return ymdLocal(d); }
   function dgWeekDates(){ const out=[]; const now=new Date(); const dow=(now.getDay()+6)%7; // Mon=0
     const mon=new Date(now); mon.setDate(now.getDate()-dow);
-    for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(d.toISOString().slice(0,10)); } return out; }
+    for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(ymdLocal(d)); } return out; }
   function dgListFor(gl,ds){ if(!gl.days) gl.days={}; if(!Array.isArray(gl.days[ds])) gl.days[ds]=[]; return gl.days[ds]; }
   // синхронізація: коли ВСІ денні цілі дня виконані → засвітити трекер today + 1 авто-крок (раз)
   function dgSync(gl,ds,todayStr){
@@ -12525,7 +12578,9 @@
     const mo=[];
     for(let d=1;d<=daysInMonth;d++){
       const dt=new Date(my,mm,d);
-      mo.push({ day:d, dow:dowShort[dt.getDay()], ds:dt.toISOString().slice(0,10) });
+      // ymdLocal, а не toISOString: dt — місцева північ, у Києві це ще вчорашній день за UTC,
+      // і вся сітка з'їжджала на день (галочка «сьогодні» стояла на завтрашній клітинці)
+      mo.push({ day:d, dow:dowShort[dt.getDay()], ds:ymdLocal(dt) });
     }
 
     const goalsHtml=g.goals.map(gl=>{
@@ -12743,7 +12798,7 @@
     const dow=(now.getDay()+6)%7; // Mon=0
     const monday=new Date(now); monday.setDate(now.getDate()-dow);
     const out=[];
-    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(d.toISOString().slice(0,10)); }
+    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(ymdLocal(d)); }
     return out;
   }
 
@@ -12977,7 +13032,7 @@
         <label class="pl-sheet-l">🔗 Зв'язок з ціллю (необов'язково)</label>
         <select class="pl-sheet-in" id="ntGoal">
           <option value="">— без цілі —</option>
-          ${goals.map(g=>`<option value="${esc(g.id||g.name||'')}">${g.emoji||'🎯'} ${esc(g.name||'Ціль')}</option>`).join('')}
+          ${goals.map(g=>`<option value="${esc(g.id||g.name||'')}">${esc(g.emoji||'🎯')} ${esc(g.name||'Ціль')}</option>`).join('')}
         </select>
         <div class="pl-sheet-btns">
           <button class="pl-sheet-cancel" id="ntCancel">Скасувати</button>
@@ -13122,7 +13177,7 @@
 
     // рівень цілей
     const goalsSub = goals.length ? `<div class="flw-sub"><div class="flw-sub-in">${
-      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${gl.id}"><span class="d"></span><span>${gl.emoji||'🎯'} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
+      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${gl.id}"><span class="d"></span><span>${esc(gl.emoji||'🎯')} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
     }</div></div>` : `<div class="flw-sub"><div class="flw-empty">Цілей ще нема. Додай нижче.</div></div>`;
 
     // рівень "сьогодні" — денні цілі з усіх goals на сьогодні
@@ -13397,14 +13452,14 @@
         const td=plTodayStr(); const list=plBlocksFor(td);
         const i=list.findIndex(b=>b.id===nt.dataset.plnowtmr); if(i<0) return;
         const b=list.splice(i,1)[0];
-        const tm=new Date(); tm.setDate(tm.getDate()+1); const tds=tm.toISOString().slice(0,10);
+        const tm=new Date(); tm.setDate(tm.getDate()+1); const tds=ymdLocal(tm);
         plBlocksFor(tds).push(Object.assign({},b,{id:'b_'+Date.now(),done:false,remindAt:null}));
         saveGoals(); plRerender();
         plToast('→ «'+b.t+'» завтра о '+plHM(b.h));
       };
     }
     { const ro=c.querySelector('[data-plrook]'); if(ro) ro.onclick=()=>{
-        const td=plTodayStr(); const y=new Date(); y.setDate(y.getDate()-1); const yds=y.toISOString().slice(0,10);
+        const td=plTodayStr(); const y=new Date(); y.setDate(y.getDate()-1); const yds=ymdLocal(y);
         const yl=Array.isArray(p.blocksByDay[yds])?p.blocksByDay[yds]:[];
         const undone=yl.filter(b=>!b.done && !b.fromRecur && !b.rolled);
         const list=plBlocksFor(td);
@@ -13563,7 +13618,7 @@
     const p=plData(); const out=[];
     for(let i=days-1;i>=0;i--){
       const d=new Date(); d.setDate(d.getDate()-i);
-      const ds=d.toISOString().slice(0,10);
+      const ds=ymdLocal(d);
       const list=Array.isArray(p.blocksByDay[ds])?p.blocksByDay[ds]:[];
       out.push({ ds, dow:d.getDay(), total:list.length,
         done:list.filter(b=>b.done).length,
@@ -13834,12 +13889,26 @@
   }
   /* ═══ DEV-РЕЖИМ (Нокс): технічний асистент розробника ═══ */
   /* Dev-режим існує ТІЛЬКИ у web-збірці. У native (Capacitor) він
-     вимкнений на рівні прапорця, а сам код вирізається build-ios.mjs — щоб у
-     бандлі App Store фізично не було ні виконання коду, ні прихованих входів.
-     Прапорець з storage міг приїхати з веб-версії, тому native має пріоритет. */
+     вимкнений на рівні прапорця. Блоки @dev-only задумані, щоб їх вирізав
+     скрипт збірки під App Store (build-ios.mjs), але такого скрипта ПОКИ НЕМА
+     і tools/build.py маркери не обробляє — код лежить у будь-якому бандлі.
+     Тож захист зараз тримають лише прапорці нижче; перед App Store вирізання
+     треба дописати. Прапорець з storage міг приїхати з веб-версії, тому
+     native має пріоритет. */
   function aiDevOn(){
     try{ if(window.FLOW_NATIVE) return false; }catch(_){}
     try{ return localStorage.getItem('ai_dev')==='1'; }catch(_){ return false; }
+  }
+  /* dev_eval виконує JS, який написала модель. Dev-режим вмикає будь-хто
+     довгим натиском на аватар, тож одного його мало: отруєний текст
+     (вкладення, пам'ять) міг би підштовхнути Нокса запропонувати шкідливий
+     код, а людина — натиснути «Виконати». Тому dev_eval — лише для власника:
+     акаунт розробника або пристрій із flow_dev=1 (ті самі ворота upDevOn, що
+     й в екрана «Апгрейд»). Для решти інструмента нема навіть у списку, який
+     бачить модель, і виклик відхиляється ще й у виконавці. */
+  function aiDevEvalOn(){
+    if(!aiDevOn()) return false;
+    try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; }
   }
   /* @dev-only:start */
   function aiDevToggleSheet(){
@@ -13981,7 +14050,10 @@
       return rows.map(r=>r.k+' · '+(r.b>2048?Math.round(r.b/1024)+'КБ':r.b+'Б')+(r.reg?'':' · ПОЗА FLOW_KEYS')).join('\n')||'порожньо';
     }
     if(inp.action==='get'){
-      const k=String(inp.key||''); const v=localStorage.getItem(k);
+      const k=String(inp.key||'');
+      // токен входу Supabase моделі не віддаємо: він пішов би через воркер в історію чату
+      if(/^sb-|auth-token/i.test(k)) return '⚠️ «'+k+'» — токен входу, його не показую';
+      const v=localStorage.getItem(k);
       if(v==null) return '⚠️ ключа «'+k+'» немає';
       return k+' ('+v.length+'Б):\n'+v.slice(0,1300)+(v.length>1300?'\n…(обрізано)':'');
     }
@@ -14082,6 +14154,7 @@
     return '⚠️ невідома дія';
   }
   async function devToolEval(inp){
+    if(!aiDevEvalOn()) return '⚠️ dev_eval доступний лише власнику (акаунт розробника або flow_dev=1)';
     const code=String(inp.code||'').trim();
     if(!code) return '⚠️ порожній code';
     if(code.length>3000) return '⚠️ код задовгий (>3000) — розбий на кроки';
@@ -14255,6 +14328,7 @@
           endH:{type:'number'},
           t:{type:'string',description:'назва (create) або фрагмент назви наявного (move/done/delete/remind)'},
           goal:{type:'string',description:'фрагмент назви цілі, лише для create'},
+          at:{type:'number',description:'час початку НАЯВНОГО блоку — лише щоб розрізнити однакові назви (move/done/delete)'},
           remind:{type:'string',description:'час нагадування "HH:MM" (у день ds); порожньо — на початок блоку; "off" — зняти. Для create і remind'}
         }, required:['t'] } }
       }, required:['action','blocks'] } },
@@ -14487,14 +14561,19 @@
     else if(inp.action==='done')   pr.done=arr;
     else if(inp.action==='delete') pr.del=arr;
     else return '⚠️ невідома дія';
-    if(inp.action!=='done'){
-      const names=arr.map(b=>b.t||'').filter(Boolean).slice(0,4).join(', ');
-      const verb=inp.action==='create'?'Створити':(inp.action==='move'?'Перенести':'Видалити');
-      const ok=await aiToolConfirm(verb+' блок(и): '+(names||arr.length+' шт.'),{title:'🗓️ Frequency хоче змінити планер'});
-      if(!ok) return 'людина скасувала — не повторюй';
+    /* Спершу знаходимо РЕАЛЬНІ блоки, і лише потім шторка — саме з ними (назва, день, час).
+       Раніше шторка показувала фрагмент від моделі («зал»), а видалявся перший збіг
+       («Зала переговорів» замість «Спортзалу»). Неоднозначне повертаємо моделі з кандидатами,
+       як debt_delete. done теж через шторку: він може записати дохід у Гаманець. */
+    if(inp.action!=='create'){
+      const R=aiResolveOps(pr);
+      if(R.miss.length) return '⚠️ '+R.miss.map(x=>aiMissText(x,true)).join('\n')
+        +'\nНічого не змінено. День '+flowToolRead({what:'day',ds:aiOpDs(R.miss[0].it)});
     }
+    const g=await aiGateOps(pr,{always:true,room:Infinity});   // ліміт уже перевірив aiAgentTurn
+    if(!g.pr) return 'людина скасувала — не повторюй';
     const before=arr.length;
-    const r=aiCommit(pr);
+    const r=aiCommit(g.pr);
     const okN=(r.nb||0)+(r.nop||0);
     let msg='виконано '+okN+' із '+before;
     if(okN<before) msg+='; не знайдено/конфлікт: перевір назви (t — фрагмент наявного блоку) і чи вільний час';
@@ -14532,6 +14611,9 @@
       const frag=String(inp.t||'').toLowerCase().trim();
       const st=(gl.steps||[]).find(s=>s&&!s.done&&String(s.name||s.t||'').toLowerCase().includes(frag)&&frag);
       if(!st) return '⚠️ невиконаний крок «'+(inp.t||'')+'» не знайдено. Кроки: '+(gl.steps||[]).filter(s=>s&&!s.done).map(s=>s.name||s.t).slice(0,5).join('; ');
+      // закриття кроку міняє прогрес цілі — як і done у планері, лише після шторки (SEC-4)
+      const ok=await aiToolConfirm('Відмітити виконаним крок «'+(st.name||st.t)+'» у цілі «'+(gl.name||'')+'»',{title:'🎯 Frequency хоче змінити ціль'});
+      if(!ok) return 'людина скасувала — не повторюй';
       st.done=true; saveGoals();
       try{ renderGoals(); }catch(_){}
       try{ plToast('🤖 крок виконано: '+(st.name||st.t)); }catch(_){}
@@ -14544,7 +14626,7 @@
       const ok=await aiToolConfirm('Нова ціль «'+nm+'»',{title:'🎯 Frequency хоче створити ціль'});
       if(!ok) return 'людина скасувала — не повторюй';
       const colors=['#5b8def','#34c77b','#e8843c','#c77dff','#f0b429','#4ecdc4'];
-      goalsData.goals.push({ id:'g_'+Date.now(), name:nm, emoji:(inp.emoji||'⭐'),
+      goalsData.goals.push({ id:'g_'+Date.now(), name:nm, emoji:safeEmoji(inp.emoji,'⭐'),
         color:colors[goalsData.goals.length%colors.length], steps:[], track:{}, days:{},
         folderKey:null, open:true });
       saveGoals(); try{ renderGoals(); }catch(_){}
@@ -14560,7 +14642,7 @@
         const ov=document.createElement('div'); ov.className='asheet';
         ov.innerHTML='<div class="asheet-in"><div class="asheet-grip"></div>'
           +'<div class="asheet-title">'+esc(opts.title||'🤖 Frequency хоче внести зміну')+'</div>'
-          +'<div class="asheet-sub">'+esc(sub)+'</div>'
+          +'<div class="asheet-sub"'+(String(sub).indexOf('\n')>=0?' style="text-align:left;white-space:pre-line;max-height:40vh;overflow:auto"':'')+'>'+esc(sub)+'</div>'
           +'<button class="asheet-item primary" data-ok="1"><span class="tx"><span class="lab2">'+esc(opts.okLabel||'Підтвердити')+'</span></span></button>'
           +'<button class="asheet-cancel">Скасувати</button></div>';
         document.body.appendChild(ov);
@@ -14731,7 +14813,7 @@
         if(!bs.length) return 'зошитів немає — людина може створити їх у Щоденник → Зошити';
         return bs.map(b=>{
           const arr=(diaBooks.entries[b.id]||[]).slice().sort((x,y)=>y.ts-x.ts);
-          const last=arr[0]?new Date(arr[0].ts).toISOString().slice(0,10)+': '+(String(arr[0].text||'').trim()||'🎙 аудіо').slice(0,80):'порожньо';
+          const last=arr[0]?ymdLocal(new Date(arr[0].ts))+': '+(String(arr[0].text||'').trim()||'🎙 аудіо').slice(0,80):'порожньо';
           return b.emoji+' '+b.name+' ('+arr.length+') · останній — '+last;
         }).join('\n');
       }catch(e){ return '⚠️ '+String(e.message||e); }
@@ -14828,7 +14910,7 @@
       const used=order.length;
       const due=/^\d{4}-\d{2}-\d{2}$/.test(inp.due||'')?inp.due:'';
       folders[key]={key:key, c:(typeof FOLDER_COLORS!=='undefined'?FOLDER_COLORS[used%FOLDER_COLORS.length]:'#6a7dff'),
-        emoji:(inp.emoji||(role==='project'?'🚀':'📁')), name:nm, pct:0, photo:'', flayout:'a',
+        emoji:safeEmoji(inp.emoji, role==='project'?'🚀':'📁'), name:nm, pct:0, photo:'', flayout:'a',
         pinned:false, custom:true, widgets:[], parent:'', role:role, status:role==='project'?'active':'', due:due};
       order.push(key);
       saveFolders(); try{ renderDashboard(); }catch(_){}
@@ -14955,6 +15037,16 @@
     return true;                                            // planner, goals, folders
   }
   const AI_WRITE_LIMIT=5;                                   // змін даних за одне повідомлення людини
+  let aiTurnWrites=0;                                       // скільки змін уже зробив останній хід агента
+  /* «Ціна» виклику для ліміту. planner move/done/delete/remind чіпає НАЯВНІ блоки — кожен
+     рахується окремо (раніше один виклик із 15 видаленнями був «1 зміною з 5»). Створення —
+     1 за виклик: нове нічого не знищує, шторка й так показує весь перелік, а «сплануй день»
+     на 6–8 блоків не мусить упиратись у ліміт. Решта інструментів — 1 за виклик. */
+  function aiToolWriteCost(name,inp){
+    if(!aiToolIsWrite(name,inp)) return 0;
+    if(name==='planner'&&inp&&inp.action!=='create'&&Array.isArray(inp.blocks)) return Math.max(1,inp.blocks.length);
+    return 1;
+  }
   async function aiAgentTurn(sysStable,sysDynamic,msgs,userQ,onDelta){
     const system=[
       {type:'text',text:sysStable,cache_control:{type:'ephemeral'}},
@@ -14962,8 +15054,10 @@
     ];
     const conv=msgs.slice();
     const dev=aiDevOn();
-    const TOOLS=dev?FLOW_TOOLS.concat(DEV_TOOLS):FLOW_TOOLS;
+    // dev_eval моделі показуємо лише власнику (див. aiDevEvalOn)
+    const TOOLS=dev?FLOW_TOOLS.concat(aiDevEvalOn()?DEV_TOOLS:DEV_TOOLS.filter(t=>t.name!=='dev_eval')):FLOW_TOOLS;
     let toolsUsed=0, writesUsed=0;
+    aiTurnWrites=0;
     aiTraceStart();
     for(let hop=0;hop<6;hop++){
       const resp=await aiCallRaw({
@@ -14980,11 +15074,13 @@
       for(const b of resp.content){
         if(b.type!=='tool_use') continue;
         toolsUsed++;
-        if(aiToolIsWrite(b.name,b.input)&&++writesUsed>AI_WRITE_LIMIT){
+        const cost=aiToolWriteCost(b.name,b.input);
+        if(cost&&writesUsed+cost>AI_WRITE_LIMIT){
           results.push({type:'tool_result',tool_use_id:b.id,
-            content:'⚠️ ліміт безпеки: не більше '+AI_WRITE_LIMIT+' змін даних за одне повідомлення. Підсумуй людині, що вже зроблено, і попроси надіслати решту окремим повідомленням.'});
+            content:'⚠️ ліміт безпеки: не більше '+AI_WRITE_LIMIT+' змін даних за одне повідомлення (цей виклик — '+cost+', лишилось '+Math.max(0,AI_WRITE_LIMIT-writesUsed)+'). Нічого не змінено. Підсумуй людині, що вже зроблено, і попроси надіслати решту окремим повідомленням.'});
           continue;
         }
+        writesUsed+=cost; aiTurnWrites=writesUsed;
         const ti=aiTraceStep(b.name,b.input);
         const out=await flowToolExec(b.name,b.input);
         aiTraceEnd(ti);
@@ -15112,10 +15208,83 @@
     const cut=Math.min(...['FLOW_OPS:','FLOW_BLOCKS:','FLOW_MEM:','FLOW_'].map(k=>{ const i=t.indexOf(k); return i<0?Infinity:i; }));
     return (cut===Infinity?t:t.slice(0,cut)).trim();
   }
-  function aiFindBlockByT(ds,q){
-    q=String(q||'').toLowerCase().trim(); if(!q) return null;
-    const list=plBlocksFor(ds)||[];
-    return list.find(b=>String(b.t||'').toLowerCase().includes(q))||null;
+  /* Пошук НАЯВНОГО блоку за пунктом від моделі {ds,t,at?,id?}. Раніше брали перший збіг
+     через includes, і «зал» знаходив «Зала переговорів», коли людина мала на увазі «Спортзал».
+     Тепер: id (його ставлять ворота нижче) → точна назва → фрагмент; at звужує за часом
+     початку. Блок вважається знайденим лише тоді, коли збіг РІВНО один — краще не зробити
+     нічого й перепитати, ніж зачепити чуже. */
+  function aiOpDs(it){ return /^\d{4}-\d{2}-\d{2}$/.test(it&&it.ds||'')?it.ds:plTodayStr(); }
+  function aiOpMatches(it){
+    const list=plBlocksFor(aiOpDs(it))||[];
+    if(it&&it.id) return list.filter(b=>b.id===it.id);
+    const q=String(it&&it.t||'').toLowerCase().trim(); if(!q) return [];
+    let m=list.filter(b=>String(b.t||'').toLowerCase().trim()===q);
+    if(!m.length) m=list.filter(b=>String(b.t||'').toLowerCase().includes(q));
+    const at=parseFloat(it&&it.at);
+    if(!isNaN(at)) m=m.filter(b=>Math.abs((+b.h)-at)<0.01);
+    return m;
+  }
+  function aiOpBlock(it){ const m=aiOpMatches(it); return m.length===1?m[0]:null; }
+  function aiFindBlockByT(ds,q){ return aiOpBlock({ds:ds,t:q}); }
+  // хвіст для картки пропозицій, коли блок не визначено
+  function aiOpWarn(it){ return aiOpMatches(it).length>1?' · ⚠️ кілька збігів — уточни':' · ⚠️ не знайдено'; }
+
+  /* ── Ворота для змін НАЯВНИХ блоків (move/done/del) ──
+     Спот, голос і режим «Авто» застосовували FLOW_OPS разом із видаленням мовчки
+     і повз AI_WRITE_LIMIT (AI-3, SEC-4). Тепер будь-який перенос/закриття/видалення:
+     1) розв'язується в реальний блок, і в пункт пишеться його id — змінюється саме те, що показали;
+     2) рахується в ліміт поштучно; зайве відкидається з поясненням;
+     3) іде через одну шторку з повним переліком (назва, день, час; дохід — окремою позначкою).
+     Додавання (нові блоки, кроки, папки, сторінки) нічого не знищує, одразу видно і має
+     відкат у журналі — тому без шторки, як і задумано; у шторці воно лише перелічене,
+     якщо поруч є руйнівні зміни. Перезапису наявного FLOW_OPS не вміє (сторінки й
+     FLOW_PAGE лише дописують). */
+  function aiResolveOps(pr){
+    const out={pr:Object.assign({},pr,{move:[],done:[],del:[]}),rows:[],miss:[]};
+    ['move','done','del'].forEach(k=>(pr[k]||[]).forEach(it=>{
+      if(!it) return;
+      const m=aiOpMatches(it), ds=aiOpDs(it);
+      if(m.length!==1){ out.miss.push({k:k,it:it,cand:m}); return; }
+      const b=m[0];
+      if(k==='done'&&b.done){ out.miss.push({k:k,it:it,cand:m,already:true}); return; }
+      out.pr[k].push(Object.assign({},it,{ds:ds,id:b.id}));
+      out.rows.push({k:k,ds:ds,b:b,it:it});
+    }));
+    return out;
+  }
+  // forModel — підказка моделі, як уточнити (людині в шторці вона ні до чого)
+  function aiMissText(x,forModel){
+    const t='«'+String(x.it.t||'')+'»'+(forModel?' ('+aiOpDs(x.it)+')':'');
+    if(x.already) return t+': блок «'+x.cand[0].t+'» уже виконано';
+    if(!x.cand.length) return t+': блок не знайдено';
+    return t+': кілька збігів — '+x.cand.slice(0,5).map(b=>'«'+b.t+'» '+plHM(b.h)+'–'+plHM(plBlockEnd(b))).join('; ')
+      +(forModel?'. Повтори з точною назвою в t (для однакових назв додай at — час початку)':'');
+  }
+  function aiOpRow(r){
+    const td=plTodayStr(), b=r.b;
+    const when=(r.ds===td?'':r.ds+', ')+plHM(b.h)+'–'+plHM(plBlockEnd(b));
+    if(r.k==='move') return '↔ Перенести «'+b.t+'» ('+when+') → '+plHM(+r.it.h||0)+'–'+plHM(+r.it.endH||0);
+    if(r.k==='done') return '✓ Відмітити виконаним «'+b.t+'» ('+when+')'+(b.link&&b.link.type==='fin'?' — запише дохід у Гаманець':'');
+    return '✕ Видалити «'+b.t+'» ('+when+')';
+  }
+  async function aiGateOps(pr,opts){
+    opts=opts||{};
+    const R=aiResolveOps(pr), notes=R.miss.map(x=>aiMissText(x)+' — не чіпаю');
+    const room=Math.max(0,opts.room==null?AI_WRITE_LIMIT:opts.room);
+    if(R.rows.length>room){
+      const cut=R.rows.splice(room);
+      cut.forEach(r=>{ const a=R.pr[r.k]; const i=a.findIndex(x=>x.id===r.b.id); if(i>=0) a.splice(i,1); });
+      notes.push('ліміт безпеки: не більше '+AI_WRITE_LIMIT+' змін наявних блоків за повідомлення — ще '+cut.length+' не зроблено, попроси окремо');
+    }
+    const td=plTodayStr();
+    const adds=(R.pr.blocks||[]).filter(b=>b&&b.t).map(b=>'＋ «'+b.t+'» ('+(aiOpDs(b)===td?'':aiOpDs(b)+', ')+plHM(+b.h||0)+'–'+plHM(+b.endH||0)+')')
+      .concat((R.pr.steps||[]).filter(s=>s&&s.t).map(s=>'＋ крок «'+s.t+'» у ціль «'+(s.goal||'')+'»'))
+      .concat((R.pr.folders||[]).filter(f=>f&&f.name).map(f=>'＋ папка «'+f.name+'»'))
+      .concat((R.pr.pages||[]).filter(p=>p&&p.title).map(p=>'＋ сторінка «'+p.title+'»'));
+    if(!R.rows.length&&!(opts.always&&adds.length)) return {pr:R.pr,notes:notes};
+    const lines=R.rows.map(aiOpRow).concat(adds).concat(notes.map(n=>'⚠️ '+n));
+    const ok=await aiToolConfirm(lines.join('\n'),{title:opts.title||'🗓️ Frequency хоче змінити планер'});
+    return ok?{pr:R.pr,notes:notes}:{pr:null,notes:notes};
   }
   // знайти папку за фрагментом назви (для сторінок)
   function aiFindFolderKey(q){
@@ -15172,8 +15341,8 @@
     let nb=0,ns=0,nf=0,nop=0,np=0; const undo={blocks:[],steps:[],folders:[],moves:[],dones:[],dels:[],pages:[]};
     // перенос наявних блоків
     (pr.move||[]).forEach(mv=>{
-      const ds=/^\d{4}-\d{2}-\d{2}$/.test(mv.ds||'')?mv.ds:plTodayStr();
-      const b=aiFindBlockByT(ds,mv.t); if(!b) return;
+      const ds=aiOpDs(mv);
+      const b=aiOpBlock(mv); if(!b) return;
       const h=+mv.h, endH=+mv.endH;
       if(!(h>=0&&h<24)||!(endH>h&&endH<=24)) return;
       undo.moves.push({ds:ds,id:b.id,h:b.h,endH:b.endH});
@@ -15181,8 +15350,8 @@
     });
     // відмітити виконання
     (pr.done||[]).forEach(dn=>{
-      const ds=/^\d{4}-\d{2}-\d{2}$/.test(dn.ds||'')?dn.ds:plTodayStr();
-      const b=aiFindBlockByT(ds,dn.t); if(!b||b.done) return;
+      const ds=aiOpDs(dn);
+      const b=aiOpBlock(dn); if(!b||b.done) return;
       const p=plData();
       undo.dones.push({ds:ds,id:b.id});
       if((p.selDate||plTodayStr())===ds){ plCompleteBlock(b.id); }   // повні ефекти (ціль/звичка/дохід)
@@ -15191,11 +15360,10 @@
     });
     // видалити блоки
     (pr.del||[]).forEach(dl=>{
-      const ds=/^\d{4}-\d{2}-\d{2}$/.test(dl.ds||'')?dl.ds:plTodayStr();
+      const ds=aiOpDs(dl);
       const list=plBlocksFor(ds);
-      const bi=list.findIndex(b=>String(b.t||'').toLowerCase().includes(String(dl.t||'').toLowerCase().trim())&&dl.t);
+      const b=aiOpBlock(dl); const bi=b?list.indexOf(b):-1;   // рівно той блок, що в шторці/картці
       if(bi<0) return;
-      const b=list[bi];
       if(b.done){ try{ plUncompleteEffects(b,ds); }catch(_){} }
       undo.dels.push({ds:ds,idx:bi,block:JSON.parse(JSON.stringify(b))});
       list.splice(bi,1); nop++;
@@ -15210,7 +15378,7 @@
         const role=(f.role==='project')?'project':'area';
         const due=/^\d{4}-\d{2}-\d{2}$/.test(f.due||'')?f.due:'';
         folders[key]={key:key, c:(typeof FOLDER_COLORS!=='undefined'?FOLDER_COLORS[used%FOLDER_COLORS.length]:'#6a7dff'),
-          emoji:(f.emoji||(role==='project'?'🚀':'📁')), name:String(f.name).slice(0,40), pct:0, photo:'', flayout:'a',
+          emoji:safeEmoji(f.emoji, role==='project'?'🚀':'📁'), name:String(f.name).slice(0,40), pct:0, photo:'', flayout:'a',
           pinned:false, custom:true, widgets:[], parent:'', role:role, status:role==='project'?'active':'', due:due};
         order.push(key);
         // віджети з каталогу
@@ -15931,7 +16099,8 @@
       if(it.type==='table'){ b.cols=Array.isArray(it.cols)&&it.cols.length?it.cols.map(String):['Назва','Значення'];
         b.rows=Array.isArray(it.rows)?it.rows.map(r=>Array.isArray(r)?r.map(String):[String(r)]):[]; b.title=it.text||''; }
       else if(it.type==='divider'){}
-      else { b.text=String(it.text||''); if(it.type==='callout') b.emo=it.emo||'💡'; if(it.type==='task') b.done=false; }
+      // значок виноски пише модель — пропускаємо лише емодзі, не HTML (див. safeEmoji)
+      else { b.text=String(it.text||''); if(it.type==='callout') b.emo=safeEmoji(it.emo,'💡'); if(it.type==='task') b.done=false; }
       arr.push(b); ids.push(b.id);
     });
     if(!ids.length) return {n:0,ids:[]};
@@ -16002,9 +16171,15 @@
       const pg=aiParsePage(raw);
       const pr=aiParseBlocks(pg.text);
       let done='';
-      if(pg.list.length){ const r=applyPageBlocks(pg.list); if(r.n) done+=`<div class="fs-done">✨ Додав ${r.n} блок(и) → ${ctx.label}</div>`; }
-      if(pr.blocks.length||pr.steps.length||(pr.folders&&pr.folders.length)){
-        try{ aiCommit(pr); done+=`<div class="fs-done">📅 Оновив планер</div>`; }catch(e){ console.error(e); }
+      if(pg.list.length){ const r=applyPageBlocks(pg.list); if(r.n) done+=`<div class="fs-done">✨ Додав ${r.n} блок(и) → ${esc(ctx.label)}</div>`; }
+      /* Додане (блоки, кроки, папки) — одразу, як і було. Перенести/закрити/видалити НАЯВНЕ —
+         лише через шторку з реальними блоками і в межах ліміту: раніше голосове «прибери
+         зайве» видаляло блоки мовчки (AI-3). */
+      if(aiOpsCount(pr)){
+        const g=await aiGateOps(pr);
+        if(!g.pr) done+=`<div class="fs-done">✋ Скасовано — нічого не змінив</div>`;
+        else if(aiOpsCount(g.pr)){ try{ aiCommit(g.pr); done+=`<div class="fs-done">📅 Оновив планер</div>`; }catch(e){ console.error(e); } }
+        g.notes.forEach(n=>{ done+=`<div class="fs-done">⚠️ ${esc(n)}</div>`; });
       }
       const g=document.getElementById('fsGen'); if(g) g.remove();
       const say=(pr.text||pg.text||'Готово.').trim();
@@ -16275,16 +16450,16 @@
       rows.push(`<div class="ai-act goal"><span class="ic">${aiIco(isP?'target':'folder',13)}</span><span class="tx">${isP?'Проєкт':'Папка'} «${esc(f.name||'')}»<small>${meta}</small></span></div>`);
     });
     (pr.move||[]).forEach(mv=>{
-      const b=aiFindBlockByT(/^\d{4}-\d{2}-\d{2}$/.test(mv.ds||'')?mv.ds:plTodayStr(),mv.t);
-      rows.push(`<div class="ai-act mv"><span class="ic">${aiIco('move',13)}</span><span class="tx">${esc(b?b.t:mv.t||'Блок')}<small>${b?plHM(b.h)+'–'+plHM(plBlockEnd(b))+' → ':''}${plHM(+mv.h||0)}–${plHM(+mv.endH||0)}${b?'':' · ⚠️ не знайдено'}</small></span></div>`);
+      const b=aiOpBlock(mv);
+      rows.push(`<div class="ai-act mv"><span class="ic">${aiIco('move',13)}</span><span class="tx">${esc(b?b.t:mv.t||'Блок')}<small>${b?plHM(b.h)+'–'+plHM(plBlockEnd(b))+' → ':''}${plHM(+mv.h||0)}–${plHM(+mv.endH||0)}${b?'':aiOpWarn(mv)}</small></span></div>`);
     });
     (pr.done||[]).forEach(dn=>{
-      const b=aiFindBlockByT(/^\d{4}-\d{2}-\d{2}$/.test(dn.ds||'')?dn.ds:plTodayStr(),dn.t);
-      rows.push(`<div class="ai-act dn"><span class="ic">${aiIco('check',13)}</span><span class="tx">${esc(b?b.t:dn.t||'Блок')}<small>відмітити виконаним${b?'':' · ⚠️ не знайдено'}</small></span></div>`);
+      const b=aiOpBlock(dn);
+      rows.push(`<div class="ai-act dn"><span class="ic">${aiIco('check',13)}</span><span class="tx">${esc(b?b.t:dn.t||'Блок')}<small>відмітити виконаним${b?'':aiOpWarn(dn)}</small></span></div>`);
     });
     (pr.del||[]).forEach(dl=>{
-      const b=aiFindBlockByT(/^\d{4}-\d{2}-\d{2}$/.test(dl.ds||'')?dl.ds:plTodayStr(),dl.t);
-      rows.push(`<div class="ai-act rm"><span class="ic">${aiIco('x',13)}</span><span class="tx">${esc(b?b.t:dl.t||'Блок')}<small>видалити з дня${b?'':' · ⚠️ не знайдено'}</small></span></div>`);
+      const b=aiOpBlock(dl);
+      rows.push(`<div class="ai-act rm"><span class="ic">${aiIco('x',13)}</span><span class="tx">${esc(b?b.t:dl.t||'Блок')}<small>видалити з дня${b?'':aiOpWarn(dl)}</small></span></div>`);
     });
     (pr.pages||[]).forEach(pg=>{
       const fk=aiFindFolderKey(pg.folder);
@@ -16345,7 +16520,9 @@
     el.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>aiUndo(+b.dataset.undo));
     el.querySelectorAll('[data-commit]').forEach(b=>b.onclick=()=>{
       const m=aiChatMsgs[+b.dataset.commit]; if(!m||m.applied) return;
-      aiCommit(aiParseBlocks(m.content)); m.applied=true; aiChatSave(); aiRenderHead(); aiRenderBody();
+      // applied — ДО aiCommit: той усередині викликає aiChatSave, а він підміняє повідомлення
+      // копіями, тож позначка на старому об'єкті губилась і кнопка лишалась (повторне застосування)
+      m.applied=true; aiCommit(aiParseBlocks(m.content)); aiChatSave(); aiRenderHead(); aiRenderBody();
     });
     el.querySelectorAll('[data-decline]').forEach(b=>b.onclick=()=>{
       const m=aiChatMsgs[+b.dataset.decline]; if(!m) return;
@@ -16704,7 +16881,7 @@
         if(el){ el.innerHTML=aiBusyHTML(); const b=document.getElementById('aiChatBody'); if(b) b.scrollTop=b.scrollHeight; }
         else aiRenderBody();
       };
-      let txt;
+      let txt, usedW=0;
       if(aiAgentOn()){
         // стабільний шар (кешується) окремо від динамічного (персона+контекст)
         let sysStable, sysDyn;
@@ -16720,6 +16897,7 @@
           sysDyn+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
         }
         txt=await aiAgentTurn(sysStable,sysDyn,msgs,shown,onDelta);
+        usedW=aiTurnWrites;
         const tr=aiTraceFinish(); if(tr) m.trace=tr;
       } else {
         txt=await aiCall(sys,msgs,onDelta);
@@ -16728,7 +16906,14 @@
       const pr=aiParseBlocks(m.content);
       if(pr.mem.length) aiMemAdd(pr.mem);
       aiSpeak(pr.text);
-      if(aiAuto&&aiOpsCount(pr)){ aiCommit(pr); m.applied=true; }
+      /* «Авто» довіряє додаванню, але не знищенню: перенос/закриття/видалення наявного —
+         через шторку і в залишок ліміту цього повідомлення (AI-3). Скасувала — пакет відхилено. */
+      if(aiAuto&&aiOpsCount(pr)){
+        const g=await aiGateOps(pr,{room:AI_WRITE_LIMIT-usedW});
+        // позначка ДО aiCommit: його aiChatSave підміняє повідомлення копіями
+        if(g.pr){ m.applied=true; if(aiOpsCount(g.pr)) aiCommit(g.pr); } else m.declined=true;
+        if(g.notes.length) try{ plToast('⚠️ '+g.notes[0]+(g.notes.length>1?' (+'+(g.notes.length-1)+')':'')); }catch(_){}
+      }
     }catch(e){
       try{ aiTraceFinish(); }catch(_){}   // обірваний хід не має лишати живу картку
       console.error('aiChat',e);
@@ -16822,7 +17007,7 @@
     const hasDone=ds=>Array.isArray(p.blocksByDay[ds])&&p.blocksByDay[ds].some(b=>b.done);
     let n=hasDone(plTodayStr())?1:0;
     for(let i=1;i<=365;i++){ const d=new Date(); d.setDate(d.getDate()-i);
-      if(hasDone(d.toISOString().slice(0,10))) n++; else break; }
+      if(hasDone(ymdLocal(d))) n++; else break; }
     return n;
   }
   // найдовша серія за всю історію (не лише поточна) — для хіро-картки «Серія»
@@ -16850,7 +17035,7 @@
     const out=[];
     for(let i=0;i<7;i++){
       const d=new Date(monday); d.setDate(monday.getDate()+i);
-      out.push({ l:labels[i], on:hasDone(d.toISOString().slice(0,10)), future:d>today });
+      out.push({ l:labels[i], on:hasDone(ymdLocal(d)), future:d>today });
     }
     return out;
   }
@@ -16881,23 +17066,53 @@
     }
     return { days:out, filled };
   }
+  /* Місяць — другий, тихіший показник під тижнем. Рахує те саме правило дня,
+     але по днях місяця, що вже минули: 8 днів із 25 = 32%. */
+  function heroMonthDays(){
+    const now=new Date(), y=now.getFullYear(), m=now.getMonth(), total=now.getDate();
+    let filled=0;
+    for(let d=1; d<=total; d++){
+      const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      const hasDiary=!!(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim());
+      const hasWish=!!(typeof wishActiveDays!=='undefined'&&wishActiveDays[ds]);
+      if(hasDiary||hasWish) filled++;
+    }
+    return { pct: total?Math.round(filled/total*100):0, filled, total };
+  }
+  function heroDayWord(n){
+    const n10=n%10, n100=n%100;
+    if(n10===1&&n100!==11) return 'день';
+    if(n10>=2&&n10<=4&&(n100<10||n100>=20)) return 'дні';
+    return 'днів';
+  }
   function renderHeroStreak(){
     try{
       const bigEl=document.getElementById('heroPctBig');
+      const labEl=document.getElementById('heroLab');
       const weekEl=document.getElementById('heroWeek');
+      const hintEl=document.getElementById('heroPctHint');
+      const barEl=document.getElementById('heroBarFill');
       if(!bigEl) return;
-      const st=heroWeekDays();
-      bigEl.innerHTML=st.filled+'<small>/7</small>';
-      if(weekEl) weekEl.innerHTML=st.days.map(d=>
+      const w=heroWeekDays();
+      bigEl.innerHTML=Math.round(w.filled/7*100)+'<small>%</small>';
+      /* «3 з 7» тут не годиться: підпис іде у ВЕРХНЬОМУ регістрі, а там
+         українське «з» не відрізнити від цифри 3 — виходило «3 З 7». */
+      if(labEl) labEl.innerHTML='Цього тижня · <b>'+w.filled+'/7</b>';
+      if(weekEl) weekEl.innerHTML=w.days.map(d=>
         '<i class="'+(d.on?'on':'')+(d.future?' fut':'')+(d.today?' now':'')+'">'
         +'<span>'+d.l+'</span><b></b></i>').join('');
+      const m=heroMonthDays();
+      if(hintEl) hintEl.innerHTML = m.filled===0
+        ? 'За місяць поки жодного дня'
+        : 'За місяць — <b>'+m.pct+'%</b>, це <b>'+m.filled+'</b> '+heroDayWord(m.filled)+' із '+m.total;
+      if(barEl) barEl.style.width=m.pct+'%';
     }catch(_){}
   }
   function plRolloverHTML(){
     const p=plData(); const td=plTodayStr();
     if((p.selDate||td)!==td) return '';
     if(p.rolloverDismissed===td) return '';
-    const y=new Date(); y.setDate(y.getDate()-1); const yds=y.toISOString().slice(0,10);
+    const y=new Date(); y.setDate(y.getDate()-1); const yds=ymdLocal(y);
     const yl=Array.isArray(p.blocksByDay[yds])?p.blocksByDay[yds]:[];
     const undone=yl.filter(b=>!b.done && !b.fromRecur && !b.rolled);
     if(!undone.length) return '';
@@ -17018,7 +17233,7 @@
     let cells='';
     for(let i=0;i<7;i++){
       const d=new Date(monday); d.setDate(monday.getDate()+i);
-      const ds=d.toISOString().slice(0,10);
+      const ds=ymdLocal(d);
       const blocks=Array.isArray(p.blocksByDay[ds])?p.blocksByDay[ds]:[];
       const cols=[...new Set(blocks.map(b=>PL_COL[b.c]||'#5b8def'))].slice(0,3);
       const dots=cols.map(c=>`<i style="background:${c}"></i>`).join('');
@@ -17033,7 +17248,7 @@
     const MON=['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
     if(ds===plTodayStr()) return 'Сьогодні';
     const tmr=new Date(); tmr.setDate(tmr.getDate()+1);
-    if(ds===tmr.toISOString().slice(0,10)) return 'Завтра';
+    if(ds===ymdLocal(tmr)) return 'Завтра';
     const d=new Date(ds+'T12:00:00');
     const DOW=['Неділя','Понеділок','Вівторок','Середа','Четвер','П\u2019ятниця','Субота'];
     return `${DOW[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`;
@@ -17112,7 +17327,7 @@
         <button class="fps-rdel" data-fpsrdel="${t.id}">✕</button></div>`).join('')
         :`<div class="fps-empty">Нема ритму. Створи точку з повтором (напр. Вт·Чт 19:00) — і вона сама з'являтиметься щотижня.</div>`;
       ov.querySelector('#fpsBody').innerHTML=`
-        <div class="pl-sheet-h">${f.emoji||'📁'} ${esc(f.name)} · сьогодні</div>
+        <div class="pl-sheet-h">${esc(f.emoji||'📁')} ${esc(f.name)} · сьогодні</div>
         <div class="fps-toggle">
           <button class="${showAll?'':'on'}" data-fpsall="0">Тільки проєкт</button>
           <button class="${showAll?'on':''}" data-fpsall="1">Весь день</button>
@@ -17183,7 +17398,7 @@
           <div class="fps-tx"><b>${esc(b.t)}</b><span>${plHM(b.h)}–${plHM(Math.min(plBlockEnd(b),24))}${b.fromRecur?' · 🔁':''}</span></div></div>`;
       }).join(''):`<div class="fps-empty">Найближчих точок нема</div>`;
       ov.querySelector('#fpmBody').innerHTML=`
-        <div class="pl-sheet-h">${f.emoji||'📁'} ${esc(f.name)} · ${PL_MONTH_NAMES[m-1]} ${y}</div>
+        <div class="pl-sheet-h">${esc(f.emoji||'📁')} ${esc(f.name)} · ${PL_MONTH_NAMES[m-1]} ${y}</div>
         <div class="fpm-sub">${n} точок · ${Math.round(hrs)} год за місяць</div>
         <div class="fpm-nav"><button data-fpmnav="-1">‹</button><button data-fpmnav="1">›</button></div>
         <div class="fpm-grid">${DOW_UA.slice(1).concat(DOW_UA[0]).map(l=>`<div class="fpm-dw">${l}</div>`).join('')}${grid}</div>
@@ -17338,7 +17553,7 @@
       }
       if(b.folder && typeof folders!=='undefined' && folders[b.folder]){
         const f=folders[b.folder];
-        linksHtml+=`<span class="pl-blk-link-chip folder" data-plgofolder="${esc(b.folder)}">${f.emoji||'📁'} ${esc(f.name||'Папка')}</span>`;
+        linksHtml+=`<span class="pl-blk-link-chip folder" data-plgofolder="${esc(b.folder)}">${esc(f.emoji||'📁')} ${esc(f.name||'Папка')}</span>`;
       }
       if(b.tag) linksHtml+=`<span class="pl-blk-link-chip">#${esc(b.tag)}</span>`;
       if(b.link && b.link.type==='fin') linksHtml+=`<span class="pl-blk-link-chip fin">💰 ${esc(b.link.envName||'Фінанси')}</span>`;
@@ -17813,10 +18028,10 @@
       const curLink=(b&&b.link)||{};
       if(tp==='goalstep' || tp==='habit'){
         linkExtra.innerHTML=`<label class="pl-sheet-l">Яка ціль?</label>
-          <select class="pl-sheet-in" id="pbLinkGoal">${goals.map(g=>`<option value="${esc(g.id||g.name||'')}" ${curLink.goalId===(g.id||g.name)?'selected':''}>${g.emoji||'🎯'} ${esc(g.name||'Ціль')}</option>`).join('')||'<option value="">(нема цілей — створи в Цілях)</option>'}</select>`;
+          <select class="pl-sheet-in" id="pbLinkGoal">${goals.map(g=>`<option value="${esc(g.id||g.name||'')}" ${curLink.goalId===(g.id||g.name)?'selected':''}>${esc(g.emoji||'🎯')} ${esc(g.name||'Ціль')}</option>`).join('')||'<option value="">(нема цілей — створи в Цілях)</option>'}</select>`;
       } else if(tp==='fin'){
         linkExtra.innerHTML=`<label class="pl-sheet-l">У який конверт</label>
-          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${e.id}" ${curLink.envId===e.id?'selected':''}>${e.emoji||'✉️'} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
+          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${e.id}" ${curLink.envId===e.id?'selected':''}>${esc(e.emoji||'✉️')} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
           <label class="pl-sheet-l">Сума доходу, ₴</label>
           <input class="pl-sheet-in" id="pbLinkAmt" inputmode="numeric" placeholder="напр. 1200" value="${curLink.amount||''}">`;
       } else { linkExtra.innerHTML=''; }
@@ -18093,7 +18308,7 @@
     rail.style.display='flex';
     rail.innerHTML = projs.map(k=>{
       const f=folders[k]; if(!f) return '';
-      return '<div class="proj-rail-i" data-projrail="'+k+'" style="--pc:'+(f.c||'#6a7dff')+'" title="'+esc(f.name||'')+'">'+(f.emoji||'🚀')+'</div>';
+      return '<div class="proj-rail-i" data-projrail="'+k+'" style="--pc:'+(f.c||'#6a7dff')+'" title="'+esc(f.name||'')+'">'+esc(f.emoji||'🚀')+'</div>';
     }).join('') + '<div class="proj-rail-add" data-projraddd title="Новий проєкт">＋</div>';
     rail.querySelectorAll('[data-projrail]').forEach(el=>{
       el.onclick=()=>{ try{ window.platform.haptic('select'); }catch(_){} goFolder(el.dataset.projrail); };
@@ -18403,7 +18618,7 @@
         ${ICON_ALL.map(([id,nm])=>`<button class="fic-opt ${cur===id?'on':''}" data-fic="${id}" title="${nm}" aria-label="${nm}" style="--c:${f.c||'var(--accent)'}">
           <svg class="ico" aria-hidden="true"><use href="#${id}"/></svg></button>`).join('')}
       </div>
-      <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+f.emoji+')':''}</button>
+      <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+esc(f.emoji)+')':''}</button>
       <button class="fmi" data-ficback="1">‹ Назад до налаштувань</button>
     </div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
@@ -19670,7 +19885,7 @@
     listEl.innerHTML = days.length ? days.slice(0,60).map(k=>{
       const e=diaryEntries[k];
       const m=diaMoodOf(k);
-      return '<div class="dia-entry" data-diaopen="'+k+'"><div class="de-date">'+diaFmtDate(k)+(m?' · '+DIA_MOODS[m.v-1]:'')+'</div><div class="de-txt">'+diaEsc(e.text)+'</div></div>';
+      return '<div class="dia-entry" data-diaopen="'+k+'"><div class="de-date">'+diaFmtDate(k)+(m?' · '+DIA_MOODS[m.v-1]:'')+'</div><div class="de-txt" data-i18n-skip="1">'+diaEsc(e.text)+'</div></div>';
     }).join('') : '<div class="dia-empty">Тут з\'являться попередні записи, щойно ти збережеш перший.</div>';
     // календар + стрік
     if(calEl){
@@ -20481,7 +20696,7 @@
   function plRescheduleReminders(){
     try{
       const p=plData();
-      [plTodayStr(), (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); })()].forEach(ds=>{
+      [plTodayStr(), (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return ymdLocal(d); })()].forEach(ds=>{
         (p.blocksByDay[ds]||[]).forEach(b=>{ if(b&&b.remindAt&&!b.done) plScheduleReminder(b); });
       });
     }catch(_){}
@@ -20749,7 +20964,8 @@
       .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
       .replace(/(^|[^*])\*([^*]+)\*/g,'$1<i>$2</i>')
       .replace(/`([^`]+)`/g,'<code>$1</code>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+      // посилання — лише http(s) і пошта: `[тисни](javascript:…)` інакше виконав би код по кліку
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,(m,t,u)=>/^\s*(https?:|mailto:)/i.test(u)?'<a href="'+u.trim()+'" target="_blank" rel="noopener">'+t+'</a>':t);
   }
 
   // EPUB — розпаковка zip через JSZip (CDN) + витяг HTML по spine
@@ -20780,13 +20996,13 @@
       const href=manifest[id]; if(!href) continue;
       const full=normalizeZipPath(baseDir+href);
       let html=await readZipText(zip,full); if(html==null) continue;
-      html=stripEpubHtml(html);
+      const frag=sanitizeEpubHtml(html);
       const wrap=document.createElement('section'); wrap.className='rdr-chap';
-      // заголовок глави з <title> або першого h1/h2
-      let title=(html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i)||[])[1];
-      title=title?title.replace(/<[^>]+>/g,'').trim():('Розділ '+(++idx));
+      // заголовок глави — з першого h1/h2/h3
+      const hEl=frag.querySelector('h1,h2,h3');
+      const title=(hEl&&hEl.textContent.trim())||('Розділ '+(++idx));
       wrap.dataset.chap=title;
-      wrap.innerHTML=html;
+      wrap.appendChild(frag);
       content.appendChild(wrap);
     }
     // вбудувати зображення з zip
@@ -20795,25 +21011,82 @@
   }
   async function readZipText(zip,path){ const f=zip.file(path); if(!f) return null; try{ return await f.async('string'); }catch(_){ return null; } }
   function normalizeZipPath(p){ const parts=[]; p.split('/').forEach(seg=>{ if(seg==='..') parts.pop(); else if(seg!=='.'&&seg!=='') parts.push(seg); }); return parts.join('/'); }
-  function stripEpubHtml(html){
-    let body=(html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)||[])[1]||html;
-    body=body.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'')
-             .replace(/ on\w+="[^"]*"/gi,'').replace(/<link[^>]*>/gi,'');
-    return body;
+  /* Глава EPUB — чужий HTML з файла, який людина могла скачати будь-де.
+     Раніше його чистили регулярками і вставляли через innerHTML: обробник
+     `onerror='…'` в одинарних лапках чи без лапок проходив і виконувався
+     одразу при відкритті книжки — з доступом до всього localStorage, разом
+     із токеном входу. Тепер главу розбирає DOMParser: це «мертвий» документ,
+     у ньому нічого не виконується і картинки не вантажаться. З нього в
+     сторінку переносимо ЛИШЕ теги й атрибути з білого списку, створюючи
+     елементи заново. Невідомий тег розгортаємо (текст лишається), а небезпечні
+     (скрипти, фрейми, форми, медіа) викидаємо разом із вмістом. id, class і
+     style не беремо: вони б дали книжці перекрити інтерфейс чи підмінити
+     глобальні змінні застосунку. */
+  const EPUB_TAGS=new Set(['p','div','span','section','article','header','footer','aside','main','nav',
+    'h1','h2','h3','h4','h5','h6','em','strong','i','b','u','s','sub','sup','small','big','mark','cite','q',
+    'abbr','dfn','del','ins','tt','kbd','var','samp','time','br','hr','blockquote','pre','code',
+    'ul','ol','li','dl','dt','dd','table','thead','tbody','tfoot','tr','td','th','caption','colgroup','col',
+    'figure','figcaption','img','a']);
+  const EPUB_DROP=new Set(['script','style','link','meta','base','title','head','iframe','frame','frameset',
+    'object','embed','applet','param','form','input','button','select','textarea','option','template',
+    'noscript','audio','video','source','track','canvas','math','portal','dialog','details','summary']);
+  function sanitizeEpubHtml(html){
+    const doc=new DOMParser().parseFromString(String(html||''),'text/html');
+    const frag=document.createDocumentFragment();
+    epubCopyKids(doc.body, frag);
+    return frag;
+  }
+  function epubCopyKids(from, to){
+    for(const n of Array.from(from.childNodes)){
+      if(n.nodeType===3){ to.appendChild(document.createTextNode(n.nodeValue)); continue; }
+      if(n.nodeType!==1) continue;   // коментарі та інше — геть
+      const tag=String(n.localName||'').toLowerCase();
+      if(tag==='svg'){
+        // обкладинки часто зроблені як <svg><image xlink:href="cover.jpg"/></svg> —
+        // беремо з SVG лише картинки, решту (разом з onload і скриптами) відкидаємо
+        n.querySelectorAll('image').forEach(im=>{
+          const s=epubImgSrc(im.getAttribute('href')||im.getAttribute('xlink:href'));
+          if(s){ const ni=document.createElement('img'); ni.setAttribute(s.a,s.v); to.appendChild(ni); }
+        });
+        continue;
+      }
+      if(EPUB_DROP.has(tag)) continue;
+      if(!EPUB_TAGS.has(tag)){ epubCopyKids(n,to); continue; }
+      const el=document.createElement(tag);
+      if(tag==='img'){ const s=epubImgSrc(n.getAttribute('src')); if(!s) continue; el.setAttribute(s.a,s.v); }
+      if(tag==='a'){
+        const h=String(n.getAttribute('href')||'').replace(/[\u0000- \u007f-\u009f]/g,'');
+        if(/^(https?:|mailto:)/i.test(h)){ el.setAttribute('href',h); el.setAttribute('target','_blank'); el.setAttribute('rel','noopener noreferrer'); }
+      }
+      ['alt','title','lang'].forEach(k=>{ const v=n.getAttribute(k); if(v!=null) el.setAttribute(k,v); });
+      const dir=n.getAttribute('dir'); if(/^(ltr|rtl|auto)$/i.test(dir||'')) el.setAttribute('dir',dir);
+      ['colspan','rowspan','span','start','width','height'].forEach(k=>{ const v=String(n.getAttribute(k)||'').trim(); if(/^\d{1,4}$/.test(v)) el.setAttribute(k,v); });
+      to.appendChild(el);
+      epubCopyKids(n,el);
+    }
+  }
+  /* Звідки брати картинку: data:image/… і blob: — як є; шлях усередині книжки
+     кладемо в data-src (підставить embedEpubImages із zip). Будь-яку іншу схему
+     відкидаємо: javascript: — це код, а http(s): — «піксель», що видає автору,
+     коли й де ти читаєш. */
+  function epubImgSrc(v){
+    const raw=String(v||'').trim(), u=raw.replace(/[\u0000- \u007f-\u009f]/g,'');
+    if(!u) return null;
+    if(/^data:image\//i.test(u)||/^blob:/i.test(u)) return {a:'src',v:u};
+    if(/^[a-z][a-z0-9+.\-]*:/i.test(u)||u.startsWith('//')) return null;
+    return {a:'data-src',v:raw};
   }
   async function embedEpubImages(zip, baseDir, root){
-    const imgs=[...root.querySelectorAll('img,image')];
+    const imgs=[...root.querySelectorAll('img[data-src]')];
     for(const im of imgs){
-      let src=im.getAttribute('src')||im.getAttribute('xlink:href')||im.getAttribute('href'); if(!src) continue;
-      if(/^https?:|^data:/.test(src)) continue;
-      const path=normalizeZipPath(baseDir+decodeURIComponent(src));
-      const f=zip.file(path); if(!f){ im.remove(); continue; }
+      const src=im.getAttribute('data-src'); im.removeAttribute('data-src');
       try{
+        const path=normalizeZipPath(baseDir+decodeURIComponent(src));
+        const f=zip.file(path); if(!f){ im.remove(); continue; }
         const b64=await f.async('base64');
         const ext=(path.split('.').pop()||'png').toLowerCase();
-        const mime=ext==='jpg'||ext==='jpeg'?'image/jpeg':ext==='gif'?'image/gif':ext==='svg'?'image/svg+xml':'image/png';
-        if(im.tagName.toLowerCase()==='img'){ im.src='data:'+mime+';base64,'+b64; }
-        else { const ni=document.createElement('img'); ni.src='data:'+mime+';base64,'+b64; im.replaceWith(ni); }
+        const mime=ext==='jpg'||ext==='jpeg'?'image/jpeg':ext==='gif'?'image/gif':ext==='svg'?'image/svg+xml':ext==='webp'?'image/webp':'image/png';
+        im.src='data:'+mime+';base64,'+b64;
       }catch(_){ im.remove(); }
     }
   }
@@ -21760,7 +22033,7 @@
         const rows=pks.map(k=>{const f=folders[k];const pr=folderProgress(k);const nx=folderNextStep(k);const dl=dueLabel(f.due);const s=st(f.status);
           return `<div class="pw-row" style="--fc:${f.c}">
             <div class="pw-rt" data-wgo="${k}">
-              <span class="pw-em">${(f.emoji||'📁')}</span>
+              <span class="pw-em">${esc(f.emoji||'📁')}</span>
               <span class="pw-meat"><b>${esc(f.name)}</b>
                 <span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span>
                   <span class="fprg"><i style="width:${pr.pct}%"></i></span><span class="pw-pct">${pr.pct}%</span>
@@ -21827,7 +22100,7 @@
             <div class="pw-axis">${Array.from({length:WEEKS},(_,i)=>`<span class="${i===0?'hot':''}">${i===0?'Цей тижд.':'+'+i}</span>`).join('')}</div>
             ${dks.map(k=>{const f=folders[k];const pr=folderProgress(k);const L=late(k);const w=wk(k);
               return `<div class="pw-tlrow"><div class="pw-tlbar ${L?'late':''}" style="--fc:${f.c};left:${L?0:w*(100/WEEKS)}%;width:${100/WEEKS*0.96}%" data-wgo="${k}">
-                <i style="width:${pr.pct}%"></i><span>${(f.emoji||'📁')} ${esc(f.name)}</span></div></div>`;}).join('')}
+                <i style="width:${pr.pct}%"></i><span>${esc(f.emoji||'📁')} ${esc(f.name)}</span></div></div>`;}).join('')}
           </div></div></div>`;
       }
       if(b.type==='wportal'){
@@ -23546,7 +23819,7 @@
         <div class="vz-eyebrow">Наступний крок</div>
         <h2>${esc(it.t)}</h2>
         <div class="from">${esc(it.src)}</div>
-        ${fl?`<button class="fold" data-vzok="fold">${fl.emoji||'📁'} ${esc(fl.name)} — відкрити ›</button>`:''}
+        ${fl?`<button class="fold" data-vzok="fold">${esc(fl.emoji||'📁')} ${esc(fl.name)} — відкрити ›</button>`:''}
         <div class="vz-ok-timer" id="vzOkTimer">${tfmt(vzFocus.sec)}</div>
       </div>
       <div class="vz-ok-acts">
@@ -23672,7 +23945,7 @@
           </div>`).join('')}</div>
         <button class="vz-additem" data-vzpwadd="${p.id}">＋ пункт плану</button>
         <div class="vz-pw-foot">
-          ${fl?`<button class="fold" data-vzpwfold="${p.id}">${fl.emoji||'📁'} ${esc(fl.name)} — працювати ›</button>`
+          ${fl?`<button class="fold" data-vzpwfold="${p.id}">${esc(fl.emoji||'📁')} ${esc(fl.name)} — працювати ›</button>`
               :`<button class="fold" data-vzpwlink="${p.id}">📂 Привʼязати папку</button>`}
           <button class="togoal" data-vzpwgoal="${p.id}">⭐ У Цілі</button>
         </div>
@@ -24051,6 +24324,20 @@
       if(bkRow) bkRow.onclick=()=>toggle('[data-acc-backup-expand]');
 
       // ── скидання до заводських ──
+      // Бекап перед стиранням не беремо на віру: якщо файл лише віддано браузеру
+      // на завантаження (перевірити нема як), людина мусить сама підтвердити,
+      // що бачить його, — інакше «єдина копія» могла б не існувати.
+      const runReset=async (wipeCloud, stopMsg)=>{
+        const r=await window.flowFactoryReset({wipeCloud});
+        if(r.ok) return;
+        if(r.step!=='backup-confirm'){ flowAlert(stopMsg+r.error); return; }
+        setTimeout(()=>{ confirmSheet({title:'Файл бекапу зберігся?',
+          sub:'Браузер не каже, чи «'+r.name+'» справді записано. Перевір «Завантаження»: без цього файла стерте не повернути.',
+          okLabel:'Файл є — продовжити', onOk:async ()=>{
+            const r2=await window.flowFactoryReset({wipeCloud, backupConfirmed:true});
+            if(!r2.ok) flowAlert(stopMsg+r2.error);
+          }}); }, 350);
+      };
       const rsRow=host.querySelector('[data-acc-reset-row]');
       if(rsRow) rsRow.onclick=()=>toggle('[data-acc-reset-expand]');
       const rsDev=host.querySelector('[data-acc-reset-device]');
@@ -24059,10 +24346,7 @@
         const inAcc=!!(window.sbUser&&window.sbUser());
         confirmSheet({title:'Скинути цей пристрій?',
           sub:'Локальні дані буде стерто'+(inAcc?' — після перезапуску вони повернуться з хмари акаунта':'. Входу в акаунт немає, тож вони НЕ відновляться')+'. Спершу бекап збережеться у файл.',
-          okLabel:'Скинути', onOk:async ()=>{
-            const r=await window.flowFactoryReset({wipeCloud:false});
-            if(!r.ok) flowAlert('❌ Скидання зупинено: '+r.error);
-          }});
+          okLabel:'Скинути', onOk:()=>runReset(false, '❌ Скидання зупинено: ')});
       };
       const rsAll=host.querySelector('[data-acc-reset-all]');
       if(rsAll) rsAll.onclick=(e)=>{
@@ -24073,17 +24357,17 @@
             /* друге, окреме підтвердження — пауза, щоб перший аркуш встиг закритись */
             setTimeout(()=>{ confirmSheet({title:'Точно стерти все?',
               sub:'Це незворотно. Єдина копія лишиться у файлі бекапу, який зараз збережеться.',
-              okLabel:'Стерти назавжди', onOk:async ()=>{
-                const r=await window.flowFactoryReset({wipeCloud:true});
-                if(!r.ok) flowAlert('❌ Стирання зупинено: '+r.error);
-              }}); }, 350);
+              okLabel:'Стерти назавжди', onOk:()=>runReset(true, '❌ Стирання зупинено: ')}); }, 350);
           }});
       };
       const exb=host.querySelector('[data-acc-export]');
-      if(exb) exb.onclick=(e)=>{
+      if(exb) exb.onclick=async (e)=>{
         e.stopPropagation();
-        const r=window.flowBackup.exportToFile();
-        if(r.ok) flowAlert('✅ Збережено: '+r.name+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
+        const r=await window.flowBackup.exportToFile();
+        // «✅ Збережено» — лише коли файл точно записано; інакше кажемо як є
+        if(r.ok && r.saved) flowAlert('✅ Збережено: '+r.name+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
+        else if(r.ok) flowAlert('⬇️ Файл «'+r.name+'» передано на завантаження.\n\nПеревір, що він з\'явився в «Завантаженнях», — застосунок цього не бачить. Потім поклади його в надійне місце.');
+        else if(r.cancelled) flowAlert('Збереження скасовано — файл бекапу не записано.');
         else flowAlert('❌ Не вдалося експортувати: '+(r.error||'невідома помилка'));
       };
       const imb=host.querySelector('[data-acc-import]');
@@ -24292,7 +24576,7 @@
       if(typeof inputModal!=='function') return;
       inputModal({title:'Мій шлях — куди я йду', value:upData.path, onOk:v=>{
         upData.path=String(v||'').trim();
-        if(upData.path&&!upData.pathDate) upData.pathDate=new Date().toISOString().slice(0,10);
+        if(upData.path&&!upData.pathDate) upData.pathDate=ymdLocal();
         upSave(); renderUpgrade();
       }});
     }
@@ -24835,7 +25119,12 @@
     function applyOv(){
       const head=document.getElementById('homeOvHead'), row=document.getElementById('homeWidgetsRow'),
             mini=document.getElementById('homeOvMini');
-      if(!head||!row) return;
+      if(!row) return;
+      /* Заголовка «Огляд» більше немає в розмітці (рішення Ярослава 25.09.2026:
+         на Огляді й так купа). Разом із ним пішло й згортання — а в сховищі
+         могло лишитись 'closed' із минулих сесій. Без цієї гілки секція
+         лишилась би схованою назавжди, і відкрити її було б нічим. */
+      if(!head){ row.hidden=false; return; }
       head.classList.toggle('closed', !ovOpen);
       head.setAttribute('aria-expanded', ovOpen?'true':'false');
       row.hidden=!ovOpen;
@@ -25300,11 +25589,11 @@
         : `<div class="ch-link-card"><span class="ch-lc-ic">📁</span><div><b>Папка</b><small>уже видалена</small></div></div>`;
     } else if(t==='page'||t==='group'){
       const n=(b.children||[]).length;
-      body=`<div class="ch-link-card" style="--sc:${t==='page'?'#7c8cff':'#f0b429'}"><span class="ch-lc-ic">${b.emoji||(t==='page'?'📄':'📁')}</span><div><b>${esc(b.title||(t==='page'?'Сторінка':'Папка'))}</b><small>${t==='page'?'сторінка':'папка'}${n?' · '+n+' бл.':''}</small></div>${chI('chev')}</div>`;
+      body=`<div class="ch-link-card" style="--sc:${t==='page'?'#7c8cff':'#f0b429'}"><span class="ch-lc-ic">${esc(b.emoji||(t==='page'?'📄':'📁'))}</span><div><b>${esc(b.title||(t==='page'?'Сторінка':'Папка'))}</b><small>${t==='page'?'сторінка':'папка'}${n?' · '+n+' бл.':''}</small></div>${chI('chev')}</div>`;
     } else if(t==='link'){
       body=`<div class="ch-link-card"><span class="ch-lc-ic">🔗</span><div><b>${esc(b.label||b.title||b.url||'Посилання')}</b><small>${esc(b.url||'')}</small></div>${chI('chev')}</div>`;
     } else {
-      body=`<div class="ch-link-card"><span class="ch-lc-ic">${meta.emoji||'🧩'}</span><div><b>${esc(b.title||meta.title||t)}</b><small>${esc(meta.title||t)}</small></div>${chI('chev')}</div>`;
+      body=`<div class="ch-link-card"><span class="ch-lc-ic">${esc(meta.emoji||'🧩')}</span><div><b>${esc(b.title||meta.title||t)}</b><small>${esc(meta.title||t)}</small></div>${chI('chev')}</div>`;
     }
     return `<div class="ch-msg${cls}${b.ai?' ai':''}" data-chopen="${it.bk}|${b.id}">${tag}${body}${time}</div>`;
   }
@@ -26456,7 +26745,7 @@
     if(t==='h3'){var hs3=headingStyle(b);return '<div class="pg-content pgc-h3'+hs3.cls+' pg-empty" style="'+hs3.style+'" contenteditable="true" data-ph="Заголовок 3" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
     if(t==='quote')return '<div class="pg-content pgc-quote pg-empty" contenteditable="true" data-ph="Цитата…" data-edit="'+id+'">'+esc(txtOf(b))+'</div>';
     if(t==='glass')return '<div class="pg-content"><div class="pgc-glass"><div class="pg-empty" contenteditable="true" data-ph="Напиши щось — зʼявиться на склі…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div></div>';
-    if(t==='callout')return '<div class="pg-content pgc-callout"><span class="clx">'+(b.emo||'💡')+'</span><div class="cltx pg-empty" contenteditable="true" data-ph="Виноска…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div>';
+    if(t==='callout')return '<div class="pg-content pgc-callout"><span class="clx">'+esc(b.emo||'💡')+'</span><div class="cltx pg-empty" contenteditable="true" data-ph="Виноска…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div>';
     if(t==='divider'||t==='head')return '<div class="pg-content pg-div"><hr></div>';
     if(t==='code'){
       var lang=b.lang||'';
@@ -26929,7 +27218,7 @@
       var r=pgResolve(), c=r.cont;
       var nav=document.createElement('div'); nav.className='pgnav';
       nav.innerHTML='<button class="pgnav-b" data-pgup>‹</button>'
-        +'<span class="pgnav-e">'+((c&&c.emoji)||(c&&c.type==='page'?'📄':'📁'))+'</span>'
+        +'<span class="pgnav-e">'+esc((c&&c.emoji)||(c&&c.type==='page'?'📄':'📁'))+'</span>'
         +'<span class="pgnav-t">'+esc((c&&c.title)||(c&&c.type==='page'?'Сторінка':'Папка'))+'</span>';
       out.appendChild(nav);
     }
@@ -26951,7 +27240,7 @@
       if(links&&links.length){
         var fp = br0.folderProgress?br0.folderProgress(fk):{done:0,total:0,pct:0};
         var bn=document.createElement('div'); bn.className='pt-banner';
-        bn.innerHTML='<span class="ptb-ic">'+(links[0].emoji||'🎯')+'</span>'
+        bn.innerHTML='<span class="ptb-ic">'+esc(links[0].emoji||'🎯')+'</span>'
           +'<div class="ptb-body"><div class="ptb-t">Зв\u2019язано з проєктом «'+esc(links[0].title||'')+'»</div>'
           +'<div class="ptb-s">кожне «виконано» тут = крок у проєкті</div></div>'
           +'<span class="ptb-pct">'+(fp.pct||0)+'%</span>';
@@ -28083,7 +28372,7 @@
     var todayY=jrYmd();
     var habTodayDone=b.habits.filter(function(h){return (h.marks||{})[todayY];}).length;
 
-    var head='<div class="jr-top"><span class="jr-ic pt-ic" style="--pc:'+c+'">'+(b.emoji||'🎯')+'</span>'
+    var head='<div class="jr-top"><span class="jr-ic pt-ic" style="--pc:'+c+'">'+esc(b.emoji||'🎯')+'</span>'
       +'<div class="jr-tt pg-empty" contenteditable="true" data-ph="Назва проєкту" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
       +'<div class="jr-mode">'
       +'<button class="'+(mode==='full'?'on':'')+'" data-ptmode="'+id+'|full">Повний</button>'
@@ -28097,7 +28386,7 @@
         +'<i class="pt-unlink">відв\u2019язати</i></div>'
       : (ptPick[id]
           ? '<div class="pt-picker">'+((br&&br.folderList?br.folderList():[]).filter(function(f){return f.key!==currentPtKey(id);}).map(function(f){
-              return '<button class="pt-pick-i" data-ptlink="'+id+'|'+f.key+'"><span>'+(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
+              return '<button class="pt-pick-i" data-ptlink="'+id+'|'+f.key+'"><span>'+esc(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
             }).join('')||'<div class="pt-none">Немає інших папок</div>')
             +'<button class="pt-pick-x" data-ptpickclose="'+id+'">Скасувати</button></div>'
           : '<button class="pt-linkbtn" data-ptpick="'+id+'"><svg viewBox="0 0 24 24"><path d="M9 15 15 9M8 12a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M16 12a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4" stroke-linecap="round"/></svg> Прив\u2019язати папку</button>');
@@ -28135,7 +28424,7 @@
         var on=h.marks[ymd]?'on':'', today=i===todayIdx?'today':'';
         return '<button class="pt-hd '+on+' '+today+'" data-pthab="'+id+'|'+h.id+'|'+ymd+'" style="'+(on?'--hc:'+hc:'')+'">'+PT_WD[i][0]+'</button>';
       }).join('');
-      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'">'+(h.emoji||'✅')+'</span>'
+      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'">'+esc(h.emoji||'✅')+'</span>'
         +'<div class="pt-hbody"><div class="pt-hname">'+esc(h.name)+'</div>'
         +'<div class="pt-hsub">'+(streak>1?'серія '+streak+' дн. 🔥':streak===1?'серія 1 день':'ще не почато')+'</div></div>'
         +'<div class="pt-hweek">'+cells+'</div>'
@@ -28187,7 +28476,7 @@
         var on=h.marks[ymd]?'on':'', today=i===todayIdx?'today':'';
         return '<button class="pt-hd '+on+' '+today+'" data-hbmark="'+id+'|'+h.id+'|'+ymd+'" style="'+(on?'--hc:'+hc:'')+'">'+PT_WD[i][0]+'</button>';
       }).join('');
-      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'" data-hbemo="'+id+'|'+h.id+'">'+(h.emoji||'✅')+'</span>'
+      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'" data-hbemo="'+id+'|'+h.id+'">'+esc(h.emoji||'✅')+'</span>'
         +'<div class="pt-hbody"><div class="pt-hname">'+esc(h.name)+'</div>'
         +'<div class="pt-hsub">'+sub+' · '+weekN+'/7 тиждень</div></div>'
         +'<div class="pt-hweek">'+cells+'</div>'
@@ -28264,7 +28553,7 @@
         : 'ще без кроків';
 
       var row='<div class="ph-row" data-phrow="'+id+'|'+p.id+'">'
-        +'<span class="ph-emo" style="--pc:'+c+'" data-phemo="'+id+'|'+p.id+'">'+(p.emoji||'🎯')+'</span>'
+        +'<span class="ph-emo" style="--pc:'+c+'" data-phemo="'+id+'|'+p.id+'">'+esc(p.emoji||'🎯')+'</span>'
         +'<div class="ph-body"><div class="ph-name">'+esc(p.name||'Проєкт')+'  '+badge+'</div>'
         +'<div class="ph-bar"><i style="width:'+pr.pct+'%;background:'+c+'"></i></div>'
         +'<div class="ph-meta">'+meta+'</div></div>'
@@ -28284,7 +28573,7 @@
           ? '<button class="ph-unlink" data-phunlink="'+id+'|'+p.id+'">🔗 «'+esc(linkName)+'» — відв\u2019язати</button>'
           : (phPick[id+'|'+p.id]
               ? '<div class="pt-picker">'+((br&&br.folderList?br.folderList():[]).map(function(f){
-                  return '<button class="pt-pick-i" data-phlink="'+id+'|'+p.id+'|'+f.key+'"><span>'+(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
+                  return '<button class="pt-pick-i" data-phlink="'+id+'|'+p.id+'|'+f.key+'"><span>'+esc(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
                 }).join('')||'<div class="pt-none">Немає папок</div>')
                 +'<button class="pt-pick-x" data-phpickclose="'+id+'|'+p.id+'">Скасувати</button></div>'
               : '<button class="pt-linkbtn" data-phpick="'+id+'|'+p.id+'"><svg viewBox="0 0 24 24"><path d="M9 15 15 9M8 12a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M16 12a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4" stroke-linecap="round"/></svg> Прив\u2019язати папку</button>');
@@ -28531,7 +28820,7 @@
     if(ka){pgAsk('Нове значення KPI','число, напр. 1250','',function(v){
       var l=locate(ka.dataset.pgkpiadd);if(!l)return;
       l.block.points=l.block.points||[];
-      l.block.points.push({d:new Date().toISOString().slice(0,10),v:parseFloat(v.replace(',','.'))||0});
+      l.block.points.push({d:ymdLocal(),v:parseFloat(v.replace(',','.'))||0});
       save();render();});return;}
     var ca=e.target.closest&&e.target.closest('[data-pgchadd]');
     if(ca){pgAsk('Точка графіка','мітка | число (напр. Пн | 4)','',function(v){
@@ -31580,7 +31869,7 @@ try{
     var fkeys=(typeof order!=='undefined'&&Array.isArray(order))?order:Object.keys(typeof folders!=='undefined'?folders:{});
     var chips='<button class="'+(!b.folder?'on':'')+'" style="--fc:#6f7890" data-fdfol="">— без папки</button>'+
       fkeys.filter(function(k){return !!folders[k]}).map(function(k){ var f=folders[k];
-        return '<button class="'+(b.folder===k?'on':'')+'" style="--fc:'+(f.c||'#8b7cff')+'" data-fdfol="'+escAttr(k)+'">'+(f.emoji||'📁')+' '+esc(f.name||k)+'</button>';
+        return '<button class="'+(b.folder===k?'on':'')+'" style="--fc:'+(f.c||'#8b7cff')+'" data-fdfol="'+escAttr(k)+'">'+esc(f.emoji||'📁')+' '+esc(f.name||k)+'</button>';
       }).join('');
     var tds=b.subtasks.map(function(s,i){ var txt=s.text||s.t||'';
       return '<div class="fd-tdrow'+(s.done?' dn':'')+'"><button class="ck" data-fdtd="'+i+'">✓</button><div class="tt" data-i18n-skip="1">'+esc(txt)+'</div><button class="del" data-fdtddel="'+i+'">✕</button></div>';
@@ -31655,7 +31944,7 @@ try{
           var dn=b.subtasks.filter(function(s){return s.done}).length;
           var chips='';
           if(b.folder&&typeof folders!=='undefined'&&folders[b.folder]){ var f=folders[b.folder];
-            chips+='<span class="fd-ncchip fd-ncfol" style="--fc:'+(f.c||'#8b7cff')+'">'+(f.emoji||'📁')+' '+esc(f.name||'Папка')+'</span>'; }
+            chips+='<span class="fd-ncchip fd-ncfol" style="--fc:'+(f.c||'#8b7cff')+'">'+esc(f.emoji||'📁')+' '+esc(f.name||'Папка')+'</span>'; }
           if(b.subtasks.length) chips+='<span class="fd-ncchip">☑ '+dn+'/'+b.subtasks.length+'</span>';
           if(b.note) chips+='<span class="fd-ncchip">📝 нотатка</span>';
           chips+='<span class="fd-ncchip fd-nchint">відкрити ›</span>';
@@ -32569,7 +32858,7 @@ try{
     var goalsHtml=goals.length? goals.map(function(g){
       var key=g.id||g.name, h=st.byGoal[key]||0, cc=g.color||'#5b8def';
       return '<div class="f26m-g'+(h?'':' zero')+'" data-f26m-goal="'+escA(key)+'">'+
-        '<div class="e" style="background:color-mix(in srgb,'+cc+' 20%,transparent);color:'+cc+'">'+(g.emoji||ic('compass',14))+'</div>'+
+        '<div class="e" style="background:color-mix(in srgb,'+cc+' 20%,transparent);color:'+cc+'">'+(g.emoji?esc2(g.emoji):ic('compass',14))+'</div>'+
         '<div class="m"><h6>'+esc2(g.name||'Ціль')+'</h6>'+
         '<div class="f26m-bar"><i style="width:'+(h/maxG*100).toFixed(0)+'%;background:'+cc+'"></i></div></div>'+
         '<span class="v">'+nz(h)+' год</span></div>';
@@ -32707,7 +32996,7 @@ try{
       '<label class="pl-sheet-l">🔗 Ціль (звідки береться сенс)</label>'+
       '<select class="pl-sheet-in" id="mfGoal"><option value="">— без цілі —</option>'+
         goals.map(function(g){ var k=g.id||g.name;
-          return '<option value="'+escA(k)+'"'+((f&&f.goalId===k)?' selected':'')+'>'+(g.emoji||'🎯')+' '+esc2(g.name||'Ціль')+'</option>';
+          return '<option value="'+escA(k)+'"'+((f&&f.goalId===k)?' selected':'')+'>'+esc2(g.emoji||'🎯')+' '+esc2(g.name||'Ціль')+'</option>';
         }).join('')+'</select>'+
       '<label class="pl-sheet-l">Скільки годин віддаєш цього місяця</label>'+
       '<input class="pl-sheet-in" id="mfHours" type="number" inputmode="numeric" placeholder="Напр. 40" value="'+(f&&f.hours?f.hours:'')+'">'+
@@ -32874,7 +33163,7 @@ try{
         var chips='';
         (goalsData.goals||[]).forEach(function(g){
           var k=g.id||g.name; if(used[k]) return;
-          chips+='<button data-c data-rzgoal="'+escA(k)+'" style="--fc:'+(g.color||'#8b7cff')+'">'+(g.emoji||'')+' '+esc2(g.name||'Ціль')+'</button>';
+          chips+='<button data-c data-rzgoal="'+escA(k)+'" style="--fc:'+(g.color||'#8b7cff')+'">'+esc2(g.emoji||'')+' '+esc2(g.name||'Ціль')+'</button>';
         });
         if(chips) h+='<div class="pl-sheet-l" style="margin-top:14px">З твоїх цілей</div><div class="f26m-dsel">'+chips+'</div>';
         h+='<button class="f26m-ghost" data-rzown style="margin-top:12px">'+ic('plus',13)+'Свій фокус</button>';
@@ -33428,7 +33717,7 @@ try{
           if(typeof folders!=='undefined'){
             var keys=(typeof orderedFolderKeys==='function')?orderedFolderKeys():Object.keys(folders);
             fols=keys.filter(function(k){ return !!folders[k]; }).slice(0,6).map(function(k){
-              return '<button data-fdxfol="'+escA(it.id)+'|'+escA(k)+'">'+(folders[k].emoji||'📁')+' '+esc2(folders[k].name||k)+'</button>'; }).join('');
+              return '<button data-fdxfol="'+escA(it.id)+'|'+escA(k)+'">'+esc2(folders[k].emoji||'📁')+' '+esc2(folders[k].name||k)+'</button>'; }).join('');
           }
         }catch(_){}
         more='<div class="fdx-more"><button data-fdxday="'+escA(it.id)+'">☀ У задачі дня</button>'+mv+fols+
@@ -34535,36 +34824,57 @@ html.t-flat #scr-home .summary.has-wish #nyCountdown .nyc-cell b{color:#fff;}
    і тижнем, легкий спад під підвалом. Середина й краї знімка чисті. */
 html.t-flat #scr-home .summary.has-wish .wishbg-ov{
   background:
-    radial-gradient(78% 26% at 50% 72%,rgba(6,8,12,.48),rgba(6,8,12,0) 76%),
+    radial-gradient(86% 30% at 28% 74%,rgba(6,8,12,.5),rgba(6,8,12,0) 78%),
     linear-gradient(180deg,rgba(6,8,12,.54) 0%,rgba(6,8,12,.2) 20%,rgba(6,8,12,0) 36%),
     linear-gradient(0deg,rgba(6,8,12,.5) 0%,rgba(6,8,12,.22) 20%,rgba(6,8,12,0) 44%);}
 
-/* ── 3. Композиція: назва вгорі, блок тижня внизу, усе по центру ───── */
+/* ── 3. Композиція: назва в лівому верхньому куті, показники внизу ──── */
+/* Усе вздовж лівого краю: назва вгорі, під нею вільний кадр, унизу —
+   великий відсоток тижня, підпис, сім крапок, і найтихішим рядком місяць. */
 html.t-flat #scr-home .summary>.wishlink,
 html.t-flat #scr-home .summary>.label,
 html.t-flat #scr-home .summary>.big,
-html.t-flat #scr-home .summary>.hweek{text-align:center;}
+html.t-flat #scr-home .summary>.hweek,
+html.t-flat #scr-home .summary>.hint{text-align:left;}
 /* margin-top:auto на .big уже стоїть у 19-themes-flat.css — саме він
    притискає групу до низу картки. Тут лише порядок і розміри. */
-html.t-flat #scr-home .summary>.big{font-size:46px;}
-/* «/7» лізло впритул до цифри: велике число має letter-spacing:-.04em, і
-   дрібний текст успадковував той самий притиск — скіс і сімка зливались
-   в одну закарлючку. Повертаємо нормальний розряд і відсуваємо на 3px. */
-html.t-flat #scr-home .summary>.big small{font-size:21px;letter-spacing:normal;margin-left:3px;}
-html.t-flat #scr-home .summary>.label{order:3;margin-top:6px;}
+/* Повітря між назвою і числом. У 19-themes-flat.css картка має
+   padding-top:72px, і з усім, що тепер стоїть унизу (число, підпис, сім
+   крапок, рядок місяця, смужка) на проміжок лишалось 2px — назва і число
+   злипались. Піднімаємо верх на 16px і трохи тиснемо групу: висота картки
+   не росте, а між назвою і числом з'являється майже 30px. */
+html.t-flat #scr-home .summary{padding-top:56px;}
+html.t-flat #scr-home .summary>.big{font-size:40px;}
+/* «%» лізло впритул до цифри: велике число має letter-spacing:-.04em, і
+   дрібний текст успадковував той самий притиск. Повертаємо нормальний
+   розряд і відсуваємо на 2px. */
+html.t-flat #scr-home .summary>.big small{font-size:19px;letter-spacing:normal;margin-left:2px;}
+/* ⚠️ padding-right:104px приходить із 02-page-editor.css:1186 — місце під
+   лінк «Карта бажань ›», який колись висів у правому верхньому куті
+   картки. Лінка там немає давно, а відступ лишився і зсував центрований
+   підпис на 52px уліво. Саме це було видно оком. */
+html.t-flat #scr-home .summary>.label{order:3;margin-top:6px;padding-right:0;}
+html.t-flat #scr-home .summary>.label b{font-weight:800;color:#fff;}
 /* z-index обов'язковий: вуаль поверх фото (#wishBgOv) лежить на z-index:1, і
-   в 16-mx.css над нею підняті лише діти, що були на той момент. Новий блок
-   у тому списку не значиться — без цього рядка крапки ховаються під вуаллю. */
+   в 16-mx.css над нею підняті лише діти, що були на той момент. Нові блоки
+   у тому списку не значаться — без цього рядка вони ховаються під вуаллю. */
 html.t-flat #scr-home .summary>.hweek{order:4;position:relative;z-index:2;}
-/* пояснювальний рядок і смужка місяця — їх роль перебрали сім крапок */
-html.t-flat #scr-home .summary>.hint,
-html.t-flat #scr-home .summary>.bar{display:none;}
+/* ── місяць: другий показник, навмисно тихіший за тиждень ── */
+html.t-flat #scr-home .summary>.hint{order:5;display:block;position:relative;z-index:2;
+  font-size:11.5px;margin:10px 0 0;color:rgba(255,255,255,.82);}
+html.t-flat #scr-home .summary>.hint b{font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
+html.t-flat #scr-home .summary>.bar{order:6;display:block;position:relative;z-index:2;
+  width:150px;max-width:150px;height:2.5px;margin:6px 0 0;background:rgba(255,255,255,.22);}
+/* без фото рядок місяця і смужка беруть кольори теми */
+html.t-flat #scr-home .summary:not(.has-wish)>.hint{color:var(--muted);text-shadow:none;}
+html.t-flat #scr-home .summary:not(.has-wish)>.hint b,
+html.t-flat #scr-home .summary:not(.has-wish)>.label b{color:var(--text);}
 /* крапки слайдшоу: другий ряд крапок поруч із тижневими зливався в кашу */
 html.t-flat #scr-home .summary .wishdots,
 html.t-flat #scr-home .summary .wishdots.on{display:none;}
 
 /* ── 4. Сім крапок Пн→Нд ───────────────────────────────────────────── */
-.hweek{display:flex;justify-content:center;gap:9px;margin:11px 0 0;}
+.hweek{display:flex;justify-content:flex-start;gap:9px;margin:9px 0 0;}
 .hweek i{display:flex;flex-direction:column;align-items:center;gap:5px;font-style:normal;}
 .hweek i span{font-size:8.5px;font-weight:800;letter-spacing:.06em;
   color:rgba(255,255,255,.66);text-shadow:0 1px 4px rgba(0,0,0,.7);}
