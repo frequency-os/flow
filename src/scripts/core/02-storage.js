@@ -457,20 +457,29 @@
        порожнеча зі свіжою міткою затре хмару на всіх пристроях. Автоматичним
        вважається все, що виконується всередині storeAuto(...). Ручні дії
        людини проходять як і раніше. */
-    const keyRead = {};    // key → true (прочитано) | false (не відповіло / пошкоджено)
+    const keyRead = {};    // key → true (прочитано) | false (не відповіло / пошкоджено) | null (невідомо)
     let autoDepth = 0;     // >0 — зараз виконується автоматичний запис
     window.storeMarkRead = function(raw){
+      const ready = window.__sbReady === true;
       const trusted = window.sbDataTrusted();
       Object.keys(raw||{}).forEach(k=>{
         const v = raw[k];
-        let ok = (v!=null) ? true : trusted;
+        /* Порожньо, а бібліотека Supabase ще не довантажилась (повільна мережа) —
+           ще не знаємо, гість це чи вхід із Google. Не «ні», а «невідомо» (null):
+           гостю load() більше не повторюється, і «ні» лишилось би до кінця сесії —
+           швидкий запис назавжди просив би «збережи за хвилину». */
+        let ok = (v!=null) ? true : (ready ? trusted : null);
         if(typeof v==='string' && v.length){ try{ JSON.parse(v); }catch(_){ ok = false; } }
         keyRead[k] = ok;
       });
     };
     // ключ, якого load() не читав, оцінюємо загальною довірою до сховища
     window.storeKeyReady = function(key){
-      return Object.prototype.hasOwnProperty.call(keyRead, key) ? keyRead[key] : window.sbDataTrusted();
+      if(!Object.prototype.hasOwnProperty.call(keyRead, key)) return window.sbDataTrusted();
+      // «невідомо»: сесію перевірено, її нема — гість, локальна порожнеча і є правда.
+      // Вхід із Google сюди не дійде: sbInit одразу перечитує load() і перепозначає ключ.
+      if(keyRead[key] === null) return window.__sbReady === true && !sbUserCache;
+      return keyRead[key];
     };
     // почати автоматичну ділянку; повертає функцію, що її закриває (для try/finally)
     window.storeAutoBegin = function(){
@@ -494,9 +503,55 @@
     // чи йде зараз прохід, що читає з хмари (сесія є і пакетний знімок хмари вдався)
     window.sbCloudPass = function(){ return !!(sb && sbUserCache && sbBatchCache && window.__sbCloudOk === true); };
     window.sbMarkCloudSeen = function(){ try{ if(sbUserCache) localStorage.setItem(CLOUD_SEEN, sbUserCache.id); }catch(_){} };
-    // покласти хмарне значення в локальну копію, якщо вона ще не таке саме (див. storage._mirror)
-    function sbMirror(key, value, cloudTs, localTs){
+    /* ── РЕЗЕРВ ЛОКАЛЬНОЇ КОПІЇ ПЕРЕД ПЕРШИМ ВХОДОМ ──
+       «Хмара головна» (SYNC-1) означає, що sbMirror перепише локальну копію
+       хмарною. Але якщо тут до входу працювали гостем (чи правили, доки вхід
+       ще не підтвердився), ця копія — єдине місце, де лежать ті записи, і
+       вони мовчки зникли б із пристрою. Тому перед першим таким перезаписом
+       кладемо непорожню копію, що відрізняється від хмарної, окремо:
+       flowapp___guest_backup_<час> = { at, uid, keys:{ключ: сирий запис} }.
+       Нічого не зливаємо автоматично — лише щоб дані можна було повернути.
+       Межі, щоб резерв не забив памʼять: не більше BK_MAX резервів (найстаріші
+       прибираємо) і BK_CAP символів на один. Що не влізло — попередження в
+       консолі, а перевагу однаково віддаємо хмарі: інакше на наступному старті
+       гостьова заглушка знову «новіша» за хмару. */
+    const BK_PREFIX = 'flowapp___guest_backup_', BK_MAX = 3, BK_CAP = 1000000;
+    let sbBackup = null;   // резерв цієї сесії: { name, keys }
+    // JSON без службового __sv і з ключами по порядку — хмара (jsonb) міняє порядок ключів
+    function sbPlain(str){
+      const canon = x => Array.isArray(x) ? '['+x.map(canon).join(',')+']'
+        : (x && typeof x==='object') ? '{'+Object.keys(x).filter(k=>k!=='__sv').sort().map(k=>JSON.stringify(k)+':'+canon(x[k])).join(',')+'}'
+        : JSON.stringify(x);
+      try{ let p = JSON.parse(str); if(p && typeof p==='object' && !Array.isArray(p) && '__sv' in p && 'd' in p) p = p.d; return canon(p); }
+      catch(_){ return String(str); }
+    }
+    function sbKeepLocal(key, cloudValue){
+      let raw = null;
+      try{ raw = localStorage.getItem('flowapp_'+key); }catch(_){}
+      if(!raw) return;
+      let d = raw;
+      try{ const o = JSON.parse(raw); if(o && typeof o==='object' && '_v' in o && 'd' in o) d = (typeof o.d==='string') ? o.d : JSON.stringify(o.d); }catch(_){}
+      const plain = sbPlain(d);
+      if(plain==='null' || plain==='[]' || plain==='{}' || plain==='""' || plain===sbPlain(cloudValue)) return;
+      try{
+        if(!sbBackup) sbBackup = { name: BK_PREFIX + Date.now(), keys:{} };
+        sbBackup.keys[key] = raw;
+        const str = JSON.stringify({ at: new Date().toISOString(), uid: sbUserCache ? sbUserCache.id : '', keys: sbBackup.keys });
+        if(str.length > BK_CAP) throw new Error('завеликий');
+        localStorage.setItem(sbBackup.name, str);
+        const all = [];
+        for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf(BK_PREFIX)===0) all.push(k); }
+        all.sort(); while(all.length > BK_MAX) localStorage.removeItem(all.shift());
+      }catch(_){
+        if(sbBackup) delete sbBackup.keys[key];
+        try{ console.warn('[Flow storage] резерв локальної копії не влігся — лишається хмарна:', key); }catch(_){}
+      }
+    }
+    // покласти хмарне значення в локальну копію, якщо вона ще не таке саме (див. storage._mirror);
+    // cloudFirst — перший вхід на пристрої: спершу резерв локальної копії (sbKeepLocal)
+    function sbMirror(key, value, cloudTs, localTs, cloudFirst){
       if(localTs === cloudTs || String(key).indexOf('photo:') === 0) return;
+      if(cloudFirst) sbKeepLocal(key, value);
       try{ if(window.storage._mirror) window.storage._mirror(key, value, cloudTs); }catch(_){}
     }
     let sbSigningIn=false;
@@ -634,7 +689,7 @@
         if(sbBatchCache && Object.prototype.hasOwnProperty.call(sbBatchCache,key)){
           const cloudTs = sbBatchTs[key]||0;
           if(!cloudFirst && localTs > cloudTs) return origGet(key);   // локальна свіжіша
-          sbMirror(key, sbBatchCache[key], cloudTs, localTs);
+          sbMirror(key, sbBatchCache[key], cloudTs, localTs, cloudFirst);
           return { key, value: sbBatchCache[key], shared:false };
         }
         // 3) немає в кеші — точковий запит, теж зі звіркою свіжості
@@ -644,7 +699,7 @@
             const cloudTs = Date.parse(data.updated_at)||0;
             if(!cloudFirst && localTs > cloudTs) return origGet(key);  // локальна свіжіша
             const v = JSON.stringify(data.value);
-            sbMirror(key, v, cloudTs, localTs);
+            sbMirror(key, v, cloudTs, localTs, cloudFirst);
             return { key, value: v, shared:false };
           }
         }catch(_){}
@@ -969,13 +1024,18 @@
     const LP = 'flowapp_';                 // той самий префікс, що й у storage
     const FORMAT = 1;                       // версія формату бекапу (не плутати з версією схеми даних)
     const APP = 'flow';
+    /* Службові позначки синхрону — стан ЦЬОГО пристрою, а не дані людини. У бекап
+       їх не кладемо й з бекапу не відновлюємо: інакше імпорт після «Скинути цей
+       пристрій» повернув би «хмару бачено» (і вимкнув би «хмара головна»), а
+       стара черга відправки залила б у хмару давні значення. */
+    const SERVICE = ['__cloud_seen', '__sb_outbox'];
 
     // Зібрати ВЕСЬ стан Flow з localStorage у один обʼєкт
     function collect(){
       const data = {};
       try{
         for(const k of Object.keys(localStorage)){
-          if(k.startsWith(LP)) data[k.slice(LP.length)] = localStorage.getItem(k);
+          if(k.startsWith(LP) && SERVICE.indexOf(k.slice(LP.length)) < 0) data[k.slice(LP.length)] = localStorage.getItem(k);
         }
       }catch(_){}
       return data;
@@ -1038,6 +1098,7 @@
       let restored = 0;
       try{
         for(const k of Object.keys(env.data)){
+          if(SERVICE.indexOf(k) > -1) continue;   // старі бекапи могли їх нести
           localStorage.setItem(LP + k, env.data[k]);
           restored++;
         }
