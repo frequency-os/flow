@@ -280,6 +280,16 @@
       getLocal(key){
         try{ const l=unwrap(lcGet(key)); return l? this._out(key, unstampSv(l.value)) : null; }catch(_){ return null; }
       },
+      /* Дзеркало хмари (SYNC-4): прочитане з хмари кладемо в локальну копію з
+         міткою ХМАРИ, а не «зараз». Без цього пристрій, який ключ лише читає,
+         тримав тижневу давнину: офлайн-старт показував її, а перша ж правка
+         заливала її в хмару поверх свіжого. Мітка хмари лишає звірку «що
+         новіше» чесною. Тихо: не влізло в памʼять — лишаємо стару копію, без
+         банера й очищення кешу (це не запис людини, а лише копія). */
+      _mirror(key, value, ts){
+        try{ localStorage.setItem(LP+key, JSON.stringify({ _v: ts||0, d: stampSv(key, value) })); return true; }
+        catch(_){ return false; }
+      },
       async get(key){
         const localRaw = lcGet(key);
         const local = unwrap(localRaw);
@@ -438,6 +448,57 @@
       if(!sbUserCache) return true;            // хмари нема взагалі: локальне сховище і є джерело істини
       return window.__sbCloudOk === true;      // сесія є — віримо, лише коли хмара реально відповіла
     };
+    /* ── ЯКІ КЛЮЧІ ЦЯ СЕСІЯ СПРАВДІ ПРОЧИТАЛА (SYNC-2) ──
+       Той самий запобіжник, що в saveFolders({auto:true}), тепер для всіх
+       ключів load(): дошки, чати, щоденник, фінанси… Після читання load()
+       позначає кожен ключ: прочитано (прийшли дані або чесне «порожньо») чи ні
+       (сховище мовчало / дані пошкоджені). АВТОМАТИЧНІ записи — міграції,
+       прибирання, створення заглушок — у непрочитаний ключ не йдуть: інакше
+       порожнеча зі свіжою міткою затре хмару на всіх пристроях. Автоматичним
+       вважається все, що виконується всередині storeAuto(...). Ручні дії
+       людини проходять як і раніше. */
+    const keyRead = {};    // key → true (прочитано) | false (не відповіло / пошкоджено)
+    let autoDepth = 0;     // >0 — зараз виконується автоматичний запис
+    window.storeMarkRead = function(raw){
+      const trusted = window.sbDataTrusted();
+      Object.keys(raw||{}).forEach(k=>{
+        const v = raw[k];
+        let ok = (v!=null) ? true : trusted;
+        if(typeof v==='string' && v.length){ try{ JSON.parse(v); }catch(_){ ok = false; } }
+        keyRead[k] = ok;
+      });
+    };
+    // ключ, якого load() не читав, оцінюємо загальною довірою до сховища
+    window.storeKeyReady = function(key){
+      return Object.prototype.hasOwnProperty.call(keyRead, key) ? keyRead[key] : window.sbDataTrusted();
+    };
+    // почати автоматичну ділянку; повертає функцію, що її закриває (для try/finally)
+    window.storeAutoBegin = function(){
+      autoDepth++; let open = true;
+      return function(){ if(open){ open = false; autoDepth--; } };
+    };
+    window.storeAuto = function(fn){
+      const end = window.storeAutoBegin();
+      try{ return fn(); } finally { end(); }
+    };
+    /* ── ПЕРШИЙ ВХІД НА ЦЬОМУ ПРИСТРОЇ: ХМАРА ГОЛОВНА (SYNC-1) ──
+       Гостьовий перший візит і «Скинути цей пристрій» лишають у сховищі
+       заводські значення (порожня дошка, одна папка «Робота») зі СВІЖОЮ
+       міткою. Після входу звірка «що новіше» віддавала перемогу їм, і перша ж
+       правка заливала заглушку в хмару. Тому, доки цей пристрій жодного разу
+       повністю не прочитав хмару цього акаунта, хмарі віримо без звірки міток.
+       Позначку ставить load() після проходу, що читав з хмари. «Скинути цей
+       пристрій» стирає її разом з усім — і хмара знову головна. */
+    const CLOUD_SEEN = 'flowapp___cloud_seen';
+    function sbCloudSeen(uid){ try{ return localStorage.getItem(CLOUD_SEEN) === uid; }catch(_){ return false; } }
+    // чи йде зараз прохід, що читає з хмари (сесія є і пакетний знімок хмари вдався)
+    window.sbCloudPass = function(){ return !!(sb && sbUserCache && sbBatchCache && window.__sbCloudOk === true); };
+    window.sbMarkCloudSeen = function(){ try{ if(sbUserCache) localStorage.setItem(CLOUD_SEEN, sbUserCache.id); }catch(_){} };
+    // покласти хмарне значення в локальну копію, якщо вона ще не таке саме (див. storage._mirror)
+    function sbMirror(key, value, cloudTs, localTs){
+      if(localTs === cloudTs || String(key).indexOf('photo:') === 0) return;
+      try{ if(window.storage._mirror) window.storage._mirror(key, value, cloudTs); }catch(_){}
+    }
     let sbSigningIn=false;
     window.sbSignInGoogle = async function(){
       if(sbSigningIn) return;            // захист від подвійного натискання
@@ -565,12 +626,15 @@
           return { key, value: sbWriteQueue[key], shared:false };
         }
         const localTs = sbLocalVersion(key);
+        // перший вхід на пристрої — локальним міткам не віримо (SYNC-1, див. sbCloudSeen)
+        const cloudFirst = !sbCloudSeen(u.id);
         // 2) є в кеші хмари: віддаємо ХМАРНЕ, тільки якщо воно НЕ старіше за локальне.
         //    Раніше хмара перемагала завжди — і свіжа локальна правка, що не встигла
         //    синхронізуватись, «поверталась назад». Тепер новіше перемагає.
         if(sbBatchCache && Object.prototype.hasOwnProperty.call(sbBatchCache,key)){
           const cloudTs = sbBatchTs[key]||0;
-          if(localTs > cloudTs) return origGet(key);          // локальна свіжіша
+          if(!cloudFirst && localTs > cloudTs) return origGet(key);   // локальна свіжіша
+          sbMirror(key, sbBatchCache[key], cloudTs, localTs);
           return { key, value: sbBatchCache[key], shared:false };
         }
         // 3) немає в кеші — точковий запит, теж зі звіркою свіжості
@@ -578,8 +642,10 @@
           const { data, error } = await sb.from('user_data').select('value,updated_at').eq('user_id', u.id).eq('key', key).maybeSingle();
           if(!error && data){
             const cloudTs = Date.parse(data.updated_at)||0;
-            if(localTs > cloudTs) return origGet(key);         // локальна свіжіша
-            return { key, value: JSON.stringify(data.value), shared:false };
+            if(!cloudFirst && localTs > cloudTs) return origGet(key);  // локальна свіжіша
+            const v = JSON.stringify(data.value);
+            sbMirror(key, v, cloudTs, localTs);
+            return { key, value: v, shared:false };
           }
         }catch(_){}
         // хмара порожня/недоступна — фолбек на локальну копію, щоб дані не «зникали»
@@ -816,6 +882,13 @@
       }catch(_){ return false; }
     };
     window.storage.set = async function(key, value){
+      // SYNC-2: автоматичний запис (усередині storeAuto) у ключ, який ця сесія
+      // не прочитала, не пишемо ні локально, ні в хмару — сховище ще не сказало,
+      // що там лежить, і заглушка затерла б справжні дані.
+      if(autoDepth > 0 && !window.storeKeyReady(key)){
+        try{ console.warn('[Flow storage] автозапис пропущено — ключ не прочитано (сховище мовчало):', key); }catch(_){}
+        return { key, value, shared:false, _skipped:true };
+      }
       // Запобіжник від затирання порожнечею: якщо ключ не прочитався при старті
       // (пошкоджений), не даємо його ПОРОЖНІМ дефолтом стерти добру копію. Щойно
       // прийдуть реальні дані — знімаємо позначку й зберігаємо як звичайно.

@@ -278,6 +278,14 @@
     const ta=document.getElementById('qcapTa');
     const txt=(ta.value||'').trim();
     if(!txt){ closeQuickCapture(); return; }
+    /* SYNC-2: швидкий запис переписує ВСЮ дошку (усі документи й чати) і список
+       чатів — а людина їх зараз не бачить. Якщо ця сесія їх не прочитала
+       (сховище мовчало), запис затер би все порожнечею. Тож чекаємо: вікно
+       лишається відкритим, текст на місці. */
+    if(window.storeKeyReady && (!window.storeKeyReady(BKEY) || !window.storeKeyReady('chats_v1'))){
+      try{ if(typeof window.__flowToast==='function') window.__flowToast('Записи ще не завантажились — текст лишився тут, збережи за хвилину'); }catch(_){}
+      return;
+    }
     // у чат «Вхідні»; той самий формат id і поле `at`, що й у стрічці — запис одразу має час
     ensureInboxChat();
     boards[chatBk(INBOX_CHAT)].push({ id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), type:'note', title:'', text:txt, at:Date.now(), by:'me' });

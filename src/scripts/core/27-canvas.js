@@ -66,6 +66,8 @@
   function inboxMigrateOnce(){
     var FLAG='flowapp_space_removed_v1';
     try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
+    // дошку не прочитано (сховище мовчало) — переїзд зробимо, коли дані прийдуть
+    if(window.storeKeyReady && !window.storeKeyReady(BKEY)) return;
     try{
       var srcKeys=Object.keys(boards||{}).filter(function(k){ return k==='all'||k.indexOf('all__sp_')===0; });
       var hasBlocks=srcKeys.some(function(k){ return Array.isArray(boards[k])&&boards[k].length; });
@@ -92,9 +94,13 @@
         }catch(_){}
         console.log('[Flow] Простір перенесено у «Вхідні»:', srcKeys.join(', '));
       }
+      /* Пишемо, лише якщо справді було що прибрати. Раніше тут безумовно
+         зберігались порожня дошка і порожні теми — на новому пристрої це
+         заводські заглушки зі свіжою міткою, що після входу «новіші» за
+         хмару (SYNC-1). */
       srcKeys.forEach(function(k){ delete boards[k]; });
-      try{ delete spacesMap['__root__']; delete activeSpaceMap['__root__']; saveSpacesMeta(); }catch(_){}
-      saveBoard();
+      try{ if(spacesMap['__root__']||activeSpaceMap['__root__']){ delete spacesMap['__root__']; delete activeSpaceMap['__root__']; saveSpacesMeta(); } }catch(_){}
+      if(srcKeys.length) saveBoard();
     }catch(e){ console.error('inboxMigrateOnce',e); }
     try{ localStorage.setItem(FLAG,'1'); }catch(_){}
   }
@@ -129,7 +135,9 @@
       try{ if(typeof spacesMap!=='undefined' && spacesMap && spacesMap[FK]){ delete spacesMap[FK];
         if(typeof activeSpaceMap!=='undefined' && activeSpaceMap) delete activeSpaceMap[FK];
         if(typeof saveSpacesMeta==='function') saveSpacesMeta(); } }catch(_){}
-      saveFolders({auto:true});            // знімає secret з усіх папок і в хмарі (під запобіжником)
+      // знімає secret з усіх папок і в хмарі (під запобіжником). Коли в сховищі
+      // папок нема (перший візит), чистити нічого — не пишемо заглушку (SYNC-1).
+      if(hadAgency || storedFolderCount()>0) saveFolders({auto:true});
       if(hadBoards) saveBoard();
       if(hadEnv) saveEnvelopes();
       // конфіг Vault, база документів клієнтів, старий прапорець очищення
@@ -201,6 +209,8 @@
     // 🚀 ОДИН пакет паралельних запитів замість ~30 послідовних await один за
     // одним — усі мережеві звернення летять одночасно, а не в чергу. Логіка
     // застосування значень нижче лишається в тому самому порядку, що й раніше.
+    // чи читає цей прохід з хмари (SYNC-1): тоді наприкінці позначимо «хмару бачено»
+    const cloudPass = (typeof window.sbCloudPass==='function') && window.sbCloudPass();
     const __RAW = await (async ()=>{
       const keys=[KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',
@@ -217,8 +227,15 @@
         if(typeof v==='string' && v.length){ try{ JSON.parse(v); }catch(_){ (window.__storeCorrupt=window.__storeCorrupt||new Set()).add(k); } }
       }); return m;
     })();
+    // SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть
+    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW); }catch(_){}
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
+    /* Усе нижче до кінця load() — синхронне застосування прочитаного разом з
+       міграціями й прибираннями. Їхні записи — автоматичні: у ключ, який не
+       прочитався (сховище мовчало), вони не підуть (SYNC-2, storeAuto). */
+    const endAuto = window.storeAutoBegin ? window.storeAutoBegin() : function(){};
+    try{
 
     try{ const raw=__RAW[KEY]; items=raw?JSON.parse(raw):[]; }
     catch{ items=[]; }
@@ -382,6 +399,9 @@
     try{ renderDashboard(); }catch(e){ console.error('dashboard',e); }
     try{ if(window.uiMode==='lite') goPlanner(); }catch(_){}
     try{ updateSummaryBg(); }catch(_){}
+    } finally { endAuto(); }
+    // прохід читав з хмари — відтепер на цьому пристрої звіряємо мітки як звично
+    try{ if(cloudPass && window.sbMarkCloudSeen) window.sbMarkCloudSeen(); }catch(_){}
   }
   try{ applyHomeWidgets(); }catch(_){}
   try{ applyTheme(); }catch(_){}
