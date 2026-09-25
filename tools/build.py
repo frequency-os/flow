@@ -28,6 +28,7 @@ def main():
     html = read(os.path.join(SRC, 'index.html'))
     used = []
     missing = []
+    strays = []   # чужі файли в теках @@INCDIR (копії .bak, .orig, нотатки…)
 
     def sub(m):
         rel = m.group(1)
@@ -43,8 +44,15 @@ def main():
         if not os.path.isdir(d):
             missing.append(rel + '/'); return ''
         parts = []
-        for name in sorted(os.listdir(d)):
-            if name.startswith('.'): continue
+        # Уся тека вклеюється в ОДИН <script>/<style>, тож у ній мають бути
+        # лише файли коду одного виду. Забута `36-chats.js.bak` раніше тихо
+        # потрапляла в програму і могла зламати весь core на телефоні.
+        names = [n for n in sorted(os.listdir(d)) if not n.startswith('.')]
+        code = [os.path.splitext(n)[1] for n in names if os.path.splitext(n)[1] in ('.js', '.css')]
+        kind = max(set(code), key=code.count) if code else None   # вид теки: .js чи .css
+        for name in names:
+            if os.path.splitext(name)[1] != kind:
+                strays.append(rel + '/' + name); continue
             used.append(rel + '/' + name)
             parts.append(read(os.path.join(d, name)))
         return ''.join(parts)
@@ -54,6 +62,13 @@ def main():
 
     if missing:
         print('ПОМИЛКА — немає файлів:'); [print('  ' + m) for m in missing]; sys.exit(1)
+    if strays:
+        print('ПОМИЛКА — у теці, яка цілком вклеюється в програму, є зайві файли:')
+        [print('  ' + m) for m in strays]
+        print('Там можна тримати лише .js (для <script>) або лише .css (для <style>),')
+        print('не впереміш. Інакше файл стане частиною коду і може зламати застосунок.')
+        print('Прибери його з src/ (копії — у scratchpad або git) і збери знову.')
+        sys.exit(1)
 
     os.makedirs(DIST, exist_ok=True)
     dest = os.path.join(DIST, 'index.html')
