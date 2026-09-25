@@ -1067,7 +1067,7 @@
   async function aiCallRaw(payload,onDelta){
     const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
       body:JSON.stringify(Object.assign({stream:true},payload))});
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok) throw await aiHttpError(res);   // з 11-ai-flow.js: «увійди» / «спробуй за хвилину»
     const _u={i:0,o:0,cr:0,cw:0};
     const ctype=String(res.headers.get('content-type')||'');
     if(ctype.indexOf('text/event-stream')>=0&&res.body&&res.body.getReader){

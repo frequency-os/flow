@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 56 |
-| Рядків JS | 25125 |
+| Рядків JS | 25141 |
 | Файлів CSS | 32 |
 | Рядків CSS | 8637 |
-| Сутностей верхнього рівня | 1563 |
+| Сутностей верхнього рівня | 1564 |
 | Ключів сховища (FLOW_KEYS) | 45 |
 
 ## Файли JS
@@ -44,11 +44,11 @@
 | `src/scripts/core/08-finance.js` | 935 | 99 |
 | `src/scripts/core/09-goals.js` | 638 | 25 |
 | `src/scripts/core/10-planner.js` | 903 | 49 |
-| `src/scripts/core/11-ai-flow.js` | 168 | 14 |
+| `src/scripts/core/11-ai-flow.js` | 183 | 15 |
 | `src/scripts/core/12-ai-agent.js` | 1508 | 68 |
 | `src/scripts/core/13-pets.js` | 216 | 13 |
 | `src/scripts/core/14-react.js` | 335 | 43 |
-| `src/scripts/core/15-flow-spot.js` | 2096 | 104 |
+| `src/scripts/core/15-flow-spot.js` | 2097 | 104 |
 | `src/scripts/core/16-dashboard.js` | 557 | 21 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 182 | 20 |
@@ -784,7 +784,7 @@
 | `plWeekReviewSheet` | функція | `src/scripts/core/10-planner.js:826` |
 | `plWeekAI` | функція | `src/scripts/core/10-planner.js:879` |
 
-### `src/scripts/core/11-ai-flow.js` — 14 сутностей
+### `src/scripts/core/11-ai-flow.js` — 15 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -801,7 +801,8 @@
 | `aiMood` | функція | `src/scripts/core/11-ai-flow.js:82` |
 | `aiMoodBadge` | функція | `src/scripts/core/11-ai-flow.js:89` |
 | `AI_CHAT_SYS` | значення | `src/scripts/core/11-ai-flow.js:95` |
-| `aiCall` | функція | `src/scripts/core/11-ai-flow.js:130` |
+| `aiHttpError` | функція | `src/scripts/core/11-ai-flow.js:134` |
+| `aiCall` | функція | `src/scripts/core/11-ai-flow.js:145` |
 
 ### `src/scripts/core/12-ai-agent.js` — 68 сутностей
 
@@ -1003,53 +1004,53 @@
 | `aiSumBusy` | значення | `src/scripts/core/15-flow-spot.js:772` |
 | `aiMaybeSummarize` | функція | `src/scripts/core/15-flow-spot.js:773` |
 | `aiChatSend` | функція | `src/scripts/core/15-flow-spot.js:785` |
-| `aiRec` | значення | `src/scripts/core/15-flow-spot.js:872` |
-| `aiMicUI` | функція | `src/scripts/core/15-flow-spot.js:873` |
-| `aiMicToggle` | функція | `src/scripts/core/15-flow-spot.js:874` |
-| `aiTranscribeBlob` | функція | `src/scripts/core/15-flow-spot.js:912` |
-| `aiTranscribe` | функція | `src/scripts/core/15-flow-spot.js:935` |
-| `window.aiChatSheet` | значення | `src/scripts/core/15-flow-spot.js:939` |
-| `plStreak` | функція | `src/scripts/core/15-flow-spot.js:941` |
-| `plBestStreak` | функція | `src/scripts/core/15-flow-spot.js:950` |
-| `plWeekDots` | функція | `src/scripts/core/15-flow-spot.js:964` |
-| `heroWeekDays` | функція | `src/scripts/core/15-flow-spot.js:989` |
-| `heroMonthDays` | функція | `src/scripts/core/15-flow-spot.js:1007` |
-| `heroDayWord` | функція | `src/scripts/core/15-flow-spot.js:1018` |
-| `renderHeroStreak` | функція | `src/scripts/core/15-flow-spot.js:1024` |
-| `plRolloverHTML` | функція | `src/scripts/core/15-flow-spot.js:1047` |
-| `plDaySummaryHTML` | функція | `src/scripts/core/15-flow-spot.js:1059` |
-| `plAutoSuggestHTML` | функція | `src/scripts/core/15-flow-spot.js:1093` |
-| `plQAnchorsHTML` | функція | `src/scripts/core/15-flow-spot.js:1135` |
-| `plWeekCalHTML` | функція | `src/scripts/core/15-flow-spot.js:1160` |
-| `plDayTitle` | функція | `src/scripts/core/15-flow-spot.js:1183` |
-| `plBlocksDisplay` | функція | `src/scripts/core/15-flow-spot.js:1196` |
-| `plFolderDayVal` | функція | `src/scripts/core/15-flow-spot.js:1209` |
-| `plFolderMonthVal` | функція | `src/scripts/core/15-flow-spot.js:1214` |
-| `plFolderComplete` | функція | `src/scripts/core/15-flow-spot.js:1223` |
-| `DOW_UA` | масив | `src/scripts/core/15-flow-spot.js:1228` |
-| `plRuleDowsLabel` | функція | `src/scripts/core/15-flow-spot.js:1229` |
-| `plFolderDaySheet` | функція | `src/scripts/core/15-flow-spot.js:1238` |
-| `plFolderMonthSheet` | функція | `src/scripts/core/15-flow-spot.js:1295` |
-| `PL_MXQ` | масив | `src/scripts/core/15-flow-spot.js:1360` |
-| `plMatrixHTML` | функція | `src/scripts/core/15-flow-spot.js:1361` |
-| `plMxSchedule` | функція | `src/scripts/core/15-flow-spot.js:1380` |
-| `plSlotTask` | функція | `src/scripts/core/15-flow-spot.js:1394` |
-| `plBacklogHTML` | функція | `src/scripts/core/15-flow-spot.js:1408` |
-| `plInboxHTML` | функція | `src/scripts/core/15-flow-spot.js:1423` |
-| `plBlockEnd` | функція | `src/scripts/core/15-flow-spot.js:1438` |
-| `plDayHTML` | функція | `src/scripts/core/15-flow-spot.js:1439` |
-| `plTaskCard` | функція | `src/scripts/core/15-flow-spot.js:1648` |
-| `plAdd` | функція | `src/scripts/core/15-flow-spot.js:1671` |
-| `plAddBlockAt` | функція | `src/scripts/core/15-flow-spot.js:1698` |
-| `plLinkTag` | функція | `src/scripts/core/15-flow-spot.js:1703` |
-| `plScheduleStep` | функція | `src/scripts/core/15-flow-spot.js:1711` |
-| `plMicroBlock` | функція | `src/scripts/core/15-flow-spot.js:1728` |
-| `plCompleteBlock` | функція | `src/scripts/core/15-flow-spot.js:1741` |
-| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1796` |
-| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1812` |
-| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1820` |
-| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:2042` |
-| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:2045` |
+| `aiRec` | значення | `src/scripts/core/15-flow-spot.js:873` |
+| `aiMicUI` | функція | `src/scripts/core/15-flow-spot.js:874` |
+| `aiMicToggle` | функція | `src/scripts/core/15-flow-spot.js:875` |
+| `aiTranscribeBlob` | функція | `src/scripts/core/15-flow-spot.js:913` |
+| `aiTranscribe` | функція | `src/scripts/core/15-flow-spot.js:936` |
+| `window.aiChatSheet` | значення | `src/scripts/core/15-flow-spot.js:940` |
+| `plStreak` | функція | `src/scripts/core/15-flow-spot.js:942` |
+| `plBestStreak` | функція | `src/scripts/core/15-flow-spot.js:951` |
+| `plWeekDots` | функція | `src/scripts/core/15-flow-spot.js:965` |
+| `heroWeekDays` | функція | `src/scripts/core/15-flow-spot.js:990` |
+| `heroMonthDays` | функція | `src/scripts/core/15-flow-spot.js:1008` |
+| `heroDayWord` | функція | `src/scripts/core/15-flow-spot.js:1019` |
+| `renderHeroStreak` | функція | `src/scripts/core/15-flow-spot.js:1025` |
+| `plRolloverHTML` | функція | `src/scripts/core/15-flow-spot.js:1048` |
+| `plDaySummaryHTML` | функція | `src/scripts/core/15-flow-spot.js:1060` |
+| `plAutoSuggestHTML` | функція | `src/scripts/core/15-flow-spot.js:1094` |
+| `plQAnchorsHTML` | функція | `src/scripts/core/15-flow-spot.js:1136` |
+| `plWeekCalHTML` | функція | `src/scripts/core/15-flow-spot.js:1161` |
+| `plDayTitle` | функція | `src/scripts/core/15-flow-spot.js:1184` |
+| `plBlocksDisplay` | функція | `src/scripts/core/15-flow-spot.js:1197` |
+| `plFolderDayVal` | функція | `src/scripts/core/15-flow-spot.js:1210` |
+| `plFolderMonthVal` | функція | `src/scripts/core/15-flow-spot.js:1215` |
+| `plFolderComplete` | функція | `src/scripts/core/15-flow-spot.js:1224` |
+| `DOW_UA` | масив | `src/scripts/core/15-flow-spot.js:1229` |
+| `plRuleDowsLabel` | функція | `src/scripts/core/15-flow-spot.js:1230` |
+| `plFolderDaySheet` | функція | `src/scripts/core/15-flow-spot.js:1239` |
+| `plFolderMonthSheet` | функція | `src/scripts/core/15-flow-spot.js:1296` |
+| `PL_MXQ` | масив | `src/scripts/core/15-flow-spot.js:1361` |
+| `plMatrixHTML` | функція | `src/scripts/core/15-flow-spot.js:1362` |
+| `plMxSchedule` | функція | `src/scripts/core/15-flow-spot.js:1381` |
+| `plSlotTask` | функція | `src/scripts/core/15-flow-spot.js:1395` |
+| `plBacklogHTML` | функція | `src/scripts/core/15-flow-spot.js:1409` |
+| `plInboxHTML` | функція | `src/scripts/core/15-flow-spot.js:1424` |
+| `plBlockEnd` | функція | `src/scripts/core/15-flow-spot.js:1439` |
+| `plDayHTML` | функція | `src/scripts/core/15-flow-spot.js:1440` |
+| `plTaskCard` | функція | `src/scripts/core/15-flow-spot.js:1649` |
+| `plAdd` | функція | `src/scripts/core/15-flow-spot.js:1672` |
+| `plAddBlockAt` | функція | `src/scripts/core/15-flow-spot.js:1699` |
+| `plLinkTag` | функція | `src/scripts/core/15-flow-spot.js:1704` |
+| `plScheduleStep` | функція | `src/scripts/core/15-flow-spot.js:1712` |
+| `plMicroBlock` | функція | `src/scripts/core/15-flow-spot.js:1729` |
+| `plCompleteBlock` | функція | `src/scripts/core/15-flow-spot.js:1742` |
+| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1797` |
+| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1813` |
+| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1821` |
+| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:2043` |
+| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:2046` |
 
 ### `src/scripts/core/16-dashboard.js` — 21 сутностей
 

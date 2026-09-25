@@ -858,6 +858,7 @@
       const off = (typeof navigator!=='undefined' && navigator.onLine===false);
       m.content = off
         ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
+        : (e && e.human) ? '⚠️ '+e.message     // ліміт чи вхід (aiHttpError) — причина відома, URL тут ні до чого
         : (window.FLOW_NATIVE
             ? '⚠️ Не вдалось до мене достукатись. Спробуй ще раз за хвилину.'
             : '⚠️ Не вдалось: '+String(e.message||e)+'. Перевір URL AI-проксі.');

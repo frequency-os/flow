@@ -61,19 +61,22 @@ const MAX_TOKENS_CAP = 8192;
    «:*» у кінці — будь-який порт. «null» — сторінка, відкрита з диска
    (file://). «none» — дозволити запити зовсім без Origin (curl).
    Чесне застереження: Origin легко підробити скриптом. Це замок від
-   чужих САЙТІВ; від скриптів — ліміт частоти і вхід Supabase.       */
+   чужих САЙТІВ; від скриптів — ліміт частоти і вхід Supabase.
+
+   «null» і «none» за замовчуванням НЕ пускаємо. «null» шле будь-який
+   чужий сайт, якщо сховає запит у <iframe sandbox="allow-scripts"> —
+   тоді список сайтів нічого не вартий. Живі клієнти свій Origin мають:
+   сайт — github.io, десктоп — app://frequency (desktop/main.js, перевірено
+   25.09), iOS — capacitor://localhost; усі кличуть воркер через fetch POST,
+   а він Origin шле завжди. Без Origin приходить лише збірка, відкрита з
+   диска в Electron, і скрипти. Треба для перевірки — додай «null» чи
+   «none» у ALLOWED_ORIGINS.                                          */
 const ORIGINS_DEFAULT = [
   "https://frequency-os.github.io", // сайт (GitHub Pages)
-  "null",                           // file:// — збірка, відкрита з диска
   "app://frequency",                // десктоп (Electron, desktop/main.js)
   "capacitor://localhost",          // iOS-обгортка
   "http://localhost:*",             // локальна перевірка dist/
   "http://127.0.0.1:*",
-  // Без Origin: сторінка з диска в Electron (перевірено 25.09 — file://
-  // там не шле Origin взагалі), нативні клієнти, curl. Закрити їх Origin-ом
-  // однаково не вийде (скрипт підставить будь-який), а зламати живий
-  // застосунок — легко. Від скриптів — ліміт, Opus-замок і вхід Supabase.
-  "none",
 ];
 
 function originAllowed(origin, env) {

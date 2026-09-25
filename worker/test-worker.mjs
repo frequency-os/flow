@@ -72,14 +72,24 @@ function check(name, ok, got) {
     ok.status === 204 && ok.headers.get("access-control-allow-origin") === GH
       && /authorization/.test(ok.headers.get("access-control-allow-headers") || ""),
     ok.status + " " + ok.headers.get("access-control-allow-origin") + " " + ok.headers.get("access-control-allow-headers"));
-  // file:// в Electron не шле Origin зовсім — за замовчуванням таких пускаємо
+  // Origin: null шле чужий сайт з <iframe sandbox="allow-scripts"> — за замовчуванням ні
+  const nul = await call({ origin: "null", body: { messages: msgs } });
+  check("Origin null (iframe sandbox) за замовчуванням → 403, в Anthropic нічого",
+    nul.status === 403 && toAnthropic().length === 0, nul.status + ", запитів до Anthropic: " + toAnthropic().length);
+  const nulPre = await call({ origin: "null", method: "OPTIONS" });
+  check("Origin null, передперевірка OPTIONS → 403", nulPre.status === 403, nulPre.status);
+  // Без Origin — лише скрипти і file:// в Electron; живі клієнти Origin шлють
   const noOrigin = await call({ origin: "", body: { messages: msgs } });
-  check("запит без Origin (file:// в Electron) за замовчуванням пускаємо", noOrigin.status === 200, noOrigin.status);
-  const strict = await call({ origin: "", env: { ALLOWED_ORIGINS: GH }, body: { messages: msgs } });
-  check("ALLOWED_ORIGINS без «none» → запит без Origin 403", strict.status === 403, strict.status);
+  check("запит без Origin (curl) за замовчуванням → 403", noOrigin.status === 403 && toAnthropic().length === 0,
+    noOrigin.status);
+  const loose = await call({ origin: "", env: { ALLOWED_ORIGINS: GH + ",none" }, body: { messages: msgs } });
+  check("ALLOWED_ORIGINS з «none» → запит без Origin пускаємо", loose.status === 200, loose.status);
+  const nulOn = await call({ origin: "null", env: { ALLOWED_ORIGINS: GH + ",null" }, body: { messages: msgs } });
+  check("ALLOWED_ORIGINS з «null» → Origin null пускаємо", nulOn.status === 200
+    && nulOn.headers.get("access-control-allow-origin") === "null", nulOn.status);
 }
 /* 4. Живі місця, звідки ходить застосунок */
-for (const o of ["null", "app://frequency", "capacitor://localhost", "http://localhost:4173", GH]) {
+for (const o of ["app://frequency", "capacitor://localhost", "http://localhost:4173", GH]) {
   const r = await call({ origin: o, body: { messages: msgs } });
   check("Origin " + o + " пускаємо", r.status === 200 && r.headers.get("access-control-allow-origin") === o,
     r.status + " " + r.headers.get("access-control-allow-origin"));
