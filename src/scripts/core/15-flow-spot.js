@@ -30,7 +30,7 @@
       +'\nFLOW_PAGE:{"page":[{"type":"h2","text":"Заголовок"},{"type":"note","text":"абзац"},{"type":"bullet","text":"пункт"},{"type":"num","text":"крок"},{"type":"task","text":"завдання"},{"type":"quote","text":"цитата"},{"type":"callout","text":"порада","emo":"💡"},{"type":"divider"},{"type":"table","cols":["Колонка1","Колонка2"],"rows":[["a","b"]]}]}'
       +'\nДозволені type лише з прикладу. Не описуй JSON словами і не обгортай у ```.';
     } else {
-      a+='\nЗапис у сторінки тут недоступний — для планера використовуй стандартний FLOW_BLOCKS.';
+      a+='\nЗапис у сторінки тут недоступний — для планера використовуй стандартний рядок FLOW_OPS.';
     }
     a+='\nЗмінювати самі фінансові записи ти поки не вмієш — якщо просять, чесно скажи і запропонуй блок у планер чи нотатку.';
     return a;
@@ -135,15 +135,17 @@
         g.notes.forEach(n=>{ done+=`<div class="fs-done">⚠️ ${esc(n)}</div>`; });
       }
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      const say=(pr.text||pg.text||'Готово.').trim();
+      let say=(pr.text||pg.text||'Готово.').trim();
+      if(aiLastStop==='max_tokens') say+=AI_CUT_NOTE;   // обрубок не має виглядати повною відповіддю (AI-8)
       body.insertAdjacentHTML('beforeend',done+(say?`<div class="fs-msg">${say.replace(/</g,'&lt;')}</div>`:''));
       body.scrollTop=body.scrollHeight;
       try{ aiSpeak(say); }catch(_){}
     }catch(e){
       const g=document.getElementById('fsGen'); if(g) g.remove();
       body.insertAdjacentHTML('beforeend',`<div class="fs-msg">⚠️ Не вдалось: ${String(e.message||e).replace(/</g,'&lt;')}</div>`);
+    }finally{
+      spotBusy=false; if(cap) cap.classList.remove('busy');   // що б не сталось — спот знову приймає питання
     }
-    spotBusy=false; if(cap) cap.classList.remove('busy');
   }
   async function spotMicToggle(){
     const btn=document.querySelector('#flowSpot .fs-mic');
@@ -398,8 +400,8 @@
     });
     (pr.folders||[]).forEach(f=>{
       const isP=f.role==='project';
-      const wc=Array.isArray(f.widgets)?f.widgets.filter(w=>['worktrack','income','spend','debts','envelopes','patterns','planday','planmonth'].includes(String(w))).length:0;
-      const meta=[isP?'проєкт':'папка', f.due?('до '+esc(f.due)):'', wc?(wc+' віджет'+(wc===1?'':'и')):''].filter(Boolean).join(' · ');
+      // віджетів папка ніде не показує — прев'ю їх і не рахує, щоб не обіцяти порожнечу (UX-4)
+      const meta=[isP?'проєкт':'папка', f.due?('до '+esc(f.due)):''].filter(Boolean).join(' · ');
       rows.push(`<div class="ai-act goal"><span class="ic">${aiIco(isP?'target':'folder',13)}</span><span class="tx">${isP?'Проєкт':'Папка'} «${esc(f.name||'')}»<small>${meta}</small></span></div>`);
     });
     (pr.move||[]).forEach(mv=>{
@@ -768,8 +770,8 @@
       sys:'СКІЛ /розбір: чесний аналіз без пощади і без моралі. Де самообман, де реальний прогрес. Заверши одним питанням, яке людина уникає.'},
     'фінанси':{ico:'cash',t:'Фінанси',ctx:['fin','goals'],q:'Подивись на мої фінанси цього місяця і скажи, що не так і що зробити',
       sys:'СКІЛ /фінанси: аналіз грошей місяця з контексту. Головний витік, стан конвертів відносно цілей, одна конкретна дія з сумою.'},
-    'проєкт':{ico:'folder',t:'Новий проєкт',ctx:['goals'],q:'Допоможи оформити новий проєкт: спитай одне-два уточнення, тоді створи папку-проєкт з дедлайном і доречними віджетами',
-      sys:'СКІЛ /проєкт: людина хоче новий проєкт. Якщо ціль/тема ясна з контексту — одразу створи через folders з role:"project", доречним due і 1-3 віджетами. Якщо ні — постав одне коротке уточнення і зупинись. Не перевантажуй віджетами.'}
+    'проєкт':{ico:'folder',t:'Новий проєкт',ctx:['goals'],q:'Допоможи оформити новий проєкт: спитай одне-два уточнення, тоді створи папку-проєкт з дедлайном',
+      sys:'СКІЛ /проєкт: людина хоче новий проєкт. Якщо ціль/тема ясна з контексту — одразу створи через folders з role:"project" і доречним due; за потреби додай сторінку з першими кроками. Якщо ні — постав одне коротке уточнення і зупинись. Віджетів у папці немає — не обіцяй їх.'}
   };
   function aiSkillFor(q){
     if(q[0]!=='/') return null;
@@ -844,7 +846,7 @@
           sysDyn=aiDevCtx();
         } else {
         /* @dev-only:end */
-          sysStable=AI_CHAT_SYS+AI_AGENT_ADDON;
+          sysStable=AI_CORE_SYS+AI_AGENT_ADDON;   // без мертвого FLOW_OPS/FLOW_MEM (AI-5)
           sysDyn=petPersona();
           if(sk) sysDyn+='\n\n'+AI_SKILLS[sk.key].sys;
           sysDyn+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
@@ -857,7 +859,8 @@
       }
       m.content=txt||'…'; delete m.streaming;
       const pr=aiParseBlocks(m.content);
-      if(pr.mem.length) aiMemAdd(pr.mem);
+      // факти в памʼять — лише через шторку і в залишок ліміту змін цього повідомлення (SEC-5)
+      if(pr.mem.length) usedW+=await aiMemGate(pr.mem,AI_WRITE_LIMIT-usedW);
       aiSpeak(pr.text);
       /* «Авто» довіряє додаванню, але не знищенню: перенос/закриття/видалення наявного —
          через шторку і в залишок ліміту цього повідомлення (AI-3). Скасувала — пакет відхилено. */
@@ -880,9 +883,11 @@
             ? '⚠️ Не вдалось до мене достукатись. Спробуй ще раз за хвилину.'
             : '⚠️ Не вдалось: '+String(e.message||e)+'. Перевір URL AI-проксі.');
       delete m.streaming;
+    }finally{
+      // що б не сталось (зависання, шторка, виняток) — чат знову приймає повідомлення (AI-8)
+      aiBusy=false;
+      if(scrEl) scrEl.classList.remove('busy');
     }
-    aiBusy=false;
-    if(scrEl) scrEl.classList.remove('busy');
     aiChatSave(); aiRenderHead(); aiRenderBody();
     aiMaybeSummarize();
   }

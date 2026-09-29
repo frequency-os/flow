@@ -32,7 +32,7 @@
     line:'root@flow:~#',
     persona:''};
   function petCur(){ try{ if(localStorage.getItem('ai_dev')==='1') return 'dev'; const p=localStorage.getItem('ai_pet'); return FLOW_PETS[p]&&p!=='dev'?p:'spark'; }catch(_){ return 'spark'; } }
-  function petPersona(){ return FLOW_PETS[petCur()].persona+' Ти залишаєшся Флоу-асистентом системи: всі правила FLOW_BLOCKS і формат відповіді незмінні, характер впливає лише на тон.'; }
+  function petPersona(){ return FLOW_PETS[petCur()].persona+' Ти залишаєшся Флоу-асистентом системи: усі правила і формат відповіді незмінні, характер впливає лише на тон.'; }
   function petSVG(id,size){
     try{ const r=window.fd26PetSVG&&window.fd26PetSVG(id,size); if(r) return r; }catch(_){ } // fd26: 3D-скін, фолбек нижче
     const p=FLOW_PETS[id]||FLOW_PETS.spark;
