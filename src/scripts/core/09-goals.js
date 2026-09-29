@@ -9,6 +9,34 @@
   const AI_EP_KEY='ai_endpoint';
   const AI_EP_DEFAULT='https://flowai.life-yaroslav-kril.workers.dev';
   function aiEndpoint(){ try{ return (localStorage.getItem(AI_EP_KEY)||'').trim() || AI_EP_DEFAULT; }catch(_){ return AI_EP_DEFAULT; } }
+  /* Запит до AI-воркера з пропуском. Воркер може вимагати вхід (токен сесії
+     Supabase), щоб чужі люди не ганяли платну модель за наш рахунок. Якщо
+     людина увійшла — додаємо «Authorization: Bearer …».
+     Старий воркер цього заголовка ще не знає, і браузер тоді відмовляє на
+     CORS-перевірці (TypeError). На такий випадок повторюємо запит без токена
+     і до перезапуску його не шлемо — AI не зникає, доки воркер не оновлено.
+     Якщо ж після цього воркер відповів 401 (новий, з вимогою входу) — знову
+     шлемо з токеном. */
+  let aiAuthOff=false;
+  async function aiFetch(url,opts){
+    opts=opts||{};
+    let tok='';
+    try{ if(typeof window.sbAccessToken==='function') tok=await window.sbAccessToken(); }catch(_){}
+    if(!tok) return fetch(url,opts);
+    const withTok=Object.assign({},opts,{headers:Object.assign({},opts.headers||{},{Authorization:'Bearer '+tok})});
+    if(aiAuthOff){
+      const r=await fetch(url,opts);
+      if(r.status!==401) return r;
+      aiAuthOff=false; return fetch(url,withTok);
+    }
+    try{ return await fetch(url,withTok); }
+    catch(e){
+      if(e && e.name==='AbortError') throw e;
+      const r=await fetch(url,opts);   // впаде й це — значить, справді нема мережі
+      aiAuthOff=true; return r;
+    }
+  }
+  try{ window.aiFetch=aiFetch; }catch(_){}
   function aiConfig(cb){
     inputModal({title:'AI endpoint (URL твого Worker-проксі)', value:aiEndpoint(),
       placeholder:AI_EP_DEFAULT, onOk:(v)=>{
@@ -61,7 +89,7 @@
         +'Правила: 3-5 цілей, у кожної 3-5 конкретних кроків (перший — виконуваний сьогодні). schedule додавай лише де доречний регулярний блок; dows: 0=неділя…6=субота; h/endH — години 0-24. '
         +'1-2 конверти. Реалістично, без води, кроки — дії, не побажання.';
       const usr='Точка А: '+(g.pointA||'')+'\nТочка Б: '+(g.pointB||'')+'\nВже є цілей: '+(g.goals||[]).length;
-      const res=await fetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
+      const res=await aiFetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
         body:JSON.stringify({ system:sys, messages:[{role:'user',content:usr}] }) });
       if(!res.ok) throw new Error('HTTP '+res.status);
       const data=await res.json();
@@ -244,10 +272,10 @@
   }
 
   /* ===== ЦІЛІ ДНЯ (денний чекліст усередині цілі, варіант 3) ===== */
-  function dgDateStr(offset){ const d=new Date(); d.setDate(d.getDate()+(offset||0)); return d.toISOString().slice(0,10); }
+  function dgDateStr(offset){ const d=new Date(); d.setDate(d.getDate()+(offset||0)); return ymdLocal(d); }
   function dgWeekDates(){ const out=[]; const now=new Date(); const dow=(now.getDay()+6)%7; // Mon=0
     const mon=new Date(now); mon.setDate(now.getDate()-dow);
-    for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(d.toISOString().slice(0,10)); } return out; }
+    for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(ymdLocal(d)); } return out; }
   function dgListFor(gl,ds){ if(!gl.days) gl.days={}; if(!Array.isArray(gl.days[ds])) gl.days[ds]=[]; return gl.days[ds]; }
   // синхронізація: коли ВСІ денні цілі дня виконані → засвітити трекер today + 1 авто-крок (раз)
   function dgSync(gl,ds,todayStr){
@@ -386,7 +414,9 @@
     const mo=[];
     for(let d=1;d<=daysInMonth;d++){
       const dt=new Date(my,mm,d);
-      mo.push({ day:d, dow:dowShort[dt.getDay()], ds:dt.toISOString().slice(0,10) });
+      // ymdLocal, а не toISOString: dt — місцева північ, у Києві це ще вчорашній день за UTC,
+      // і вся сітка з'їжджала на день (галочка «сьогодні» стояла на завтрашній клітинці)
+      mo.push({ day:d, dow:dowShort[dt.getDay()], ds:ymdLocal(dt) });
     }
 
     const goalsHtml=g.goals.map(gl=>{
@@ -604,7 +634,7 @@
     const dow=(now.getDay()+6)%7; // Mon=0
     const monday=new Date(now); monday.setDate(now.getDate()-dow);
     const out=[];
-    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(d.toISOString().slice(0,10)); }
+    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(ymdLocal(d)); }
     return out;
   }
 

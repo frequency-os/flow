@@ -688,7 +688,7 @@
         const rows=pks.map(k=>{const f=folders[k];const pr=folderProgress(k);const nx=folderNextStep(k);const dl=dueLabel(f.due);const s=st(f.status);
           return `<div class="pw-row" style="--fc:${f.c}">
             <div class="pw-rt" data-wgo="${k}">
-              <span class="pw-em">${(f.emoji||'📁')}</span>
+              <span class="pw-em">${esc(f.emoji||'📁')}</span>
               <span class="pw-meat"><b>${esc(f.name)}</b>
                 <span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span>
                   <span class="fprg"><i style="width:${pr.pct}%"></i></span><span class="pw-pct">${pr.pct}%</span>
@@ -755,7 +755,7 @@
             <div class="pw-axis">${Array.from({length:WEEKS},(_,i)=>`<span class="${i===0?'hot':''}">${i===0?'Цей тижд.':'+'+i}</span>`).join('')}</div>
             ${dks.map(k=>{const f=folders[k];const pr=folderProgress(k);const L=late(k);const w=wk(k);
               return `<div class="pw-tlrow"><div class="pw-tlbar ${L?'late':''}" style="--fc:${f.c};left:${L?0:w*(100/WEEKS)}%;width:${100/WEEKS*0.96}%" data-wgo="${k}">
-                <i style="width:${pr.pct}%"></i><span>${(f.emoji||'📁')} ${esc(f.name)}</span></div></div>`;}).join('')}
+                <i style="width:${pr.pct}%"></i><span>${esc(f.emoji||'📁')} ${esc(f.name)}</span></div></div>`;}).join('')}
           </div></div></div>`;
       }
       if(b.type==='wportal'){

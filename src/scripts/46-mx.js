@@ -120,7 +120,7 @@ try{
           if(typeof folders!=='undefined'){
             var keys=(typeof orderedFolderKeys==='function')?orderedFolderKeys():Object.keys(folders);
             fols=keys.filter(function(k){ return !!folders[k]; }).slice(0,6).map(function(k){
-              return '<button data-fdxfol="'+escA(it.id)+'|'+escA(k)+'">'+(folders[k].emoji||'📁')+' '+esc2(folders[k].name||k)+'</button>'; }).join('');
+              return '<button data-fdxfol="'+escA(it.id)+'|'+escA(k)+'">'+esc2(folders[k].emoji||'📁')+' '+esc2(folders[k].name||k)+'</button>'; }).join('');
           }
         }catch(_){}
         more='<div class="fdx-more"><button data-fdxday="'+escA(it.id)+'">☀ У задачі дня</button>'+mv+fols+

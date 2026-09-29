@@ -7,7 +7,7 @@
 і саме тому старіла: dist перезбирається щоразу, номери рядків у ньому
 поїхали вже наступного дня. Файли в src/ стабільні.
 
-Запуск:    python3 tools/codemap.py            (або npm run map)
+Запуск:    python3 tools/codemap.py            (або npm run map; те саме, що --write)
 Перевірка: python3 tools/codemap.py --check    — нічого не пише, лише каже,
            чи карта відстала від коду. Це і викликає tools/check.sh.
 """
@@ -370,8 +370,20 @@ def build():
 
 
 def main():
+    # Пишемо карту лише без аргументів (npm run map) або з --write. Раніше
+    # будь-що, крім --check (навіть --help), мовчки переписувало CODEMAP.md —
+    # і сесія, що лише «глянула довідку», перебудовувала карту з чужих правок.
+    args = sys.argv[1:]
+    if any(a in ('-h', '--help') for a in args):
+        print(__doc__.strip())
+        return 0
+    unknown = [a for a in args if a not in ('--check', '--write')]
+    if unknown or len(args) > 1:
+        print('Не розумію аргументи: {}. Карту не чіпаю.\n'.format(' '.join(args)))
+        print(__doc__.strip())
+        return 2
     text = build()
-    if '--check' in sys.argv:
+    if '--check' in args:
         old = ''
         if os.path.exists(OUT):
             with open(OUT, encoding='utf-8') as f:

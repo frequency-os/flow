@@ -340,7 +340,7 @@
         var data={_flow_backup:1, ts:new Date().toISOString(), keys:{}};
         for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); data.keys[k]=localStorage.getItem(k); }
         var json=JSON.stringify(data);
-        var name='flow-backup-'+new Date().toISOString().slice(0,10)+'.json';
+        var name='flow-backup-'+ymdLocal()+'.json';
         var blob=new Blob([json],{type:'application/json'});
         var file=null; try{ file=new File([blob],name,{type:'application/json'}); }catch(_){}
         if(file && navigator.canShare && navigator.canShare({files:[file]})){
@@ -667,7 +667,7 @@
       const bits=[];
       if(pr.total) bits.push(pr.done+'/'+pr.total+' · '+pr.pct+'%');
       if(dl&&dl.t) bits.push(dl.t);
-      return {k:'f:'+k, emo:(f.emoji||'🚀'), c:prjHexToRgb(f.c), t:esc(f.name||'Проєкт'),
+      return {k:'f:'+k, emo:esc(f.emoji||'🚀'), c:prjHexToRgb(f.c), t:esc(f.name||'Проєкт'),
         d:bits.length?bits.join(' · '):'ще без кроків', badge:st[1], badgeC:st[2]};
     });
     host.innerHTML=

@@ -123,7 +123,7 @@
     if(t==='h3'){var hs3=headingStyle(b);return '<div class="pg-content pgc-h3'+hs3.cls+' pg-empty" style="'+hs3.style+'" contenteditable="true" data-ph="Заголовок 3" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
     if(t==='quote')return '<div class="pg-content pgc-quote pg-empty" contenteditable="true" data-ph="Цитата…" data-edit="'+id+'">'+esc(txtOf(b))+'</div>';
     if(t==='glass')return '<div class="pg-content"><div class="pgc-glass"><div class="pg-empty" contenteditable="true" data-ph="Напиши щось — зʼявиться на склі…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div></div>';
-    if(t==='callout')return '<div class="pg-content pgc-callout"><span class="clx">'+(b.emo||'💡')+'</span><div class="cltx pg-empty" contenteditable="true" data-ph="Виноска…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div>';
+    if(t==='callout')return '<div class="pg-content pgc-callout"><span class="clx">'+esc(b.emo||'💡')+'</span><div class="cltx pg-empty" contenteditable="true" data-ph="Виноска…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div>';
     if(t==='divider'||t==='head')return '<div class="pg-content pg-div"><hr></div>';
     if(t==='code'){
       var lang=b.lang||'';
@@ -596,7 +596,7 @@
       var r=pgResolve(), c=r.cont;
       var nav=document.createElement('div'); nav.className='pgnav';
       nav.innerHTML='<button class="pgnav-b" data-pgup>‹</button>'
-        +'<span class="pgnav-e">'+((c&&c.emoji)||(c&&c.type==='page'?'📄':'📁'))+'</span>'
+        +'<span class="pgnav-e">'+esc((c&&c.emoji)||(c&&c.type==='page'?'📄':'📁'))+'</span>'
         +'<span class="pgnav-t">'+esc((c&&c.title)||(c&&c.type==='page'?'Сторінка':'Папка'))+'</span>';
       out.appendChild(nav);
     }
@@ -618,7 +618,7 @@
       if(links&&links.length){
         var fp = br0.folderProgress?br0.folderProgress(fk):{done:0,total:0,pct:0};
         var bn=document.createElement('div'); bn.className='pt-banner';
-        bn.innerHTML='<span class="ptb-ic">'+(links[0].emoji||'🎯')+'</span>'
+        bn.innerHTML='<span class="ptb-ic">'+esc(links[0].emoji||'🎯')+'</span>'
           +'<div class="ptb-body"><div class="ptb-t">Зв\u2019язано з проєктом «'+esc(links[0].title||'')+'»</div>'
           +'<div class="ptb-s">кожне «виконано» тут = крок у проєкті</div></div>'
           +'<span class="ptb-pct">'+(fp.pct||0)+'%</span>';

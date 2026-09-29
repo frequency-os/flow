@@ -185,7 +185,8 @@
       .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
       .replace(/(^|[^*])\*([^*]+)\*/g,'$1<i>$2</i>')
       .replace(/`([^`]+)`/g,'<code>$1</code>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+      // посилання — лише http(s) і пошта: `[тисни](javascript:…)` інакше виконав би код по кліку
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,(m,t,u)=>/^\s*(https?:|mailto:)/i.test(u)?'<a href="'+u.trim()+'" target="_blank" rel="noopener">'+t+'</a>':t);
   }
 
   // EPUB — розпаковка zip через JSZip (CDN) + витяг HTML по spine
@@ -216,13 +217,13 @@
       const href=manifest[id]; if(!href) continue;
       const full=normalizeZipPath(baseDir+href);
       let html=await readZipText(zip,full); if(html==null) continue;
-      html=stripEpubHtml(html);
+      const frag=sanitizeEpubHtml(html);
       const wrap=document.createElement('section'); wrap.className='rdr-chap';
-      // заголовок глави з <title> або першого h1/h2
-      let title=(html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i)||[])[1];
-      title=title?title.replace(/<[^>]+>/g,'').trim():('Розділ '+(++idx));
+      // заголовок глави — з першого h1/h2/h3
+      const hEl=frag.querySelector('h1,h2,h3');
+      const title=(hEl&&hEl.textContent.trim())||('Розділ '+(++idx));
       wrap.dataset.chap=title;
-      wrap.innerHTML=html;
+      wrap.appendChild(frag);
       content.appendChild(wrap);
     }
     // вбудувати зображення з zip
@@ -231,25 +232,82 @@
   }
   async function readZipText(zip,path){ const f=zip.file(path); if(!f) return null; try{ return await f.async('string'); }catch(_){ return null; } }
   function normalizeZipPath(p){ const parts=[]; p.split('/').forEach(seg=>{ if(seg==='..') parts.pop(); else if(seg!=='.'&&seg!=='') parts.push(seg); }); return parts.join('/'); }
-  function stripEpubHtml(html){
-    let body=(html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)||[])[1]||html;
-    body=body.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'')
-             .replace(/ on\w+="[^"]*"/gi,'').replace(/<link[^>]*>/gi,'');
-    return body;
+  /* Глава EPUB — чужий HTML з файла, який людина могла скачати будь-де.
+     Раніше його чистили регулярками і вставляли через innerHTML: обробник
+     `onerror='…'` в одинарних лапках чи без лапок проходив і виконувався
+     одразу при відкритті книжки — з доступом до всього localStorage, разом
+     із токеном входу. Тепер главу розбирає DOMParser: це «мертвий» документ,
+     у ньому нічого не виконується і картинки не вантажаться. З нього в
+     сторінку переносимо ЛИШЕ теги й атрибути з білого списку, створюючи
+     елементи заново. Невідомий тег розгортаємо (текст лишається), а небезпечні
+     (скрипти, фрейми, форми, медіа) викидаємо разом із вмістом. id, class і
+     style не беремо: вони б дали книжці перекрити інтерфейс чи підмінити
+     глобальні змінні застосунку. */
+  const EPUB_TAGS=new Set(['p','div','span','section','article','header','footer','aside','main','nav',
+    'h1','h2','h3','h4','h5','h6','em','strong','i','b','u','s','sub','sup','small','big','mark','cite','q',
+    'abbr','dfn','del','ins','tt','kbd','var','samp','time','br','hr','blockquote','pre','code',
+    'ul','ol','li','dl','dt','dd','table','thead','tbody','tfoot','tr','td','th','caption','colgroup','col',
+    'figure','figcaption','img','a']);
+  const EPUB_DROP=new Set(['script','style','link','meta','base','title','head','iframe','frame','frameset',
+    'object','embed','applet','param','form','input','button','select','textarea','option','template',
+    'noscript','audio','video','source','track','canvas','math','portal','dialog','details','summary']);
+  function sanitizeEpubHtml(html){
+    const doc=new DOMParser().parseFromString(String(html||''),'text/html');
+    const frag=document.createDocumentFragment();
+    epubCopyKids(doc.body, frag);
+    return frag;
+  }
+  function epubCopyKids(from, to){
+    for(const n of Array.from(from.childNodes)){
+      if(n.nodeType===3){ to.appendChild(document.createTextNode(n.nodeValue)); continue; }
+      if(n.nodeType!==1) continue;   // коментарі та інше — геть
+      const tag=String(n.localName||'').toLowerCase();
+      if(tag==='svg'){
+        // обкладинки часто зроблені як <svg><image xlink:href="cover.jpg"/></svg> —
+        // беремо з SVG лише картинки, решту (разом з onload і скриптами) відкидаємо
+        n.querySelectorAll('image').forEach(im=>{
+          const s=epubImgSrc(im.getAttribute('href')||im.getAttribute('xlink:href'));
+          if(s){ const ni=document.createElement('img'); ni.setAttribute(s.a,s.v); to.appendChild(ni); }
+        });
+        continue;
+      }
+      if(EPUB_DROP.has(tag)) continue;
+      if(!EPUB_TAGS.has(tag)){ epubCopyKids(n,to); continue; }
+      const el=document.createElement(tag);
+      if(tag==='img'){ const s=epubImgSrc(n.getAttribute('src')); if(!s) continue; el.setAttribute(s.a,s.v); }
+      if(tag==='a'){
+        const h=String(n.getAttribute('href')||'').replace(/[\u0000- \u007f-\u009f]/g,'');
+        if(/^(https?:|mailto:)/i.test(h)){ el.setAttribute('href',h); el.setAttribute('target','_blank'); el.setAttribute('rel','noopener noreferrer'); }
+      }
+      ['alt','title','lang'].forEach(k=>{ const v=n.getAttribute(k); if(v!=null) el.setAttribute(k,v); });
+      const dir=n.getAttribute('dir'); if(/^(ltr|rtl|auto)$/i.test(dir||'')) el.setAttribute('dir',dir);
+      ['colspan','rowspan','span','start','width','height'].forEach(k=>{ const v=String(n.getAttribute(k)||'').trim(); if(/^\d{1,4}$/.test(v)) el.setAttribute(k,v); });
+      to.appendChild(el);
+      epubCopyKids(n,el);
+    }
+  }
+  /* Звідки брати картинку: data:image/… і blob: — як є; шлях усередині книжки
+     кладемо в data-src (підставить embedEpubImages із zip). Будь-яку іншу схему
+     відкидаємо: javascript: — це код, а http(s): — «піксель», що видає автору,
+     коли й де ти читаєш. */
+  function epubImgSrc(v){
+    const raw=String(v||'').trim(), u=raw.replace(/[\u0000- \u007f-\u009f]/g,'');
+    if(!u) return null;
+    if(/^data:image\//i.test(u)||/^blob:/i.test(u)) return {a:'src',v:u};
+    if(/^[a-z][a-z0-9+.\-]*:/i.test(u)||u.startsWith('//')) return null;
+    return {a:'data-src',v:raw};
   }
   async function embedEpubImages(zip, baseDir, root){
-    const imgs=[...root.querySelectorAll('img,image')];
+    const imgs=[...root.querySelectorAll('img[data-src]')];
     for(const im of imgs){
-      let src=im.getAttribute('src')||im.getAttribute('xlink:href')||im.getAttribute('href'); if(!src) continue;
-      if(/^https?:|^data:/.test(src)) continue;
-      const path=normalizeZipPath(baseDir+decodeURIComponent(src));
-      const f=zip.file(path); if(!f){ im.remove(); continue; }
+      const src=im.getAttribute('data-src'); im.removeAttribute('data-src');
       try{
+        const path=normalizeZipPath(baseDir+decodeURIComponent(src));
+        const f=zip.file(path); if(!f){ im.remove(); continue; }
         const b64=await f.async('base64');
         const ext=(path.split('.').pop()||'png').toLowerCase();
-        const mime=ext==='jpg'||ext==='jpeg'?'image/jpeg':ext==='gif'?'image/gif':ext==='svg'?'image/svg+xml':'image/png';
-        if(im.tagName.toLowerCase()==='img'){ im.src='data:'+mime+';base64,'+b64; }
-        else { const ni=document.createElement('img'); ni.src='data:'+mime+';base64,'+b64; im.replaceWith(ni); }
+        const mime=ext==='jpg'||ext==='jpeg'?'image/jpeg':ext==='gif'?'image/gif':ext==='svg'?'image/svg+xml':ext==='webp'?'image/webp':'image/png';
+        im.src='data:'+mime+';base64,'+b64;
       }catch(_){ im.remove(); }
     }
   }

@@ -314,7 +314,7 @@
         <div class="vz-eyebrow">Наступний крок</div>
         <h2>${esc(it.t)}</h2>
         <div class="from">${esc(it.src)}</div>
-        ${fl?`<button class="fold" data-vzok="fold">${fl.emoji||'📁'} ${esc(fl.name)} — відкрити ›</button>`:''}
+        ${fl?`<button class="fold" data-vzok="fold">${esc(fl.emoji||'📁')} ${esc(fl.name)} — відкрити ›</button>`:''}
         <div class="vz-ok-timer" id="vzOkTimer">${tfmt(vzFocus.sec)}</div>
       </div>
       <div class="vz-ok-acts">
@@ -440,7 +440,7 @@
           </div>`).join('')}</div>
         <button class="vz-additem" data-vzpwadd="${p.id}">＋ пункт плану</button>
         <div class="vz-pw-foot">
-          ${fl?`<button class="fold" data-vzpwfold="${p.id}">${fl.emoji||'📁'} ${esc(fl.name)} — працювати ›</button>`
+          ${fl?`<button class="fold" data-vzpwfold="${p.id}">${esc(fl.emoji||'📁')} ${esc(fl.name)} — працювати ›</button>`
               :`<button class="fold" data-vzpwlink="${p.id}">📂 Привʼязати папку</button>`}
           <button class="togoal" data-vzpwgoal="${p.id}">⭐ У Цілі</button>
         </div>

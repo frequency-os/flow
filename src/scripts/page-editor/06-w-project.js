@@ -26,7 +26,7 @@
     var todayY=jrYmd();
     var habTodayDone=b.habits.filter(function(h){return (h.marks||{})[todayY];}).length;
 
-    var head='<div class="jr-top"><span class="jr-ic pt-ic" style="--pc:'+c+'">'+(b.emoji||'🎯')+'</span>'
+    var head='<div class="jr-top"><span class="jr-ic pt-ic" style="--pc:'+c+'">'+esc(b.emoji||'🎯')+'</span>'
       +'<div class="jr-tt pg-empty" contenteditable="true" data-ph="Назва проєкту" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
       +'<div class="jr-mode">'
       +'<button class="'+(mode==='full'?'on':'')+'" data-ptmode="'+id+'|full">Повний</button>'
@@ -40,7 +40,7 @@
         +'<i class="pt-unlink">відв\u2019язати</i></div>'
       : (ptPick[id]
           ? '<div class="pt-picker">'+((br&&br.folderList?br.folderList():[]).filter(function(f){return f.key!==currentPtKey(id);}).map(function(f){
-              return '<button class="pt-pick-i" data-ptlink="'+id+'|'+f.key+'"><span>'+(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
+              return '<button class="pt-pick-i" data-ptlink="'+id+'|'+f.key+'"><span>'+esc(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
             }).join('')||'<div class="pt-none">Немає інших папок</div>')
             +'<button class="pt-pick-x" data-ptpickclose="'+id+'">Скасувати</button></div>'
           : '<button class="pt-linkbtn" data-ptpick="'+id+'"><svg viewBox="0 0 24 24"><path d="M9 15 15 9M8 12a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M16 12a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4" stroke-linecap="round"/></svg> Прив\u2019язати папку</button>');
@@ -78,7 +78,7 @@
         var on=h.marks[ymd]?'on':'', today=i===todayIdx?'today':'';
         return '<button class="pt-hd '+on+' '+today+'" data-pthab="'+id+'|'+h.id+'|'+ymd+'" style="'+(on?'--hc:'+hc:'')+'">'+PT_WD[i][0]+'</button>';
       }).join('');
-      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'">'+(h.emoji||'✅')+'</span>'
+      return '<div class="pt-hrow"><span class="pt-hemo" style="--hc:'+hc+'">'+esc(h.emoji||'✅')+'</span>'
         +'<div class="pt-hbody"><div class="pt-hname">'+esc(h.name)+'</div>'
         +'<div class="pt-hsub">'+(streak>1?'серія '+streak+' дн. 🔥':streak===1?'серія 1 день':'ще не почато')+'</div></div>'
         +'<div class="pt-hweek">'+cells+'</div>'

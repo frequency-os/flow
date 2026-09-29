@@ -148,7 +148,7 @@
     rail.style.display='flex';
     rail.innerHTML = projs.map(k=>{
       const f=folders[k]; if(!f) return '';
-      return '<div class="proj-rail-i" data-projrail="'+k+'" style="--pc:'+(f.c||'#6a7dff')+'" title="'+esc(f.name||'')+'">'+(f.emoji||'🚀')+'</div>';
+      return '<div class="proj-rail-i" data-projrail="'+k+'" style="--pc:'+(f.c||'#6a7dff')+'" title="'+esc(f.name||'')+'">'+esc(f.emoji||'🚀')+'</div>';
     }).join('') + '<div class="proj-rail-add" data-projraddd title="Новий проєкт">＋</div>';
     rail.querySelectorAll('[data-projrail]').forEach(el=>{
       el.onclick=()=>{ try{ window.platform.haptic('select'); }catch(_){} goFolder(el.dataset.projrail); };
@@ -458,7 +458,7 @@
         ${ICON_ALL.map(([id,nm])=>`<button class="fic-opt ${cur===id?'on':''}" data-fic="${id}" title="${nm}" aria-label="${nm}" style="--c:${f.c||'var(--accent)'}">
           <svg class="ico" aria-hidden="true"><use href="#${id}"/></svg></button>`).join('')}
       </div>
-      <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+f.emoji+')':''}</button>
+      <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+esc(f.emoji)+')':''}</button>
       <button class="fmi" data-ficback="1">‹ Назад до налаштувань</button>
     </div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };

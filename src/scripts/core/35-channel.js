@@ -326,11 +326,11 @@
         : `<div class="ch-link-card"><span class="ch-lc-ic">📁</span><div><b>Папка</b><small>уже видалена</small></div></div>`;
     } else if(t==='page'||t==='group'){
       const n=(b.children||[]).length;
-      body=`<div class="ch-link-card" style="--sc:${t==='page'?'#7c8cff':'#f0b429'}"><span class="ch-lc-ic">${b.emoji||(t==='page'?'📄':'📁')}</span><div><b>${esc(b.title||(t==='page'?'Сторінка':'Папка'))}</b><small>${t==='page'?'сторінка':'папка'}${n?' · '+n+' бл.':''}</small></div>${chI('chev')}</div>`;
+      body=`<div class="ch-link-card" style="--sc:${t==='page'?'#7c8cff':'#f0b429'}"><span class="ch-lc-ic">${esc(b.emoji||(t==='page'?'📄':'📁'))}</span><div><b>${esc(b.title||(t==='page'?'Сторінка':'Папка'))}</b><small>${t==='page'?'сторінка':'папка'}${n?' · '+n+' бл.':''}</small></div>${chI('chev')}</div>`;
     } else if(t==='link'){
       body=`<div class="ch-link-card"><span class="ch-lc-ic">🔗</span><div><b>${esc(b.label||b.title||b.url||'Посилання')}</b><small>${esc(b.url||'')}</small></div>${chI('chev')}</div>`;
     } else {
-      body=`<div class="ch-link-card"><span class="ch-lc-ic">${meta.emoji||'🧩'}</span><div><b>${esc(b.title||meta.title||t)}</b><small>${esc(meta.title||t)}</small></div>${chI('chev')}</div>`;
+      body=`<div class="ch-link-card"><span class="ch-lc-ic">${esc(meta.emoji||'🧩')}</span><div><b>${esc(b.title||meta.title||t)}</b><small>${esc(meta.title||t)}</small></div>${chI('chev')}</div>`;
     }
     return `<div class="ch-msg${cls}${b.ai?' ai':''}" data-chopen="${it.bk}|${b.id}">${tag}${body}${time}</div>`;
   }

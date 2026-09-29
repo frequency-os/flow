@@ -138,7 +138,7 @@
     listEl.innerHTML = days.length ? days.slice(0,60).map(k=>{
       const e=diaryEntries[k];
       const m=diaMoodOf(k);
-      return '<div class="dia-entry" data-diaopen="'+k+'"><div class="de-date">'+diaFmtDate(k)+(m?' · '+DIA_MOODS[m.v-1]:'')+'</div><div class="de-txt">'+diaEsc(e.text)+'</div></div>';
+      return '<div class="dia-entry" data-diaopen="'+k+'"><div class="de-date">'+diaFmtDate(k)+(m?' · '+DIA_MOODS[m.v-1]:'')+'</div><div class="de-txt" data-i18n-skip="1">'+diaEsc(e.text)+'</div></div>';
     }).join('') : '<div class="dia-empty">Тут з\'являться попередні записи, щойно ти збережеш перший.</div>';
     // календар + стрік
     if(calEl){

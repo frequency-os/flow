@@ -286,6 +286,20 @@
       if(bkRow) bkRow.onclick=()=>toggle('[data-acc-backup-expand]');
 
       // ── скидання до заводських ──
+      // Бекап перед стиранням не беремо на віру: якщо файл лише віддано браузеру
+      // на завантаження (перевірити нема як), людина мусить сама підтвердити,
+      // що бачить його, — інакше «єдина копія» могла б не існувати.
+      const runReset=async (wipeCloud, stopMsg)=>{
+        const r=await window.flowFactoryReset({wipeCloud});
+        if(r.ok) return;
+        if(r.step!=='backup-confirm'){ flowAlert(stopMsg+r.error); return; }
+        setTimeout(()=>{ confirmSheet({title:'Файл бекапу зберігся?',
+          sub:'Браузер не каже, чи «'+r.name+'» справді записано. Перевір «Завантаження»: без цього файла стерте не повернути.',
+          okLabel:'Файл є — продовжити', onOk:async ()=>{
+            const r2=await window.flowFactoryReset({wipeCloud, backupConfirmed:true});
+            if(!r2.ok) flowAlert(stopMsg+r2.error);
+          }}); }, 350);
+      };
       const rsRow=host.querySelector('[data-acc-reset-row]');
       if(rsRow) rsRow.onclick=()=>toggle('[data-acc-reset-expand]');
       const rsDev=host.querySelector('[data-acc-reset-device]');
@@ -294,10 +308,7 @@
         const inAcc=!!(window.sbUser&&window.sbUser());
         confirmSheet({title:'Скинути цей пристрій?',
           sub:'Локальні дані буде стерто'+(inAcc?' — після перезапуску вони повернуться з хмари акаунта':'. Входу в акаунт немає, тож вони НЕ відновляться')+'. Спершу бекап збережеться у файл.',
-          okLabel:'Скинути', onOk:async ()=>{
-            const r=await window.flowFactoryReset({wipeCloud:false});
-            if(!r.ok) flowAlert('❌ Скидання зупинено: '+r.error);
-          }});
+          okLabel:'Скинути', onOk:()=>runReset(false, '❌ Скидання зупинено: ')});
       };
       const rsAll=host.querySelector('[data-acc-reset-all]');
       if(rsAll) rsAll.onclick=(e)=>{
@@ -308,17 +319,17 @@
             /* друге, окреме підтвердження — пауза, щоб перший аркуш встиг закритись */
             setTimeout(()=>{ confirmSheet({title:'Точно стерти все?',
               sub:'Це незворотно. Єдина копія лишиться у файлі бекапу, який зараз збережеться.',
-              okLabel:'Стерти назавжди', onOk:async ()=>{
-                const r=await window.flowFactoryReset({wipeCloud:true});
-                if(!r.ok) flowAlert('❌ Стирання зупинено: '+r.error);
-              }}); }, 350);
+              okLabel:'Стерти назавжди', onOk:()=>runReset(true, '❌ Стирання зупинено: ')}); }, 350);
           }});
       };
       const exb=host.querySelector('[data-acc-export]');
-      if(exb) exb.onclick=(e)=>{
+      if(exb) exb.onclick=async (e)=>{
         e.stopPropagation();
-        const r=window.flowBackup.exportToFile();
-        if(r.ok) flowAlert('✅ Збережено: '+r.name+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
+        const r=await window.flowBackup.exportToFile();
+        // «✅ Збережено» — лише коли файл точно записано; інакше кажемо як є
+        if(r.ok && r.saved) flowAlert('✅ Збережено: '+r.name+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
+        else if(r.ok) flowAlert('⬇️ Файл «'+r.name+'» передано на завантаження.\n\nПеревір, що він з\'явився в «Завантаженнях», — застосунок цього не бачить. Потім поклади його в надійне місце.');
+        else if(r.cancelled) flowAlert('Збереження скасовано — файл бекапу не записано.');
         else flowAlert('❌ Не вдалося експортувати: '+(r.error||'невідома помилка'));
       };
       const imb=host.querySelector('[data-acc-import]');

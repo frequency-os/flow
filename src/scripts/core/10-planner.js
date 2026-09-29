@@ -228,7 +228,7 @@
         <label class="pl-sheet-l">🔗 Зв'язок з ціллю (необов'язково)</label>
         <select class="pl-sheet-in" id="ntGoal">
           <option value="">— без цілі —</option>
-          ${goals.map(g=>`<option value="${esc(g.id||g.name||'')}">${g.emoji||'🎯'} ${esc(g.name||'Ціль')}</option>`).join('')}
+          ${goals.map(g=>`<option value="${esc(g.id||g.name||'')}">${esc(g.emoji||'🎯')} ${esc(g.name||'Ціль')}</option>`).join('')}
         </select>
         <div class="pl-sheet-btns">
           <button class="pl-sheet-cancel" id="ntCancel">Скасувати</button>
@@ -373,7 +373,7 @@
 
     // рівень цілей
     const goalsSub = goals.length ? `<div class="flw-sub"><div class="flw-sub-in">${
-      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${gl.id}"><span class="d"></span><span>${gl.emoji||'🎯'} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
+      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${gl.id}"><span class="d"></span><span>${esc(gl.emoji||'🎯')} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
     }</div></div>` : `<div class="flw-sub"><div class="flw-empty">Цілей ще нема. Додай нижче.</div></div>`;
 
     // рівень "сьогодні" — денні цілі з усіх goals на сьогодні
@@ -648,14 +648,14 @@
         const td=plTodayStr(); const list=plBlocksFor(td);
         const i=list.findIndex(b=>b.id===nt.dataset.plnowtmr); if(i<0) return;
         const b=list.splice(i,1)[0];
-        const tm=new Date(); tm.setDate(tm.getDate()+1); const tds=tm.toISOString().slice(0,10);
+        const tm=new Date(); tm.setDate(tm.getDate()+1); const tds=ymdLocal(tm);
         plBlocksFor(tds).push(Object.assign({},b,{id:'b_'+Date.now(),done:false,remindAt:null}));
         saveGoals(); plRerender();
         plToast('→ «'+b.t+'» завтра о '+plHM(b.h));
       };
     }
     { const ro=c.querySelector('[data-plrook]'); if(ro) ro.onclick=()=>{
-        const td=plTodayStr(); const y=new Date(); y.setDate(y.getDate()-1); const yds=y.toISOString().slice(0,10);
+        const td=plTodayStr(); const y=new Date(); y.setDate(y.getDate()-1); const yds=ymdLocal(y);
         const yl=Array.isArray(p.blocksByDay[yds])?p.blocksByDay[yds]:[];
         const undone=yl.filter(b=>!b.done && !b.fromRecur && !b.rolled);
         const list=plBlocksFor(td);
@@ -814,7 +814,7 @@
     const p=plData(); const out=[];
     for(let i=days-1;i>=0;i--){
       const d=new Date(); d.setDate(d.getDate()-i);
-      const ds=d.toISOString().slice(0,10);
+      const ds=ymdLocal(d);
       const list=Array.isArray(p.blocksByDay[ds])?p.blocksByDay[ds]:[];
       out.push({ ds, dow:d.getDay(), total:list.length,
         done:list.filter(b=>b.done).length,
@@ -889,7 +889,7 @@
         +(d.topMiss?('\nНайчастіше зривається: «'+d.topMiss[0]+'» ('+d.topMiss[1]+'× за 3 тижні)'):'')
         +(d.worstDow?('\nНайслабший день: '+d.worstDow):'')
         +'\nПо днях (done/total): '+d.wk.map(x=>x.ds.slice(5)+' '+x.done+'/'+x.total).join(', ');
-      const res=await fetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
+      const res=await aiFetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
         body:JSON.stringify({ system:sys, messages:[{role:'user',content:usr}] }) });
       if(!res.ok) throw new Error('HTTP '+res.status);
       const data=await res.json();
