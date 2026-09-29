@@ -202,7 +202,11 @@ try{
       saveGoals(); fdWeekRender(c); }; });
     c.querySelectorAll('[data-f26del]').forEach(function(el){ el.onclick=function(){
       var i=p.tasks.findIndex(function(x){return x.id===el.dataset.f26del;});
-      if(i>=0){ p.tasks.splice(i,1); saveGoals(); fdWeekRender(c); } }; });
+      if(i<0) return;
+      var gone=p.tasks.splice(i,1)[0]; saveGoals(); fdWeekRender(c);
+      // «×» стирає без питання (разом із підзадачами) — 5 с на «Повернути»
+      if(window.flowUndoToast) window.flowUndoToast('Задачу видалено',function(){
+        var q=plData(); q.tasks.splice(Math.min(i,q.tasks.length),0,gone); saveGoals(); fdWeekRender(c); }); }; });
     c.querySelectorAll('[data-f26daypick]').forEach(function(el){ el.onclick=function(){ fdDaySheet(el.dataset.f26daypick); }; });
     c.querySelectorAll('[data-f26add]').forEach(function(el){ el.onclick=function(){ try{ plAdd(); }catch(e){ console.error(e); } }; });
     var rv=c.querySelector('[data-f26rev]'); if(rv) rv.onclick=function(){ try{ plWeekReviewSheet(); }catch(e){ console.error(e); } };

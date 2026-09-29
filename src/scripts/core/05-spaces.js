@@ -170,6 +170,14 @@
   document.getElementById('navHome').onclick = goHome;
   document.getElementById('navFinance').onclick = goFinance;
   document.getElementById('navPlanner').onclick = ()=>{ goPlanner(); };
+  // клавіатура / VoiceOver: «кнопки» не з <button> (таб-бар <a> без href, іконки шапки <div>)
+  // мають role="button" і tabindex — Enter чи Пробіл спрацьовують як тап
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ') return;
+    const t=e.target;
+    if(!t||!t.matches||!t.matches('[role="button"]:not(button):not(input):not(textarea)')) return;
+    e.preventDefault(); t.click();
+  });
 
 
   // ── профіль у футері сайдбара: Google-акаунт + меню функцій ──

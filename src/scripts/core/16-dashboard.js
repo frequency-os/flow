@@ -251,6 +251,7 @@
     // opts: {title, value, placeholder, emoji (bool), onOk(val, emojiVal)}
     const o=opts||{};
     const ov=document.createElement('div'); ov.className='imodal';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');   // шторка модальна для VoiceOver
     const emojiRow = o.emoji ? `
       <div class="im-label">Емодзі (необов'язково)</div>
       <div class="im-emoji-row">

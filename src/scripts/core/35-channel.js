@@ -652,6 +652,7 @@
   function chSheet(title, rowsHtml, bind){
     document.querySelectorAll('.ch-sheet-ov').forEach(x=>x.remove());
     const ov=document.createElement('div'); ov.className='ch-sheet-ov';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');   // шторка модальна для VoiceOver
     const c=chChat();
     ov.innerHTML=`<div class="ch-sheet" style="--fc:${(c&&c.c)||'var(--accent)'}"><div class="ch-grip"></div>${title?`<div class="ch-sheet-t">${title}</div>`:''}${rowsHtml}</div>`;
     document.body.appendChild(ov);

@@ -19,6 +19,7 @@
   function actionSheet(opts){
     const o=opts||{}; const items=o.items||[];
     const ov=document.createElement('div'); ov.className='asheet';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');   // шторка модальна для VoiceOver
     const rowCls = o.row ? 'asheet-row' : '';
     const itemsHtml=items.map((it,i)=>`
       <button class="asheet-item ${it.danger?'danger':''} ${it.primary?'primary':''}" data-ai="${i}">

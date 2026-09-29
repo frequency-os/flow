@@ -42,8 +42,9 @@
     100%{box-shadow:none;}}
 
   /* ===== UNDO (кнопка повернення) ===== */
+  /* z-index 270 — над шторками планера (.fd-cab 250, матриця .fdx 260): з них теж видаляють «×» */
   .undo-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom));
-    z-index:260;background:var(--card-2);border:1px solid var(--line);border-radius:14px;
+    z-index:270;background:var(--card-2);border:1px solid var(--line);border-radius:14px;
     padding:10px 12px 10px 15px;display:none;align-items:center;gap:12px;box-shadow:0 6px 26px rgba(0,0,0,.4);
     max-width:calc(100% - 32px);}
   .undo-toast.show{display:flex;animation:slideUp .2s ease;}
