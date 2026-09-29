@@ -1647,7 +1647,8 @@
       saveBoard(); renderBoard(); });
     // тікер фокуса: 1 інтервал на всі wfocus, точковий апдейт без ререндера
     if(!window.__fcTick){
-      window.__fcTick=setInterval(()=>{
+      // рахує від b.end (годинник), тож пауза у фоні безпечна: при поверненні — одразу тік
+      window.__fcTick=visInterval(()=>{
         document.querySelectorAll('.tfocus.run').forEach(tile=>{
           let b=null; try{ b=getBlock(tile.dataset.tileid); }catch(_){ }
           if(!b) return;
@@ -1667,7 +1668,7 @@
           const fg=tile.querySelector('.fc-fg');
           if(fg){ const CIRC=2*Math.PI*34; fg.style.strokeDashoffset=CIRC*(1-left/totalT); }
         });
-      },1000);
+      },1000,{now:true});
     }
 
   }

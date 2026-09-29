@@ -125,8 +125,8 @@ try{
   if(typeof _rp==='function'){
     window.renderPlanner=function(c){ _rp(c); try{ fdEnhance(c); }catch(e){ console.error('fdEnhance',e); } };
   }
-  /* якщо кабіна відкрита — жити з оновленнями */
-  setInterval(function(){ try{
+  /* якщо кабіна відкрита — жити з оновленнями (у фоні — спати) */
+  (window.visInterval||setInterval)(function(){ try{
     var el=document.getElementById('fdCabin');
     if(el&&el.classList.contains('on')&&fdCabId&&document.activeElement&&document.activeElement.tagName!=='TEXTAREA'&&document.activeElement.tagName!=='INPUT') fdDrawCabin();
   }catch(_){} },60000);

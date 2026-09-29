@@ -129,5 +129,5 @@
       const t=e.target;
       if(t.closest && (t.closest('#navHome')||t.closest('[data-dnav="home"]'))) setTimeout(render,60);
     });
-    setInterval(render,60000);
+    visInterval(render,60000,{now:true});   // у фоні не перемальовуємо
   })();

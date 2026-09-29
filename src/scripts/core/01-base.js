@@ -25,6 +25,42 @@
     }catch(_){}
   })();
 
+  /* ── Рукописний шрифт Caveat — ліниво, ПІСЛЯ першого кадру ──
+     ≈235 КБ тексту, а потрібен лише для «Карти бажань» у темі «Плоска» і стилю
+     «рукопис» у редакторі. Вбудований в index.html, він розбирався на кожному
+     старті раніше за перший екран. Тепер лежить поруч (fonts-caveat.css, його
+     кладе build.py з src/web, офлайн — sw.js), а до завантаження діє cursive. */
+  (function(){
+    try{
+      const go=()=>{
+        if(document.getElementById('fontCaveat')) return;
+        const l=document.createElement('link');
+        l.id='fontCaveat'; l.rel='stylesheet'; l.href='fonts-caveat.css';
+        document.head.appendChild(l);
+      };
+      const later=()=>requestAnimationFrame(()=>setTimeout(go,0));
+      if(document.readyState==='complete') later(); else window.addEventListener('load', later, {once:true});
+    }catch(_){}
+  })();
+
+  /* ── Таймер, що спить, поки застосунок сховано ──
+     Вічні setInterval (лічильник НР, котик, віджети, фокус-таймери) будили
+     телефон у фоні щосекунди — батарея і зайва робота, якої ніхто не бачить.
+     Тут інтервал зупиняється на document.hidden і вмикається при поверненні;
+     now:true — одразу один тік, щоб екран не показував застарілий час.
+     Годиться лише там, де тік рахує від годинника (Date.now), а не «сек--». */
+  function visInterval(fn, ms, o){
+    let id=null;
+    const run=()=>{ try{ fn(); }catch(e){ console.error('visInterval',e); } };
+    const on=()=>{ if(id==null) id=setInterval(run, ms); };
+    const off=()=>{ if(id!=null){ clearInterval(id); id=null; } };
+    const vis=()=>{ if(document.hidden){ off(); return; } if(o&&o.now) run(); on(); };
+    document.addEventListener('visibilitychange', vis);
+    if(!document.hidden) on();
+    return { stop(){ off(); document.removeEventListener('visibilitychange', vis); } };
+  }
+  window.visInterval = visInterval;
+
   /* ============ ХЕЛПЕРИ ДАТ: локальний час, не UTC ============
      toISOString() дає UTC: в Амстердамі між 00:00 і 02:00 «сьогодні» = вчора.
      Всюди, де треба «сьогодні/поточний місяць» — тільки ці функції. */
@@ -227,15 +263,37 @@
     }
     window.i18nApply = i18nApply;
 
-    // після кожної зміни DOM (рендери екранів) — тихо доперекладаємо
-    let raf=null;
-    const mo = new MutationObserver(()=>{
+    // Чи вузол у зоні, куди переклад не заходить (повний обхід зупиняється
+    // на таких предках сам; точковому треба перевірити їх явно).
+    function i18nBlocked(node){
+      const el = node.nodeType===1 ? node : node.parentElement;
+      if(!el || !el.isConnected) return true;
+      if(el.isContentEditable || el.closest('[data-i18n-skip],textarea,script,style')) return true;
+      const opt = el.closest('option'); if(opt && !opt.hasAttribute('value')) return true;
+      return false;
+    }
+    // після кожної зміни DOM (рендери екранів) — тихо доперекладаємо ЛИШЕ змінене.
+    // Раніше кожна мутація запускала обхід усього body (~1500 елементів), а
+    // лічильник НР міняє текст щосекунди — тобто повний обхід DOM щосекунди.
+    let raf=null, pend=new Set();
+    const flush=()=>{
+      raf=null;
+      const list=[...pend]; pend.clear();
       if(getLang()!=='en') return;
-      if(raf) return;
-      raf = requestAnimationFrame(()=>{ raf=null; i18nApply(); });
+      list.forEach(n=>{ try{ if(!i18nBlocked(n)) translateNode(n); }catch(_){} });
+      mo.takeRecords();   // наші ж заміни тексту — не привід для ще одного проходу
+    };
+    const mo = new MutationObserver(muts=>{
+      if(getLang()!=='en') return;
+      muts.forEach(m=>{
+        if(m.type==='childList') m.addedNodes.forEach(n=>pend.add(n));
+        else pend.add(m.target);   // characterData — сам текст; attributes — елемент із title/placeholder
+      });
+      if(!raf && pend.size) raf = requestAnimationFrame(flush);
     });
     document.addEventListener('DOMContentLoaded', function(){
-      try{ mo.observe(document.body, {childList:true, subtree:true, characterData:true}); }catch(_){}
+      try{ mo.observe(document.body, {childList:true, subtree:true, characterData:true,
+        attributes:true, attributeFilter:['title','placeholder','aria-label']}); }catch(_){}
       i18nApply();
     });
   })();

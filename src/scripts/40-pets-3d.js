@@ -231,11 +231,21 @@ try{
         raf=false;
         if(!dirty) return;
         dirty=false;
-        document.documentElement.style.setProperty('--fdlx',glx.toFixed(3));
-        document.documentElement.style.setProperty('--fdly',gly.toFixed(3));
+        /* світло пишемо на самих котиків, а не на <html>: змінна на корені
+           перераховувала стилі ВСЬОГО документа на кожен рух пальця/гіроскопа,
+           навіть коли котика на екрані немає. Тепер — лише його SVG. */
+        var svgs=document.querySelectorAll('svg[data-fd-pet]');
+        if(!svgs.length) return;
+        var lx=glx.toFixed(3), ly=gly.toFixed(3);
+        for(var i=0;i<svgs.length;i++){
+          var sv=svgs[i];
+          if(sv.__fdl===lx+'|'+ly) continue;             // те саме значення — стилі не чіпаємо
+          sv.__fdl=lx+'|'+ly;
+          sv.style.setProperty('--fdlx',lx);
+          sv.style.setProperty('--fdly',ly);
+        }
         if(px!=null){
-          var svgs=document.querySelectorAll('svg[data-fd-pet]');
-          for(var i=0;i<svgs.length;i++){
+          for(i=0;i<svgs.length;i++){
             var r=svgs[i].getBoundingClientRect();
             if(!r.width) continue;
             var dx=px-(r.left+r.width/2), dy=py-(r.top+r.height*.48);
@@ -247,7 +257,7 @@ try{
       };
       var kick=function(){ if(!raf){ raf=true; requestAnimationFrame(frame); } };
       document.addEventListener('pointermove',function(e){
-        if(useGyro) return;
+        if(useGyro||document.hidden) return;
         px=e.clientX; py=e.clientY; lastInput=Date.now();
         setL((px/innerWidth)*2-1,(py/innerHeight)*2-1);
       },{passive:true});
@@ -259,14 +269,14 @@ try{
       try{
         if(typeof DeviceOrientationEvent!=='undefined'&&!DeviceOrientationEvent.requestPermission){
           addEventListener('deviceorientation',function(e){
-            if(e.gamma==null) return;
+            if(e.gamma==null||document.hidden) return;   // у фоні гіроскоп не малює
             useGyro=true; lastInput=Date.now();
             setL(Math.max(-1,Math.min(1,e.gamma/28)),Math.max(-1,Math.min(1,(e.beta-45)/32)));
           });
         }
       }catch(_){}
-      /* idle: без вводу 4с — випадкові погляди, як у живих */
-      setInterval(function(){
+      /* idle: без вводу 4с — випадкові погляди, як у живих (у фоні таймер спить) */
+      (window.visInterval||setInterval)(function(){
         try{
           if(Date.now()-lastInput<4000) return;
           if(document.hidden) return;
