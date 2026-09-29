@@ -762,10 +762,30 @@
       if(r&&r.value){ try{ var v=JSON.parse(r.value)||{}; covers=Object.assign({},v,covers); renderCover(); }catch(_){} }
     }).catch(function(){});
   }catch(_){}
+  var covSaveT=null;
   function saveCovers(){
+    if(covSaveT){ clearTimeout(covSaveT); covSaveT=null; }
     try{ localStorage.setItem(COVKEY,JSON.stringify(covers)); }catch(_){}
     try{ var p=window.storage&&window.storage.set&&window.storage.set(COVKEY,JSON.stringify(covers),false); if(p&&p.catch)p.catch(function(){}); }catch(_){}
   }
+  /* Під час жесту (перетягування, повзунки) зберігаємо не на кожен рух, а раз —
+     коли палець зупинився на 400 мс або відпустив. Інакше кожен touchmove
+     серіалізував і писав УСІ обкладинки з фото (сотні КБ) двічі — жест смикався.
+     Екран оновлюється одразу (renderCover), відкладається лише запис. */
+  function saveCoversSoon(){
+    if(covSaveT) clearTimeout(covSaveT);
+    covSaveT=setTimeout(saveCovers,400);
+  }
+  function flushCovers(){ if(covSaveT) saveCovers(); }
+  // застосунок ховають/закривають посеред жесту — відкладене не губимо.
+  // visibilitychange слухаємо на window у фазі перехоплення (true): так він
+  // спрацює РАНІШЕ за sbOnHide (той на document, зареєстрований раніше), і
+  // обкладинка потрапить у партію, яку sbOnHide одразу шле в хмару. Інакше
+  // вона чекала б 500 мс таймера, якого у фоні iOS може вже не бути.
+  try{
+    window.addEventListener('pagehide',flushCovers);
+    window.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')flushCovers(); },true);
+  }catch(_){}
   var COV_GRADS=[
     'radial-gradient(120% 100% at 15% 0%,#41508f 0%,transparent 55%),radial-gradient(110% 90% at 85% 15%,#7b4a9e 0%,transparent 50%),radial-gradient(130% 120% at 60% 100%,#173a5e 0%,#0f1115 78%)',
     'linear-gradient(135deg,#0f2b1e,#1f6f4a 60%,#4ee69a)',
@@ -912,26 +932,31 @@
       if(e.target.closest('[data-covedclear]')){ delete covers[covKey()]; saveCovers(); renderCover(); covEdClose(); return; }
     });
     b.querySelector('[data-coveddark]').addEventListener('input',function(){
-      var c=covEdState(); if(!c)return; c.dark=+this.value; saveCovers(); renderCover(); covEdSync(true);
+      var c=covEdState(); if(!c)return; c.dark=+this.value; saveCoversSoon(); renderCover(); covEdSync(true);
     });
     b.querySelector('[data-covedh]').addEventListener('input',function(){
-      var c=covEdState(); if(!c)return; c.h=+this.value; saveCovers(); renderCover(); covEdSync(true);
+      var c=covEdState(); if(!c)return; c.h=+this.value; saveCoversSoon(); renderCover(); covEdSync(true);
     });
+    // повзунок відпустили — зберегти одразу, не чекаючи таймера
+    b.querySelector('[data-coveddark]').addEventListener('change',flushCovers);
+    b.querySelector('[data-covedh]').addEventListener('change',flushCovers);
     var pv=b.querySelector('[data-covedprev]');
     function dgStart(y){ var c=covEdState(); covEdDrag={y:y,p:c?c.pos:50}; }
     function dgMove(y){
       if(!covEdDrag)return; var c=covEdState(); if(!c||!c.img)return;
       c.pos=Math.max(0,Math.min(100,covEdDrag.p+(covEdDrag.y-y)/1.6));
-      saveCovers(); renderCover(); covEdSync(true);
+      saveCoversSoon(); renderCover(); covEdSync(true);
     }
+    function dgEnd(){ covEdDrag=null; flushCovers(); }
     pv.addEventListener('touchstart',function(e){ dgStart(e.touches[0].clientY); },{passive:true});
     pv.addEventListener('touchmove',function(e){ e.preventDefault(); dgMove(e.touches[0].clientY); },{passive:false});
-    pv.addEventListener('touchend',function(){ covEdDrag=null; });
+    pv.addEventListener('touchend',dgEnd);
+    pv.addEventListener('touchcancel',dgEnd);
     pv.addEventListener('mousedown',function(e){ e.preventDefault(); dgStart(e.clientY); });
     document.addEventListener('mousemove',function(e){ if(covEdDrag)dgMove(e.clientY); });
-    document.addEventListener('mouseup',function(){ covEdDrag=null; });
+    document.addEventListener('mouseup',function(){ if(covEdDrag)dgEnd(); });
     return b;
   }
   function covEdOpen(){ if(!covKey())return; covEdBuild(); covEdSync(); covEdBox.classList.add('on'); }
-  function covEdClose(){ if(covEdBox)covEdBox.classList.remove('on'); renderCover(); }
+  function covEdClose(){ flushCovers(); if(covEdBox)covEdBox.classList.remove('on'); renderCover(); }
 
