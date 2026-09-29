@@ -46,7 +46,10 @@
   .undo-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom));
     z-index:270;background:var(--card-2);border:1px solid var(--line);border-radius:14px;
     padding:10px 12px 10px 15px;display:none;align-items:center;gap:12px;box-shadow:0 6px 26px rgba(0,0,0,.4);
-    max-width:calc(100% - 32px);}
+    max-width:calc(100% - 32px);
+    /* без цього рядка браузер при left:50% дає тосту лише пів екрана,
+       і підпис різався до «Крок вида…» */
+    width:max-content;}
   .undo-toast.show{display:flex;animation:slideUp .2s ease;}
   .undo-toast .ut-msg{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .undo-toast .ut-btn{flex:0 0 auto;background:var(--accent);color:#fff;border:none;border-radius:10px;
