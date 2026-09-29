@@ -160,7 +160,6 @@
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
     try{ renderProjRail(); }catch(_){}
-    try{ if(!window.FLOW_BUILD){ window.FLOW_BUILD='2026-07-29-folders-v2.4'; console.log('[Flow] build', window.FLOW_BUILD); } }catch(_){}
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag');

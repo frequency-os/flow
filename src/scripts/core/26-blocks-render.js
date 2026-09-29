@@ -1,29 +1,3 @@
-  function pickPhoto(targetArr){
-    const dest = Array.isArray(targetArr) ? targetArr : curBoard();
-    const inp=document.createElement('input');
-    inp.type='file'; inp.accept='image/*';
-    inp.onchange=()=>{
-      const f=inp.files&&inp.files[0]; if(!f) return;
-      const reader=new FileReader();
-      reader.onload=()=>{
-        const img=new Image();
-        img.onload=()=>{
-          const max=900; let{width:w,height:h}=img;
-          if(w>max||h>max){ const r=Math.min(max/w,max/h); w=Math.round(w*r); h=Math.round(h*r); }
-          const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-          cv.getContext('2d').drawImage(img,0,0,w,h);
-          const data=cv.toDataURL('image/jpeg',0.72);
-          const blk={ id:Date.now()+Math.random(), type:'photo', title:'Фото', data };
-          dest.push(blk); syncBlocks();
-          saveBoard(); renderBoard();
-          requestAnimationFrame(()=>{ const el=document.querySelector('[data-tileid="'+blk.id+'"]'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); });
-        };
-        img.src=reader.result;
-      };
-      reader.readAsDataURL(f);
-    };
-    inp.click();
-  }
   // рекурсивний пошук блока (враховує вкладені у папки)
   function isContainer(b){ return b && (b.type==='group'||b.type==='page'); }
   function findBlockDeep(arr,id){
