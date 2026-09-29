@@ -785,20 +785,20 @@
       const env = b.envId ? envelopes.find(e=>String(e.id)===String(b.envId)) : null;
       if(env){
         const sv=envSaved(env), pct=env.goal?Math.min(100,Math.round(sv/env.goal*100)):0;
-        const col=env.color||'#c77dff';
+        const col=safeColor(env.color,'#c77dff');
         const cover=env.cover||env.wishImg||'';
         const kind=env.kind||(env.wishId?'мрія':'ціль');
-        return `<div class="tile ${sz} tlink tenv" data-tileid="${b.id}" data-envwopen="${env.id}" style="--tc:${col}">${head}
+        return `<div class="tile ${sz} tlink tenv" data-tileid="${esc(b.id)}" data-envwopen="${esc(env.id)}" style="--tc:${col}">${head}
           <div class="tenv-card" style="--ec:${col}">
-            ${cover?`<div class="tenv-cover" style="background-image:url('${esc(cover)}')"></div>`:''}
+            ${cover?`<div class="tenv-cover" style="background-image:url('${safeImg(cover)}')"></div>`:''}
             <div class="tenv-water" style="height:${pct}%"></div>
-            <div class="tenv-top"><span class="tenv-em">${env.emoji||'✉️'}</span><span class="tenv-pct">${pct}%</span></div>
+            <div class="tenv-top"><span class="tenv-em">${safeEmoji(env.emoji,'✉️')}</span><span class="tenv-pct">${pct}%</span></div>
             <div class="tenv-nm">${esc(env.name)}</div>
             <div class="tenv-amt">${fmt(sv)} / ${fmt(env.goal||0)} ₴ · 🎯 ${esc(kind)}</div>
           </div>
           <div class="fin-btns">
-            <button class="fin-btn" data-envwadd="${env.id}|in">+ Поповнити</button>
-            <button class="fin-btn" data-envwadd="${env.id}|out">− Витрата</button>
+            <button class="fin-btn" data-envwadd="${esc(env.id)}|in">+ Поповнити</button>
+            <button class="fin-btn" data-envwadd="${esc(env.id)}|out">− Витрата</button>
           </div></div>`;
       }
       // не привʼязаний — зведення по всіх конвертах + вибір

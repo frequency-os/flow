@@ -311,9 +311,9 @@
       const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
       const goalTxt=e.goal?`ціль ${fmt(e.goal)} · є ${fmt(e.saved||0)}`:`є ${fmt(e.saved||0)}`;
       return `<div class="alloc-env">
-        <div class="ic">${e.emoji||'✉️'}</div>
+        <div class="ic">${safeEmoji(e.emoji,'✉️')}</div>
         <div class="mid"><b>${esc(e.name)}</b><small>${goalTxt}</small></div>
-        <div class="pinput"><input type="number" min="0" step="10" data-alloc="${e.id}" value="${p||''}" placeholder="0"><span>${sym}</span></div>
+        <div class="pinput"><input type="number" min="0" step="10" data-alloc="${esc(e.id)}" value="${p||''}" placeholder="0"><span>${sym}</span></div>
       </div>`;
     }).join('');
     list.querySelectorAll('[data-alloc]').forEach(inp=>inp.addEventListener('input',()=>allocUpdateSummary(me,sym)));

@@ -840,7 +840,7 @@
         let sysStable, sysDyn;
         /* @dev-only:start replace="if(false){} else {" */
         if(aiDevOn()){
-          sysStable=AI_DEV_SYS;
+          sysStable=aiDevSys();
           sysDyn=aiDevCtx();
         } else {
         /* @dev-only:end */
@@ -1127,7 +1127,7 @@
     try{
       (goalsData.goals||[]).slice(0,2).forEach(g=>{
         if(g.days && !existing.includes((g.name||'').toLowerCase())){
-          sugg.push({ic:g.emoji||'💪',t:g.name||'Звичка',s:'звичка · щодня',c:'hab',
+          sugg.push({ic:safeEmoji(g.emoji,'💪'),t:g.name||'Звичка',s:'звичка · щодня',c:'hab',
             block:{t:g.name||'Звичка', h:18, endH:19, c:'hab', link:{type:'habit',goalId:g.id||g.name,goalName:g.name}}});
         }
       });
@@ -1160,13 +1160,13 @@
     const cards=goals.slice(0,6).map(gl=>{
       const steps=gl.steps||[]; const sd=steps.filter(s=>s.done).length;
       const gp=steps.length?Math.round(sd/steps.length*100):(gl.progress||0);
-      const cc=gl.color||'#5b8def';
+      const cc=safeColor(gl.color,'#5b8def');
       // скільки задач планера цього дня згадують цю ціль (за назвою в t.goal або t.tag)
       const nm=(gl.name||'').toLowerCase();
       const linked=p.tasks.filter(t=>t.scope==='day' && ((t.goal||'').toLowerCase().includes(nm) || (t.tag||'').toLowerCase().includes(nm))).length;
       const sub=linked?linked+' задач сьогодні ↓':(steps.length?sd+'/'+steps.length+' кроків':'ціль кварталу');
       return `<div class="pl-qa" style="--gc:${cc}" data-plqgoal="${esc(gl.id||gl.name||'')}">
-        <div class="pl-qah"><div class="pl-qae" style="background:${cc}22">${gl.emoji||'🎯'}</div>
+        <div class="pl-qah"><div class="pl-qae" style="background:${cc}22">${safeEmoji(gl.emoji,'🎯')}</div>
           <div class="pl-qan">${esc(gl.name||'Ціль')}</div><div class="pl-qap" style="color:${cc}">${gp}%</div></div>
         <div class="pl-qbar"><i style="width:${gp}%;background:${cc}"></i></div>
         <div class="pl-qm">${sub}</div></div>`;

@@ -473,9 +473,9 @@
         body=goalsData.goals.map(gl=>{
           const steps=gl.steps||[]; const sd=steps.filter(s=>s.done).length;
           const gp=steps.length?Math.round(sd/steps.length*100):(gl.progress||0);
-          const cc=gl.color||'#5b8def';
+          const cc=safeColor(gl.color,'#5b8def');
           return `<div class="pl-qgoal" style="--gc:${cc}"><div class="pl-qh">
-            <div class="pl-qemoji" style="background:${cc}2e">${gl.emoji||'🎯'}</div>
+            <div class="pl-qemoji" style="background:${cc}2e">${safeEmoji(gl.emoji,'🎯')}</div>
             <h5>${esc(gl.name)}</h5><span class="pl-qpc" style="color:${cc}">${gp}%</span></div>
             <div class="pl-qbar"><i style="width:${gp}%;background:${cc};box-shadow:0 0 10px ${cc}"></i></div>
             <div class="pl-qmeta"><span class="pl-chip">📋 ${sd}/${steps.length} кроків</span></div></div>`;

@@ -310,9 +310,9 @@
       <div class="fdash-sec"><span>Плани · ${fmt(saved)} ₴${goalSum?' / '+fmt(goalSum):''}</span><span class="lnk" data-wal="env">усі ›</span></div>
       ${envTop.length ? envTop.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-        return `<div class="wal-env" data-envopen="${e.id}" style="--ec:${e.color||'#5b8def'}">
+        return `<div class="wal-env" data-envopen="${esc(e.id)}" style="--ec:${safeColor(e.color,'#5b8def')}">
           <i class="fill" style="width:${pct}%"></i>
-          <span class="e">${e.emoji||'✉️'}</span>
+          <span class="e">${safeEmoji(e.emoji,'✉️')}</span>
           <div class="n">${esc(e.name)}<s>${e.goal?pct+'% · ще '+fmt(Math.max(0,e.goal-sv))+' ₴':'без цілі'}</s></div>
           <b>${fmt(sv)}</b></div>`;
       }).join('') : `<div class="fh-empty">Планів ще немає. Конверт — це ціль із числом і датою.</div>`}
@@ -368,15 +368,15 @@
       <div class="env2-grid">
       ${envelopes.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-        const col=e.color||'#5b8def';
+        const col=safeColor(e.color,'#5b8def');
         const outs=(e.ops||[]).filter(o=>o.t==='out').length;
         const kind=e.kind||(e.wishId?'мрія':'ціль');
-        const tags=[`🎯 ${kind}`]; if(outs) tags.push(`${outs} витрат`);
+        const tags=[`🎯 ${esc(kind)}`]; if(outs) tags.push(`${outs} витрат`);
         const cover=e.cover||e.wishImg||'';
-        return `<div class="env2 ${(e.wishId||cover)?'wishlinked':''}" style="--ec:${col}" data-envopen="${e.id}">
-          ${cover?`<div class="e2cover" style="background-image:url('${esc(cover)}')"></div>`:''}
+        return `<div class="env2 ${(e.wishId||cover)?'wishlinked':''}" style="--ec:${col}" data-envopen="${esc(e.id)}">
+          ${cover?`<div class="e2cover" style="background-image:url('${safeImg(cover)}')"></div>`:''}
           <div class="e2water" style="height:0" data-e2fill="${pct}"></div>
-          <div class="e2top"><span class="e2em">${e.emoji||'✉️'}</span><span class="e2pct">${pct}%</span></div>
+          <div class="e2top"><span class="e2em">${safeEmoji(e.emoji,'✉️')}</span><span class="e2pct">${pct}%</span></div>
           <div class="e2nm">${esc(e.name)}</div>
           <div class="e2amt">${fmt(sv)} / ${fmt(e.goal||0)} ₴</div>
           <div class="e2tags">${tags.map(t=>`<span class="e2tg">${t}</span>`).join('')}</div>
@@ -893,17 +893,17 @@
     envMigrate(e);
     const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
     const left=Math.max(0,(e.goal||0)-sv);
-    const col=e.color||'#5b8def';
+    const col=safeColor(e.color,'#5b8def');
     const kind=e.kind||(e.wishId?'мрія':'ціль');
     const cover=e.cover||e.wishImg||'';
     s.style.setProperty('--ec',col);
     s.innerHTML=`<div class="e2grab"></div>
       <div class="e2hero">
-        <div class="e2bg" style="background:${cover?`url('${esc(cover)}')`:`linear-gradient(135deg,${col},#1a1d27)`};background-size:cover;background-position:center"></div>
+        <div class="e2bg" style="background:${cover?`url('${safeImg(cover)}')`:`linear-gradient(135deg,${col},#1a1d27)`};background-size:cover;background-position:center"></div>
         <div class="e2veil"></div>
         <div class="e2htop"><span class="e2chip">🎯 ${esc(kind)}</span><span class="e2chip">${pct}%</span></div>
         <div class="e2htxt">
-          <div class="e2nm2">${e.emoji||'✉️'} ${esc(e.name)}</div>
+          <div class="e2nm2">${safeEmoji(e.emoji,'✉️')} ${esc(e.name)}</div>
           <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${fmt(e.goal||0)} ₴</div>
           <div class="e2prog"><i style="width:${pct}%"></i></div>
           <div class="e2nums"><div class="n">${fmt(sv)} ₴<small>накопичено</small></div>

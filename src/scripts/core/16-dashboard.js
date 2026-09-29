@@ -148,7 +148,7 @@
     rail.style.display='flex';
     rail.innerHTML = projs.map(k=>{
       const f=folders[k]; if(!f) return '';
-      return '<div class="proj-rail-i" data-projrail="'+k+'" style="--pc:'+(f.c||'#6a7dff')+'" title="'+esc(f.name||'')+'">'+esc(f.emoji||'🚀')+'</div>';
+      return '<div class="proj-rail-i" data-projrail="'+esc(k)+'" style="--pc:'+safeColor(f.c,'#6a7dff')+'" title="'+esc(f.name||'')+'">'+esc(f.emoji||'🚀')+'</div>';
     }).join('') + '<div class="proj-rail-add" data-projraddd title="Новий проєкт">＋</div>';
     rail.querySelectorAll('[data-projrail]').forEach(el=>{
       el.onclick=()=>{ try{ window.platform.haptic('select'); }catch(_){} goFolder(el.dataset.projrail); };
@@ -173,7 +173,7 @@
       const f=folders[k]; if(!f) return;
       const active = (f.widgets||[]).filter(w=>w.ready).length;
       const subCount = childFolderKeys(k).length;
-      const emojiShow = (f.emoji && f.emoji.trim()) ? f.emoji : esc((f.name||'?').trim().charAt(0).toUpperCase());
+      const emojiShow = (f.emoji && f.emoji.trim()) ? esc(f.emoji.trim()) : esc((f.name||'?').trim().charAt(0).toUpperCase());
       const pinDot = f.pinned ? `<span class="fpin">📌</span>` : '';
       const subBadge = subCount ? `<span class="fsub">📁 ${subCount}</span>` : '';
       // метарядок залежно від ролі папки
@@ -206,7 +206,7 @@
       let inner='';
       if(f.photo){
         const pp=f.photoPos;
-        const xf=pp?`transform:translate(${pp.x}%,${pp.y}%) scale(${pp.scale});`:'';
+        const xf=pp?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
         inner+=`<div class="fc2-bg" style="background-image:url('${safeImg(window.photoSrc(f.photo))}');${xf}"></div>`;
       }
       else { el.classList.add('nocover'); }
@@ -215,7 +215,7 @@
       // темах — емодзі, у нових (desk-*/studio-*) — лінійну іконку. Так
       // перемикання теми міняє вигляд миттєво, без перемальовування списку.
       inner+=`<div class="fc2-em"><span class="fc2-emj">${emojiShow}</span>`+
-             `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${folderIcon(f)}"/></svg></div>`;
+             `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></div>`;
       if(homeFolderView==='deck'){
         let dpct=0;
         if(f.role==='project'){ const pr=folderProgress(k); dpct=pr.total?pr.pct:0; }
@@ -224,7 +224,7 @@
       } else {
         inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}</div>`;
       }
-      inner+=`<button class="fmenu" data-fmenu="${k}" title="Налаштування">⋮</button>`+
+      inner+=`<button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування">⋮</button>`+
              `<button class="fdrag-handle" title="Перетягнути" aria-label="Перетягнути">⠿</button>`;
       el.innerHTML=inner;
       el.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
@@ -455,7 +455,7 @@
       <div class="fmenu-grip"></div>
       <div class="fmenu-title">Іконка · ${esc(f.name)}</div>
       <div class="fic-grid">
-        ${ICON_ALL.map(([id,nm])=>`<button class="fic-opt ${cur===id?'on':''}" data-fic="${id}" title="${nm}" aria-label="${nm}" style="--c:${f.c||'var(--accent)'}">
+        ${ICON_ALL.map(([id,nm])=>`<button class="fic-opt ${cur===id?'on':''}" data-fic="${id}" title="${nm}" aria-label="${nm}" style="--c:${safeColor(f.c,'var(--accent)')}">
           <svg class="ico" aria-hidden="true"><use href="#${id}"/></svg></button>`).join('')}
       </div>
       <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+esc(f.emoji)+')':''}</button>
@@ -485,8 +485,8 @@
     const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='fmenuSheet';
     const rootRow=(f.parent||'')?`<button class="fmi" data-mv="">🏠 На головну (без папки)</button>`:'';
     const rows=targets.map(k=>{ const tf=folders[k]; const cur=(f.parent||'')===k?' ✓':'';
-      const em=(tf.emoji&&tf.emoji.trim())?tf.emoji:'📁';
-      return `<button class="fmi" data-mv="${k}"><span class="gfp-em">${em}</span> ${esc(tf.name)}${cur}</button>`; }).join('');
+      const em=(tf.emoji&&tf.emoji.trim())?esc(tf.emoji):'📁';
+      return `<button class="fmi" data-mv="${esc(k)}"><span class="gfp-em">${em}</span> ${esc(tf.name)}${cur}</button>`; }).join('');
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
       <div class="fmenu-title">Перемістити «${esc(f.name)}»</div>
       ${rootRow}${rows||'<div class="fmi-label">Немає інших папок</div>'}</div>`;
