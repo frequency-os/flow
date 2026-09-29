@@ -1,20 +1,21 @@
-  /* ============ DEBTS LOGIC ============ */
+  /* ============ DEBTS LOGIC ============
+     Весь core — один спільний <script>, тож імена тут глобальні. Тому все
+     з префіксом debt*: загальні render/save/items колись перехопила б
+     будь-яка інша частина програми. esc і fmt — у 01-base.js. */
   const CUR={UAH:"₴",USD:"$",EUR:"€",PLN:"zł"};
-  const KEY='debts';
-  let kind='owe', items=[];
+  const DEBT_KEY='debts';
+  let debtKind='owe', debtItems=[];
 
   document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
     document.querySelectorAll('.seg button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); kind=b.dataset.k;
+    b.classList.add('on'); debtKind=b.dataset.k;
   });
   document.getElementById('date').value=ymdLocal();
 
-  function save(){
-    try{ const p=window.storage.set(KEY,JSON.stringify(items),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){}
+  function debtSave(){
+    try{ const p=window.storage.set(DEBT_KEY,JSON.stringify(debtItems),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){}
   }
-  function fmt(n){ return Number(n).toLocaleString('uk-UA',{maximumFractionDigits:2}); }
   function initials(n){ return (n.trim()[0]||'?').toUpperCase(); }
-  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   // дозволяємо лише прості теги форматування у rich-нотатці
   function sanitizeRich(html){
     try{
@@ -58,14 +59,14 @@
     const date=document.getElementById('date').value;
     const note=document.getElementById('note').value.trim();
     if(!name||!(amount>0)){ (!name?document.getElementById('name'):document.getElementById('amount')).focus(); return; }
-    items.unshift({ id:Date.now(), kind, name, cur, ops:[{id:Date.now(),type:'borrow',amount,date,note}] });
+    debtItems.unshift({ id:Date.now(), kind:debtKind, name, cur, ops:[{id:Date.now(),type:'borrow',amount,date,note}] });
     document.getElementById('name').value=''; document.getElementById('amount').value=''; document.getElementById('note').value='';
-    save(); render();
+    debtSave(); debtRender();
   };
-  function del(id){ items=items.filter(i=>i.id!==id); save(); render(); if(curId===id) closeModal(); }
+  function debtDel(id){ debtItems=debtItems.filter(i=>i.id!==id); debtSave(); debtRender(); if(curId===id) closeModal(); }
 
-  function render(){
-    document.getElementById('cnt').textContent=items.length;
+  function debtRender(){
+    document.getElementById('cnt').textContent=debtItems.length;
     const tot=debtTotals(), curs=Object.keys(tot);
     const sumLine=k=>curs.length?curs.map(c=>`<div class="dsum">${fmt(tot[c][k])} <small>${CUR[c]||c}</small></div>`).join(''):'0 <small>₴</small>';
     document.getElementById('sumOwe').innerHTML=sumLine('owe');
@@ -76,8 +77,8 @@
     ne.style.color=nets.length===1?(nets[0].n>0?'var(--owed)':nets[0].n<0?'var(--owe)':'var(--text)'):'var(--text)';
 
     const list=document.getElementById('list');
-    if(!items.length){ list.innerHTML=`<div class="empty"><div class="e">🪙</div>Поки що порожньо.<br>Додай перший запис вище.</div>`; return; }
-    list.innerHTML=items.map(i=>{
+    if(!debtItems.length){ list.innerHTML=`<div class="empty"><div class="e">🪙</div>Поки що порожньо.<br>Додай перший запис вище.</div>`; return; }
+    list.innerHTML=debtItems.map(i=>{
       const c=i.kind==='owe'?'var(--owe)':'var(--owed)';
       const bal=balance(i), settled=bal<=0.0001;
       const sign=i.kind==='owe'?'−':'+';
@@ -100,7 +101,7 @@
   }
 
   function toggleDebtSync(id){
-    const i=items.find(x=>String(x.id)===String(id)); if(!i) return;
+    const i=debtItems.find(x=>String(x.id)===String(id)); if(!i) return;
     const bal=balance(i);
     if(i.synced){
       // прибрати пов'язану операцію
@@ -120,7 +121,7 @@
       i.synced=true; i.finOpId=opId;
       saveFinOps();
     }
-    save(); render(); try{ renderFinance(); }catch(_){}
+    debtSave(); debtRender(); try{ renderFinance(); }catch(_){}
   }
 
   /* ---- modal ---- */
@@ -132,7 +133,7 @@
   document.getElementById('modal').onclick=e=>{ if(e.target.id==='modal') closeModal(); };
 
   function renderModal(){
-    const i=items.find(x=>x.id===curId); if(!i){ closeModal(); return; }
+    const i=debtItems.find(x=>x.id===curId); if(!i){ closeModal(); return; }
     const c=i.kind==='owe'?'var(--owe)':'var(--owed)', sym=CUR[i.cur]||i.cur;
     document.getElementById('modalIn').style.setProperty('--c',c);
     document.getElementById('mAv').textContent=initials(i.name);
@@ -158,7 +159,7 @@
     }).join('');
   }
   function askOp(type){ pendingType=type;
-    const i=items.find(x=>x.id===curId), p=document.getElementById('prompt');
+    const i=debtItems.find(x=>x.id===curId), p=document.getElementById('prompt');
     let title = type==='repay' ? (i.kind==='owe'?'Скільки ти віддав?':'Скільки тобі повернули?')
                                : (i.kind==='owe'?'Скільки ще позичив?':'Скільки ще дав у борг?');
     document.getElementById('pTitle').textContent=title; p.classList.remove('hidden');
@@ -167,16 +168,16 @@
   document.getElementById('pOk').onclick=commitOp;
   document.getElementById('pAmount').addEventListener('keydown',e=>{ if(e.key==='Enter') commitOp(); });
   function commitOp(){
-    const i=items.find(x=>x.id===curId), amt=parseFloat(document.getElementById('pAmount').value);
+    const i=debtItems.find(x=>x.id===curId), amt=parseFloat(document.getElementById('pAmount').value);
     if(!i||!(amt>0)){ document.getElementById('pAmount').focus(); return; }
     let amount=amt;
     if(pendingType==='repay'){ const bal=balance(i); if(amount>bal) amount=bal; }
     i.ops.push({id:Date.now(),type:pendingType,amount,date:ymdLocal(),note:''});
     document.getElementById('prompt').classList.add('hidden'); pendingType=null;
-    save(); renderModal(); render();
+    debtSave(); renderModal(); debtRender();
   }
   function delOp(opId){
-    const i=items.find(x=>x.id===curId); if(!i||i.ops.length<=1) return;
-    i.ops=i.ops.filter(o=>o.id!==opId); save(); renderModal(); render();
+    const i=debtItems.find(x=>x.id===curId); if(!i||i.ops.length<=1) return;
+    i.ops=i.ops.filter(o=>o.id!==opId); debtSave(); renderModal(); debtRender();
   }
 

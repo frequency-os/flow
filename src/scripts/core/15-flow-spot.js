@@ -346,17 +346,6 @@
     const v=document.getElementById('aiViews'); if(!v) return;
     v.innerHTML=''; v.style.display='none';
   }
-  function aiPendingMsg(){
-    for(let i=aiChatMsgs.length-1;i>=0;i--){
-      const m=aiChatMsgs[i];
-      if(m.role!=='assistant') continue;
-      if(m.applied||m.declined) return null;
-      if(m.streaming) return null;
-      const pr=aiParseBlocks(m.content);
-      return aiOpsCount(pr)?{m:m,pr:pr}:null;
-    }
-    return null;
-  }
   function aiLogHTML(){
     if(!aiLog.length) return '';
     const fmtT=ts=>{ const d=new Date(ts); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
@@ -964,35 +953,6 @@
       if(hasDone(ymdLocal(d))) n++; else break; }
     return n;
   }
-  // найдовша серія за всю історію (не лише поточна) — для хіро-картки «Серія»
-  function plBestStreak(){
-    const p=plData();
-    const days=Object.keys(p.blocksByDay||{})
-      .filter(ds=>Array.isArray(p.blocksByDay[ds])&&p.blocksByDay[ds].some(b=>b.done)).sort();
-    if(!days.length) return 0;
-    let best=1, cur=1;
-    for(let i=1;i<days.length;i++){
-      const diff=Math.round((new Date(days[i])-new Date(days[i-1]))/86400000);
-      cur = diff===1 ? cur+1 : 1;
-      if(cur>best) best=cur;
-    }
-    return Math.max(best,plStreak());
-  }
-  // поточний тиждень (Пн→Нд), для смужки крапок на хіро-картці
-  function plWeekDots(){
-    const p=plData();
-    const hasDone=ds=>Array.isArray(p.blocksByDay[ds])&&p.blocksByDay[ds].some(b=>b.done);
-    const labels=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
-    const today=new Date(); today.setHours(0,0,0,0);
-    const dow=(today.getDay()+6)%7;
-    const monday=new Date(today); monday.setDate(today.getDate()-dow);
-    const out=[];
-    for(let i=0;i<7;i++){
-      const d=new Date(monday); d.setDate(monday.getDate()+i);
-      out.push({ l:labels[i], on:hasDone(ymdLocal(d)), future:d>today });
-    }
-    return out;
-  }
   /* ── хіро-картка Огляду: тиждень присутності ──
      Було «Прогрес місяця — 10%»: частка днів місяця, що вже минули, коли був
      запис у Щоденнику або дотик до Карти бажань. Напис нічого не пояснював, а
@@ -1001,8 +961,8 @@
      поточний тиждень — «скільки з семи» і сім крапок Пн→Нд, де видно і
      пропуски, і що вихідні ще попереду.
 
-     Правило дня лишилось те саме (Щоденник АБО Карта бажань). Сусідні
-     plWeekDots()/plStreak() сюди не годяться: вони рахують виконані блоки
+     Правило дня лишилось те саме (Щоденник АБО Карта бажань). Сусідній
+     plStreak() сюди не годиться: він рахує виконані блоки
      Планера, а це інша річ. */
   function heroWeekDays(){
     const labels=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
@@ -1149,31 +1109,6 @@
     return {html:rows,n:sugg.length};
   }
 
-  // квартальні цілі-якорі: реальний прогрес + скільки задач сьогодні їх рухає
-  function plQAnchorsHTML(){
-    const goals=(goalsData.goals||[]);
-    if(!goals.length){
-      return `<div class="seclbl">${plIco('goal',13)} Цілі кварталу</div>
-        <div class="pl-qempty" data-plqall>Ще нема цілей. Додай ціль — і бачитимеш, як день її рухає ›</div>`;
-    }
-    const p=plData();
-    const cards=goals.slice(0,6).map(gl=>{
-      const steps=gl.steps||[]; const sd=steps.filter(s=>s.done).length;
-      const gp=steps.length?Math.round(sd/steps.length*100):(gl.progress||0);
-      const cc=gl.color||'#5b8def';
-      // скільки задач планера цього дня згадують цю ціль (за назвою в t.goal або t.tag)
-      const nm=(gl.name||'').toLowerCase();
-      const linked=p.tasks.filter(t=>t.scope==='day' && ((t.goal||'').toLowerCase().includes(nm) || (t.tag||'').toLowerCase().includes(nm))).length;
-      const sub=linked?linked+' задач сьогодні ↓':(steps.length?sd+'/'+steps.length+' кроків':'ціль кварталу');
-      return `<div class="pl-qa" style="--gc:${cc}" data-plqgoal="${esc(gl.id||gl.name||'')}">
-        <div class="pl-qah"><div class="pl-qae" style="background:${cc}22">${gl.emoji||'🎯'}</div>
-          <div class="pl-qan">${esc(gl.name||'Ціль')}</div><div class="pl-qap" style="color:${cc}">${gp}%</div></div>
-        <div class="pl-qbar"><i style="width:${gp}%;background:${cc}"></i></div>
-        <div class="pl-qm">${sub}</div></div>`;
-    }).join('');
-    return `<div class="seclbl" style="display:flex;justify-content:space-between;align-items:center">${plIco('goal',13)} Цілі кварталу<span class="pl-qmore" data-plqall>усі ›</span></div><div class="pl-qstrip">${cards}</div>`;
-  }
-
   // тижневий календар: 7 днів навколо обраного, крапки = заплановані блоки
   function plWeekCalHTML(){
     const p=plData();
@@ -1198,15 +1133,6 @@
     const jump = sel!==today ? `<div class="pl-todayjump"><button data-plday="${today}">↩ Сьогодні</button></div>` : '';
     return `${jump}<div class="pl-dayscroll">${cells}</div>`;
   }
-  function plDayTitle(ds){
-    const MON=['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
-    if(ds===plTodayStr()) return 'Сьогодні';
-    const tmr=new Date(); tmr.setDate(tmr.getDate()+1);
-    if(ds===ymdLocal(tmr)) return 'Завтра';
-    const d=new Date(ds+'T12:00:00');
-    const DOW=['Неділя','Понеділок','Вівторок','Середа','Четвер','П\u2019ятниця','Субота'];
-    return `${DOW[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`;
-  }
 
   // задача бек-логу → блок розкладу на обрану годину
   // ═══ Віджети плану в папці (📅 день / 🗓 місяць) ═══
@@ -1223,19 +1149,6 @@
       extra.push({id:'disp_'+tpl.id, h:tpl.h, endH:tpl.endH, t:tpl.t, c:tpl.c, link:tpl.link, tag:tpl.tag, folder:tpl.folder||'', fromRecur:tpl.id, done:false});
     });
     return saved.concat(extra);
-  }
-  function plFolderDayVal(key){
-    const bs=plBlocksDisplay(plTodayStr()).filter(b=>b.folder===key);
-    if(!bs.length) return '+';
-    return bs.filter(b=>b.done).length+'/'+bs.length+' сьогодні';
-  }
-  function plFolderMonthVal(key){
-    const ym=plTodayStr().slice(0,7);
-    let n=0, hrs=0;
-    plMonthWeeks(ym).flat().filter(Boolean).forEach(ds=>{
-      plBlocksDisplay(ds).filter(b=>b.folder===key).forEach(b=>{ n++; hrs+=Math.max(0,plBlockEnd(b)-b.h); });
-    });
-    return n? n+' точок · '+Math.round(hrs)+' год' : '+';
   }
   // виконання блоку з контексту папки (завжди сьогодні)
   function plFolderComplete(id){

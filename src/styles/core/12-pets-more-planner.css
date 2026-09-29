@@ -255,8 +255,6 @@
   .mh-sheet-h span{font-size:13px;color:var(--muted);}
   .mh-sheet-body{font-size:14.5px;color:var(--muted);line-height:1.65;}
   .mh-sheet-body b{color:var(--text);font-weight:700;}
-  .mh-soon{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:12px;font-weight:800;
-    color:var(--accent);background:rgba(106,125,255,.14);padding:8px 15px;border-radius:99px;}
 
   /* десктоп: ширші плитки на 3 в ряд */
   @media (min-width:1024px){
@@ -1169,6 +1167,12 @@
   .acc-mini.gg{background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;border-color:transparent;}
   .acc-mini.dng{color:var(--owe,#ff5a5f);}
   .acc-mini.tg{background:linear-gradient(135deg,#2aabee,#229ed9);color:#fff;border-color:transparent;}
+  .acc-errlog{width:100%;max-height:220px;overflow:auto;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:11px/1.45 ui-monospace,Menlo,monospace;color:var(--text);word-break:break-word;}
+  .acc-errlog-i{padding:3px 0;border-bottom:1px dashed var(--line);}
+  .acc-errlog-i:last-child{border-bottom:none;}
+  .acc-errlog-i b{color:var(--muted);font-weight:600;}
+  .acc-errlog-i span{color:var(--muted);}
+  .acc-errlog-ta{display:block;width:100%;min-height:180px;background:transparent;border:0;outline:none;resize:vertical;color:var(--text);font:inherit;padding:0;}
   .acc-hint{width:100%;font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:2px;}
   .bk-diag{margin-top:10px;width:100%;background:var(--bg-2);border:1px solid var(--line);color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;padding:9px;border-radius:10px;cursor:pointer;}
   .dg-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px);}
@@ -1189,3 +1193,14 @@
   .dg-empty{color:var(--muted);font-size:12px;text-align:center;padding:14px;}
   .dg-foot{margin:13px 0 0;font-size:10px;color:var(--muted);line-height:1.5;}
 
+
+  /* «Зменшити рух» (iOS: Універсальний доступ → Рух): напарник і AI-сцени не ворушаться
+     безкінечно — дихання, кліпання, аура, «Zz», сцена з хом'ячком стоять. Спінер
+     завантаження, курсор стріму й пульс запису лишаємо: вони кажуть, що щось триває. */
+  @media (prefers-reduced-motion:reduce){
+    #flowCap,#flowCap .fc-dot,
+    .ai-hamscene,.ai-hamscene *,#aiCapPet,#aiCapPet *,
+    .ai-pet-stage,.ai-pet-stage::before,.ai-pet-stage *,
+    .ai-aurora,.ai-orb,.ai-orb::before,
+    [style*="petBlink"],[style*="petGlow"]{animation:none!important;}
+  }

@@ -128,33 +128,6 @@
     folder:'<path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-12z" stroke-linejoin="round"/>'
   };
   function pgsIc(k){ return '<svg viewBox="0 0 24 24">'+(PGS_ICONS[k]||PGS_ICONS.text)+'</svg>'; }
-  function pgsDemo(k){
-    if(k==='progress')return 'Марафон · 64%<div class="pgst-bar"><i style="width:64%"></i></div>';
-    if(k==='countdown')return 'До переїзду<div class="pgst-cnt"><b>43</b><b>дн</b><b>12</b><b>год</b></div>';
-    if(k==='fin')return '<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="color:#f0b429;font-size:14px">€ ···</b><span>цей місяць</span></div><div class="pgst-bar"><i style="width:48%;background:#f0b429"></i></div>';
-    if(k==='calendar')return '<div class="pgst-cal"><i></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>';
-    if(k==='wpult')return '<div class="pgst-prow"><span class="pgst-dot" style="background:#34c77b"></span>Проєкт А · наступний крок</div><div class="pgst-prow"><span class="pgst-dot" style="background:#e8843c"></span>Проєкт Б · наступний крок</div>';
-    if(k==='wpipe')return '<div class="pgst-kan"><div><i class="a"></i><i class="a"></i><i></i></div><div><i class="a"></i></div><div><i class="a"></i><i></i></div></div>';
-    if(k==='kanban')return '<div class="pgst-kan"><div><i class="a"></i><i></i><i></i></div><div><i class="a"></i><i class="a"></i></div><div><i></i></div></div>';
-    if(k==='contacts')return '<div class="pgst-ava"><i style="background:#5b8def"></i><i style="background:#e8843c"></i><i style="background:#34c77b"></i><i style="background:#c77dff"></i></div>';
-    if(k==='caseline')return '<div class="pgst-prow"><span class="pgst-dot" style="background:#e8843c"></span>12 лип · подія</div><div class="pgst-prow"><span class="pgst-dot" style="background:#5b8def"></span>18 лип · подія</div>';
-    if(k==='project')return '<div style="display:flex;justify-content:space-between"><span>Дохід − витрати</span><b style="color:#34c77b">= прибуток</b></div><div class="pgst-bar"><i style="width:70%"></i></div>';
-    if(k==='wportal')return 'Тап — і ти в потрібній папці, без блукання по рівнях.';
-    if(k==='db')return '<div class="pgst-kan"><div><i class="a"></i><i></i></div><div><i class="a"></i><i></i></div><div><i class="a"></i><i></i></div></div>';
-    if(k==='toggle')return '▸ Заголовок, що ховає вміст усередині.';
-    if(k==='divider')return '<div style="height:1px;background:var(--pg-line);margin:8px 0"></div>';
-    /* ═══ PREMIUM PACK V1 ═══ */
-    if(k==='prompt')return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><b style="font-size:10px">Промт для рілсів</b><span style="background:rgba(199,125,255,.18);color:#c77dff;border-radius:6px;padding:2px 6px;font-size:8px">копіювати</span></div><div style="font-size:9px;opacity:.6;font-family:ui-monospace,monospace">Ти — сценарист коротких відео. Напиши хук про {тему}…</div>';
-    if(k==='heatmap')return '<div class="pgst-cal"><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i></i></div>';
-    if(k==='kpi')return '<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:16px">1 250 <span style="font-size:10px;opacity:.7">€</span></b><span style="color:#34c77b;font-size:10px">▲ 12%</span></div><div class="pgst-bar"><i style="width:62%;background:#6a7dff"></i></div>';
-    if(k==='chart')return '<div style="display:flex;align-items:flex-end;gap:3px;height:26px"><i style="flex:1;background:#5b8def;border-radius:2px;height:40%"></i><i style="flex:1;background:#5b8def;border-radius:2px;height:70%"></i><i style="flex:1;background:#5b8def;border-radius:2px;height:55%"></i><i style="flex:1;background:#5b8def;border-radius:2px;height:100%"></i><i style="flex:1;background:#5b8def;border-radius:2px;height:80%"></i></div>';
-    if(k==='tabs')return '<div style="display:flex;gap:4px"><span style="background:#9b8cff;color:#fff;border-radius:99px;padding:2px 8px;font-size:9px">План</span><span style="background:rgba(255,255,255,.08);border-radius:99px;padding:2px 8px;font-size:9px">Ідеї</span><span style="background:rgba(255,255,255,.08);border-radius:99px;padding:2px 8px;font-size:9px">Нотатки</span></div>';
-    if(k==='accord')return '<div class="pgst-prow">▾ Розгорнута секція</div><div class="pgst-prow" style="opacity:.55">▸ Згорнута секція</div>';
-    if(k==='embed')return '<div style="aspect-ratio:16/9;max-height:34px;background:rgba(255,107,157,.18);border-radius:6px;display:flex;align-items:center;justify-content:center">▶</div>';
-    if(k==='audio')return '<div style="display:flex;align-items:center;gap:6px"><span style="width:18px;height:18px;border-radius:50%;background:#c77dff;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:8px">▶</span><span class="pgst-bar" style="flex:1;margin:0"><i style="width:35%;background:#c77dff"></i></span></div>';
-    if(k==='wfocus')return '<div style="display:flex;align-items:center;gap:8px"><b style="font-size:14px">25:00</b><span>🍅 тап = старт фокуса</span></div>';
-    return 'Тап «Вставити» — блок з\u2019явиться на сторінці.';
-  }
 
   function bridge(){ return window.__flowPageBridge||null; }
   var editor=document.getElementById('pgEditor');

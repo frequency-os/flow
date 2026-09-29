@@ -263,22 +263,39 @@
         const s = await npSeed();
         return { restored:h.restored, checked:h.checked, seeded:s, native: !!npReady() };
       },
-      // обробити значення на виході: мігрувати якщо треба, віддати модулю чисті дані
-      _out(key, valueStr){
+      /* обробити значення на виході: мігрувати якщо треба, віддати модулю чисті дані.
+         Приймає рядок ЯК ЛЕЖИТЬ у сховищі (з __sv). Читання більше НІЧОГО НЕ ПИШЕ.
+         Раніше сюди приходив уже розгорнутий рядок без __sv — версія завжди
+         читалась як 0, і КОЖНЕ читання envelopes/debts/goals_data/work_sessions/
+         spend переписувало ключ зі свіжою міткою (навіть коли хмара мовчить):
+         локальна копія «новішала» і при звірці перемагала правки з інших
+         пристроїв. Закріпити нову версію в сховищі — справа restampLocal(),
+         яку кличе реєстр міграцій лише після довіреного читання. */
+      _out(key, storedStr){
         const target = SCHEMAS[key] || 0;
-        if(!target) return valueStr; // не версіонований — як є
-        let parsed; try{ parsed = JSON.parse(valueStr); }catch(_){ return valueStr; }
+        if(!target) return unstampSv(storedStr); // не версіонований — як є
+        let parsed; try{ parsed = JSON.parse(storedStr); }catch(_){ return storedStr; }
         const m = migrateParsed(key, parsed);
-        const cleanStr = JSON.stringify(m.data);
-        if(m.changed){
-          // тихо перезберігаємо вже у новій версії (локально; Supabase-обгортка нижче підхопить)
-          try{ const stamped = stampSv(key, cleanStr); const raw = wrap(stamped); lcSet(key, raw); }catch(_){}
-        }
-        return cleanStr; // модулю — чисті дані без __sv
+        if(!m.changed) return unstampSv(storedStr);
+        return unstampSv(stampSv(key, JSON.stringify(m.data))); // модулю — чисті дані без __sv
+      },
+      /* Дописати актуальну версію схеми в локальні копії, які ще без неї.
+         Кличе реєстр MIGRATIONS_ONCE (27-canvas.js) після довіреного читання.
+         Мітку _v лишаємо ТІЄЮ САМОЮ: це той самий запис у новій формі, а не
+         свіжа правка — інакше він перебив би новіші дані з хмари. */
+      restampLocal(){
+        let n=0;
+        Object.keys(SCHEMAS).forEach(key=>{
+          const l=unwrap(lcGet(key)); if(!l) return;
+          let parsed; try{ parsed=JSON.parse(l.value); }catch(_){ return; }
+          const m=migrateParsed(key, parsed); if(!m.changed) return;
+          if(lcSet(key, JSON.stringify({ _v: l.v || Date.now(), d: stampSv(key, JSON.stringify(m.data)) }))) n++;
+        });
+        return n;
       },
       // ⚡ синхронне читання ЛИШЕ локальної копії (для миттєвого першого рендера до синку з хмарою)
       getLocal(key){
-        try{ const l=unwrap(lcGet(key)); return l? this._out(key, unstampSv(l.value)) : null; }catch(_){ return null; }
+        try{ const l=unwrap(lcGet(key)); return l? this._out(key, l.value) : null; }catch(_){ return null; }
       },
       /* Дзеркало хмари (SYNC-4): прочитане з хмари кладемо в локальну копію з
          міткою ХМАРИ, а не «зараз». Без цього пристрій, який ключ лише читає,
@@ -293,7 +310,7 @@
       async get(key){
         const localRaw = lcGet(key);
         const local = unwrap(localRaw);
-        if(local) return { key, value: this._out(key, unstampSv(local.value)), shared:false };
+        if(local) return { key, value: this._out(key, local.value), shared:false };
         throw new Error('not found');
       },
       async set(key, value){
@@ -353,17 +370,19 @@
       });
     }
 
+    // перевірку сесії завершено — хто чекав на довіру до даних (реєстр міграцій), може йти
+    function sbReadyEvt(){ try{ document.dispatchEvent(new CustomEvent('flowsbready')); }catch(_){} }
     async function sbInit(){
       if(sbInitPromise) return sbInitPromise;
       sbInitPromise = (async()=>{
         const lib = await loadSupabaseLib();
-        if(!lib){ window.__sbReady = true; return null; }
+        if(!lib){ window.__sbReady = true; sbReadyEvt(); return null; }
         sb = lib.createClient(SB_URL, SB_KEY);
         try{
           const { data } = await sb.auth.getSession();
           sbUserCache = data && data.session ? data.session.user : null;
         }catch(_){}
-        window.__sbReady = true;
+        window.__sbReady = true; sbReadyEvt();
         try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
         // Якщо на момент старту сторінки сесія вже була (людина заходить у знайомому
         // браузері) — стартовий load() міг устигнути прочитати ЛИШЕ локальну копію
@@ -766,13 +785,42 @@
     //    кількома рядками замість окремого запиту на кожен ключ ──
     let sbWriteQueue = {}; // {key: rawValueString} — очікують відправки в хмару
     let sbWriteTimer = null;
+    /* Партія, яку sbFlushWrites уже забрав із черги, але хмара ще не відповіла.
+       Вона теж мусить лежати в кошику: інакше будь-яке збереження кошика під час
+       польоту (відкладений таймер, згортання, set іншого ключа) бачить порожню
+       чергу і стирає кошик — і якщо iOS уб'є застосунок до відповіді, правка
+       в хмару вже не піде. Прибираємо ключ звідси лише після відповіді. */
+    let sbInFlight = {};
+    /* Номер партії й номер останньої партії, що ДІЙШЛА, для кожного ключа.
+       Потрібні, щоб стара партія, яка впала пізніше за новішу, не повернула
+       старе значення в чергу: повтор записав би його в хмару з найсвіжішою
+       міткою, і правку пристрій потім сам відкотив би. Лічильник, а не
+       годинник: мітки хмари з інших пристроїв можуть бути зсунуті. */
+    let sbFlushSeq = 0;
+    const sbDoneSeq = {};
     /* «Вихідний кошик» у localStorage: незлиті записи мають пережити перезапуск,
        інакше офлайн-правка, зроблена перед закриттям, губиться назавжди. */
     function sbOutboxSave(){
+      if(sbOutboxTimer){ clearTimeout(sbOutboxTimer); sbOutboxTimer=null; }
       try{
-        if(Object.keys(sbWriteQueue).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(sbWriteQueue));
+        const all = Object.assign({}, sbInFlight, sbWriteQueue);   // новіше з черги перемагає
+        if(Object.keys(all).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(all));
         else localStorage.removeItem('flowapp___sb_outbox');
       }catch(_){}
+    }
+    /* Кошик пишемо не на КОЖЕН set(), а не частіше ніж раз на 400 мс. Чому:
+       повзунок чи перетягування дає десятки set() того самого ключа за секунду,
+       і кожен раз уся черга (з дошкою ~0.7 МБ) серіалізувалась і лягала в
+       localStorage заново — хоча в черзі однаково лишається тільки ОСТАННЄ
+       значення ключа. Саме значення вже лежить у localStorage (origSet пише
+       синхронно), тож у ці 400 мс ризикує лише позначка «ще не в хмарі».
+       Коли застосунок ховають або закривають — кошик пишемо НЕГАЙНО (sbOnHide),
+       і будь-який запис уже після ховання теж іде в кошик одразу. */
+    let sbOutboxTimer = null;
+    let sbHiding = false;   // pagehide вже був (visibilityState на старих WebKit міг ще лишатись 'visible')
+    function sbOutboxSaveSoon(){
+      if(sbHiding || document.visibilityState==='hidden'){ sbOutboxSave(); return; }
+      if(!sbOutboxTimer) sbOutboxTimer = setTimeout(sbOutboxSave, 400);
     }
     function sbOutboxLoad(){
       try{
@@ -783,8 +831,8 @@
     }
     function sbSyncPending(){ try{ window.__flowSync.sbPending = Object.keys(sbWriteQueue).length; }catch(_){} }
     function sbScheduleWrite(key, value){
-      sbWriteQueue[key] = value;
-      sbOutboxSave(); sbSyncPending();
+      sbWriteQueue[key] = value;       // той самий ключ удруге — просто нове значення (останнє перемагає)
+      sbOutboxSaveSoon(); sbSyncPending();
       try{ if(window.__setSync) window.__setSync('syncing'); }catch(_){}
       if(sbWriteTimer) return;
       sbWriteTimer = setTimeout(sbFlushWrites, 500);
@@ -795,6 +843,8 @@
       const q = sbWriteQueue; sbWriteQueue = {};   // знімаємо поточну партію
       const keys = Object.keys(q);
       if(!keys.length){ sbOutboxSave(); return; }
+      keys.forEach(k=>{ sbInFlight[k]=q[k]; });
+      const seq = ++sbFlushSeq;
       let ok=false;
       if(u && sb){
         try{
@@ -807,14 +857,20 @@
           const { error } = await sb.from('user_data').upsert(rows, { onConflict:'user_id,key' });
           if(error) throw error;
           if(sbBatchCache) keys.forEach(k=>{ sbBatchCache[k]=q[k]; });
-          keys.forEach(k=>{ sbBatchTs[k]=now; });   // свіжість хмари тепер відома точно
+          keys.forEach(k=>{ sbBatchTs[k]=now; sbDoneSeq[k]=seq; });   // свіжість хмари тепер відома точно
           ok=true;
         }catch(_){ ok=false; }
       }
+      // відповідь є — ця партія більше не «в польоті» (якщо ключ уже летить
+      // новішим значенням в іншій партії, його не чіпаємо)
+      keys.forEach(k=>{ if(sbInFlight[k]===q[k]) delete sbInFlight[k]; });
       if(!ok){
         // НЕ втрачаємо партію: повертаємо ключі в чергу (не затираючи новіші),
         // зберігаємо в outbox і повторюємо з паузою — і одразу коли з'явиться мережа.
-        keys.forEach(k=>{ if(!(k in sbWriteQueue)) sbWriteQueue[k]=q[k]; });
+        // Ключ НЕ повертаємо, якщо новіше значення вже в черзі, ще летить в іншій
+        // партії (у sbInFlight лишається лише чуже, своє ми щойно прибрали) або
+        // пізніша партія вже дійшла — інакше старе перемогло б новіше.
+        keys.forEach(k=>{ if(!(k in sbWriteQueue) && !(k in sbInFlight) && !((sbDoneSeq[k]||0) > seq)) sbWriteQueue[k]=q[k]; });
         sbOutboxSave(); sbSyncPending();
         window.__flowSync.sbHadError = true;
         try{ if(window.__setSync) window.__setSync('error'); }catch(_){}
@@ -831,13 +887,24 @@
     }
     // віддаємо на випадок, якщо треба «доштовхнути» outbox ззовні (напр. після входу)
     window.sbFlushWrites = sbFlushWrites;
-    document.addEventListener('visibilitychange', ()=>{
-      if(document.visibilityState==='hidden' && Object.keys(sbWriteQueue).length){
+    // застосунок ховають/закривають: відкладений кошик — у localStorage зараз,
+    // черга — в хмару зараз (таймери у фоні iOS можуть уже не спрацювати)
+    function sbOnHide(){
+      if(sbOutboxTimer) sbOutboxSave();
+      if(Object.keys(sbWriteQueue).length){
         sbOutboxSave();
         if(sbWriteTimer){ clearTimeout(sbWriteTimer); sbWriteTimer=null; }
         try{ sbFlushWrites(); }catch(_){}
       }
+    }
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState==='hidden') sbOnHide();
+      else sbHiding=false;
     });
+    try{
+      window.addEventListener('pagehide', ()=>{ sbHiding=true; sbOnHide(); });
+      window.addEventListener('pageshow', ()=>{ sbHiding=false; });
+    }catch(_){}
     // щойно повернулась мережа — спробувати відправити те, що чекає
     try{ window.addEventListener('online', ()=>{ if(Object.keys(sbWriteQueue).length && !sbWriteTimer) sbWriteTimer=setTimeout(sbFlushWrites,300); }); }catch(_){}
     // при старті підхопити незлиті правки з попередньої сесії (відправляться, коли буде сесія)
@@ -847,10 +914,38 @@
        Хмара досі читалась лише при запуску та по ручному «↻» — застосунок,
        що висить відкритим на Маку, не бачив правок з телефона, доки його не
        перезапустиш. Тепер: (а) при поверненні до вкладки/застосунку і
-       (б) тихим кроком раз на ~2 хв, поки він видимий, робимо ОДИН пакетний
-       запит і, ТІЛЬКИ якщо в хмарі зʼявилось щось новіше за локальне,
+       (б) тихим кроком раз на ~2 хв, поки він видимий, звіряємо час-мітки
+       (sbPullChanged) і, ТІЛЬКИ якщо в хмарі зʼявилось щось новіше за локальне,
        перечитуємо дані тим самим __load(), що й кнопка «↻». Порожні звірки
        екран не смикають узагалі. */
+    /* Звірка у ДВА кроки замість повного скачування. Раніше кожне повернення в
+       застосунок і кожні 2 хв тягнули ВСІ значення всіх ключів (дошка з фото —
+       ~0.7 МБ) лише для того, щоб порівняти час-мітки. Тепер: (1) лише
+       key+updated_at — кілька КБ; (2) значення докачуємо тільки для ключів,
+       чия мітка в хмарі не така, як у нашому кеші. Кеш після цього такий самий,
+       як після повного читання, тож storage.get() поводиться як раніше. */
+    async function sbPullChanged(){
+      if(!sb || !sbUserCache) return false;
+      if(!sbBatchCache) return sbPrefetchAll();   // кешу ще нема — одне повне читання, як раніше
+      try{
+        const uid = sbUserCache.id;
+        const { data, error } = await sb.from('user_data').select('key,updated_at').eq('user_id', uid).not('key','like','photo:%');
+        if(error || !data){ window.__sbCloudOk=false; return false; }
+        const stamps = {};
+        data.forEach(r=>{ stamps[r.key]=Date.parse(r.updated_at)||0; });
+        // ключ зник із хмари — прибрати з кешу, як це зробило б повне читання
+        Object.keys(sbBatchCache).forEach(k=>{ if(!(k in stamps)){ delete sbBatchCache[k]; delete sbBatchTs[k]; } });
+        const need = Object.keys(stamps).filter(k=> !(k in sbBatchCache) || stamps[k]!==(sbBatchTs[k]||0));
+        if(need.length){
+          const r2 = await sb.from('user_data').select('key,value,updated_at').eq('user_id', uid).in('key', need);
+          if(r2.error || !r2.data){ window.__sbCloudOk=false; return false; }
+          // sbFromCloud, як і в sbPrefetchAll: сирий текст (аватарка, ui_mode) — без лапок
+          r2.data.forEach(r=>{ sbBatchCache[r.key]=sbFromCloud(r.value); sbBatchTs[r.key]=Date.parse(r.updated_at)||0; });
+        }
+        window.__sbCloudOk=true;
+        return true;
+      }catch(_){ window.__sbCloudOk=false; return false; }
+    }
     let sbLastPull = 0;
     async function sbPullFresh(){
       if(!sb || !sbUserCache) return;
@@ -863,7 +958,7 @@
       }catch(_){}
       sbLastPull = Date.now();
       const before = Object.assign({}, sbBatchTs);  // час-мітки хмари ДО звірки
-      let ok=false; try{ ok = await sbPrefetchAll(); }catch(_){}
+      let ok=false; try{ ok = await sbPullChanged(); }catch(_){}
       if(!ok) return;
       try{ sbPhotoSync(); }catch(_){}   // заразом доштовхнути фото, що чекають
       let changed = false;
@@ -872,7 +967,10 @@
         // новим вважаємо лише те, чого ми ще не бачили І що свіжіше за локальну копію
         if(cloudTs > (before[k]||0) && cloudTs > sbLocalVersion(k)){ changed = true; break; }
       }
-      if(!changed) return;
+      // хмара відповіла, а міграції цієї сесії ще відкладені (стартували, поки вона мовчала) —
+      // перечитуємо, навіть якщо нового нема: інакше вони чекали б до наступного запуску
+      let migWait=false; try{ migWait=!!(window.__flowMigDeferred && window.__flowMigDeferred()); }catch(_){}
+      if(!changed && !migWait) return;
       try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
       try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
@@ -882,7 +980,8 @@
     document.addEventListener('visibilitychange', ()=>{
       if(document.visibilityState==='visible') sbPullFresh();
     });
-    setInterval(sbPullFresh, 120000);
+    // у фоні не будимо телефон: при поверненні звірку й так робить visibilitychange вище
+    visInterval(sbPullFresh, 120000);
 
     /* ── ФОТО В ХМАРІ ──
        Знімки папок і Карти бажань лежать в IndexedDB (PhotoDB), а в конфіги
@@ -983,7 +1082,7 @@
       try{
         const { error } = await sb.from('user_data').delete().eq('user_id', sbUserCache.id);
         if(error) throw error;
-        sbBatchCache={}; sbBatchTs={}; sbWriteQueue={};
+        sbBatchCache={}; sbBatchTs={}; sbWriteQueue={}; sbInFlight={};
         sbOutboxSave(); sbSyncPending();
         return true;
       }catch(_){ return false; }
@@ -1026,7 +1125,7 @@
       if(u && sb){
         try{ await sb.from('user_data').delete().eq('user_id', u.id).eq('key', key); }catch(_){}
         if(sbBatchCache) delete sbBatchCache[key];
-        if(sbWriteQueue) delete sbWriteQueue[key];
+        if((sbWriteQueue && key in sbWriteQueue) || key in sbInFlight){ delete sbWriteQueue[key]; delete sbInFlight[key]; sbOutboxSaveSoon(); }   // інакше стертий ключ воскрес би з кошика після перезапуску
       }
       return localResult;
     };

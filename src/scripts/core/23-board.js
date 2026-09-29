@@ -235,9 +235,27 @@
     if(undoTimer) clearTimeout(undoTimer);
     undoTimer=setTimeout(hideUndo,6000);
   }
+  /* той самий тост «Видалено · ↩ Повернути» для дрібних видалень поза дошкою
+     (задача планера, крок, пункт біля чекбокса): маленький «×» стирає одразу,
+     без підтвердження — тож даємо 5 с усе повернути. restore — як саме повернути. */
+  function flowUndoToast(msg, restore){
+    if(typeof restore!=='function') return;
+    undoSnapshot={ restore };
+    const t=document.getElementById('undoToast');
+    const m=document.getElementById('undoMsg');
+    if(m) m.textContent=msg||'Видалено';
+    if(t){ t.classList.add('show'); }
+    if(undoTimer) clearTimeout(undoTimer);
+    undoTimer=setTimeout(hideUndo,5000);
+  }
+  window.flowUndoToast=flowUndoToast;
   function hideUndo(){ const t=document.getElementById('undoToast'); if(t) t.classList.remove('show'); }
   function doUndo(){
     if(!undoSnapshot) return;
+    if(undoSnapshot.restore){
+      try{ undoSnapshot.restore(); window.platform.haptic('light'); }catch(e){ console.error('undo',e); }
+      undoSnapshot=null; hideUndo(); return;
+    }
     try{
       boards[undoSnapshot.key]=JSON.parse(undoSnapshot.data);
       boardKey=undoSnapshot.key;
@@ -261,7 +279,8 @@
       f=folders[INBOX_FKEY]={ key:INBOX_FKEY, c:'#6a7dff', emoji:'📥', icon:'fo-mail', name:INBOX_TITLE,
         pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
       if(order.indexOf(INBOX_FKEY)<0) order.unshift(INBOX_FKEY);
-      saveFolders();
+      // кличе лише міграція (inboxMigrateOnce) — отже, автозапис під запобіжником
+      saveFolders({auto:true});
       try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
     }
     if(!boards[INBOX_FKEY]) boards[INBOX_FKEY]=[];
