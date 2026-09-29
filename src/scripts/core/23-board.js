@@ -261,7 +261,8 @@
       f=folders[INBOX_FKEY]={ key:INBOX_FKEY, c:'#6a7dff', emoji:'📥', icon:'fo-mail', name:INBOX_TITLE,
         pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
       if(order.indexOf(INBOX_FKEY)<0) order.unshift(INBOX_FKEY);
-      saveFolders();
+      // кличе лише міграція (inboxMigrateOnce) — отже, автозапис під запобіжником
+      saveFolders({auto:true});
       try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
     }
     if(!boards[INBOX_FKEY]) boards[INBOX_FKEY]=[];

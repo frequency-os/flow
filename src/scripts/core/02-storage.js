@@ -263,27 +263,44 @@
         const s = await npSeed();
         return { restored:h.restored, checked:h.checked, seeded:s, native: !!npReady() };
       },
-      // обробити значення на виході: мігрувати якщо треба, віддати модулю чисті дані
-      _out(key, valueStr){
+      /* обробити значення на виході: мігрувати якщо треба, віддати модулю чисті дані.
+         Приймає рядок ЯК ЛЕЖИТЬ у сховищі (з __sv). Читання більше НІЧОГО НЕ ПИШЕ.
+         Раніше сюди приходив уже розгорнутий рядок без __sv — версія завжди
+         читалась як 0, і КОЖНЕ читання envelopes/debts/goals_data/work_sessions/
+         spend переписувало ключ зі свіжою міткою (навіть коли хмара мовчить):
+         локальна копія «новішала» і при звірці перемагала правки з інших
+         пристроїв. Закріпити нову версію в сховищі — справа restampLocal(),
+         яку кличе реєстр міграцій лише після довіреного читання. */
+      _out(key, storedStr){
         const target = SCHEMAS[key] || 0;
-        if(!target) return valueStr; // не версіонований — як є
-        let parsed; try{ parsed = JSON.parse(valueStr); }catch(_){ return valueStr; }
+        if(!target) return unstampSv(storedStr); // не версіонований — як є
+        let parsed; try{ parsed = JSON.parse(storedStr); }catch(_){ return storedStr; }
         const m = migrateParsed(key, parsed);
-        const cleanStr = JSON.stringify(m.data);
-        if(m.changed){
-          // тихо перезберігаємо вже у новій версії (локально; Supabase-обгортка нижче підхопить)
-          try{ const stamped = stampSv(key, cleanStr); const raw = wrap(stamped); lcSet(key, raw); }catch(_){}
-        }
-        return cleanStr; // модулю — чисті дані без __sv
+        if(!m.changed) return unstampSv(storedStr);
+        return unstampSv(stampSv(key, JSON.stringify(m.data))); // модулю — чисті дані без __sv
+      },
+      /* Дописати актуальну версію схеми в локальні копії, які ще без неї.
+         Кличе реєстр MIGRATIONS_ONCE (27-canvas.js) після довіреного читання.
+         Мітку _v лишаємо ТІЄЮ САМОЮ: це той самий запис у новій формі, а не
+         свіжа правка — інакше він перебив би новіші дані з хмари. */
+      restampLocal(){
+        let n=0;
+        Object.keys(SCHEMAS).forEach(key=>{
+          const l=unwrap(lcGet(key)); if(!l) return;
+          let parsed; try{ parsed=JSON.parse(l.value); }catch(_){ return; }
+          const m=migrateParsed(key, parsed); if(!m.changed) return;
+          if(lcSet(key, JSON.stringify({ _v: l.v || Date.now(), d: stampSv(key, JSON.stringify(m.data)) }))) n++;
+        });
+        return n;
       },
       // ⚡ синхронне читання ЛИШЕ локальної копії (для миттєвого першого рендера до синку з хмарою)
       getLocal(key){
-        try{ const l=unwrap(lcGet(key)); return l? this._out(key, unstampSv(l.value)) : null; }catch(_){ return null; }
+        try{ const l=unwrap(lcGet(key)); return l? this._out(key, l.value) : null; }catch(_){ return null; }
       },
       async get(key){
         const localRaw = lcGet(key);
         const local = unwrap(localRaw);
-        if(local) return { key, value: this._out(key, unstampSv(local.value)), shared:false };
+        if(local) return { key, value: this._out(key, local.value), shared:false };
         throw new Error('not found');
       },
       async set(key, value){
@@ -343,17 +360,19 @@
       });
     }
 
+    // перевірку сесії завершено — хто чекав на довіру до даних (реєстр міграцій), може йти
+    function sbReadyEvt(){ try{ document.dispatchEvent(new CustomEvent('flowsbready')); }catch(_){} }
     async function sbInit(){
       if(sbInitPromise) return sbInitPromise;
       sbInitPromise = (async()=>{
         const lib = await loadSupabaseLib();
-        if(!lib){ window.__sbReady = true; return null; }
+        if(!lib){ window.__sbReady = true; sbReadyEvt(); return null; }
         sb = lib.createClient(SB_URL, SB_KEY);
         try{
           const { data } = await sb.auth.getSession();
           sbUserCache = data && data.session ? data.session.user : null;
         }catch(_){}
-        window.__sbReady = true;
+        window.__sbReady = true; sbReadyEvt();
         try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
         // Якщо на момент старту сторінки сесія вже була (людина заходить у знайомому
         // браузері) — стартовий load() міг устигнути прочитати ЛИШЕ локальну копію
@@ -799,7 +818,10 @@
         // новим вважаємо лише те, чого ми ще не бачили І що свіжіше за локальну копію
         if(cloudTs > (before[k]||0) && cloudTs > sbLocalVersion(k)){ changed = true; break; }
       }
-      if(!changed) return;
+      // хмара відповіла, а міграції цієї сесії ще відкладені (стартували, поки вона мовчала) —
+      // перечитуємо, навіть якщо нового нема: інакше вони чекали б до наступного запуску
+      let migWait=false; try{ migWait=!!(window.__flowMigDeferred && window.__flowMigDeferred()); }catch(_){}
+      if(!changed && !migWait) return;
       try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
       try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}

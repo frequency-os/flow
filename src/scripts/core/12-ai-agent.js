@@ -164,12 +164,15 @@
   /* @dev-only:start */
   function devToolStorage(inp){
     if(inp.action==='keys'){
-      const reg={}; (window.FLOW_KEYS||[]).forEach(k=>reg[k]=1);
+      const reg={}; (window.FLOW_KEYS||[]).forEach(k=>reg['flowapp_'+k]=1);   // у localStorage вони з префіксом
+      // сирі ключі (опис у 01-base.js) і дзеркала prefSet — теж «свої»
+      (window.FLOW_RAW_KEYS||[]).concat(window.FLOW_KEYS||[]).forEach(k=>reg[k]=1);
       ['ai_agent','ai_dev','ai_brief_ds','ai_week_ds','ai_usage','ai_pet','pet_sleep','ui_fx','ui_fx_say'].forEach(k=>reg[k]=1);  // локальні прапорці пристрою
       const rows=[];
       for(let i=0;i<localStorage.length;i++){
         const k=localStorage.key(i), v=localStorage.getItem(k)||'';
-        rows.push({k:k, b:v.length, reg:!!reg[k]});
+        // службові flowapp___* і прапорці міграцій flowapp_*_v1 — не дані, але й не «чужі»
+        rows.push({k:k, b:v.length, reg:!!reg[k] || /^flowapp___|^flowapp_\w+_v\d+$/.test(k)});
       }
       rows.sort((a,b)=>b.b-a.b);
       return rows.map(r=>r.k+' · '+(r.b>2048?Math.round(r.b/1024)+'КБ':r.b+'Б')+(r.reg?'':' · ПОЗА FLOW_KEYS')).join('\n')||'порожньо';

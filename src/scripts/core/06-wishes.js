@@ -68,7 +68,7 @@
   async function loadWishes(){
     try{ const r=await window.storage.get(WISH_KEY,false); if(r&&r.value){ const d=JSON.parse(r.value); if(Array.isArray(d)) wishes=d; } }catch(_){}
     try{ const r2=await window.storage.get(WISH_ACT_KEY,false); if(r2&&r2.value){ const d2=JSON.parse(r2.value); if(d2&&typeof d2==='object') wishActiveDays=d2; } }catch(_){}
-    try{ await migrateWishPhotosOnce(); }catch(e){ console.error('migrateWishPhotos', e); }
+    // переїзд фото в PhotoDB кличе реєстр міграцій (27-canvas.js) — лише після довіреного читання
   }
   /* Переїзд знімків Карти бажань у PhotoDB. Тут вони найважчі: до шести
      кадрів по 1400px, і всі лежали одним рядком у wishes_board — тобто
