@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="format-detection" content="telephone=no">
+<!-- Політика безпеки (CSP): куди сторінці можна ходити. Якщо в дані все ж
+     пролізе чужий код, він не зможе тихо відправити їх на свій сервер
+     (connect-src — лише наші адреси), підмінити <base>, відправити форму
+     чи вбудувати плагін. Адреси зібрано з коду:
+     · supabase.co — вхід і синхронізація (https + wss для живих оновлень);
+     · workers.dev — AI-воркер (чат, голос, розпізнавання);
+     · cdnjs / jsdelivr — запасні копії бібліотек, коли vendor/ недоступний,
+       і воркер pdf.js (його pdf.js вантажить тегом <script>);
+     · youtube.com — вбудоване відео у плитці; картинки й медіа — будь-який https,
+       бо обкладинки, фото і аудіо люди вставляють посиланнями.
+     'unsafe-inline' — бо розмітка має inline-обробники й стилі; 'unsafe-eval' —
+     бо dev_eval власника і пошук глобалей у голосовому острові працюють через
+     eval. Додаєш новий домен у код — допиши його сюди, інакше він тихо не спрацює. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://mogtitbgvrhzyhxmzvhs.supabase.co wss://mogtitbgvrhzyhxmzvhs.supabase.co https://flowai.life-yaroslav-kril.workers.dev; frame-src https://www.youtube.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Frequency</title>
 <!-- шерінг: щоб посилання розгорталось карткою, а не голим URL (аудит Т6) -->
 <meta name="description" content="Frequency — персональна ОС: планер, гроші, проєкти, звички і AI-агент в одному застосунку.">
