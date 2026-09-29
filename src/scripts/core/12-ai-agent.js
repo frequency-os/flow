@@ -85,7 +85,7 @@
         try{ localStorage.setItem('dev_translate_content', on?'0':'1'); }catch(_){}
         try{ plToast(on?'Переклад контенту вимкнено':'Переклад контенту увімкнено'); }catch(_){}
         try{ if(window.flowSetLang) window.flowSetLang('en'); }catch(_){} // переклад контенту без англ. UI не має сенсу
-        try{ render(); }catch(_){}
+        try{ debtRender(); }catch(_){}
       }
     });
   }
@@ -181,12 +181,15 @@
   /* @dev-only:start */
   function devToolStorage(inp){
     if(inp.action==='keys'){
-      const reg={}; (window.FLOW_KEYS||[]).forEach(k=>reg[k]=1);
+      const reg={}; (window.FLOW_KEYS||[]).forEach(k=>reg['flowapp_'+k]=1);   // у localStorage вони з префіксом
+      // сирі ключі (опис у 01-base.js) і дзеркала prefSet — теж «свої»
+      (window.FLOW_RAW_KEYS||[]).concat(window.FLOW_KEYS||[]).forEach(k=>reg[k]=1);
       ['ai_agent','ai_dev','ai_brief_ds','ai_week_ds','ai_usage','ai_pet','pet_sleep','ui_fx','ui_fx_say'].forEach(k=>reg[k]=1);  // локальні прапорці пристрою
       const rows=[];
       for(let i=0;i<localStorage.length;i++){
         const k=localStorage.key(i), v=localStorage.getItem(k)||'';
-        rows.push({k:k, b:v.length, reg:!!reg[k]});
+        // службові flowapp___* і прапорці міграцій flowapp_*_v1 — не дані, але й не «чужі»
+        rows.push({k:k, b:v.length, reg:!!reg[k] || /^flowapp___|^flowapp_\w+_v\d+$/.test(k)});
       }
       rows.sort((a,b)=>b.b-a.b);
       return rows.map(r=>r.k+' · '+(r.b>2048?Math.round(r.b/1024)+'КБ':r.b+'Б')+(r.reg?'':' · ПОЗА FLOW_KEYS')).join('\n')||'порожньо';
@@ -804,9 +807,9 @@
     /* ── дії без суми ── */
     if(a==='debt_list'){
       try{
-        if(!items.length) return 'боргів немає — чисто';
+        if(!debtItems.length) return 'боргів немає — чисто';
         const CURS={UAH:'₴',USD:'$',EUR:'€',PLN:'zł'};
-        const open=items.map(i=>({i,b:balance(i)})).filter(x=>x.b>0.0001);
+        const open=debtItems.map(i=>({i,b:balance(i)})).filter(x=>x.b>0.0001);
         if(!open.length) return 'усі борги закриті';
         return open.map(x=>(x.i.kind==='owe'?'я винен ':'мені винен(на) ')+x.i.name+': '+x.b+' '+(CURS[x.i.cur]||x.i.cur||'')).join('\n');
       }catch(e){ return '⚠️ не зміг прочитати борги: '+String(e.message||e); }
@@ -827,7 +830,7 @@
       const frag=String(inp.who||label||'').toLowerCase().trim();
       if(!frag) return '⚠️ вкажи who — чий борг видаляємо';
       try{
-        const cand=items.map(i=>({i,b:balance(i)})).filter(x=>String(x.i.name||'').toLowerCase().includes(frag));
+        const cand=debtItems.map(i=>({i,b:balance(i)})).filter(x=>String(x.i.name||'').toLowerCase().includes(frag));
         if(!cand.length) return '⚠️ борг не знайдено. '+await flowToolFinance({action:'debt_list'});
         if(cand.length>1) return '⚠️ під «'+frag+'» підпадає кілька боргів: '+cand.map(x=>x.i.name).join('; ')+' — уточни імʼя';
         const x=cand[0], CURS={UAH:'₴',USD:'$',EUR:'€',PLN:'zł'}, cs=CURS[x.i.cur]||x.i.cur||'';
@@ -835,8 +838,8 @@
           return '⚠️ у '+x.i.name+' залишок '+x.b+' '+cs+', а не '+amt+' — перепитай людину, чи той це борг';
         const ok=await aiFinConfirm('ВИДАЛИТИ борг '+(x.i.kind==='owe'?'(я винен) ':'(мені винні) ')+x.i.name+': '+x.b+' '+cs+' · разом з історією, без вороття');
         if(!ok) return 'людина скасувала — не повторюй';
-        const idx=items.indexOf(x.i); if(idx>=0) items.splice(idx,1);
-        save(); try{ render(); }catch(_){}
+        const idx=debtItems.indexOf(x.i); if(idx>=0) debtItems.splice(idx,1);
+        debtSave(); try{ debtRender(); }catch(_){}
         try{ plToast('🤖 борг '+x.i.name+' видалено'); }catch(_){}
         return 'борг '+x.i.name+' видалено повністю (разом з історією операцій)';
       }catch(e){ return '⚠️ '+String(e.message||e); }
@@ -847,7 +850,7 @@
       const nw=String(inp.new_who||'').trim().slice(0,40);
       if(!nw&&!(amt>0)) return '⚠️ дай new_who (нове імʼя) та/або amount (правильний залишок)';
       try{
-        const cand=items.map(i=>({i,b:balance(i)})).filter(x=>String(x.i.name||'').toLowerCase().includes(frag));
+        const cand=debtItems.map(i=>({i,b:balance(i)})).filter(x=>String(x.i.name||'').toLowerCase().includes(frag));
         if(!cand.length) return '⚠️ борг не знайдено. '+await flowToolFinance({action:'debt_list'});
         if(cand.length>1) return '⚠️ під «'+frag+'» підпадає кілька боргів: '+cand.map(x=>x.i.name).join('; ')+' — уточни імʼя';
         const x=cand[0], CURS={UAH:'₴',USD:'$',EUR:'€',PLN:'zł'}, cs=CURS[x.i.cur]||x.i.cur||'';
@@ -862,7 +865,7 @@
           const d=Math.round((amt-x.b)*100)/100;
           x.i.ops.push({ id:Date.now(), type:d>0?'borrow':'repay', amount:Math.abs(d), date:ymdLocal(), note:'коригування (AI)' });
         }
-        save(); try{ render(); }catch(_){}
+        debtSave(); try{ debtRender(); }catch(_){}
         try{ plToast('🤖 борг оновлено: '+x.i.name); }catch(_){}
         return 'борг виправлено: '+x.i.name+', залишок тепер '+balance(x.i)+' '+cs;
       }catch(e){ return '⚠️ '+String(e.message||e); }
@@ -897,9 +900,9 @@
       const ok2=await aiFinConfirm((dir==='owe'?'Я винен ':'Мені винен(на) ')+who+': '+amt+' '+CURS[cur]+(label&&label!==who?' · '+label:''));
       if(!ok2) return 'людина скасувала — не повторюй';
       try{
-        items.unshift({ id:Date.now(), kind:dir, name:who, cur,
+        debtItems.unshift({ id:Date.now(), kind:dir, name:who, cur,
           ops:[{ id:Date.now()+1, type:'borrow', amount:amt, date:ymdLocal(), note:(label&&label!==who)?label:'' }] });
-        save(); try{ render(); }catch(_){}
+        debtSave(); try{ debtRender(); }catch(_){}
         try{ plToast('🤖 борг записано: '+who+' · '+amt+' '+CURS[cur]); }catch(_){}
         return 'борг записано: '+(dir==='owe'?'ти винен ':'тобі винен(на) ')+who+' '+amt+' '+CURS[cur]+'. Він у Гроші → Борги';
       }catch(e){ return '⚠️ не зміг записати борг: '+String(e.message||e); }
@@ -908,14 +911,14 @@
       const frag=String(inp.who||label||'').toLowerCase().trim();
       if(!frag) return '⚠️ вкажи who — чий борг гасимо';
       try{
-        const cand=items.map(i=>({i,b:balance(i)})).filter(x=>x.b>0.0001&&String(x.i.name||'').toLowerCase().includes(frag));
+        const cand=debtItems.map(i=>({i,b:balance(i)})).filter(x=>x.b>0.0001&&String(x.i.name||'').toLowerCase().includes(frag));
         if(!cand.length) return '⚠️ відкритий борг не знайдено. '+await flowToolFinance({action:'debt_list'});
         const x=cand[0], pay=Math.min(amt,x.b);
         const CURS={UAH:'₴',USD:'$',EUR:'€',PLN:'zł'};
         const ok3=await aiFinConfirm('Погашення боргу '+x.i.name+': '+pay+' '+(CURS[x.i.cur]||''));
         if(!ok3) return 'людина скасувала — не повторюй';
         x.i.ops.push({ id:Date.now(), type:'repay', amount:pay, date:ymdLocal(), note:label||'' });
-        save(); try{ render(); }catch(_){}
+        debtSave(); try{ debtRender(); }catch(_){}
         const left=balance(x.i);
         try{ plToast('🤖 борг '+x.i.name+': -'+pay+(left<=0.0001?' · закрито ✓':'')); }catch(_){}
         return 'погашено '+pay+' по боргу з '+x.i.name+(left>0.0001?', лишилось '+left:' — борг ЗАКРИТО 🎉');

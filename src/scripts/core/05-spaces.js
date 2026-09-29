@@ -170,6 +170,14 @@
   document.getElementById('navHome').onclick = goHome;
   document.getElementById('navFinance').onclick = goFinance;
   document.getElementById('navPlanner').onclick = ()=>{ goPlanner(); };
+  // клавіатура / VoiceOver: «кнопки» не з <button> (таб-бар <a> без href, іконки шапки <div>)
+  // мають role="button" і tabindex — Enter чи Пробіл спрацьовують як тап
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ') return;
+    const t=e.target;
+    if(!t||!t.matches||!t.matches('[role="button"]:not(button):not(input):not(textarea)')) return;
+    e.preventDefault(); t.click();
+  });
 
 
   // ── профіль у футері сайдбара: Google-акаунт + меню функцій ──
@@ -330,52 +338,6 @@
       wb.onclick=()=>setZen(!pg.classList.contains('pg-zen'));
     } }
 
-  // ── бекап: експорт/імпорт усіх даних у файл (шлях до iCloud Drive через «Файли») ──
-  (function(){
-    var ex=document.getElementById('bkpExport'), im=document.getElementById('bkpImport'), note=document.getElementById('bkpNote');
-    if(!ex||!im)return;
-    function setNote(t){ if(note)note.textContent=t; }
-    ex.onclick=function(){
-      try{
-        var data={_flow_backup:1, ts:new Date().toISOString(), keys:{}};
-        for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); data.keys[k]=localStorage.getItem(k); }
-        var json=JSON.stringify(data);
-        var name='flow-backup-'+ymdLocal()+'.json';
-        var blob=new Blob([json],{type:'application/json'});
-        var file=null; try{ file=new File([blob],name,{type:'application/json'}); }catch(_){}
-        if(file && navigator.canShare && navigator.canShare({files:[file]})){
-          navigator.share({files:[file],title:'Frequency бекап'})
-            .then(function(){ setNote('Готово. У шиті обери «Зберегти у Файли» → iCloud Drive.'); })
-            .catch(function(){ setNote('Скасовано.'); });
-          return;
-        }
-        var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
-        document.body.appendChild(a); a.click(); a.remove();
-        setNote('Файл завантажено ('+Math.round(json.length/1024)+' КБ).');
-      }catch(e){ setNote('Не вдалося: '+((e&&e.message)||e)); }
-    };
-    im.onclick=function(){
-      var inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
-      inp.onchange=function(){
-        var f=inp.files&&inp.files[0]; if(!f)return;
-        var rd=new FileReader();
-        rd.onload=function(){
-          try{
-            var data=JSON.parse(rd.result);
-            if(!data||data._flow_backup!==1||!data.keys){ setNote('Це не файл бекапу Flow.'); return; }
-            var n=Object.keys(data.keys).length;
-            if(!confirm('Відновити бекап від '+(data.ts?data.ts.slice(0,16).replace('T',' '):'?')+'? Поточні дані на цьому пристрої буде замінено ('+n+' ключів).'))return;
-            Object.keys(data.keys).forEach(function(k){ try{ localStorage.setItem(k,data.keys[k]); }catch(_){} });
-            setNote('Відновлено. Перезавантажую…');
-            setTimeout(function(){ location.reload(); },600);
-          }catch(e){ setNote('Помилка читання: '+((e&&e.message)||e)); }
-        };
-        rd.readAsText(f);
-      };
-      inp.click();
-    };
-  })();
-
   // ── десктопний сайдбар: ті самі дії, що й мобільна навігація ──
   document.querySelectorAll('.dsb-i').forEach(b=>b.onclick=()=>{
     const k=b.dataset.dnav;
@@ -463,16 +425,22 @@
      нейтральна палітра. Хто був на класичній темі — переїжджає на пару desk
      (light→desk-light, dark/black→desk-dark), нові користувачі стартують на
      desk-dark. Робиться РАЗ (прапорець), далі будь-який вибір сталий — класична,
-     студія, AMOLED лишаються доступними в «Набір стилю». */
+     студія, AMOLED лишаються доступними в «Набір стилю».
+     Поза реєстром MIGRATIONS_ONCE (27-canvas.js) навмисно: тема потрібна ДО
+     першого малювання, а load() ще не почався. Тому пишемо лише справжній
+     перехід зі збереженої класичної теми; новий дефолт не записуємо зовсім —
+     він і так 'desk-dark' (вище), а запис зі свіжою міткою на новому пристрої
+     поїхав би в хмару поверх теми, яку людина вибрала деінде. */
   try{
     if(!localStorage.getItem('theme_flat_default_v1')){
-      localStorage.setItem('theme_flat_default_v1','1');
       const MIG={ light:'desk-light', dark:'desk-dark', black:'desk-dark' };
       const saved=localStorage.getItem('flowtheme');
-      let next=null;
-      if(saved && MIG[saved]) next=MIG[saved];    // був на класичній — переносимо
-      else if(!isTheme(saved)) next='desk-dark';  // нічого валідного — новий дефолт
-      if(next){ theme=next; try{ prefSet('flowtheme', theme); }catch(_){ try{ localStorage.setItem('flowtheme', theme); }catch(_){} } }
+      if(saved && MIG[saved]){                    // був на класичній — переносимо
+        theme=MIG[saved];
+        try{ prefSet('flowtheme', theme); }catch(_){ try{ localStorage.setItem('flowtheme', theme); }catch(_){} }
+      }
+      // прапорець — лише після проходу (виняток вище → спробуємо при наступному старті)
+      localStorage.setItem('theme_flat_default_v1','1');
     }
   }catch(_){}
   function applyTheme(){
@@ -565,11 +533,13 @@
 
 
   // ── фічу «ручний десктопний режим» видалено; чистимо старі збережені прапорці,
-  //    щоб у користувачів не лишався зламаний viewport зі старих версій ──
+  //    щоб у користувачів не лишався зламаний viewport зі старих версій.
+  //    Тут — лише сирі ключі цього пристрою. '0' у сховищі/хмарі ставить реєстр
+  //    міграцій (migForceLayoutOff, 27-canvas.js): раніше prefSet ішов при КОЖНОМУ
+  //    старті, навіть коли хмара мовчить, і щоразу слав у неї свіжий запис. ──
   try{
     localStorage.removeItem('forcedesktop');
     localStorage.removeItem('forcemobile');
-    if(typeof prefSet==='function'){ prefSet('forcedesktop','0'); prefSet('forcemobile','0'); }
   }catch(_){}
 
   // наповнення правої панелі: конфігуроване користувачем (вибір/порядок/вимкнення)
@@ -615,7 +585,7 @@
     try{ if(typeof habitStreak==='number') streak=habitStreak; }catch(_){}
     // фінансовий баланс
     let bal=null;
-    try{ if(typeof items!=='undefined'){ let owe=0,owed=0; items.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} }); bal=owed-owe; } }catch(_){}
+    try{ if(typeof debtItems!=='undefined'){ let owe=0,owed=0; debtItems.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} }); bal=owed-owe; } }catch(_){}
 
     const W={
       tasks:`<div class="wgt" style="--wc:#5b8def"><div class="wh"><div class="wi">🎯</div><div><div class="wn">${taskTotal?taskTotal:'0'} завдань</div></div></div>

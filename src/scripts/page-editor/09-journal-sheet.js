@@ -441,7 +441,10 @@
   try{ window.__pgRender=render; }catch(_){}
   // opts.focusId — прокрутити до блока й підсвітити (стрибок із Каналу папки)
   window.openFlowPage=function(opts){
-    if(!bridge()){ if(window.__show)window.__show('scr-space'); return; }
+    // без мосту папки сторінці нема що показати — повертаємось на Огляд.
+    // Раніше тут був екран «Простір» (scr-space), але 14.09 його видалено:
+    // show() знімав active з усіх екранів і падав на відсутньому — білий екран.
+    if(!bridge()){ if(window.__show)window.__show('scr-home'); return; }
     applyTheme(pageThemeDefault());
     pgPath=[];
     undoStack.length=0; redoStack.length=0; syncUndoBtn(); // не переносити історію між різними сторінками

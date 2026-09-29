@@ -16,10 +16,17 @@ def read(p):
         return f.read()
 
 def build_stamp():
-    """Дата збірки + короткий git-хеш, напр. 2026-09-03-0142-50f7fc9."""
+    """Дата збірки + короткий git-хеш, напр. 2026-09-03-0142-50f7fc9.
+
+    «+» у кінці — зібрано з незакомічених правок src/: тоді хеш описує код
+    не повністю, і це видно одразу в «Ще» чи на аварійному банері."""
     try:
         h = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'],
                                     cwd=ROOT, stderr=subprocess.DEVNULL).decode().strip()
+        dirty = subprocess.check_output(['git', 'status', '--porcelain', '--', 'src'],
+                                        cwd=ROOT, stderr=subprocess.DEVNULL).decode().strip()
+        if dirty:
+            h += '+'
     except Exception:
         h = 'nogit'
     return time.strftime('%Y-%m-%d-%H%M') + '-' + h
@@ -60,6 +67,12 @@ def main():
     out = re.sub(r'@@INCDIR:([^@]+)@@', subdir, html)
     out = re.sub(r'@@INC:([^@]+)@@', sub, out)
 
+    # Версія збірки — у сторінку (window.FLOW_BUILD, 01-crash-screen.js) і
+    # в sw.js нижче. Одна мітка на обидва: за банером з телефона видно,
+    # з якого коміту зібрано те, що впало, і що кеш воркера — той самий.
+    stamp = build_stamp()
+    out = out.replace('@@BUILD@@', stamp)
+
     if missing:
         print('ПОМИЛКА — немає файлів:'); [print('  ' + m) for m in missing]; sys.exit(1)
     if strays:
@@ -75,8 +88,8 @@ def main():
     with open(dest, 'w', encoding='utf-8', newline='') as f:
         f.write(out)
 
-    print('Зібрано %d частин → dist/index.html (%.1f KB, %d рядків)'
-          % (len(used), len(out.encode('utf-8'))/1024, out.count('\n') + 1))
+    print('Зібрано %d частин → dist/index.html (%.1f KB, %d рядків), версія %s'
+          % (len(used), len(out.encode('utf-8'))/1024, out.count('\n') + 1, stamp))
 
     # Іконка + маніфест: щоб сайт можна було поставити на телефон
     # як застосунок (повний екран, своя іконка, без адресного рядка).
@@ -86,7 +99,7 @@ def main():
         for n in names:
             if n == 'sw.js':
                 # версія збірки → новий кеш воркера, старі чистяться самі
-                sw = read(os.path.join(wsrc, n)).replace('@@BUILD@@', build_stamp())
+                sw = read(os.path.join(wsrc, n)).replace('@@BUILD@@', stamp)
                 with open(os.path.join(DIST, n), 'w', encoding='utf-8', newline='') as f:
                     f.write(sw)
             else:

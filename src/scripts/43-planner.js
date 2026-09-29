@@ -62,7 +62,10 @@ try{
     el.querySelectorAll('[data-fdtd]').forEach(function(x){ x.onclick=function(){
       var s=b.subtasks[+x.dataset.fdtd]; if(s){ s.done=!s.done; saveGoals(); fdDrawCabin(); } }; });
     el.querySelectorAll('[data-fdtddel]').forEach(function(x){ x.onclick=function(){
-      b.subtasks.splice(+x.dataset.fdtddel,1); saveGoals(); fdDrawCabin(); }; });
+      var i=+x.dataset.fdtddel, gone=b.subtasks.splice(i,1)[0]; saveGoals(); fdDrawCabin();
+      // ✕ біля чекбокса стирає одразу — даємо повернути
+      if(gone&&window.flowUndoToast) window.flowUndoToast('Підзадачу видалено',function(){
+        b.subtasks.splice(Math.min(i,b.subtasks.length),0,gone); saveGoals(); fdDrawCabin(); }); }; });
     var tg=document.getElementById('fdTdGo'), ti=document.getElementById('fdTdNew');
     tg.onclick=function(){ var v=(ti.value||'').trim(); if(!v) return;
       b.subtasks.push({text:v,done:false}); saveGoals(); fdDrawCabin();
@@ -125,8 +128,8 @@ try{
   if(typeof _rp==='function'){
     window.renderPlanner=function(c){ _rp(c); try{ fdEnhance(c); }catch(e){ console.error('fdEnhance',e); } };
   }
-  /* якщо кабіна відкрита — жити з оновленнями */
-  setInterval(function(){ try{
+  /* якщо кабіна відкрита — жити з оновленнями (у фоні — спати) */
+  (window.visInterval||setInterval)(function(){ try{
     var el=document.getElementById('fdCabin');
     if(el&&el.classList.contains('on')&&fdCabId&&document.activeElement&&document.activeElement.tagName!=='TEXTAREA'&&document.activeElement.tagName!=='INPUT') fdDrawCabin();
   }catch(_){} },60000);

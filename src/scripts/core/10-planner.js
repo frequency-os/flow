@@ -628,7 +628,11 @@
       const [tid,si]=el.dataset.plsub.split('|'); const t=p.tasks.find(x=>x.id===tid);
       if(t&&t.subs&&t.subs[+si]){ t.subs[+si].d=!t.subs[+si].d; saveGoals(); plRerender(); } });
     c.querySelectorAll('[data-pldel]').forEach(el=>el.onclick=(e)=>{ e.stopPropagation();
-      p.tasks=p.tasks.filter(x=>x.id!==el.dataset.pldel); saveGoals(); plRerender(); });
+      const i=p.tasks.findIndex(x=>x.id===el.dataset.pldel); if(i<0) return;
+      const gone=p.tasks[i];
+      p.tasks=p.tasks.filter(x=>x!==gone); saveGoals(); plRerender();
+      // «×» біля чекбокса — без підтвердження, тож 5 с на «Повернути»
+      flowUndoToast('Задачу видалено',()=>{ const q=plData(); q.tasks.splice(Math.min(i,q.tasks.length),0,gone); saveGoals(); plRerender(); }); });
     const fb=c.querySelector('[data-plfocus]'); if(fb) fb.onclick=()=>{ try{ window.platform.haptic('medium'); }catch(_){} plStartFocus(); };
     const ab=c.querySelector('[data-pladd]'); if(ab) ab.onclick=()=>plAdd();
     /* ═══ Fusion bindings ═══ */

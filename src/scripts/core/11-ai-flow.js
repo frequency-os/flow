@@ -86,12 +86,6 @@
     if(m.mode==='soft') return 'просідання (виконання '+m.pc+'% за 7 днів) — режим мʼякого напарника: зменш обсяг до одного маленького кроку, без тиску і без сорому';
     return 'середній ритм (виконання '+m.pc+'% за 7 днів) — режим спокійного аналітика: факти, одна конкретна корекція';
   }
-  function aiMoodBadge(){
-    const m=aiMoodCalc();
-    if(m.mode==='coach') return '<span class="ai-badge coach">🔥 Тренер</span>';
-    if(m.mode==='soft') return '<span class="ai-badge soft">🤝 Напарник</span>';
-    return '<span class="ai-badge calm">📊 Аналітик</span>';
-  }
   /* Підказка = ЯДРО (хто такий Флоу, мова, стиль, правила) + модуль протоколу FLOW_OPS/FLOW_MEM.
      Агент з інструментами бере лише ядро + AI_AGENT_ADDON (12-ai-agent.js): ~1 тис. токенів
      протоколу там були мертві й прямо суперечили «ЛИШЕ planner / memory» (AI-5). Спот, звичайний
