@@ -237,6 +237,12 @@
   /* ---------- screens ---------- */
   .screen{display:none;animation:screenSpring .38s cubic-bezier(.34,1.4,.64,1);}
   .screen.active{display:block;}
+  /* Вторинні екрани: «‹ Назад» і шапка не мають лізти під годинник / Dynamic Island.
+     Оболонка дає фіксовані 26px згори; на iPhone виріз 47–59px — додаємо різницю.
+     Без вирізу (браузер, компʼютер) env()=0 → нуль, нічого не зсувається.
+     Огляд, документ, чат і читалка рахують виріз самі — їх не чіпаємо. */
+  .screen:not(#scr-home):not(#scr-page):not(#scr-channel):not(#scr-reader){
+    padding-top:max(0px, calc(env(safe-area-inset-top, 0px) - 26px));}
   @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
   @keyframes screenSpring{from{opacity:0;transform:translateY(14px) scale(.985);}to{opacity:1;transform:none;}}
   @media (prefers-reduced-motion:reduce){ .screen{animation:none;} }

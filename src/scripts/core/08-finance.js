@@ -16,7 +16,6 @@
     return e;
   }
   function envSaved(e){ envMigrate(e); const v=e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0); e.saved=v; return v; }
-  function envSpentOut(e){ envMigrate(e); return e.ops.filter(o=>o.t==='out').reduce((s,o)=>s+o.amount,0); }
   function envTotalSaved(){ return envelopes.reduce((s,e)=>s+envSaved(e),0); }
 
   // додати рух у конверт + віддзеркалити у finOps (вплив на Дохід/Розхід/Баланс)
@@ -45,7 +44,6 @@
     e.saved = e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0);
     saveEnvelopes(); saveFinOps();
   }
-  function envSummary(){ return envelopes.length ? fmt(envTotalSaved())+' ₴' : '—'; }
 
   // tracker: income/expense operations
   let finOps=[]; // {id,type:'in'|'out',amount,label,date}
@@ -81,9 +79,12 @@
   function cardBalance(){ return walletBalance(); }
   function incomeSummary(){ try{ return fmt(walletBalance())+' ₴'; }catch(_){ return '—'; } }
   function _projCardId(){ return WALLET_ID; }
-  function ensureCards(){
+  // opts.memOnly — лише в памʼяті: так кличе load(), поки дані сесії не підтверджені
+  // (хмара мовчить) — заводський гаманець не має лягти в сховище поверх справжнього
+  function ensureCards(opts){
+    const mem=!!(opts&&opts.memOnly);
     if(!Array.isArray(cards) || !cards.length || cards.length>1 || cards[0].id!==WALLET_ID){
-      cards=[walletCard()]; saveCards();
+      cards=[walletCard()]; if(!mem) saveCards();
     }
     let ch=false;
     // витрати ІЗ конверта не мають вдруге списувати баланс
@@ -94,7 +95,7 @@
     }catch(_){}
     // операції без рахунку → у гаманець
     finOps.forEach(o=>{ if(!o.card && !o.envSpend){ o.card=WALLET_ID; ch=true; } });
-    if(ch) saveFinOps();
+    if(ch && !mem) saveFinOps();
   }
 
   /* ============ Одноразова міграція: усі картки → гаманець ============
@@ -147,7 +148,9 @@
      інший пристрій бачив «новіше», перечитувався, сам переписував — і так
      по колу, а в кожному колі могла загубитись свіжа витрата з іншого
      пристрою. Тепер пишемо лише те, що справді змінилось, а прапорець
-     ставимо, коли операції вже побачено і переведено в гаманець. */
+     ставимо, коли операції вже побачено і переведено в гаманець.
+     Сам прапорець читає й ставить реєстр MIGRATIONS_ONCE (27-canvas.js):
+     лише після довіреного читання і лише коли rep.ops > 0. */
   const WALLET_MIG_FLAG='flowapp_wallet_migrated_v1';
   // const, а не function — щоб НЕ висіла в window: файли core/ склеєні в один
   // <script> без обгортки, і кожна function верхнього рівня сама стає window.*.
@@ -155,7 +158,6 @@
   // нікому не потрібна, а зайві двері до переписування всієї книги краще зачинити.
   const migrateToWallet=function(rawCards, rawFx){
     const rep={ ops:0, moved:0, converted:0, orphan:0, before:0, after:0, diff:0 };
-    try{ if(localStorage.getItem(WALLET_MIG_FLAG)) return rep; }catch(_){ return rep; }
     if(!Array.isArray(finOps)) return rep;
     const rates=migRates(rawFx), curBy=migCurByCard(rawCards);
     rep.before=walletSumUAH(rates, curBy);
@@ -179,10 +181,9 @@
     rep.after=walletSumUAH(rates, {});      // після міграції все у гривні
     rep.diff=Math.round((rep.after-rep.before)*100)/100;
     if(rep.moved || rep.converted) saveFinOps();
-    // Порожня книга — прапорець НЕ ставимо: на новому пристрої чи без мережі
+    // Порожня книга (rep.ops===0) — реєстр прапорець НЕ ставить: на новому пристрої
     // операції ще можуть не дійти, і міграція має спрацювати, коли дійдуть.
     // Повтор без прапорця нічого не пише — записи вище лише за реальної зміни.
-    if(rep.ops){ try{ localStorage.setItem(WALLET_MIG_FLAG,'1'); }catch(_){} }
     if(rep.moved || rep.converted || !isWallet){
       try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
     }
@@ -217,37 +218,12 @@
     });
     if(ch){ saveRecurring(); saveFinOps(); }
   }
-  function nextRecurring(n){
-    const now=new Date(), ym=ymLocal(now);
-    return recurring.map(r=>{
-      const d=recDayOf(r); if(!d) return null;
-      let dt=new Date(now.getFullYear(),now.getMonth(),d);
-      if(r.lastYM===ym || d<now.getDate()) dt=new Date(now.getFullYear(),now.getMonth()+1,d);
-      return {r,dt};
-    }).filter(Boolean).sort((a,b2)=>a.dt-b2.dt).slice(0,n||2);
-  }
-  function openNextSheet(){
-    const ym=ymLocal();
-    const its=recurring.map(r=>{ const d=recDayOf(r);
-      return { ic:r.emoji||'🔁', label:r.name+' · '+fmt(r.amount)+' ₴',
-        sub:d?('списується '+d+'-го числа'+(r.lastYM===ym?' · цього місяця ✓':'')):'тапни — встановити день автосписання',
-        onClick:()=>{
-          inputModal({title:'День списання «'+r.name+'» (1–31)', value:d?String(d):'', placeholder:'Напр. 15', onOk:(v)=>{
-            const dd=parseInt((v||'').replace(/\D/g,''),10);
-            if(dd>=1&&dd<=31){ r.day=dd; saveRecurring(); try{ recAutoPost(); }catch(_){} renderFinance(); }
-          }});
-        } };
-    });
-    actionSheet({ title:'Найближчі платежі', sub:'тап по платежу — змінити день автосписання',
-      items: its.concat([{ ic:'＋', label:'Новий регулярний платіж', onClick:()=>newRecurring() }]) });
-  }
   let workCardId=''; // куди приходить зарплата (обирається в меню картки)
   function workCard(){ return cardById(workCardId)||cards.find(c=>c.type==='work')||mainCard(); }
 
   /* ============ АНАЛІТИКА · ріст і спад ============ */
   function _isRealExpense(o){ return o.type==='out' && !o._tr && !(o.envId && !o.envSpend); }
   function _isRealIncome(o){ return o.type==='in' && !o._tr; }
-  function lastMonths(n){ const a=[]; const now=new Date(); for(let i=n-1;i>=0;i--){ const x=new Date(now.getFullYear(),now.getMonth()-i,1); a.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')); } return a; }
   function monthAgg(ym){ let inn=0,out=0; finOps.forEach(o=>{ if(String(o.date||'').slice(0,7)!==ym) return; if(_isRealIncome(o)) inn+=o.amount; else if(_isRealExpense(o)) out+=o.amount; }); return {in:inn,out}; }
 
   /* ============ МОЯ ФІНАНСОВА ГРАМОТНІСТЬ ============ */
@@ -255,18 +231,8 @@
 
   let finTab='overview'; // legacy (kept for compatibility)
   let finView='dash'; // 'dash' | 'envelopes'
-  function finIncome(){ return finOps.filter(o=>o.type==='in').reduce((s,o)=>s+o.amount,0); }
-  function finExpense(){ return finOps.filter(o=>o.type==='out').reduce((s,o)=>s+o.amount,0); }
   function finBalance(){ return finOps.reduce((s,o)=>s+(o.type==='in'?o.amount:(o.envSpend?0:-o.amount)),0); }
 
-  function finEnvIcon(e){
-    const s=((e&&(e.name||''))+' '+((e&&e.emoji)||'')).toLowerCase();
-    if(/✈|🏖|🏝|відпус|подорож|трав|відпочин|італ|море|плям/.test(s)) return 'fi-plane';
-    if(/🛡|подуш|безпек|резерв|емердж|надзвич|fund/.test(s)) return 'fi-shield';
-    if(/🤝|борг|позик/.test(s)) return 'fi-handshake';
-    if(/🏆|челен|ціль|goal/.test(s)) return 'fi-trophy';
-    return 'fi-wallet';
-  }
   function renderFinance(){
     const body=document.getElementById('financeBody'); if(!body) return;
     document.getElementById('finSub').textContent='гаманець і плани';

@@ -777,9 +777,11 @@ try{
     else wakeResume();
   });
 
-  /* відновлення стану wake після рестарту апки */
-  if(fdOn()&&wakeStored()){ wakeOn=true; wakeWant=true; wakeSetUI();
-    setTimeout(function(){ if(wakeOn) wakeStart(); },1500); }
+  /* Після рестарту апки мікрофон САМ не вмикаємо (APP-2, 30.09.2026): раніше збережене
+     fd_wake='1' через 1,5 с запускало прослуховування без жодного дотику людини —
+     і на iOS це ще й системний запит доступу посеред нічого. Тепер виклик голосом
+     вмикається лише тапом по кнопці-«голос»; старий прапорець просто скидаємо. */
+  if(wakeStored()){ try{ localStorage.setItem(WAKE_KEY,'0'); }catch(_){} }
 
 }catch(e){ console.error('fdVoice init',e); }
 })();

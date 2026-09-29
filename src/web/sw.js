@@ -14,6 +14,7 @@ const INDEX = './index.html';
 const PRECACHE = [
   INDEX,
   './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png',
+  './fonts-caveat.css',   // рукописний шрифт, вантажиться після першого кадру (01-base.js)
   './vendor/jszip.min.js', './vendor/pdf.min.js', './vendor/supabase.min.js',
 ];
 const NAV_WAIT = 4000; // мс: далі чекати мережу немає сенсу — показуємо копію

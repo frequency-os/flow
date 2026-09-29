@@ -13,6 +13,7 @@
      видалити). Прикріплені папки відкриваються документом і повертають сюди. */
   let chKey=null;          // id відкритого чату
   let chTopic='all';       // 'all' | 'media' (лише фото чату)
+  let chFeedTail=null;     // хвіст намальованої стрічки: куди і з якою датою дописувати (chAppendFeed)
   let chOrigin=null;       // звідки прийшли: {scr:'home'} | {scr:'page', key:папка}
   let chMode='note';       // що створить рядок вводу: 'note' | 'task'
   let chRec=null, chStream=null; // диктування
@@ -266,10 +267,11 @@
   /* ── стрічка ── */
   function renderChFeed(){
     const host=document.getElementById('chFeed'); if(!host) return;
+    chFeedTail=null;
     if(chTopic==='media'){
       const ph=chPhotos();
       host.innerHTML = ph.length
-        ? `<div class="ch-media">${ph.map(p=>`<button class="ch-mi" data-chopen="${p.bk}|${p.b.id}"><img src="${p.b.data}" alt="" loading="lazy"></button>`).join('')}</div>`
+        ? `<div class="ch-media">${ph.map(p=>`<button class="ch-mi" data-chopen="${p.bk}|${p.b.id}"><img src="${p.b.data}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`
         : `<div class="ch-empty"><b>Фото ще немає</b><span>Додай через «+» → Фото — і всі знімки чату збиратимуться тут.</span></div>`;
       chBindFeed(host); return;
     }
@@ -279,16 +281,47 @@
       return;
     }
     let h='', lastDay=null;
+    const eager=chEagerPhotos(items);
     items.forEach(it=>{
       const day=chDayLabel(it.at);
       if(day!==lastDay){ h+=`<div class="ch-day">${day}</div>`; lastDay=day; }
-      h+=chBubble(it);
+      h+=chBubble(it, eager.has(it.b));
     });
     host.innerHTML=h;
+    // ymd — день малювання: після півночі «Сьогодні» в старих бульбашках уже неправда
+    chFeedTail={bk:chBoardKey(), day:lastDay, at:items[items.length-1].at, ymd:ymdLocal()};
     chBindFeed(host);
     chAiSync();
   }
-  function chBubble(it){
+  /* Новий запис — ДОПИСУЄМО в кінець, а не перебудовуємо всю стрічку:
+     раніше кожне повідомлення стирало й наново малювало всі бульбашки
+     (з фото — ще й перекодовувало кожне зображення). Повна перебудова
+     лишається запасним шляхом: інший режим, порожня стрічка, чужа дошка
+     або запис «старший» за останній (тоді його місце не в кінці). */
+  function chAppendFeed(b){
+    const host=document.getElementById('chFeed'), bk=chBoardKey(), tail=chFeedTail;
+    const at=chTimeOf(b);
+    if(!host||chTopic!=='all'||!tail||tail.bk!==bk||tail.ymd!==ymdLocal()||!host.querySelector('.ch-msg')||at<tail.at){ renderChFeed(); return; }
+    const day=chDayLabel(at);
+    let h=day!==tail.day ? `<div class="ch-day">${day}</div>` : '';
+    h+=chBubble({b,bk,at,i:(boards[bk]||[]).length-1}, true);
+    if(!h) return;   // роздільник-divider у стрічці не малюється
+    const wrap=document.createElement('div'); wrap.innerHTML=h;
+    const nodes=[...wrap.children];
+    nodes.forEach(n=>host.appendChild(n));
+    nodes.forEach(n=>chBindFeed(n));
+    chFeedTail={bk, day, at, ymd:tail.ymd};
+    chAiSync();
+  }
+  /* Фото в стрічці: останні кілька — одразу, старші — ліниво (loading="lazy").
+     Останні НЕ ліниві навмисно: інакше після прокрутки в кінець вони
+     догружались, стрічка підростала і ховала останній запис під рядком вводу. */
+  function chEagerPhotos(items){
+    const s=new Set(); let n=0;
+    for(let i=items.length-1;i>=0&&n<6;i--){ if(items[i].b.type==='photo'){ s.add(items[i].b); n++; } }
+    return s;
+  }
+  function chBubble(it, eager){
     const b=it.b, t=b.type||'note';
     if(t==='divider') return '';
     let tag=(b.topic&&b.topic.name) ? `<div class="ch-tag" style="--sc:${safeColor(b.topic.color,'var(--accent)')}">${esc(b.topic.emoji||'')} ${esc(b.topic.name)}</div>` : '';
@@ -313,10 +346,10 @@
       body=`<div class="ch-card">${b.title&&b.title!=='Список'?`<div class="ch-card-t">${esc(b.title)}</div>`:''}${items.map((x,i)=>`<div class="ch-li"><span>${t==='numlist'?(i+1)+'.':'•'}</span><div class="ch-text">${esc(chPlain(x.text))}</div></div>`).join('')}</div>`;
     } else if(t==='photo'){
       cls=' photo';
-      // без loading="lazy": фото — data-URL, а лінива підгрузка після прокрутки до кінця
-      // підрощувала стрічку і ховала останній запис під рядком вводу
+      // decoding="async" — розкодування фото не блокує прокрутку; lazy — лише
+      // для старих (див. chEagerPhotos), останні вантажимо одразу
       body = b.data
-        ? `<div class="ch-photo"><img src="${b.data}" alt=""${b.h?` style="height:${Math.min(340,Math.max(80,+b.h||0))}px"`:''}></div>${b.title?`<div class="ch-text ch-cap">${esc(b.title)}</div>`:''}`
+        ? `<div class="ch-photo"><img src="${b.data}" alt="" decoding="async"${eager?'':' loading="lazy"'}${b.h?` style="height:${Math.min(340,Math.max(80,+b.h||0))}px"`:''}></div>${b.title?`<div class="ch-text ch-cap">${esc(b.title)}</div>`:''}`
         : `<div class="ch-link-card"><span class="ch-lc-ic">🖼️</span><div><b>Фото</b><small>без зображення</small></div>${chI('chev')}</div>`;
     } else if(t==='flink'){
       // картка «прикріплено папку» — момент, коли це сталось; тап відкриває документ папки
@@ -421,7 +454,9 @@
       });
   }
   function chBindFeed(host){
-    host.querySelectorAll('[data-chtodo]').forEach(el=>el.onclick=(e)=>{
+    // host — уся стрічка або одна дописана бульбашка (тоді вона сама [data-chopen])
+    const all=s=>[...(host.matches&&host.matches(s)?[host]:[]), ...host.querySelectorAll(s)];
+    all('[data-chtodo]').forEach(el=>el.onclick=(e)=>{
       e.stopPropagation();
       const [bk,id,iid]=el.dataset.chtodo.split('|');
       const b=(boards[bk]||[]).find(x=>x&&String(x.id)===id); if(!b) return;
@@ -430,7 +465,7 @@
       saveBoard(); chHaptic('light');
       const top=document.body.scrollTop; renderChFeed(); document.body.scrollTop=top;
     });
-    host.querySelectorAll('[data-chopen]').forEach(el=>el.onclick=(e)=>{
+    all('[data-chopen]').forEach(el=>el.onclick=(e)=>{
       if(e.target.closest('[data-chtodo]')) return;
       const [bk,id]=el.dataset.chopen.split('|');
       const b=(boards[bk]||[]).find(x=>x&&String(x.id)===id); if(!b) return;
@@ -586,7 +621,7 @@
     boards[bk].push(b); saveBoard();
     if(boardKey===bk) syncBlocks();
     if(chTopic==='media'&&b.type!=='photo'){ chTopic='all'; renderChChips(); }
-    renderChFeed(); chScrollBottom(true); chHaptic('light'); chSyncSub();
+    chAppendFeed(b); chScrollBottom(true); chHaptic('light'); chSyncSub();
   }
   function chSend(){
     const inp=document.getElementById('chInput'); if(!inp) return;
@@ -652,6 +687,7 @@
   function chSheet(title, rowsHtml, bind){
     document.querySelectorAll('.ch-sheet-ov').forEach(x=>x.remove());
     const ov=document.createElement('div'); ov.className='ch-sheet-ov';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');   // шторка модальна для VoiceOver
     const c=chChat();
     ov.innerHTML=`<div class="ch-sheet" style="--fc:${safeColor(c&&c.c,'var(--accent)')}"><div class="ch-grip"></div>${title?`<div class="ch-sheet-t">${title}</div>`:''}${rowsHtml}</div>`;
     document.body.appendChild(ov);

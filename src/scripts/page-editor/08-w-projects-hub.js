@@ -1,5 +1,24 @@
   /* ═══════════ ВІДЖЕТ «ХАБ ПРОЄКТІВ» (список карток, варіант A) ═══════════ */
   var phOpen={}, phStepAdd={}, phPick={};
+  /* «✕» біля чекбокса / звички стирає одразу, без питання — тож показуємо тост
+     «Видалено · ↩ Повернути» (core, 5 с). pick(block) → [власник, ключ] масиву;
+     на поверненні блок шукаємо наново: документ за цей час міг перемалюватись. */
+  function pgDelUndo(bid,pick,match,msg){
+    var l=locate(bid); if(!l) return;
+    var ref=pick(l.block); if(!ref) return;
+    var arr=ref[0][ref[1]]||[], i=-1;
+    for(var k=0;k<arr.length;k++){ if(match(arr[k])){ i=k; break; } }
+    if(i<0) return;
+    var gone=arr[i];
+    ref[0][ref[1]]=arr.filter(function(x){ return x!==gone; });
+    save(); render();
+    if(window.flowUndoToast) window.flowUndoToast(msg||'Видалено',function(){
+      var l2=locate(bid); if(!l2) return;
+      var r2=pick(l2.block); if(!r2) return;
+      var a=r2[0][r2[1]]||(r2[0][r2[1]]=[]);
+      a.splice(Math.min(i,a.length),0,gone); save(); render();
+    });
+  }
   var PH_COLORS=['#7c8cff','#34c77b','#f0b429','#ff6b9d','#4ecdc4','#a78bfa'];
   function phHTML(b){
     var id=b.id; b.projects=b.projects||[];
@@ -179,7 +198,7 @@
       if(q('[data-cds]'))q('[data-cds]').textContent=String(s).padStart(2,'0');
     });
   }
-  setInterval(cdTick,1000);
+  if(window.visInterval) window.visInterval(cdTick,1000,{now:true}); else setInterval(cdTick,1000);
 
   // ── скляний календар для «Відліку» ──
   var CAL_MONTHS=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
@@ -445,8 +464,8 @@
       if(lhbe){var he=(lhbe.block.habits||[]).find(function(x){return x.id===hbe0[1];});
         if(he){inputModal({title:'Емодзі звички',value:he.emoji||'✅',onOk:function(v){he.emoji=(v||'✅').trim().slice(0,2)||'✅';save();render();}});}}return;}
     var hbd=e.target.closest&&e.target.closest('[data-hbdel]');
-    if(hbd){var hbd0=hbd.dataset.hbdel.split('|');var lhbd=locate(hbd0[0]);
-      if(lhbd){lhbd.block.habits=(lhbd.block.habits||[]).filter(function(x){return x.id!==hbd0[1];});save();render();}return;}
+    if(hbd){var hbd0=hbd.dataset.hbdel.split('|');
+      pgDelUndo(hbd0[0],function(b){return [b,'habits'];},function(x){return x.id===hbd0[1];},'Звичку видалено');return;}
     var hbx=e.target.closest&&e.target.closest('[data-hbexport]');
     if(hbx){var lhbx=locate(hbx.dataset.hbexport);if(lhbx)hbExport(lhbx.block);return;}
     /* ── хаб проєктів ── */
@@ -482,9 +501,9 @@
       if(lhs){var pp4=(lhs.block.projects||[]).find(function(x){return x.id===hs0[1];});
         if(pp4){var st4=(pp4.steps||[]).find(function(x){return x.id===hs0[2];});if(st4){st4.done=!st4.done;save();render();}}}return;}
     var hsd=e.target.closest&&e.target.closest('[data-phstepdel]');
-    if(hsd){var hd0=hsd.dataset.phstepdel.split('|');var lhd2=locate(hd0[0]);
-      if(lhd2){var pp5=(lhd2.block.projects||[]).find(function(x){return x.id===hd0[1];});
-        if(pp5){pp5.steps=(pp5.steps||[]).filter(function(x){return x.id!==hd0[2];});save();render();}}return;}
+    if(hsd){var hd0=hsd.dataset.phstepdel.split('|');
+      pgDelUndo(hd0[0],function(b){var pp5=(b.projects||[]).find(function(x){return x.id===hd0[1];});return pp5?[pp5,'steps']:null;},
+        function(x){return x.id===hd0[2];},'Крок видалено');return;}
     var hdel=e.target.closest&&e.target.closest('[data-phdel]');
     if(hdel){var hde0=hdel.dataset.phdel.split('|');var lhde=locate(hde0[0]);
       if(lhde){confirmSheet({title:'Видалити проєкт?',onOk:function(){
@@ -507,8 +526,8 @@
     if(pst){var s0=pst.dataset.ptstep.split('|');var ls=locate(s0[0]);
       if(ls){var st=(ls.block.steps||[]).find(function(x){return String(x.id)===s0[1];});if(st){st.done=!st.done;save();render();}}return;}
     var psd=e.target.closest&&e.target.closest('[data-ptstepdel]');
-    if(psd){var sd=psd.dataset.ptstepdel.split('|');var lsd=locate(sd[0]);
-      if(lsd){lsd.block.steps=(lsd.block.steps||[]).filter(function(x){return String(x.id)!==sd[1];});save();render();}return;}
+    if(psd){var sd=psd.dataset.ptstepdel.split('|');
+      pgDelUndo(sd[0],function(b){return [b,'steps'];},function(x){return String(x.id)===sd[1];},'Крок видалено');return;}
     var psa=e.target.closest&&e.target.closest('[data-ptstepadd]');
     if(psa){ptStepAdd[psa.dataset.ptstepadd]=true;render();
       var si=editor.querySelector('[data-ptstepinput="'+psa.dataset.ptstepadd+'"]');if(si)si.focus();return;}
@@ -517,8 +536,8 @@
       if(lh){var hb=(lh.block.habits||[]).find(function(x){return String(x.id)===h0[1];});
         if(hb){hb.marks=hb.marks||{};if(hb.marks[h0[2]])delete hb.marks[h0[2]];else hb.marks[h0[2]]=true;save();render();}}return;}
     var phd=e.target.closest&&e.target.closest('[data-pthabdel]');
-    if(phd){var hd=phd.dataset.pthabdel.split('|');var lhd=locate(hd[0]);
-      if(lhd){lhd.block.habits=(lhd.block.habits||[]).filter(function(x){return String(x.id)!==hd[1];});save();render();}return;}
+    if(phd){var hd=phd.dataset.pthabdel.split('|');
+      pgDelUndo(hd[0],function(b){return [b,'habits'];},function(x){return String(x.id)===hd[1];},'Звичку видалено');return;}
     var pha=e.target.closest&&e.target.closest('[data-pthabadd]');
     if(pha){ptHabAdd[pha.dataset.pthabadd]=true;render();
       var hi=editor.querySelector('[data-pthabinput="'+pha.dataset.pthabadd+'"]');if(hi)hi.focus();return;}
@@ -533,10 +552,9 @@
       if(lg){var it=((lg.block.todos||{})[g[1]]||[]).find(function(x){return String(x.id)===g[2];});
         if(it){it.done=!it.done;save();render();}}return;}
     var jdl=e.target.closest&&e.target.closest('[data-jtdel]');
-    if(jdl){var dl0=jdl.dataset.jtdel.split('|');var ll=locate(dl0[0]);
-      if(ll&&ll.block.todos&&ll.block.todos[dl0[1]]){
-        ll.block.todos[dl0[1]]=ll.block.todos[dl0[1]].filter(function(x){return String(x.id)!==dl0[2];});
-        save();render();}return;}
+    if(jdl){var dl0=jdl.dataset.jtdel.split('|');
+      pgDelUndo(dl0[0],function(b){return b.todos&&b.todos[dl0[1]]?[b.todos,dl0[1]]:null;},
+        function(x){return String(x.id)===dl0[2];},'Задачу видалено');return;}
     /* ── щоденник ── */
     var jm=e.target.closest&&e.target.closest('[data-jrmode]');
     if(jm){var m=jm.dataset.jrmode.split('|');var l1=locate(m[0]);if(l1){l1.block.jmode=m[1];save();render();}return;}
@@ -762,10 +780,30 @@
       if(r&&r.value){ try{ var v=JSON.parse(r.value)||{}; covers=Object.assign({},v,covers); renderCover(); }catch(_){} }
     }).catch(function(){});
   }catch(_){}
+  var covSaveT=null;
   function saveCovers(){
+    if(covSaveT){ clearTimeout(covSaveT); covSaveT=null; }
     try{ localStorage.setItem(COVKEY,JSON.stringify(covers)); }catch(_){}
     try{ var p=window.storage&&window.storage.set&&window.storage.set(COVKEY,JSON.stringify(covers),false); if(p&&p.catch)p.catch(function(){}); }catch(_){}
   }
+  /* Під час жесту (перетягування, повзунки) зберігаємо не на кожен рух, а раз —
+     коли палець зупинився на 400 мс або відпустив. Інакше кожен touchmove
+     серіалізував і писав УСІ обкладинки з фото (сотні КБ) двічі — жест смикався.
+     Екран оновлюється одразу (renderCover), відкладається лише запис. */
+  function saveCoversSoon(){
+    if(covSaveT) clearTimeout(covSaveT);
+    covSaveT=setTimeout(saveCovers,400);
+  }
+  function flushCovers(){ if(covSaveT) saveCovers(); }
+  // застосунок ховають/закривають посеред жесту — відкладене не губимо.
+  // visibilitychange слухаємо на window у фазі перехоплення (true): так він
+  // спрацює РАНІШЕ за sbOnHide (той на document, зареєстрований раніше), і
+  // обкладинка потрапить у партію, яку sbOnHide одразу шле в хмару. Інакше
+  // вона чекала б 500 мс таймера, якого у фоні iOS може вже не бути.
+  try{
+    window.addEventListener('pagehide',flushCovers);
+    window.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')flushCovers(); },true);
+  }catch(_){}
   var COV_GRADS=[
     'radial-gradient(120% 100% at 15% 0%,#41508f 0%,transparent 55%),radial-gradient(110% 90% at 85% 15%,#7b4a9e 0%,transparent 50%),radial-gradient(130% 120% at 60% 100%,#173a5e 0%,#0f1115 78%)',
     'linear-gradient(135deg,#0f2b1e,#1f6f4a 60%,#4ee69a)',
@@ -783,7 +821,6 @@
       clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} }
     };
   }catch(_){}
-  function pgHasCov(){ try{ return !!covers[covKey()]; }catch(_){ return false; } }
   function covKey(){ try{ return (bridge()&&bridge().curKey())||''; }catch(_){ return ''; } }
   function covMenuHTML(){
     var sw=COV_GRADS.map(function(g,i){
@@ -912,26 +949,31 @@
       if(e.target.closest('[data-covedclear]')){ delete covers[covKey()]; saveCovers(); renderCover(); covEdClose(); return; }
     });
     b.querySelector('[data-coveddark]').addEventListener('input',function(){
-      var c=covEdState(); if(!c)return; c.dark=+this.value; saveCovers(); renderCover(); covEdSync(true);
+      var c=covEdState(); if(!c)return; c.dark=+this.value; saveCoversSoon(); renderCover(); covEdSync(true);
     });
     b.querySelector('[data-covedh]').addEventListener('input',function(){
-      var c=covEdState(); if(!c)return; c.h=+this.value; saveCovers(); renderCover(); covEdSync(true);
+      var c=covEdState(); if(!c)return; c.h=+this.value; saveCoversSoon(); renderCover(); covEdSync(true);
     });
+    // повзунок відпустили — зберегти одразу, не чекаючи таймера
+    b.querySelector('[data-coveddark]').addEventListener('change',flushCovers);
+    b.querySelector('[data-covedh]').addEventListener('change',flushCovers);
     var pv=b.querySelector('[data-covedprev]');
     function dgStart(y){ var c=covEdState(); covEdDrag={y:y,p:c?c.pos:50}; }
     function dgMove(y){
       if(!covEdDrag)return; var c=covEdState(); if(!c||!c.img)return;
       c.pos=Math.max(0,Math.min(100,covEdDrag.p+(covEdDrag.y-y)/1.6));
-      saveCovers(); renderCover(); covEdSync(true);
+      saveCoversSoon(); renderCover(); covEdSync(true);
     }
+    function dgEnd(){ covEdDrag=null; flushCovers(); }
     pv.addEventListener('touchstart',function(e){ dgStart(e.touches[0].clientY); },{passive:true});
     pv.addEventListener('touchmove',function(e){ e.preventDefault(); dgMove(e.touches[0].clientY); },{passive:false});
-    pv.addEventListener('touchend',function(){ covEdDrag=null; });
+    pv.addEventListener('touchend',dgEnd);
+    pv.addEventListener('touchcancel',dgEnd);
     pv.addEventListener('mousedown',function(e){ e.preventDefault(); dgStart(e.clientY); });
     document.addEventListener('mousemove',function(e){ if(covEdDrag)dgMove(e.clientY); });
-    document.addEventListener('mouseup',function(){ covEdDrag=null; });
+    document.addEventListener('mouseup',function(){ if(covEdDrag)dgEnd(); });
     return b;
   }
   function covEdOpen(){ if(!covKey())return; covEdBuild(); covEdSync(); covEdBox.classList.add('on'); }
-  function covEdClose(){ if(covEdBox)covEdBox.classList.remove('on'); renderCover(); }
+  function covEdClose(){ flushCovers(); if(covEdBox)covEdBox.classList.remove('on'); renderCover(); }
 

@@ -1,29 +1,3 @@
-  function pickPhoto(targetArr){
-    const dest = Array.isArray(targetArr) ? targetArr : curBoard();
-    const inp=document.createElement('input');
-    inp.type='file'; inp.accept='image/*';
-    inp.onchange=()=>{
-      const f=inp.files&&inp.files[0]; if(!f) return;
-      const reader=new FileReader();
-      reader.onload=()=>{
-        const img=new Image();
-        img.onload=()=>{
-          const max=900; let{width:w,height:h}=img;
-          if(w>max||h>max){ const r=Math.min(max/w,max/h); w=Math.round(w*r); h=Math.round(h*r); }
-          const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-          cv.getContext('2d').drawImage(img,0,0,w,h);
-          const data=cv.toDataURL('image/jpeg',0.72);
-          const blk={ id:Date.now()+Math.random(), type:'photo', title:'Фото', data };
-          dest.push(blk); syncBlocks();
-          saveBoard(); renderBoard();
-          requestAnimationFrame(()=>{ const el=document.querySelector('[data-tileid="'+blk.id+'"]'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); });
-        };
-        img.src=reader.result;
-      };
-      reader.readAsDataURL(f);
-    };
-    inp.click();
-  }
   // рекурсивний пошук блока (враховує вкладені у папки)
   function isContainer(b){ return b && (b.type==='group'||b.type==='page'); }
   function findBlockDeep(arr,id){
@@ -771,7 +745,7 @@
       }
     }
     if(b.type==='fin'){
-      let owe=0,owed=0; items.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} });
+      let owe=0,owed=0; debtItems.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} });
       const net=owed-owe, spent=spendTotal();
       return `<div class="tile ${sz} tlink tfin" data-tileid="${b.id}" style="--tc:${c}">${head}
         <div class="lrow"><span>🤝 Чистий баланс боргів</span><b style="color:${net<0?'var(--owe)':'var(--owed)'}">${(net>0?'+':'')+fmt(net)} ₴</b></div>
@@ -1647,7 +1621,8 @@
       saveBoard(); renderBoard(); });
     // тікер фокуса: 1 інтервал на всі wfocus, точковий апдейт без ререндера
     if(!window.__fcTick){
-      window.__fcTick=setInterval(()=>{
+      // рахує від b.end (годинник), тож пауза у фоні безпечна: при поверненні — одразу тік
+      window.__fcTick=visInterval(()=>{
         document.querySelectorAll('.tfocus.run').forEach(tile=>{
           let b=null; try{ b=getBlock(tile.dataset.tileid); }catch(_){ }
           if(!b) return;
@@ -1667,7 +1642,7 @@
           const fg=tile.querySelector('.fc-fg');
           if(fg){ const CIRC=2*Math.PI*34; fg.style.strokeDashoffset=CIRC*(1-left/totalT); }
         });
-      },1000);
+      },1000,{now:true});
     }
 
   }
