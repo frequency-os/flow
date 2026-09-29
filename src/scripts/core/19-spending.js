@@ -62,7 +62,6 @@
     if(ch) saveFinOps();
   }
   function spendTotal(){ return spendOps().reduce((s,x)=>s+x.amount,0); }
-  function spendSummary(){ return spendOps().length? fmt(spendTotal())+' ₴' : '—'; }
 
   document.getElementById('spAdd').onclick=()=>{
     const inp=document.getElementById('spInput');

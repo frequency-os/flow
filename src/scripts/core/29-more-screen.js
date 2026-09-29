@@ -1,27 +1,27 @@
   /* ════════ ЕКРАН «ЩЕ»: модулі + навігація ════════ */
   (function(){
+    /* Лише живі плитки. Заглушки «🚧 У розробці» (звіт тижня, серії звичок, PDF,
+       віджети) прибрано 30.09.2026: людина тапала — а там обіцянка. Фокус і цілі
+       вже є в Планері й «Плані на рік» — плитки ведуть туди. */
     const MAIN=[
       {k:'quick', emo:'⚡', c:'232,132,60',  t:'Швидкий запис', d:'Витрата, нотатка чи задача за 2 сек'},
-      {k:'focus', emo:'⏱️', c:'255,107,157', t:'Фокус-сесії',   d:'Pomodoro + статистика концентрації'},
-      {k:'report',emo:'📊', c:'91,141,239',  t:'Звіт тижня',    d:'Гроші, задачі, фокус, серії', badge:'нове'},
-      {k:'streak',emo:'🔥', c:'52,199,123',  t:'Серії звичок',  d:'Стрік-календар за 90 днів'},
+      {k:'focus', emo:'⏱️', c:'255,107,157', t:'Фокус-сесія',   d:'Pomodoro 25 хв + підсумок дня'},
     ];
     const MORE=[
-      {k:'inbox', emo:'📥', c:'47,182,196',  t:'Вхідні',            d:'Незараховані задачі', pill:'3'},
-      {k:'goals', emo:'🎯', c:'199,125,255', t:'Дерево цілей',      d:'OKR-карта з прогресом гілок'},
-      {k:'pdf',   emo:'📄', c:'240,180,41',  t:'Експорт PDF-звіту', d:'Гарний звіт для себе чи клієнта'},
-      {k:'widget',emo:'📲', c:'106,125,255', t:'Віджети на екран',  d:'Баланс і задачі на головному'},
+      {k:'inbox', emo:'📥', c:'47,182,196',  t:'Вхідні',        d:'Швидкі записи, що чекають розбору'},
+      {k:'goals', emo:'🎯', c:'199,125,255', t:'План на рік',   d:'Цілі, кроки й прогрес'},
     ];
-    const INFO={
-      quick:'Глобальна кнопка швидкого вводу. Один тап — і ти записуєш <b>витрату, нотатку або задачу</b> без переходів по екранах. Розпізнає тип за текстом (напр. «-200 кава» → витрата).',
-      focus:'Таймер <b>Pomodoro</b> з історією сесій: скільки годин фокусу за день/тиждень, які папки забирали найбільше уваги, серія днів поспіль.',
-      report:'Один екран підсумків за тиждень: <b>дохід/витрати</b>, виконані задачі, години фокусу, найдовші серії звичок. Можна гортати по тижнях.',
-      streak:'Календар-стрік для звичок за останні <b>90 днів</b>: видно пропуски, поточну й найдовшу серію, відсоток виконання.',
-      inbox:'Швидкий «вхідний кошик» для задач, які ще не розкладені по папках. Накидав сюди — розсортував пізніше. Лічильник показує скільки чекає.',
-      goals:'Візуальна <b>OKR-карта</b>: цілі → ключові результати → задачі. Видно прогрес кожної гілки й що тягне вниз.',
-      pdf:'Згенерувати охайний <b>PDF-звіт</b> з твоєї статистики — для себе, інвестора чи клієнта. Логотип, графіки, період на вибір.',
-      widget:'Винеси <b>баланс, задачі на сьогодні чи серію звичок</b> на головний екран телефона як віджет — без відкривання застосунку.',
-    };
+    /* Lite ховає «Огляд» з панелі, а підпис обіцяє «решта чекає тут» — ось двері */
+    const LITE_DOORS=[
+      {k:'home',   emo:'📁', c:'106,125,255', t:'Папки й чати',  d:'Огляд: усі папки, чати й Вхідні'},
+      {k:'diary',  emo:'📔', c:'124,140,255', t:'Щоденник',      d:'Записи дня й зошити'},
+      {k:'wishes', emo:'🧭', c:'240,180,41',  t:'Карта бажань',  d:'Бажання, мудборд і ритуали'},
+    ];
+    /* справжній лічильник «Вхідних»: записи, що чекають (виконані задачі не рахуємо);
+       нуль або помилка — жодного числа, а не вигадане «3» */
+    function inboxWaiting(){
+      try{ return (boards[chatBk(INBOX_CHAT)]||[]).filter(b=>b&&!b.done).length; }catch(_){ return 0; }
+    }
     function tileHTML(m){
       return `<button class="mh-tile" data-mh="${m.k}" style="--mc:rgb(${m.c})">
         <div class="mh-orb" style="background:rgb(${m.c})"></div>
@@ -41,6 +41,8 @@
     function renderMore(){
       const host=document.getElementById('moreHybrid'); if(!host) return;
       const _m=(window.uiMode||'pro');
+      const nIn=inboxWaiting();
+      const more=MORE.map(m=>m.k==='inbox'&&nIn>0?Object.assign({},m,{pill:String(nIn)}):m);
       host.innerHTML=
         `<div class="mh-rows mh-projects">${rowHTML({k:'projects', emo:'🗂️', c:'139,124,255', t:'Проєкти', d:'Робота й твої проєкти'})}</div>
          <div class="mh-mode">
@@ -51,11 +53,15 @@
              <button class="${_m==='lite'?'on':''}" data-uimode="lite">Lite</button>
              <button class="${_m==='pro'?'on':''}" data-uimode="pro">Pro</button>
            </div>
-         </div>
-         <div class="mh-lbl">⚡ Головне</div>
+         </div>` +
+        (_m==='lite'
+          ? `<div class="mh-lbl">🚪 Решта Frequency</div>
+             <div class="mh-rows mh-projects">${LITE_DOORS.map(rowHTML).join('')}</div>`
+          : '') +
+        `<div class="mh-lbl">⚡ Головне</div>
          <div class="mh-grid">${MAIN.map(tileHTML).join('')}</div>
          <div class="mh-lbl mt">🧩 Ще інструменти</div>
-         <div class="mh-rows">${MORE.map(rowHTML).join('')}</div>
+         <div class="mh-rows">${more.map(rowHTML).join('')}</div>
          <div class="mh-lbl mt">🔒 Приватність</div>
          <div class="mh-rows">${rowHTML({k:'aipriv', emo:'🔒', c:'52,199,123', t:'AI і приватність', d:'Що бачить AI · згода · закриті розділи'})}</div>` +
         ((window.upDevOn&&window.upDevOn())
@@ -68,25 +74,19 @@
         renderMore();
       }));
     }
+    // кожна плитка — жива дія (колишня шторка «🚧 У розробці» більше не потрібна)
     function openMoreSheet(key){
+      try{ window.platform.haptic('light'); }catch(_){}
       if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
       if(key==='projects'){ if(window.goProjects) window.goProjects(); return; }
       if(key==='aipriv'){ if(window.aiPrivacySheet) window.aiPrivacySheet(); return; }
-      const m=[...MAIN,...MORE].find(x=>x.k===key); if(!m) return;
-      window.platform.haptic('light');
-      // живі дії замість заглушок
       if(key==='quick'){ if(window.flowQuickCapture) window.flowQuickCapture(); return; }
       if(key==='inbox'){ if(window.flowOpenInbox) window.flowOpenInbox(); return; }
-      const ov=document.createElement('div'); ov.className='mh-sheet';
-      ov.innerHTML=`<div class="mh-sheet-in">
-        <div class="mh-grip"></div>
-        <div class="mh-sheet-h">
-          <div class="mh-ico" style="background:rgba(${m.c},.18)">${m.emo}</div>
-          <div><h3>${m.t}</h3><span>${m.d}</span></div></div>
-        <div class="mh-sheet-body">${INFO[key]||''}<br><span class="mh-soon">🚧 У розробці</span></div>
-      </div>`;
-      ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
-      document.body.appendChild(ov);
+      if(key==='focus'){ try{ plStartFocus(); }catch(e){ console.error('more focus',e); } return; }
+      if(key==='goals'){ goGoals(); return; }
+      if(key==='home'){ goHome(); return; }
+      if(key==='diary'){ if(window.goDiary) window.goDiary(); return; }
+      if(key==='wishes'){ if(window.goWishes) window.goWishes(); return; }
     }
     function goMore(){ renderMore(); renderAccount(); const sh=window.__show||window.show||(typeof show==='function'?show:null); if(sh) sh('scr-more'); }
     window.goMore=goMore; window.renderMore=renderMore;
@@ -129,7 +129,6 @@
       if(st==='local-big') return ['error','Завелике для хмари','частина даних (фото) лише тут'];
       return ['idle','Локально','зміни збережено на цьому пристрої'];
     }
-    function ALL_KEYS(){ return (window.FLOW_KEYS||[]).slice(); }
 
     /* ── індикатор пам'яті ──
        localStorage («швидка память») впирається в ~5 МБ — саме він дає банер
@@ -195,6 +194,13 @@
         ? 'Власна іконка встановлена — можна замінити.'
         : 'Не обов’язково: можна додати власну іконку профілю, або лишити фото з Google чи літеру імені.';
       const avHint=`<p class="acc-hint acc-hint-av">${avHintTxt}${customAvatar?' <button class="acc-mini-link" data-acc-av-remove>прибрати</button>':''}</p>`;
+      // журнал помилок (01-crash-screen.js): на телефоні нема консолі — тут видно, що падало
+      const errs=(window.flowErrLog&&window.flowErrLog.list())||[];
+      const errWhen=t=>(window.flowErrLog?window.flowErrLog.when(t):String(t));
+      const errSub=errs.length?(errs.length+' записів · остання '+errWhen(errs[errs.length-1].t)):'порожньо — помилок не було';
+      const errList=errs.length
+        ? errs.slice(-20).reverse().map(e=>`<div class="acc-errlog-i"><b>${escA(errWhen(e.t))}${e.n>1?' ×'+e.n:''}</b> ${escA(e.msg)}${e.src||e.line?` <span>@ ${escA(e.src||'?')}:${+e.line||0}</span>`:''}</div>`).join('')
+        : '<div class="acc-errlog-i">Поки порожньо.</div>';
 
       host.innerHTML=`<div class="acc-wrap">
         <div class="acc-head">
@@ -249,6 +255,20 @@
           <div class="acc-rico">⚙️</div>
           <div class="acc-rtext"><div class="acc-rtitle">Всі налаштування</div></div>
           <span class="acc-chev">›</span>
+        </div>
+        <div class="acc-row" data-acc-errlog-row>
+          <div class="acc-rico">🧾</div>
+          <div class="acc-rtext"><div class="acc-rtitle">Журнал помилок</div><div class="acc-rsub">${escA(errSub)}</div></div>
+          <span class="acc-chev">›</span>
+        </div>
+        <div class="acc-expand" data-acc-errlog-expand hidden>
+          <div class="acc-errlog">${errList}</div>
+          <button class="acc-mini" data-acc-errlog-share>📤 Скопіювати / поділитися</button>
+          <p class="acc-hint">Лише на цьому пристрої: журнал не йде ні в хмару, ні в бекап. Надішли його, коли щось зламалось.</p>
+        </div>
+        <div class="acc-row" data-acc-ver style="cursor:default">
+          <div class="acc-rico">🏷️</div>
+          <div class="acc-rtext"><div class="acc-rtitle">Версія ${escA(window.FLOW_BUILD||'невідома')}</div><div class="acc-rsub">дата і час збірки · код коміту</div></div>
         </div>
       </div>`;
 
@@ -360,6 +380,26 @@
       const setRow=host.querySelector('[data-acc-settings-row]');
       if(setRow) setRow.onclick=()=>{ if(window.openSettingsSheet) window.openSettingsSheet(); };
 
+      const elRow=host.querySelector('[data-acc-errlog-row]');
+      if(elRow) elRow.onclick=()=>toggle('[data-acc-errlog-expand]');
+      const elShare=host.querySelector('[data-acc-errlog-share]');
+      // спершу системне «Поділитися» (телефон), інакше — буфер обміну (Mac),
+      // а якщо й він закритий — кладемо текст у поле й виділяємо: скопіювати руками
+      if(elShare) elShare.onclick=async (e)=>{
+        e.stopPropagation();
+        const txt=window.flowErrLog?window.flowErrLog.text():'Журнал недоступний';
+        if(navigator.share){
+          try{ await navigator.share({title:'Frequency — журнал помилок', text:txt}); return; }
+          catch(err){ if(err&&err.name==='AbortError') return; }
+        }
+        try{ await navigator.clipboard.writeText(txt); flowAlert('📋 Журнал скопійовано — встав його в повідомлення.'); return; }catch(_){}
+        const box=host.querySelector('.acc-errlog'); if(!box) return;
+        const ta=document.createElement('textarea'); ta.readOnly=true; ta.className='acc-errlog-ta'; ta.value=txt;
+        box.replaceChildren(ta); try{ ta.focus(); ta.select(); }catch(_){}
+        const hint=host.querySelector('[data-acc-errlog-expand] .acc-hint');
+        if(hint) hint.textContent='Автоматично скопіювати не вийшло — текст виділено вище, скопіюй його вручну.';
+      };
+
       // власна іконка профілю: тап по аватарці/олівцю відкриває вибір фото
       const avFile=host.querySelector('[data-acc-av-file]');
       host.querySelectorAll('[data-acc-av-btn]').forEach(b=>b.onclick=(e)=>{ e.stopPropagation(); if(avFile) avFile.click(); });
@@ -391,7 +431,7 @@
     const hm=document.getElementById('homeMoreBtn'); if(hm) hm.onclick=goMore;
     const na=document.getElementById('navAI'); if(na) na.onclick=()=>{ if(window.aiChatSheet) window.aiChatSheet(); };
     const nm=document.getElementById('navMore'); if(nm) nm.onclick=goMore;
-    try{ flowCapRender(); setInterval(flowCapRender,60000); }catch(_){}
+    try{ flowCapRender(); visInterval(flowCapRender,60000,{now:true}); }catch(_){}
     try{ prefCatchup('pet_pos',()=>flowCapRender()); prefCatchup('pet_sleep',()=>flowCapRender()); }catch(_){}
     document.querySelectorAll('.dsb-i[data-dnav="more"]').forEach(b=>b.onclick=goMore);
     renderMore();

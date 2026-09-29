@@ -25,6 +25,14 @@ OUT = os.path.join(ROOT, 'CODEMAP.md')
 # рядком })();. Поодинці кожен із них виглядає як файл із поламаними дужками.
 GROUP_DIRS = ('src/scripts/core', 'src/scripts/page-editor')
 
+# Код поза src/scripts, який теж працює у живій програмі чи поруч із нею:
+# воркер сайту (src/web/sw.js), Mac-оболонка (desktop/), AI-воркер
+# Cloudflare (worker/), наші перевірки (tools/) і бібліотеки (src/vendor/).
+# Раніше карта їх не бачила зовсім — і сесія, що шукала, скажімо, обробник
+# меню Mac чи маршрут воркера, не знаходила його в карті. Кожен такий файл —
+# окремий скрипт, тож і сканується окремо.
+SOLO_DIRS = ('src/vendor', 'src/web', 'desktop', 'worker', 'tools')
+
 # Верхній рівень визначається глибиною фігурних дужок, а не відступом.
 # Відступ бреше: core/02-storage.js має кілька функцій на 2 пробілах
 # і все головне тіло на 4 (зайвий IIFE), а core/12-ai-agent.js має 127
@@ -184,6 +192,13 @@ def js_groups():
                  for n in sorted(os.listdir(full_d)) if n.endswith('.js')]
         if files:
             groups.append(files)
+    for d in SOLO_DIRS:
+        full_d = os.path.join(ROOT, d)
+        if not os.path.isdir(full_d):
+            continue
+        for n in sorted(os.listdir(full_d)):
+            if n.endswith(('.js', '.mjs')) and os.path.isfile(os.path.join(full_d, n)):
+                groups.append([os.path.relpath(os.path.join(full_d, n), ROOT)])
     return groups
 
 

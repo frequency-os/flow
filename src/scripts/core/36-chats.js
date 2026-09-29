@@ -103,10 +103,10 @@
   /* одноразова міграція: папка-Канал f_inbox → чат «Вхідні». Записи головної дошки
      і тем переїжджають у boards['chat_inbox'] (тема лишається підписом `topic`),
      обкладинка — теж, папка зникає зі списку папок. Прапорець локальний, як в інших
-     міграціях; на другому пристрої дані вже прийдуть перенесеними — тоді нема що робити. */
+     міграціях; на другому пристрої дані вже прийдуть перенесеними — тоді нема що робити.
+     Запуск і прапорець — реєстр MIGRATIONS_ONCE (27-canvas.js): лише після довіреного
+     читання і лише якщо прохід не впав. */
   function chatsMigrateInboxOnce(){
-    const FLAG='flowapp_inbox_chat_v1';
-    try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
     const FK='f_inbox';
     const f=folders[FK];
     const srcKeys=Object.keys(boards||{}).filter(k=>k===FK||k.indexOf(FK+'__sp_')===0);
@@ -134,7 +134,7 @@
       saveFolders({auto:true}); saveBoard(); saveChats();
       console.log('[Flow] «Вхідні»: папку перенесено в чат, записів:', n);
     }
-    try{ localStorage.setItem(FLAG,'1'); }catch(_){}
+    return true;
   }
 
   /* ── зв'язок папка ↔ чат ── */

@@ -13,6 +13,7 @@
     "build": "python3 tools/build.py",
     "check": "./tools/check.sh",
     "smoke": "./tools/smoke.sh",
+    "test:migrations": "./tools/test-migrations.sh",
     "build:mac": "python3 tools/build.py && electron-builder --mac",
     "deploy": "./tools/deploy.sh",
     "bugs": "./tools/bugs.sh",

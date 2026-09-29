@@ -25,6 +25,42 @@
     }catch(_){}
   })();
 
+  /* ── Рукописний шрифт Caveat — ліниво, ПІСЛЯ першого кадру ──
+     ≈235 КБ тексту, а потрібен лише для «Карти бажань» у темі «Плоска» і стилю
+     «рукопис» у редакторі. Вбудований в index.html, він розбирався на кожному
+     старті раніше за перший екран. Тепер лежить поруч (fonts-caveat.css, його
+     кладе build.py з src/web, офлайн — sw.js), а до завантаження діє cursive. */
+  (function(){
+    try{
+      const go=()=>{
+        if(document.getElementById('fontCaveat')) return;
+        const l=document.createElement('link');
+        l.id='fontCaveat'; l.rel='stylesheet'; l.href='fonts-caveat.css';
+        document.head.appendChild(l);
+      };
+      const later=()=>requestAnimationFrame(()=>setTimeout(go,0));
+      if(document.readyState==='complete') later(); else window.addEventListener('load', later, {once:true});
+    }catch(_){}
+  })();
+
+  /* ── Таймер, що спить, поки застосунок сховано ──
+     Вічні setInterval (лічильник НР, котик, віджети, фокус-таймери) будили
+     телефон у фоні щосекунди — батарея і зайва робота, якої ніхто не бачить.
+     Тут інтервал зупиняється на document.hidden і вмикається при поверненні;
+     now:true — одразу один тік, щоб екран не показував застарілий час.
+     Годиться лише там, де тік рахує від годинника (Date.now), а не «сек--». */
+  function visInterval(fn, ms, o){
+    let id=null;
+    const run=()=>{ try{ fn(); }catch(e){ console.error('visInterval',e); } };
+    const on=()=>{ if(id==null) id=setInterval(run, ms); };
+    const off=()=>{ if(id!=null){ clearInterval(id); id=null; } };
+    const vis=()=>{ if(document.hidden){ off(); return; } if(o&&o.now) run(); on(); };
+    document.addEventListener('visibilitychange', vis);
+    if(!document.hidden) on();
+    return { stop(){ off(); document.removeEventListener('visibilitychange', vis); } };
+  }
+  window.visInterval = visInterval;
+
   /* ============ ХЕЛПЕРИ ДАТ: локальний час, не UTC ============
      toISOString() дає UTC: в Амстердамі між 00:00 і 02:00 «сьогодні» = вчора.
      Всюди, де треба «сьогодні/поточний місяць» — тільки ці функції. */
@@ -32,6 +68,12 @@
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   function ymLocal(d){ return ymdLocal(d).slice(0,7); }
   window.ymdLocal = ymdLocal; window.ymLocal = ymLocal;
+
+  /* ============ СПІЛЬНІ ХЕЛПЕРИ ТЕКСТУ Й ЧИСЕЛ ============
+     Раніше жили в 18-debts.js, а кличе їх пів програми (~20 файлів) —
+     тепер тут, щоб не залежати від модуля боргів. Поведінку не міняти. */
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function fmt(n){ return Number(n).toLocaleString('uk-UA',{maximumFractionDigits:2}); }
 
   /* Відмінювання за українськими правилами:
      pluralUk(1,'картка','картки','карток') → 'картка', pluralUk(5,…) → 'карток'.
@@ -59,7 +101,8 @@
 
   /* ============ РЕЄСТР КЛЮЧІВ СХОВИЩА — єдине джерело правди ============
      Новий ключ додаєш ТУТ (і за потреби версію в SCHEMAS).
-     Звідси беруться prefetchAll на старті та ALL_KEYS для бекапу.
+     Звідси беруться prefetchAll на старті та перше перенесення в нативне
+     сховище iPhone (бекап натомість бере всі ключі з префіксом flowapp_).
      Раніше списки велись руками у 2 місцях і розійшлися: модуль «Робота»
      (work_sessions/work_cfg/work_extras/work_blocks) та канвас-простори
      взагалі не потрапляли в бекап. */
@@ -77,8 +120,48 @@
     'patterns_chains','patterns_score','patterns_transform',
     'vision_v1','custom_avatar_v1','diary_entries_v1','diary_insights_v1','diary_books_v1','upgrade_profile_v1',
     'lang_pref','i18n_content_cache',
-    'chats_v1'
+    'chats_v1',
+    /* Звірка 30.09.2026 (ARCH-10): ці ключі модулі давно пишуть через
+       window.storage / prefSet, але в реєстр вони не потрапили — отже, їх
+       не засівав у Preferences npSeed (iPhone) і інспектор бачив «чужими». */
+    'flowPgCovers',                                      // обкладинки сторінок (08-w-projects-hub.js)
+    'wish_active_days_v1','wish_price','home_glass_on',  // 06-wishes.js (досі додавались на льоту)
+    'ritual_board','collage_board',                      // 06-wishes.js (теж на льоту)
+    // легкі налаштування (prefSet у 02-storage.js — сирий ключ + копія тут)
+    'flowtheme','flowprotheme','flowcardskin','folderview','homewidgets','hometab','homeov',
+    'sidebarcol','spacefull','fx_mode','fx_say','ai_pet','ai_voice','pet_hidden','pet_pos','pet_sleep',
+    'forcedesktop','forcemobile'                         // фічу видалено; у сховищі лишається '0'
   ];
+  /* ── СИРІ КЛЮЧІ localStorage (без префікса flowapp_) — опис, не реєстр сховища ──
+     FLOW_KEYS вище — це ключі window.storage: у localStorage вони лежать як
+     'flowapp_'+ключ (обгортка {_v,d}) і їдуть у хмару. Усе нижче пишеться
+     напряму localStorage.setItem і в хмару САМЕ не потрапляє:
+       • дзеркала prefSet — тема, вкладки, пет тощо: сирий ключ читається
+         синхронно до першого малювання, копія flowapp_* — для хмари. Задумано.
+       • 'lang_pref', 'i18n_content_cache' — стоять у FLOW_KEYS, але пишуться
+         СИРИМИ: 'flowapp_lang_pref' не існує, тож npSeed їх не бачить.
+       • B3 — дублікати даних без префікса: prefCatchup у 33-home-widgets.js
+         копіює цілі 'goals_data', 'fin_ops', 'diary_entries_v1' у сирі ключі
+         (подвійне місце в ~5 МБ localStorage). Прибрати — окремою міграцією
+         ключів (перейменування/видалення тут навмисно НЕ робимо).
+       • прапорці міграцій: 'space_purge_v1', 'legacy_widgets_purge_v1',
+         'theme_flat_default_v1' — сирі; 'flowapp_*_v1' (wallet_migrated,
+         seedfolders_removed, agency_purged, space_removed, inbox_chat) — з
+         префіксом, але це НЕ дані: див. MIGRATIONS_ONCE у 27-canvas.js.
+       • службові з префіксом: 'flowapp___sb_outbox', 'flowapp___ph_push',
+         'flowapp___ph_ts', 'flowapp___seeded' (Preferences).
+       • 'rit_auto', 'fd_*', 'pet3d*' модулі додають у FLOW_KEYS на льоту, але
+         пишуть СИРИМИ — запис у реєстрі для них нічого не дає.
+       • лише цей пристрій: ai_agent, ai_dev, ai_usage, ai_brief_ds, ai_week_ds,
+         pet3d, pet3d_fx, pet_say_i, rit_auto, rrail_cfg, pg_wide, fd_isl, fd_wake,
+         fd_tts, fd_tts_voice, fd26t, flow_dev, dev_translate_content,
+         flowPgLastBlock, flowPgRecentBlocks, flowPageThemeChoice, __flow_snapshot__,
+         __flow_wipe_idb__, __devtest. */
+  window.FLOW_RAW_KEYS = ['lang_pref','i18n_content_cache','goals_data','fin_ops','diary_entries_v1',
+    'space_purge_v1','legacy_widgets_purge_v1','theme_flat_default_v1',
+    'ai_agent','ai_dev','ai_usage','ai_brief_ds','ai_week_ds','pet3d','pet3d_fx','pet_say_i','rit_auto',
+    'rrail_cfg','pg_wide','fd_isl','fd_wake','fd_tts','fd_tts_voice','fd26t','flow_dev','dev_translate_content',
+    'flowPgLastBlock','flowPgRecentBlocks','flowPageThemeChoice','__flow_snapshot__','__flow_wipe_idb__','__devtest'];
 
   /* ═══════════════════════════════════════════════════════════════════
      I18N: перемикач мови UI (uk/en) + переклад контенту в dev-режимі
@@ -227,15 +310,37 @@
     }
     window.i18nApply = i18nApply;
 
-    // після кожної зміни DOM (рендери екранів) — тихо доперекладаємо
-    let raf=null;
-    const mo = new MutationObserver(()=>{
+    // Чи вузол у зоні, куди переклад не заходить (повний обхід зупиняється
+    // на таких предках сам; точковому треба перевірити їх явно).
+    function i18nBlocked(node){
+      const el = node.nodeType===1 ? node : node.parentElement;
+      if(!el || !el.isConnected) return true;
+      if(el.isContentEditable || el.closest('[data-i18n-skip],textarea,script,style')) return true;
+      const opt = el.closest('option'); if(opt && !opt.hasAttribute('value')) return true;
+      return false;
+    }
+    // після кожної зміни DOM (рендери екранів) — тихо доперекладаємо ЛИШЕ змінене.
+    // Раніше кожна мутація запускала обхід усього body (~1500 елементів), а
+    // лічильник НР міняє текст щосекунди — тобто повний обхід DOM щосекунди.
+    let raf=null, pend=new Set();
+    const flush=()=>{
+      raf=null;
+      const list=[...pend]; pend.clear();
       if(getLang()!=='en') return;
-      if(raf) return;
-      raf = requestAnimationFrame(()=>{ raf=null; i18nApply(); });
+      list.forEach(n=>{ try{ if(!i18nBlocked(n)) translateNode(n); }catch(_){} });
+      mo.takeRecords();   // наші ж заміни тексту — не привід для ще одного проходу
+    };
+    const mo = new MutationObserver(muts=>{
+      if(getLang()!=='en') return;
+      muts.forEach(m=>{
+        if(m.type==='childList') m.addedNodes.forEach(n=>pend.add(n));
+        else pend.add(m.target);   // characterData — сам текст; attributes — елемент із title/placeholder
+      });
+      if(!raf && pend.size) raf = requestAnimationFrame(flush);
     });
     document.addEventListener('DOMContentLoaded', function(){
-      try{ mo.observe(document.body, {childList:true, subtree:true, characterData:true}); }catch(_){}
+      try{ mo.observe(document.body, {childList:true, subtree:true, characterData:true,
+        attributes:true, attributeFilter:['title','placeholder','aria-label']}); }catch(_){}
       i18nApply();
     });
   })();

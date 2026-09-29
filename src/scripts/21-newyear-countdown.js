@@ -102,7 +102,8 @@
 
   document.addEventListener('DOMContentLoaded',function(){
     var back=document.getElementById('nycBack');
-    if(back)back.onclick=function(){var g=window.goMore;if(g)g();else if(window.__show)window.__show('scr-more');};
+    // лічильник живе на Огляді (картка Карти бажань) — туди й повертаємось, а не в «Ще»
+    if(back)back.onclick=function(){var g=window.goHome;if(g)g();else if(window.__show)window.__show('scr-home');};
     document.querySelectorAll('[data-nycview]').forEach(function(b){
       b.onclick=function(){
         document.querySelectorAll('[data-nycview]').forEach(function(x){x.classList.remove('on');});
@@ -110,10 +111,12 @@
       };
     });
     tickWidget();tickHero();
-    setInterval(function(){
+    // щосекундний тік — лише поки застосунок на екрані (visInterval з 01-base.js)
+    var tick=function(){
       tickWidget();
       if(document.getElementById('scr-nyc')&&document.getElementById('scr-nyc').classList.contains('active'))tickHero();
-    },1000);
+    };
+    if(window.visInterval)window.visInterval(tick,1000,{now:true});else setInterval(tick,1000);
   });
 
   window.goNYC=function(){

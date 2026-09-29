@@ -160,7 +160,6 @@
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
     try{ renderProjRail(); }catch(_){}
-    try{ if(!window.FLOW_BUILD){ window.FLOW_BUILD='2026-07-29-folders-v2.4'; console.log('[Flow] build', window.FLOW_BUILD); } }catch(_){}
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag');
@@ -251,6 +250,7 @@
     // opts: {title, value, placeholder, emoji (bool), onOk(val, emojiVal)}
     const o=opts||{};
     const ov=document.createElement('div'); ov.className='imodal';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');   // шторка модальна для VoiceOver
     const emojiRow = o.emoji ? `
       <div class="im-label">Емодзі (необов'язково)</div>
       <div class="im-emoji-row">
