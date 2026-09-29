@@ -236,7 +236,7 @@
       return `<div class="wk-extra-row"><span class="ic">${m.ic}</span>
         <div class="mid"><b>${m.name}${x.note?' · '+esc(x.note):''}</b><small>${d}</small></div>
         <span class="amt" style="color:${m.color}">${m.sign>0?'+':'−'}${fmt(x.amount)} ${sym}</span>
-        <button class="del" data-exdel="${x.id}">×</button></div>`;
+        <button class="del" data-exdel="${esc(x.id)}">×</button></div>`;
     }).join(''):'';
     list.querySelectorAll('[data-exdel]').forEach(b=>b.onclick=()=>delExtra(b.dataset.exdel));
     document.querySelectorAll('#scr-work [data-extra]').forEach(b=>b.onclick=()=>addExtra(b.dataset.extra));

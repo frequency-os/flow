@@ -18,6 +18,7 @@ const PRECACHE = [
   './vendor/jszip.min.js', './vendor/pdf.min.js', './vendor/supabase.min.js',
 ];
 const NAV_WAIT = 4000; // мс: далі чекати мережу немає сенсу — показуємо копію
+const NAV_ABORT = 15000; // мс: сервер так і не відповів — обриваємо запит зовсім
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -56,8 +57,16 @@ function navigate(e){
   // Як копію сторінки беремо лише HTML без переадресації: пряме відкриття,
   // скажімо, vendor/pdf.min.js не повинно лягти в кеш замість сторінки.
   const isPage = r => r && r.ok && !r.redirected && /text\/html/i.test(r.headers.get('content-type') || '');
-  const net = fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' })
-    .then(res => ({ res, copy: isPage(res) ? res.clone() : null }));
+  // Запит, на який сервер не відповідає взагалі, обриваємо через NAV_ABORT.
+  // Інакше waitUntil тримає його до TCP-таймауту: наступні старти стоять за
+  // ним у черзі й бачать стару копію, а новий воркер не стає активним.
+  // Таймер знімаємо, щойно прийшли заголовки, — повільне, але живе
+  // завантаження сторінки на поганій мережі не ріжемо.
+  const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+  const kill = ctl ? setTimeout(() => ctl.abort(), NAV_ABORT) : 0;
+  const net = fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin', signal: ctl ? ctl.signal : undefined })
+    .then(res => { clearTimeout(kill); return { res, copy: isPage(res) ? res.clone() : null }; },
+          err => { clearTimeout(kill); throw err; });
   // waitUntil — синхронно, поки подія жива: запис копії доживе, навіть
   // якщо сторінку вже віддали з кешу через таймаут.
   e.waitUntil(Promise.all([opened, net])

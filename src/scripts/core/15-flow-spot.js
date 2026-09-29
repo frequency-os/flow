@@ -434,7 +434,7 @@
       +tr.shelf.map(x=>{
         const go=AI_SHELF_GO[x.k];
         return `<div class="ai-shc sh-${esc(x.k)}"${go?` data-shgo="${go}"`:''}>
-          <div class="th"><i class="l1"></i><i class="l2"></i><i class="bk"></i><span>${x.e||'📄'}</span></div>
+          <div class="th"><i class="l1"></i><i class="l2"></i><i class="bk"></i><span>${esc(x.e||'📄')}</span></div>
           <b>${esc(x.name)}</b><small>${esc(x.meta||'розділ')}</small></div>`;
       }).join('')+`</div>`;
   }
@@ -1181,7 +1181,7 @@
       const all=plBlocksFor(td).slice().sort((a,b)=>a.h-b.h);
       const rows=all.filter(b=>showAll||b.folder===key).map(b=>{
         const mine=b.folder===key;
-        const cc=mine?(f.c||'#c77dff'):'var(--muted)';
+        const cc=mine?safeColor(f.c,'#c77dff'):'var(--muted)';   // колір папки — з даних, у style
         return `<div class="fps-row ${b.done?'done':''} ${mine?'':'dim'}">
           <span class="fps-tm">${plHM(b.h)}</span>
           <div class="fps-tx"><b>${esc(b.t)}</b><span>${plHM(b.h)}–${plHM(Math.min(plBlockEnd(b),24))}${b.fromRecur?' · 🔁':''}</span></div>
@@ -1246,7 +1246,7 @@
       const grid=weeks.map(w=>w.map(ds=>{
         if(!ds) return '<div></div>';
         const d=+ds.slice(8);
-        return `<div class="fpm-dd ${byDs[ds]?'dot':''} ${ds===td?'today':''}" data-fpmday="${ds}" style="--fc:${f.c||'#c77dff'}">${d}</div>`;
+        return `<div class="fpm-dd ${byDs[ds]?'dot':''} ${ds===td?'today':''}" data-fpmday="${ds}" style="--fc:${safeColor(f.c,'#c77dff')}">${d}</div>`;
       }).join('')).join('');
       // найближчі точки: від сьогодні, до 10 шт, у межах 45 днів
       const up=[];
@@ -1803,7 +1803,7 @@
         ${folderKeys.length?`<label class="pl-sheet-l">📁 Папка / проєкт (необов'язково)</label>
         <select class="pl-sheet-in" id="pbFolder">
           <option value="">— без папки —</option>
-          ${folderKeys.map(k=>`<option value="${k}" ${(b&&b.folder===k)?'selected':''}>${(folders[k].emoji||'📁')} ${esc(folders[k].name||'Папка')}</option>`).join('')}
+          ${folderKeys.map(k=>`<option value="${esc(k)}" ${(b&&b.folder===k)?'selected':''}>${esc(folders[k].emoji||'📁')} ${esc(folders[k].name||'Папка')}</option>`).join('')}
         </select>`:''}
         <div class="pl-sheet-btns">
           ${b?`<button class="pl-sheet-del" id="pbDel">Видалити</button>`:''}
@@ -1898,7 +1898,7 @@
           <select class="pl-sheet-in" id="pbLinkGoal">${goals.map(g=>`<option value="${esc(g.id||g.name||'')}" ${curLink.goalId===(g.id||g.name)?'selected':''}>${esc(g.emoji||'🎯')} ${esc(g.name||'Ціль')}</option>`).join('')||'<option value="">(нема цілей — створи в Цілях)</option>'}</select>`;
       } else if(tp==='fin'){
         linkExtra.innerHTML=`<label class="pl-sheet-l">У який конверт</label>
-          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${e.id}" ${curLink.envId===e.id?'selected':''}>${esc(e.emoji||'✉️')} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
+          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${esc(e.id)}" ${curLink.envId===e.id?'selected':''}>${esc(e.emoji||'✉️')} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
           <label class="pl-sheet-l">Сума доходу, ₴</label>
           <input class="pl-sheet-in" id="pbLinkAmt" inputmode="numeric" placeholder="напр. 1200" value="${curLink.amount||''}">`;
       } else { linkExtra.innerHTML=''; }

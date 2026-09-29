@@ -588,7 +588,7 @@
   function contactsWidgetHtml(b, sz, head){
     const people=Array.isArray(b.people)?b.people:[];
     const rows=people.map((p,i)=>`<div class="ctw-row" data-ctrow="${b.id}|${p.id}">
-      <span class="ctw-ava" style="background:${p.color||CTW_COLORS[i%CTW_COLORS.length]}">${esc(ctwInit(p.name))}</span>
+      <span class="ctw-ava" style="background:${safeColor(p.color,CTW_COLORS[i%CTW_COLORS.length])}">${esc(ctwInit(p.name))}</span>
       <span class="ctw-m"><b>${esc(p.name||'')}</b>${p.note?`<span>${esc(p.note)}</span>`:''}</span>
       ${p.link?`<button class="ctw-go" data-ctgo="${b.id}|${p.id}" title="Відкрити">↗</button>`:''}</div>`).join('');
     return `<div class="tile ${sz} tctw" data-tileid="${b.id}" style="--tc:#34c77b">${head}
@@ -810,7 +810,7 @@
         sub:'Прибуток проєкту: '+fmt(net)+' '+cur,
         items: envelopes.map(e=>{
           const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-          return { ic:(e.emoji||'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
+          return { ic:safeEmoji(e.emoji,'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
             onClick:()=>{
               inputModal({title:'Скільки в «'+e.name+'» (₴)', placeholder:'Сума', onOk:(v)=>{
                 const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
@@ -848,7 +848,7 @@
       sub:'Цей віджет показуватиме обраний конверт',
       items: envelopes.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-        return { ic:(e.emoji||'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
+        return { ic:safeEmoji(e.emoji,'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
           onClick:()=>{ block.envId=e.id; saveBoard(); renderBoard(); } };
       })
     });
@@ -911,7 +911,7 @@
     { const cb=s.querySelector('#e2Card'); if(cb) cb.onclick=()=>{
       ensureCards();
       actionSheet({ title:'Картка для поповнень', sub:e.cardId?('Зараз: '+((cardById(e.cardId)||{}).name||'—')):'Зараз: питати щоразу',
-        items: cards.map(c=>({ ic:c.emoji||'💳', label:c.name, sub:fmt(cardBalance(c))+' '+cardSym(c), onClick:()=>{ e.cardId=c.id; saveEnvelopes(); renderEnvSheet(); } }))
+        items: cards.map(c=>({ ic:safeEmoji(c.emoji,'💳'), label:c.name, sub:fmt(cardBalance(c))+' '+cardSym(c), onClick:()=>{ e.cardId=c.id; saveEnvelopes(); renderEnvSheet(); } }))
           .concat([{ ic:'❓', label:'Питати щоразу', onClick:()=>{ delete e.cardId; saveEnvelopes(); renderEnvSheet(); } }])
       });
     }; }

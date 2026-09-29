@@ -109,8 +109,10 @@
           <div class="si">${C.emoji}</div>
           <div class="sm"><div class="snm">${esc(x.label)}</div><div class="smeta">${C.name} · ${d}</div></div>
           <div class="sv">${fmt(x.amount)} ₴</div>
-          <button class="sx" onclick="delSpend('${x.id}')">×</button></div>`;
+          <button class="sx" data-spdel="${esc(x.id)}">×</button></div>`;
       }).join('');
+      // id витрати раніше йшов у onclick="delSpend('…')" — лапка в id ламала клік або виконувала код
+      log.querySelectorAll('[data-spdel]').forEach(b=>b.onclick=()=>delSpend(b.dataset.spdel));
     }
 
     // tools

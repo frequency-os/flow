@@ -37,10 +37,26 @@
     }
   }
   try{ window.aiFetch=aiFetch; }catch(_){}
+  /* Адреса AI мусить бути в connect-src політики безпеки (CSP у src/index.html),
+     інакше чат, голос і розпізнавання тихо не відповідатимуть — а адреса ще й
+     синхронізується на інші пристрої. Тому чужу адресу не зберігаємо і кажемо чому. */
+  function aiEpAllowed(u){
+    try{
+      const m=document.querySelector('meta[http-equiv="Content-Security-Policy"]'); if(!m) return true;
+      const cs=(String(m.content).match(/connect-src([^;]*)/)||[])[1]; if(!cs) return true;
+      const o=new URL(u).origin;
+      return cs.trim().split(/\s+/).some(x=>x.replace(/\/$/,'')===o);
+    }catch(_){ return false; }
+  }
   function aiConfig(cb){
     inputModal({title:'AI endpoint (URL твого Worker-проксі)', value:aiEndpoint(),
       placeholder:AI_EP_DEFAULT, onOk:(v)=>{
-        prefSet(AI_EP_KEY,(v||'').trim()); if(cb) cb();
+        const t=(v||'').trim();
+        if(t && !aiEpAllowed(t)){
+          try{ plToast('Цю адресу застосунок не пропустить (правила безпеки) — адресу AI не змінено'); }catch(_){}
+          return;
+        }
+        prefSet(AI_EP_KEY,t); if(cb) cb();
       }});
   }
   function aiSheetClose(){ const ov=document.getElementById('aiOv'); if(ov) ov.remove(); }

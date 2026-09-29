@@ -147,7 +147,7 @@
         <div class="tnote" style="color:var(--muted)">Невідомий блок «${esc(String(b.type||'?'))}»</div></div>`;
     }
     const c=T.color;
-    const cc = (b.color)||c;  // власний колір картки папки/сторінки
+    const cc = safeColor(b.color,c);  // власний колір картки папки/сторінки (з даних — чистимо, іде в style)
 
     // ── СТОРІНКА (окремий аркуш, тап → відкривається новий аркуш) ──
     if(b.type==='page'){
@@ -620,6 +620,8 @@
         <button data-del="${b.id}" style="color:var(--owe)">×</button></div></div>`;
     }
     // ── 5 ВІДЖЕТІВ ПРОЄКТІВ (папки з роллю «Проєкт») ──
+    // колір папки (f.c) іде в style="--fc:…" і stroke — чистимо: папка могла прийти з хмари чи від AI
+    const pwC=f=>safeColor(f&&f.c,'#8b7cff');
     if(b.type==='wplanday'||b.type==='wplanmonth'){
       let fk=b.pfolder||''; try{ if(!fk){ const cx=curCtx(); if(cx!=='__root__') fk=cx; } }catch(_){}
       if(!fk || typeof folders==='undefined' || !folders[fk]){
@@ -631,7 +633,7 @@
         const td=plTodayStr();
         const bs=plBlocksDisplay(td).filter(x=>x.folder===fk).sort((a,b2)=>a.h-b2.h);
         const dn=bs.filter(x=>x.done).length;
-        const rows=bs.slice(0,4).map(x=>`<div class="pw-planrow ${x.done?'done':''}" style="--fc:${f.c}">
+        const rows=bs.slice(0,4).map(x=>`<div class="pw-planrow ${x.done?'done':''}" style="--fc:${pwC(f)}">
           <span>${plHM(x.h)}</span><b>${esc(x.t)}</b>${x.fromRecur?'<em>🔁</em>':''}</div>`).join('')
           ||`<div class="pw-planempty">Сьогодні точок нема — додай першу</div>`;
         return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}
@@ -647,7 +649,7 @@
         const has=plBlocksDisplay(ds).some(x=>x.folder===fk); if(has) nd++;
         return `<i class="${has?'dot':''}${ds===td?' td':''}"></i>`;
       }).join('')).join('');
-      return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c};--fc:${f.c}">${head}
+      return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c};--fc:${pwC(f)}">${head}
         <div class="pw-plansub">${nd?nd+' дн. з точками цього місяця':'ритм проєкту за місяць'}</div>
         <div class="pw-mmini">${cells}</div>
         <button class="pw-btn go" data-wplan="month|${fk}">Відкрити календар</button></div>`;
@@ -660,8 +662,8 @@
       if(b.type==='wpult'){
         if(!pks.length) return empt('Немає папок-проєктів');
         const rows=pks.map(k=>{const f=folders[k];const pr=folderProgress(k);const nx=folderNextStep(k);const dl=dueLabel(f.due);const s=st(f.status);
-          return `<div class="pw-row" style="--fc:${f.c}">
-            <div class="pw-rt" data-wgo="${k}">
+          return `<div class="pw-row" style="--fc:${pwC(f)}">
+            <div class="pw-rt" data-wgo="${esc(k)}">
               <span class="pw-em">${esc(f.emoji||'📁')}</span>
               <span class="pw-meat"><b>${esc(f.name)}</b>
                 <span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span>
@@ -684,12 +686,12 @@
         }
         const f=folders[pks[i]];const pr=folderProgress(pks[i]);const nx=folderNextStep(pks[i]);const dl=dueLabel(f.due);const s=st(f.status);
         const C2=2*Math.PI*20, off=Math.round(C2*(1-pr.pct/100));
-        return `<div class="tile ${sz} pw pw-stack" data-tileid="${b.id}" style="--tc:${c};--fc:${f.c}">${head}
+        return `<div class="tile ${sz} pw pw-stack" data-tileid="${b.id}" style="--tc:${c};--fc:${pwC(f)}">${head}
           <div class="pw-scard">
             <div class="pw-shead">
               <span class="pw-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="var(--hair)" stroke-width="5"/>
-                <circle cx="24" cy="24" r="20" fill="none" stroke="${f.c}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C2}" stroke-dashoffset="${off}" transform="rotate(-90 24 24)"/></svg><b>${pr.pct}%</b></span>
-              <span class="pw-meat"><b>${(f.emoji||'📁')} ${esc(f.name)}</b>
+                <circle cx="24" cy="24" r="20" fill="none" stroke="${pwC(f)}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C2}" stroke-dashoffset="${off}" transform="rotate(-90 24 24)"/></svg><b>${pr.pct}%</b></span>
+              <span class="pw-meat"><b>${esc(f.emoji||'📁')} ${esc(f.name)}</b>
                 <span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span>
                 ${dl?`<span class="fdue ${dl.late?'late':''}">⏳ ${dl.t}</span>`:''}</span></span>
             </div>
@@ -708,8 +710,8 @@
           const list=pks.filter(k=>(folders[k].status||'active')===sk);
           return `<div class="pw-col" style="--sc:${sc}"><div class="pw-colh">${sn}<i>${list.length}</i></div>
             ${list.map(k=>{const f=folders[k];const pr=folderProgress(k);
-              return `<div class="pw-pcard" style="--fc:${f.c}" data-wpipe="${k}" title="Тап — наступний статус">
-                <b>${(f.emoji||'📁')} ${esc(f.name)}</b>
+              return `<div class="pw-pcard" style="--fc:${pwC(f)}" data-wpipe="${esc(k)}" title="Тап — наступний статус">
+                <b>${esc(f.emoji||'📁')} ${esc(f.name)}</b>
                 <span class="pw-line"><span class="fprg"><i style="width:${pr.pct}%"></i></span><span class="pw-pct">${pr.pct}%</span></span></div>`;}).join('')||'<div class="pw-colempty">—</div>'}
           </div>`;}).join('');
         const act=pks.filter(k=>(folders[k].status||'active')==='active').length;
@@ -728,7 +730,7 @@
             <div class="pw-hot" style="left:0;width:${100/WEEKS}%"></div>
             <div class="pw-axis">${Array.from({length:WEEKS},(_,i)=>`<span class="${i===0?'hot':''}">${i===0?'Цей тижд.':'+'+i}</span>`).join('')}</div>
             ${dks.map(k=>{const f=folders[k];const pr=folderProgress(k);const L=late(k);const w=wk(k);
-              return `<div class="pw-tlrow"><div class="pw-tlbar ${L?'late':''}" style="--fc:${f.c};left:${L?0:w*(100/WEEKS)}%;width:${100/WEEKS*0.96}%" data-wgo="${k}">
+              return `<div class="pw-tlrow"><div class="pw-tlbar ${L?'late':''}" style="--fc:${pwC(f)};left:${L?0:w*(100/WEEKS)}%;width:${100/WEEKS*0.96}%" data-wgo="${esc(k)}">
                 <i style="width:${pr.pct}%"></i><span>${esc(f.emoji||'📁')} ${esc(f.name)}</span></div></div>`;}).join('')}
           </div></div></div>`;
       }
@@ -737,8 +739,8 @@
         if(!all.length) return empt('Немає папок');
         return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}
           <div class="pw-grid">${all.map(k=>{const f=folders[k];const role=f.role||'area';const pr=role==='project'?folderProgress(k):null;const s=st(f.status);
-            return `<div class="pw-gcell" style="--fc:${f.c}" data-wgo="${k}">
-              <span class="pw-em big">${(f.emoji||'📁')}</span><b>${esc(f.name)}</b>
+            return `<div class="pw-gcell" style="--fc:${pwC(f)}" data-wgo="${esc(k)}">
+              <span class="pw-em big">${esc(f.emoji||'📁')}</span><b>${esc(f.name)}</b>
               ${role==='project'?`<span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span><span class="fprg"><i style="width:${pr.pct}%"></i></span></span>`
                 :`<span class="pw-role">${role==='page'?'📄 сторінка':'📁 область'}</span>`}</div>`;}).join('')}
           </div></div>`;
