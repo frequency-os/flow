@@ -21,10 +21,13 @@
   async function aiFetch(url,opts){
     opts=opts||{};
     /* Згода на AI (37-ai-privacy.js): усі шляхи до моделі й голосу йдуть
-       сюди, тож одна перевірка закриває всі. Без згоди — шторка; «Не зараз»
-       чи вимкнений AI — запит не виходить (помилка з human/aiOff).
-       /upload-photo — хмарне сховище фото, а не AI, його не зупиняємо. */
-    if(!/\/upload-photo(\?|$)/.test(String(url||''))) await aiConsentGate();
+       сюди, тож одна перевірка закриває всі. opts.ai = {bg, uses}: bg —
+       фоновий запит (без згоди тихо не йде, шторки нема), uses — розділи,
+       чиї дані несе запит (закритий — не йде). Без згоди на дію людини —
+       шторка; «Не зараз» чи вимкнений AI — запит не виходить (помилка з
+       human/aiOff). /upload-photo — хмарне сховище фото, а не AI, його не зупиняємо. */
+    const ai=opts.ai; if(ai){ opts=Object.assign({},opts); delete opts.ai; }
+    if(!/\/upload-photo(\?|$)/.test(String(url||''))) await aiConsentGate(ai);
     let tok='';
     try{ if(typeof window.sbAccessToken==='function') tok=await window.sbAccessToken(); }catch(_){}
     if(!tok) return fetch(url,opts);
@@ -106,8 +109,10 @@
       if(!draft||!Array.isArray(draft.goals)||!draft.goals.length) throw new Error('порожня відповідь');
       aiPreview(draft,'AI-чернетка');
     }catch(e){
-      console.error('aiGenerate',e);
-      body.innerHTML=`<div class="ai-load">⚠️ Не вдалось: ${esc(String(e.message||e))}.<br>Перевір URL проксі або спробуй базову чернетку.</div>`;
+      if(!(e&&e.aiOff)) console.error('aiGenerate',e);
+      body.innerHTML = (e&&e.aiOff)   // відмова від AI — не поломка проксі; базова чернетка працює і без AI
+        ? `<div class="ai-load">${esc(e.message)}<br>Можна взяти базову чернетку.</div>`
+        : `<div class="ai-load">⚠️ Не вдалось: ${esc(String(e.message||e))}.<br>Перевір URL проксі або спробуй базову чернетку.</div>`;
       if(acts) acts.style.display='';
     }
   }

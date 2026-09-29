@@ -447,7 +447,8 @@
             if(!result) throw new Error('порожня відповідь');
             done=true; out.textContent=result; save.disabled=false;
           }catch(e){
-            out.innerHTML='<span class="ch-ai-err">Не вдалося: '+esc((e&&e.message)||'спробуй пізніше')+'</span>';
+            // відмова від AI (згода / вимкнено) — вибір людини, тож без «Не вдалося»
+            out.innerHTML='<span class="ch-ai-err">'+(e&&e.aiOff?'':'Не вдалося: ')+esc((e&&e.message)||'спробуй пізніше')+'</span>';
             save.disabled=false; save.textContent='Ще раз'; save.dataset.retry='1';
           }finally{ chAiBusy=false; chAiSync(); }
         })();

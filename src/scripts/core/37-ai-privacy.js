@@ -3,9 +3,16 @@
      вона має побачити, ЩО саме піде, КОМУ і НАВІЩО, і погодитись.
      Тому жоден запит до AI-воркера не виходить без згоди — перевірка стоїть
      у aiFetch (09-goals.js), через який ідуть усі шляхи: чат, спот, голос,
-     аналіз щоденника, Апгрейд, тренер тижня, AI-старт.
+     аналіз щоденника, Апгрейд, тренер тижня, AI-старт, віджет «Щоденник».
+     Там же — друга половина: запит, що несе дані закритого розділу
+     (opts.ai.uses), не виходить, навіть якщо шлях забув перевірити сам.
 
-     Ключ ai_privacy_v1 (у FLOW_KEYS — синкається між пристроями):
+     Шторку згоди показує ЛИШЕ дія людини. Фоновий запит (opts.ai.bg —
+     авто-зведення, оцінка настрою, озвучення) без згоди тихо не йде:
+     без шторки і без тосту-помилки (помилка з quiet=true).
+
+     Ключ ai_privacy_v1 (у FLOW_KEYS — синкається між пристроями: load() читає
+     його через storage.get, тобто хмарне значення, якщо воно новіше):
        { consent: <версія тексту, на яку людина погодилась>, at: ISO-дата,
          off: true — AI вимкнено повністю,
          deny: { diary, finance, photos } — розділи, які агент НЕ читає }
@@ -14,19 +21,37 @@
   const AI_PRIV_KEY='ai_privacy_v1';
   const AI_CONSENT_VER=1;
   const AI_PRIV_SECTIONS=[
-    {k:'diary',   emo:'📓', t:'Щоденник',  d:'Записи, зошити, аналіз тижня і настрою'},
+    {k:'diary',   emo:'📓', t:'Щоденник',  d:'Записи, зошити, віджет у папках, аналіз тижня і настрою'},
     {k:'finance', emo:'💶', t:'Фінанси',   d:'Гаманець, конверти, борги, витрати'},
     {k:'photos',  emo:'🖼️', t:'Фото',      d:'Знімки, які прикріплюєш у чаті'},
   ];
-  function aiPrivGet(){
-    let o=null;
-    try{ const raw=window.storage.getLocal(AI_PRIV_KEY); if(raw) o=JSON.parse(raw); }catch(_){}
+  /* Останнє відоме значення. getLocal — лише копія цього пристрою, тож після
+     load() тут лежить те, що віддав storage.get (хмара, якщо там новіше):
+     вимкнула людина AI на iPhone — Mac після звірки з хмарою теж не шле. */
+  var aiPrivMem=null;   // var, а не let: ранній виклик aiPrivGet не впаде на «ще не оголошено»
+  function aiPrivNorm(o){
     o=(o&&typeof o==='object')?o:{};
     o.deny=(o.deny&&typeof o.deny==='object')?o.deny:{};
     return o;
   }
+  function aiPrivGet(){
+    if(aiPrivMem) return aiPrivNorm(JSON.parse(JSON.stringify(aiPrivMem)));   // копія: виклики її змінюють
+    let o=null;
+    try{ const raw=window.storage.getLocal(AI_PRIV_KEY); if(raw) o=JSON.parse(raw); }catch(_){}
+    return aiPrivNorm(o);
+  }
   function aiPrivSet(o){
+    aiPrivMem=aiPrivNorm(JSON.parse(JSON.stringify(o)));
     try{ const p=window.storage.set(AI_PRIV_KEY,JSON.stringify(o)); if(p&&p.catch) p.catch(()=>{}); }catch(_){}
+  }
+  /* Кличе load() (27-canvas.js): на старті й після кожної звірки з хмарою, що
+     принесла новіше. Назад у сховище НЕ пишемо — інакше пристрої перекидались
+     би тим самим значенням зі свіжою міткою без кінця. */
+  async function aiPrivLoad(){
+    try{
+      const r=await window.storage.get(AI_PRIV_KEY);
+      if(r&&typeof r.value==='string'&&r.value) aiPrivMem=aiPrivNorm(JSON.parse(r.value));
+    }catch(_){ /* ключа ще нема ні тут, ні в хмарі — лишаємо як є */ }
   }
   function aiConsentOk(){ const o=aiPrivGet(); return !o.off && (+o.consent||0)>=AI_CONSENT_VER; }
   /* Чи можна зараз ТИХО (без шторки) піти в AI — для фонових запитів,
@@ -40,12 +65,31 @@
   }
   /* Помилка, яку бачить людина: human=true — без «перевір URL проксі»,
      aiOff=true — чат показує її без ⚠️, це не поломка. */
-  function aiOffError(off){
+  function aiOffError(off,quiet){
     const e=new Error(off
       ? '🔒 AI вимкнено. Увімкнути: Ще → AI і приватність.'
       : '🔒 Без твоєї згоди AI нічого не отримує. Передумаєш — Ще → AI і приватність.');
-    e.human=true; e.aiOff=true;
+    e.human=true; e.aiOff=true; e.quiet=!!quiet;   // quiet — фоновий запит: людині нічого не кажемо
     return e;
+  }
+  function aiSectionError(k,quiet){
+    const s=AI_PRIV_SECTIONS.find(x=>x.k===k);
+    const e=new Error('🔒 Розділ «'+(s?s.t:k)+'» закрито від AI, тож його дані не надсилаються. Відкрити: Ще → AI і приватність.');
+    e.human=true; e.aiOff=true; e.quiet=!!quiet;
+    return e;
+  }
+  /* Тиха підказка для віджета, що сам ходить до AI у фоні: чому він зараз
+     мовчить. '' — усе дозволено. act — назва кнопки, якою людина може
+     попросити сама (тоді й спитаємо згоду). */
+  function aiQuietHint(section,act){
+    const o=aiPrivGet();
+    if(o.off) return '🔒 AI вимкнено, тож сюди нічого не надсилається. Увімкнути: Ще → AI і приватність.';
+    if(section&&o.deny[section]){
+      const s=AI_PRIV_SECTIONS.find(x=>x.k===section);
+      return '🔒 Розділ «'+(s?s.t:section)+'» закрито від AI, тож його дані не надсилаються. Відкрити: Ще → AI і приватність.';
+    }
+    if((+o.consent||0)<AI_CONSENT_VER) return '🔒 Сам я нічого не надсилаю, доки ти не погодишся.'+(act?' Натисни «'+act+'» — спершу спитаю.':'');
+    return '';
   }
 
   /* ── «Що бачить AI»: один текст і для шторки згоди, і для налаштувань ── */
@@ -55,7 +99,8 @@
       +'А ще — те, що агент читає, щоб відповісти по суті: планер і беклог, цілі й Точку Б, щоденник і зошити, '
       +'фінанси (гаманець, конверти, борги), папки й проєкти, Візію, підписи Карти бажань, памʼять про тебе. '
       +'Після згоди дещо йде й без окремого прохання: ранковий бриф і тижневий огляд, коли відкриваєш чат, '
-      +'та оцінка настрою за записами, коли відкриваєш щоденник.</p>'
+      +'оцінка настрою за записами, коли відкриваєш щоденник, і зведення віджета «Щоденник» на сторінці папки '
+      +'(записи за тиждень чи місяць, а ще ритуал, витрати й завдання тих днів).</p>'
       +'<p><b>Кому.</b> Моделі Claude від Anthropic — через наш сервер-посередник на Cloudflare '
       +'(ключ доступу до моделі лежить там, а не в застосунку). Голос: розпізнавання мови — модель Whisper на Cloudflare Workers AI; '
       +'озвучення відповідей — ElevenLabs, запасний — Microsoft Azure Speech. Якщо вони недоступні, говорить системний голос телефона, без мережі.</p>'
@@ -99,12 +144,18 @@
     });
     return aiConsentPending;
   }
-  /* Ворота для aiFetch: true — можна слати. Вимкнено — без шторки (людина
-     сама так вирішила); згоди нема — питаємо. */
-  async function aiConsentGate(){
-    const o=aiPrivGet();
-    if(o.off) throw aiOffError(true);
+  /* Ворота для aiFetch: true — можна слати. ai = {bg, uses} з opts.ai.
+     Вимкнено — без шторки (людина сама так вирішила). Запит несе закритий
+     розділ (uses) — не йде. Згоди нема: дія людини — питаємо шторкою,
+     фоновий запит (bg) — тихо не йде. */
+  async function aiConsentGate(ai){
+    ai=ai||{};
+    const o=aiPrivGet(), bg=!!ai.bg;
+    if(o.off) throw aiOffError(true,bg);
+    const closed=(Array.isArray(ai.uses)?ai.uses:[]).find(k=>o.deny[k]);
+    if(closed) throw aiSectionError(closed,bg);
     if((+o.consent||0)>=AI_CONSENT_VER) return true;
+    if(bg) throw aiOffError(false,true);
     if(await aiConsentSheet()) return true;
     throw aiOffError(false);
   }
@@ -149,4 +200,4 @@
     ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
     document.body.appendChild(ov);
   }
-  try{ window.aiPrivacySheet=aiPrivacySheet; window.aiAllowed=aiAllowed; }catch(_){}
+  try{ window.aiPrivacySheet=aiPrivacySheet; window.aiAllowed=aiAllowed; window.aiQuietHint=aiQuietHint; }catch(_){}

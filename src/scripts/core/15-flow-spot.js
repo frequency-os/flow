@@ -777,13 +777,21 @@
       const old=aiChatMsgs.slice(0,aiChatMsgs.length-16);
       const dlg=old.map(m=>(m.role==='user'?'Я: ':'Флоу: ')+aiStreamText(m.content).slice(0,300)).join('\n');
       const s=await aiCall('Стисни діалог у резюме до 500 символів українською: факти про людину, рішення, домовленості, незакриті теми. Без води, без markdown. Якщо є попереднє резюме — обʼєднай.',
-        [{role:'user',content:(aiSum?'ПОПЕРЕДНЄ РЕЗЮМЕ: '+aiSum+'\n\n':'')+'ДІАЛОГ:\n'+dlg}]);
+        [{role:'user',content:(aiSum?'ПОПЕРЕДНЄ РЕЗЮМЕ: '+aiSum+'\n\n':'')+'ДІАЛОГ:\n'+dlg}], null, {bg:true});
       if(s){ aiSum=s.slice(0,1600); aiChatMsgs=aiChatMsgs.slice(-16); aiChatSave(); }
-    }catch(e){ console.error('aiSum',e); }
+    }catch(e){ if(!(e&&e.aiOff)) console.error('aiSum',e); }
     aiSumBusy=false;
   }
   async function aiChatSend(q){
     q=(q||'').trim(); if(!q&&!aiAttach.length) return; if(aiBusy) return;
+    /* фото прикріпили ще до того, як закрили розділ «Фото»: не шлемо і кажемо
+       про це — інакше AI отримав би «прочитай вкладення» без вкладення */
+    if(aiSectionOff('photos') && aiAttach.some(a=>a.kind==='image')){
+      for(let i=aiAttach.length-1;i>=0;i--) if(aiAttach[i].kind==='image') aiAttach.splice(i,1);
+      aiAttachRender();
+      plToast('🔒 Фото закрито від AI — знімок не надіслано');
+      if(!q&&!aiAttach.length) return;
+    }
     const inp=document.getElementById('aiInput'); if(inp){ inp.value=''; inp.placeholder='Напиши '+FLOW_PETS[petCur()].name+'…'; }
     aiSlashHide();
     let sk=aiSkillFor(q);
@@ -865,9 +873,15 @@
       /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
          а не «поганий URL»; на native поле проксі взагалі приховане. */
       const off = (typeof navigator!=='undefined' && navigator.onLine===false);
-      m.content = off
-        ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
-        : (e && e.aiOff) ? e.message           // «Не зараз» чи AI вимкнено — вибір людини, не поломка
+      /* «Не зараз» чи AI вимкнено — вибір людини, не поломка. Стоїть ПЕРЕД
+         перевіркою мережі: запит і не йшов, тож «немає зв’язку» було б неправдою.
+         Вкладення повертаємо в рядок вводу — погодиться, і не треба чіпляти знову. */
+      if(e && e.aiOff && att.length){
+        att.forEach(a=>{ if(!(a.kind==='image'&&aiSectionOff('photos'))) aiAttach.push(a); });
+        try{ aiAttachRender(); }catch(_){}
+      }
+      m.content = (e && e.aiOff) ? e.message
+        : off ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
         : (e && e.human) ? '⚠️ '+e.message     // ліміт чи вхід (aiHttpError) — причина відома, URL тут ні до чого
         : (window.FLOW_NATIVE
             ? '⚠️ Не вдалось до мене достукатись. Спробуй ще раз за хвилину.'

@@ -1100,8 +1100,8 @@
     }catch(_){}
   }
   try{ window.__flowAiRaw=aiCallRaw; }catch(_){}
-  async function aiCallRaw(payload,onDelta){
-    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+  async function aiCallRaw(payload,onDelta,ai){   // ai — {bg, uses} для воріт згоди (aiFetch)
+    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},ai:ai,
       body:JSON.stringify(Object.assign({stream:true},payload))});
     if(!res.ok) throw await aiHttpError(res);   // з 11-ai-flow.js: «увійди» / «спробуй за хвилину»
     const _u={i:0,o:0,cr:0,cw:0};

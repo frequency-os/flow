@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 69 |
-| Рядків JS | 27351 |
+| Рядків JS | 27451 |
 | Файлів CSS | 32 |
 | Рядків CSS | 8658 |
-| Сутностей верхнього рівня | 1693 |
+| Сутностей верхнього рівня | 1699 |
 | Ключів сховища (FLOW_KEYS) | 71 |
 
 ## Файли JS
@@ -31,7 +31,7 @@
 | `src/scripts/21-newyear-countdown.js` | 127 | 11 |
 | `src/scripts/40-pets-3d.js` | 297 | 0 |
 | `src/scripts/41-theme-layer.js` | 153 | 0 |
-| `src/scripts/42-voice-island.js` | 790 | 0 |
+| `src/scripts/42-voice-island.js` | 792 | 0 |
 | `src/scripts/43-planner.js` | 137 | 0 |
 | `src/scripts/44-week.js` | 333 | 0 |
 | `src/scripts/45-month.js` | 661 | 0 |
@@ -44,35 +44,35 @@
 | `src/scripts/core/06-wishes.js` | 1192 | 92 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 922 | 92 |
-| `src/scripts/core/09-goals.js` | 644 | 24 |
-| `src/scripts/core/10-planner.js` | 907 | 49 |
-| `src/scripts/core/11-ai-flow.js` | 177 | 14 |
+| `src/scripts/core/09-goals.js` | 649 | 24 |
+| `src/scripts/core/10-planner.js` | 909 | 49 |
+| `src/scripts/core/11-ai-flow.js` | 178 | 14 |
 | `src/scripts/core/12-ai-agent.js` | 1630 | 79 |
 | `src/scripts/core/13-pets.js` | 216 | 13 |
 | `src/scripts/core/14-react.js` | 335 | 43 |
-| `src/scripts/core/15-flow-spot.js` | 2031 | 97 |
+| `src/scripts/core/15-flow-spot.js` | 2045 | 97 |
 | `src/scripts/core/16-dashboard.js` | 557 | 21 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 183 | 18 |
 | `src/scripts/core/19-spending.js` | 134 | 14 |
 | `src/scripts/core/20-work.js` | 487 | 50 |
 | `src/scripts/core/21-patterns.js` | 191 | 21 |
-| `src/scripts/core/22-diary.js` | 530 | 54 |
+| `src/scripts/core/22-diary.js` | 531 | 54 |
 | `src/scripts/core/23-board.js` | 330 | 32 |
 | `src/scripts/core/24-reminders.js` | 196 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
 | `src/scripts/core/26-blocks-render.js` | 1649 | 16 |
-| `src/scripts/core/27-canvas.js` | 568 | 27 |
+| `src/scripts/core/27-canvas.js` | 569 | 27 |
 | `src/scripts/core/28-vision.js` | 529 | 42 |
 | `src/scripts/core/29-more-screen.js` | 439 | 22 |
-| `src/scripts/core/30-upgrade.js` | 292 | 30 |
+| `src/scripts/core/30-upgrade.js` | 296 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 151 | 13 |
 | `src/scripts/core/33-home-widgets.js` | 133 | 14 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
-| `src/scripts/core/35-channel.js` | 701 | 65 |
+| `src/scripts/core/35-channel.js` | 702 | 65 |
 | `src/scripts/core/36-chats.js` | 341 | 39 |
-| `src/scripts/core/37-ai-privacy.js` | 152 | 15 |
+| `src/scripts/core/37-ai-privacy.js` | 203 | 20 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
@@ -81,7 +81,7 @@
 | `src/scripts/page-editor/06-w-project.js` | 100 | 6 |
 | `src/scripts/page-editor/07-w-habits.js` | 69 | 4 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 979 | 44 |
-| `src/scripts/page-editor/09-journal-sheet.js` | 467 | 36 |
+| `src/scripts/page-editor/09-journal-sheet.js` | 485 | 37 |
 | `src/scripts/page-editor/10-mic.js` | 155 | 10 |
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
 | `src/vendor/pdf.min.js` _(мініфікований вендор)_ | 22 | — |
@@ -761,22 +761,22 @@
 | `aiEndpoint` | функція | `src/scripts/core/09-goals.js:11` |
 | `aiAuthOff` | значення | `src/scripts/core/09-goals.js:20` |
 | `aiFetch` | функція | `src/scripts/core/09-goals.js:21` |
-| `aiConfig` | функція | `src/scripts/core/09-goals.js:45` |
-| `aiSheetClose` | функція | `src/scripts/core/09-goals.js:51` |
-| `aiStartSheet` | функція | `src/scripts/core/09-goals.js:52` |
-| `aiGenerate` | функція | `src/scripts/core/09-goals.js:83` |
-| `aiLocalDraft` | функція | `src/scripts/core/09-goals.js:115` |
-| `DOW_SHORT` | масив | `src/scripts/core/09-goals.js:139` |
-| `aiPreview` | функція | `src/scripts/core/09-goals.js:140` |
-| `aiApplyDraft` | функція | `src/scripts/core/09-goals.js:175` |
-| `renderGoals` | функція | `src/scripts/core/09-goals.js:215` |
-| `dgDateStr` | функція | `src/scripts/core/09-goals.js:280` |
-| `dgWeekDates` | функція | `src/scripts/core/09-goals.js:281` |
-| `dgListFor` | функція | `src/scripts/core/09-goals.js:284` |
-| `dgSync` | функція | `src/scripts/core/09-goals.js:286` |
-| `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:307` |
-| `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:359` |
-| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:398` |
+| `aiConfig` | функція | `src/scripts/core/09-goals.js:48` |
+| `aiSheetClose` | функція | `src/scripts/core/09-goals.js:54` |
+| `aiStartSheet` | функція | `src/scripts/core/09-goals.js:55` |
+| `aiGenerate` | функція | `src/scripts/core/09-goals.js:86` |
+| `aiLocalDraft` | функція | `src/scripts/core/09-goals.js:120` |
+| `DOW_SHORT` | масив | `src/scripts/core/09-goals.js:144` |
+| `aiPreview` | функція | `src/scripts/core/09-goals.js:145` |
+| `aiApplyDraft` | функція | `src/scripts/core/09-goals.js:180` |
+| `renderGoals` | функція | `src/scripts/core/09-goals.js:220` |
+| `dgDateStr` | функція | `src/scripts/core/09-goals.js:285` |
+| `dgWeekDates` | функція | `src/scripts/core/09-goals.js:286` |
+| `dgListFor` | функція | `src/scripts/core/09-goals.js:289` |
+| `dgSync` | функція | `src/scripts/core/09-goals.js:291` |
+| `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:312` |
+| `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:364` |
+| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:403` |
 
 ### `src/scripts/core/10-planner.js` — 49 сутностей
 
@@ -849,7 +849,7 @@
 | `aiMood` | функція | `src/scripts/core/11-ai-flow.js:82` |
 | `AI_CHAT_SYS` | значення | `src/scripts/core/11-ai-flow.js:89` |
 | `aiHttpError` | функція | `src/scripts/core/11-ai-flow.js:128` |
-| `aiCall` | функція | `src/scripts/core/11-ai-flow.js:139` |
+| `aiCall` | функція | `src/scripts/core/11-ai-flow.js:140` |
 
 ### `src/scripts/core/12-ai-agent.js` — 79 сутностей
 
@@ -1061,47 +1061,47 @@
 | `aiSumBusy` | значення | `src/scripts/core/15-flow-spot.js:771` |
 | `aiMaybeSummarize` | функція | `src/scripts/core/15-flow-spot.js:772` |
 | `aiChatSend` | функція | `src/scripts/core/15-flow-spot.js:785` |
-| `aiRec` | значення | `src/scripts/core/15-flow-spot.js:883` |
-| `aiMicUI` | функція | `src/scripts/core/15-flow-spot.js:884` |
-| `aiMicToggle` | функція | `src/scripts/core/15-flow-spot.js:885` |
-| `aiTranscribeBlob` | функція | `src/scripts/core/15-flow-spot.js:923` |
-| `aiTranscribe` | функція | `src/scripts/core/15-flow-spot.js:946` |
-| `window.aiChatSheet` | значення | `src/scripts/core/15-flow-spot.js:950` |
-| `plStreak` | функція | `src/scripts/core/15-flow-spot.js:952` |
-| `heroWeekDays` | функція | `src/scripts/core/15-flow-spot.js:971` |
-| `heroMonthDays` | функція | `src/scripts/core/15-flow-spot.js:989` |
-| `heroDayWord` | функція | `src/scripts/core/15-flow-spot.js:1000` |
-| `renderHeroStreak` | функція | `src/scripts/core/15-flow-spot.js:1006` |
-| `plRolloverHTML` | функція | `src/scripts/core/15-flow-spot.js:1029` |
-| `plDaySummaryHTML` | функція | `src/scripts/core/15-flow-spot.js:1041` |
-| `plAutoSuggestHTML` | функція | `src/scripts/core/15-flow-spot.js:1075` |
-| `plWeekCalHTML` | функція | `src/scripts/core/15-flow-spot.js:1117` |
-| `plBlocksDisplay` | функція | `src/scripts/core/15-flow-spot.js:1144` |
-| `plFolderComplete` | функція | `src/scripts/core/15-flow-spot.js:1158` |
-| `DOW_UA` | масив | `src/scripts/core/15-flow-spot.js:1163` |
-| `plRuleDowsLabel` | функція | `src/scripts/core/15-flow-spot.js:1164` |
-| `plFolderDaySheet` | функція | `src/scripts/core/15-flow-spot.js:1173` |
-| `plFolderMonthSheet` | функція | `src/scripts/core/15-flow-spot.js:1230` |
-| `PL_MXQ` | масив | `src/scripts/core/15-flow-spot.js:1295` |
-| `plMatrixHTML` | функція | `src/scripts/core/15-flow-spot.js:1296` |
-| `plMxSchedule` | функція | `src/scripts/core/15-flow-spot.js:1315` |
-| `plSlotTask` | функція | `src/scripts/core/15-flow-spot.js:1329` |
-| `plBacklogHTML` | функція | `src/scripts/core/15-flow-spot.js:1343` |
-| `plInboxHTML` | функція | `src/scripts/core/15-flow-spot.js:1358` |
-| `plBlockEnd` | функція | `src/scripts/core/15-flow-spot.js:1373` |
-| `plDayHTML` | функція | `src/scripts/core/15-flow-spot.js:1374` |
-| `plTaskCard` | функція | `src/scripts/core/15-flow-spot.js:1583` |
-| `plAdd` | функція | `src/scripts/core/15-flow-spot.js:1606` |
-| `plAddBlockAt` | функція | `src/scripts/core/15-flow-spot.js:1633` |
-| `plLinkTag` | функція | `src/scripts/core/15-flow-spot.js:1638` |
-| `plScheduleStep` | функція | `src/scripts/core/15-flow-spot.js:1646` |
-| `plMicroBlock` | функція | `src/scripts/core/15-flow-spot.js:1663` |
-| `plCompleteBlock` | функція | `src/scripts/core/15-flow-spot.js:1676` |
-| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1731` |
-| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1747` |
-| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1755` |
-| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1977` |
-| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1980` |
+| `aiRec` | значення | `src/scripts/core/15-flow-spot.js:897` |
+| `aiMicUI` | функція | `src/scripts/core/15-flow-spot.js:898` |
+| `aiMicToggle` | функція | `src/scripts/core/15-flow-spot.js:899` |
+| `aiTranscribeBlob` | функція | `src/scripts/core/15-flow-spot.js:937` |
+| `aiTranscribe` | функція | `src/scripts/core/15-flow-spot.js:960` |
+| `window.aiChatSheet` | значення | `src/scripts/core/15-flow-spot.js:964` |
+| `plStreak` | функція | `src/scripts/core/15-flow-spot.js:966` |
+| `heroWeekDays` | функція | `src/scripts/core/15-flow-spot.js:985` |
+| `heroMonthDays` | функція | `src/scripts/core/15-flow-spot.js:1003` |
+| `heroDayWord` | функція | `src/scripts/core/15-flow-spot.js:1014` |
+| `renderHeroStreak` | функція | `src/scripts/core/15-flow-spot.js:1020` |
+| `plRolloverHTML` | функція | `src/scripts/core/15-flow-spot.js:1043` |
+| `plDaySummaryHTML` | функція | `src/scripts/core/15-flow-spot.js:1055` |
+| `plAutoSuggestHTML` | функція | `src/scripts/core/15-flow-spot.js:1089` |
+| `plWeekCalHTML` | функція | `src/scripts/core/15-flow-spot.js:1131` |
+| `plBlocksDisplay` | функція | `src/scripts/core/15-flow-spot.js:1158` |
+| `plFolderComplete` | функція | `src/scripts/core/15-flow-spot.js:1172` |
+| `DOW_UA` | масив | `src/scripts/core/15-flow-spot.js:1177` |
+| `plRuleDowsLabel` | функція | `src/scripts/core/15-flow-spot.js:1178` |
+| `plFolderDaySheet` | функція | `src/scripts/core/15-flow-spot.js:1187` |
+| `plFolderMonthSheet` | функція | `src/scripts/core/15-flow-spot.js:1244` |
+| `PL_MXQ` | масив | `src/scripts/core/15-flow-spot.js:1309` |
+| `plMatrixHTML` | функція | `src/scripts/core/15-flow-spot.js:1310` |
+| `plMxSchedule` | функція | `src/scripts/core/15-flow-spot.js:1329` |
+| `plSlotTask` | функція | `src/scripts/core/15-flow-spot.js:1343` |
+| `plBacklogHTML` | функція | `src/scripts/core/15-flow-spot.js:1357` |
+| `plInboxHTML` | функція | `src/scripts/core/15-flow-spot.js:1372` |
+| `plBlockEnd` | функція | `src/scripts/core/15-flow-spot.js:1387` |
+| `plDayHTML` | функція | `src/scripts/core/15-flow-spot.js:1388` |
+| `plTaskCard` | функція | `src/scripts/core/15-flow-spot.js:1597` |
+| `plAdd` | функція | `src/scripts/core/15-flow-spot.js:1620` |
+| `plAddBlockAt` | функція | `src/scripts/core/15-flow-spot.js:1647` |
+| `plLinkTag` | функція | `src/scripts/core/15-flow-spot.js:1652` |
+| `plScheduleStep` | функція | `src/scripts/core/15-flow-spot.js:1660` |
+| `plMicroBlock` | функція | `src/scripts/core/15-flow-spot.js:1677` |
+| `plCompleteBlock` | функція | `src/scripts/core/15-flow-spot.js:1690` |
+| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1745` |
+| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1761` |
+| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1769` |
+| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1991` |
+| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1994` |
 
 ### `src/scripts/core/16-dashboard.js` — 21 сутностей
 
@@ -1303,20 +1303,20 @@
 | `diaWeekAvg` | функція | `src/scripts/core/22-diary.js:231` |
 | `renderDiaView` | функція | `src/scripts/core/22-diary.js:232` |
 | `diaWeekAnalyze` | функція | `src/scripts/core/22-diary.js:293` |
-| `diaMoodBusy` | значення | `src/scripts/core/22-diary.js:321` |
-| `diaMoodBatch` | функція | `src/scripts/core/22-diary.js:322` |
-| `DIA_BOOK_EMOJIS` | масив | `src/scripts/core/22-diary.js:356` |
-| `DIA_BOOK_COLORS` | масив | `src/scripts/core/22-diary.js:357` |
-| `diaNewEmoji` | значення | `src/scripts/core/22-diary.js:358` |
-| `renderDiaBooks` | функція | `src/scripts/core/22-diary.js:359` |
-| `renderDiaBook` | функція | `src/scripts/core/22-diary.js:384` |
-| `diaRec` | значення | `src/scripts/core/22-diary.js:451` |
-| `diaFmtDur` | функція | `src/scripts/core/22-diary.js:452` |
-| `diaPlayAudio` | функція | `src/scripts/core/22-diary.js:453` |
-| `diaRecord` | функція | `src/scripts/core/22-diary.js:454` |
-| `window.diaRecord` | значення | `src/scripts/core/22-diary.js:485` |
-| `diaBookRec` | значення | `src/scripts/core/22-diary.js:489` |
-| `diaBookRecord` | функція | `src/scripts/core/22-diary.js:490` |
+| `diaMoodBusy` | значення | `src/scripts/core/22-diary.js:322` |
+| `diaMoodBatch` | функція | `src/scripts/core/22-diary.js:323` |
+| `DIA_BOOK_EMOJIS` | масив | `src/scripts/core/22-diary.js:357` |
+| `DIA_BOOK_COLORS` | масив | `src/scripts/core/22-diary.js:358` |
+| `diaNewEmoji` | значення | `src/scripts/core/22-diary.js:359` |
+| `renderDiaBooks` | функція | `src/scripts/core/22-diary.js:360` |
+| `renderDiaBook` | функція | `src/scripts/core/22-diary.js:385` |
+| `diaRec` | значення | `src/scripts/core/22-diary.js:452` |
+| `diaFmtDur` | функція | `src/scripts/core/22-diary.js:453` |
+| `diaPlayAudio` | функція | `src/scripts/core/22-diary.js:454` |
+| `diaRecord` | функція | `src/scripts/core/22-diary.js:455` |
+| `window.diaRecord` | значення | `src/scripts/core/22-diary.js:486` |
+| `diaBookRec` | значення | `src/scripts/core/22-diary.js:490` |
+| `diaBookRecord` | функція | `src/scripts/core/22-diary.js:491` |
 
 ### `src/scripts/core/23-board.js` — 32 сутностей
 
@@ -1464,15 +1464,15 @@
 | `loadInFlight` | значення | `src/scripts/core/27-canvas.js:307` |
 | `load` | функція | `src/scripts/core/27-canvas.js:308` |
 | `loadOnce` | функція | `src/scripts/core/27-canvas.js:313` |
-| `vv` | значення | `src/scripts/core/27-canvas.js:481` |
-| `FIELD` | значення | `src/scripts/core/27-canvas.js:482` |
-| `isField` | функція | `src/scripts/core/27-canvas.js:484` |
-| `kbHeight` | функція | `src/scripts/core/27-canvas.js:487` |
-| `syncKb` | функція | `src/scripts/core/27-canvas.js:491` |
-| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:498` |
-| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:534` |
-| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:541` |
-| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:559` |
+| `vv` | значення | `src/scripts/core/27-canvas.js:482` |
+| `FIELD` | значення | `src/scripts/core/27-canvas.js:483` |
+| `isField` | функція | `src/scripts/core/27-canvas.js:485` |
+| `kbHeight` | функція | `src/scripts/core/27-canvas.js:488` |
+| `syncKb` | функція | `src/scripts/core/27-canvas.js:492` |
+| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:499` |
+| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:535` |
+| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:542` |
+| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:560` |
 
 ### `src/scripts/core/28-vision.js` — 42 сутностей
 
@@ -1580,8 +1580,8 @@
 | `upSheet` | функція | `src/scripts/core/30-upgrade.js:212` |
 | `upApplyVerdict` | функція | `src/scripts/core/30-upgrade.js:226` |
 | `upAnalyze` | функція | `src/scripts/core/30-upgrade.js:240` |
-| `goUpgrade` | функція | `src/scripts/core/30-upgrade.js:280` |
-| `window.goUpgrade` | значення | `src/scripts/core/30-upgrade.js:289` |
+| `goUpgrade` | функція | `src/scripts/core/30-upgrade.js:284` |
+| `window.goUpgrade` | значення | `src/scripts/core/30-upgrade.js:293` |
 
 ### `src/scripts/core/31-my-year.js` — 21 сутностей
 
@@ -1707,24 +1707,24 @@
 | `chAiSync` | функція | `src/scripts/core/35-channel.js:371` |
 | `chAiCollect` | функція | `src/scripts/core/35-channel.js:388` |
 | `chAiSummarize` | функція | `src/scripts/core/35-channel.js:414` |
-| `chBindFeed` | функція | `src/scripts/core/35-channel.js:456` |
-| `chJumpTo` | функція | `src/scripts/core/35-channel.js:478` |
-| `chRecordSheet` | функція | `src/scripts/core/35-channel.js:490` |
-| `chEditRecord` | функція | `src/scripts/core/35-channel.js:509` |
-| `chCopyToFolder` | функція | `src/scripts/core/35-channel.js:530` |
-| `chPickCopyTarget` | функція | `src/scripts/core/35-channel.js:537` |
-| `chDeleteRecord` | функція | `src/scripts/core/35-channel.js:546` |
-| `chInitComposer` | функція | `src/scripts/core/35-channel.js:555` |
-| `chAutoGrow` | функція | `src/scripts/core/35-channel.js:600` |
-| `chSyncSend` | функція | `src/scripts/core/35-channel.js:601` |
-| `chSetMode` | функція | `src/scripts/core/35-channel.js:607` |
-| `chToggleTray` | функція | `src/scripts/core/35-channel.js:613` |
-| `chPushBlock` | функція | `src/scripts/core/35-channel.js:619` |
-| `chSend` | функція | `src/scripts/core/35-channel.js:626` |
-| `chPickFile` | функція | `src/scripts/core/35-channel.js:639` |
-| `chShrink` | функція | `src/scripts/core/35-channel.js:645` |
-| `chVoice` | функція | `src/scripts/core/35-channel.js:656` |
-| `chSheet` | функція | `src/scripts/core/35-channel.js:687` |
+| `chBindFeed` | функція | `src/scripts/core/35-channel.js:457` |
+| `chJumpTo` | функція | `src/scripts/core/35-channel.js:479` |
+| `chRecordSheet` | функція | `src/scripts/core/35-channel.js:491` |
+| `chEditRecord` | функція | `src/scripts/core/35-channel.js:510` |
+| `chCopyToFolder` | функція | `src/scripts/core/35-channel.js:531` |
+| `chPickCopyTarget` | функція | `src/scripts/core/35-channel.js:538` |
+| `chDeleteRecord` | функція | `src/scripts/core/35-channel.js:547` |
+| `chInitComposer` | функція | `src/scripts/core/35-channel.js:556` |
+| `chAutoGrow` | функція | `src/scripts/core/35-channel.js:601` |
+| `chSyncSend` | функція | `src/scripts/core/35-channel.js:602` |
+| `chSetMode` | функція | `src/scripts/core/35-channel.js:608` |
+| `chToggleTray` | функція | `src/scripts/core/35-channel.js:614` |
+| `chPushBlock` | функція | `src/scripts/core/35-channel.js:620` |
+| `chSend` | функція | `src/scripts/core/35-channel.js:627` |
+| `chPickFile` | функція | `src/scripts/core/35-channel.js:640` |
+| `chShrink` | функція | `src/scripts/core/35-channel.js:646` |
+| `chVoice` | функція | `src/scripts/core/35-channel.js:657` |
+| `chSheet` | функція | `src/scripts/core/35-channel.js:688` |
 
 ### `src/scripts/core/36-chats.js` — 39 сутностей
 
@@ -1770,25 +1770,30 @@
 | `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:319` |
 | `chatsInit` | функція | `src/scripts/core/36-chats.js:329` |
 
-### `src/scripts/core/37-ai-privacy.js` — 15 сутностей
+### `src/scripts/core/37-ai-privacy.js` — 20 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `AI_PRIV_KEY` | значення | `src/scripts/core/37-ai-privacy.js:14` |
-| `AI_CONSENT_VER` | значення | `src/scripts/core/37-ai-privacy.js:15` |
-| `AI_PRIV_SECTIONS` | масив | `src/scripts/core/37-ai-privacy.js:16` |
-| `aiPrivGet` | функція | `src/scripts/core/37-ai-privacy.js:21` |
-| `aiPrivSet` | функція | `src/scripts/core/37-ai-privacy.js:28` |
-| `aiConsentOk` | функція | `src/scripts/core/37-ai-privacy.js:31` |
-| `aiAllowed` | функція | `src/scripts/core/37-ai-privacy.js:35` |
-| `aiSectionOff` | функція | `src/scripts/core/37-ai-privacy.js:36` |
-| `aiSectionOffMsg` | функція | `src/scripts/core/37-ai-privacy.js:37` |
-| `aiOffError` | функція | `src/scripts/core/37-ai-privacy.js:43` |
-| `aiPrivWhatHTML` | функція | `src/scripts/core/37-ai-privacy.js:52` |
-| `aiConsentPending` | значення | `src/scripts/core/37-ai-privacy.js:71` |
-| `aiConsentSheet` | функція | `src/scripts/core/37-ai-privacy.js:72` |
-| `aiConsentGate` | функція | `src/scripts/core/37-ai-privacy.js:104` |
-| `aiPrivacySheet` | функція | `src/scripts/core/37-ai-privacy.js:113` |
+| `AI_PRIV_KEY` | значення | `src/scripts/core/37-ai-privacy.js:21` |
+| `AI_CONSENT_VER` | значення | `src/scripts/core/37-ai-privacy.js:22` |
+| `AI_PRIV_SECTIONS` | масив | `src/scripts/core/37-ai-privacy.js:23` |
+| `aiPrivMem` | значення | `src/scripts/core/37-ai-privacy.js:31` |
+| `aiPrivNorm` | функція | `src/scripts/core/37-ai-privacy.js:32` |
+| `aiPrivGet` | функція | `src/scripts/core/37-ai-privacy.js:37` |
+| `aiPrivSet` | функція | `src/scripts/core/37-ai-privacy.js:43` |
+| `aiPrivLoad` | функція | `src/scripts/core/37-ai-privacy.js:50` |
+| `aiConsentOk` | функція | `src/scripts/core/37-ai-privacy.js:56` |
+| `aiAllowed` | функція | `src/scripts/core/37-ai-privacy.js:60` |
+| `aiSectionOff` | функція | `src/scripts/core/37-ai-privacy.js:61` |
+| `aiSectionOffMsg` | функція | `src/scripts/core/37-ai-privacy.js:62` |
+| `aiOffError` | функція | `src/scripts/core/37-ai-privacy.js:68` |
+| `aiSectionError` | функція | `src/scripts/core/37-ai-privacy.js:75` |
+| `aiQuietHint` | функція | `src/scripts/core/37-ai-privacy.js:84` |
+| `aiPrivWhatHTML` | функція | `src/scripts/core/37-ai-privacy.js:96` |
+| `aiConsentPending` | значення | `src/scripts/core/37-ai-privacy.js:116` |
+| `aiConsentSheet` | функція | `src/scripts/core/37-ai-privacy.js:117` |
+| `aiConsentGate` | функція | `src/scripts/core/37-ai-privacy.js:151` |
+| `aiPrivacySheet` | функція | `src/scripts/core/37-ai-privacy.js:164` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
@@ -1988,7 +1993,7 @@
 | `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:977` |
 | `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:978` |
 
-### `src/scripts/page-editor/09-journal-sheet.js` — 36 сутностей
+### `src/scripts/page-editor/09-journal-sheet.js` — 37 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2016,18 +2021,19 @@
 | `jeMoKey` | функція | `src/scripts/page-editor/09-journal-sheet.js:210` |
 | `jeEntries` | функція | `src/scripts/page-editor/09-journal-sheet.js:211` |
 | `jeG` | функція | `src/scripts/page-editor/09-journal-sheet.js:224` |
-| `jeFacts` | функція | `src/scripts/page-editor/09-journal-sheet.js:225` |
-| `jePending` | функція | `src/scripts/page-editor/09-journal-sheet.js:243` |
-| `JE_SYS_W` | значення | `src/scripts/page-editor/09-journal-sheet.js:262` |
-| `JE_SYS_M` | значення | `src/scripts/page-editor/09-journal-sheet.js:268` |
-| `jeBusy` | значення | `src/scripts/page-editor/09-journal-sheet.js:273` |
-| `jeGen` | функція | `src/scripts/page-editor/09-journal-sheet.js:275` |
-| `jeAuto` | функція | `src/scripts/page-editor/09-journal-sheet.js:309` |
-| `jeMd` | функція | `src/scripts/page-editor/09-journal-sheet.js:313` |
-| `jeAiHTML` | функція | `src/scripts/page-editor/09-journal-sheet.js:319` |
-| `jeRec` | значення | `src/scripts/page-editor/09-journal-sheet.js:401` |
-| `jeMic` | функція | `src/scripts/page-editor/09-journal-sheet.js:402` |
-| `window.openFlowPage` | функція | `src/scripts/page-editor/09-journal-sheet.js:440` |
+| `jeAiOff` | функція | `src/scripts/page-editor/09-journal-sheet.js:226` |
+| `jeFacts` | функція | `src/scripts/page-editor/09-journal-sheet.js:227` |
+| `jePending` | функція | `src/scripts/page-editor/09-journal-sheet.js:245` |
+| `JE_SYS_W` | значення | `src/scripts/page-editor/09-journal-sheet.js:264` |
+| `JE_SYS_M` | значення | `src/scripts/page-editor/09-journal-sheet.js:270` |
+| `jeBusy` | значення | `src/scripts/page-editor/09-journal-sheet.js:275` |
+| `jeGen` | функція | `src/scripts/page-editor/09-journal-sheet.js:279` |
+| `jeAuto` | функція | `src/scripts/page-editor/09-journal-sheet.js:319` |
+| `jeMd` | функція | `src/scripts/page-editor/09-journal-sheet.js:328` |
+| `jeAiHTML` | функція | `src/scripts/page-editor/09-journal-sheet.js:334` |
+| `jeRec` | значення | `src/scripts/page-editor/09-journal-sheet.js:419` |
+| `jeMic` | функція | `src/scripts/page-editor/09-journal-sheet.js:420` |
+| `window.openFlowPage` | функція | `src/scripts/page-editor/09-journal-sheet.js:458` |
 
 ### `src/scripts/page-editor/10-mic.js` — 10 сутностей
 

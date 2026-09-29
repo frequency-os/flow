@@ -136,10 +136,11 @@
     if(msg) e.human=true;
     return e;
   }
-  async function aiCall(sys,messages,onDelta){
+  /* ai — {bg, uses} для воріт згоди в aiFetch (див. 37-ai-privacy.js) */
+  async function aiCall(sys,messages,onDelta,ai){
     try{ if((window.flowLang&&window.flowLang())==='en'){ sys = (sys||'') + ' \n\nВАЖЛИВО: користувач переключив мову інтерфейсу на англійську — відповідай ТІЛЬКИ англійською мовою, незалежно від мови його повідомлення.'; } }catch(_){}
     const wantStream=typeof onDelta==='function';
-    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},ai:ai,
       body:JSON.stringify(wantStream?{system:sys,messages:messages,stream:true}:{system:sys,messages:messages})});
     if(!res.ok) throw await aiHttpError(res);
     const ctype=String(res.headers.get('content-type')||'');

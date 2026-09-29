@@ -356,7 +356,8 @@
       }); return m;
     })();
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
-    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
+    // aiPrivLoad — згода й закриті від AI розділи (37-ai-privacy.js): так вони синкаються між пристроями
+    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass(), aiPrivLoad()]); applyHomeGlass(); }catch(_){}
 
     try{ const raw=__RAW[DEBT_KEY]; debtItems=raw?JSON.parse(raw):[]; }
     catch{ debtItems=[]; }

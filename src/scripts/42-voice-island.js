@@ -30,9 +30,10 @@ try{
     try{ var v=(localStorage.getItem('ai_endpoint')||'').trim(); if(v) return v; }catch(_){}
     return 'https://flowai.life-yaroslav-kril.workers.dev';
   }
-  /* запит до воркера з пропуском (токен сесії) — через aiFetch головного
-     скрипта; якщо його чомусь нема, звичайний fetch, як раніше */
-  function wfetch(u,o){ var f=Gf('aiFetch'); return f ? f(u,o) : fetch(u,o); }
+  /* запит до воркера з пропуском (токен сесії) — лише через aiFetch головного
+     скрипта: там ворота згоди на AI. Його нема — запит не йде взагалі,
+     а не обходить згоду звичайним fetch */
+  function wfetch(u,o){ var f=Gf('aiFetch'); return f ? f(u,o) : Promise.reject(new Error('AI недоступний')); }
   function petName(){
     try{ var P=G('FLOW_PETS'), c=Gf('petCur'); if(P&&c&&P[c()]&&P[c()].name) return P[c()].name; }catch(_){}
     return 'Спарк';
@@ -100,7 +101,7 @@ try{
           if(off||ttsDead){ return origSpeak(u); }
           var my=++seq; stopA(); try{ origCancel(); }catch(_){}
           var vc=ttsVoiceCfg();
-          wfetch(endpoint().replace(/\/+$/,'')+'/tts',{method:'POST',
+          wfetch(endpoint().replace(/\/+$/,'')+'/tts',{method:'POST',ai:{bg:true},   // озвучення відповіді — не прохання людини
             headers:{'content-type':'application/json'},
             body:JSON.stringify({text:txt.slice(0,700),voice:vc.id,rate:vc.rate||'+2%',pitch:vc.pitch||'+0Hz'})})
           .then(function(r){
@@ -730,7 +731,8 @@ try{
       body:JSON.stringify({text:'Привіт! Я '+((v&&v.t)||'Спарк')+'. Так звучатиме твій напарник.',voice:id,rate:v.rate||'+2%',pitch:v.pitch||'+0Hz'})})
     .then(function(r){ if(!r.ok) throw 0; return r.blob(); })
     .then(function(b){ if(!b||b.size<600) throw 0; vPrev=new Audio(URL.createObjectURL(b)); var p=vPrev.play(); if(p&&p.catch)p.catch(function(){}); })
-    .catch(function(){ toast('⚠️ Прев\u2019ю недоступне — задеплой воркер із /tts'); });
+    // відмова від AI («Не зараз» / вимкнено) — кажемо її, а не про воркер
+    .catch(function(e){ toast(e&&e.aiOff ? e.message : '⚠️ Прев\u2019ю недоступне — задеплой воркер із /tts'); });
   }
   /* long-press (600мс) на кнопці-голос → меню диктора */
   function bindLongPress(btn){
