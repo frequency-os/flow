@@ -771,7 +771,7 @@
       }
     }
     if(b.type==='fin'){
-      let owe=0,owed=0; items.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} });
+      let owe=0,owed=0; debtItems.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} });
       const net=owed-owe, spent=spendTotal();
       return `<div class="tile ${sz} tlink tfin" data-tileid="${b.id}" style="--tc:${c}">${head}
         <div class="lrow"><span>🤝 Чистий баланс боргів</span><b style="color:${net<0?'var(--owe)':'var(--owed)'}">${(net>0?'+':'')+fmt(net)} ₴</b></div>

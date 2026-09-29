@@ -26,8 +26,8 @@
   /* ---- load ---- */
   function migrate(){
     let ch=false;
-    items.forEach(i=>{ if(!i.ops){ i.ops=[{id:i.id,type:'borrow',amount:i.amount||0,date:i.date,note:i.note}]; delete i.amount;delete i.date;delete i.note; ch=true; } });
-    if(ch) save();
+    debtItems.forEach(i=>{ if(!i.ops){ i.ops=[{id:i.id,type:'borrow',amount:i.amount||0,date:i.date,note:i.note}]; delete i.amount;delete i.date;delete i.note; ch=true; } });
+    if(ch) debtSave();
   }
   // приводить блоки до коректної форми (доповнює відсутні поля за типом)
   function normalizeBlocks(arr){
@@ -202,7 +202,7 @@
     // одним — усі мережеві звернення летять одночасно, а не в чергу. Логіка
     // застосування значень нижче лишається в тому самому порядку, що й раніше.
     const __RAW = await (async ()=>{
-      const keys=[KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
+      const keys=[DEBT_KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',
         WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
@@ -220,8 +220,8 @@
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
 
-    try{ const raw=__RAW[KEY]; items=raw?JSON.parse(raw):[]; }
-    catch{ items=[]; }
+    try{ const raw=__RAW[DEBT_KEY]; debtItems=raw?JSON.parse(raw):[]; }
+    catch{ debtItems=[]; }
     try{ const raw2=__RAW[SKEY]; spends=raw2?JSON.parse(raw2):[]; }
     catch{ spends=[]; }
     try{ const rawp=__RAW[PAT_CKEY]; patChains=rawp?JSON.parse(rawp):[]; if(!Array.isArray(patChains))patChains=[]; }
@@ -377,7 +377,7 @@
     try{ chatsMigrateInboxOnce(); }catch(e){ console.error('chatsMigrate',e); }   // папка «Вхідні» → чат (36-chats.js)
     syncBlocks();
     try{ migrate(); }catch(e){ console.error('migrate',e); }
-    try{ render(); }catch(e){ console.error('render',e); }
+    try{ debtRender(); }catch(e){ console.error('render',e); }
     try{ chatsInit(); }catch(e){ console.error('chatsInit',e); }
     try{ renderDashboard(); }catch(e){ console.error('dashboard',e); }
     try{ if(window.uiMode==='lite') goPlanner(); }catch(_){}
