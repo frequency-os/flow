@@ -69,6 +69,12 @@
   function ymLocal(d){ return ymdLocal(d).slice(0,7); }
   window.ymdLocal = ymdLocal; window.ymLocal = ymLocal;
 
+  /* ============ СПІЛЬНІ ХЕЛПЕРИ ТЕКСТУ Й ЧИСЕЛ ============
+     Раніше жили в 18-debts.js, а кличе їх пів програми (~20 файлів) —
+     тепер тут, щоб не залежати від модуля боргів. Поведінку не міняти. */
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function fmt(n){ return Number(n).toLocaleString('uk-UA',{maximumFractionDigits:2}); }
+
   /* Відмінювання за українськими правилами:
      pluralUk(1,'картка','картки','карток') → 'картка', pluralUk(5,…) → 'карток'.
      Одне місце на всю апку — раніше форми зашивались руками в кожному екрані. */

@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 68 |
-| Рядків JS | 27092 |
+| Рядків JS | 27099 |
 | Файлів CSS | 32 |
 | Рядків CSS | 8614 |
 | Сутностей верхнього рівня | 1674 |
@@ -36,7 +36,7 @@
 | `src/scripts/44-week.js` | 329 | 0 |
 | `src/scripts/45-month.js` | 661 | 0 |
 | `src/scripts/46-mx.js` | 215 | 0 |
-| `src/scripts/core/01-base.js` | 386 | 35 |
+| `src/scripts/core/01-base.js` | 392 | 37 |
 | `src/scripts/core/02-storage.js` | 1310 | 115 |
 | `src/scripts/core/03-platform.js` | 60 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 268 | 46 |
@@ -53,7 +53,7 @@
 | `src/scripts/core/15-flow-spot.js` | 2027 | 97 |
 | `src/scripts/core/16-dashboard.js` | 556 | 21 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
-| `src/scripts/core/18-debts.js` | 182 | 20 |
+| `src/scripts/core/18-debts.js` | 183 | 18 |
 | `src/scripts/core/19-spending.js` | 134 | 14 |
 | `src/scripts/core/20-work.js` | 487 | 50 |
 | `src/scripts/core/21-patterns.js` | 191 | 21 |
@@ -234,7 +234,7 @@
 
 ### `src/scripts/46-mx.js` — порожньо на верхньому рівні
 
-### `src/scripts/core/01-base.js` — 35 сутностей
+### `src/scripts/core/01-base.js` — 37 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -243,36 +243,38 @@
 | `ymdLocal` | функція | `src/scripts/core/01-base.js:67` |
 | `ymLocal` | функція | `src/scripts/core/01-base.js:69` |
 | `window.ymdLocal` | значення | `src/scripts/core/01-base.js:70` |
-| `pluralUk` | функція | `src/scripts/core/01-base.js:75` |
-| `window.pluralUk` | значення | `src/scripts/core/01-base.js:82` |
-| `safeEmoji` | функція | `src/scripts/core/01-base.js:89` |
-| `window.safeEmoji` | значення | `src/scripts/core/01-base.js:94` |
-| `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:103` |
-| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:154` |
-| `getLang` | функція | `src/scripts/core/01-base.js:171` |
-| `setLang` | функція | `src/scripts/core/01-base.js:172` |
-| `window.__flowLang` | значення | `src/scripts/core/01-base.js:173` |
-| `window.flowLang` | значення | `src/scripts/core/01-base.js:174` |
-| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:175` |
-| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:180` |
-| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:232` |
-| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:260` |
-| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:275` |
-| `translateNode` | функція | `src/scripts/core/01-base.js:278` |
-| `i18nApply` | функція | `src/scripts/core/01-base.js:301` |
-| `window.i18nApply` | значення | `src/scripts/core/01-base.js:305` |
-| `i18nBlocked` | функція | `src/scripts/core/01-base.js:309` |
-| `raf` | значення | `src/scripts/core/01-base.js:319` |
-| `flush` | функція | `src/scripts/core/01-base.js:320` |
-| `mo` | функція | `src/scripts/core/01-base.js:327` |
-| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:348` |
-| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:351` |
-| `hash` | функція | `src/scripts/core/01-base.js:352` |
-| `cacheGet` | функція | `src/scripts/core/01-base.js:353` |
-| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:358` |
-| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:374` |
-| `push` | функція | `src/scripts/core/01-base.js:375` |
-| `window.flowErrors` | функція | `src/scripts/core/01-base.js:384` |
+| `esc` | функція | `src/scripts/core/01-base.js:75` |
+| `fmt` | функція | `src/scripts/core/01-base.js:76` |
+| `pluralUk` | функція | `src/scripts/core/01-base.js:81` |
+| `window.pluralUk` | значення | `src/scripts/core/01-base.js:88` |
+| `safeEmoji` | функція | `src/scripts/core/01-base.js:95` |
+| `window.safeEmoji` | значення | `src/scripts/core/01-base.js:100` |
+| `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:109` |
+| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:160` |
+| `getLang` | функція | `src/scripts/core/01-base.js:177` |
+| `setLang` | функція | `src/scripts/core/01-base.js:178` |
+| `window.__flowLang` | значення | `src/scripts/core/01-base.js:179` |
+| `window.flowLang` | значення | `src/scripts/core/01-base.js:180` |
+| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:181` |
+| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:186` |
+| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:238` |
+| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:266` |
+| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:281` |
+| `translateNode` | функція | `src/scripts/core/01-base.js:284` |
+| `i18nApply` | функція | `src/scripts/core/01-base.js:307` |
+| `window.i18nApply` | значення | `src/scripts/core/01-base.js:311` |
+| `i18nBlocked` | функція | `src/scripts/core/01-base.js:315` |
+| `raf` | значення | `src/scripts/core/01-base.js:325` |
+| `flush` | функція | `src/scripts/core/01-base.js:326` |
+| `mo` | функція | `src/scripts/core/01-base.js:333` |
+| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:354` |
+| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:357` |
+| `hash` | функція | `src/scripts/core/01-base.js:358` |
+| `cacheGet` | функція | `src/scripts/core/01-base.js:359` |
+| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:364` |
+| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:380` |
+| `push` | функція | `src/scripts/core/01-base.js:381` |
+| `window.flowErrors` | функція | `src/scripts/core/01-base.js:390` |
 
 ### `src/scripts/core/02-storage.js` — 115 сутностей
 
@@ -1133,30 +1135,28 @@
 | `debtTotals` | функція | `src/scripts/core/17-folder-render.js:5` |
 | `debtSummary` | функція | `src/scripts/core/17-folder-render.js:10` |
 
-### `src/scripts/core/18-debts.js` — 20 сутностей
+### `src/scripts/core/18-debts.js` — 18 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `CUR` | обʼєкт | `src/scripts/core/18-debts.js:2` |
-| `KEY` | значення | `src/scripts/core/18-debts.js:3` |
-| `kind` | значення | `src/scripts/core/18-debts.js:4` |
-| `save` | функція | `src/scripts/core/18-debts.js:12` |
-| `fmt` | функція | `src/scripts/core/18-debts.js:15` |
-| `initials` | функція | `src/scripts/core/18-debts.js:16` |
-| `esc` | функція | `src/scripts/core/18-debts.js:17` |
-| `sanitizeRich` | функція | `src/scripts/core/18-debts.js:19` |
-| `safeImg` | функція | `src/scripts/core/18-debts.js:40` |
-| `balance` | функція | `src/scripts/core/18-debts.js:52` |
-| `del` | функція | `src/scripts/core/18-debts.js:65` |
-| `render` | функція | `src/scripts/core/18-debts.js:67` |
-| `toggleDebtSync` | функція | `src/scripts/core/18-debts.js:102` |
-| `curId` | значення | `src/scripts/core/18-debts.js:127` |
-| `openModal` | функція | `src/scripts/core/18-debts.js:128` |
-| `closeModal` | функція | `src/scripts/core/18-debts.js:131` |
-| `renderModal` | функція | `src/scripts/core/18-debts.js:134` |
-| `askOp` | функція | `src/scripts/core/18-debts.js:160` |
-| `commitOp` | функція | `src/scripts/core/18-debts.js:169` |
-| `delOp` | функція | `src/scripts/core/18-debts.js:178` |
+| `CUR` | обʼєкт | `src/scripts/core/18-debts.js:5` |
+| `DEBT_KEY` | значення | `src/scripts/core/18-debts.js:6` |
+| `debtKind` | значення | `src/scripts/core/18-debts.js:7` |
+| `debtSave` | функція | `src/scripts/core/18-debts.js:15` |
+| `initials` | функція | `src/scripts/core/18-debts.js:18` |
+| `sanitizeRich` | функція | `src/scripts/core/18-debts.js:20` |
+| `safeImg` | функція | `src/scripts/core/18-debts.js:41` |
+| `balance` | функція | `src/scripts/core/18-debts.js:53` |
+| `debtDel` | функція | `src/scripts/core/18-debts.js:66` |
+| `debtRender` | функція | `src/scripts/core/18-debts.js:68` |
+| `toggleDebtSync` | функція | `src/scripts/core/18-debts.js:103` |
+| `curId` | значення | `src/scripts/core/18-debts.js:128` |
+| `openModal` | функція | `src/scripts/core/18-debts.js:129` |
+| `closeModal` | функція | `src/scripts/core/18-debts.js:132` |
+| `renderModal` | функція | `src/scripts/core/18-debts.js:135` |
+| `askOp` | функція | `src/scripts/core/18-debts.js:161` |
+| `commitOp` | функція | `src/scripts/core/18-debts.js:170` |
+| `delOp` | функція | `src/scripts/core/18-debts.js:179` |
 
 ### `src/scripts/core/19-spending.js` — 14 сутностей
 

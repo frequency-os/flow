@@ -259,7 +259,7 @@
       goSpaceFor(key); return;
     }catch(e){ console.error('goFolder', key, e); flowAlert('Не вдалося відкрити папку: '+e.message); }
   }
-  function goDebts(){ render(); show('scr-debts'); }
+  function goDebts(){ debtRender(); show('scr-debts'); }
   function goFinance(){ finView='dash'; renderFinance(); show('scr-finance'); }
   function goEnvelopes(){ finView='envelopes'; renderFinance(); show('scr-finance'); }
   function goSpend(){ renderSpend(); show('scr-spend'); }

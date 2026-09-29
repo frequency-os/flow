@@ -577,7 +577,7 @@
     try{ if(typeof habitStreak==='number') streak=habitStreak; }catch(_){}
     // фінансовий баланс
     let bal=null;
-    try{ if(typeof items!=='undefined'){ let owe=0,owed=0; items.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} }); bal=owed-owe; } }catch(_){}
+    try{ if(typeof debtItems!=='undefined'){ let owe=0,owed=0; debtItems.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} }); bal=owed-owe; } }catch(_){}
 
     const W={
       tasks:`<div class="wgt" style="--wc:#5b8def"><div class="wh"><div class="wi">🎯</div><div><div class="wn">${taskTotal?taskTotal:'0'} завдань</div></div></div>
