@@ -110,10 +110,12 @@
       };
     });
     tickWidget();tickHero();
-    setInterval(function(){
+    // щосекундний тік — лише поки застосунок на екрані (visInterval з 01-base.js)
+    var tick=function(){
       tickWidget();
       if(document.getElementById('scr-nyc')&&document.getElementById('scr-nyc').classList.contains('active'))tickHero();
-    },1000);
+    };
+    if(window.visInterval)window.visInterval(tick,1000,{now:true});else setInterval(tick,1000);
   });
 
   window.goNYC=function(){

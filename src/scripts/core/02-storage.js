@@ -831,7 +831,8 @@
     document.addEventListener('visibilitychange', ()=>{
       if(document.visibilityState==='visible') sbPullFresh();
     });
-    setInterval(sbPullFresh, 120000);
+    // у фоні не будимо телефон: при поверненні звірку й так робить visibilitychange вище
+    visInterval(sbPullFresh, 120000);
 
     /* ── ФОТО В ХМАРІ ──
        Знімки папок і Карти бажань лежать в IndexedDB (PhotoDB), а в конфіги

@@ -125,7 +125,8 @@
     };
   }
   if(!window.__pgFcTick){
-    window.__pgFcTick=setInterval(function(){
+    // від fb.end (годинник) — у фоні спимо, при поверненні одразу тік
+    window.__pgFcTick=(window.visInterval||setInterval)(function(){
       var scrEl=document.getElementById('scr-page');
       if(!scrEl||!scrEl.classList.contains('active'))return;
       editor.querySelectorAll('.pgfc.run').forEach(function(w){
@@ -147,7 +148,7 @@
         var fg=w.querySelector('.fgc');
         if(fg){var C=2*Math.PI*26; fg.style.strokeDashoffset=C*(1-left/tot);}
       });
-    },1000);
+    },1000,{now:true});
   }
 
   /* якір: ставимо меню одразу ПІД блоком, який додаємо (всі екрани) */

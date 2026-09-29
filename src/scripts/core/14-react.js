@@ -103,7 +103,7 @@
   let fcLifeTimer=null;
   function fcLifeStart(){
     if(fcLifeTimer) return;
-    fcLifeTimer=setInterval(()=>{
+    fcLifeTimer=visInterval(()=>{
       const cap=document.getElementById('flowCap');
       if(!cap||cap.style.display==='none'||petSleeping()) return;
       if(document.body.classList.contains('spot-open')) return;
@@ -289,7 +289,7 @@
   function fcSayStart(){
     if(fcSayTimer) return;
     setTimeout(fcSayShow, 25000);                       // перше «привіт» через ~25 сек
-    fcSayTimer=setInterval(fcSayShow, 120000);          // далі кожні 2 хв
+    fcSayTimer=visInterval(fcSayShow, 120000);          // далі кожні 2 хв (у фоні — ні)
   }
   function flowCapRender(){
     const el=document.getElementById('flowCap'); if(!el) return;

@@ -428,7 +428,7 @@
     const hm=document.getElementById('homeMoreBtn'); if(hm) hm.onclick=goMore;
     const na=document.getElementById('navAI'); if(na) na.onclick=()=>{ if(window.aiChatSheet) window.aiChatSheet(); };
     const nm=document.getElementById('navMore'); if(nm) nm.onclick=goMore;
-    try{ flowCapRender(); setInterval(flowCapRender,60000); }catch(_){}
+    try{ flowCapRender(); visInterval(flowCapRender,60000,{now:true}); }catch(_){}
     try{ prefCatchup('pet_pos',()=>flowCapRender()); prefCatchup('pet_sleep',()=>flowCapRender()); }catch(_){}
     document.querySelectorAll('.dsb-i[data-dnav="more"]').forEach(b=>b.onclick=goMore);
     renderMore();

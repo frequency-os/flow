@@ -179,7 +179,7 @@
       if(q('[data-cds]'))q('[data-cds]').textContent=String(s).padStart(2,'0');
     });
   }
-  setInterval(cdTick,1000);
+  if(window.visInterval) window.visInterval(cdTick,1000,{now:true}); else setInterval(cdTick,1000);
 
   // ── скляний календар для «Відліку» ──
   var CAL_MONTHS=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
