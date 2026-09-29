@@ -81,9 +81,12 @@
   function cardBalance(){ return walletBalance(); }
   function incomeSummary(){ try{ return fmt(walletBalance())+' ₴'; }catch(_){ return '—'; } }
   function _projCardId(){ return WALLET_ID; }
-  function ensureCards(){
+  // opts.memOnly — лише в памʼяті: так кличе load(), поки дані сесії не підтверджені
+  // (хмара мовчить) — заводський гаманець не має лягти в сховище поверх справжнього
+  function ensureCards(opts){
+    const mem=!!(opts&&opts.memOnly);
     if(!Array.isArray(cards) || !cards.length || cards.length>1 || cards[0].id!==WALLET_ID){
-      cards=[walletCard()]; saveCards();
+      cards=[walletCard()]; if(!mem) saveCards();
     }
     let ch=false;
     // витрати ІЗ конверта не мають вдруге списувати баланс
@@ -94,7 +97,7 @@
     }catch(_){}
     // операції без рахунку → у гаманець
     finOps.forEach(o=>{ if(!o.card && !o.envSpend){ o.card=WALLET_ID; ch=true; } });
-    if(ch) saveFinOps();
+    if(ch && !mem) saveFinOps();
   }
 
   /* ============ Одноразова міграція: усі картки → гаманець ============
@@ -147,7 +150,9 @@
      інший пристрій бачив «новіше», перечитувався, сам переписував — і так
      по колу, а в кожному колі могла загубитись свіжа витрата з іншого
      пристрою. Тепер пишемо лише те, що справді змінилось, а прапорець
-     ставимо, коли операції вже побачено і переведено в гаманець. */
+     ставимо, коли операції вже побачено і переведено в гаманець.
+     Сам прапорець читає й ставить реєстр MIGRATIONS_ONCE (27-canvas.js):
+     лише після довіреного читання і лише коли rep.ops > 0. */
   const WALLET_MIG_FLAG='flowapp_wallet_migrated_v1';
   // const, а не function — щоб НЕ висіла в window: файли core/ склеєні в один
   // <script> без обгортки, і кожна function верхнього рівня сама стає window.*.
@@ -155,7 +160,6 @@
   // нікому не потрібна, а зайві двері до переписування всієї книги краще зачинити.
   const migrateToWallet=function(rawCards, rawFx){
     const rep={ ops:0, moved:0, converted:0, orphan:0, before:0, after:0, diff:0 };
-    try{ if(localStorage.getItem(WALLET_MIG_FLAG)) return rep; }catch(_){ return rep; }
     if(!Array.isArray(finOps)) return rep;
     const rates=migRates(rawFx), curBy=migCurByCard(rawCards);
     rep.before=walletSumUAH(rates, curBy);
@@ -179,10 +183,9 @@
     rep.after=walletSumUAH(rates, {});      // після міграції все у гривні
     rep.diff=Math.round((rep.after-rep.before)*100)/100;
     if(rep.moved || rep.converted) saveFinOps();
-    // Порожня книга — прапорець НЕ ставимо: на новому пристрої чи без мережі
+    // Порожня книга (rep.ops===0) — реєстр прапорець НЕ ставить: на новому пристрої
     // операції ще можуть не дійти, і міграція має спрацювати, коли дійдуть.
     // Повтор без прапорця нічого не пише — записи вище лише за реальної зміни.
-    if(rep.ops){ try{ localStorage.setItem(WALLET_MIG_FLAG,'1'); }catch(_){} }
     if(rep.moved || rep.converted || !isWallet){
       try{ window.__walletReport=rep; console.info('[гаманець] міграція:', rep); }catch(_){}
     }

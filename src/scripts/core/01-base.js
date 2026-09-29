@@ -77,8 +77,48 @@
     'patterns_chains','patterns_score','patterns_transform',
     'vision_v1','custom_avatar_v1','diary_entries_v1','diary_insights_v1','diary_books_v1','upgrade_profile_v1',
     'lang_pref','i18n_content_cache',
-    'chats_v1'
+    'chats_v1',
+    /* Звірка 30.09.2026 (ARCH-10): ці ключі модулі давно пишуть через
+       window.storage / prefSet, але в реєстр вони не потрапили — отже, їх
+       не засівав у Preferences npSeed (iPhone) і інспектор бачив «чужими». */
+    'flowPgCovers',                                      // обкладинки сторінок (08-w-projects-hub.js)
+    'wish_active_days_v1','wish_price','home_glass_on',  // 06-wishes.js (досі додавались на льоту)
+    'ritual_board','collage_board',                      // 06-wishes.js (теж на льоту)
+    // легкі налаштування (prefSet у 02-storage.js — сирий ключ + копія тут)
+    'flowtheme','flowprotheme','flowcardskin','folderview','homewidgets','hometab','homeov',
+    'sidebarcol','spacefull','fx_mode','fx_say','ai_pet','ai_voice','pet_hidden','pet_pos','pet_sleep',
+    'forcedesktop','forcemobile'                         // фічу видалено; у сховищі лишається '0'
   ];
+  /* ── СИРІ КЛЮЧІ localStorage (без префікса flowapp_) — опис, не реєстр сховища ──
+     FLOW_KEYS вище — це ключі window.storage: у localStorage вони лежать як
+     'flowapp_'+ключ (обгортка {_v,d}) і їдуть у хмару. Усе нижче пишеться
+     напряму localStorage.setItem і в хмару САМЕ не потрапляє:
+       • дзеркала prefSet — тема, вкладки, пет тощо: сирий ключ читається
+         синхронно до першого малювання, копія flowapp_* — для хмари. Задумано.
+       • 'lang_pref', 'i18n_content_cache' — стоять у FLOW_KEYS, але пишуться
+         СИРИМИ: 'flowapp_lang_pref' не існує, тож npSeed їх не бачить.
+       • B3 — дублікати даних без префікса: prefCatchup у 33-home-widgets.js
+         копіює цілі 'goals_data', 'fin_ops', 'diary_entries_v1' у сирі ключі
+         (подвійне місце в ~5 МБ localStorage). Прибрати — окремою міграцією
+         ключів (перейменування/видалення тут навмисно НЕ робимо).
+       • прапорці міграцій: 'space_purge_v1', 'legacy_widgets_purge_v1',
+         'theme_flat_default_v1' — сирі; 'flowapp_*_v1' (wallet_migrated,
+         seedfolders_removed, agency_purged, space_removed, inbox_chat) — з
+         префіксом, але це НЕ дані: див. MIGRATIONS_ONCE у 27-canvas.js.
+       • службові з префіксом: 'flowapp___sb_outbox', 'flowapp___ph_push',
+         'flowapp___ph_ts', 'flowapp___seeded' (Preferences).
+       • 'rit_auto', 'fd_*', 'pet3d*' модулі додають у FLOW_KEYS на льоту, але
+         пишуть СИРИМИ — запис у реєстрі для них нічого не дає.
+       • лише цей пристрій: ai_agent, ai_dev, ai_usage, ai_brief_ds, ai_week_ds,
+         pet3d, pet3d_fx, pet_say_i, rit_auto, rrail_cfg, pg_wide, fd_isl, fd_wake,
+         fd_tts, fd_tts_voice, fd26t, flow_dev, dev_translate_content,
+         flowPgLastBlock, flowPgRecentBlocks, flowPageThemeChoice, __flow_snapshot__,
+         __flow_wipe_idb__, __devtest. */
+  window.FLOW_RAW_KEYS = ['lang_pref','i18n_content_cache','goals_data','fin_ops','diary_entries_v1',
+    'space_purge_v1','legacy_widgets_purge_v1','theme_flat_default_v1',
+    'ai_agent','ai_dev','ai_usage','ai_brief_ds','ai_week_ds','pet3d','pet3d_fx','pet_say_i','rit_auto',
+    'rrail_cfg','pg_wide','fd_isl','fd_wake','fd_tts','fd_tts_voice','fd26t','flow_dev','dev_translate_content',
+    'flowPgLastBlock','flowPgRecentBlocks','flowPageThemeChoice','__flow_snapshot__','__flow_wipe_idb__','__devtest'];
 
   /* ═══════════════════════════════════════════════════════════════════
      I18N: перемикач мови UI (uk/en) + переклад контенту в dev-режимі

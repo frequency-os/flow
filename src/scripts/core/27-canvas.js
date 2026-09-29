@@ -24,10 +24,12 @@
   function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
   /* ---- load ---- */
-  function migrate(){
+  // борги старого формату → ops[]. memOnly — лише в памʼяті (екран боргів без ops падає),
+  // коли реєстр міграцій відклав записи до довіреного читання
+  function migrate(memOnly){
     let ch=false;
     items.forEach(i=>{ if(!i.ops){ i.ops=[{id:i.id,type:'borrow',amount:i.amount||0,date:i.date,note:i.note}]; delete i.amount;delete i.date;delete i.note; ch=true; } });
-    if(ch) save();
+    if(ch && !memOnly) save();
   }
   // приводить блоки до коректної форми (доповнює відсутні поля за типом)
   function normalizeBlocks(arr){
@@ -62,84 +64,220 @@
      Якщо там щось лежало — переносимо у звичайну папку «Вхідні» (f_inbox):
      блоки кореня → головна дошка папки, групи «Вхідні» розкриваємо (їхні діти
      стають записами), додаткові простори кореня → теми папки, обкладинка — за ними.
-     Порожні джерела просто видаляємо. Виконується рівно раз на пристрої. */
+     Порожні джерела просто видаляємо. Прапорець — у реєстрі MIGRATIONS_ONCE. */
   function inboxMigrateOnce(){
-    var FLAG='flowapp_space_removed_v1';
-    try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
-    try{
-      var srcKeys=Object.keys(boards||{}).filter(function(k){ return k==='all'||k.indexOf('all__sp_')===0; });
-      var hasBlocks=srcKeys.some(function(k){ return Array.isArray(boards[k])&&boards[k].length; });
-      if(hasBlocks){
-        ensureInboxFolder();
-        srcKeys.forEach(function(k){
-          var flat=[];
-          (boards[k]||[]).forEach(function(b){ if(!b) return;
-            if(b.type==='group'&&b.title===INBOX_TITLE){ (b.children||[]).forEach(function(c){ if(c) flat.push(c); }); }
-            else flat.push(b); });
-          if(!flat.length) return;
-          var dst = k==='all' ? INBOX_FKEY : INBOX_FKEY+'__sp_'+k.slice('all__sp_'.length);
-          boards[dst]=(boards[dst]||[]).concat(flat);
-        });
-        try{
-          var extra=(spacesMap['__root__']||[]).filter(function(s){ return s&&s.id!=='main'; });
-          if(extra.length){ spacesMap[INBOX_FKEY]=(spacesMap[INBOX_FKEY]||[]).concat(extra.map(function(s){ return Object.assign({},s); })); }
-        }catch(_){}
-        try{
-          var c=JSON.parse(localStorage.getItem('flowPgCovers')||'{}')||{};
-          if(c.all){ c[INBOX_FKEY]=c[INBOX_FKEY]||c.all; delete c.all;
-            localStorage.setItem('flowPgCovers',JSON.stringify(c));
-            var p=window.storage&&window.storage.set&&window.storage.set('flowPgCovers',JSON.stringify(c),false); if(p&&p.catch)p.catch(function(){}); }
-        }catch(_){}
-        console.log('[Flow] Простір перенесено у «Вхідні»:', srcKeys.join(', '));
-      }
-      srcKeys.forEach(function(k){ delete boards[k]; });
-      try{ delete spacesMap['__root__']; delete activeSpaceMap['__root__']; saveSpacesMeta(); }catch(_){}
-      saveBoard();
-    }catch(e){ console.error('inboxMigrateOnce',e); }
-    try{ localStorage.setItem(FLAG,'1'); }catch(_){}
+    var srcKeys=Object.keys(boards||{}).filter(function(k){ return k==='all'||k.indexOf('all__sp_')===0; });
+    var hasBlocks=srcKeys.some(function(k){ return Array.isArray(boards[k])&&boards[k].length; });
+    if(hasBlocks){
+      ensureInboxFolder();
+      srcKeys.forEach(function(k){
+        var flat=[];
+        (boards[k]||[]).forEach(function(b){ if(!b) return;
+          if(b.type==='group'&&b.title===INBOX_TITLE){ (b.children||[]).forEach(function(c){ if(c) flat.push(c); }); }
+          else flat.push(b); });
+        if(!flat.length) return;
+        var dst = k==='all' ? INBOX_FKEY : INBOX_FKEY+'__sp_'+k.slice('all__sp_'.length);
+        boards[dst]=(boards[dst]||[]).concat(flat);
+      });
+      try{
+        var extra=(spacesMap['__root__']||[]).filter(function(s){ return s&&s.id!=='main'; });
+        if(extra.length){ spacesMap[INBOX_FKEY]=(spacesMap[INBOX_FKEY]||[]).concat(extra.map(function(s){ return Object.assign({},s); })); }
+      }catch(_){}
+      try{
+        var c=JSON.parse(localStorage.getItem('flowPgCovers')||'{}')||{};
+        if(c.all){ c[INBOX_FKEY]=c[INBOX_FKEY]||c.all; delete c.all;
+          localStorage.setItem('flowPgCovers',JSON.stringify(c));
+          var p=window.storage&&window.storage.set&&window.storage.set('flowPgCovers',JSON.stringify(c),false); if(p&&p.catch)p.catch(function(){}); }
+      }catch(_){}
+      console.log('[Flow] Простір перенесено у «Вхідні»:', srcKeys.join(', '));
+    }
+    srcKeys.forEach(function(k){ delete boards[k]; });
+    var hadRoot=false;
+    try{ hadRoot=!!(spacesMap['__root__']||activeSpaceMap['__root__']); }catch(_){}
+    if(hadRoot){ try{ delete spacesMap['__root__']; delete activeSpaceMap['__root__']; saveSpacesMeta(); }catch(_){} }
+    // Пишемо лише те, що справді змінилось: порожній прохід раніше клав у сховище
+    // (і в хмару) дошки зі свіжою міткою — на новому пристрої це '{}' поверх усього.
+    if(srcKeys.length) saveBoard();
+    return true;
   }
   /* ── Одноразове прибирання після видалення Агенції (04.09.2026) ──
      Її папка, дошки, конверти, конфіг Vault і база документів клієнтів більше
      не мають власника в коді — прибираємо зі сховища. Сховані папки НЕ
      видаляємо: прапорець secret просто перестав читатися (applyFolderCfgRaw),
      тож вони знову видимі на Огляді; saveFolders() нижче закріплює це і в хмарі.
-     Виконується рівно раз на пристрої. */
-  function agencyPurgeOnce(){
-    var FLAG='flowapp_agency_purged_v1', FK='f_agsk_seed';
-    try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
-    try{
-      var hadAgency=false;
-      Object.keys(folders).forEach(function(k){
-        var f=folders[k]; if(!f) return;
-        if(k===FK || f.parent===FK){
-          try{ if(f.photo && window.photoDel) window.photoDel(f.photo); }catch(_){}
-          delete folders[k]; hadAgency=true;
-        }
-      });
-      for(var i=order.length-1;i>=0;i--){ if(!folders[order[i]]) order.splice(i,1); }
-      try{ if(folderWidgets && folderWidgets[FK]) delete folderWidgets[FK]; }catch(_){}
-      // дошки: головна + додаткові простори папки
-      var hadBoards=false;
-      Object.keys(boards).forEach(function(k){ if(k===FK || k.indexOf(FK+'__sp_')===0){ delete boards[k]; hadBoards=true; } });
-      // конверти агенції (Податки/Резерв, Reinvest)
-      var hadEnv=false;
-      for(var j=envelopes.length-1;j>=0;j--){ var e=envelopes[j];
-        if(e && (/^env_agsk_/.test(String(e.id||'')) || e.link===FK)){ envelopes.splice(j,1); hadEnv=true; } }
-      // мета просторів у контексті агенції
-      try{ if(typeof spacesMap!=='undefined' && spacesMap && spacesMap[FK]){ delete spacesMap[FK];
-        if(typeof activeSpaceMap!=='undefined' && activeSpaceMap) delete activeSpaceMap[FK];
-        if(typeof saveSpacesMeta==='function') saveSpacesMeta(); } }catch(_){}
-      saveFolders({auto:true});            // знімає secret з усіх папок і в хмарі (під запобіжником)
-      if(hadBoards) saveBoard();
-      if(hadEnv) saveEnvelopes();
-      // конфіг Vault, база документів клієнтів, старий прапорець очищення
-      try{ var p=window.storage.delete('vault_cfg'); if(p&&p.catch) p.catch(function(){}); }catch(_){}
-      try{ indexedDB.deleteDatabase('flow_docs'); }catch(_){}
-      try{ localStorage.removeItem('flowapp_agsk_cleaned_v2'); }catch(_){}
-      if(hadAgency) console.log('[Flow] Агенцію прибрано зі сховища');
-    }catch(e){ console.error('agencyPurge', e); }
-    try{ localStorage.setItem(FLAG,'1'); }catch(_){}
+     Прапорець — у реєстрі MIGRATIONS_ONCE. */
+  function agencyPurgeOnce(ctx){
+    var FK='f_agsk_seed';
+    var hadAgency=false;
+    Object.keys(folders).forEach(function(k){
+      var f=folders[k]; if(!f) return;
+      if(k===FK || f.parent===FK){
+        try{ if(f.photo && window.photoDel) window.photoDel(f.photo); }catch(_){}
+        delete folders[k]; hadAgency=true;
+      }
+    });
+    for(var i=order.length-1;i>=0;i--){ if(!folders[order[i]]) order.splice(i,1); }
+    try{ if(folderWidgets && folderWidgets[FK]) delete folderWidgets[FK]; }catch(_){}
+    // дошки: головна + додаткові простори папки
+    var hadBoards=false;
+    Object.keys(boards).forEach(function(k){ if(k===FK || k.indexOf(FK+'__sp_')===0){ delete boards[k]; hadBoards=true; } });
+    // конверти агенції (Податки/Резерв, Reinvest)
+    var hadEnv=false;
+    for(var j=envelopes.length-1;j>=0;j--){ var e=envelopes[j];
+      if(e && (/^env_agsk_/.test(String(e.id||'')) || e.link===FK)){ envelopes.splice(j,1); hadEnv=true; } }
+    // мета просторів у контексті агенції
+    try{ if(typeof spacesMap!=='undefined' && spacesMap && spacesMap[FK]){ delete spacesMap[FK];
+      if(typeof activeSpaceMap!=='undefined' && activeSpaceMap) delete activeSpaceMap[FK];
+      if(typeof saveSpacesMeta==='function') saveSpacesMeta(); } }catch(_){}
+    // знімає secret з усіх папок і в хмарі (під запобіжником) — лише якщо є що знімати
+    if(hadAgency || /"secret"\s*:/.test(String(ctx&&ctx.rawFolders||''))) saveFolders({auto:true});
+    if(hadBoards) saveBoard();
+    if(hadEnv) saveEnvelopes();
+    // конфіг Vault, база документів клієнтів, старий прапорець очищення
+    try{ var p=window.storage.delete('vault_cfg'); if(p&&p.catch) p.catch(function(){}); }catch(_){}
+    try{ indexedDB.deleteDatabase('flow_docs'); }catch(_){}
+    try{ localStorage.removeItem('flowapp_agsk_cleaned_v2'); }catch(_){}
+    if(hadAgency) console.log('[Flow] Агенцію прибрано зі сховища');
+    return true;
   }
+  /* ── ОЧИЩЕННЯ: «Простір» видалено повністю разом із даними (липень 2026).
+     Прибираємо: кореневі дошки ('all' + 'all__sp_*'), додаткові простори
+     кореня та колись перенесені папки «🧩 Простір» ('f_space_*'). */
+  function migSpacePurge(){
+    let changed=false;
+    Object.keys(boards).forEach(k=>{
+      if(k==='all'){ if(Array.isArray(boards[k])&&boards[k].length){ boards[k]=[]; changed=true; } }
+      else if(k.indexOf('all__sp_')===0 || k.indexOf('f_space_')===0){ delete boards[k]; changed=true; }
+    });
+    Object.keys(folders).forEach(k=>{
+      if(k.indexOf('f_space_')===0){ delete folders[k]; changed=true; }
+    });
+    for(let i=order.length-1;i>=0;i--){
+      if(String(order[i]).indexOf('f_space_')===0){ order.splice(i,1); changed=true; }
+    }
+    try{
+      if(typeof spacesMap!=='undefined' && spacesMap && spacesMap['__root__']){
+        delete spacesMap['__root__'];
+        if(typeof activeSpaceMap!=='undefined' && activeSpaceMap) delete activeSpaceMap['__root__'];
+        if(typeof saveSpacesMeta==='function') saveSpacesMeta();
+        changed=true;
+      }
+    }catch(_){}
+    if(changed){ try{ saveFolders({auto:true}); }catch(_){} try{ saveBoard(); }catch(_){} }
+    return true;
+  }
+  /* ── ОЧИЩЕННЯ 2: старі віджети та проєктні блоки (перенесені зі Простору)
+     видаляємо з усіх папок — на їхнє місце прийшли нові. «Відлік» лишається. */
+  function migLegacyWidgets(){
+    const DEAD={progress:1,fin:1,envelope:1,calendar:1,wpult:1,wstack:1,wpipe:1,wtline:1,
+      wportal:1,wplanday:1,wplanmonth:1,project:1,kanban:1,contacts:1,caseline:1,festival:1};
+    let removed=0;
+    const strip=(arr)=>{
+      if(!Array.isArray(arr))return;
+      for(let i=arr.length-1;i>=0;i--){
+        const b=arr[i];
+        if(b&&DEAD[b.type]){ arr.splice(i,1); removed++; continue; }
+        if(b&&Array.isArray(b.children)) strip(b.children);
+      }
+    };
+    Object.keys(boards).forEach(k=>strip(boards[k]));
+    if(removed){ try{ saveBoard(); }catch(_){} }
+    return true;
+  }
+  // папка «Патерни» відкривається одразу як екран — її простір не використовується, чистимо залишки
+  function migBoardPat(){
+    if(boards && boards['pat']){ delete boards['pat']; saveBoard(); }
+  }
+  // «ручний десктопний режим» видалено: у сховищі (і хмарі) лишаємо '0', але пишемо лише
+  // коли там ще не '0' — раніше це йшло при КОЖНОМУ старті зі свіжою міткою (05-spaces.js)
+  // (не prefSet: сирі ключі цього пристрою 05-spaces.js якраз прибирає — їм і лишатись порожніми)
+  function migForceLayoutOff(){
+    ['forcedesktop','forcemobile'].forEach(k=>{
+      let cur=null; try{ cur=window.storage.getLocal(k); }catch(_){}
+      if(cur!=='0'){ const p=window.storage.set(k,'0',false); if(p&&p.catch)p.catch(()=>{}); }
+    });
+  }
+
+  /* ═══════ РЕЄСТР РАЗОВИХ МІГРАЦІЙ — єдиний список, у порядку виконання ═══════
+     Раніше ~10 переїздів жили по різних файлах, кожен сам вирішував, коли
+     запускатись і коли ставити прапорець. Звідси два класи багів:
+       • міграція йшла, коли дані ще не прочитані (новий пристрій + хмара мовчить):
+         порожня заглушка лягала в сховище зі свіжою міткою і через хмару
+         затирала справжні дані на всіх пристроях;
+       • прапорець ставився навіть після винятку чи «порожнього» проходу —
+         і міграція вже ніколи не бачила справжніх даних.
+     Правила реєстру:
+       1) runMigrations не робить НІЧОГО, поки window.sbDataTrusted() ≠ true
+          (сесію перевірено і хмара відповіла, або входу нема взагалі). Прапорців
+          теж не чіпає — наступний load() спробує знову.
+       2) Прапорець ставиться ЛИШЕ після успішного run(): не кинув виняток і не
+          повернув false (false = «ще нема на чому працювати, спробуй пізніше»).
+       3) Папки — тільки saveFolders({auto:true}); писати — лише коли щось змінилось.
+       4) Імена прапорців НЕ міняти: за ними пристрої знають, що вже зроблено —
+          нове імʼя означає повторний прогін на всіх пристроях.
+     every:true — без прапорця: ідемпотентна дочистка, що йде при кожному
+     довіреному load() і пише лише за реальної зміни.
+     Поза реєстром (навмисно): перехід теми 01.09 (05-spaces.js — мусить іти до
+     першого малювання, чіпає лише тему пристрою), планер blocks→blocksByDay
+     (10-planner.js, лише в памʼяті при читанні). Схеми SCHEMAS (02-storage.js)
+     підвищуються при читанні лише в памʼяті, а в сховище їх закріплює schema_stamp. */
+  const MIGRATIONS_ONCE = [
+    // версії схем SCHEMAS (02-storage.js): закріпити в локальних копіях без __sv
+    { id:'schema_stamp',    every:true,                            run: ()=>{ if(window.storage.restampLocal) window.storage.restampLocal(); } },
+    { id:'space_purge',     flag:'space_purge_v1',                 run: migSpacePurge },
+    { id:'legacy_widgets',  flag:'legacy_widgets_purge_v1',        run: migLegacyWidgets },
+    { id:'board_pat',       every:true,                            run: migBoardPat },
+    { id:'force_layout',    every:true,                            run: migForceLayoutOff },
+    { id:'spends_to_fin',   every:true,                            run: ()=>migrateSpendsToFin() },   // 19-spending.js
+    // спершу гаманець — йому потрібні СТАРІ картки й курси зі сховища (ctx), які ensureCards() затирає.
+    // Порожня книга → false: на новому пристрої операції ще можуть не дійти
+    { id:'wallet',          flag:WALLET_MIG_FLAG,                  run: ctx=>migrateToWallet(ctx.rawCards, ctx.rawFx).ops>0 },   // 08-finance.js
+    { id:'folder_photos',   every:true,                            run: ()=>migrateFolderPhotosOnce() },   // async, у фоні
+    { id:'wish_photos',     every:true,                            run: ()=>migrateWishPhotosOnce() },     // 06-wishes.js, async
+    { id:'seed_folders',    flag:'flowapp_seedfolders_removed_v1', run: removeSystemSeedFoldersOnce },
+    { id:'agency_purge',    flag:'flowapp_agency_purged_v1',       run: agencyPurgeOnce },
+    { id:'space_to_inbox',  flag:'flowapp_space_removed_v1',       run: inboxMigrateOnce },
+    { id:'inbox_to_chat',   flag:'flowapp_inbox_chat_v1',          run: ()=>chatsMigrateInboxOnce() },    // 36-chats.js
+    { id:'debt_ops',        every:true,                            run: ()=>migrate() },
+  ];
+  let migDeferred=false;   // останній load() відклав міграції (дані не підтверджені)
+  function runMigrations(ctx){
+    const rep={ at:Date.now(), trusted:false, ran:[], skipped:[], failed:[] };
+    rep.trusted = (typeof window.sbDataTrusted==='function') ? window.sbDataTrusted() : true;
+    try{ window.__migReport=rep; }catch(_){}
+    if(!rep.trusted){
+      migDeferred=true;
+      try{ console.warn('[Flow] міграції відкладено: дані цієї сесії ще не підтверджені сховищем'); }catch(_){}
+      return false;
+    }
+    migDeferred=false;
+    MIGRATIONS_ONCE.forEach(m=>{
+      if(m.flag){
+        let done=true;   // прапорець не читається — не ризикуємо повторним прогоном
+        try{ done=!!localStorage.getItem(m.flag); }catch(_){}
+        if(done){ rep.skipped.push(m.id); return; }
+      }
+      const fail=e=>{ rep.failed.push(m.id); try{ console.error('[Flow] міграція '+m.id+' не вдалась — повторю наступного разу', e); }catch(_){} };
+      const finish=ok=>{
+        if(ok===false){ rep.skipped.push(m.id); return; }
+        if(m.flag){ try{ localStorage.setItem(m.flag,'1'); }catch(_){} }
+        rep.ran.push(m.id);
+      };
+      try{
+        const r=m.run(ctx||{});
+        if(r && typeof r.then==='function') r.then(finish, fail);
+        else finish(r);
+      }catch(e){ fail(e); }
+    });
+    return true;
+  }
+  try{ window.__flowMigDeferred=()=>migDeferred; }catch(_){}
+  // Без входу довіра настає, щойно перевірку сесії завершено (02-storage.js шле
+  // 'flowsbready'). Якщо стартовий load() устиг раніше і відклав міграції — доганяємо.
+  // Із сесією load() і так повториться після відповіді хмари.
+  document.addEventListener('flowsbready', ()=>{
+    try{ if(migDeferred && window.sbDataTrusted && window.sbDataTrusted()) load().catch(()=>{}); }catch(_){}
+  });
 
   // ── merge конфігурації папок (спільна для миттєвого й повного завантаження) ──
   function applyFolderCfgRaw(rawf){
@@ -238,8 +376,7 @@
       else boards={};
       // нормалізуємо всі блоки, щоб старі/неповні дані не ламали рендер
       Object.keys(boards).forEach(k=>{ if(Array.isArray(boards[k])) boards[k]=normalizeBlocks(boards[k]); });
-      // папка «Патерни» відкривається одразу як екран — її простір не використовується, чистимо залишки
-      try{ if(boards['pat']){ delete boards['pat']; saveBoard(); } }catch(_){}
+      // залишки простору «Патерни» ('pat') прибирає реєстр міграцій (board_pat) — після довіреного читання
     }
     catch{ boards={}; }
     try{ rescheduleAllReminders(); checkDueReminders(); }catch(_){}
@@ -271,56 +408,6 @@
       }
     }catch(_){}
     try{ applyChatsRaw(__RAW['chats_v1']); }catch(e){ console.error('chats load',e); }
-    // ── ОЧИЩЕННЯ: «Простір» видалено повністю разом із даними.
-    //    Прибираємо: кореневі дошки ('all' + 'all__sp_*'), додаткові простори
-    //    кореня та колись перенесені папки «🧩 Простір» ('f_space_*').
-    //    Виконується один раз.
-    try{
-      if(!localStorage.getItem('space_purge_v1')){
-        let changed=false;
-        Object.keys(boards).forEach(k=>{
-          if(k==='all'){ if(Array.isArray(boards[k])&&boards[k].length){ boards[k]=[]; changed=true; } }
-          else if(k.indexOf('all__sp_')===0 || k.indexOf('f_space_')===0){ delete boards[k]; changed=true; }
-        });
-        Object.keys(folders).forEach(k=>{
-          if(k.indexOf('f_space_')===0){ delete folders[k]; changed=true; }
-        });
-        for(let i=order.length-1;i>=0;i--){
-          if(String(order[i]).indexOf('f_space_')===0){ order.splice(i,1); changed=true; }
-        }
-        try{
-          if(typeof spacesMap!=='undefined' && spacesMap && spacesMap['__root__']){
-            delete spacesMap['__root__'];
-            if(typeof activeSpaceMap!=='undefined' && activeSpaceMap) delete activeSpaceMap['__root__'];
-            if(typeof saveSpacesMeta==='function') saveSpacesMeta();
-            changed=true;
-          }
-        }catch(_){}
-        if(changed){ try{ saveFolders({auto:true}); }catch(_){} try{ saveBoard(); }catch(_){} }
-        localStorage.setItem('space_purge_v1','1');
-      }
-    }catch(e){ console.error('space purge', e); }
-    // ── ОЧИЩЕННЯ 2: старі віджети та проєктні блоки (перенесені зі Простору)
-    //    видаляємо з усіх папок — на їхнє місце прийдуть нові, професійніші.
-    //    «Відлік» лишається — він рідний для сторінки. Виконується один раз.
-    try{
-      if(!localStorage.getItem('legacy_widgets_purge_v1')){
-        const DEAD={progress:1,fin:1,envelope:1,calendar:1,wpult:1,wstack:1,wpipe:1,wtline:1,
-          wportal:1,wplanday:1,wplanmonth:1,project:1,kanban:1,contacts:1,caseline:1,festival:1};
-        let removed=0;
-        const strip=(arr)=>{
-          if(!Array.isArray(arr))return;
-          for(let i=arr.length-1;i>=0;i--){
-            const b=arr[i];
-            if(b&&DEAD[b.type]){ arr.splice(i,1); removed++; continue; }
-            if(b&&Array.isArray(b.children)) strip(b.children);
-          }
-        };
-        Object.keys(boards).forEach(k=>strip(boards[k]));
-        if(removed){ try{ saveBoard(); }catch(_){} }
-        localStorage.setItem('legacy_widgets_purge_v1','1');
-      }
-    }catch(e){ console.error('legacy widgets purge', e); }
     // goals data
     try{
       const rawg=__RAW[GKEY];
@@ -363,20 +450,18 @@
     try{ const raw=__RAW[WKBLKKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') wkBlocks=Object.assign(wkBlocks,d); }catch(_){}
     try{ const raw=__RAW[RECKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) recurring=d; }catch(_){}
     try{ const raw=__RAW[CARDKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) cards=d; }catch(_){}
-    try{ migrateSpendsToFin(); }catch(_){}   // одна книга: старі spends → finOps (ідемпотентно)
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}
     try{ const raw=__RAW[DIAINS_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaInsights=Object.assign({mood:{},weeks:{}},d); }catch(_){}
     try{ const raw=__RAW[DIABOOKS_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object'&&Array.isArray(d.books)) diaBooks=Object.assign({books:[],entries:{}},d); }catch(_){}
-    // спершу міграція — їй потрібні СТАРІ картки й курси, які ensureCards() затирає
-    try{ migrateToWallet(__RAW[CARDKEY], __RAW['fx_cfg']); }catch(e){ console.error('migrateToWallet',e); }
-    try{ ensureCards(); }catch(_){}
-    try{ migrateFolderPhotosOnce(); }catch(e){ console.error('migratePhotos',e); }
-    try{ removeSystemSeedFoldersOnce(); }catch(e){ console.error('removeSeedFolders',e); }
-    try{ agencyPurgeOnce(); }catch(e){ console.error('agencyPurge',e); }
-    try{ inboxMigrateOnce(); }catch(e){ console.error('inboxMigrate',e); }
-    try{ chatsMigrateInboxOnce(); }catch(e){ console.error('chatsMigrate',e); }   // папка «Вхідні» → чат (36-chats.js)
+    /* Усі разові переїзди даних — у реєстрі MIGRATIONS_ONCE (вище) і лише після
+       довіреного читання: коли сховище/хмара мовчать, runMigrations нічого не пише
+       і прапорців не ставить — спробує наступний load(). */
+    const migOk = runMigrations({ rawCards:__RAW[CARDKEY], rawFx:__RAW['fx_cfg'], rawFolders:__RAW[FKEY] });
+    // гаманець потрібен екранам завжди, але поки дані не підтверджені — лише в памʼяті:
+    // інакше заводський гаманець ляже в сховище (і хмару) поверх справжнього з назвою/кольором
+    try{ ensureCards(migOk ? null : {memOnly:true}); }catch(_){}
+    if(!migOk){ try{ migrate(true); }catch(e){ console.error('migrate',e); } }
     syncBlocks();
-    try{ migrate(); }catch(e){ console.error('migrate',e); }
     try{ render(); }catch(e){ console.error('render',e); }
     try{ chatsInit(); }catch(e){ console.error('chatsInit',e); }
     try{ renderDashboard(); }catch(e){ console.error('dashboard',e); }
@@ -470,17 +555,14 @@
       console.log('[Flow] знімків перенесено в PhotoDB:', keys.length);
     }catch(e){ console.error('migrateFolderPhotos', e); }
   }
+  // прапорець — у реєстрі MIGRATIONS_ONCE (ставиться лише після успішного проходу)
   function removeSystemSeedFoldersOnce(){
-    var FLAG='flowapp_seedfolders_removed_v1';
-    try{ if(localStorage.getItem(FLAG)) return; }catch(_){ return; }
-    try{
-      var changed=false;
-      ['pat', VISION_FKEY].forEach(function(k){
-        if(folders && folders[k]){ delete folders[k]; changed=true; }
-        var i=order.indexOf(k); if(i>=0){ order.splice(i,1); changed=true; }
-      });
-      if(changed) saveFolders({auto:true});
-    }catch(_){}
-    try{ localStorage.setItem(FLAG,'1'); }catch(_){}
+    var changed=false;
+    ['pat', VISION_FKEY].forEach(function(k){
+      if(folders && folders[k]){ delete folders[k]; changed=true; }
+      var i=order.indexOf(k); if(i>=0){ order.splice(i,1); changed=true; }
+    });
+    if(changed) saveFolders({auto:true});
+    return true;
   }
 
