@@ -94,6 +94,9 @@ try{
           var txt=ttsClean((u&&u.text)||'');
           if(!txt.trim()) return;
           var off=false; try{ off=localStorage.getItem('fd_tts')==='0'; }catch(_){}
+          /* без згоди на AI (чи з вимкненим AI) текст не віддаємо сервісу озвучення —
+             говорить системний голос, і шторка згоди тут не вискакує */
+          var aok=Gf('aiAllowed'); if(aok&&!aok()) off=true;
           if(off||ttsDead){ return origSpeak(u); }
           var my=++seq; stopA(); try{ origCancel(); }catch(_){}
           var vc=ttsVoiceCfg();
@@ -424,7 +427,7 @@ try{
       var j={}; try{ j=await res.json(); }catch(_){}
       if(!res.ok){ toast('⚠️ Розпізнавання: '+((j&&j.error)||('HTTP '+res.status))); return ''; }
       return (j&&j.text||'').trim();
-    }catch(e){ toast('⚠️ Транскрипція не вдалась: '+String(e&&e.message||e)); return ''; }
+    }catch(e){ toast(e&&e.aiOff ? e.message : '⚠️ Транскрипція не вдалась: '+String(e&&e.message||e)); return ''; }
   }
   function routeSend(ctxName,text){
     try{

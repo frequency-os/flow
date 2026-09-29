@@ -167,7 +167,8 @@
         if(last && ds<=last) continue;
         const list=Array.isArray(byDay[ds])?byDay[ds]:[];
         const items=list.map(b=>(b.done?'[x] ':'[ ] ')+String(b.t||'').slice(0,60)).filter(s=>s.trim().length>4);
-        let dia=''; try{ const e=(typeof diaryEntries==='object'&&diaryEntries)?diaryEntries[ds]:null; if(e&&e.text) dia=String(e.text).replace(/\s+/g,' ').slice(0,220); }catch(_){}
+        // щоденник закрито від AI (Ще → AI і приватність) — аналіз лише за планером
+        let dia=''; try{ const e=(typeof diaryEntries==='object'&&diaryEntries&&!aiSectionOff('diary'))?diaryEntries[ds]:null; if(e&&e.text) dia=String(e.text).replace(/\s+/g,' ').slice(0,220); }catch(_){}
         if(items.length||dia) days.push({ds, items, dia});
       }
       return days;

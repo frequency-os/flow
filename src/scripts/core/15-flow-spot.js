@@ -141,7 +141,7 @@
       try{ aiSpeak(say); }catch(_){}
     }catch(e){
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">⚠️ Не вдалось: ${String(e.message||e).replace(/</g,'&lt;')}</div>`);
+      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">${e&&e.aiOff?'':'⚠️ Не вдалось: '}${String(e.message||e).replace(/</g,'&lt;')}</div>`);
     }
     spotBusy=false; if(cap) cap.classList.remove('busy');
   }
@@ -601,6 +601,7 @@
       const f=inp.files&&inp.files[0]; if(!f) return;
       try{
         if(/^image\//.test(f.type)){
+          if(aiSectionOff('photos')){ plToast('🔒 Фото закрито від AI — Ще → AI і приватність'); return; }
           plToast('⏳ Стискаю фото…');
           const data=await aiImgShrink(f);
           aiAttach.push({kind:'image',media:'image/jpeg',data:data,name:f.name});
@@ -781,6 +782,7 @@
   let aiSumBusy=false;
   async function aiMaybeSummarize(){
     if(aiSumBusy||aiChatMsgs.length<28) return;
+    if(!aiAllowed()) return;   // фонове стискання: після «Не зараз» не питаємо згоду вдруге
     aiSumBusy=true;
     try{
       const old=aiChatMsgs.slice(0,aiChatMsgs.length-16);
@@ -820,7 +822,8 @@
       if(att.length){ // останнє user-повідомлення стає мультимодальним
         const blocks=[];
         att.forEach(a=>{
-          if(a.kind==='image') blocks.push({type:'image',source:{type:'base64',media_type:a.media,data:a.data}});
+          // фото, прикріплене до того, як людина закрила розділ «Фото», теж не йде
+          if(a.kind==='image'){ if(!aiSectionOff('photos')) blocks.push({type:'image',source:{type:'base64',media_type:a.media,data:a.data}}); }
           else if(a.kind==='pdf') blocks.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:a.data}});
           else if(a.kind==='text') blocks.push({type:'text',text:'ФАЙЛ «'+(a.name||'txt')+'»:\n'+a.text});
         });
@@ -869,12 +872,13 @@
       }
     }catch(e){
       try{ aiTraceFinish(); }catch(_){}   // обірваний хід не має лишати живу картку
-      console.error('aiChat',e);
+      if(!(e&&e.aiOff)) console.error('aiChat',e);   // відмова від AI — не помилка
       /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
          а не «поганий URL»; на native поле проксі взагалі приховане. */
       const off = (typeof navigator!=='undefined' && navigator.onLine===false);
       m.content = off
         ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
+        : (e && e.aiOff) ? e.message           // «Не зараз» чи AI вимкнено — вибір людини, не поломка
         : (e && e.human) ? '⚠️ '+e.message     // ліміт чи вхід (aiHttpError) — причина відома, URL тут ні до чого
         : (window.FLOW_NATIVE
             ? '⚠️ Не вдалось до мене достукатись. Спробуй ще раз за хвилину.'
@@ -945,8 +949,8 @@
       if(!t){ plToast('🎙 Не розчув — скажи чіткіше і трохи довше'); return ''; }
       return t;
     }catch(e){
-      console.error('aiTranscribeBlob',e);
-      plToast('⚠️ Транскрипція не вдалась: '+String(e.message||e));
+      if(!(e&&e.aiOff)) console.error('aiTranscribeBlob',e);
+      plToast(e&&e.aiOff ? e.message : '⚠️ Транскрипція не вдалась: '+String(e.message||e));
       return '';
     }
   }

@@ -297,6 +297,8 @@
     const mon=diaViewWeek||diaMonday(plTodayStr());
     const days=diaWeekDss(mon).filter(diaHasEntry);
     if(!days.length){ try{ flowAlert('За цей тиждень ще нема текстових записів.'); }catch(_){} return; }
+    // щоденник закрито від AI (Ще → AI і приватність) — записи не відправляємо
+    if(aiSectionOff('diary')){ try{ flowAlert('Щоденник закрито від AI. Відкрити: Ще → AI і приватність.'); }catch(_){} return; }
     const body=days.map(k=>diaFmtDate(k)+':\n'+diaryEntries[k].text).join('\n\n---\n\n');
     btn.disabled=true; btn.textContent='Аналізую…';
     out.style.display='block'; out.textContent='';
@@ -319,6 +321,9 @@
   let diaMoodBusy=false;
   async function diaMoodBatch(){
     if(diaMoodBusy) return;
+    /* фонова оцінка — людина її не просила, тож без згоди чи з закритим
+       щоденником мовчки пропускаємо, а не вискакуємо шторкою згоди */
+    if(!aiAllowed('diary')) return;
     const days=[];
     for(let i=0;i<35;i++){
       const ds=diaDs(-i); const e=diaryEntries[ds];

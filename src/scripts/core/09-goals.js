@@ -20,6 +20,11 @@
   let aiAuthOff=false;
   async function aiFetch(url,opts){
     opts=opts||{};
+    /* Згода на AI (37-ai-privacy.js): усі шляхи до моделі й голосу йдуть
+       сюди, тож одна перевірка закриває всі. Без згоди — шторка; «Не зараз»
+       чи вимкнений AI — запит не виходить (помилка з human/aiOff).
+       /upload-photo — хмарне сховище фото, а не AI, його не зупиняємо. */
+    if(!/\/upload-photo(\?|$)/.test(String(url||''))) await aiConsentGate();
     let tok='';
     try{ if(typeof window.sbAccessToken==='function') tok=await window.sbAccessToken(); }catch(_){}
     if(!tok) return fetch(url,opts);
