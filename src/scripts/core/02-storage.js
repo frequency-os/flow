@@ -623,6 +623,13 @@
        чергу і стирає кошик — і якщо iOS уб'є застосунок до відповіді, правка
        в хмару вже не піде. Прибираємо ключ звідси лише після відповіді. */
     let sbInFlight = {};
+    /* Номер партії й номер останньої партії, що ДІЙШЛА, для кожного ключа.
+       Потрібні, щоб стара партія, яка впала пізніше за новішу, не повернула
+       старе значення в чергу: повтор записав би його в хмару з найсвіжішою
+       міткою, і правку пристрій потім сам відкотив би. Лічильник, а не
+       годинник: мітки хмари з інших пристроїв можуть бути зсунуті. */
+    let sbFlushSeq = 0;
+    const sbDoneSeq = {};
     /* «Вихідний кошик» у localStorage: незлиті записи мають пережити перезапуск,
        інакше офлайн-правка, зроблена перед закриттям, губиться назавжди. */
     function sbOutboxSave(){
@@ -669,6 +676,7 @@
       const keys = Object.keys(q);
       if(!keys.length){ sbOutboxSave(); return; }
       keys.forEach(k=>{ sbInFlight[k]=q[k]; });
+      const seq = ++sbFlushSeq;
       let ok=false;
       if(u && sb){
         try{
@@ -681,7 +689,7 @@
           const { error } = await sb.from('user_data').upsert(rows, { onConflict:'user_id,key' });
           if(error) throw error;
           if(sbBatchCache) keys.forEach(k=>{ sbBatchCache[k]=q[k]; });
-          keys.forEach(k=>{ sbBatchTs[k]=now; });   // свіжість хмари тепер відома точно
+          keys.forEach(k=>{ sbBatchTs[k]=now; sbDoneSeq[k]=seq; });   // свіжість хмари тепер відома точно
           ok=true;
         }catch(_){ ok=false; }
       }
@@ -691,7 +699,10 @@
       if(!ok){
         // НЕ втрачаємо партію: повертаємо ключі в чергу (не затираючи новіші),
         // зберігаємо в outbox і повторюємо з паузою — і одразу коли з'явиться мережа.
-        keys.forEach(k=>{ if(!(k in sbWriteQueue)) sbWriteQueue[k]=q[k]; });
+        // Ключ НЕ повертаємо, якщо новіше значення вже в черзі, ще летить в іншій
+        // партії (у sbInFlight лишається лише чуже, своє ми щойно прибрали) або
+        // пізніша партія вже дійшла — інакше старе перемогло б новіше.
+        keys.forEach(k=>{ if(!(k in sbWriteQueue) && !(k in sbInFlight) && !((sbDoneSeq[k]||0) > seq)) sbWriteQueue[k]=q[k]; });
         sbOutboxSave(); sbSyncPending();
         window.__flowSync.sbHadError = true;
         try{ if(window.__setSync) window.__setSync('error'); }catch(_){}
@@ -760,7 +771,8 @@
         if(need.length){
           const r2 = await sb.from('user_data').select('key,value,updated_at').eq('user_id', uid).in('key', need);
           if(r2.error || !r2.data){ window.__sbCloudOk=false; return false; }
-          r2.data.forEach(r=>{ sbBatchCache[r.key]=JSON.stringify(r.value); sbBatchTs[r.key]=Date.parse(r.updated_at)||0; });
+          // sbFromCloud, як і в sbPrefetchAll: сирий текст (аватарка, ui_mode) — без лапок
+          r2.data.forEach(r=>{ sbBatchCache[r.key]=sbFromCloud(r.value); sbBatchTs[r.key]=Date.parse(r.updated_at)||0; });
         }
         window.__sbCloudOk=true;
         return true;
