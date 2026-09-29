@@ -9,6 +9,34 @@
   const AI_EP_KEY='ai_endpoint';
   const AI_EP_DEFAULT='https://flowai.life-yaroslav-kril.workers.dev';
   function aiEndpoint(){ try{ return (localStorage.getItem(AI_EP_KEY)||'').trim() || AI_EP_DEFAULT; }catch(_){ return AI_EP_DEFAULT; } }
+  /* Запит до AI-воркера з пропуском. Воркер може вимагати вхід (токен сесії
+     Supabase), щоб чужі люди не ганяли платну модель за наш рахунок. Якщо
+     людина увійшла — додаємо «Authorization: Bearer …».
+     Старий воркер цього заголовка ще не знає, і браузер тоді відмовляє на
+     CORS-перевірці (TypeError). На такий випадок повторюємо запит без токена
+     і до перезапуску його не шлемо — AI не зникає, доки воркер не оновлено.
+     Якщо ж після цього воркер відповів 401 (новий, з вимогою входу) — знову
+     шлемо з токеном. */
+  let aiAuthOff=false;
+  async function aiFetch(url,opts){
+    opts=opts||{};
+    let tok='';
+    try{ if(typeof window.sbAccessToken==='function') tok=await window.sbAccessToken(); }catch(_){}
+    if(!tok) return fetch(url,opts);
+    const withTok=Object.assign({},opts,{headers:Object.assign({},opts.headers||{},{Authorization:'Bearer '+tok})});
+    if(aiAuthOff){
+      const r=await fetch(url,opts);
+      if(r.status!==401) return r;
+      aiAuthOff=false; return fetch(url,withTok);
+    }
+    try{ return await fetch(url,withTok); }
+    catch(e){
+      if(e && e.name==='AbortError') throw e;
+      const r=await fetch(url,opts);   // впаде й це — значить, справді нема мережі
+      aiAuthOff=true; return r;
+    }
+  }
+  try{ window.aiFetch=aiFetch; }catch(_){}
   function aiConfig(cb){
     inputModal({title:'AI endpoint (URL твого Worker-проксі)', value:aiEndpoint(),
       placeholder:AI_EP_DEFAULT, onOk:(v)=>{
@@ -61,7 +89,7 @@
         +'Правила: 3-5 цілей, у кожної 3-5 конкретних кроків (перший — виконуваний сьогодні). schedule додавай лише де доречний регулярний блок; dows: 0=неділя…6=субота; h/endH — години 0-24. '
         +'1-2 конверти. Реалістично, без води, кроки — дії, не побажання.';
       const usr='Точка А: '+(g.pointA||'')+'\nТочка Б: '+(g.pointB||'')+'\nВже є цілей: '+(g.goals||[]).length;
-      const res=await fetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
+      const res=await aiFetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
         body:JSON.stringify({ system:sys, messages:[{role:'user',content:usr}] }) });
       if(!res.ok) throw new Error('HTTP '+res.status);
       const data=await res.json();

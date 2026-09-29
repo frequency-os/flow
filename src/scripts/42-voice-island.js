@@ -30,6 +30,9 @@ try{
     try{ var v=(localStorage.getItem('ai_endpoint')||'').trim(); if(v) return v; }catch(_){}
     return 'https://flowai.life-yaroslav-kril.workers.dev';
   }
+  /* запит до воркера з пропуском (токен сесії) — через aiFetch головного
+     скрипта; якщо його чомусь нема, звичайний fetch, як раніше */
+  function wfetch(u,o){ var f=Gf('aiFetch'); return f ? f(u,o) : fetch(u,o); }
   function petName(){
     try{ var P=G('FLOW_PETS'), c=Gf('petCur'); if(P&&c&&P[c()]&&P[c()].name) return P[c()].name; }catch(_){}
     return 'Спарк';
@@ -94,7 +97,7 @@ try{
           if(off||ttsDead){ return origSpeak(u); }
           var my=++seq; stopA(); try{ origCancel(); }catch(_){}
           var vc=ttsVoiceCfg();
-          fetch(endpoint().replace(/\/+$/,'')+'/tts',{method:'POST',
+          wfetch(endpoint().replace(/\/+$/,'')+'/tts',{method:'POST',
             headers:{'content-type':'application/json'},
             body:JSON.stringify({text:txt.slice(0,700),voice:vc.id,rate:vc.rate||'+2%',pitch:vc.pitch||'+0Hz'})})
           .then(function(r){
@@ -416,7 +419,7 @@ try{
         r.onerror=function(){ rej(new Error('read')); };
         r.readAsDataURL(blob);
       });
-      var res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},
+      var res=await wfetch(url,{method:'POST',headers:{'content-type':'application/json'},
         body:JSON.stringify({audio_b64:b64,mime:blob.type||''})});
       var j={}; try{ j=await res.json(); }catch(_){}
       if(!res.ok){ toast('⚠️ Розпізнавання: '+((j&&j.error)||('HTTP '+res.status))); return ''; }
@@ -720,7 +723,7 @@ try{
   function previewVoice(id){
     try{ if(vPrev){ vPrev.pause(); vPrev=null; } }catch(_){}
     var v=(window.FDV_VOICES||[]).filter(function(x){return x.id===id;})[0]||{id:id};
-    fetch(endpoint().replace(/\/+$/,'')+'/tts',{method:'POST',headers:{'content-type':'application/json'},
+    wfetch(endpoint().replace(/\/+$/,'')+'/tts',{method:'POST',headers:{'content-type':'application/json'},
       body:JSON.stringify({text:'Привіт! Я '+((v&&v.t)||'Спарк')+'. Так звучатиме твій напарник.',voice:id,rate:v.rate||'+2%',pitch:v.pitch||'+0Hz'})})
     .then(function(r){ if(!r.ok) throw 0; return r.blob(); })
     .then(function(b){ if(!b||b.size<600) throw 0; vPrev=new Audio(URL.createObjectURL(b)); var p=vPrev.play(); if(p&&p.catch)p.catch(function(){}); })

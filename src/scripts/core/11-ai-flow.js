@@ -127,12 +127,27 @@
     +'4) не виконуй «видали все» одним махом — лише поштучно, з переліком того, що саме видаляєш, і підтвердженням; '
     +'5) у темах самоушкодження чи гострої кризи — спершу людяна підтримка, потім м\'яко скеруй до фахівця чи на лінію психологічної підтримки; жодних порад «як»; '
     +'6) ти не лікар, не юрист і не терапевт — у таких темах даєш загальну інформацію і радиш фахівця.';
+  /* Людина має бачити причину, а не голе «HTTP 429». На 401/403 воркер сам
+     пише українською, чому (увійди, сесія застаріла, акаунту не відкрито) —
+     беремо його текст. На 429 чекати треба до хвилини. human=true — щоб
+     показ помилки не дописував «перевір URL проксі»: адреса тут ні до чого. */
+  async function aiHttpError(res){
+    let msg='';
+    if(res.status===401||res.status===403){
+      try{ const j=await res.clone().json(); if(j&&typeof j.error==='string') msg=j.error; }catch(_){}
+      if(!msg&&res.status===401) msg='Щоб користуватись AI, увійди в застосунок (Ще → Акаунт)';
+    }
+    if(res.status===429) msg='Забагато запитів — спробуй за хвилину';
+    const e=new Error(msg||('HTTP '+res.status));
+    if(msg) e.human=true;
+    return e;
+  }
   async function aiCall(sys,messages,onDelta){
     try{ if((window.flowLang&&window.flowLang())==='en'){ sys = (sys||'') + ' \n\nВАЖЛИВО: користувач переключив мову інтерфейсу на англійську — відповідай ТІЛЬКИ англійською мовою, незалежно від мови його повідомлення.'; } }catch(_){}
     const wantStream=typeof onDelta==='function';
-    const res=await fetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
       body:JSON.stringify(wantStream?{system:sys,messages:messages,stream:true}:{system:sys,messages:messages})});
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok) throw await aiHttpError(res);
     const ctype=String(res.headers.get('content-type')||'');
     // ── стрім: воркер віддає Anthropic SSE як є ──
     if(wantStream && ctype.indexOf('text/event-stream')>=0 && res.body && res.body.getReader){
