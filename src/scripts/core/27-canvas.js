@@ -227,10 +227,15 @@
         if(typeof v==='string' && v.length){ try{ JSON.parse(v); }catch(_){ (window.__storeCorrupt=window.__storeCorrupt||new Set()).add(k); } }
       }); return m;
     })();
-    // SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть
-    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW); }catch(_){}
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
+    /* SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть.
+       Саме тут, після останнього await: далі прочитане синхронно лягає в памʼять.
+       Позначка раніше (до await) казала «прочитано з хмари», поки в памʼяті ще
+       лежала гостьова дошка, — швидкий запис у цю мить заливав її в хмару.
+       cloudPass: чи цей прохід читав з хмари (ключі, взяті лише з локальної копії
+       до першого прочитання хмари акаунта, ще не «прочитані», див. sbLocalOnly). */
+    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, cloudPass); }catch(_){}
     /* Усе нижче до кінця load() — синхронне застосування прочитаного разом з
        міграціями й прибираннями. Їхні записи — автоматичні: у ключ, який не
        прочитався (сховище мовчало), вони не підуть (SYNC-2, storeAuto). */

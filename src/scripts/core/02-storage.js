@@ -483,11 +483,16 @@
        вважається все, що виконується всередині storeAuto(...). Ручні дії
        людини проходять як і раніше. */
     const keyRead = {};    // key → true (прочитано) | false (не відповіло / пошкоджено) | null (невідомо)
+    const keyCloud = {};   // key → true, якщо той прохід load() читав з хмари (sbCloudPass)
     let autoDepth = 0;     // >0 — зараз виконується автоматичний запис
-    window.storeMarkRead = function(raw){
+    // cloudPass — чи читав цей прохід з хмари; load() рахує його ДО читання,
+    // бо за час читання знімок хмари міг щойно прийти, а ключі взято з локальної копії
+    window.storeMarkRead = function(raw, cloudPass){
       const ready = window.__sbReady === true;
       const trusted = window.sbDataTrusted();
+      const fromCloud = (cloudPass === undefined) ? window.sbCloudPass() : !!cloudPass;
       Object.keys(raw||{}).forEach(k=>{
+        keyCloud[k] = fromCloud;
         const v = raw[k];
         /* Порожньо, а бібліотека Supabase ще не довантажилась (повільна мережа) —
            ще не знаємо, гість це чи вхід із Google. Не «ні», а «невідомо» (null):
@@ -504,8 +509,25 @@
       // «невідомо»: сесію перевірено, її нема — гість, локальна порожнеча і є правда.
       // Вхід із Google сюди не дійде: sbInit одразу перечитує load() і перепозначає ключ.
       if(keyRead[key] === null) return window.__sbReady === true && !sbUserCache;
+      if(keyRead[key] === true && sbLocalOnly(key)) return false;
       return keyRead[key];
     };
+    /* Ключ прочитано лише з ЛОКАЛЬНОЇ копії, а хмару цього акаунта пристрій ще
+       не бачив (SYNC-1). Тоді «прочитано» — неправда: після входу в памʼяті
+       лежить гостьова дошка, а хмара ще йде. Швидкий запис у цю мить заливав
+       гостьову дошку поверх хмарної — документи й чати зникали всюди.
+       Два випадки:
+       • сесія вже є, прохід із хмарою ще не завершився — чекаємо його;
+       • сесію ще не перевірено, а пристрій ЖОДНОГО акаунта ще не бачив — якщо
+         зараз виявиться вхід, «хмара головна» замінить цю копію, і правка
+         зникла б з екрана (лишилась би лише в резерві). Коротко почекати краще.
+       Гість після перевірки сесії — локальна копія і є правда, не заважаємо. */
+    function sbLocalOnly(key){
+      if(keyCloud[key]) return false;
+      if(sbUserCache) return !sbCloudSeen(sbUserCache.id);
+      if(window.__sbReady !== true){ try{ return !localStorage.getItem(CLOUD_SEEN); }catch(_){ return true; } }
+      return false;
+    }
     // почати автоматичну ділянку; повертає функцію, що її закриває (для try/finally)
     window.storeAutoBegin = function(){
       autoDepth++; let open = true;
@@ -534,13 +556,15 @@
        ще не підтвердився), ця копія — єдине місце, де лежать ті записи, і
        вони мовчки зникли б із пристрою. Тому перед першим таким перезаписом
        кладемо непорожню копію, що відрізняється від хмарної, окремо:
-       flowapp___guest_backup_<час> = { at, uid, keys:{ключ: сирий запис} }.
+       flowapp___guest_keep_<час> = { at, uid, keys:{ключ: сирий запис} }.
+       Назва без «backup»/«bak»: такі ключі purgeDisposable() вважає кешем і
+       першим стирає, щойно памʼять переповниться. Резерв їде в експорт у файл.
        Нічого не зливаємо автоматично — лише щоб дані можна було повернути.
        Межі, щоб резерв не забив памʼять: не більше BK_MAX резервів (найстаріші
        прибираємо) і BK_CAP символів на один. Що не влізло — попередження в
        консолі, а перевагу однаково віддаємо хмарі: інакше на наступному старті
        гостьова заглушка знову «новіша» за хмару. */
-    const BK_PREFIX = 'flowapp___guest_backup_', BK_MAX = 3, BK_CAP = 1000000;
+    const BK_PREFIX = 'flowapp___guest_keep_', BK_MAX = 3, BK_CAP = 1000000;
     let sbBackup = null;   // резерв цієї сесії: { name, keys }
     // JSON без службового __sv і з ключами по порядку — хмара (jsonb) міняє порядок ключів
     function sbPlain(str){
@@ -576,7 +600,11 @@
     // cloudFirst — перший вхід на пристрої: спершу резерв локальної копії (sbKeepLocal)
     function sbMirror(key, value, cloudTs, localTs, cloudFirst){
       if(localTs === cloudTs || String(key).indexOf('photo:') === 0) return;
-      if(cloudFirst) sbKeepLocal(key, value);
+      /* Резерв лише там, де «хмара головна» перекрила НОВІШУ локальну копію.
+         Старіша за хмару копія (пристрій, що був у акаунті ще до оновлення)
+         поступилась би хмарі й за звичайною звіркою — свого в ній нема, а у
+         великого акаунта резерв зʼїв би до 40% памʼяті Safari. */
+      if(cloudFirst && localTs > cloudTs) sbKeepLocal(key, value);
       try{ if(window.storage._mirror) window.storage._mirror(key, value, cloudTs); }catch(_){}
     }
     let sbSigningIn=false;
@@ -980,6 +1008,15 @@
       // на випадок, якщо сторінку закриють до завершення мережевого запиту в Supabase
       const localResult = await origSet(key, value);
       const u = sbUserCache;
+      /* Ручна правка ключа, який load() узяв лише з локальної копії, доки хмару
+         цього акаунта пристрій ще не бачив (перший вхід, знімок хмари ще йде):
+         у хмару НЕ шлемо. Інакше гостьова дошка з цією правкою лягла б поверх
+         хмарної. Прохід із хмарою все одно замінить локальну копію хмарною
+         (SYNC-1), а цю — разом із правкою — покладе в резерв (sbKeepLocal). */
+      if(u && sb && Object.prototype.hasOwnProperty.call(keyRead, key) && sbLocalOnly(key)){
+        try{ console.warn('[Flow storage] у хмару не відправлено — хмару акаунта ще не прочитано:', key); }catch(_){}
+        return localResult;
+      }
       if(u && sb) sbScheduleWrite(key, value);
       return localResult;
     };
