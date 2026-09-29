@@ -524,7 +524,11 @@
       e.stopPropagation();
       const [gid,sid]=el.dataset.delstep.split('|');
       const gl=g.goals.find(x=>x.id===gid); if(!gl) return;
-      gl.steps=(gl.steps||[]).filter(s=>s.id!==sid); saveGoals(); renderGoalsTab();
+      const arr=gl.steps||[], i=arr.findIndex(s=>s.id===sid); if(i<0) return;
+      const gone=arr[i];
+      gl.steps=arr.filter(s=>s!==gone); saveGoals(); renderGoalsTab();
+      // «×» біля чекбокса кроку — без підтвердження, тож 5 с на «Повернути»
+      flowUndoToast('Крок видалено',()=>{ const a=gl.steps||(gl.steps=[]); a.splice(Math.min(i,a.length),0,gone); saveGoals(); renderGoalsTab(); });
     });
     // ЛАНЦЮГ: крок → блок у Планері
     c.querySelectorAll('[data-planstep]').forEach(el=>el.onclick=(e)=>{
@@ -579,8 +583,11 @@
       e.stopPropagation();
       const [gid,ds,iid]=el.dataset.dgdel.split('|');
       const gl=g.goals.find(x=>x.id===gid); if(!gl) return;
-      gl.days[ds]=dgListFor(gl,ds).filter(x=>x.id!==iid);
+      const before=dgListFor(gl,ds).slice();
+      gl.days[ds]=before.filter(x=>x.id!==iid);
       dgSync(gl,ds,todayStr); saveGoals(); renderGoalsTab();
+      if(before.length!==gl.days[ds].length)
+        flowUndoToast('Пункт видалено',()=>{ gl.days[ds]=before; dgSync(gl,ds,todayStr); saveGoals(); renderGoalsTab(); });
     });
     // ── цілі дня: додати пункт ──
     function dgAdd(gid,ds,val){

@@ -1,5 +1,24 @@
   /* ═══════════ ВІДЖЕТ «ХАБ ПРОЄКТІВ» (список карток, варіант A) ═══════════ */
   var phOpen={}, phStepAdd={}, phPick={};
+  /* «✕» біля чекбокса / звички стирає одразу, без питання — тож показуємо тост
+     «Видалено · ↩ Повернути» (core, 5 с). pick(block) → [власник, ключ] масиву;
+     на поверненні блок шукаємо наново: документ за цей час міг перемалюватись. */
+  function pgDelUndo(bid,pick,match,msg){
+    var l=locate(bid); if(!l) return;
+    var ref=pick(l.block); if(!ref) return;
+    var arr=ref[0][ref[1]]||[], i=-1;
+    for(var k=0;k<arr.length;k++){ if(match(arr[k])){ i=k; break; } }
+    if(i<0) return;
+    var gone=arr[i];
+    ref[0][ref[1]]=arr.filter(function(x){ return x!==gone; });
+    save(); render();
+    if(window.flowUndoToast) window.flowUndoToast(msg||'Видалено',function(){
+      var l2=locate(bid); if(!l2) return;
+      var r2=pick(l2.block); if(!r2) return;
+      var a=r2[0][r2[1]]||(r2[0][r2[1]]=[]);
+      a.splice(Math.min(i,a.length),0,gone); save(); render();
+    });
+  }
   var PH_COLORS=['#7c8cff','#34c77b','#f0b429','#ff6b9d','#4ecdc4','#a78bfa'];
   function phHTML(b){
     var id=b.id; b.projects=b.projects||[];
@@ -445,8 +464,8 @@
       if(lhbe){var he=(lhbe.block.habits||[]).find(function(x){return x.id===hbe0[1];});
         if(he){inputModal({title:'Емодзі звички',value:he.emoji||'✅',onOk:function(v){he.emoji=(v||'✅').trim().slice(0,2)||'✅';save();render();}});}}return;}
     var hbd=e.target.closest&&e.target.closest('[data-hbdel]');
-    if(hbd){var hbd0=hbd.dataset.hbdel.split('|');var lhbd=locate(hbd0[0]);
-      if(lhbd){lhbd.block.habits=(lhbd.block.habits||[]).filter(function(x){return x.id!==hbd0[1];});save();render();}return;}
+    if(hbd){var hbd0=hbd.dataset.hbdel.split('|');
+      pgDelUndo(hbd0[0],function(b){return [b,'habits'];},function(x){return x.id===hbd0[1];},'Звичку видалено');return;}
     var hbx=e.target.closest&&e.target.closest('[data-hbexport]');
     if(hbx){var lhbx=locate(hbx.dataset.hbexport);if(lhbx)hbExport(lhbx.block);return;}
     /* ── хаб проєктів ── */
@@ -482,9 +501,9 @@
       if(lhs){var pp4=(lhs.block.projects||[]).find(function(x){return x.id===hs0[1];});
         if(pp4){var st4=(pp4.steps||[]).find(function(x){return x.id===hs0[2];});if(st4){st4.done=!st4.done;save();render();}}}return;}
     var hsd=e.target.closest&&e.target.closest('[data-phstepdel]');
-    if(hsd){var hd0=hsd.dataset.phstepdel.split('|');var lhd2=locate(hd0[0]);
-      if(lhd2){var pp5=(lhd2.block.projects||[]).find(function(x){return x.id===hd0[1];});
-        if(pp5){pp5.steps=(pp5.steps||[]).filter(function(x){return x.id!==hd0[2];});save();render();}}return;}
+    if(hsd){var hd0=hsd.dataset.phstepdel.split('|');
+      pgDelUndo(hd0[0],function(b){var pp5=(b.projects||[]).find(function(x){return x.id===hd0[1];});return pp5?[pp5,'steps']:null;},
+        function(x){return x.id===hd0[2];},'Крок видалено');return;}
     var hdel=e.target.closest&&e.target.closest('[data-phdel]');
     if(hdel){var hde0=hdel.dataset.phdel.split('|');var lhde=locate(hde0[0]);
       if(lhde){confirmSheet({title:'Видалити проєкт?',onOk:function(){
@@ -507,8 +526,8 @@
     if(pst){var s0=pst.dataset.ptstep.split('|');var ls=locate(s0[0]);
       if(ls){var st=(ls.block.steps||[]).find(function(x){return String(x.id)===s0[1];});if(st){st.done=!st.done;save();render();}}return;}
     var psd=e.target.closest&&e.target.closest('[data-ptstepdel]');
-    if(psd){var sd=psd.dataset.ptstepdel.split('|');var lsd=locate(sd[0]);
-      if(lsd){lsd.block.steps=(lsd.block.steps||[]).filter(function(x){return String(x.id)!==sd[1];});save();render();}return;}
+    if(psd){var sd=psd.dataset.ptstepdel.split('|');
+      pgDelUndo(sd[0],function(b){return [b,'steps'];},function(x){return String(x.id)===sd[1];},'Крок видалено');return;}
     var psa=e.target.closest&&e.target.closest('[data-ptstepadd]');
     if(psa){ptStepAdd[psa.dataset.ptstepadd]=true;render();
       var si=editor.querySelector('[data-ptstepinput="'+psa.dataset.ptstepadd+'"]');if(si)si.focus();return;}
@@ -517,8 +536,8 @@
       if(lh){var hb=(lh.block.habits||[]).find(function(x){return String(x.id)===h0[1];});
         if(hb){hb.marks=hb.marks||{};if(hb.marks[h0[2]])delete hb.marks[h0[2]];else hb.marks[h0[2]]=true;save();render();}}return;}
     var phd=e.target.closest&&e.target.closest('[data-pthabdel]');
-    if(phd){var hd=phd.dataset.pthabdel.split('|');var lhd=locate(hd[0]);
-      if(lhd){lhd.block.habits=(lhd.block.habits||[]).filter(function(x){return String(x.id)!==hd[1];});save();render();}return;}
+    if(phd){var hd=phd.dataset.pthabdel.split('|');
+      pgDelUndo(hd[0],function(b){return [b,'habits'];},function(x){return String(x.id)===hd[1];},'Звичку видалено');return;}
     var pha=e.target.closest&&e.target.closest('[data-pthabadd]');
     if(pha){ptHabAdd[pha.dataset.pthabadd]=true;render();
       var hi=editor.querySelector('[data-pthabinput="'+pha.dataset.pthabadd+'"]');if(hi)hi.focus();return;}
@@ -533,10 +552,9 @@
       if(lg){var it=((lg.block.todos||{})[g[1]]||[]).find(function(x){return String(x.id)===g[2];});
         if(it){it.done=!it.done;save();render();}}return;}
     var jdl=e.target.closest&&e.target.closest('[data-jtdel]');
-    if(jdl){var dl0=jdl.dataset.jtdel.split('|');var ll=locate(dl0[0]);
-      if(ll&&ll.block.todos&&ll.block.todos[dl0[1]]){
-        ll.block.todos[dl0[1]]=ll.block.todos[dl0[1]].filter(function(x){return String(x.id)!==dl0[2];});
-        save();render();}return;}
+    if(jdl){var dl0=jdl.dataset.jtdel.split('|');
+      pgDelUndo(dl0[0],function(b){return b.todos&&b.todos[dl0[1]]?[b.todos,dl0[1]]:null;},
+        function(x){return String(x.id)===dl0[2];},'Задачу видалено');return;}
     /* ── щоденник ── */
     var jm=e.target.closest&&e.target.closest('[data-jrmode]');
     if(jm){var m=jm.dataset.jrmode.split('|');var l1=locate(m[0]);if(l1){l1.block.jmode=m[1];save();render();}return;}

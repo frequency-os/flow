@@ -102,7 +102,8 @@
 
   document.addEventListener('DOMContentLoaded',function(){
     var back=document.getElementById('nycBack');
-    if(back)back.onclick=function(){var g=window.goMore;if(g)g();else if(window.__show)window.__show('scr-more');};
+    // лічильник живе на Огляді (картка Карти бажань) — туди й повертаємось, а не в «Ще»
+    if(back)back.onclick=function(){var g=window.goHome;if(g)g();else if(window.__show)window.__show('scr-home');};
     document.querySelectorAll('[data-nycview]').forEach(function(b){
       b.onclick=function(){
         document.querySelectorAll('[data-nycview]').forEach(function(x){x.classList.remove('on');});

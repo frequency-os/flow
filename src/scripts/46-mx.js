@@ -179,8 +179,13 @@ try{
       moreId=null; try{ saveGoals(); }catch(_){} paint(); }; });
     q('[data-fdxdel]').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation();
       var it=find(b.dataset.fdxdel); if(!it) return;
-      var p=plData(); p.matrix[curQ]=p.matrix[curQ].filter(function(x){ return x!==it; });
-      moreId=null; try{ saveGoals(); }catch(_){} paint(); }; });
+      var p=plData(), q=curQ, i=p.matrix[q].indexOf(it);
+      p.matrix[q]=p.matrix[q].filter(function(x){ return x!==it; });
+      moreId=null; try{ saveGoals(); }catch(_){} paint();
+      // ✕ біля чекбокса стирає одразу — 5 с на «Повернути»
+      if(window.flowUndoToast) window.flowUndoToast('Видалено',function(){
+        var m=plData().matrix; if(!m[q]) m[q]=[]; m[q].splice(Math.min(Math.max(i,0),m[q].length),0,it);
+        try{ saveGoals(); }catch(_){} paint(); }); }; });
     var clr=el.querySelector('[data-fdxclr]');
     if(clr) clr.onclick=function(){
       var p=plData(); p.matrix[curQ]=(p.matrix[curQ]||[]).filter(function(i){ return !i.done; });
