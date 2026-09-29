@@ -19,7 +19,8 @@
      рішеннями про гроші. i — вхід, o — вихід, cr — читання з кешу, cw — запис у кеш (5 хв). */
   const AI_PRICES={
     h:{name:'Haiku 4.5', i:1, o:5,  cr:0.10, cw:1.25},
-    s:{name:'Sonnet 5',  i:2, o:10, cr:0.20, cw:2.50},
+    s:{name:'Sonnet 4.6',i:3, o:15, cr:0.30, cw:3.75},   // старі записи «s» — до переходу на Sonnet 5
+    s5:{name:'Sonnet 5', i:2, o:10, cr:0.20, cw:2.50},
     o:{name:'Opus 5',    i:5, o:25, cr:0.50, cw:6.25}
   };
   let aiAgentStatus='';                       // що агент робить зараз (для бульбашки чату)
@@ -1112,7 +1113,7 @@
      на 3-му хопі писав увесь префікс наново ×1.25 та міняв поведінку посеред дії (AI-9).
      Записи даних — на main (AI-11): «запиши/перенеси/додай» раніше йшли на Haiku, а саме він
      04.09 звітував «✅ Виправив!» без виклику інструмента. Haiku — лише розмова й читання. */
-  const AI_MAIN_RE=/🎙|розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй|виправ|видал|перейменуй|нагадай|запиш|запис|додай|перенес|відміт|познач|закрий|створи|постав|зміни|змін|витрат|заплатив|дохід|заробив|борг|позич|конверт|відклад|запамʼятай|запам'ятай|забудь|\b(plan|analy[sz]e|why|week|month|compare|fix|delete|remove|rename|remind|add|move|record|log|spent|paid|debt|create|save|remember|forget|schedule)/i;
+  const AI_MAIN_RE=/🎙|розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй|виправ|видал|перейменуй|нагадай|запиш|запис|додай|перенес|відміт|познач|закрий|створи|постав|зміни|змін|витрат|заплатив|дохід|заробив|борг|позич|конверт|відклад|запамʼятай|запам'ятай|забудь|\b(plan(s|ned|ning)?|analy[sz](e|es|ed|ing|is)|why|weeks?|weekly|months?|monthly|compar(e|es|ed|ing)|fix(es|ed|ing)?|delet(e|es|ed|ing)|remov(e|es|ed|ing)|renam(e|es|ed|ing)|remind(s|ed|er|ing)?|add(s|ed|ing)?|mov(e|es|ed|ing)|record(s|ed|ing)?|log(s|ged|ging)?|spent|paid|debts?|creat(e|es|ed|ing)|sav(e|es|ed|ing)|remember(s|ed|ing)?|forget(s|ting)?|forgot|schedul(e|es|ed|ing))\b/i;
   function aiPickModel(q){
     q=String(q||'');
     if(q.length>220||AI_MAIN_RE.test(q)) return AI_MODELS.main;
@@ -1121,8 +1122,11 @@
   /* Мінімальний кешований префікс (токенів): коротший кеш мовчки не пише, тож брейкпоінт
      там марний. Haiku 4.5 — 4096, Sonnet 5 — 1024 (довідник Anthropic, prompt caching). */
   function aiCacheMin(model){ return /haiku/.test(String(model))?4096:1024; }
-  // груба оцінка токенів знизу: кирилиця ≈2.4–3.2 символу на токен, беремо 3.2 — щоб не переоцінити
-  function aiTokEst(chars){ return Math.floor((+chars||0)/3.2); }
+  /* Груба оцінка токенів: кирилиця ≈2.4–3.2 символу на токен. Беремо 2.6, а не 3.2: зайвий
+     брейкпоінт під мінімумом нічого не коштує (кеш просто не пишеться), а недооцінка вимикає
+     кеш зовсім — з /3.2 стабільна підказка + інструменти давали 4055 < 4096, і на Haiku
+     (основна модель розмов) системну підказку не кешувало жодного разу. */
+  function aiTokEst(chars){ return Math.floor((+chars||0)/2.6); }
   /* Копія розмови з брейкпоінтом кешу на останньому блоці останнього повідомлення (це завжди
      user: питання людини або результати інструментів). Наступний хоп і наступне повідомлення
      читають усю попередню історію з кешу за ~1/10 ціни, а не платять за неї щоразу (AI-9).
@@ -1142,7 +1146,8 @@
     try{
       const k='ai_usage'; const d=JSON.parse(localStorage.getItem(k)||'{}');
       const ds=plTodayStr(); d[ds]=d[ds]||{};
-      const m=/haiku/.test(String(model))?'h':(/opus/.test(String(model))?'o':'s');
+      // Sonnet 5 — окремий ключ: інакше dev_cost переоцінював увесь місяць Sonnet 4.6 за цінами Sonnet 5
+      const m=/haiku/.test(String(model))?'h':(/opus/.test(String(model))?'o':(/sonnet-5/.test(String(model))?'s5':'s'));
       const e=d[ds][m]=d[ds][m]||{i:0,o:0,cr:0,cw:0,n:0};
       e.i+=u.i||0; e.o+=u.o||0; e.cr+=u.cr||0; e.cw+=u.cw||0; e.n++;
       const ks=Object.keys(d).sort(); while(ks.length>62){ delete d[ks.shift()]; }
@@ -1205,7 +1210,7 @@
           }
         }
       }
-      if(g.fired) throw aiTimeoutError();
+      if(g.fired) throw aiTimeoutError(g.ms);
       blocks=blocks.filter(Boolean).map(b=>{
         if(b.type==='tool_use'){ try{ b.input=b._json?JSON.parse(b._json):{}; }catch(_){ b.input={}; } delete b._json; }
         return b;
@@ -1236,6 +1241,24 @@
   }
   const AI_WRITE_LIMIT=5;                                   // змін даних за одне повідомлення людини
   let aiTurnWrites=0;                                       // скільки змін уже зробив останній хід агента
+  let aiTurnDone=[];                                        // що САМЕ вже змінено за цей хід — людськими словами
+  /* Рядок «що зроблено» для людини, якщо хід обірветься (тайм-аут, мережа) ПІСЛЯ змін: інакше
+     вона бачить лише «зависла… спробуй ще раз», повторює — і витрата чи блок пишуться вдруге.
+     Порожньо — виклик нічого не змінив (скасувала, «вже було», не знайдено). */
+  function aiDoneLine(name,inp,out){
+    inp=inp||{};
+    const s=String(out==null?'':out).split('\n')[0].trim();
+    if(!s||/^⚠️|скасувал|^вже було|^нічого/.test(s)) return '';
+    if(name==='memory'&&inp.action==='save') return 'запамʼятав: «'+String(inp.text||'').trim().slice(0,60)+'»';
+    if(name==='planner'&&inp.action!=='remind'){
+      const m=/^виконано (\d+) із (\d+)/.exec(s);
+      if(m&&+m[1]===0) return '';
+      const V={create:'додав у планер',move:'переніс у планері',done:'закрив у планері',delete:'видалив із планера'};
+      const names=(Array.isArray(inp.blocks)?inp.blocks:[]).slice(0,4).map(b=>'«'+String(b&&b.t||'').slice(0,30)+'»').join(', ');
+      return (V[inp.action]||'планер')+(names?': '+names:'')+(m&&m[1]!==m[2]?' ('+m[1]+' із '+m[2]+')':'');
+    }
+    return s.slice(0,100);
+  }
   /* «Ціна» виклику для ліміту. planner move/done/delete/remind чіпає НАЯВНІ блоки — кожен
      рахується окремо (раніше один виклик із 15 видаленнями був «1 зміною з 5»). Створення —
      1 за виклик: нове нічого не знищує, шторка й так показує весь перелік, а «сплануй день»
@@ -1273,7 +1296,7 @@
       {type:'text',text:dyn}
     ];
     let toolsUsed=0, writesUsed=0;
-    aiTurnWrites=0;
+    aiTurnWrites=0; aiTurnDone=[];
     aiTraceStart();
     for(let hop=0;hop<6;hop++){
       const cacheTail=aiTokEst(toolsLen+sysStable.length+dyn.length+JSON.stringify(conv).length)>=minC;
@@ -1288,7 +1311,7 @@
         /* Обрізано по стелі (думання + текст не вмістились): кажемо про це прямо, а
            недописаний виклик інструмента не виконуємо — його вхід міг обірватись (AI-8). */
         if(resp.stop_reason==='max_tokens') return (fin+AI_CUT_NOTE).trim();
-        if(resp.stop_reason==='refusal') return ((fin?fin+'\n\n':'')+'⚠️ Модель відмовилась продовжувати цю відповідь. Спробуй сформулювати інакше.').trim();
+        if(resp.stop_reason==='refusal') return (fin+AI_REFUSAL_NOTE).trim();
         return fin||(toolsUsed?'✅ Зроблено.':'Не зміг відповісти — спробуй ще раз.');
       }
       const results=[];
@@ -1305,6 +1328,7 @@
         const ti=aiTraceStep(b.name,b.input);
         const out=await flowToolExec(b.name,b.input);
         aiTraceEnd(ti);
+        if(cost){ const d=aiDoneLine(b.name,b.input,out); if(d) aiTurnDone.push(d); }
         results.push({type:'tool_result',tool_use_id:b.id,
           content:aiToolOut(b.name,out)});
       }

@@ -120,6 +120,9 @@
       const sys=AI_CHAT_SYS+'\n\n'+petPersona()+'\n\n'+spotAddon(ctx)+'\n\nКОНТЕКСТ:\n'+aiCtx();
       spotMsgs.push({role:'user',content:q});
       const raw=await aiCall(sys,spotMsgs.slice(-6));
+      /* Знімаємо одразу: шторка нижче чекає людину, а фоновий aiCall (стискання чату, настрій
+         щоденника) тим часом перезапише глобальний aiLastStop. */
+      const stop=aiLastStop;
       spotMsgs.push({role:'assistant',content:raw});
       const pg=aiParsePage(raw);
       const pr=aiParseBlocks(pg.text);
@@ -135,8 +138,9 @@
         g.notes.forEach(n=>{ done+=`<div class="fs-done">⚠️ ${esc(n)}</div>`; });
       }
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      let say=(pr.text||pg.text||'Готово.').trim();
-      if(aiLastStop==='max_tokens') say+=AI_CUT_NOTE;   // обрубок не має виглядати повною відповіддю (AI-8)
+      let say=(pr.text||pg.text||(stop==='refusal'?'':'Готово.')).trim();
+      if(stop==='max_tokens') say+=AI_CUT_NOTE;   // обрубок не має виглядати повною відповіддю (AI-8)
+      else if(stop==='refusal') say=(say+AI_REFUSAL_NOTE).trim();   // не «Готово.» на відмову
       body.insertAdjacentHTML('beforeend',done+(say?`<div class="fs-msg">${say.replace(/</g,'&lt;')}</div>`:''));
       body.scrollTop=body.scrollHeight;
       try{ aiSpeak(say); }catch(_){}
@@ -802,7 +806,7 @@
     try{ window.platform.haptic('light'); }catch(_){}
     const m={role:'assistant',content:'',streaming:true};
     aiChatMsgs.push(m);
-    let lastPaint=0;
+    let lastPaint=0, viaAgent=false;
     try{
       let sys=AI_CHAT_SYS+'\n\n'+petPersona();
       if(sk) sys+='\n\n'+AI_SKILLS[sk.key].sys;
@@ -826,7 +830,8 @@
         else aiRenderBody();
       };
       let txt, usedW=0;
-      if(aiAgentOn()){
+      viaAgent=aiAgentOn();
+      if(viaAgent){
         // стабільний шар (кешується) окремо від динамічного (персона+контекст)
         let sysStable, sysDyn;
         /* @dev-only:start replace="if(false){} else {" */
@@ -860,12 +865,20 @@
         if(g.notes.length) try{ plToast('⚠️ '+g.notes[0]+(g.notes.length>1?' (+'+(g.notes.length-1)+')':'')); }catch(_){}
       }
     }catch(e){
-      try{ aiTraceFinish(); }catch(_){}   // обірваний хід не має лишати живу картку
+      // обірваний хід не має лишати живу картку; компактний слід — у повідомлення, як і в удалому ході
+      try{ const tr=aiTraceFinish(); if(tr) m.trace=tr; }catch(_){}
       console.error('aiChat',e);
       /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
          а не «поганий URL»; на native поле проксі взагалі приховане. */
       const off = (typeof navigator!=='undefined' && navigator.onLine===false);
-      m.content = off
+      /* Обрив ПІСЛЯ змін (хоп 0 записав, хоп 1 завис): «спробуй ще раз» тут шкідливе — повтор
+         запише витрату чи блок удруге. Кажемо, що вже збережено, і просимо не повторювати цілком. */
+      const done = viaAgent ? aiTurnDone.slice(0,6) : [];
+      m.content = done.length
+        ? '⚠️ Відповідь обірвалась'+(e&&e.timeout?' (зависла)':off?' (немає зв’язку)':'')+', але дещо я вже встиг зробити:\n'
+          +done.map(x=>'• '+x).join('\n')
+          +'\n\nЦе вже збережено. Не повторюй запит цілком — вийде дубль. Попроси лише те, чого тут нема.'
+        : off
         ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
         : (e && e.human) ? '⚠️ '+e.message     // ліміт чи вхід (aiHttpError) — причина відома, URL тут ні до чого
         : (window.FLOW_NATIVE

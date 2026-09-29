@@ -159,18 +159,26 @@
      з дефолтними 2048 довга відповідь обривалась або приходила порожньою (AI-8). 8192 — стеля
      воркера (MAX_TOKENS_CAP); платимо лише за реально витрачені токени, не за стелю. */
   const AI_MAX_TOKENS=8192;
-  const AI_IDLE_MS=60000;              // стільки без жодного байта — і запит вважаємо завислим
+  const AI_IDLE_MS=60000;              // СТРІМ: стільки без жодного байта — і запит вважаємо завислим
+  /* БЕЗ стріму (спот, аналіз «Апгрейду», настрій щоденника, стискання чату) воркер не шле
+     жодного байта, доки модель не допише відповідь: 60 с «тиші» тут — звичайна довга генерація
+     (8192 токени + думання Sonnet 5), а не зависання. Тому окрема межа на весь запит — трохи
+     менша за 180 с, які сам воркер чекає Anthropic (UPSTREAM_TIMEOUT_MS). */
+  const AI_NOSTREAM_MS=170000;
   const AI_CUT_NOTE='\n\n✂️ Відповідь обрізано — не вмістилась у ліміт. Напиши «продовж» або звузь запит.';
+  const AI_REFUSAL_NOTE='\n\n⚠️ Модель відмовилась продовжувати цю відповідь. Спробуй сформулювати інакше.';
   let aiLastStop='';                   // чим закінчилась остання відповідь aiCall (max_tokens → спот допише позначку)
-  function aiTimeoutError(){
-    const e=new Error('Відповідь зависла: '+Math.round(AI_IDLE_MS/1000)+' с без жодних даних. Перевір інтернет і спробуй ще раз.');
+  function aiTimeoutError(ms){
+    const e=new Error('Відповідь зависла: '+Math.round((ms||AI_IDLE_MS)/1000)+' с без жодних даних. Перевір інтернет і спробуй ще раз.');
     e.human=true; e.timeout=true; return e;
   }
-  /* Тайм-аут простою: AI_IDLE_MS без даних (до заголовків чи посеред стріму) → обриваємо запит.
+  /* Тайм-аут простою: ms без даних (до заголовків чи посеред стріму) → обриваємо запит.
+     ms — AI_IDLE_MS для стріму, AI_NOSTREAM_MS для запиту без стріму (там байти йдуть лише в кінці).
      Раніше rd.read() при зміні мережі на телефоні висів вічно, aiBusy лишався true, і чат
      мовчки ігнорував усі наступні повідомлення до перезапуску (AI-8). wait() — гонка з
      таймером: спрацює, навіть якщо fetch не зважає на signal. Кожна порція даних — kick(). */
-  function aiIdleGuard(){
+  function aiIdleGuard(ms){
+    ms=ms||AI_IDLE_MS;
     const ctl=(typeof AbortController!=='undefined')?new AbortController():null;
     let timer=null, rej=null;
     const g={fired:false, rd:null, signal:ctl?ctl.signal:undefined};
@@ -178,14 +186,15 @@
       g.fired=true;
       try{ if(ctl) ctl.abort(); }catch(_){}
       try{ if(g.rd){ const c=g.rd.cancel(); if(c&&c.catch) c.catch(()=>{}); } }catch(_){}
-      if(rej){ const r=rej; rej=null; r(aiTimeoutError()); }
+      if(rej){ const r=rej; rej=null; r(aiTimeoutError(ms)); }
     };
-    g.kick=()=>{ clearTimeout(timer); timer=setTimeout(fire,AI_IDLE_MS); };
+    g.ms=ms;
+    g.kick=()=>{ clearTimeout(timer); timer=setTimeout(fire,ms); };
     g.stop=()=>{ clearTimeout(timer); rej=null; };
     g.wait=p=>new Promise((res,rj)=>{
-      if(g.fired){ rj(aiTimeoutError()); return; }
+      if(g.fired){ rj(aiTimeoutError(ms)); return; }
       rej=rj;
-      Promise.resolve(p).then(v=>{ rej=null; g.kick(); res(v); }, e=>{ rej=null; rj(g.fired?aiTimeoutError():e); });
+      Promise.resolve(p).then(v=>{ rej=null; g.kick(); res(v); }, e=>{ rej=null; rj(g.fired?aiTimeoutError(ms):e); });
     });
     g.kick();
     return g;
@@ -193,7 +202,7 @@
   async function aiCall(sys,messages,onDelta){
     sys=(sys||'')+aiLangDirective();
     const wantStream=typeof onDelta==='function';
-    const g=aiIdleGuard();
+    const g=aiIdleGuard(wantStream?AI_IDLE_MS:AI_NOSTREAM_MS);
     aiLastStop='';
     try{
       const body={system:sys,messages:messages,max_tokens:AI_MAX_TOKENS};
@@ -225,11 +234,12 @@
             }catch(e){ if(String(e.message||'').indexOf('JSON')<0) throw e; }
           }
         }
-        if(g.fired) throw aiTimeoutError();
+        if(g.fired) throw aiTimeoutError(g.ms);
         aiLastStop=stop;
         full=full.trim();
         // людина має бачити, що відповідь не вся, а не приймати обрубок за повну
         if(stop==='max_tokens'){ full+=AI_CUT_NOTE; onDelta(full); }
+        else if(stop==='refusal'){ full=(full+AI_REFUSAL_NOTE).trim(); onDelta(full); }   // інакше в чаті «…»
         return full;
       }
       // ── фолбек: звичайний JSON (старий воркер без стріму) ──
@@ -240,6 +250,7 @@
       else if(typeof data.text==='string') txt=data.text;
       txt=(txt||'').trim();
       if(wantStream&&txt&&aiLastStop==='max_tokens') txt+=AI_CUT_NOTE;
+      if(wantStream&&aiLastStop==='refusal') txt=(txt+AI_REFUSAL_NOTE).trim();
       if(wantStream&&txt) onDelta(txt);
       return txt;
     }finally{ g.stop(); }
