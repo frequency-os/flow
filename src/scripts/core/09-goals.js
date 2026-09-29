@@ -629,12 +629,4 @@
     });
   }
 
-  function currentWeekDates(){
-    const now=new Date();
-    const dow=(now.getDay()+6)%7; // Mon=0
-    const monday=new Date(now); monday.setDate(now.getDate()-dow);
-    const out=[];
-    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); out.push(ymdLocal(d)); }
-    return out;
-  }
 

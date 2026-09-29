@@ -83,10 +83,6 @@
   function vzEditTags(){ inputModal({title:'Теги напрямку (через кому)', value:vzData.tags.join(', '),
     placeholder:'Напр.: 🏡 Переїзд, 💼 Справа, 📱 Frequency',
     onOk:v=>{ vzData.tags=v.split(',').map(s=>s.trim()).filter(Boolean).slice(0,6); vzSave(); renderVision(); }}); }
-  function vzEditWhy(side){ const cur=side==='b'?vzData.why2:vzData.why;
-    inputModal({title:side==='b'?'Нагадування собі (зворот картки)':'Для чого мені це',
-      value:cur, placeholder:side==='b'?'Фраза-якір на важкі дні':'Чесна відповідь: заради чого все це',
-      onOk:v=>{ if(side==='b')vzData.why2=v; else vzData.why=v; vzSave(); renderVision(); }}); }
   function vzEditFocus(){
     inputModal({title:'Мій фокус зараз (одна річ)', value:vzData.focus.title,
       placeholder:'Напр.: Запуск проєкту — 5 угод', onOk:t=>{

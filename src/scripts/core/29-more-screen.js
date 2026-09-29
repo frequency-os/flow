@@ -126,7 +126,6 @@
       if(st==='local-big') return ['error','Завелике для хмари','частина даних (фото) лише тут'];
       return ['idle','Локально','зміни збережено на цьому пристрої'];
     }
-    function ALL_KEYS(){ return (window.FLOW_KEYS||[]).slice(); }
 
     /* ── індикатор пам'яті ──
        localStorage («швидка память») впирається в ~5 МБ — саме він дає банер
@@ -192,6 +191,13 @@
         ? 'Власна іконка встановлена — можна замінити.'
         : 'Не обов’язково: можна додати власну іконку профілю, або лишити фото з Google чи літеру імені.';
       const avHint=`<p class="acc-hint acc-hint-av">${avHintTxt}${customAvatar?' <button class="acc-mini-link" data-acc-av-remove>прибрати</button>':''}</p>`;
+      // журнал помилок (01-crash-screen.js): на телефоні нема консолі — тут видно, що падало
+      const errs=(window.flowErrLog&&window.flowErrLog.list())||[];
+      const errWhen=t=>(window.flowErrLog?window.flowErrLog.when(t):String(t));
+      const errSub=errs.length?(errs.length+' записів · остання '+errWhen(errs[errs.length-1].t)):'порожньо — помилок не було';
+      const errList=errs.length
+        ? errs.slice(-20).reverse().map(e=>`<div class="acc-errlog-i"><b>${escA(errWhen(e.t))}${e.n>1?' ×'+e.n:''}</b> ${escA(e.msg)}${e.src||e.line?` <span>@ ${escA(e.src||'?')}:${+e.line||0}</span>`:''}</div>`).join('')
+        : '<div class="acc-errlog-i">Поки порожньо.</div>';
 
       host.innerHTML=`<div class="acc-wrap">
         <div class="acc-head">
@@ -246,6 +252,20 @@
           <div class="acc-rico">⚙️</div>
           <div class="acc-rtext"><div class="acc-rtitle">Всі налаштування</div></div>
           <span class="acc-chev">›</span>
+        </div>
+        <div class="acc-row" data-acc-errlog-row>
+          <div class="acc-rico">🧾</div>
+          <div class="acc-rtext"><div class="acc-rtitle">Журнал помилок</div><div class="acc-rsub">${escA(errSub)}</div></div>
+          <span class="acc-chev">›</span>
+        </div>
+        <div class="acc-expand" data-acc-errlog-expand hidden>
+          <div class="acc-errlog">${errList}</div>
+          <button class="acc-mini" data-acc-errlog-share>📤 Скопіювати / поділитися</button>
+          <p class="acc-hint">Лише на цьому пристрої: журнал не йде ні в хмару, ні в бекап. Надішли його, коли щось зламалось.</p>
+        </div>
+        <div class="acc-row" data-acc-ver style="cursor:default">
+          <div class="acc-rico">🏷️</div>
+          <div class="acc-rtext"><div class="acc-rtitle">Версія ${escA(window.FLOW_BUILD||'невідома')}</div><div class="acc-rsub">дата і час збірки · код коміту</div></div>
         </div>
       </div>`;
 
@@ -356,6 +376,26 @@
 
       const setRow=host.querySelector('[data-acc-settings-row]');
       if(setRow) setRow.onclick=()=>{ if(window.openSettingsSheet) window.openSettingsSheet(); };
+
+      const elRow=host.querySelector('[data-acc-errlog-row]');
+      if(elRow) elRow.onclick=()=>toggle('[data-acc-errlog-expand]');
+      const elShare=host.querySelector('[data-acc-errlog-share]');
+      // спершу системне «Поділитися» (телефон), інакше — буфер обміну (Mac),
+      // а якщо й він закритий — кладемо текст у поле й виділяємо: скопіювати руками
+      if(elShare) elShare.onclick=async (e)=>{
+        e.stopPropagation();
+        const txt=window.flowErrLog?window.flowErrLog.text():'Журнал недоступний';
+        if(navigator.share){
+          try{ await navigator.share({title:'Frequency — журнал помилок', text:txt}); return; }
+          catch(err){ if(err&&err.name==='AbortError') return; }
+        }
+        try{ await navigator.clipboard.writeText(txt); flowAlert('📋 Журнал скопійовано — встав його в повідомлення.'); return; }catch(_){}
+        const box=host.querySelector('.acc-errlog'); if(!box) return;
+        const ta=document.createElement('textarea'); ta.readOnly=true; ta.className='acc-errlog-ta'; ta.value=txt;
+        box.replaceChildren(ta); try{ ta.focus(); ta.select(); }catch(_){}
+        const hint=host.querySelector('[data-acc-errlog-expand] .acc-hint');
+        if(hint) hint.textContent='Автоматично скопіювати не вийшло — текст виділено вище, скопіюй його вручну.';
+      };
 
       // власна іконка профілю: тап по аватарці/олівцю відкриває вибір фото
       const avFile=host.querySelector('[data-acc-av-file]');

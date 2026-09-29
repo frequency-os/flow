@@ -9,9 +9,6 @@
     try{ const p=window.storage.set(WORKKEY,JSON.stringify(workSessions),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){}
     try{ const q=window.storage.set(WORKCFGKEY,JSON.stringify({rate:workRate,cur:workCur,payday:workPayday,postedSal:workPostedSal,cardId:workCardId}),false); if(q&&q.catch)q.catch(()=>{}); }catch(_){}
   }
-  function workHoursTotal(){ return workSessions.reduce((s,w)=>s+(+w.hours||0),0); }
-  function workEarnedTotal(){ return workSessions.reduce((s,w)=>s+(+w.amount||0),0); }
-  function workSummary(){ return workSessions.length? fmt(workEarnedTotal())+' '+(CUR[workCur]||workCur) : '—'; }
   function workHoursOn(ds){ return workSessions.filter(w=>w.date===ds).reduce((s,w)=>s+(+w.hours||0),0); }
   function workSessionsIn(ym){ return workSessions.filter(w=>String(w.date).slice(0,7)===ym); }
 
@@ -111,15 +108,6 @@
   { const bg=document.getElementById('wkmBack'); if(bg) bg.onclick=(e)=>{ if(e.target===bg) wkmClose(); }; }
   { const n=document.getElementById('wkmNote'); if(n) n.addEventListener('keydown',e=>{ if(e.key==='Enter') wkmSave(); }); }
 
-  function workUpdatePreview(){
-    const r=parseFloat((document.getElementById('wkRate').value||'').replace(',','.'))||0;
-    const h=parseFloat((document.getElementById('wkHrsInput').value||'').replace(',','.'))||0;
-    const cur=document.getElementById('wkCur').value;
-    const sym=CUR[cur]||cur;
-    const el=document.getElementById('wkPreview');
-    if(r>0&&h>0){ el.innerHTML=`<b style="color:var(--hab)">${fmt(r*h)} ${sym}</b> за ${fmt(h)} год · ${fmt(r)} ${sym}/год`; }
-    else{ el.textContent='Впиши ставку й години — порахую заробіток сам.'; }
-  }
 
   function ymOffset(ym,off){
     const [y,m]=ym.split('-').map(Number);
@@ -482,13 +470,6 @@
     }
     workSessions=workSessions.filter(x=>String(x.id)!==String(id));
     saveWork(); renderWork(); try{ renderFinance(); }catch(_){}
-  }
-  function clearWork(){
-    confirmSheet({title:'Видалити всі зміни?', sub:'Пов’язані доходи у фінансах теж приберуться.', onOk:()=>{
-    const ids=workSessions.filter(w=>w.opId).map(w=>w.opId);
-    if(ids.length){ finOps=finOps.filter(o=>!ids.includes(o.id)); saveFinOps(); }
-    workSessions=[]; saveWork(); renderWork(); try{ renderFinance(); }catch(_){}
-    }});
   }
   function clearWorkMonth(){
     const mName=WK_MONTHS[parseInt(workMonth.slice(5,7))-1]+' '+workMonth.slice(0,4);

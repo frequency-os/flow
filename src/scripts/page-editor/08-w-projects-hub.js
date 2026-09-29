@@ -803,7 +803,6 @@
       clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} }
     };
   }catch(_){}
-  function pgHasCov(){ try{ return !!covers[covKey()]; }catch(_){ return false; } }
   function covKey(){ try{ return (bridge()&&bridge().curKey())||''; }catch(_){ return ''; } }
   function covMenuHTML(){
     var sw=COV_GRADS.map(function(g,i){

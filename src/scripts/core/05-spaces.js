@@ -330,52 +330,6 @@
       wb.onclick=()=>setZen(!pg.classList.contains('pg-zen'));
     } }
 
-  // ── бекап: експорт/імпорт усіх даних у файл (шлях до iCloud Drive через «Файли») ──
-  (function(){
-    var ex=document.getElementById('bkpExport'), im=document.getElementById('bkpImport'), note=document.getElementById('bkpNote');
-    if(!ex||!im)return;
-    function setNote(t){ if(note)note.textContent=t; }
-    ex.onclick=function(){
-      try{
-        var data={_flow_backup:1, ts:new Date().toISOString(), keys:{}};
-        for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); data.keys[k]=localStorage.getItem(k); }
-        var json=JSON.stringify(data);
-        var name='flow-backup-'+ymdLocal()+'.json';
-        var blob=new Blob([json],{type:'application/json'});
-        var file=null; try{ file=new File([blob],name,{type:'application/json'}); }catch(_){}
-        if(file && navigator.canShare && navigator.canShare({files:[file]})){
-          navigator.share({files:[file],title:'Frequency бекап'})
-            .then(function(){ setNote('Готово. У шиті обери «Зберегти у Файли» → iCloud Drive.'); })
-            .catch(function(){ setNote('Скасовано.'); });
-          return;
-        }
-        var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
-        document.body.appendChild(a); a.click(); a.remove();
-        setNote('Файл завантажено ('+Math.round(json.length/1024)+' КБ).');
-      }catch(e){ setNote('Не вдалося: '+((e&&e.message)||e)); }
-    };
-    im.onclick=function(){
-      var inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
-      inp.onchange=function(){
-        var f=inp.files&&inp.files[0]; if(!f)return;
-        var rd=new FileReader();
-        rd.onload=function(){
-          try{
-            var data=JSON.parse(rd.result);
-            if(!data||data._flow_backup!==1||!data.keys){ setNote('Це не файл бекапу Flow.'); return; }
-            var n=Object.keys(data.keys).length;
-            if(!confirm('Відновити бекап від '+(data.ts?data.ts.slice(0,16).replace('T',' '):'?')+'? Поточні дані на цьому пристрої буде замінено ('+n+' ключів).'))return;
-            Object.keys(data.keys).forEach(function(k){ try{ localStorage.setItem(k,data.keys[k]); }catch(_){} });
-            setNote('Відновлено. Перезавантажую…');
-            setTimeout(function(){ location.reload(); },600);
-          }catch(e){ setNote('Помилка читання: '+((e&&e.message)||e)); }
-        };
-        rd.readAsText(f);
-      };
-      inp.click();
-    };
-  })();
-
   // ── десктопний сайдбар: ті самі дії, що й мобільна навігація ──
   document.querySelectorAll('.dsb-i').forEach(b=>b.onclick=()=>{
     const k=b.dataset.dnav;

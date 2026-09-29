@@ -10,7 +10,6 @@
   const CUSTOM_AV_KEY='custom_avatar_v1';
   let customAvatar='';
   function saveCustomAvatar(){ try{ const p=window.storage.set(CUSTOM_AV_KEY, customAvatar||'', false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
-  function customAvatarHtml(){ return customAvatar? `<img src="${customAvatar}" alt="">` : ''; }
   const FKEY='folders_cfg', FOKEY='folders_order';
   const FOLDER_COLORS=['#e8843c','#34c77b','#5b8def','#c77dff','#ff6b9d','#4ecdc4','#f0b429','#9b8cff','#ff5a5f','#2dd4bf'];
   const FOLDER_EMOJIS=['📁','💰','🏃','⭐','📚','🎯','💡','❤️','🏠','✈️','🍎','💪','🧠','🎨','🎵','📈'];
@@ -152,25 +151,12 @@
   let folderWidgets={}; // { folderKey: ['worktrack', ...] }
   const FWKEY='folder_widgets';
   function saveFolderWidgets(){ try{ const p=window.storage.set(FWKEY,JSON.stringify(folderWidgets),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
-  function widgetsForFolder(key){
-    // вбудовані (з folders[key].widgets) + додані вручну
-    const built=(folders[key]&&folders[key].widgets||[]).map(w=>w.id);
-    const added=folderWidgets[key]||[];
-    // унікальні, у порядку: вбудовані, потім додані
-    const seen={}; const out=[];
-    built.concat(added).forEach(id=>{ if(!seen[id] && WIDGET_CATALOG[id]){ seen[id]=1; out.push(id); } });
-    return out;
-  }
   function addWidgetToFolder(key,id){
     if(!WIDGET_CATALOG[id]) return;
     if(!folderWidgets[key]) folderWidgets[key]=[];
     if(!folderWidgets[key].includes(id) && !((folders[key]&&folders[key].widgets||[]).some(w=>w.id===id))){
       folderWidgets[key].push(id); saveFolderWidgets();
     }
-  }
-  function removeWidgetFromFolder(key,id){
-    if(folderWidgets[key]) folderWidgets[key]=folderWidgets[key].filter(x=>x!==id);
-    saveFolderWidgets();
   }
 
   function orderedFolderKeys(){
