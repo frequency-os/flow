@@ -16,7 +16,7 @@
 | Файлів JS | 68 |
 | Рядків JS | 27282 |
 | Файлів CSS | 32 |
-| Рядків CSS | 8630 |
+| Рядків CSS | 8633 |
 | Сутностей верхнього рівня | 1689 |
 | Ключів сховища (FLOW_KEYS) | 70 |
 
@@ -123,7 +123,7 @@
 | `src/styles/core/10-reader-blocks.css` | 461 | 4 |
 | `src/styles/core/11-spaces-desktop.css` | 211 | 0 |
 | `src/styles/core/12-pets-more-planner.css` | 1206 | 0 |
-| `src/styles/core/13-search-capture.css` | 81 | 0 |
+| `src/styles/core/13-search-capture.css` | 84 | 0 |
 | `src/styles/core/15-vision.css` | 172 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
