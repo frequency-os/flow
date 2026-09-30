@@ -827,10 +827,19 @@
         if(ae && (ae.tagName==='INPUT' || ae.tagName==='TEXTAREA' || ae.isContentEditable)) return;
       }catch(_){}
       sbLastPull = Date.now();
+      if(await sbPullAndLoad()){ try{ sbPhotoSync(); }catch(_){} }   // заразом доштовхнути фото, що чекають
+    }
+    /* Звірка з хмарою І перечитування в памʼять, якщо там новіше. Окремо від
+       sbPullFresh (без паузи 30 с і перевірки фокуса), бо потрібна ще й бекапу:
+       раніше makeFile тихо оновлював кеш через sbPrefetchAll — мітки зсувались,
+       наступний пул уже не бачив змін, екран і памʼять лишались старими, і перша
+       ж правка на цьому пристрої (saveBoard пише всю дошку) затирала хмару.
+       Правило: хто оновлює кеш і мітки хмари, той і перечитує дані (__load). */
+    async function sbPullAndLoad(){
+      if(!sb || !sbUserCache) return false;
       const before = Object.assign({}, sbBatchTs);  // час-мітки хмари ДО звірки
       let ok=false; try{ ok = await sbPullChanged(); }catch(_){}
-      if(!ok) return;
-      try{ sbPhotoSync(); }catch(_){}   // заразом доштовхнути фото, що чекають
+      if(!ok) return false;
       let changed = false;
       for(const k in sbBatchTs){
         const cloudTs = sbBatchTs[k]||0;
@@ -840,13 +849,15 @@
       // хмара відповіла, а міграції цієї сесії ще відкладені (стартували, поки вона мовчала) —
       // перечитуємо, навіть якщо нового нема: інакше вони чекали б до наступного запуску
       let migWait=false; try{ migWait=!!(window.__flowMigDeferred && window.__flowMigDeferred()); }catch(_){}
-      if(!changed && !migWait) return;
+      if(!changed && !migWait) return true;
       try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
       try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
       try{ if(window.__setSync){ window.__flowSync.last=Date.now(); window.__setSync('synced'); } }catch(_){}
+      return true;
     }
     window.sbPullFresh = sbPullFresh;
+    window.sbPullAndLoad = sbPullAndLoad;
     document.addEventListener('visibilitychange', ()=>{
       if(document.visibilityState==='visible') sbPullFresh();
     });
@@ -1128,9 +1139,11 @@
        файлом); 'auto' — zip лише якщо фото є; інакше — звичайний .json. */
     async function makeFile(opts){
       opts = opts || {};
-      // хмара могла змінитись після останньої звірки — освіжаємо, щоб бекап збігся з екраном
-      if(window.sbUser && window.sbUser() && window.sbPrefetchAll){
-        try{ await Promise.race([ window.sbPrefetchAll(), new Promise(r=>setTimeout(r, 8000)) ]); }catch(_){}
+      // хмара могла змінитись після останньої звірки — освіжаємо, щоб бекап збігся з екраном.
+      // Саме звірка з перечитуванням (як пул при фокусі), а не голий sbPrefetchAll:
+      // той зсував мітки без __load, і свіжа правка з телефона потім затиралась старою памʼяттю
+      if(window.sbUser && window.sbUser() && window.sbPullAndLoad){
+        try{ await Promise.race([ window.sbPullAndLoad(), new Promise(r=>setTimeout(r, 8000)) ]); }catch(_){}
       }
       const stamp = ymdLocal();
       let ps = null;
@@ -1192,6 +1205,9 @@
           }
         }catch(e){
           if(e && e.name==='AbortError') return cancelled;
+          // в обгортці застосунку <a download> нижче нічого не пише — не вдаємо, що файл
+          // «передано на завантаження»: скидання спитало б «файл є?», а його нема
+          if(window.FLOW_NATIVE) return { ok:false, name, error:'аркуш «Поділитися» не відкрився ('+((e&&e.name)||'помилка')+') — файл не записано' };
         }
       }
       // 3) звичайне завантаження — останній варіант, результат невідомий
@@ -1204,13 +1220,31 @@
         return { ok:true, saved:false, how:'download', name };
       }catch(e){ return { ok:false, error:String(e) }; }
     }
-    // Експорт: зібрати файл (opts.photos — див. makeFile) і зберегти його
-    async function exportToFile(opts){
-      let f;
-      try{ f = await makeFile(opts); }catch(e){ return { ok:false, error:String((e&&e.message)||e) }; }
+    // Зберегти вже зібраний файл (з makeFile) — викликати прямо з натискання
+    async function saveFile(f){
       const r = await saveBlob(f);
       r.photos = f.photos; r.bytes = f.blob.size;
       return r;
+    }
+    /* Чи ще діє дозвіл від натискання (user activation). Аркуш «Поділитися» і
+       діалог «Зберегти як…» відкриваються лише одразу після дотику, а перед ними
+       тепер звірка з хмарою (до 8 с) і пакування zip. Якщо дозвіл минув, на iPhone
+       share кидав помилку і все падало в <a download>, який в обгортці нічого не
+       пише, — а скидання питало «файл є?». Де браузер не каже напевно — вважаємо
+       свіжим лише перші 800 мс. */
+    function tapStillFresh(t0){
+      try{ const ua = navigator.userActivation; if(ua && typeof ua.isActive==='boolean') return ua.isActive; }catch(_){}
+      return Date.now()-t0 < 800;
+    }
+    // Експорт: зібрати файл (opts.photos — див. makeFile) і зберегти його.
+    // Дозвіл від натискання минув, поки збирали, — повертаємо крок 'tap' з готовим
+    // файлом: екран покаже кнопку «Зберегти», і її свіжий дотик відкриє аркуш.
+    async function exportToFile(opts){
+      const t0 = Date.now();
+      let f;
+      try{ f = await makeFile(opts); }catch(e){ return { ok:false, error:String((e&&e.message)||e) }; }
+      if(!tapStillFresh(t0)) return { ok:false, step:'tap', file:f, name:f.name, photos:f.photos, bytes:f.blob.size };
+      return saveFile(f);
     }
 
     // Аварійний знімок у самій localStorage (на випадок "зламав — відкоти")
@@ -1395,7 +1429,7 @@
       return applyInspected(ins, {makeSafetyCopy:true});
     }
 
-    window.flowBackup = { collect, stats, photoStats, makeFile, exportToFile, inspectFile, applyInspected,
+    window.flowBackup = { collect, stats, photoStats, makeFile, saveFile, exportToFile, inspectFile, applyInspected,
                           importFromFile, snapshot, restoreSnapshot, FORMAT };
   })();
 
@@ -1419,8 +1453,11 @@
     //    викличе нас знову з backupConfirmed:true (без повторного експорту).
     //    Фото (PhotoDB) скидання теж стирає — тож якщо вони є, бекап іде zip-ом
     //    разом із ними. Книжки (BookDB) не беремо: вони великі, їх завантажують знову.
+    //    Крок 'tap': файл зібрано, але дозвіл від натискання минув (звірка з хмарою,
+    //    zip) — екран дає кнопку «Зберегти» і кличе нас знову з o.file (вже зібраним).
     if(!o.backupConfirmed){
-      const bk = await window.flowBackup.exportToFile({photos:'auto'});
+      const bk = o.file ? await window.flowBackup.saveFile(o.file) : await window.flowBackup.exportToFile({photos:'auto'});
+      if(bk && bk.step==='tap') return bk;
       if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
       if(!bk.saved) return { ok:false, step:'backup-confirm', name:bk.name, error:'не видно, чи файл бекапу збережено' };
     }

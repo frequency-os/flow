@@ -311,9 +311,11 @@
       // Бекап перед стиранням не беремо на віру: якщо файл лише віддано браузеру
       // на завантаження (перевірити нема як), людина мусить сама підтвердити,
       // що бачить його, — інакше «єдина копія» могла б не існувати.
-      const runReset=async (wipeCloud, stopMsg)=>{
-        const r=await window.flowFactoryReset({wipeCloud});
+      // file — уже зібраний бекап із кроку 'tap' (див. askTap нижче)
+      const runReset=async (wipeCloud, stopMsg, file)=>{
+        const r=await window.flowFactoryReset({wipeCloud, file});
         if(r.ok) return;
+        if(r.step==='tap'){ askTap(r, ()=>runReset(wipeCloud, stopMsg, r.file)); return; }
         if(r.step!=='backup-confirm'){ flowAlert(stopMsg+r.error); return; }
         setTimeout(()=>{ confirmSheet({title:'Файл бекапу зберігся?',
           sub:'Браузер не каже, чи «'+r.name+'» справді записано. Перевір «Завантаження»: без цього файла стерте не повернути.',
@@ -345,8 +347,18 @@
           }});
       };
       const mb=n=>n>=1048576?(n/1048576).toFixed(1)+' МБ':Math.max(1,Math.round(n/1024))+' КБ';
+      /* Бекап зібрано, але дозвіл від натискання минув, поки звіряли хмару й пакували
+         фото: аркуш «Поділитися» (iPhone) чи «Зберегти як…» (Mac) відкриються лише з
+         нового дотику. Тому окрема кнопка — її onClick одразу віддає готовий файл. */
+      const askTap=(r, onTap)=>setTimeout(()=>actionSheet({ title:'Бекап готовий',
+        sub:'Файл «'+r.name+'»'+(r.photos?' (разом із '+r.photos+' фото, '+mb(r.bytes||0)+')':'')+' зібрано. Натисни «Зберегти файл» і вибери, куди його покласти.',
+        items:[{ ic:'down', label:'Зберегти файл', primary:true, onClick:onTap }], cancel:'Скасувати' }), 350);
       const exportRun=async (photos)=>{
         const r=await window.flowBackup.exportToFile(photos?{photos:true}:null);
+        if(r.step==='tap'){ askTap(r, async ()=>exportTell(await window.flowBackup.saveFile(r.file))); return; }
+        exportTell(r);
+      };
+      const exportTell=(r)=>{
         const what=r.photos?' (разом із '+r.photos+' фото, '+mb(r.bytes||0)+')':'';
         // «✅ Збережено» — лише коли файл точно записано; інакше кажемо як є
         if(r.ok && r.saved) flowAlert('✅ Збережено: '+r.name+what+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');

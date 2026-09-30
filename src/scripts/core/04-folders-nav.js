@@ -238,13 +238,37 @@
     folderTombs=merged;
     if(!foldersLoaded) return 0;
     if(!tombsSame(merged, got)) saveFolderTombs();
-    let n=0;
+    const purged=[];
     Object.keys(folderTombs.ids).forEach(k=>{
       if(folders[k] && !folders[k].custom) return;     // вбудовані папки видаляти не можна
-      if(folderPurge(k)) n++;
+      if(folderPurge(k)) purged.push(k);
     });
+    const n=purged.length;
     if(n){ saveFolders({auto:true}); console.warn('[Flow] прибрано папок, видалених на іншому пристрої:', n); }
+    try{ leaveTombedFolder(purged); }catch(e){ console.error('leaveTombedFolder',e); }
     return n;
+  }
+  /* Папку видалили на іншому пристрої, поки вона відкрита тут. Без цього на
+     екрані лишався її документ, а boardKey вказував на неї — syncBlocks()
+     знову заводив boards[key]=[], і все дописане йшло в невидиму дошку-сироту
+     (та ще й щоразу поверталось у хмару). Скидаємо вказівники ДО syncBlocks
+     у load() і, якщо людина саме в цій папці, повертаємо на Огляд із поясненням.
+     purged — папки, прибрані щойно (тобто видалені деінде): лише про них тост. */
+  function leaveTombedFolder(purged){
+    const gone=k=>!!k && folderTombed(k) && !folders[k];
+    const bBase=String(boardKey||'').split('__sp_')[0];
+    const onBoard=gone(bBase), onFolder=gone(currentFolderKey);
+    if(!onBoard && !onFolder) return false;
+    const act=document.querySelector('.screen.active');
+    // документ папки (scr-page) показує саме boardKey; інші екрани її вмісту не тримають
+    const visible=!!(act && act.id==='scr-page' && onBoard);
+    if(onBoard){ delete boards[boardKey]; boardKey='all'; }
+    if(onFolder) currentFolderKey=null;
+    if(visible){
+      goHome();
+      if((purged||[]).indexOf(bBase)>=0){ try{ plToast('Папку видалено на іншому пристрої'); }catch(_){} }
+    }
+    return true;
   }
 
   /* ===== додані віджети папок (спільні дані, різні входи) ===== */
