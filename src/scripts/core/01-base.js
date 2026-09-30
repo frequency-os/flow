@@ -99,6 +99,17 @@
   }
   window.safeEmoji = safeEmoji;
 
+  /* Колір із даних (папка, чат, ціль, конверт) іде просто в style="…".
+     Його теж може написати модель або принести хмара, і рядок на кшталт
+     «red"><img …>» вийшов би за межі атрибута. Пропускаємо лише те, що
+     справді буває кольором у нас: #hex, rgb()/rgba() з числами і var(--…). */
+  function safeColor(c, def){
+    const t = String(c==null?'':c).trim();
+    if(/^#[0-9a-f]{3,8}$/i.test(t) || /^rgba?\([\d\s.,%\/]+\)$/i.test(t) || /^var\(--[\w-]+\)$/.test(t)) return t;
+    return def==null ? '' : def;
+  }
+  window.safeColor = safeColor;
+
   /* ============ РЕЄСТР КЛЮЧІВ СХОВИЩА — єдине джерело правди ============
      Новий ключ додаєш ТУТ (і за потреби версію в SCHEMAS).
      Звідси беруться prefetchAll на старті та перше перенесення в нативне
@@ -107,7 +118,7 @@
      (work_sessions/work_cfg/work_extras/work_blocks) та канвас-простори
      взагалі не потрапляли в бекап. */
   window.FLOW_KEYS = [
-    'ui_mode','ai_endpoint','ai_chat','ai_memory','ai_prompts',
+    'ui_mode','ai_endpoint','ai_chat','ai_memory','ai_prompts','ai_privacy_v1',
     'folders_cfg','folders_order','folder_widgets','switcher_style',
     'spaces_map_v2','active_space_map_v2',
     'goals_data','values_state','wishes_board',

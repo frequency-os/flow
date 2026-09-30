@@ -30,7 +30,7 @@
       +'\nFLOW_PAGE:{"page":[{"type":"h2","text":"Заголовок"},{"type":"note","text":"абзац"},{"type":"bullet","text":"пункт"},{"type":"num","text":"крок"},{"type":"task","text":"завдання"},{"type":"quote","text":"цитата"},{"type":"callout","text":"порада","emo":"💡"},{"type":"divider"},{"type":"table","cols":["Колонка1","Колонка2"],"rows":[["a","b"]]}]}'
       +'\nДозволені type лише з прикладу. Не описуй JSON словами і не обгортай у ```.';
     } else {
-      a+='\nЗапис у сторінки тут недоступний — для планера використовуй стандартний FLOW_BLOCKS.';
+      a+='\nЗапис у сторінки тут недоступний — для планера використовуй стандартний рядок FLOW_OPS.';
     }
     a+='\nЗмінювати самі фінансові записи ти поки не вмієш — якщо просять, чесно скажи і запропонуй блок у планер чи нотатку.';
     return a;
@@ -120,6 +120,9 @@
       const sys=AI_CHAT_SYS+'\n\n'+petPersona()+'\n\n'+spotAddon(ctx)+'\n\nКОНТЕКСТ:\n'+aiCtx();
       spotMsgs.push({role:'user',content:q});
       const raw=await aiCall(sys,spotMsgs.slice(-6));
+      /* Знімаємо одразу: шторка нижче чекає людину, а фоновий aiCall (стискання чату, настрій
+         щоденника) тим часом перезапише глобальний aiLastStop. */
+      const stop=aiLastStop;
       spotMsgs.push({role:'assistant',content:raw});
       const pg=aiParsePage(raw);
       const pr=aiParseBlocks(pg.text);
@@ -135,15 +138,18 @@
         g.notes.forEach(n=>{ done+=`<div class="fs-done">⚠️ ${esc(n)}</div>`; });
       }
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      const say=(pr.text||pg.text||'Готово.').trim();
+      let say=(pr.text||pg.text||(stop==='refusal'?'':'Готово.')).trim();
+      if(stop==='max_tokens') say+=AI_CUT_NOTE;   // обрубок не має виглядати повною відповіддю (AI-8)
+      else if(stop==='refusal') say=(say+AI_REFUSAL_NOTE).trim();   // не «Готово.» на відмову
       body.insertAdjacentHTML('beforeend',done+(say?`<div class="fs-msg">${say.replace(/</g,'&lt;')}</div>`:''));
       body.scrollTop=body.scrollHeight;
       try{ aiSpeak(say); }catch(_){}
     }catch(e){
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">⚠️ Не вдалось: ${String(e.message||e).replace(/</g,'&lt;')}</div>`);
+      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">${e&&e.aiOff?'':'⚠️ Не вдалось: '}${String(e.message||e).replace(/</g,'&lt;')}</div>`);
+    }finally{
+      spotBusy=false; if(cap) cap.classList.remove('busy');   // що б не сталось — спот знову приймає питання
     }
-    spotBusy=false; if(cap) cap.classList.remove('busy');
   }
   async function spotMicToggle(){
     const btn=document.querySelector('#flowSpot .fs-mic');
@@ -387,8 +393,8 @@
     });
     (pr.folders||[]).forEach(f=>{
       const isP=f.role==='project';
-      const wc=Array.isArray(f.widgets)?f.widgets.filter(w=>['worktrack','income','spend','debts','envelopes','patterns','planday','planmonth'].includes(String(w))).length:0;
-      const meta=[isP?'проєкт':'папка', f.due?('до '+esc(f.due)):'', wc?(wc+' віджет'+(wc===1?'':'и')):''].filter(Boolean).join(' · ');
+      // віджетів папка ніде не показує — прев'ю їх і не рахує, щоб не обіцяти порожнечу (UX-4)
+      const meta=[isP?'проєкт':'папка', f.due?('до '+esc(f.due)):''].filter(Boolean).join(' · ');
       rows.push(`<div class="ai-act goal"><span class="ic">${aiIco(isP?'target':'folder',13)}</span><span class="tx">${isP?'Проєкт':'Папка'} «${esc(f.name||'')}»<small>${meta}</small></span></div>`);
     });
     (pr.move||[]).forEach(mv=>{
@@ -434,7 +440,7 @@
       +tr.shelf.map(x=>{
         const go=AI_SHELF_GO[x.k];
         return `<div class="ai-shc sh-${esc(x.k)}"${go?` data-shgo="${go}"`:''}>
-          <div class="th"><i class="l1"></i><i class="l2"></i><i class="bk"></i><span>${x.e||'📄'}</span></div>
+          <div class="th"><i class="l1"></i><i class="l2"></i><i class="bk"></i><span>${esc(x.e||'📄')}</span></div>
           <b>${esc(x.name)}</b><small>${esc(x.meta||'розділ')}</small></div>`;
       }).join('')+`</div>`;
   }
@@ -590,6 +596,7 @@
       const f=inp.files&&inp.files[0]; if(!f) return;
       try{
         if(/^image\//.test(f.type)){
+          if(aiSectionOff('photos')){ plToast('🔒 Фото закрито від AI — Ще → AI і приватність'); return; }
           plToast('⏳ Стискаю фото…');
           const data=await aiImgShrink(f);
           aiAttach.push({kind:'image',media:'image/jpeg',data:data,name:f.name});
@@ -757,8 +764,8 @@
       sys:'СКІЛ /розбір: чесний аналіз без пощади і без моралі. Де самообман, де реальний прогрес. Заверши одним питанням, яке людина уникає.'},
     'фінанси':{ico:'cash',t:'Фінанси',ctx:['fin','goals'],q:'Подивись на мої фінанси цього місяця і скажи, що не так і що зробити',
       sys:'СКІЛ /фінанси: аналіз грошей місяця з контексту. Головний витік, стан конвертів відносно цілей, одна конкретна дія з сумою.'},
-    'проєкт':{ico:'folder',t:'Новий проєкт',ctx:['goals'],q:'Допоможи оформити новий проєкт: спитай одне-два уточнення, тоді створи папку-проєкт з дедлайном і доречними віджетами',
-      sys:'СКІЛ /проєкт: людина хоче новий проєкт. Якщо ціль/тема ясна з контексту — одразу створи через folders з role:"project", доречним due і 1-3 віджетами. Якщо ні — постав одне коротке уточнення і зупинись. Не перевантажуй віджетами.'}
+    'проєкт':{ico:'folder',t:'Новий проєкт',ctx:['goals'],q:'Допоможи оформити новий проєкт: спитай одне-два уточнення, тоді створи папку-проєкт з дедлайном',
+      sys:'СКІЛ /проєкт: людина хоче новий проєкт. Якщо ціль/тема ясна з контексту — одразу створи через folders з role:"project" і доречним due; за потреби додай сторінку з першими кроками. Якщо ні — постав одне коротке уточнення і зупинись. Віджетів у папці немає — не обіцяй їх.'}
   };
   function aiSkillFor(q){
     if(q[0]!=='/') return null;
@@ -770,18 +777,27 @@
   let aiSumBusy=false;
   async function aiMaybeSummarize(){
     if(aiSumBusy||aiChatMsgs.length<28) return;
+    if(!aiAllowed()) return;   // фонове стискання: після «Не зараз» не питаємо згоду вдруге
     aiSumBusy=true;
     try{
       const old=aiChatMsgs.slice(0,aiChatMsgs.length-16);
       const dlg=old.map(m=>(m.role==='user'?'Я: ':'Флоу: ')+aiStreamText(m.content).slice(0,300)).join('\n');
       const s=await aiCall('Стисни діалог у резюме до 500 символів українською: факти про людину, рішення, домовленості, незакриті теми. Без води, без markdown. Якщо є попереднє резюме — обʼєднай.',
-        [{role:'user',content:(aiSum?'ПОПЕРЕДНЄ РЕЗЮМЕ: '+aiSum+'\n\n':'')+'ДІАЛОГ:\n'+dlg}]);
+        [{role:'user',content:(aiSum?'ПОПЕРЕДНЄ РЕЗЮМЕ: '+aiSum+'\n\n':'')+'ДІАЛОГ:\n'+dlg}], null, {bg:true});
       if(s){ aiSum=s.slice(0,1600); aiChatMsgs=aiChatMsgs.slice(-16); aiChatSave(); }
-    }catch(e){ console.error('aiSum',e); }
+    }catch(e){ if(!(e&&e.aiOff)) console.error('aiSum',e); }
     aiSumBusy=false;
   }
   async function aiChatSend(q){
     q=(q||'').trim(); if(!q&&!aiAttach.length) return; if(aiBusy) return;
+    /* фото прикріпили ще до того, як закрили розділ «Фото»: не шлемо і кажемо
+       про це — інакше AI отримав би «прочитай вкладення» без вкладення */
+    if(aiSectionOff('photos') && aiAttach.some(a=>a.kind==='image')){
+      for(let i=aiAttach.length-1;i>=0;i--) if(aiAttach[i].kind==='image') aiAttach.splice(i,1);
+      aiAttachRender();
+      plToast('🔒 Фото закрито від AI — знімок не надіслано');
+      if(!q&&!aiAttach.length) return;
+    }
     const inp=document.getElementById('aiInput'); if(inp){ inp.value=''; inp.placeholder='Напиши '+FLOW_PETS[petCur()].name+'…'; }
     aiSlashHide();
     let sk=aiSkillFor(q);
@@ -800,7 +816,7 @@
     try{ window.platform.haptic('light'); }catch(_){}
     const m={role:'assistant',content:'',streaming:true};
     aiChatMsgs.push(m);
-    let lastPaint=0;
+    let lastPaint=0, viaAgent=false;
     try{
       let sys=AI_CHAT_SYS+'\n\n'+petPersona();
       if(sk) sys+='\n\n'+AI_SKILLS[sk.key].sys;
@@ -809,7 +825,8 @@
       if(att.length){ // останнє user-повідомлення стає мультимодальним
         const blocks=[];
         att.forEach(a=>{
-          if(a.kind==='image') blocks.push({type:'image',source:{type:'base64',media_type:a.media,data:a.data}});
+          // фото, прикріплене до того, як людина закрила розділ «Фото», теж не йде
+          if(a.kind==='image'){ if(!aiSectionOff('photos')) blocks.push({type:'image',source:{type:'base64',media_type:a.media,data:a.data}}); }
           else if(a.kind==='pdf') blocks.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:a.data}});
           else if(a.kind==='text') blocks.push({type:'text',text:'ФАЙЛ «'+(a.name||'txt')+'»:\n'+a.text});
         });
@@ -824,16 +841,17 @@
         else aiRenderBody();
       };
       let txt, usedW=0;
-      if(aiAgentOn()){
+      viaAgent=aiAgentOn();
+      if(viaAgent){
         // стабільний шар (кешується) окремо від динамічного (персона+контекст)
         let sysStable, sysDyn;
         /* @dev-only:start replace="if(false){} else {" */
         if(aiDevOn()){
-          sysStable=AI_DEV_SYS;
+          sysStable=aiDevSys();
           sysDyn=aiDevCtx();
         } else {
         /* @dev-only:end */
-          sysStable=AI_CHAT_SYS+AI_AGENT_ADDON;
+          sysStable=AI_CORE_SYS+AI_AGENT_ADDON;   // без мертвого FLOW_OPS/FLOW_MEM (AI-5)
           sysDyn=petPersona();
           if(sk) sysDyn+='\n\n'+AI_SKILLS[sk.key].sys;
           sysDyn+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
@@ -846,7 +864,8 @@
       }
       m.content=txt||'…'; delete m.streaming;
       const pr=aiParseBlocks(m.content);
-      if(pr.mem.length) aiMemAdd(pr.mem);
+      // факти в памʼять — лише через шторку і в залишок ліміту змін цього повідомлення (SEC-5)
+      if(pr.mem.length) usedW+=await aiMemGate(pr.mem,AI_WRITE_LIMIT-usedW);
       aiSpeak(pr.text);
       /* «Авто» довіряє додаванню, але не знищенню: перенос/закриття/видалення наявного —
          через шторку і в залишок ліміту цього повідомлення (AI-3). Скасувала — пакет відхилено. */
@@ -857,21 +876,39 @@
         if(g.notes.length) try{ plToast('⚠️ '+g.notes[0]+(g.notes.length>1?' (+'+(g.notes.length-1)+')':'')); }catch(_){}
       }
     }catch(e){
-      try{ aiTraceFinish(); }catch(_){}   // обірваний хід не має лишати живу картку
-      console.error('aiChat',e);
+      // обірваний хід не має лишати живу картку; компактний слід — у повідомлення, як і в удалому ході
+      try{ const tr=aiTraceFinish(); if(tr) m.trace=tr; }catch(_){}
+      if(!(e&&e.aiOff)) console.error('aiChat',e);   // відмова від AI — не помилка
       /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
          а не «поганий URL»; на native поле проксі взагалі приховане. */
       const off = (typeof navigator!=='undefined' && navigator.onLine===false);
-      m.content = off
+      /* «Не зараз» чи AI вимкнено — вибір людини, не поломка. Стоїть ПЕРЕД
+         перевіркою мережі: запит і не йшов, тож «немає зв’язку» було б неправдою.
+         Вкладення повертаємо в рядок вводу — погодиться, і не треба чіпляти знову. */
+      if(e && e.aiOff && att.length){
+        att.forEach(a=>{ if(!(a.kind==='image'&&aiSectionOff('photos'))) aiAttach.push(a); });
+        try{ aiAttachRender(); }catch(_){}
+      }
+      /* Обрив ПІСЛЯ змін (хоп 0 записав, хоп 1 завис): «спробуй ще раз» тут шкідливе — повтор
+         запише витрату чи блок удруге. Кажемо, що вже збережено, і просимо не повторювати цілком. */
+      const done = (viaAgent && !(e&&e.aiOff)) ? aiTurnDone.slice(0,6) : [];
+      m.content = (e && e.aiOff) ? e.message
+        : done.length
+        ? '⚠️ Відповідь обірвалась'+(e&&e.timeout?' (зависла)':off?' (немає зв’язку)':'')+', але дещо я вже встиг зробити:\n'
+          +done.map(x=>'• '+x).join('\n')
+          +'\n\nЦе вже збережено. Не повторюй запит цілком — вийде дубль. Попроси лише те, чого тут нема.'
+        : off
         ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
         : (e && e.human) ? '⚠️ '+e.message     // ліміт чи вхід (aiHttpError) — причина відома, URL тут ні до чого
         : (window.FLOW_NATIVE
             ? '⚠️ Не вдалось до мене достукатись. Спробуй ще раз за хвилину.'
             : '⚠️ Не вдалось: '+String(e.message||e)+'. Перевір URL AI-проксі.');
       delete m.streaming;
+    }finally{
+      // що б не сталось (зависання, шторка, виняток) — чат знову приймає повідомлення (AI-8)
+      aiBusy=false;
+      if(scrEl) scrEl.classList.remove('busy');
     }
-    aiBusy=false;
-    if(scrEl) scrEl.classList.remove('busy');
     aiChatSave(); aiRenderHead(); aiRenderBody();
     aiMaybeSummarize();
   }
@@ -934,8 +971,8 @@
       if(!t){ plToast('🎙 Не розчув — скажи чіткіше і трохи довше'); return ''; }
       return t;
     }catch(e){
-      console.error('aiTranscribeBlob',e);
-      plToast('⚠️ Транскрипція не вдалась: '+String(e.message||e));
+      if(!(e&&e.aiOff)) console.error('aiTranscribeBlob',e);
+      plToast(e&&e.aiOff ? e.message : '⚠️ Транскрипція не вдалась: '+String(e.message||e));
       return '';
     }
   }
@@ -1087,7 +1124,7 @@
     try{
       (goalsData.goals||[]).slice(0,2).forEach(g=>{
         if(g.days && !existing.includes((g.name||'').toLowerCase())){
-          sugg.push({ic:g.emoji||'💪',t:g.name||'Звичка',s:'звичка · щодня',c:'hab',
+          sugg.push({ic:safeEmoji(g.emoji,'💪'),t:g.name||'Звичка',s:'звичка · щодня',c:'hab',
             block:{t:g.name||'Звичка', h:18, endH:19, c:'hab', link:{type:'habit',goalId:g.id||g.name,goalName:g.name}}});
         }
       });
@@ -1181,7 +1218,7 @@
       const all=plBlocksFor(td).slice().sort((a,b)=>a.h-b.h);
       const rows=all.filter(b=>showAll||b.folder===key).map(b=>{
         const mine=b.folder===key;
-        const cc=mine?(f.c||'#c77dff'):'var(--muted)';
+        const cc=mine?safeColor(f.c,'#c77dff'):'var(--muted)';   // колір папки — з даних, у style
         return `<div class="fps-row ${b.done?'done':''} ${mine?'':'dim'}">
           <span class="fps-tm">${plHM(b.h)}</span>
           <div class="fps-tx"><b>${esc(b.t)}</b><span>${plHM(b.h)}–${plHM(Math.min(plBlockEnd(b),24))}${b.fromRecur?' · 🔁':''}</span></div>
@@ -1246,7 +1283,7 @@
       const grid=weeks.map(w=>w.map(ds=>{
         if(!ds) return '<div></div>';
         const d=+ds.slice(8);
-        return `<div class="fpm-dd ${byDs[ds]?'dot':''} ${ds===td?'today':''}" data-fpmday="${ds}" style="--fc:${f.c||'#c77dff'}">${d}</div>`;
+        return `<div class="fpm-dd ${byDs[ds]?'dot':''} ${ds===td?'today':''}" data-fpmday="${ds}" style="--fc:${safeColor(f.c,'#c77dff')}">${d}</div>`;
       }).join('')).join('');
       // найближчі точки: від сьогодні, до 10 шт, у межах 45 днів
       const up=[];
@@ -1803,7 +1840,7 @@
         ${folderKeys.length?`<label class="pl-sheet-l">📁 Папка / проєкт (необов'язково)</label>
         <select class="pl-sheet-in" id="pbFolder">
           <option value="">— без папки —</option>
-          ${folderKeys.map(k=>`<option value="${k}" ${(b&&b.folder===k)?'selected':''}>${(folders[k].emoji||'📁')} ${esc(folders[k].name||'Папка')}</option>`).join('')}
+          ${folderKeys.map(k=>`<option value="${esc(k)}" ${(b&&b.folder===k)?'selected':''}>${esc(folders[k].emoji||'📁')} ${esc(folders[k].name||'Папка')}</option>`).join('')}
         </select>`:''}
         <div class="pl-sheet-btns">
           ${b?`<button class="pl-sheet-del" id="pbDel">Видалити</button>`:''}
@@ -1898,7 +1935,7 @@
           <select class="pl-sheet-in" id="pbLinkGoal">${goals.map(g=>`<option value="${esc(g.id||g.name||'')}" ${curLink.goalId===(g.id||g.name)?'selected':''}>${esc(g.emoji||'🎯')} ${esc(g.name||'Ціль')}</option>`).join('')||'<option value="">(нема цілей — створи в Цілях)</option>'}</select>`;
       } else if(tp==='fin'){
         linkExtra.innerHTML=`<label class="pl-sheet-l">У який конверт</label>
-          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${e.id}" ${curLink.envId===e.id?'selected':''}>${esc(e.emoji||'✉️')} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
+          <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${esc(e.id)}" ${curLink.envId===e.id?'selected':''}>${esc(e.emoji||'✉️')} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
           <label class="pl-sheet-l">Сума доходу, ₴</label>
           <input class="pl-sheet-in" id="pbLinkAmt" inputmode="numeric" placeholder="напр. 1200" value="${curLink.amount||''}">`;
       } else { linkExtra.innerHTML=''; }

@@ -96,7 +96,11 @@
   /* ── «Вхідні» ── */
   function ensureInboxChat(){
     let c=chatById(INBOX_CHAT);
-    if(!c) c=chatCreate({id:INBOX_CHAT, name:'Вхідні', emoji:'📥', c:'#6a7dff'});
+    /* Створення «Вхідних» — автоматичне (людина його не просила): якщо чати чи
+       дошку ця сесія не прочитала, запис не піде, інакше порожній список чатів
+       і майже порожня дошка затерли б хмару (SYNC-2). */
+    if(!c) c=(window.storeAuto ? window.storeAuto(()=>chatCreate({id:INBOX_CHAT, name:'Вхідні', emoji:'📥', c:'#6a7dff'}))
+                               : chatCreate({id:INBOX_CHAT, name:'Вхідні', emoji:'📥', c:'#6a7dff'}));
     if(!boards[chatBk(INBOX_CHAT)]) boards[chatBk(INBOX_CHAT)]=[];
     return c;
   }
@@ -253,7 +257,7 @@
     rows.forEach(({c,last})=>{
       const fl=chatFolders(c);
       const pill = fl.length ? `<span class="chl-pill" data-i18n-skip="1">${esc(fl[0].emoji||'📁')} ${esc(fl[0].name)}${fl.length>1?' +'+(fl.length-1):''}</span>` : '';
-      h+=`<button class="chl-row" data-chat="${esc(c.id)}" style="--cc:${c.c||'var(--accent)'}">
+      h+=`<button class="chl-row" data-chat="${esc(c.id)}" style="--cc:${safeColor(c.c,'var(--accent)')}">
         <span class="chl-av">${esc(c.emoji||'💬')}</span>
         <span class="chl-body">
           <span class="chl-top"><b data-i18n-skip="1">${esc(c.name)}</b><small>${chatTimeLabel(last?last.at:0)}</small></span>
@@ -295,7 +299,7 @@
     if(!list.length){ host.innerHTML=''; host.hidden=true; return; }
     host.hidden=false;
     host.innerHTML=`<div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
-      `<button class="pgl-row" data-pgchat="${esc(c.id)}" style="--cc:${c.c||'var(--accent)'}">
+      `<button class="pgl-row" data-pgchat="${esc(c.id)}" style="--cc:${safeColor(c.c,'var(--accent)')}">
         <span class="pgl-av">${esc(c.emoji||'💬')}</span>
         <span class="pgl-body"><b data-i18n-skip="1">${esc(c.name)}</b><small data-i18n-skip="1">${esc(chatPreview(last&&last.b))}</small></span>
         <small class="pgl-time">${chatTimeLabel(last?last.at:0)}</small></button>`).join('');

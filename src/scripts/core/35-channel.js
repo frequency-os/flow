@@ -151,7 +151,7 @@
     const c=chChat(); if(!c) return;
     if(chTopic!=='all'&&chTopic!=='media') chTopic='all';
     const scr=document.getElementById('scr-channel');
-    scr.style.setProperty('--fc', c.c||'var(--accent)');
+    scr.style.setProperty('--fc', safeColor(c.c,'var(--accent)'));
     renderChCover(); renderChChips(); renderChFeed();
   }
 
@@ -170,10 +170,10 @@
     const c=chChat(), el=document.getElementById('chCover'); if(!c||!el) return;
     const api=chCoverApi(); const cov=api?api.get(chBoardKey()):null;
     let bg;
-    if(cov&&cov.img) bg=`background-image:url('${cov.img}');background-size:cover;background-position:50% ${cov.pos==null?50:cov.pos}%;`;
+    if(cov&&cov.img) bg=`background-image:url('${safeImg(cov.img)}');background-size:cover;background-position:50% ${cov.pos==null?50:(+cov.pos||0)}%;`;
     else if(cov&&api&&api.grads[cov.g||0]) bg='background:'+api.grads[cov.g||0]+';';
-    else bg=`background:linear-gradient(160deg,color-mix(in srgb,${c.c} 60%,#0f1115),color-mix(in srgb,${c.c} 14%,var(--bg)));`;
-    const em=(c.emoji&&c.emoji.trim())?c.emoji:esc((c.name||'?').trim().charAt(0).toUpperCase());
+    else bg=`background:linear-gradient(160deg,color-mix(in srgb,${safeColor(c.c)} 60%,#0f1115),color-mix(in srgb,${safeColor(c.c)} 14%,var(--bg)));`;
+    const em=(c.emoji&&c.emoji.trim())?esc(c.emoji.trim()):esc((c.name||'?').trim().charAt(0).toUpperCase());
     const sub=chSubText();
     el.innerHTML=`<div class="ch-cov-bg" style="${bg}"></div>
       <div class="ch-cov-top">
@@ -324,7 +324,7 @@
   function chBubble(it, eager){
     const b=it.b, t=b.type||'note';
     if(t==='divider') return '';
-    let tag=(b.topic&&b.topic.name) ? `<div class="ch-tag" style="--sc:${b.topic.color||'var(--accent)'}">${esc(b.topic.emoji||'')} ${esc(b.topic.name)}</div>` : '';
+    let tag=(b.topic&&b.topic.name) ? `<div class="ch-tag" style="--sc:${safeColor(b.topic.color,'var(--accent)')}">${esc(b.topic.emoji||'')} ${esc(b.topic.name)}</div>` : '';
     if(b.ai) tag+=`<div class="ch-tag ai">${chI('spark')}Підсумок</div>`;
     const time=it.at ? `<div class="ch-time">${chHM(it.at)}</div>` : '';
     const meta=(typeof BLOCK_TYPES!=='undefined'&&BLOCK_TYPES[t])||{};
@@ -355,7 +355,7 @@
       // картка «прикріплено папку» — момент, коли це сталось; тап відкриває документ папки
       const f=folders[b.folder];
       body = f
-        ? `<div class="ch-link-card" style="--sc:${f.c||'var(--fc)'}"><span class="ch-lc-ic">${esc(f.emoji||'📁')}</span><div><b data-i18n-skip="1">${esc(f.name)}</b><small>прикріплено папку · відкрити документ</small></div>${chI('chev')}</div>`
+        ? `<div class="ch-link-card" style="--sc:${safeColor(f.c,'var(--fc)')}"><span class="ch-lc-ic">${esc(f.emoji||'📁')}</span><div><b data-i18n-skip="1">${esc(f.name)}</b><small>прикріплено папку · відкрити документ</small></div>${chI('chev')}</div>`
         : `<div class="ch-link-card"><span class="ch-lc-ic">📁</span><div><b>Папка</b><small>уже видалена</small></div></div>`;
     } else if(t==='page'||t==='group'){
       const n=(b.children||[]).length;
@@ -447,7 +447,8 @@
             if(!result) throw new Error('порожня відповідь');
             done=true; out.textContent=result; save.disabled=false;
           }catch(e){
-            out.innerHTML='<span class="ch-ai-err">Не вдалося: '+esc((e&&e.message)||'спробуй пізніше')+'</span>';
+            // відмова від AI (згода / вимкнено) — вибір людини, тож без «Не вдалося»
+            out.innerHTML='<span class="ch-ai-err">'+(e&&e.aiOff?'':'Не вдалося: ')+esc((e&&e.message)||'спробуй пізніше')+'</span>';
             save.disabled=false; save.textContent='Ще раз'; save.dataset.retry='1';
           }finally{ chAiBusy=false; chAiSync(); }
         })();
@@ -689,7 +690,7 @@
     const ov=document.createElement('div'); ov.className='ch-sheet-ov';
     ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');   // шторка модальна для VoiceOver
     const c=chChat();
-    ov.innerHTML=`<div class="ch-sheet" style="--fc:${(c&&c.c)||'var(--accent)'}"><div class="ch-grip"></div>${title?`<div class="ch-sheet-t">${title}</div>`:''}${rowsHtml}</div>`;
+    ov.innerHTML=`<div class="ch-sheet" style="--fc:${safeColor(c&&c.c,'var(--accent)')}"><div class="ch-grip"></div>${title?`<div class="ch-sheet-t">${title}</div>`:''}${rowsHtml}</div>`;
     document.body.appendChild(ov);
     const close=()=>ov.remove();
     ov.addEventListener('click',e=>{ if(e.target===ov) close(); });

@@ -236,7 +236,7 @@
       return `<div class="wk-extra-row"><span class="ic">${m.ic}</span>
         <div class="mid"><b>${m.name}${x.note?' · '+esc(x.note):''}</b><small>${d}</small></div>
         <span class="amt" style="color:${m.color}">${m.sign>0?'+':'−'}${fmt(x.amount)} ${sym}</span>
-        <button class="del" data-exdel="${x.id}">×</button></div>`;
+        <button class="del" data-exdel="${esc(x.id)}">×</button></div>`;
     }).join(''):'';
     list.querySelectorAll('[data-exdel]').forEach(b=>b.onclick=()=>delExtra(b.dataset.exdel));
     document.querySelectorAll('#scr-work [data-extra]').forEach(b=>b.onclick=()=>addExtra(b.dataset.extra));
@@ -299,9 +299,9 @@
       const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
       const goalTxt=e.goal?`ціль ${fmt(e.goal)} · є ${fmt(e.saved||0)}`:`є ${fmt(e.saved||0)}`;
       return `<div class="alloc-env">
-        <div class="ic">${e.emoji||'✉️'}</div>
+        <div class="ic">${safeEmoji(e.emoji,'✉️')}</div>
         <div class="mid"><b>${esc(e.name)}</b><small>${goalTxt}</small></div>
-        <div class="pinput"><input type="number" min="0" step="10" data-alloc="${e.id}" value="${p||''}" placeholder="0"><span>${sym}</span></div>
+        <div class="pinput"><input type="number" min="0" step="10" data-alloc="${esc(e.id)}" value="${p||''}" placeholder="0"><span>${sym}</span></div>
       </div>`;
     }).join('');
     list.querySelectorAll('[data-alloc]').forEach(inp=>inp.addEventListener('input',()=>allocUpdateSummary(me,sym)));

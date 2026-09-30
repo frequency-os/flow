@@ -22,7 +22,7 @@
     var week=ptWeekDays(), todayIdx=(jrParse(todayY).getDay()+6)%7;
     var rows=b.habits.map(function(h,idx){
       h.marks=h.marks||{};
-      var streak=ptHabStreak(h.marks), hc=h.color||HB_COLORS[idx%HB_COLORS.length];
+      var streak=ptHabStreak(h.marks), hc=safeColor(h.color,HB_COLORS[idx%HB_COLORS.length]);   // колір із даних — у style, чистимо
       var weekN=week.filter(function(y){return h.marks[y];}).length;
       var sub=streak>1?('серія '+streak+' дн.'+(streak>=7?' 🔥':''))
         :streak===1?'серія 1 день':'ще не почато';

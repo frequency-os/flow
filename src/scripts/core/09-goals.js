@@ -20,6 +20,14 @@
   let aiAuthOff=false;
   async function aiFetch(url,opts){
     opts=opts||{};
+    /* Згода на AI (37-ai-privacy.js): усі шляхи до моделі й голосу йдуть
+       сюди, тож одна перевірка закриває всі. opts.ai = {bg, uses}: bg —
+       фоновий запит (без згоди тихо не йде, шторки нема), uses — розділи,
+       чиї дані несе запит (закритий — не йде). Без згоди на дію людини —
+       шторка; «Не зараз» чи вимкнений AI — запит не виходить (помилка з
+       human/aiOff). /upload-photo — хмарне сховище фото, а не AI, його не зупиняємо. */
+    const ai=opts.ai; if(ai){ opts=Object.assign({},opts); delete opts.ai; }
+    if(!/\/upload-photo(\?|$)/.test(String(url||''))) await aiConsentGate(ai);
     let tok='';
     try{ if(typeof window.sbAccessToken==='function') tok=await window.sbAccessToken(); }catch(_){}
     if(!tok) return fetch(url,opts);
@@ -37,10 +45,26 @@
     }
   }
   try{ window.aiFetch=aiFetch; }catch(_){}
+  /* Адреса AI мусить бути в connect-src політики безпеки (CSP у src/index.html),
+     інакше чат, голос і розпізнавання тихо не відповідатимуть — а адреса ще й
+     синхронізується на інші пристрої. Тому чужу адресу не зберігаємо і кажемо чому. */
+  function aiEpAllowed(u){
+    try{
+      const m=document.querySelector('meta[http-equiv="Content-Security-Policy"]'); if(!m) return true;
+      const cs=(String(m.content).match(/connect-src([^;]*)/)||[])[1]; if(!cs) return true;
+      const o=new URL(u).origin;
+      return cs.trim().split(/\s+/).some(x=>x.replace(/\/$/,'')===o);
+    }catch(_){ return false; }
+  }
   function aiConfig(cb){
     inputModal({title:'AI endpoint (URL твого Worker-проксі)', value:aiEndpoint(),
       placeholder:AI_EP_DEFAULT, onOk:(v)=>{
-        prefSet(AI_EP_KEY,(v||'').trim()); if(cb) cb();
+        const t=(v||'').trim();
+        if(t && !aiEpAllowed(t)){
+          try{ plToast('Цю адресу застосунок не пропустить (правила безпеки) — адресу AI не змінено'); }catch(_){}
+          return;
+        }
+        prefSet(AI_EP_KEY,t); if(cb) cb();
       }});
   }
   function aiSheetClose(){ const ov=document.getElementById('aiOv'); if(ov) ov.remove(); }
@@ -101,8 +125,10 @@
       if(!draft||!Array.isArray(draft.goals)||!draft.goals.length) throw new Error('порожня відповідь');
       aiPreview(draft,'AI-чернетка');
     }catch(e){
-      console.error('aiGenerate',e);
-      body.innerHTML=`<div class="ai-load">⚠️ Не вдалось: ${esc(String(e.message||e))}.<br>Перевір URL проксі або спробуй базову чернетку.</div>`;
+      if(!(e&&e.aiOff)) console.error('aiGenerate',e);
+      body.innerHTML = (e&&e.aiOff)   // відмова від AI — не поломка проксі; базова чернетка працює і без AI
+        ? `<div class="ai-load">${esc(e.message)}<br>Можна взяти базову чернетку.</div>`
+        : `<div class="ai-load">⚠️ Не вдалось: ${esc(String(e.message||e))}.<br>Перевір URL проксі або спробуй базову чернетку.</div>`;
       if(acts) acts.style.display='';
     }
   }
@@ -143,12 +169,12 @@
       const schTxt=(sc&&Array.isArray(sc.dows)&&sc.dows.length)?
         ' · 🗓 '+sc.dows.map(d=>DOW_SHORT[d]||'').filter(Boolean).join('·')+' о '+String(Math.floor(sc.h)).padStart(2,'0')+':00':'';
       items.push(`<div class="ai-item on" data-aitem="g${i}"><div class="ck">✓</div>
-        <div class="tx"><b>${gd.emoji||'🎯'} ${esc(gd.name||'Ціль')}</b>
+        <div class="tx"><b>${safeEmoji(gd.emoji,'🎯')} ${esc(gd.name||'Ціль')}</b>
         <span>${(gd.steps||[]).length} кроків${schTxt}</span></div></div>`);
     });
     (draft.envelopes||[]).forEach((ed,i)=>{
       items.push(`<div class="ai-item on" data-aitem="e${i}"><div class="ck">✓</div>
-        <div class="tx"><b>${ed.emoji||'✉️'} ${esc(ed.name||'Конверт')}</b>
+        <div class="tx"><b>${safeEmoji(ed.emoji,'✉️')} ${esc(ed.name||'Конверт')}</b>
         <span>конверт у Грошах${ed.goal?' · ціль '+fmt(parseInt(ed.goal)||0):''}</span></div></div>`);
     });
     body.innerHTML=`<div class="sub" style="margin:4px 0 10px">${esc(label||'Чернетка')} — тапни, щоб виключити зайве:</div>
@@ -174,7 +200,7 @@
     (draft.goals||[]).forEach(gd=>{
       if(gd._skip) return;
       const gid='g_ai_'+Date.now()+'_'+Math.random().toString(36).slice(2,5);
-      goalsData.goals.push({ id:gid, name:String(gd.name||'Ціль').slice(0,80), emoji:gd.emoji||'🎯',
+      goalsData.goals.push({ id:gid, name:String(gd.name||'Ціль').slice(0,80), emoji:safeEmoji(gd.emoji,'🎯'),
         color:colors[goalsData.goals.length%colors.length],
         steps:(gd.steps||[]).slice(0,7).map(s=>({ id:'st_ai_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
           name:String(s).slice(0,120), done:false })),
@@ -195,7 +221,7 @@
     (draft.envelopes||[]).forEach(ed=>{
       if(ed._skip) return;
       envelopes.push({ id:'env_ai_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        name:String(ed.name||'Конверт').slice(0,60), emoji:ed.emoji||'✉️',
+        name:String(ed.name||'Конверт').slice(0,60), emoji:safeEmoji(ed.emoji,'✉️'),
         color:colors[envelopes.length%colors.length], goal:parseInt(ed.goal)||0,
         saved:0, ops:[], kind:'ціль', link:'main', linkLabel:'головна папка' });
       nE++;
@@ -303,7 +329,7 @@
     const view=gl._dayView||'today';
     const ds = view==='tom' ? dgDateStr(1) : todayStr;
     const segs=[['today','Сьогодні'],['tom','Завтра'],['week','Тиждень']];
-    const segHtml=segs.map(([k,l])=>`<button class="${view===k?'on':''}" data-dgview="${gl.id}|${k}">${l}</button>`).join('');
+    const segHtml=segs.map(([k,l])=>`<button class="${view===k?'on':''}" data-dgview="${esc(gl.id)}|${k}">${l}</button>`).join('');
 
     if(view==='week'){
       const week=dgWeekDates(); const dowS=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
@@ -330,11 +356,11 @@
     const done=list.filter(x=>x.done).length;
     const pct=list.length?Math.round(done/list.length*100):0;
     const itemsHtml = list.length ? list.map(it=>`
-      <div class="dg-item ${it.done?'done':''}" data-dgitem="${gl.id}|${ds}|${it.id}">
+      <div class="dg-item ${it.done?'done':''}" data-dgitem="${esc(gl.id)}|${ds}|${esc(it.id)}">
         <span class="dg-ck">✓</span>
         <span class="dg-tx">${esc(it.text)}</span>
-        ${ds===todayStr?`<button class="dg-push ${it.done?'on':''}" data-dgpush="${gl.id}|${ds}|${it.id}" title="Занести в трекер вручну">↑</button>`:''}
-        <span class="dg-del" data-dgdel="${gl.id}|${ds}|${it.id}">×</span>
+        ${ds===todayStr?`<button class="dg-push ${it.done?'on':''}" data-dgpush="${esc(gl.id)}|${ds}|${esc(it.id)}" title="Занести в трекер вручну">↑</button>`:''}
+        <span class="dg-del" data-dgdel="${esc(gl.id)}|${ds}|${esc(it.id)}">×</span>
       </div>`).join('') : `<div class="dg-empty">Цілей на ${view==='tom'?'завтра':'сьогодні'} ще нема</div>`;
 
     return `<div class="dgoals">
@@ -343,8 +369,8 @@
       <div class="dg-prog"><i style="width:${pct}%"></i></div>
       ${itemsHtml}
       <div class="dg-add">
-        <input type="text" placeholder="Додати ціль на ${view==='tom'?'завтра':'сьогодні'}…" data-dgadd="${gl.id}|${ds}">
-        <button data-dgaddbtn="${gl.id}|${ds}">+</button>
+        <input type="text" placeholder="Додати ціль на ${view==='tom'?'завтра':'сьогодні'}…" data-dgadd="${esc(gl.id)}|${ds}">
+        <button data-dgaddbtn="${esc(gl.id)}|${ds}">+</button>
       </div>
       ${ds===todayStr?'<div class="dg-note">Закриєш усі — трекер засвітить сьогодні + додасть крок. «↑» — вручну.</div>':''}
     </div>`;
@@ -358,8 +384,8 @@
     const keys=(typeof order!=='undefined'?order:Object.keys(folders)).filter(k=>folders[k] && folderVisible(k));
     const rows=keys.map(k=>{
       const f=folders[k];
-      return `<button class="gfp-row" data-gfk="${k}">
-        <span class="gfp-em">${f.emoji||'📁'}</span>
+      return `<button class="gfp-row" data-gfk="${esc(k)}">
+        <span class="gfp-em">${safeEmoji(f.emoji,'📁')}</span>
         <span class="gfp-nm">${esc(f.name||'Папка')}</span>
         <span class="gfp-chev">›</span></button>`;
     }).join('');
@@ -425,10 +451,10 @@
       const pct=steps.length?Math.round(doneSteps/steps.length*100):(gl.progress||0);
       const open=!!gl.open;
       const stepsHtml=steps.map(s=>`
-        <div class="b-item ${s.done?'done':''}" data-step="${gl.id}|${s.id}">
+        <div class="b-item ${s.done?'done':''}" data-step="${esc(gl.id)}|${esc(s.id)}">
           <span class="b-check">${s.done?'✓':'○'}</span><span class="b-tx">${esc(s.name)}</span>
-          ${s.done?'':`<span class="b-plan" data-planstep="${gl.id}|${s.id}" title="У Планер сьогодні">📅</span>`}
-          <span class="b-del" data-delstep="${gl.id}|${s.id}">×</span>
+          ${s.done?'':`<span class="b-plan" data-planstep="${esc(gl.id)}|${esc(s.id)}" title="У Планер сьогодні">📅</span>`}
+          <span class="b-del" data-delstep="${esc(gl.id)}|${esc(s.id)}">×</span>
         </div>`).join('') || `<div class="b-empty">Кроків ще нема</div>`;
       const totalDays=mo.length;
       const trackedCount=gl.track?Object.keys(gl.track).filter(k=>k.startsWith(`${my}-${String(mm+1).padStart(2,'0')}`)).length:0;
@@ -436,21 +462,21 @@
       const gridRow=`<div class="gtrack-row">${mo.map(d=>{
           const on=gl.track&&gl.track[d.ds];
           const todayCls=d.ds===todayStr?'today':'';
-          return `<button class="gtd ${on?'on':''} ${todayCls}" data-track="${gl.id}|${d.ds}" style="--c:${gl.color||'#5b8def'}">${on?'✓':''}</button>`;
+          return `<button class="gtd ${on?'on':''} ${todayCls}" data-track="${esc(gl.id)}|${d.ds}" style="--c:${safeColor(gl.color,'#5b8def')}">${on?'✓':''}</button>`;
         }).join('')}</div>`;
       const dayGoalsHtml = dayGoalsBlock(gl, todayStr);
-      const wishCover = gl.wishImg ? `<div class="gnode-cover" data-gwish="${gl.id}" style="background-image:url('${safeImg(gl.wishImg)}')"><div class="gnode-cover-ov"></div><span class="gnode-cover-tag">✨ з Карти бажань</span></div>` : '';
-      return `<div class="gnode ${gl.wishImg?'has-cover':''}" data-goal="${gl.id}">
+      const wishCover = gl.wishImg ? `<div class="gnode-cover" data-gwish="${esc(gl.id)}" style="background-image:url('${safeImg(gl.wishImg)}')"><div class="gnode-cover-ov"></div><span class="gnode-cover-tag">✨ з Карти бажань</span></div>` : '';
+      return `<div class="gnode ${gl.wishImg?'has-cover':''}" data-goal="${esc(gl.id)}">
         ${wishCover}
         <div class="grow">
           <div class="grow-left">
-            <span class="grow-car" data-toggle="${gl.id}">${open?'▾':'▸'}</span>
-            <span class="grow-emoji">${gl.emoji||'🎯'}</span>
-            <div class="grow-info" data-toggle="${gl.id}">
-              <div class="grow-name${gl.folderKey&&folders[gl.folderKey]?' has-folder':''}"${gl.folderKey&&folders[gl.folderKey]?` data-goalfolder="${gl.folderKey}"`:''}>${esc(gl.name)}${gl.folderKey&&folders[gl.folderKey]?`<span class="gfolder-tag">${folders[gl.folderKey].emoji||'📁'}</span>`:''}</div>
+            <span class="grow-car" data-toggle="${esc(gl.id)}">${open?'▾':'▸'}</span>
+            <span class="grow-emoji">${safeEmoji(gl.emoji,'🎯')}</span>
+            <div class="grow-info" data-toggle="${esc(gl.id)}">
+              <div class="grow-name${gl.folderKey&&folders[gl.folderKey]?' has-folder':''}"${gl.folderKey&&folders[gl.folderKey]?` data-goalfolder="${esc(gl.folderKey)}"`:''}>${esc(gl.name)}${gl.folderKey&&folders[gl.folderKey]?`<span class="gfolder-tag">${safeEmoji(folders[gl.folderKey].emoji,'📁')}</span>`:''}</div>
               <div class="grow-meta">${trackedCount}/${totalDays} · ${pct}%</div>
             </div>
-            <span class="grow-del" data-delgoal="${gl.id}">×</span>
+            <span class="grow-del" data-delgoal="${esc(gl.id)}">×</span>
           </div>
           <div class="gtrack" data-scrollme="1">
             ${gridHead}
@@ -460,7 +486,7 @@
         <div class="branch ${open?'open':''}">
           ${dayGoalsHtml}
           ${stepsHtml}
-          <button class="b-add" data-addstep="${gl.id}">+ Крок</button>
+          <button class="b-add" data-addstep="${esc(gl.id)}">+ Крок</button>
         </div>
       </div>`;
     }).join('');
@@ -472,7 +498,7 @@
       const cards=wishGoals.map(gl=>{
         const steps=gl.steps||[]; const sd=steps.filter(s=>s.done).length;
         const pct=steps.length?Math.round(sd/steps.length*100):(gl.progress||0);
-        return `<div class="wgs-card" data-wgoal="${gl.id}" style="background-image:url('${safeImg(gl.wishImg)}')">
+        return `<div class="wgs-card" data-wgoal="${esc(gl.id)}" style="background-image:url('${safeImg(gl.wishImg)}')">
           <div class="wgs-ov"></div>
           ${pct>=100?'<div class="wgs-done">✓</div>':''}
           <div class="wgs-foot">

@@ -117,7 +117,7 @@
       {ic:'edit', label:'Підпис', sub:s.d||'без підпису', onClick:()=>inputModal({title:'Підпис кроку', value:s.d, onOk:v=>{ s.d=v; vzSave(); renderVision(); }})},
       {ic:'edit', label:'Мітка', sub:'Зараз: '+(s.q||'—'), onClick:()=>inputModal({title:'Мітка (напр. Q3, Осінь)', value:s.q||'', onOk:v=>{ s.q=(v||'').slice(0,6); vzSave(); renderVision(); }})},
       (s.folder&&folders[s.folder]
-        ? {ic:folders[s.folder].emoji||'📁', label:'Відкрити папку', sub:folders[s.folder].name+' · привʼязана', onClick:()=>goFolder(s.folder)}
+        ? {ic:safeEmoji(folders[s.folder].emoji,'📁'), label:'Відкрити папку', sub:folders[s.folder].name+' · привʼязана', onClick:()=>goFolder(s.folder)}
         : {ic:'📂', label:'Привʼязати папку', sub:'Тап по чіпу в кроці відкриє її', onClick:()=>vzPickFolder('Папка для кроку «'+s.t+'»',k=>{ s.folder=k; vzSave(); renderVision(); })}),
       (s.folder ? {ic:'trash', label:'Відвʼязати папку', onClick:()=>{ s.folder=''; vzSave(); renderVision(); }} : null),
       {ic:'⭐', label:'Зробити ціллю', sub:'Перенести крок у Цілі', onClick:()=>vzStepToGoal(s)},
@@ -130,7 +130,7 @@
     let list=[]; try{ list=(order||[]).filter(k=>folders[k] && k!==VISION_FKEY); }catch(_){ list=[]; }
     if(!list.length){ flowAlert('Папок ще немає — створи їх на Огляді.','Звʼязки'); return; }
     actionSheet({ title:title||'Обери папку',
-      items:list.slice(0,14).map(k=>({ ic:folders[k].emoji||'📁', label:folders[k].name||k,
+      items:list.slice(0,14).map(k=>({ ic:safeEmoji(folders[k].emoji,'📁'), label:folders[k].name||k,
         onClick:()=>cb(k) })) });
   }
   /* ── перенесення у Цілі ── */
@@ -180,7 +180,7 @@
       {ic:'edit', label:'Назва та емодзі', sub:p.title, onClick:()=>inputModal({title:'Назва віджета', value:p.title, emoji:true, emojiVal:p.emoji||'', onOk:(v,emo)=>{ if(v)p.title=v; p.emoji=emo||p.emoji; vzSave(); renderVision(); }})},
     ];
     if(p.folder && folders[p.folder]){
-      items.push({ic:folders[p.folder].emoji||'📁', label:'Відкрити папку', sub:folders[p.folder].name, onClick:()=>goFolder(p.folder)});
+      items.push({ic:safeEmoji(folders[p.folder].emoji,'📁'), label:'Відкрити папку', sub:folders[p.folder].name, onClick:()=>goFolder(p.folder)});
       items.push({ic:'trash', label:'Відвʼязати папку', onClick:()=>{ p.folder=''; vzSave(); renderVision(); }});
     } else {
       items.push({ic:'📂', label:'Привʼязати папку', sub:'Для швидкого переходу в роботу', onClick:()=>vzPickFolder('Папка для «'+p.title+'»',k=>{ p.folder=k; vzSave(); renderVision(); })});
@@ -195,7 +195,7 @@
     if(!list.length){ flowAlert('Всі папки вже привʼязані або папок ще немає.','Звʼязки'); return; }
     actionSheet({ title:'Привʼязати папку до візії',
       sub:'Папка зʼявиться серед звʼязків з живим лічильником',
-      items:list.slice(0,12).map(k=>({ ic:folders[k].emoji||'📁', label:folders[k].name||k,
+      items:list.slice(0,12).map(k=>({ ic:safeEmoji(folders[k].emoji,'📁'), label:folders[k].name||k,
         onClick:()=>{ vzData.folderLinks.push(k); vzSave(); renderVision(); } })) });
   }
   function vzFolderChipMenu(k){
@@ -339,8 +339,8 @@
     const CIRC=264;
     const foldChips=vzData.folderLinks.filter(k=>{ try{ return !!folders[k]; }catch(_){ return false; } })
       .map(k=>{ let cnt=0; try{ cnt=(boards&&Array.isArray(boards[k]))?boards[k].length:0; }catch(_){}
-        return `<button class="vz-lchip" data-vzfold="${k}">
-          <span>${folders[k].emoji||'📁'} ${esc(folders[k].name||k)}</span><b>${cnt}</b><small>блоків</small></button>`; }).join('');
+        return `<button class="vz-lchip" data-vzfold="${esc(k)}">
+          <span>${esc(folders[k].emoji||'📁')} ${esc(folders[k].name||k)}</span><b>${cnt}</b><small>блоків</small></button>`; }).join('');
     // ранковий запуск: стан
     const rzDone=vzRzToday(), rzAll=vzRzDayFull(plTodayStr());
     const rzChain=(()=>{ const L=['Н','П','В','С','Ч','П','С']; let h='';
@@ -412,7 +412,7 @@
         ${vzData.steps.length?vzData.steps.map(s=>`
           <div class="vz-step ${s.done?'done':''}">
             <span class="q" data-vztoggle="${s.id}">${esc(s.q||'•')}</span>
-            <div class="tx" data-vzmenu="${s.id}"><b>${esc(s.t)}</b>${s.d?`<small>${esc(s.d)}</small>`:''}${(s.folder&&folders[s.folder])?`<span class="vz-fchip" data-vzstepgo="${s.folder}">${folders[s.folder].emoji||'📁'} ${esc(folders[s.folder].name||'')} ›</span>`:''}</div>
+            <div class="tx" data-vzmenu="${s.id}"><b>${esc(s.t)}</b>${s.d?`<small>${esc(s.d)}</small>`:''}${(s.folder&&folders[s.folder])?`<span class="vz-fchip" data-vzstepgo="${esc(s.folder)}">${esc(folders[s.folder].emoji||'📁')} ${esc(folders[s.folder].name||'')} ›</span>`:''}</div>
             <span class="dots" data-vzmenu2="${s.id}">⋯</span>
           </div>`).join('')
         :`<div class="vz-empty">Розбий шлях на 3–5 великих кроків: що має статись цього кварталу, наступного, і перед фінішем.</div>`}

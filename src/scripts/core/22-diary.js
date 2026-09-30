@@ -166,7 +166,7 @@
       });
       rows.sort((x,y)=>x.e.ts-y.e.ts);
       dbEl.innerHTML=rows.length ? '<div class="dia-list-head">Із зошитів цього дня</div><div class="dia-list">'
-        +rows.map(r=>'<div class="dia-entry" data-diagobook="'+r.b.id+'"><div class="de-date" style="color:'+diaEsc(r.b.color)+'">'
+        +rows.map(r=>'<div class="dia-entry" data-diagobook="'+diaEsc(r.b.id)+'"><div class="de-date" style="color:'+safeColor(r.b.color,'#8b7cff')+'">'
           +diaEsc(r.b.emoji+' '+r.b.name)+(r.e.audio?' · 🎙 '+diaFmtDur(r.e.audio.dur||0):'')+'</div>'
           +'<div class="de-txt">'+diaEsc(r.e.text||'')+'</div></div>').join('')+'</div>' : '';
       dbEl.querySelectorAll('[data-diagobook]').forEach(el=>{
@@ -297,6 +297,8 @@
     const mon=diaViewWeek||diaMonday(plTodayStr());
     const days=diaWeekDss(mon).filter(diaHasEntry);
     if(!days.length){ try{ flowAlert('За цей тиждень ще нема текстових записів.'); }catch(_){} return; }
+    // щоденник закрито від AI (Ще → AI і приватність) — записи не відправляємо
+    if(aiSectionOff('diary')){ try{ flowAlert('Щоденник закрито від AI. Відкрити: Ще → AI і приватність.'); }catch(_){} return; }
     const body=days.map(k=>diaFmtDate(k)+':\n'+diaryEntries[k].text).join('\n\n---\n\n');
     btn.disabled=true; btn.textContent='Аналізую…';
     out.style.display='block'; out.textContent='';
@@ -307,10 +309,11 @@
         +'без загальних банальностей і без вигаданих фактів. Дай 2-4 конкретні спостереження і 1-3 практичні поради на наступний тиждень. '
         +'Пиши стисло, по суті, українською мовою, без вступних фраз на кшталт "Я проаналізував записи".',
         [{role:'user',content:body}],
-        (partial)=>{ out.textContent=partial; }
+        (partial)=>{ out.textContent=partial; },
+        {uses:['diary']}
       );
       if(txt){ diaInsights.weeks=diaInsights.weeks||{}; diaInsights.weeks[mon]={text:txt,ts:Date.now()}; saveDiaInsights(); }
-    }catch(e){ out.textContent='Не вдалося проаналізувати: '+(e.message||'спробуй пізніше.'); }
+    }catch(e){ out.textContent=(e&&e.aiOff) ? e.message : 'Не вдалося проаналізувати: '+(e.message||'спробуй пізніше.'); }
     btn.disabled=false;
     renderDiaView();
   }
@@ -319,6 +322,9 @@
   let diaMoodBusy=false;
   async function diaMoodBatch(){
     if(diaMoodBusy) return;
+    /* фонова оцінка — людина її не просила, тож без згоди чи з закритим
+       щоденником мовчки пропускаємо, а не вискакуємо шторкою згоди */
+    if(!aiAllowed('diary')) return;
     const days=[];
     for(let i=0;i<35;i++){
       const ds=diaDs(-i); const e=diaryEntries[ds];
@@ -334,7 +340,7 @@
         'Оціни емоційний стан людини за кожен день за її записами в щоденнику, шкала 1-5 '
         +'(1 — дуже важкий день, 2 — поганий, 3 — нейтральний, 4 — хороший, 5 — чудовий). '
         +'Відповідай ЛИШЕ валідним JSON виду {"2026-09-01":3} з усіма наданими датами, без пояснень і тексту довкола.',
-        [{role:'user',content:body}]);
+        [{role:'user',content:body}], null, {bg:true, uses:['diary']});   // фонова: без згоди тихо не йде
       const m=String(txt||'').match(/\{[\s\S]*\}/);
       if(m){
         const obj=JSON.parse(m[0]); diaInsights.mood=diaInsights.mood||{};
@@ -360,7 +366,7 @@
     if(book){ renderDiaBook(book); return; }
     grid.innerHTML=diaBooks.books.map(b=>{
       const n=(diaBooks.entries[b.id]||[]).length;
-      return '<div class="dia-book" style="--bc:'+diaEsc(b.color)+'" data-diabook="'+b.id+'">'
+      return '<div class="dia-book" style="--bc:'+safeColor(b.color,'#8b7cff')+'" data-diabook="'+diaEsc(b.id)+'">'
         +'<div class="db-ic">'+diaEsc(b.emoji)+'</div><div class="db-t">'+diaEsc(b.name)+'</div>'
         +'<div class="db-n">'+n+' '+diaPlural(n,'запис','записи','записів')+'</div></div>';
     }).join('');
@@ -382,8 +388,8 @@
     const arr=(diaBooks.entries[book.id]||[]).slice().sort((a,b)=>b.ts-a.ts);
     l.innerHTML=arr.length?arr.map(e=>{
       const d=new Date(e.ts);
-      const au=e.audio?'<button class="db-play" data-dbplay="'+e.id+'" style="background:none;border:0;color:'+diaEsc(book.color)+';cursor:pointer;padding:0;font-size:13px">▶ 🎙 '+diaFmtDur(e.audio.dur||0)+'</button>':'';
-      return '<div class="dia-entry db-entry"><div><div class="de-date" style="color:'+diaEsc(book.color)+'">'+d.getDate()+' '+DIA_MONTHS[d.getMonth()]+'</div>'
+      const au=e.audio?'<button class="db-play" data-dbplay="'+e.id+'" style="background:none;border:0;color:'+safeColor(book.color,'#8b7cff')+';cursor:pointer;padding:0;font-size:13px">▶ 🎙 '+diaFmtDur(e.audio.dur||0)+'</button>':'';
+      return '<div class="dia-entry db-entry"><div><div class="de-date" style="color:'+safeColor(book.color,'#8b7cff')+'">'+d.getDate()+' '+DIA_MONTHS[d.getMonth()]+'</div>'
         +'<div class="de-txt db-txt">'+diaEsc(e.text)+'</div>'+au+'</div>'
         +'<button class="db-del" data-dbdel="'+e.id+'" title="Видалити запис">✕</button></div>';
     }).join(''):'<div class="dia-empty">Перший запис — у полі зверху.</div>';

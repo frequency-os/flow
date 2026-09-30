@@ -42,7 +42,7 @@
 
     var rows=b.projects.map(function(p,idx){
       p.steps=p.steps||[];
-      var c=p.color||PH_COLORS[idx%PH_COLORS.length];
+      var c=safeColor(p.color,PH_COLORS[idx%PH_COLORS.length]);   // колір із даних — у style, чистимо
       var pr=ptProgress(p);
       var linkName=p.link&&br&&br.folderName?br.folderName(p.link):'';
       var opened=phOpen[id+'|'+p.id];

@@ -131,8 +131,13 @@
         const f=folders[k];
         cfg[k]={c:f.c,emoji:f.emoji,icon:f.icon||folderIconFor(f.emoji),iconSet:f.iconSet?1:0,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||''};
       });
-      const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
-      const p2=window.storage.set(FOKEY,JSON.stringify(order),false); if(p2&&p2.catch)p2.catch(()=>{});
+      const put=()=>{
+        const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
+        const p2=window.storage.set(FOKEY,JSON.stringify(order),false); if(p2&&p2.catch)p2.catch(()=>{});
+      };
+      // {auto:true} — автоматичний запис і для сховища: заводські папки гостя
+      // лягають з міткою 0 і не перебивають хмару після входу (SYNC-1, 02-storage.js)
+      if(auto && window.storeAuto) window.storeAuto(put); else put();
       return true;
     }catch(_){ return false; }
   }
