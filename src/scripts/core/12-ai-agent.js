@@ -1066,10 +1066,8 @@
       const key=findKey(inp.folder); if(!key) return '⚠️ папку не знайдено: '+inp.folder;
       const ok=await aiToolConfirm('Видалити папку «'+folders[key].name+'» назавжди',{title:'🗑️ Frequency хоче видалити папку'});
       if(!ok) return 'людина скасувала — не повторюй';
-      const nm=folders[key].name, par=folders[key].parent||'';
-      Object.keys(folders).forEach(ck=>{ if(folders[ck]&&(folders[ck].parent||'')===key) folders[ck].parent=par; });
-      delete folders[key]; order=order.filter(x=>x!==key);
-      saveFolders(); try{ renderDashboard(); }catch(_){}
+      const nm=folders[key].name;
+      folderDelete(key); try{ renderDashboard(); }catch(_){}   // те саме, що й видалення з меню папки
       return 'папку «'+nm+'» видалено';
     }
     return '⚠️ невідома дія';
@@ -1585,11 +1583,8 @@
     });
     (L.undo&&L.undo.folders||[]).forEach(key=>{
       try{
-        if(typeof folderWidgets==='object'&&folderWidgets[key]) delete folderWidgets[key];
-        if(typeof saveFolderWidgets==='function') saveFolderWidgets();
-        if(typeof folders==='object'&&folders[key]){ delete folders[key]; }
-        if(Array.isArray(order)){ const oi=order.indexOf(key); if(oi>=0) order.splice(oi,1); }
-        if(typeof saveFolders==='function') saveFolders();
+        // відкат створеної агентом папки — звичайне видалення (з надгробком, щоб не воскресла з іншого пристрою)
+        folderDelete(key);
         try{ renderDashboard(); }catch(_){}
       }catch(e){ console.error('aiUndoFolder',e); }
     });

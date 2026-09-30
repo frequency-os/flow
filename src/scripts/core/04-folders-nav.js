@@ -137,6 +137,116 @@
     }catch(_){ return false; }
   }
 
+  /* ═══════ «НАДГРОБКИ» ВИДАЛЕНИХ ПАПОК ═══════
+     Конфіг папок при читанні лише ДОЛИВАЄТЬСЯ (applyFolderCfgRaw у 27-canvas.js
+     не прибирає того, чого в сховищі нема). Тому пристрій, що ще тримав
+     видалену папку в памʼяті чи в локальній копії, першим же saveFolders()
+     повертав її в хмару — і вона воскресала на всіх пристроях.
+     Тепер видалення лишає запис {ключ: коли} у синхронізованому ключі
+     folders_deleted_v1, і кожен пристрій після читання прибирає такі папки
+     разом з усім, що їм належало. Ключі папок унікальні ('f_'+час), тож
+     надгробок не зачепить нову папку.
+     reset — мить відновлення з бекапу: давніші надгробки більше не діють
+     (інакше інший пристрій знову стер би щойно відновлені папки). */
+  const FDELKEY='folders_deleted_v1';
+  const FDEL_MAX=300;                      // межа розміру: найстаріші надгробки відкидаємо
+  function tombsNorm(o){
+    const t={ reset:(o&&+o.reset)||0, ids:{} };
+    const ids=(o&&o.ids&&typeof o.ids==='object')?o.ids:{};
+    Object.keys(ids).forEach(k=>{ const ts=+ids[k]||0; if(ts>t.reset) t.ids[k]=ts; });
+    const ks=Object.keys(t.ids);
+    if(ks.length>FDEL_MAX) ks.sort((a,b)=>t.ids[b]-t.ids[a]).slice(FDEL_MAX).forEach(k=>{ delete t.ids[k]; });
+    return t;
+  }
+  // злити дві копії (памʼять цього пристрою + сховище/хмара): жодне видалення не губиться
+  function tombsMerge(a,b){
+    const reset=Math.max(a.reset||0,b.reset||0), ids={};
+    [a,b].forEach(t=>Object.keys(t.ids||{}).forEach(k=>{ const ts=+t.ids[k]||0; if(ts>(ids[k]||0)) ids[k]=ts; }));
+    return tombsNorm({reset, ids});
+  }
+  function tombsSame(a,b){
+    const ka=Object.keys(a.ids), kb=Object.keys(b.ids);
+    return a.reset===b.reset && ka.length===kb.length && ka.every(k=>a.ids[k]===b.ids[k]);
+  }
+  let folderTombs={ reset:0, ids:{} };
+  // одразу з локальної копії: миттєвий рендер (27-canvas.js) не має блиснути видаленою папкою
+  try{ const r=window.storage.getLocal(FDELKEY); if(r) folderTombs=tombsNorm(JSON.parse(r)); }catch(_){}
+  function folderTombed(k){ return !!folderTombs.ids[k]; }
+  function saveFolderTombs(){ try{ const p=window.storage.set(FDELKEY,JSON.stringify(folderTombs),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+  // віддає проміс запису: відновлення з бекапу чекає його, перш ніж штовхати чергу в хмару
+  window.folderTombsReset=function(){ folderTombs={ reset:Date.now(), ids:{} }; return window.storage.set(FDELKEY,JSON.stringify(folderTombs),false); };
+
+  /* Прибрати все, що належить папці: документ і теми (дошки key та key__sp_*),
+     список тем, додані віджети, обкладинку документа, фото (IndexedDB + рядок
+     photo:<id> у хмарі), прикріплення в чатах і картки «Прикріплено» в їхніх
+     стрічках. Кожне сховище пишемо лише тоді, коли в ньому справді щось змінилось.
+     Повертає true, якщо було що прибирати. */
+  function folderPurge(key){
+    if(!key) return false;
+    let any=false;
+    const f=folders[key];
+    const own=k=>k===key || k.indexOf(key+'__sp_')===0;
+    try{
+      const refs=new Set();
+      if(f && window.photoIsRef(f.photo)) refs.add(String(f.photo));
+      const pid='ph_'+key; if(window.__photoCache && window.__photoCache[pid]) refs.add('idb:'+pid);
+      refs.forEach(r=>{ window.photoDel(r); any=true; });
+    }catch(_){}
+    try{
+      let ch=false;
+      Object.keys(boards).forEach(k=>{
+        if(own(k)){ delete boards[k]; ch=true; return; }
+        if(k.indexOf('chat_')===0 && Array.isArray(boards[k])){
+          const n=boards[k].length;
+          boards[k]=boards[k].filter(b=>!(b && b.type==='flink' && b.folder===key));
+          if(boards[k].length!==n) ch=true;
+        }
+      });
+      if(ch){ saveBoard(); any=true; }
+    }catch(e){ console.error('folderPurge boards',e); }
+    try{ const api=window.__pgCovers; if(api && typeof api.keys==='function') api.keys().filter(own).forEach(k=>{ api.clear(k); any=true; }); }catch(_){}
+    try{ if(spacesMap[key]!==undefined || activeSpaceMap[key]!==undefined){ delete spacesMap[key]; delete activeSpaceMap[key]; saveSpacesMeta(); any=true; } }catch(_){}
+    try{ if(folderWidgets[key]){ delete folderWidgets[key]; saveFolderWidgets(); any=true; } }catch(_){}
+    try{
+      let ch=false;
+      chats.forEach(c=>{ if(c && Array.isArray(c.folders) && c.folders.includes(key)){ c.folders=c.folders.filter(k=>k!==key); ch=true; } });
+      if(ch){ saveChats(); any=true; }
+    }catch(_){}
+    if(f){
+      const par=f.parent||'';
+      Object.keys(folders).forEach(ck=>{ if(folders[ck]&&(folders[ck].parent||'')===key) folders[ck].parent=par; });
+      delete folders[key]; any=true;
+    }
+    if(order.indexOf(key)>=0){ order=order.filter(x=>x!==key); any=true; }
+    return any;
+  }
+  // Людина видаляє папку (меню папки, агент, «відкотити» агента): надгробок → прибирання → запис
+  function folderDelete(key){
+    if(!folders[key]) return false;
+    folderTombs.ids[key]=Date.now(); folderTombs=tombsNorm(folderTombs); saveFolderTombs();
+    folderPurge(key);
+    saveFolders();
+    return true;
+  }
+  /* Після читання сховища (load у 27-canvas.js): злити надгробки з тими, що вже
+     в памʼяті, і прибрати папки, видалені на іншому пристрої. Пише лише після
+     довіреного читання — як усі автоматичні записи папок. */
+  function applyFolderTombsRaw(raw){
+    let got={ reset:0, ids:{} };
+    try{ const o=raw?JSON.parse(raw):null; if(o&&typeof o==='object') got=tombsNorm(o); }catch(_){}
+    const merged=tombsMerge(folderTombs, got);
+    folderTombs=merged;
+    if(!foldersLoaded) return 0;
+    if(!tombsSame(merged, got)) saveFolderTombs();
+    let n=0;
+    Object.keys(folderTombs.ids).forEach(k=>{
+      if(folders[k] && !folders[k].custom) return;     // вбудовані папки видаляти не можна
+      if(folderPurge(k)) n++;
+    });
+    if(n){ saveFolders({auto:true}); console.warn('[Flow] прибрано папок, видалених на іншому пристрої:', n); }
+    return n;
+  }
+
   /* ===== додані віджети папок (спільні дані, різні входи) ===== */
   // каталог доступних віджетів, які можна додати в будь-яку папку
   const WIDGET_CATALOG = {

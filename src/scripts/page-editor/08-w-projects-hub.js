@@ -817,6 +817,7 @@
     window.__pgCovers={
       grads:COV_GRADS,
       get:function(k){ return covers[k]||null; },
+      keys:function(){ return Object.keys(covers); },   // видалення папки прибирає і її обкладинки (04-folders-nav.js)
       set:function(k,c){ covers[k]=c; saveCovers(); try{ renderCover(); }catch(_){} },
       clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} }
     };

@@ -227,9 +227,11 @@
         </div>
         <div class="acc-expand" data-acc-backup-expand hidden>
           <button class="acc-mini" data-acc-export>⬇️ Експорт у файл</button>
+          <button class="acc-mini" data-acc-export-ph>📦 Повний бекап з фото</button>
           <button class="acc-mini" data-acc-import>⬆️ Імпорт з файлу</button>
-          <input type="file" accept="application/json,.json" data-acc-file style="display:none">
-          <p class="acc-hint">Імпорт перезапише поточні дані (попередній стан зберігається автоматично).</p>
+          <input type="file" accept="application/json,.json,application/zip,.zip" data-acc-file style="display:none">
+          <p class="acc-hint" data-acc-ph-count>Фото: рахую…</p>
+          <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом. Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
         </div>
         <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
           <div class="acc-rico">💾</div>
@@ -246,7 +248,7 @@
         <div class="acc-expand" data-acc-reset-expand hidden>
           <button class="acc-mini" data-acc-reset-device>♻️ Скинути цей пристрій</button>
           <button class="acc-mini dng" data-acc-reset-all>🗑 Стерти все з акаунта</button>
-          <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл.</p>
+          <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл (якщо є фото — zip разом із ними). Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
         </div>
         <div class="acc-row" data-acc-settings-row>
           <div class="acc-rico">⚙️</div>
@@ -327,7 +329,7 @@
         e.stopPropagation();
         const inAcc=!!(window.sbUser&&window.sbUser());
         confirmSheet({title:'Скинути цей пристрій?',
-          sub:'Локальні дані буде стерто'+(inAcc?' — після перезапуску вони повернуться з хмари акаунта':'. Входу в акаунт немає, тож вони НЕ відновляться')+'. Спершу бекап збережеться у файл.',
+          sub:'Локальні дані буде стерто'+(inAcc?' — після перезапуску вони повернуться з хмари акаунта':'. Входу в акаунт немає, тож вони НЕ відновляться')+'. Спершу бекап збережеться у файл. Книжки з читалки в нього не входять — їх треба буде завантажити знову.',
           okLabel:'Скинути', onOk:()=>runReset(false, '❌ Скидання зупинено: ')});
       };
       const rsAll=host.querySelector('[data-acc-reset-all]');
@@ -338,39 +340,64 @@
           okLabel:'Далі', onOk:()=>{
             /* друге, окреме підтвердження — пауза, щоб перший аркуш встиг закритись */
             setTimeout(()=>{ confirmSheet({title:'Точно стерти все?',
-              sub:'Це незворотно. Єдина копія лишиться у файлі бекапу, який зараз збережеться.',
+              sub:'Це незворотно. Єдина копія лишиться у файлі бекапу, який зараз збережеться (з фото, якщо вони є). Книжок з читалки в ньому не буде — їх доведеться завантажити знову.',
               okLabel:'Стерти назавжди', onOk:()=>runReset(true, '❌ Стирання зупинено: ')}); }, 350);
           }});
       };
-      const exb=host.querySelector('[data-acc-export]');
-      if(exb) exb.onclick=async (e)=>{
-        e.stopPropagation();
-        const r=await window.flowBackup.exportToFile();
+      const mb=n=>n>=1048576?(n/1048576).toFixed(1)+' МБ':Math.max(1,Math.round(n/1024))+' КБ';
+      const exportRun=async (photos)=>{
+        const r=await window.flowBackup.exportToFile(photos?{photos:true}:null);
+        const what=r.photos?' (разом із '+r.photos+' фото, '+mb(r.bytes||0)+')':'';
         // «✅ Збережено» — лише коли файл точно записано; інакше кажемо як є
-        if(r.ok && r.saved) flowAlert('✅ Збережено: '+r.name+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
-        else if(r.ok) flowAlert('⬇️ Файл «'+r.name+'» передано на завантаження.\n\nПеревір, що він з\'явився в «Завантаженнях», — застосунок цього не бачить. Потім поклади його в надійне місце.');
+        if(r.ok && r.saved) flowAlert('✅ Збережено: '+r.name+what+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
+        else if(r.ok) flowAlert('⬇️ Файл «'+r.name+'»'+what+' передано на завантаження.\n\nПеревір, що він з\'явився в «Завантаженнях», — застосунок цього не бачить. Потім поклади його в надійне місце.');
         else if(r.cancelled) flowAlert('Збереження скасовано — файл бекапу не записано.');
         else flowAlert('❌ Не вдалося експортувати: '+(r.error||'невідома помилка'));
       };
+      const exb=host.querySelector('[data-acc-export]');
+      if(exb) exb.onclick=(e)=>{ e.stopPropagation(); exportRun(false); };
+      const exph=host.querySelector('[data-acc-export-ph]');
+      if(exph) exph.onclick=async (e)=>{
+        e.stopPropagation();
+        if(exph.disabled) return;
+        exph.disabled=true; const old=exph.textContent; exph.textContent='⏳ Пакую фото…';
+        try{ await exportRun(true); }finally{ exph.disabled=false; exph.textContent=old; }
+      };
+      // лічильник фото: скільки їх і скільки важитиме повний бекап
+      const phCnt=host.querySelector('[data-acc-ph-count]');
+      if(phCnt && window.flowBackup.photoStats) window.flowBackup.photoStats().then(ps=>{
+        phCnt.textContent = ps.count ? ('Фото: '+ps.count+' · ≈ '+mb(ps.bytes)+' у повному бекапі') : 'Фото поки немає — повний бекап буде таким самим, як звичайний.';
+      }).catch(()=>{ phCnt.textContent=''; });
       const imb=host.querySelector('[data-acc-import]');
       const fileInput=host.querySelector('[data-acc-file]');
       if(imb && fileInput){
         imb.onclick=(e)=>{ e.stopPropagation(); fileInput.click(); };
         fileInput.onchange=async ()=>{
           const f=fileInput.files&&fileInput.files[0]; if(!f) return;
-          confirmSheet({title:'Імпортувати «'+f.name+'»?', sub:'Поточні дані буде замінено. Авто-копія попереднього стану збережеться на випадок відкату.', okLabel:'Імпортувати', onOk:async ()=>{
-          const r=await window.flowBackup.importFromFile(f);
           fileInput.value='';
-          if(r.ok){
-            flowAlert('✅ Відновлено '+r.restored+' записів'+(r.exportedAt?'\nз бекапу від '+new Date(r.exportedAt).toLocaleString():'')+'\n\nЗастосунок зараз перезавантажить дані.');
-            try{ const ld=window.__load; if(typeof ld==='function') await ld(); }catch(_){}
-            try{ const rd=window.__renderDashboard; if(typeof rd==='function') rd(); }catch(_){}
-            try{ if(typeof renderMore==='function') renderMore(); }catch(_){}
-            renderAccount();
-          } else {
-            flowAlert('❌ Імпорт не вдався: '+(r.error||'невідома помилка'));
-          }
-          }});
+          // 1) спершу перевірка й підсумок — нічого не записано
+          const ins=await window.flowBackup.inspectFile(f);
+          if(!ins.ok){ flowAlert('❌ Цей файл не відновити: '+(ins.error||'невідома помилка')+'\n\nПоточні дані не змінено.'); return; }
+          const inCloud=!!(window.sbUser&&window.sbUser());
+          const when=ins.summary.exportedAt?('Бекап від '+new Date(ins.summary.exportedAt).toLocaleString()+'.\n'):'';
+          const cloudWarn=inCloud
+            ? '\n\n⚠️ Ти увійшов у Google: відновлене одразу піде в хмару і ПЕРЕЗАПИШЕ те, що там зараз. Інші пристрої отримають його при наступній синхронізації.'
+            : '';
+          // 2) людина бачить, що відновиться, і лише тоді підтверджує
+          confirmSheet({title:'Відновити з «'+f.name+'»?', ic:'refresh',
+            sub:when+ins.summary.text+'\n\nПоточні дані буде замінено. Авто-копія попереднього стану збережеться на випадок відкату.'+cloudWarn,
+            okLabel:inCloud?'Відновити і перезаписати хмару':'Відновити', onOk:async ()=>{
+              const r=await window.flowBackup.applyInspected(ins);
+              if(!r.ok){ flowAlert('❌ Імпорт не вдався: '+(r.error||'невідома помилка')); return; }
+              let msg='✅ Відновлено '+r.restored+' розділів даних'+(r.photos?' і '+r.photos+' фото':'')+'.';
+              if(r.cloud) msg += (r.pending||r.phFail)
+                ? '\n\n☁️ Частина ще не дійшла до хмари (нема зв\'язку?) — застосунок дошле сам, щойно зв\'язок з\'явиться.'
+                : '\n\n☁️ Хмару оновлено — інші пристрої підхоплять відновлене при синхронізації.';
+              msg += '\n\nЗастосунок зараз перезапуститься.';
+              flowAlert(msg);
+              // повний перезапуск: частину налаштувань модулі читають лише на старті
+              setTimeout(()=>{ try{ location.reload(); }catch(_){} }, 1800);
+            }});
         };
       }
 

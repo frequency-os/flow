@@ -290,7 +290,8 @@
         // saveFolders(); доти емодзі лишається єдиним джерелом правди.
         const ic=c.icon||folderIconFor(c.emoji);
         if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||''}); }
-        else if(c.custom){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||''}; }
+        // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
+        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||''}; }
       });
     }
   }
@@ -341,7 +342,7 @@
     // застосування значень нижче лишається в тому самому порядку, що й раніше.
     const __RAW = await (async ()=>{
       const keys=[DEBT_KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
-        FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',
+        FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',FDELKEY,
         WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
@@ -408,6 +409,8 @@
       }
     }catch(_){}
     try{ applyChatsRaw(__RAW['chats_v1']); }catch(e){ console.error('chats load',e); }
+    // папки, видалені на іншому пристрої, — геть разом з документом, темами, фото й посиланнями чатів
+    try{ applyFolderTombsRaw(__RAW[FDELKEY]); }catch(e){ console.error('folder tombs',e); }
     // goals data
     try{
       const rawg=__RAW[GKEY];

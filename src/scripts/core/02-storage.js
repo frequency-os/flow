@@ -293,6 +293,10 @@
         });
         return n;
       },
+      /* Значення у тому вигляді, як воно лежить у localStorage ({_v,d} + версія
+         схеми) — щоб бекап міг покласти поруч із локальними й хмарну копію,
+         якщо вона свіжіша (див. collect у BACKUP нижче). */
+      wrapRaw(key, value, v){ return JSON.stringify({ _v: v || Date.now(), d: stampSv(key, value) }); },
       // ⚡ синхронне читання ЛИШЕ локальної копії (для миттєвого першого рендера до синку з хмарою)
       getLocal(key){
         try{ const l=unwrap(lcGet(key)); return l? this._out(key, l.value) : null; }catch(_){ return null; }
@@ -470,6 +474,21 @@
       }catch(_){ return 0; }
     }
     window.sbPrefetchAll = sbPrefetchAll;
+    /* Ключі, чия хмарна копія свіжіша за локальну. Хмарне значення при читанні
+       віддається модулю, але в localStorage НЕ пишеться — тож на пристрої, де
+       правили з іншого, локальна копія стара, і бекап лише з localStorage
+       зберіг би НЕ те, що людина бачить на екрані. Віддаємо у форматі
+       localStorage ({_v,d}), щоб бекап просто поклав їх поверх локальних. */
+    window.sbCloudFresher = function(){
+      if(!sb || !sbUserCache || !sbBatchCache) return null;
+      const out = {};
+      Object.keys(sbBatchCache).forEach(k=>{
+        if(k in sbWriteQueue || k in sbInFlight) return;   // своя правка ще летить — вона новіша
+        const ts = sbBatchTs[k]||0;
+        if(ts > sbLocalVersion(k)) out[k] = window.storage.wrapRaw(k, sbBatchCache[k], ts);
+      });
+      return out;
+    };
     /* ── ЧИ МОЖНА ВІРИТИ ПОРОЖНЬОМУ ЧИТАННЮ? ──
        Головне питання перед будь-яким автоматичним записом: «у сховищі справді
        нічого нема» чи «сховище не відповіло»? Досі обидва випадки виглядали
@@ -1019,16 +1038,43 @@
     const LP = 'flowapp_';                 // той самий префікс, що й у storage
     const FORMAT = 1;                       // версія формату бекапу (не плутати з версією схеми даних)
     const APP = 'flow';
+    const ZIP_JSON = 'frequency-backup.json';   // дані всередині «повного бекапу з фото»
+    /* Службові ключі з подвійним підкресленням (flowapp___sb_outbox — кошик
+       синку, ___ph_push / ___ph_ts / ___ph_backfill_* — черга й мітки фото,
+       ___seeded — прапорець Preferences) описують стан ЦЬОГО пристрою, а не
+       дані людини. Раніше вони йшли в бекап, і відновлений старий кошик
+       повторно відправляв би в хмару давні правки. */
+    function isSvc(short){ return String(short).slice(0,2)==='__'; }
+    /* Звірка з FLOW_KEYS (01-base.js): з усього реєстру лише ці пишуться
+       СИРИМИ (без flowapp_), тож збір за префіксом їх не бачив.
+       i18n_content_cache — кеш перекладу, його не беремо. */
+    const RAW_DATA = ['lang_pref'];
+    // ключі, які МУСЯТЬ читатись як JSON — інакше файл пошкоджений і відновлювати не можна
+    const JSON_KEYS = ['folders_cfg','folders_order','folders_deleted_v1','chats_v1','board','goals_data',
+      'diary_entries_v1','diary_books_v1','fin_ops','wishes_board'];
 
-    // Зібрати ВЕСЬ стан Flow з localStorage у один обʼєкт
+    // Зібрати ВЕСЬ стан Flow у один обʼєкт (у форматі localStorage: {_v,d})
     function collect(){
       const data = {};
       try{
         for(const k of Object.keys(localStorage)){
-          if(k.startsWith(LP)) data[k.slice(LP.length)] = localStorage.getItem(k);
+          if(!k.startsWith(LP)) continue;
+          const short = k.slice(LP.length);
+          if(!isSvc(short)) data[short] = localStorage.getItem(k);
         }
       }catch(_){}
+      // з входом у Google хмарна копія буває свіжішою за локальну (правили на
+      // іншому пристрої) — у бекап має піти те, що людина бачить на екрані
+      try{
+        const fr = window.sbCloudFresher && window.sbCloudFresher();
+        if(fr) Object.keys(fr).forEach(k=>{ if(!isSvc(k)) data[k] = fr[k]; });
+      }catch(_){}
       return data;
+    }
+    function collectRaw(){
+      const r = {};
+      RAW_DATA.forEach(k=>{ try{ const v = localStorage.getItem(k); if(v!=null) r[k] = v; }catch(_){} });
+      return r;
     }
 
     // Скільки ключів / приблизний розмір — для UI
@@ -1037,38 +1083,96 @@
       let bytes = 0; try{ bytes = new Blob([JSON.stringify(d)]).size; }catch(_){ bytes = JSON.stringify(d).length; }
       return { keys: keys.length, bytes };
     }
+    /* Фото з IndexedDB (PhotoDB): скільки їх і скільки важать — лічильник для
+       кнопки «Повний бекап з фото». Розмір рахуємо з base64 (×3/4), без декодування. */
+    async function photoStats(){
+      let all = {};
+      try{ if(window.PhotoDB && window.PhotoDB.available()) all = await window.PhotoDB.all(); }catch(_){}
+      let count = 0, bytes = 0;
+      Object.keys(all).forEach(id=>{
+        const v = all[id]; if(typeof v!=='string' || !v) return;
+        count++; const i = v.indexOf(',');
+        bytes += i>0 ? Math.floor((v.length-i-1)*3/4) : v.length;
+      });
+      return { count, bytes, all };
+    }
 
-    // Згорнути все у JSON-конверт з метаданими
-    function makeEnvelope(){
-      return JSON.stringify({
+    // Згорнути все у JSON-конверт з метаданими (extra — додаткові поля, напр. опис фото)
+    function makeEnvelope(extra){
+      const data = collect();
+      return JSON.stringify(Object.assign({
         app: APP,
         format: FORMAT,
         exportedAt: new Date().toISOString(),
-        keyCount: Object.keys(collect()).length,
-        data: collect()
-      }, null, 0);
+        keyCount: Object.keys(data).length,
+        data,
+        raw: collectRaw()
+      }, extra||{}), null, 0);
     }
 
-    // Експорт: зберегти файл flow-backup-YYYY-MM-DD.json і сказати ПРАВДУ,
-    // чи він є. Раніше після a.click() відповідь завжди була ok:true — хоча
-    // в iPhone-обгортці <a download> нічого не пише, а на Mac діалог
-    // збереження можна скасувати. «Стерти все» спиралось на цей «бекап».
+    // JSZip лежить у vendor/ і потрібен рідко — вантажимо лише коли справді треба
+    async function loadZip(){
+      if(window.JSZip) return window.JSZip;
+      try{ if(typeof loadScriptOnce==='function') await loadScriptOnce(['vendor/jszip.min.js','https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js']); }catch(_){}
+      return window.JSZip || null;
+    }
+    const PH_EXT = { 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp', 'image/gif':'gif' };
+    function dataUrlParts(v){
+      const m = /^data:([^;,]*)(;base64)?,/.exec(String(v||''));
+      if(!m) return null;
+      return { mime: m[1]||'application/octet-stream', b64: !!m[2], body: String(v).slice(m[0].length) };
+    }
+
+    /* Готовий файл бекапу (ще НЕ збережений): { name, blob, type, photos }.
+       opts.photos: true — «повний бекап з фото» (zip: дані + кожне фото окремим
+       файлом); 'auto' — zip лише якщо фото є; інакше — звичайний .json. */
+    async function makeFile(opts){
+      opts = opts || {};
+      // хмара могла змінитись після останньої звірки — освіжаємо, щоб бекап збігся з екраном
+      if(window.sbUser && window.sbUser() && window.sbPrefetchAll){
+        try{ await Promise.race([ window.sbPrefetchAll(), new Promise(r=>setTimeout(r, 8000)) ]); }catch(_){}
+      }
+      const stamp = ymdLocal();
+      let ps = null;
+      if(opts.photos){ ps = await photoStats(); if(opts.photos==='auto' && !ps.count) ps = null; }
+      if(!ps){
+        return { name:`flow-backup-${stamp}.json`, type:'application/json', photos:0,
+                 blob: new Blob([makeEnvelope()], {type:'application/json'}) };
+      }
+      const JSZip = await loadZip();
+      if(!JSZip) throw new Error('не вдалося завантажити модуль zip — зроби звичайний бекап без фото');
+      const zip = new JSZip(), map = {};
+      Object.keys(ps.all).forEach(id=>{
+        const p = dataUrlParts(ps.all[id]); if(!p) return;
+        const file = 'photos/'+encodeURIComponent(id)+'.'+(PH_EXT[p.mime]||'bin');
+        // JPEG уже стиснутий — пакуємо як є, стискаємо лише дані JSON
+        if(p.b64) zip.file(file, p.body, { base64:true, compression:'STORE' });
+        else zip.file(file, decodeURIComponent(p.body), { compression:'STORE' });
+        map[id] = { file, mime:p.mime };
+      });
+      zip.file(ZIP_JSON, makeEnvelope({ photos:map }), { compression:'DEFLATE' });
+      const blob = await zip.generateAsync({ type:'blob', mimeType:'application/zip' });
+      return { name:`flow-backup-${stamp}-photos.zip`, type:'application/zip', photos:Object.keys(map).length, blob };
+    }
+
+    // Зберегти файл і сказати ПРАВДУ, чи він є. Раніше після a.click() відповідь
+    // завжди була ok:true — хоча в iPhone-обгортці <a download> нічого не пише,
+    // а на Mac діалог збереження можна скасувати. «Стерти все» спиралось на цей «бекап».
     //   { ok:true,  saved:true }  — файл точно віддано: діалог «Зберегти як…»
     //                               чи аркуш «Поділитися» завершились успіхом
     //   { ok:true,  saved:false } — віддали браузеру на завантаження; чи
     //                               файл з'явився, сторінка знати не може
     //   { ok:false, cancelled:true } — людина закрила діалог: файлу НЕМА
-    async function exportToFile(){
-      const json = makeEnvelope();
-      const stamp = ymdLocal();
-      const name = `flow-backup-${stamp}.json`;
+    async function saveBlob(f){
+      const { name, blob, type } = f;
+      const ext = name.slice(name.lastIndexOf('.'));
       const cancelled = { ok:false, cancelled:true, name, error:'збереження скасовано — файл не записано' };
       // 1) діалог «Зберегти як…» (Chrome, Edge, застосунок на Mac): результат відомий напевно
       if(typeof window.showSaveFilePicker==='function'){
         try{
           const h = await window.showSaveFilePicker({ suggestedName:name,
-            types:[{ description:'Frequency backup', accept:{'application/json':['.json']} }] });
-          const w = await h.createWritable(); await w.write(json); await w.close();
+            types:[{ description:'Frequency backup', accept:{ [type]:[ext] } }] });
+          const w = await h.createWritable(); await w.write(blob); await w.close();
           return { ok:true, saved:true, how:'picker', name:h.name||name };
         }catch(e){
           if(e && e.name==='AbortError') return cancelled;
@@ -1081,9 +1185,9 @@
                   (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
       if(ios && navigator.share && typeof File==='function'){
         try{
-          const f = new File([json], name, {type:'application/json'});
-          if(!navigator.canShare || navigator.canShare({files:[f]})){
-            await navigator.share({ files:[f], title:name });
+          const file = new File([blob], name, {type});
+          if(!navigator.canShare || navigator.canShare({files:[file]})){
+            await navigator.share({ files:[file], title:name });
             return { ok:true, saved:true, how:'share', name };
           }
         }catch(e){
@@ -1092,7 +1196,6 @@
       }
       // 3) звичайне завантаження — останній варіант, результат невідомий
       try{
-        const blob = new Blob([json], {type:'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = name; document.body.appendChild(a); a.click();
@@ -1100,6 +1203,14 @@
         setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(_){} }, 1500);
         return { ok:true, saved:false, how:'download', name };
       }catch(e){ return { ok:false, error:String(e) }; }
+    }
+    // Експорт: зібрати файл (opts.photos — див. makeFile) і зберегти його
+    async function exportToFile(opts){
+      let f;
+      try{ f = await makeFile(opts); }catch(e){ return { ok:false, error:String((e&&e.message)||e) }; }
+      const r = await saveBlob(f);
+      r.photos = f.photos; r.bytes = f.blob.size;
+      return r;
     }
 
     // Аварійний знімок у самій localStorage (на випадок "зламав — відкоти")
@@ -1110,40 +1221,182 @@
       try{ const s = localStorage.getItem('__flow_snapshot__'); if(!s) return false; return applyEnvelope(s, {makeSafetyCopy:false}); }catch(_){ return false; }
     }
 
-    // Розпакувати конверт назад у localStorage
-    // opts.makeSafetyCopy: перед перезаписом зробити авто-знімок поточного стану
-    function applyEnvelope(json, opts){
-      opts = opts || {};
+    // значення у форматі localStorage ({_v,d} чи сирий рядок) → рядок даних
+    function unwrapVal(raw){
+      try{ const o = JSON.parse(raw); if(o && typeof o==='object' && '_v' in o && 'd' in o) return typeof o.d==='string' ? o.d : JSON.stringify(o.d); }catch(_){}
+      return raw;
+    }
+    // розібраний обʼєкт даних ключа (без обгортки версії схеми {__sv,d}) або null
+    function valOf(env, k){
+      const raw = env.data[k]; if(typeof raw!=='string') return null;
+      try{
+        let o = JSON.parse(unwrapVal(raw));
+        if(o && typeof o==='object' && !Array.isArray(o) && '__sv' in o && 'd' in o) o = o.d;
+        return o;
+      }catch(_){ return null; }
+    }
+    // Перевірити структуру конверта, НІЧОГО не записуючи
+    function checkEnvelope(json){
       let env;
       try{ env = JSON.parse(json); }catch(_){ return { ok:false, error:'Файл не є коректним JSON' }; }
-      if(!env || env.app !== APP || !env.data || typeof env.data !== 'object'){
+      if(!env || env.app !== APP || !env.data || typeof env.data !== 'object' || Array.isArray(env.data)){
         return { ok:false, error:'Це не схоже на бекап Frequency' };
       }
       if(env.format > FORMAT){
         return { ok:false, error:'Бекап з новішої версії застосунку. Онови Frequency.' };
       }
+      const bad = [];
+      Object.keys(env.data).forEach(k=>{
+        const v = env.data[k];
+        if(typeof v!=='string'){ bad.push(k); return; }
+        if(JSON_KEYS.includes(k)){ try{ JSON.parse(unwrapVal(v)); }catch(_){ bad.push(k); } }
+      });
+      if(bad.length) return { ok:false, error:'Файл пошкоджений — не читаються: '+bad.slice(0,5).join(', ') };
+      return { ok:true, env };
+    }
+    function plural(n, one, few, many){
+      const a = n%10, b = n%100;
+      return n+' '+(a===1 && b!==11 ? one : (a>=2 && a<=4 && (b<12 || b>14) ? few : many));
+    }
+    // Підсумок «що буде відновлено» — людина бачить його ДО того, як щось перезапишеться
+    function summarize(env, photos, missing){
+      const parts = [];
+      const fc = valOf(env,'folders_cfg'); if(fc && typeof fc==='object') parts.push(plural(Object.keys(fc).length,'папка','папки','папок'));
+      const ch = valOf(env,'chats_v1'); if(Array.isArray(ch)) parts.push(plural(ch.length,'чат','чати','чатів'));
+      let dn = 0;
+      const de = valOf(env,'diary_entries_v1'); if(de && typeof de==='object') dn += Object.keys(de).length;
+      const db = valOf(env,'diary_books_v1');
+      if(db && db.entries && typeof db.entries==='object') Object.keys(db.entries).forEach(b=>{ if(Array.isArray(db.entries[b])) dn += db.entries[b].length; });
+      if(dn) parts.push(plural(dn,'запис щоденника','записи щоденника','записів щоденника'));
+      const bd = valOf(env,'board');
+      if(bd && typeof bd==='object'){ let n=0; Object.keys(bd).forEach(k=>{ if(Array.isArray(bd[k])) n += bd[k].length; });
+        if(n) parts.push(plural(n,'блок у документах і чатах','блоки в документах і чатах','блоків у документах і чатах')); }
+      const gd = valOf(env,'goals_data'); if(gd && Array.isArray(gd.goals) && gd.goals.length) parts.push(plural(gd.goals.length,'ціль','цілі','цілей'));
+      const fo = valOf(env,'fin_ops'); if(Array.isArray(fo) && fo.length) parts.push(plural(fo.length,'фінансова операція','фінансові операції','фінансових операцій'));
+      const wb = valOf(env,'wishes_board'); if(Array.isArray(wb) && wb.length) parts.push(plural(wb.length,'бажання','бажання','бажань'));
+      const np = photos ? Object.keys(photos).length : 0;
+      parts.push(np ? np+' фото' : 'фото в цьому файлі немає');
+      const keys = Object.keys(env.data).filter(k=>!isSvc(k)).length;
+      let text = 'Буде відновлено: '+parts.join(', ')+' (усього '+plural(keys,'розділ','розділи','розділів')+' даних).';
+      if(missing) text += ' Не вдалося прочитати фото: '+missing+'.';
+      return { parts, keys, photos:np, missing:missing||0, exportedAt:env.exportedAt||'', text };
+    }
+
+    function readFile(file, how){
+      return new Promise((res, rej)=>{
+        const r = new FileReader();
+        r.onload = ()=> res(r.result);
+        r.onerror = ()=> rej(r.error || new Error('read'));
+        if(how==='buf') r.readAsArrayBuffer(file); else r.readAsText(file);
+      });
+    }
+    /* Крок 1 відновлення: прочитати файл (.json чи .zip з фото) і перевірити
+       структуру. НІЧОГО не пише — повертає { ok, env, photos, summary }. */
+    async function inspectFile(file){
+      let text = null, zip = null;
+      try{
+        const head = new Uint8Array(await readFile(file.slice(0,2), 'buf'));
+        if(head[0]===0x50 && head[1]===0x4b){          // 'PK' — це zip
+          const JSZip = await loadZip();
+          if(!JSZip) return { ok:false, error:'Не вдалося відкрити zip: модуль не завантажився' };
+          zip = await JSZip.loadAsync(await readFile(file, 'buf'));
+          const jf = zip.file(ZIP_JSON);
+          if(!jf) return { ok:false, error:'У zip немає '+ZIP_JSON+' — це не бекап Frequency' };
+          text = await jf.async('string');
+        } else text = String(await readFile(file, 'text'));
+      }catch(e){ return { ok:false, error:'Не вдалося прочитати файл: '+String((e&&e.message)||e) }; }
+      const chk = checkEnvelope(text); if(!chk.ok) return chk;
+      const env = chk.env;
+      let photos = null, missing = 0;
+      if(zip && env.photos && typeof env.photos==='object'){
+        photos = {};
+        for(const id of Object.keys(env.photos)){
+          const m = env.photos[id]; const zf = m && m.file && zip.file(m.file);
+          if(!zf){ missing++; continue; }
+          try{ photos[id] = 'data:'+(m.mime||'image/jpeg')+';base64,'+(await zf.async('base64')); }catch(_){ missing++; }
+        }
+      }
+      return { ok:true, env, photos, summary: summarize(env, photos, missing) };
+    }
+
+    // Розпакувати конверт (рядок чи вже перевірений обʼєкт) назад у localStorage
+    // opts.makeSafetyCopy: перед перезаписом зробити авто-знімок поточного стану
+    function applyEnvelope(src, opts){
+      opts = opts || {};
+      let env = src;
+      if(typeof src==='string'){ const c = checkEnvelope(src); if(!c.ok) return c; env = c.env; }
       if(opts.makeSafetyCopy !== false) snapshot();
       let restored = 0;
       try{
         for(const k of Object.keys(env.data)){
+          if(isSvc(k)) continue;           // старі бекапи несли й службові ключі — стан чужого пристрою
           localStorage.setItem(LP + k, env.data[k]);
           restored++;
         }
+        if(env.raw && typeof env.raw==='object') RAW_DATA.forEach(k=>{ if(typeof env.raw[k]==='string') localStorage.setItem(k, env.raw[k]); });
       }catch(e){ return { ok:false, error:'Не вистачило памʼяті: '+String(e), restored }; }
       return { ok:true, restored, exportedAt: env.exportedAt };
     }
 
-    // Імпорт із файлу (через <input type=file>)
-    function importFromFile(file){
-      return new Promise(res=>{
-        const r = new FileReader();
-        r.onload = ()=> res(applyEnvelope(String(r.result), {makeSafetyCopy:true}));
-        r.onerror = ()=> res({ ok:false, error:'Не вдалося прочитати файл' });
-        r.readAsText(file);
-      });
+    /* Відновлене має стати НАЙСВІЖІШИМ записом. Мітка _v у бекапі стара, тож
+       без перепису (а) з входом у Google хмара з новішою міткою перемагала при
+       першому ж читанні — відновлення мовчки не діяло; (б) на iPhone
+       Preferences з новішою міткою так само підняли б старе при старті.
+       Тому кожен ключ даних переписуємо через window.storage.set: свіжа мітка →
+       localStorage + Preferences + черга в хмару. Сирі прапорці міграцій (не
+       {_v,d}) не чіпаємо — вони й не синхронізуються. */
+    async function pushRestored(keys, photos){
+      let n = 0;
+      for(const k of keys){
+        if(isSvc(k)) continue;
+        let wrapped = false;
+        try{ const o = JSON.parse(localStorage.getItem(LP+k)); wrapped = !!(o && typeof o==='object' && '_v' in o && 'd' in o); }catch(_){}
+        if(!wrapped) continue;
+        const v = window.storage.getLocal(k); if(v==null) continue;
+        try{ await window.storage.set(k, v, false); n++; }catch(_){}
+      }
+      if(!(window.sbUser && window.sbUser())) return { cloud:false, keys:n };
+      // відновлення — крок назад у часі: «надгробки» папок, які інші пристрої
+      // ще тримають у памʼяті, більше не діють (інакше вони знову стерли б
+      // щойно відновлені папки). Без входу інших пристроїв нема — не чіпаємо.
+      try{ if(typeof window.folderTombsReset==='function') await window.folderTombsReset(); }catch(_){}
+      // у хмару одразу, не чекаючи таймера: далі сторінка перезапуститься
+      try{ if(window.sbFlushWrites) await window.sbFlushWrites(); }catch(_){}
+      let phOk = 0, phFail = 0;
+      if(photos && window.sbPhotoPush){
+        for(const id of Object.keys(photos)){ try{ if(await window.sbPhotoPush(id)) phOk++; else phFail++; }catch(_){ phFail++; } }
+      }
+      const pending = (window.__flowSync && window.__flowSync.sbPending) || 0;
+      return { cloud:true, keys:n, pending, phOk, phFail };
+    }
+    /* Крок 2 відновлення (після підтвердження людиною): записати дані й фото,
+       зробити їх найсвіжішими і — з входом у Google — відправити в хмару. */
+    async function applyInspected(ins, opts){
+      opts = opts || {};
+      if(!ins || !ins.ok || !ins.env) return { ok:false, error:'Нема що відновлювати' };
+      const r = applyEnvelope(ins.env, { makeSafetyCopy: opts.makeSafetyCopy!==false });
+      if(!r.ok) return r;
+      let ph = 0;
+      if(ins.photos && window.PhotoDB && window.PhotoDB.available()){
+        for(const id of Object.keys(ins.photos)){
+          try{ await window.PhotoDB.put(id, ins.photos[id]); window.__photoCache[id] = ins.photos[id]; ph++; }catch(_){}
+        }
+      }
+      r.photos = ph;
+      const c = await pushRestored(Object.keys(ins.env.data), ins.photos);
+      r.cloud = c.cloud; r.pending = c.pending||0; r.phFail = c.phFail||0;
+      return r;
     }
 
-    window.flowBackup = { collect, stats, exportToFile, importFromFile, snapshot, restoreSnapshot, FORMAT };
+    // Імпорт із файлу одним кроком (перевірка + запис) — для старих викликів
+    async function importFromFile(file){
+      const ins = await inspectFile(file);
+      if(!ins.ok) return ins;
+      return applyInspected(ins, {makeSafetyCopy:true});
+    }
+
+    window.flowBackup = { collect, stats, photoStats, makeFile, exportToFile, inspectFile, applyInspected,
+                          importFromFile, snapshot, restoreSnapshot, FORMAT };
   })();
 
   /* ============ СКИДАННЯ ДО ЗАВОДСЬКИХ ============
@@ -1154,6 +1407,7 @@
        • «Стерти все з акаунта» (wipeCloud:true) — плюс видаляє всі рядки
          в хмарі й виходить з акаунта. Незворотно.
      Обидві починаються з експорту бекапу у файл — без нього не рушаємо.
+     Книжки читалки (BookDB) в бекап не входять — екран чесно попереджає.
      IndexedDB тут лише позначається прапорцем: бази видаляє ранній хук
      на наступному старті (див. верх файлу), бо відкриті зʼєднання
      блокують deleteDatabase. ============ */
@@ -1163,8 +1417,10 @@
     //    Якщо файл лише віддано на завантаження (saved:false), сторінка не знає,
     //    чи він є, — повертаємо крок 'backup-confirm': екран спитає людину і
     //    викличе нас знову з backupConfirmed:true (без повторного експорту).
+    //    Фото (PhotoDB) скидання теж стирає — тож якщо вони є, бекап іде zip-ом
+    //    разом із ними. Книжки (BookDB) не беремо: вони великі, їх завантажують знову.
     if(!o.backupConfirmed){
-      const bk = await window.flowBackup.exportToFile();
+      const bk = await window.flowBackup.exportToFile({photos:'auto'});
       if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
       if(!bk.saved) return { ok:false, step:'backup-confirm', name:bk.name, error:'не видно, чи файл бекапу збережено' };
     }
