@@ -5,6 +5,24 @@
      Вимкнути: localStorage.setItem('ai_agent','0') */
   const AI_AGENT_KEY='ai_agent';
   function aiAgentOn(){ try{ return (localStorage.getItem(AI_AGENT_KEY)||'1')==='1'; }catch(_){ return true; } }
+  /* Моделі — ті самі назви, що в MODELS воркера (worker/flow-ai-worker.js):
+     fast — Haiku 4.5, без «думання», дешевий: розмова й читання;
+     main — Sonnet 5 з adaptive thinking: записи даних, аналіз, dev-режим.
+     Застарілі назви (sonnet-4-6, haiku-…-20251001) воркер перекладає сам, але покладатись
+     на це не варто: невідому назву він мовчки міняє на дорожчу модель (AI-11, APP-8). */
+  const AI_MODELS={fast:'claude-haiku-4-5', main:'claude-sonnet-5'};
+  try{ window.AI_MODELS=AI_MODELS; }catch(_){}
+  /* Ціни для статистики витрат (dev_cost) — ЄДИНЕ місце, $ за 1 млн токенів.
+     Джерело: platform.claude.com/docs/en/about-claude/pricing (виписано у вересні 2026,
+     market-business.md, розд. 2). Opus 5 — $5/$25 з довідника моделей Anthropic, кеш за тим
+     самим правилом (читання ×0.1, запис ×1.25). ЗВІРИТИ з anthropic.com/pricing перед
+     рішеннями про гроші. i — вхід, o — вихід, cr — читання з кешу, cw — запис у кеш (5 хв). */
+  const AI_PRICES={
+    h:{name:'Haiku 4.5', i:1, o:5,  cr:0.10, cw:1.25},
+    s:{name:'Sonnet 4.6',i:3, o:15, cr:0.30, cw:3.75},   // старі записи «s» — до переходу на Sonnet 5
+    s5:{name:'Sonnet 5', i:2, o:10, cr:0.20, cw:2.50},
+    o:{name:'Opus 5',    i:5, o:25, cr:0.50, cw:6.25}
+  };
   let aiAgentStatus='';                       // що агент робить зараз (для бульбашки чату)
   function aiAgentSetStatus(s){
     aiAgentStatus=s||'';
@@ -215,26 +233,25 @@
   function devToolCost(){
     let d={}; try{ d=JSON.parse(localStorage.getItem('ai_usage')||'{}'); }catch(_){}
     const mon=plTodayStr().slice(0,7);
-    const P={h:{i:1,o:5},s:{i:3,o:15}};   // $ за Mtok
-    const cost=(m,e)=>(e.i*P[m].i+e.o*P[m].o+e.cr*P[m].i*0.1+e.cw*P[m].i*1.25)/1e6;
-    let tot=0,totH=0,totS=0; const rows=[];
+    const cost=(m,e)=>{ const p=AI_PRICES[m]; return (e.i*p.i+e.o*p.o+(e.cr||0)*p.cr+(e.cw||0)*p.cw)/1e6; };
+    let tot=0; const byM={}; const rows=[];
     Object.keys(d).sort().forEach(ds=>{
       if(ds.slice(0,7)!==mon) return;
       let day=0,parts=[];
-      ['h','s'].forEach(m=>{ const e=d[ds][m]; if(!e) return;
-        const c=cost(m,e); day+=c; if(m==='h')totH+=c; else totS+=c;
-        parts.push((m==='h'?'Haiku':'Sonnet')+' '+e.n+'зап, in '+e.i+' (кеш '+e.cr+'), out '+e.o);
+      Object.keys(AI_PRICES).forEach(m=>{ const e=d[ds][m]; if(!e) return;
+        const c=cost(m,e); day+=c; byM[m]=(byM[m]||0)+c;
+        parts.push(AI_PRICES[m].name+' '+e.n+'зап, in '+e.i+' (кеш '+e.cr+'), out '+e.o);
       });
       tot+=day;
       rows.push(ds+': $'+day.toFixed(3)+' · '+parts.join(' · '));
     });
     if(!rows.length) return 'за '+mon+' даних ще немає (збір почався з цієї версії)';
-    return rows.join('\n')+'\nРАЗОМ '+mon+': $'+tot.toFixed(2)+' (Haiku $'+totH.toFixed(2)+' / Sonnet $'+totS.toFixed(2)+')';
+    return rows.join('\n')+'\nРАЗОМ '+mon+': $'+tot.toFixed(2)+' ('+Object.keys(byM).map(m=>AI_PRICES[m].name+' $'+byM[m].toFixed(2)).join(' / ')+')';
   }
   async function devToolSelftest(){
     const out=[];
     // 1) воркер: обидві моделі, латенсі
-    for(const m of ['claude-haiku-4-5','claude-sonnet-4-6']){
+    for(const m of [AI_MODELS.fast,AI_MODELS.main]){
       const t0=Date.now();
       try{
         const r=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
@@ -299,7 +316,7 @@
   /* @dev-only:end */
   /* ── /ai зі сторінки редактора: агентний хід з текстом сторінки в контексті ── */
   async function aiPageAsk(q,pageTxt){
-    const sysStable=AI_CHAT_SYS+AI_AGENT_ADDON;
+    const sysStable=AI_CORE_SYS+AI_AGENT_ADDON;
     const sysDyn='РЕЖИМ СТОРІНКИ: людина викликала тебе слеш-командою зі сторінки редактора. Нижче — текст цієї сторінки. Виконай прохання; за потреби використовуй інструменти (planner/goals/finance/memory/get_data). Відповідь — стислий текст, який ляже блоком на цю сторінку: без FLOW_OPS, без заголовків, без markdown.'
       +'\n\nСТОРІНКА:\n'+(pageTxt||'(порожньо)')
       +'\n\nКОНТЕКСТ:\n'+aiCtx(null);
@@ -492,8 +509,7 @@
       input_schema:{ type:'object', properties:{
         action:{ type:'string', enum:['save','forget'] },
         text:{ type:'string' }
-      }, required:['action','text'] },
-      cache_control:{ type:'ephemeral' } },
+      }, required:['action','text'] } },
     { name:'folders',
       description:'Папки й проєкти на головному екрані: create (нова папка/проєкт), rename, set_role (зробити проєктом/звичайною папкою, виставити due), delete. folder — фрагмент наявної назви.',
       input_schema:{ type:'object', properties:{
@@ -517,10 +533,11 @@
   const AI_AGENT_ADDON='\n\nАГЕНТНИЙ РЕЖИМ: у тебе є інструменти get_data, planner, goals, finance, patterns, memory, folders, diary. '
     +'Дії з блоками планера — ЛИШЕ інструмент planner. «Нагадай мені о X про Y» — теж planner: на наявний блок action=remind, для нового — create з полем remind (короткий блок на той час). Кроки/цілі — інструмент goals. ВЕСЬ блок Гроші — інструмент finance: витрати, доходи, конверти (env_deposit/env_spend/env_create), борги (debt_add/debt_pay/debt_edit/debt_delete/debt_list) і виправлення (del_last). Помилково записаний борг можна виправити (debt_edit: імʼя/залишок) або видалити (debt_delete). Ніколи не кажи, що не можеш редагувати борги чи конверти — можеш, викликом finance. '
     +'Цикли заміни звичок — інструмент patterns (перемога=mark_new, зрив=mark_old, без осуду). '
-    +'Довготривалі факти про людину — інструмент memory (save/forget), а НЕ FLOW_MEM-рядок. '
-    +'Папки й проєкти на головному екрані — інструмент folders (create/rename/set_role/delete). '
+    +'Довготривалі факти про людину — інструмент memory (save/forget); запис людина підтверджує шторкою. '
+    +'Папки й проєкти на головному екрані — інструмент folders (create/rename/set_role/delete). Віджетів у папку він не кладе — не обіцяй їх. '
     +'Щоденник — інструмент diary: «запиши в щоденник…» → add_entry (за день), «запиши в Стосунки/Вдячність/зошит…» → book_entry, перелік зошитів → book_list. Запис у зошит автоматично видно і в дні щоденника. '
-    +'FLOW_OPS використовуй лише для pages. '
+    +'СТОРІНКИ з контентом у папці (чекліст, план, нотатка, структура проєкту) — інструмента для них нема: додай ОСТАННІМ рядком FLOW_OPS:{"pages":[...]} (валідний JSON одним рядком), людина застосує його кнопкою. Інших полів у FLOW_OPS не пиши — для решти є інструменти. '
+    +AI_PAGES_SYS
     +'ПІДТВЕРДЖЕННЯ: майже кожен інструмент, що щось МІНЯЄ (не читає), сам питає людину підтвердити дію шторкою знизу — просто викликай його, шторка зʼявиться автоматично. Якщо результат каже "людина скасувала" — прийми це, не повторюй той самий виклик і не наполягай. '
     +'ЛІМІТ БЕЗПЕКИ: не більше 5 змін даних за одне повідомлення людини (читання не рахується). Якщо просять більше — зроби найважливіші 5, поясни і попроси решту окремим повідомленням. Масове «видали все» не виконуй одним махом — лише поштучно, з переліком. '
     +'Перед плануванням дня, якого немає в КОНТЕКСТІ, спершу подивись його через get_data. '
@@ -1008,8 +1025,14 @@
     const t=String(inp.text||'').trim();
     if(!t) return '⚠️ порожній text';
     if(inp.action==='save'){
-      const n0=aiMem.length; aiMemAdd([t.slice(0,120)]);
-      return aiMem.length>n0?'запамʼятав':'вже було в памʼяті';
+      /* Памʼять іде в КОЖЕН наступний промпт і синхронізується між пристроями: тихий запис
+         був постійним каналом для підкинутих інструкцій (напр. з вкладеного PDF). Тепер —
+         лише після шторки з текстом факту; ліміт змін за хід рахує aiAgentTurn (SEC-5). */
+      const f=t.slice(0,120);
+      if(aiMem.some(x=>x.toLowerCase()===f.toLowerCase())) return 'вже було в памʼяті';
+      const ok=await aiToolConfirm('Запамʼятати: «'+f+'»',{title:'🧠 Frequency хоче запамʼятати факт',okLabel:'Запамʼятати'});
+      if(!ok) return 'людина скасувала — не повторюй';
+      return aiMemAdd([f])?'запамʼятав':'вже було в памʼяті';
     }
     if(inp.action==='forget'){
       const ok=await aiToolConfirm('Забути з памʼяті: «'+t+'»',{title:'🧠 Frequency хоче забути факт'});
@@ -1020,6 +1043,18 @@
       return 'нічого не знайшов у памʼяті по «'+t+'»';
     }
     return '⚠️ невідома дія';
+  }
+  /* FLOW_MEM з відповіді без інструментів (звичайний чат) — так само, як memory save:
+     лише через шторку з текстом фактів і не більше, ніж лишилось змін у цьому ході (SEC-5).
+     Повертає, скільки фактів записано. */
+  async function aiMemGate(facts,room){
+    facts=(facts||[]).map(f=>String(f||'').trim().slice(0,160)).filter(f=>f&&!aiMem.some(x=>x.toLowerCase()===f.toLowerCase()));
+    room=Math.max(0,room==null?AI_WRITE_LIMIT:room);
+    if(!facts.length||!room) return 0;
+    facts=facts.slice(0,room);
+    const sub=facts.length===1?'Запамʼятати: «'+facts[0]+'»':'Запамʼятати:\n'+facts.map(f=>'• '+f).join('\n');
+    const ok=await aiToolConfirm(sub,{title:'🧠 Frequency хоче запамʼятати',okLabel:'Запамʼятати'});
+    return ok?aiMemAdd(facts):0;
   }
   async function flowToolFolders(inp){
     const a=inp.action;
@@ -1074,19 +1109,45 @@
     }
     return '⚠️ невідома дія';
   }
-  function aiPickModel(q,hop){
+  /* Модель на ВЕСЬ хід, а не на кожен хоп: кеш прив'язаний до моделі, і стрибок Haiku→Sonnet
+     на 3-му хопі писав увесь префікс наново ×1.25 та міняв поведінку посеред дії (AI-9).
+     Записи даних — на main (AI-11): «запиши/перенеси/додай» раніше йшли на Haiku, а саме він
+     04.09 звітував «✅ Виправив!» без виклику інструмента. Haiku — лише розмова й читання. */
+  const AI_MAIN_RE=/🎙|розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй|виправ|видал|перейменуй|нагадай|запиш|запис|додай|перенес|відміт|познач|закрий|створи|постав|зміни|змін|витрат|заплатив|дохід|заробив|борг|позич|конверт|відклад|запамʼятай|запам'ятай|забудь|\b(plan(s|ned|ning)?|analy[sz](e|es|ed|ing|is)|why|weeks?|weekly|months?|monthly|compar(e|es|ed|ing)|fix(es|ed|ing)?|delet(e|es|ed|ing)|remov(e|es|ed|ing)|renam(e|es|ed|ing)|remind(s|ed|er|ing)?|add(s|ed|ing)?|mov(e|es|ed|ing)|record(s|ed|ing)?|log(s|ged|ging)?|spent|paid|debts?|creat(e|es|ed|ing)|sav(e|es|ed|ing)|remember(s|ed|ing)?|forget(s|ting)?|forgot|schedul(e|es|ed|ing))\b/i;
+  function aiPickModel(q){
     q=String(q||'');
-    if(hop>=3) return 'claude-sonnet-4-6';
-    if(q.length>220) return 'claude-sonnet-4-6';
-    if(/розплануй|проаналізуй|розпиши|чому|стратег|тиждень|місяць|порівняй|виправ|видали|видал|перейменуй|нагадай/i.test(q)) return 'claude-sonnet-4-6';
-    return 'claude-haiku-4-5';
+    if(q.length>220||AI_MAIN_RE.test(q)) return AI_MODELS.main;
+    return AI_MODELS.fast;
+  }
+  /* Мінімальний кешований префікс (токенів): коротший кеш мовчки не пише, тож брейкпоінт
+     там марний. Haiku 4.5 — 4096, Sonnet 5 — 1024 (довідник Anthropic, prompt caching). */
+  function aiCacheMin(model){ return /haiku/.test(String(model))?4096:1024; }
+  /* Груба оцінка токенів: кирилиця ≈2.4–3.2 символу на токен. Беремо 2.6, а не 3.2: зайвий
+     брейкпоінт під мінімумом нічого не коштує (кеш просто не пишеться), а недооцінка вимикає
+     кеш зовсім — з /3.2 стабільна підказка + інструменти давали 4055 < 4096, і на Haiku
+     (основна модель розмов) системну підказку не кешувало жодного разу. */
+  function aiTokEst(chars){ return Math.floor((+chars||0)/2.6); }
+  /* Копія розмови з брейкпоінтом кешу на останньому блоці останнього повідомлення (це завжди
+     user: питання людини або результати інструментів). Наступний хоп і наступне повідомлення
+     читають усю попередню історію з кешу за ~1/10 ціни, а не платять за неї щоразу (AI-9).
+     conv не чіпаємо: маркер має бути лише один, на хвості. */
+  function aiCacheTail(conv){
+    const out=conv.slice(), i=out.length-1, m=out[i];
+    if(!m) return out;
+    const content=typeof m.content==='string'?[{type:'text',text:m.content}]:(Array.isArray(m.content)?m.content.slice():[]);
+    const j=content.length-1;
+    if(j<0||(content[j].type==='text'&&!String(content[j].text||'').trim())) return out;
+    content[j]=Object.assign({},content[j],{cache_control:{type:'ephemeral'}});
+    out[i]={role:m.role,content:content};
+    return out;
   }
 
   function aiUsageAdd(model,u){
     try{
       const k='ai_usage'; const d=JSON.parse(localStorage.getItem(k)||'{}');
       const ds=plTodayStr(); d[ds]=d[ds]||{};
-      const m=/haiku/.test(String(model))?'h':'s';
+      // Sonnet 5 — окремий ключ: інакше dev_cost переоцінював увесь місяць Sonnet 4.6 за цінами Sonnet 5
+      const m=/haiku/.test(String(model))?'h':(/opus/.test(String(model))?'o':(/sonnet-5/.test(String(model))?'s5':'s'));
       const e=d[ds][m]=d[ds][m]||{i:0,o:0,cr:0,cw:0,n:0};
       e.i+=u.i||0; e.o+=u.o||0; e.cr+=u.cr||0; e.cw+=u.cw||0; e.n++;
       const ks=Object.keys(d).sort(); while(ks.length>62){ delete d[ks.shift()]; }
@@ -1095,16 +1156,19 @@
   }
   try{ window.__flowAiRaw=aiCallRaw; }catch(_){}
   async function aiCallRaw(payload,onDelta){
-    const res=await aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
-      body:JSON.stringify(Object.assign({stream:true},payload))});
+    const g=aiIdleGuard();   // 11-ai-flow.js: 60 с без даних → обрив і зрозумілий текст (AI-8)
+    try{
+    const res=await g.wait(aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify(Object.assign({stream:true},payload)), signal:g.signal}));
     if(!res.ok) throw await aiHttpError(res);   // з 11-ai-flow.js: «увійди» / «спробуй за хвилину»
     const _u={i:0,o:0,cr:0,cw:0};
     const ctype=String(res.headers.get('content-type')||'');
     if(ctype.indexOf('text/event-stream')>=0&&res.body&&res.body.getReader){
       const rd=res.body.getReader(), dec=new TextDecoder();
+      g.rd=rd;
       let buf='', blocks=[], stop='', textFull='';
       for(;;){
-        const {done,value}=await rd.read();
+        const {done,value}=await g.wait(rd.read());
         if(done) break;
         buf+=dec.decode(value,{stream:true});
         const lines=buf.split('\n'); buf=lines.pop();
@@ -1115,8 +1179,13 @@
           let ev; try{ ev=JSON.parse(p); }catch(_){ continue; }
           if(ev.type==='content_block_start'&&ev.content_block){
             const cb=ev.content_block;
+            /* Блоки «думання» Sonnet 5 повертаємо в наступний хоп БЕЗ змін (з підписом):
+               раніше вони ставали порожнім text і викидались, а API на викинуте думання
+               посеред циклу інструментів відповідає 400-кою. */
             blocks[ev.index]= cb.type==='tool_use'
               ? {type:'tool_use',id:cb.id,name:cb.name,_json:''}
+              : cb.type==='thinking' ? {type:'thinking',thinking:cb.thinking||'',signature:cb.signature||''}
+              : cb.type==='redacted_thinking' ? {type:'redacted_thinking',data:cb.data||''}
               : {type:'text',text:cb.text||''};
           } else if(ev.type==='content_block_delta'&&ev.delta){
             const b=blocks[ev.index]; if(!b) continue;
@@ -1125,6 +1194,10 @@
               if(onDelta) onDelta(textFull);
             } else if(ev.delta.type==='input_json_delta'){
               b._json=(b._json||'')+(ev.delta.partial_json||'');
+            } else if(ev.delta.type==='thinking_delta'){
+              b.thinking=(b.thinking||'')+(ev.delta.thinking||'');
+            } else if(ev.delta.type==='signature_delta'){
+              b.signature=(b.signature||'')+(ev.delta.signature||'');
             }
           } else if(ev.type==='message_start'&&ev.message&&ev.message.usage){
             const uu=ev.message.usage;
@@ -1137,6 +1210,7 @@
           }
         }
       }
+      if(g.fired) throw aiTimeoutError(g.ms);
       blocks=blocks.filter(Boolean).map(b=>{
         if(b.type==='tool_use'){ try{ b.input=b._json?JSON.parse(b._json):{}; }catch(_){ b.input={}; } delete b._json; }
         return b;
@@ -1144,7 +1218,7 @@
       aiUsageAdd(payload.model,_u);
       return {content:blocks, stop_reason:stop||'end_turn'};
     }
-    const data=await res.json();
+    const data=await g.wait(res.json());
     if(data.usage) aiUsageAdd(payload.model,{i:data.usage.input_tokens||0,o:data.usage.output_tokens||0,
       cr:data.usage.cache_read_input_tokens||0,cw:data.usage.cache_creation_input_tokens||0});
     if(onDelta&&Array.isArray(data.content)){
@@ -1152,12 +1226,13 @@
       if(t) onDelta(t);
     }
     return {content:data.content||[], stop_reason:data.stop_reason||'end_turn'};
+    }finally{ g.stop(); }
   }
 
   /* Запобіжник: чи МІНЯЄ виклик інструмента дані (а не читає). Для ліміту змін за повідомлення. */
   function aiToolIsWrite(name,inp){
     const a=(inp&&inp.action)||'';
-    if(name==='get_data'||name==='memory') return false;
+    if(name==='get_data') return false;                    // memory — теж зміна: шторка + ліміт (SEC-5)
     if(/^dev_/.test(name)) return false;                    // dev-режим має власні підтвердження
     if(name==='finance') return a!=='debt_list';
     if(name==='patterns') return a!=='list';
@@ -1166,6 +1241,24 @@
   }
   const AI_WRITE_LIMIT=5;                                   // змін даних за одне повідомлення людини
   let aiTurnWrites=0;                                       // скільки змін уже зробив останній хід агента
+  let aiTurnDone=[];                                        // що САМЕ вже змінено за цей хід — людськими словами
+  /* Рядок «що зроблено» для людини, якщо хід обірветься (тайм-аут, мережа) ПІСЛЯ змін: інакше
+     вона бачить лише «зависла… спробуй ще раз», повторює — і витрата чи блок пишуться вдруге.
+     Порожньо — виклик нічого не змінив (скасувала, «вже було», не знайдено). */
+  function aiDoneLine(name,inp,out){
+    inp=inp||{};
+    const s=String(out==null?'':out).split('\n')[0].trim();
+    if(!s||/^⚠️|скасувал|^вже було|^нічого/.test(s)) return '';
+    if(name==='memory'&&inp.action==='save') return 'запамʼятав: «'+String(inp.text||'').trim().slice(0,60)+'»';
+    if(name==='planner'&&inp.action!=='remind'){
+      const m=/^виконано (\d+) із (\d+)/.exec(s);
+      if(m&&+m[1]===0) return '';
+      const V={create:'додав у планер',move:'переніс у планері',done:'закрив у планері',delete:'видалив із планера'};
+      const names=(Array.isArray(inp.blocks)?inp.blocks:[]).slice(0,4).map(b=>'«'+String(b&&b.t||'').slice(0,30)+'»').join(', ');
+      return (V[inp.action]||'планер')+(names?': '+names:'')+(m&&m[1]!==m[2]?' ('+m[1]+' із '+m[2]+')':'');
+    }
+    return s.slice(0,100);
+  }
   /* «Ціна» виклику для ліміту. planner move/done/delete/remind чіпає НАЯВНІ блоки — кожен
      рахується окремо (раніше один виклик із 15 видаленнями був «1 зміною з 5»). Створення —
      1 за виклик: нове нічого не знищує, шторка й так показує весь перелік, а «сплануй день»
@@ -1175,27 +1268,50 @@
     if(name==='planner'&&inp&&inp.action!=='create'&&Array.isArray(inp.blocks)) return Math.max(1,inp.blocks.length);
     return 1;
   }
+  /* Результат інструмента для моделі. Обрізання — з явною позначкою: без неї агент бачив
+     2–3 записи щоденника з 10 і впевнено казав «більше нема» (AI-10). get_data (щоденник,
+     період) довший за решту — йому більший бюджет. */
+  const AI_TOOL_OUT_MAX={get_data:4000};
+  function aiToolOut(name,out){
+    const s=String(out==null?'':out), max=AI_TOOL_OUT_MAX[name]||1500;
+    if(s.length<=max) return s;
+    return s.slice(0,max)+'\n…обрізано: показано '+max+' з '+s.length+' символів. Про решту висновків не роби — звузь запит (ds/from/to) або чесно скажи людині, що бачиш не все.';
+  }
   async function aiAgentTurn(sysStable,sysDynamic,msgs,userQ,onDelta){
-    const system=[
-      {type:'text',text:sysStable,cache_control:{type:'ephemeral'}},
-      {type:'text',text:sysDynamic}
-    ];
     const conv=msgs.slice();
     const dev=aiDevOn();
     // dev_eval моделі показуємо лише власнику (див. aiDevEvalOn)
     const TOOLS=dev?FLOW_TOOLS.concat(aiDevEvalOn()?DEV_TOOLS:DEV_TOOLS.filter(t=>t.name!=='dev_eval')):FLOW_TOOLS;
+    const model=dev?AI_MODELS.main:aiPickModel(userQ);      // один раз на весь хід (AI-9)
+    // мова інтерфейсу — у динамічну частину, щоб кешований стабільний шар не залежав від мови (AI-6)
+    const dyn=String(sysDynamic||'')+aiLangDirective();
+    /* Брейкпоінти кешу — лише там, де префікс сягає мінімуму моделі (на Haiku 4096 токенів):
+       нижче кеш мовчки не пишеться. Разом із брейкпоінтом воркера на останньому інструменті
+       їх щонайбільше 3 з дозволених 4. */
+    const minC=aiCacheMin(model), toolsLen=JSON.stringify(TOOLS).length;
+    const system=[
+      aiTokEst(toolsLen+sysStable.length)>=minC
+        ? {type:'text',text:sysStable,cache_control:{type:'ephemeral'}}
+        : {type:'text',text:sysStable},
+      {type:'text',text:dyn}
+    ];
     let toolsUsed=0, writesUsed=0;
-    aiTurnWrites=0;
+    aiTurnWrites=0; aiTurnDone=[];
     aiTraceStart();
     for(let hop=0;hop<6;hop++){
+      const cacheTail=aiTokEst(toolsLen+sysStable.length+dyn.length+JSON.stringify(conv).length)>=minC;
       const resp=await aiCallRaw({
-        model:dev?'claude-sonnet-4-6':aiPickModel(userQ,hop), system:system, tools:TOOLS,
-        max_tokens:2048, messages:conv
+        model:model, system:system, tools:TOOLS,
+        max_tokens:AI_MAX_TOKENS, messages:cacheTail?aiCacheTail(conv):conv
       },onDelta);
       conv.push({role:'assistant',content:resp.content});
       if(resp.stop_reason!=='tool_use'){
         aiAgentSetStatus('');
         const fin=resp.content.filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+        /* Обрізано по стелі (думання + текст не вмістились): кажемо про це прямо, а
+           недописаний виклик інструмента не виконуємо — його вхід міг обірватись (AI-8). */
+        if(resp.stop_reason==='max_tokens') return (fin+AI_CUT_NOTE).trim();
+        if(resp.stop_reason==='refusal') return (fin+AI_REFUSAL_NOTE).trim();
         return fin||(toolsUsed?'✅ Зроблено.':'Не зміг відповісти — спробуй ще раз.');
       }
       const results=[];
@@ -1212,8 +1328,9 @@
         const ti=aiTraceStep(b.name,b.input);
         const out=await flowToolExec(b.name,b.input);
         aiTraceEnd(ti);
+        if(cost){ const d=aiDoneLine(b.name,b.input,out); if(d) aiTurnDone.push(d); }
         results.push({type:'tool_result',tool_use_id:b.id,
-          content:String(out).slice(0,1500)});
+          content:aiToolOut(b.name,out)});
       }
       conv.push({role:'user',content:results});
       aiAgentSetStatus('🧠 аналізую результат…');

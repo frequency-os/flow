@@ -30,7 +30,7 @@
       +'\nFLOW_PAGE:{"page":[{"type":"h2","text":"Заголовок"},{"type":"note","text":"абзац"},{"type":"bullet","text":"пункт"},{"type":"num","text":"крок"},{"type":"task","text":"завдання"},{"type":"quote","text":"цитата"},{"type":"callout","text":"порада","emo":"💡"},{"type":"divider"},{"type":"table","cols":["Колонка1","Колонка2"],"rows":[["a","b"]]}]}'
       +'\nДозволені type лише з прикладу. Не описуй JSON словами і не обгортай у ```.';
     } else {
-      a+='\nЗапис у сторінки тут недоступний — для планера використовуй стандартний FLOW_BLOCKS.';
+      a+='\nЗапис у сторінки тут недоступний — для планера використовуй стандартний рядок FLOW_OPS.';
     }
     a+='\nЗмінювати самі фінансові записи ти поки не вмієш — якщо просять, чесно скажи і запропонуй блок у планер чи нотатку.';
     return a;
@@ -120,6 +120,9 @@
       const sys=AI_CHAT_SYS+'\n\n'+petPersona()+'\n\n'+spotAddon(ctx)+'\n\nКОНТЕКСТ:\n'+aiCtx();
       spotMsgs.push({role:'user',content:q});
       const raw=await aiCall(sys,spotMsgs.slice(-6));
+      /* Знімаємо одразу: шторка нижче чекає людину, а фоновий aiCall (стискання чату, настрій
+         щоденника) тим часом перезапише глобальний aiLastStop. */
+      const stop=aiLastStop;
       spotMsgs.push({role:'assistant',content:raw});
       const pg=aiParsePage(raw);
       const pr=aiParseBlocks(pg.text);
@@ -135,15 +138,18 @@
         g.notes.forEach(n=>{ done+=`<div class="fs-done">⚠️ ${esc(n)}</div>`; });
       }
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      const say=(pr.text||pg.text||'Готово.').trim();
+      let say=(pr.text||pg.text||(stop==='refusal'?'':'Готово.')).trim();
+      if(stop==='max_tokens') say+=AI_CUT_NOTE;   // обрубок не має виглядати повною відповіддю (AI-8)
+      else if(stop==='refusal') say=(say+AI_REFUSAL_NOTE).trim();   // не «Готово.» на відмову
       body.insertAdjacentHTML('beforeend',done+(say?`<div class="fs-msg">${say.replace(/</g,'&lt;')}</div>`:''));
       body.scrollTop=body.scrollHeight;
       try{ aiSpeak(say); }catch(_){}
     }catch(e){
       const g=document.getElementById('fsGen'); if(g) g.remove();
       body.insertAdjacentHTML('beforeend',`<div class="fs-msg">⚠️ Не вдалось: ${String(e.message||e).replace(/</g,'&lt;')}</div>`);
+    }finally{
+      spotBusy=false; if(cap) cap.classList.remove('busy');   // що б не сталось — спот знову приймає питання
     }
-    spotBusy=false; if(cap) cap.classList.remove('busy');
   }
   async function spotMicToggle(){
     const btn=document.querySelector('#flowSpot .fs-mic');
@@ -387,8 +393,8 @@
     });
     (pr.folders||[]).forEach(f=>{
       const isP=f.role==='project';
-      const wc=Array.isArray(f.widgets)?f.widgets.filter(w=>['worktrack','income','spend','debts','envelopes','patterns','planday','planmonth'].includes(String(w))).length:0;
-      const meta=[isP?'проєкт':'папка', f.due?('до '+esc(f.due)):'', wc?(wc+' віджет'+(wc===1?'':'и')):''].filter(Boolean).join(' · ');
+      // віджетів папка ніде не показує — прев'ю їх і не рахує, щоб не обіцяти порожнечу (UX-4)
+      const meta=[isP?'проєкт':'папка', f.due?('до '+esc(f.due)):''].filter(Boolean).join(' · ');
       rows.push(`<div class="ai-act goal"><span class="ic">${aiIco(isP?'target':'folder',13)}</span><span class="tx">${isP?'Проєкт':'Папка'} «${esc(f.name||'')}»<small>${meta}</small></span></div>`);
     });
     (pr.move||[]).forEach(mv=>{
@@ -757,8 +763,8 @@
       sys:'СКІЛ /розбір: чесний аналіз без пощади і без моралі. Де самообман, де реальний прогрес. Заверши одним питанням, яке людина уникає.'},
     'фінанси':{ico:'cash',t:'Фінанси',ctx:['fin','goals'],q:'Подивись на мої фінанси цього місяця і скажи, що не так і що зробити',
       sys:'СКІЛ /фінанси: аналіз грошей місяця з контексту. Головний витік, стан конвертів відносно цілей, одна конкретна дія з сумою.'},
-    'проєкт':{ico:'folder',t:'Новий проєкт',ctx:['goals'],q:'Допоможи оформити новий проєкт: спитай одне-два уточнення, тоді створи папку-проєкт з дедлайном і доречними віджетами',
-      sys:'СКІЛ /проєкт: людина хоче новий проєкт. Якщо ціль/тема ясна з контексту — одразу створи через folders з role:"project", доречним due і 1-3 віджетами. Якщо ні — постав одне коротке уточнення і зупинись. Не перевантажуй віджетами.'}
+    'проєкт':{ico:'folder',t:'Новий проєкт',ctx:['goals'],q:'Допоможи оформити новий проєкт: спитай одне-два уточнення, тоді створи папку-проєкт з дедлайном',
+      sys:'СКІЛ /проєкт: людина хоче новий проєкт. Якщо ціль/тема ясна з контексту — одразу створи через folders з role:"project" і доречним due; за потреби додай сторінку з першими кроками. Якщо ні — постав одне коротке уточнення і зупинись. Віджетів у папці немає — не обіцяй їх.'}
   };
   function aiSkillFor(q){
     if(q[0]!=='/') return null;
@@ -800,7 +806,7 @@
     try{ window.platform.haptic('light'); }catch(_){}
     const m={role:'assistant',content:'',streaming:true};
     aiChatMsgs.push(m);
-    let lastPaint=0;
+    let lastPaint=0, viaAgent=false;
     try{
       let sys=AI_CHAT_SYS+'\n\n'+petPersona();
       if(sk) sys+='\n\n'+AI_SKILLS[sk.key].sys;
@@ -824,7 +830,8 @@
         else aiRenderBody();
       };
       let txt, usedW=0;
-      if(aiAgentOn()){
+      viaAgent=aiAgentOn();
+      if(viaAgent){
         // стабільний шар (кешується) окремо від динамічного (персона+контекст)
         let sysStable, sysDyn;
         /* @dev-only:start replace="if(false){} else {" */
@@ -833,7 +840,7 @@
           sysDyn=aiDevCtx();
         } else {
         /* @dev-only:end */
-          sysStable=AI_CHAT_SYS+AI_AGENT_ADDON;
+          sysStable=AI_CORE_SYS+AI_AGENT_ADDON;   // без мертвого FLOW_OPS/FLOW_MEM (AI-5)
           sysDyn=petPersona();
           if(sk) sysDyn+='\n\n'+AI_SKILLS[sk.key].sys;
           sysDyn+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
@@ -846,7 +853,8 @@
       }
       m.content=txt||'…'; delete m.streaming;
       const pr=aiParseBlocks(m.content);
-      if(pr.mem.length) aiMemAdd(pr.mem);
+      // факти в памʼять — лише через шторку і в залишок ліміту змін цього повідомлення (SEC-5)
+      if(pr.mem.length) usedW+=await aiMemGate(pr.mem,AI_WRITE_LIMIT-usedW);
       aiSpeak(pr.text);
       /* «Авто» довіряє додаванню, але не знищенню: перенос/закриття/видалення наявного —
          через шторку і в залишок ліміту цього повідомлення (AI-3). Скасувала — пакет відхилено. */
@@ -857,21 +865,31 @@
         if(g.notes.length) try{ plToast('⚠️ '+g.notes[0]+(g.notes.length>1?' (+'+(g.notes.length-1)+')':'')); }catch(_){}
       }
     }catch(e){
-      try{ aiTraceFinish(); }catch(_){}   // обірваний хід не має лишати живу картку
+      // обірваний хід не має лишати живу картку; компактний слід — у повідомлення, як і в удалому ході
+      try{ const tr=aiTraceFinish(); if(tr) m.trace=tr; }catch(_){}
       console.error('aiChat',e);
       /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
          а не «поганий URL»; на native поле проксі взагалі приховане. */
       const off = (typeof navigator!=='undefined' && navigator.onLine===false);
-      m.content = off
+      /* Обрив ПІСЛЯ змін (хоп 0 записав, хоп 1 завис): «спробуй ще раз» тут шкідливе — повтор
+         запише витрату чи блок удруге. Кажемо, що вже збережено, і просимо не повторювати цілком. */
+      const done = viaAgent ? aiTurnDone.slice(0,6) : [];
+      m.content = done.length
+        ? '⚠️ Відповідь обірвалась'+(e&&e.timeout?' (зависла)':off?' (немає зв’язку)':'')+', але дещо я вже встиг зробити:\n'
+          +done.map(x=>'• '+x).join('\n')
+          +'\n\nЦе вже збережено. Не повторюй запит цілком — вийде дубль. Попроси лише те, чого тут нема.'
+        : off
         ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
         : (e && e.human) ? '⚠️ '+e.message     // ліміт чи вхід (aiHttpError) — причина відома, URL тут ні до чого
         : (window.FLOW_NATIVE
             ? '⚠️ Не вдалось до мене достукатись. Спробуй ще раз за хвилину.'
             : '⚠️ Не вдалось: '+String(e.message||e)+'. Перевір URL AI-проксі.');
       delete m.streaming;
+    }finally{
+      // що б не сталось (зависання, шторка, виняток) — чат знову приймає повідомлення (AI-8)
+      aiBusy=false;
+      if(scrEl) scrEl.classList.remove('busy');
     }
-    aiBusy=false;
-    if(scrEl) scrEl.classList.remove('busy');
     aiChatSave(); aiRenderHead(); aiRenderBody();
     aiMaybeSummarize();
   }

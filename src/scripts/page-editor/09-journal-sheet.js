@@ -290,8 +290,11 @@
         +(prev?'\n\nТИЖНЕВІ ЗВЕДЕННЯ ЦЬОГО МІСЯЦЯ:\n'+prev:'');
       var sys=(job.kind==='m')?JE_SYS_M:JE_SYS_W, txt='', raw=window.__flowAiRaw;
       if(typeof raw==='function'){
-        var r=await raw({model:(job.kind==='m')?'claude-sonnet-4-6':'claude-haiku-4-5-20251001',
-          system:sys,max_tokens:900,messages:[{role:'user',content:user}]});
+        // назви — як у воркері (AI_MODELS з 12-ai-agent.js); стеля 4096, бо в Sonnet 5 вона
+        // рахує і «думання»: з 900 місячне зведення могло прийти порожнім (APP-8, AI-8)
+        var M=window.AI_MODELS||{};
+        var r=await raw({model:(job.kind==='m')?(M.main||'claude-sonnet-5'):(M.fast||'claude-haiku-4-5'),
+          system:sys,max_tokens:4096,messages:[{role:'user',content:user}]});
         txt=(r&&r.content||[]).filter(function(x){return x.type==='text';})
           .map(function(x){return x.text;}).join('\n').trim();
       }else{
