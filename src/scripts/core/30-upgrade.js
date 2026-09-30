@@ -167,7 +167,8 @@
         if(last && ds<=last) continue;
         const list=Array.isArray(byDay[ds])?byDay[ds]:[];
         const items=list.map(b=>(b.done?'[x] ':'[ ] ')+String(b.t||'').slice(0,60)).filter(s=>s.trim().length>4);
-        let dia=''; try{ const e=(typeof diaryEntries==='object'&&diaryEntries)?diaryEntries[ds]:null; if(e&&e.text) dia=String(e.text).replace(/\s+/g,' ').slice(0,220); }catch(_){}
+        // щоденник закрито від AI (Ще → AI і приватність) — аналіз лише за планером
+        let dia=''; try{ const e=(typeof diaryEntries==='object'&&diaryEntries&&!aiSectionOff('diary'))?diaryEntries[ds]:null; if(e&&e.text) dia=String(e.text).replace(/\s+/g,' ').slice(0,220); }catch(_){}
         if(items.length||dia) days.push({ds, items, dia});
       }
       return days;
@@ -244,15 +245,19 @@
         upSheet('За цей період у планері й щоденнику порожньо — AI нема з чого робити висновок. Поживи кілька днів у застосунку і повертайся.');
         return;
       }
-      const ov=upSheet('<div class="up-vd-wait">✦ Дивлюся на твої дні…<br><small>'+days.length+' дн. · планер + щоденник</small></div>');
+      // підпис не бреше: щоденник закрито від AI — upCollectDays його й не бере
+      const src=aiSectionOff('diary')?'лише планер':'планер + щоденник';
+      const ov=upSheet('<div class="up-vd-wait">✦ Дивлюся на твої дні…<br><small>'+days.length+' дн. · '+src+'</small></div>');
       let v;
       try{
         const p=upBuildPrompt(days);
         const txt=await aiCall(p.sys,[{role:'user',content:p.user}]);
         v=upParseVerdict(txt);
       }catch(e){
-        console.error('upAnalyze',e);
         const body=ov.querySelector('.up-vd-body');
+        // відмова від AI — вибір людини, не поломка: без console.error і без «перевір зʼєднання»
+        if(e&&e.aiOff){ if(body) body.textContent=e.message; return; }
+        console.error('upAnalyze',e);
         if(body) body.innerHTML='Не вдалося отримати аналіз — перевір зʼєднання і спробуй ще раз.<br><small style="color:var(--muted)">'+upEsc(String(e&&e.message||e))+'</small>';
         return;
       }

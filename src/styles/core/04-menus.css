@@ -27,6 +27,34 @@
   .asheet-row .asheet-item{margin-bottom:0;flex-direction:column;gap:8px;text-align:center;padding:16px 8px;}
   .asheet-row .asheet-item .ic{width:42px;height:42px;font-size:20px;}
   .asheet-row .asheet-item .tx{font-size:13px;}
+  /* ── AI і приватність: шторка згоди + налаштування (37-ai-privacy.js) ──
+     Вище за все, навіть за голосовий острів: згоду питають і з голосового шляху.
+     Фон від теми (--bg-2), а не темний сталий — у світлій темі текст темний. */
+  .asheet.aip-sheet{z-index:100005;}
+  .aip-in{background:var(--bg-2);max-height:88vh;max-height:88dvh;overflow-y:auto;overscroll-behavior:contain;}
+  .aip-in.aip-ask{display:flex;flex-direction:column;overflow:hidden;}
+  .aip-ask > *{flex:0 0 auto;}
+  .aip-ask .aip-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin-bottom:12px;}
+  .aip-ask .aip-scroll .aip-what{margin-bottom:0;}
+  .aip-what{font-size:13px;line-height:1.45;color:var(--text);background:var(--field);border:1px solid var(--line);
+    border-radius:15px;padding:12px 14px;margin-bottom:12px;}
+  .aip-what p{margin:0 0 8px;} .aip-what p:last-child{margin:0;} .aip-what b{font-weight:800;}
+  .aip-lbl{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.03em;margin:14px 4px 8px;}
+  .aip-tg{display:flex;align-items:center;gap:12px;width:100%;background:var(--field);border:1px solid var(--line);
+    border-radius:15px;padding:12px 14px;margin-bottom:8px;font-family:inherit;color:var(--text);cursor:pointer;text-align:left;}
+  .aip-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--hair-2);font-size:17px;flex:0 0 auto;}
+  .aip-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .aip-tx b{font-size:15px;font-weight:700;} .aip-tx small{font-size:12px;color:var(--muted);line-height:1.3;}
+  .aip-sw{flex:0 0 auto;width:44px;height:26px;border-radius:99px;background:var(--hair-2);position:relative;transition:background .2s;}
+  .aip-sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s;}
+  .aip-tg[aria-checked="true"] .aip-sw{background:var(--hab);}
+  .aip-tg[aria-checked="true"] .aip-sw::after{transform:translateX(18px);}
+  .aip-det{margin:6px 0 12px;}
+  .aip-det summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--val);padding:8px 4px;}
+  .aip-det .aip-what{margin:6px 0 0;}
+  .asheet-item.aip-yes{justify-content:center;background:var(--val);border-color:transparent;color:#fff;}
+  .asheet-item.aip-yes .tx{align-items:center;}
   /* ── вибір розміру фото: візуальні прев'ю пропорцій замість тексту ── */
   .pgsz-ov{position:fixed;inset:0;background:rgba(8,10,16,.55);backdrop-filter:blur(5px);
     display:flex;align-items:flex-end;justify-content:center;z-index:1300;opacity:0;pointer-events:none;transition:opacity .2s;}

@@ -903,6 +903,8 @@
       if(Array.isArray(data.content)) txt=data.content.filter(x=>x&&x.type==='text').map(x=>x.text).join('\n');
       out.innerHTML=`<div class="wk-insight"><b>🤖 Тренер:</b> ${esc(txt.trim()||'…')}</div>`;
     }catch(e){
+      // відмова від AI (згода / вимкнено) — вибір людини, не помилка: без console.error і без «⚠️»
+      if(e&&e.aiOff){ out.innerHTML=`<div class="wk-insight">${esc(e.message)}</div>`; return; }
       console.error('plWeekAI',e);
       out.innerHTML=`<div class="wk-insight">⚠️ Не вдалось отримати огляд: ${esc(String(e.message||e))}</div>`;
     }

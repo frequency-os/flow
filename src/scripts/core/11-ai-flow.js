@@ -199,7 +199,8 @@
     g.kick();
     return g;
   }
-  async function aiCall(sys,messages,onDelta){
+  /* ai — {bg, uses} для воріт згоди в aiFetch (див. 37-ai-privacy.js) */
+  async function aiCall(sys,messages,onDelta,ai){
     sys=(sys||'')+aiLangDirective();
     const wantStream=typeof onDelta==='function';
     const g=aiIdleGuard(wantStream?AI_IDLE_MS:AI_NOSTREAM_MS);
@@ -207,7 +208,7 @@
     try{
       const body={system:sys,messages:messages,max_tokens:AI_MAX_TOKENS};
       if(wantStream) body.stream=true;
-      const res=await g.wait(aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+      const res=await g.wait(aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},ai:ai,
         body:JSON.stringify(body), signal:g.signal}));
       if(!res.ok) throw await aiHttpError(res);
       const ctype=String(res.headers.get('content-type')||'');

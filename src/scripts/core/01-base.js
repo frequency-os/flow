@@ -118,7 +118,7 @@
      (work_sessions/work_cfg/work_extras/work_blocks) та канвас-простори
      взагалі не потрапляли в бекап. */
   window.FLOW_KEYS = [
-    'ui_mode','ai_endpoint','ai_chat','ai_memory','ai_prompts',
+    'ui_mode','ai_endpoint','ai_chat','ai_memory','ai_prompts','ai_privacy_v1',
     'folders_cfg','folders_order','folder_widgets','switcher_style',
     'spaces_map_v2','active_space_map_v2',
     'goals_data','values_state','wishes_board',

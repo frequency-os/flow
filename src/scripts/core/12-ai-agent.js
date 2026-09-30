@@ -331,6 +331,7 @@
   function aiMorningMaybe(){
     try{
       if(!aiAgentOn()||aiDevOn()) return;
+      if(!aiAllowed()) return;   // без згоди бриф не питає її сам — людина лише відкрила чат
       if(typeof aiBusy!=='undefined'&&aiBusy) return;
       const ds=plTodayStr();
       if(localStorage.getItem('ai_brief_ds')===ds) return;
@@ -343,6 +344,7 @@
   function aiWeeklyMaybe(){
     try{
       if(!aiAgentOn()||aiDevOn()) return;
+      if(!aiAllowed()) return;
       if(typeof aiBusy!=='undefined'&&aiBusy) return;
       const now=new Date();
       if(now.getDay()!==0||now.getHours()<17) return;
@@ -405,6 +407,7 @@
   };
   function aiTraceReadMeta(what,inp){
     try{
+      if((what==='diary'||what==='finance')&&aiSectionOff(what)) return 'закрито';   // слід не бреше, що прочитав
       if(what==='day'){
         const l=plBlocksFor(/^\d{4}-\d{2}-\d{2}$/.test(inp.ds||'')?inp.ds:plTodayStr())||[];
         return l.length?aiPlz(l.length,'блок','блоки','блоків'):'';
@@ -557,11 +560,13 @@
       if(name==='get_data') return flowToolRead(inp||{});
       if(name==='planner')  return await flowToolPlanner(inp||{});
       if(name==='goals')    return await flowToolGoals(inp||{});
-      if(name==='finance')  return await flowToolFinance(inp||{});
+      /* розділ, який людина закрила від AI (Ще → AI і приватність): інструмент
+         не читає і не пише — навіть «записати витрату» повертає баланси */
+      if(name==='finance')  return aiSectionOff('finance') ? aiSectionOffMsg('finance') : await flowToolFinance(inp||{});
       if(name==='patterns') return await flowToolPatterns(inp||{});
       if(name==='memory')   return await flowToolMemory(inp||{});
       if(name==='folders')  return await flowToolFolders(inp||{});
-      if(name==='diary')    return await flowToolDiary(inp||{});
+      if(name==='diary')    return aiSectionOff('diary') ? aiSectionOffMsg('diary') : await flowToolDiary(inp||{});
       /* @dev-only:start */
       if(name==='dev_storage'||name==='dev_errors'||name==='dev_cost'){
         if(!aiDevOn()) return '⚠️ доступно лише в dev-режимі';
@@ -607,6 +612,7 @@
         return (g.emoji||'🎯')+' '+g.name+' ('+dn+'/'+st.length+')'+(nx.length?' · далі: '+nx.join('; '):'');
       }).join('\n'))||'цілей немає';
     }
+    if((inp.what==='finance'||inp.what==='diary') && aiSectionOff(inp.what)) return aiSectionOffMsg(inp.what);
     if(inp.what==='finance') return aiFinCtx();
     if(inp.what==='backlog'){
       const t=(plData().tasks||[]).filter(x=>!x.done).slice(0,15)
@@ -1160,10 +1166,10 @@
     }catch(_){}
   }
   try{ window.__flowAiRaw=aiCallRaw; }catch(_){}
-  async function aiCallRaw(payload,onDelta){
+  async function aiCallRaw(payload,onDelta,ai){   // ai — {bg, uses} для воріт згоди (aiFetch)
     const g=aiIdleGuard();   // 11-ai-flow.js: 60 с без даних → обрив і зрозумілий текст (AI-8)
     try{
-    const res=await g.wait(aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},
+    const res=await g.wait(aiFetch(aiEndpoint(),{method:'POST',headers:{'content-type':'application/json'},ai:ai,
       body:JSON.stringify(Object.assign({stream:true},payload)), signal:g.signal}));
     if(!res.ok) throw await aiHttpError(res);   // з 11-ai-flow.js: «увійди» / «спробуй за хвилину»
     const _u={i:0,o:0,cr:0,cw:0};
@@ -1406,7 +1412,7 @@
       out.push('Цілі: '+goals);
       out.push('Точка Б: '+(((g.pointB||'').trim().slice(0,400))||'—'));
     }
-    if(want('fin')) out.push('Фінанси:\n'+aiFinCtx());
+    if(want('fin')) out.push(aiSectionOff('finance') ? 'Фінанси: '+aiSectionOffMsg('finance') : 'Фінанси:\n'+aiFinCtx());
     if(aiMem.length) out.push('ПАМʼЯТЬ ПРО ЛЮДИНУ (з минулих розмов): '+aiMem.join(' | '));
     if(aiSum) out.push('РЕЗЮМЕ СТАРІШОЇ ІСТОРІЇ: '+aiSum);
     out.push('РЕЖИМ ТОНУ: '+aiMood());

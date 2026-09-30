@@ -356,12 +356,13 @@
       }); return m;
     })();
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
-    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
+    // aiPrivLoad — згода й закриті від AI розділи (37-ai-privacy.js): так вони синкаються між пристроями
+    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass(), aiPrivLoad()]); applyHomeGlass(); }catch(_){}
     /* SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть,
        а ручні правки в них чекатимуть звірки з хмарою (02-storage.js, storeMarkRead).
        Саме тут, після останнього await: далі прочитане синхронно лягає в памʼять.
        Разом із __RAW — ключі, які дочитують loadValues/loadWishes/loadWishPrice/loadHomeGlass. */
-    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY]); }catch(_){}
+    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY, 'ai_privacy_v1']); }catch(_){}
     /* Усе нижче до кінця load() — синхронне застосування прочитаного разом з
        міграціями й прибираннями. Їхні записи — автоматичні: у ключ, який не
        прочитався (сховище мовчало), вони не підуть (SYNC-2, storeAuto). */

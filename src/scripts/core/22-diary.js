@@ -297,6 +297,8 @@
     const mon=diaViewWeek||diaMonday(plTodayStr());
     const days=diaWeekDss(mon).filter(diaHasEntry);
     if(!days.length){ try{ flowAlert('За цей тиждень ще нема текстових записів.'); }catch(_){} return; }
+    // щоденник закрито від AI (Ще → AI і приватність) — записи не відправляємо
+    if(aiSectionOff('diary')){ try{ flowAlert('Щоденник закрито від AI. Відкрити: Ще → AI і приватність.'); }catch(_){} return; }
     const body=days.map(k=>diaFmtDate(k)+':\n'+diaryEntries[k].text).join('\n\n---\n\n');
     btn.disabled=true; btn.textContent='Аналізую…';
     out.style.display='block'; out.textContent='';
@@ -307,10 +309,11 @@
         +'без загальних банальностей і без вигаданих фактів. Дай 2-4 конкретні спостереження і 1-3 практичні поради на наступний тиждень. '
         +'Пиши стисло, по суті, українською мовою, без вступних фраз на кшталт "Я проаналізував записи".',
         [{role:'user',content:body}],
-        (partial)=>{ out.textContent=partial; }
+        (partial)=>{ out.textContent=partial; },
+        {uses:['diary']}
       );
       if(txt){ diaInsights.weeks=diaInsights.weeks||{}; diaInsights.weeks[mon]={text:txt,ts:Date.now()}; saveDiaInsights(); }
-    }catch(e){ out.textContent='Не вдалося проаналізувати: '+(e.message||'спробуй пізніше.'); }
+    }catch(e){ out.textContent=(e&&e.aiOff) ? e.message : 'Не вдалося проаналізувати: '+(e.message||'спробуй пізніше.'); }
     btn.disabled=false;
     renderDiaView();
   }
@@ -319,6 +322,9 @@
   let diaMoodBusy=false;
   async function diaMoodBatch(){
     if(diaMoodBusy) return;
+    /* фонова оцінка — людина її не просила, тож без згоди чи з закритим
+       щоденником мовчки пропускаємо, а не вискакуємо шторкою згоди */
+    if(!aiAllowed('diary')) return;
     const days=[];
     for(let i=0;i<35;i++){
       const ds=diaDs(-i); const e=diaryEntries[ds];
@@ -334,7 +340,7 @@
         'Оціни емоційний стан людини за кожен день за її записами в щоденнику, шкала 1-5 '
         +'(1 — дуже важкий день, 2 — поганий, 3 — нейтральний, 4 — хороший, 5 — чудовий). '
         +'Відповідай ЛИШЕ валідним JSON виду {"2026-09-01":3} з усіма наданими датами, без пояснень і тексту довкола.',
-        [{role:'user',content:body}]);
+        [{role:'user',content:body}], null, {bg:true, uses:['diary']});   // фонова: без згоди тихо не йде
       const m=String(txt||'').match(/\{[\s\S]*\}/);
       if(m){
         const obj=JSON.parse(m[0]); diaInsights.mood=diaInsights.mood||{};

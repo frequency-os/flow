@@ -222,8 +222,10 @@
     return out;
   }
   function jeG(n){ try{ return (0,eval)(n); }catch(_){ return undefined; } }
+  /* розділ закрито від AI (Ще → AI і приватність)? Функції нема — вважаємо закритим */
+  function jeAiOff(k){ var f=jeG('aiSectionOff'); try{ return typeof f!=='function' || !!f(k); }catch(_){ return true; } }
   function jeFacts(from,to){
-    var out=[], RIT=jeG('RIT'), fin=jeG('finOps'), pd=jeG('plData'), pdat=null;
+    var out=[], RIT=jeG('RIT'), fin=jeAiOff('finance')?null:jeG('finOps'), pd=jeG('plData'), pdat=null;
     try{ if(typeof pd==='function') pdat=pd(); }catch(_){}
     var cur=new Date(from);
     while(cur<=to){
@@ -272,7 +274,9 @@
     +'Не більше 180 слів.';
   var jeBusy=false, jeOpenRep=null, jeAutoDone={};
 
-  async function jeGen(b,job){
+  /* auto — фонове зведення (jeAuto): без згоди воно тихо не йде, шторку
+     згоди показує лише натиснуте «Зібрати» */
+  async function jeGen(b,job,auto){
     if(jeBusy) return;
     var toast=window.__flowToast||function(){};
     var ents=jeEntries(b,job.from,job.to); if(!ents.length) return;
@@ -286,32 +290,43 @@
       }
       var facts=jeFacts(job.from,job.to);
       var user='ЗАПИСИ:\n'+ents.join('\n\n')
-        +(facts?'\n\nФАКТИ З ЗАСТОСУНКУ (ритуал, витрати, завдання):\n'+facts:'')
+        +(facts?'\n\nФАКТИ З ЗАСТОСУНКУ ('+(jeAiOff('finance')?'ритуал, завдання':'ритуал, витрати, завдання')+'):\n'+facts:'')
         +(prev?'\n\nТИЖНЕВІ ЗВЕДЕННЯ ЦЬОГО МІСЯЦЯ:\n'+prev:'');
       var sys=(job.kind==='m')?JE_SYS_M:JE_SYS_W, txt='', raw=window.__flowAiRaw;
+      // записи віджета — це щоденник: закритий розділ ворота в aiFetch не пропустять
+      var aio={bg:!!auto, uses:['diary']};
       if(typeof raw==='function'){
         // назви — як у воркері (AI_MODELS з 12-ai-agent.js); стеля 4096, бо в Sonnet 5 вона
         // рахує і «думання»: з 900 місячне зведення могло прийти порожнім (APP-8, AI-8)
         var M=window.AI_MODELS||{};
         var r=await raw({model:(job.kind==='m')?(M.main||'claude-sonnet-5'):(M.fast||'claude-haiku-4-5'),
-          system:sys,max_tokens:4096,messages:[{role:'user',content:user}]});
+          system:sys,max_tokens:4096,messages:[{role:'user',content:user}]},null,aio);
         txt=(r&&r.content||[]).filter(function(x){return x.type==='text';})
           .map(function(x){return x.text;}).join('\n').trim();
       }else{
         var ac=jeG('aiCall');
         if(typeof ac!=='function') throw new Error('AI недоступний');
-        txt=String(await ac(sys,[{role:'user',content:user}])||'').trim();
+        txt=String(await ac(sys,[{role:'user',content:user}],null,aio)||'').trim();
       }
       if(!txt) throw new Error('порожня відповідь');
       b.reports=b.reports||{};
       b.reports[job.k]={t:txt,n:ents.length,ts:Date.now()};
       save(); toast('📔 Зведення готове');
-    }catch(err){ try{ toast('⚠️ Зведення не вдалось: '+String(err.message||err)); }catch(_){} }
+    }catch(err){ try{
+      // відмова від AI — вибір людини, а не поломка; фонова (quiet) — без жодного тосту
+      if(err&&err.aiOff){ if(!err.quiet) toast(err.message); }
+      else toast('⚠️ Зведення не вдалось: '+String(err.message||err));
+    }catch(_){} }
     jeBusy=false; render();
   }
   function jeAuto(b){
-    if(jeAutoDone[b.id]||jeBusy) return; jeAutoDone[b.id]=true;
-    try{ var j=jePending(b); if(j.length) setTimeout(function(){ jeGen(b,j[0]); },1400); }catch(_){}
+    if(jeAutoDone[b.id]||jeBusy) return;
+    /* людина лише відкрила сторінку — без згоди чи з закритим щоденником
+       фонове зведення не йде і шторкою не вискакує (підказка — у jeAiHTML).
+       jeAutoDone не ставимо: дасть згоду — наступне відкриття збере саме */
+    var ok=jeG('aiAllowed'); if(typeof ok!=='function'||!ok('diary')) return;
+    jeAutoDone[b.id]=true;
+    try{ var j=jePending(b); if(j.length) setTimeout(function(){ jeGen(b,j[0],true); },1400); }catch(_){}
   }
   function jeMd(t){
     return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
@@ -325,11 +340,14 @@
     var pend=jePending(b);
     var head='<div class="je-aih"><span>Зведення</span>'
       +'<button class="je-gen" data-jegen="'+b.id+'">'+(jeBusy?'…':'Зібрати')+'</button></div>';
+    // тиха підказка, чому зведення самі не збираються (згода / закритий щоденник / AI вимкнено)
+    var qh=''; try{ var qf=jeG('aiQuietHint'); qh=(typeof qf==='function')?qf('diary','Зібрати'):''; }catch(_){}
+    var qhHTML=qh?'<div class="je-empty">'+esc(qh)+'</div>':'';
     if(!keys.length){
-      return head+'<div class="je-empty">Зʼявляються самі: у неділю за тиждень і першого числа за місяць.'
-        +(pend.length?' Готово до збору: '+pend.length+'.':' Потрібно щонайменше три записи за період.')+'</div>';
+      return head+qhHTML+(qh?'':'<div class="je-empty">Зʼявляються самі: у неділю за тиждень і першого числа за місяць.'
+        +(pend.length?' Готово до збору: '+pend.length+'.':' Потрібно щонайменше три записи за період.')+'</div>');
     }
-    return head+keys.map(function(k){
+    return head+qhHTML+keys.map(function(k){
       var r=b.reports[k]||{}, open=(jeOpenRep===k);
       var ttl=(k.charAt(0)==='w')
         ? 'Тиждень з '+k.slice(2).slice(8)+'.'+k.slice(2).slice(5,7)

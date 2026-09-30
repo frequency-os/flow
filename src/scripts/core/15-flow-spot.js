@@ -146,7 +146,7 @@
       try{ aiSpeak(say); }catch(_){}
     }catch(e){
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">⚠️ Не вдалось: ${String(e.message||e).replace(/</g,'&lt;')}</div>`);
+      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">${e&&e.aiOff?'':'⚠️ Не вдалось: '}${String(e.message||e).replace(/</g,'&lt;')}</div>`);
     }finally{
       spotBusy=false; if(cap) cap.classList.remove('busy');   // що б не сталось — спот знову приймає питання
     }
@@ -596,6 +596,7 @@
       const f=inp.files&&inp.files[0]; if(!f) return;
       try{
         if(/^image\//.test(f.type)){
+          if(aiSectionOff('photos')){ plToast('🔒 Фото закрито від AI — Ще → AI і приватність'); return; }
           plToast('⏳ Стискаю фото…');
           const data=await aiImgShrink(f);
           aiAttach.push({kind:'image',media:'image/jpeg',data:data,name:f.name});
@@ -776,18 +777,27 @@
   let aiSumBusy=false;
   async function aiMaybeSummarize(){
     if(aiSumBusy||aiChatMsgs.length<28) return;
+    if(!aiAllowed()) return;   // фонове стискання: після «Не зараз» не питаємо згоду вдруге
     aiSumBusy=true;
     try{
       const old=aiChatMsgs.slice(0,aiChatMsgs.length-16);
       const dlg=old.map(m=>(m.role==='user'?'Я: ':'Флоу: ')+aiStreamText(m.content).slice(0,300)).join('\n');
       const s=await aiCall('Стисни діалог у резюме до 500 символів українською: факти про людину, рішення, домовленості, незакриті теми. Без води, без markdown. Якщо є попереднє резюме — обʼєднай.',
-        [{role:'user',content:(aiSum?'ПОПЕРЕДНЄ РЕЗЮМЕ: '+aiSum+'\n\n':'')+'ДІАЛОГ:\n'+dlg}]);
+        [{role:'user',content:(aiSum?'ПОПЕРЕДНЄ РЕЗЮМЕ: '+aiSum+'\n\n':'')+'ДІАЛОГ:\n'+dlg}], null, {bg:true});
       if(s){ aiSum=s.slice(0,1600); aiChatMsgs=aiChatMsgs.slice(-16); aiChatSave(); }
-    }catch(e){ console.error('aiSum',e); }
+    }catch(e){ if(!(e&&e.aiOff)) console.error('aiSum',e); }
     aiSumBusy=false;
   }
   async function aiChatSend(q){
     q=(q||'').trim(); if(!q&&!aiAttach.length) return; if(aiBusy) return;
+    /* фото прикріпили ще до того, як закрили розділ «Фото»: не шлемо і кажемо
+       про це — інакше AI отримав би «прочитай вкладення» без вкладення */
+    if(aiSectionOff('photos') && aiAttach.some(a=>a.kind==='image')){
+      for(let i=aiAttach.length-1;i>=0;i--) if(aiAttach[i].kind==='image') aiAttach.splice(i,1);
+      aiAttachRender();
+      plToast('🔒 Фото закрито від AI — знімок не надіслано');
+      if(!q&&!aiAttach.length) return;
+    }
     const inp=document.getElementById('aiInput'); if(inp){ inp.value=''; inp.placeholder='Напиши '+FLOW_PETS[petCur()].name+'…'; }
     aiSlashHide();
     let sk=aiSkillFor(q);
@@ -815,7 +825,8 @@
       if(att.length){ // останнє user-повідомлення стає мультимодальним
         const blocks=[];
         att.forEach(a=>{
-          if(a.kind==='image') blocks.push({type:'image',source:{type:'base64',media_type:a.media,data:a.data}});
+          // фото, прикріплене до того, як людина закрила розділ «Фото», теж не йде
+          if(a.kind==='image'){ if(!aiSectionOff('photos')) blocks.push({type:'image',source:{type:'base64',media_type:a.media,data:a.data}}); }
           else if(a.kind==='pdf') blocks.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:a.data}});
           else if(a.kind==='text') blocks.push({type:'text',text:'ФАЙЛ «'+(a.name||'txt')+'»:\n'+a.text});
         });
@@ -867,14 +878,22 @@
     }catch(e){
       // обірваний хід не має лишати живу картку; компактний слід — у повідомлення, як і в удалому ході
       try{ const tr=aiTraceFinish(); if(tr) m.trace=tr; }catch(_){}
-      console.error('aiChat',e);
+      if(!(e&&e.aiOff)) console.error('aiChat',e);   // відмова від AI — не помилка
       /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
          а не «поганий URL»; на native поле проксі взагалі приховане. */
       const off = (typeof navigator!=='undefined' && navigator.onLine===false);
+      /* «Не зараз» чи AI вимкнено — вибір людини, не поломка. Стоїть ПЕРЕД
+         перевіркою мережі: запит і не йшов, тож «немає зв’язку» було б неправдою.
+         Вкладення повертаємо в рядок вводу — погодиться, і не треба чіпляти знову. */
+      if(e && e.aiOff && att.length){
+        att.forEach(a=>{ if(!(a.kind==='image'&&aiSectionOff('photos'))) aiAttach.push(a); });
+        try{ aiAttachRender(); }catch(_){}
+      }
       /* Обрив ПІСЛЯ змін (хоп 0 записав, хоп 1 завис): «спробуй ще раз» тут шкідливе — повтор
          запише витрату чи блок удруге. Кажемо, що вже збережено, і просимо не повторювати цілком. */
-      const done = viaAgent ? aiTurnDone.slice(0,6) : [];
-      m.content = done.length
+      const done = (viaAgent && !(e&&e.aiOff)) ? aiTurnDone.slice(0,6) : [];
+      m.content = (e && e.aiOff) ? e.message
+        : done.length
         ? '⚠️ Відповідь обірвалась'+(e&&e.timeout?' (зависла)':off?' (немає зв’язку)':'')+', але дещо я вже встиг зробити:\n'
           +done.map(x=>'• '+x).join('\n')
           +'\n\nЦе вже збережено. Не повторюй запит цілком — вийде дубль. Попроси лише те, чого тут нема.'
@@ -952,8 +971,8 @@
       if(!t){ plToast('🎙 Не розчув — скажи чіткіше і трохи довше'); return ''; }
       return t;
     }catch(e){
-      console.error('aiTranscribeBlob',e);
-      plToast('⚠️ Транскрипція не вдалась: '+String(e.message||e));
+      if(!(e&&e.aiOff)) console.error('aiTranscribeBlob',e);
+      plToast(e&&e.aiOff ? e.message : '⚠️ Транскрипція не вдалась: '+String(e.message||e));
       return '';
     }
   }
