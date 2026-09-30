@@ -234,7 +234,7 @@
           <button class="acc-mini" data-acc-import>⬆️ Імпорт з файлу</button>
           <input type="file" accept="application/json,.json,application/zip,.zip" data-acc-file style="display:none">
           <p class="acc-hint" data-acc-ph-count>Фото: рахую…</p>
-          <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом. Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
+          <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом: і з цього пристрою, і ті, що поки лежать лише в хмарі (їх бекап спершу докачає). Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
         </div>
         <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
           <div class="acc-rico">💾</div>
@@ -251,7 +251,7 @@
         <div class="acc-expand" data-acc-reset-expand hidden>
           <button class="acc-mini" data-acc-reset-device>♻️ Скинути цей пристрій</button>
           <button class="acc-mini dng" data-acc-reset-all>🗑 Стерти все з акаунта</button>
-          <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл (якщо є фото — zip разом із ними). Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
+          <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл. «Скинути пристрій» кладе в нього фото з цього пристрою (решта лишається в хмарі). «Стерти все» спершу докачує у файл і фото, що є лише в хмарі, — і нічого не стирає, якщо хоч одне взяти не вдалось. Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
         </div>
         <div class="acc-row" data-acc-settings-row>
           <div class="acc-rico">⚙️</div>
@@ -307,18 +307,22 @@
         finally{ setTimeout(()=>{ try{ gb.disabled=false; gb.textContent=old; }catch(_){} }, 8000); }
       };
 
-      const bkRow=host.querySelector('[data-acc-backup-row]');
-      if(bkRow) bkRow.onclick=()=>toggle('[data-acc-backup-expand]');
+      const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
 
       // ── скидання до заводських ──
       // Бекап перед стиранням не беремо на віру: якщо файл лише віддано браузеру
       // на завантаження (перевірити нема як), людина мусить сама підтвердити,
       // що бачить його, — інакше «єдина копія» могла б не існувати.
       // file — уже зібраний бекап із кроку 'tap' (див. askTap нижче)
-      const runReset=async (wipeCloud, stopMsg, file)=>{
-        const r=await window.flowFactoryReset({wipeCloud, file});
+      // btn — кнопка скидання: на ній чесний хід бекапу («Фото з хмари: 3 з 12…»)
+      const runReset=async (wipeCloud, stopMsg, file, btn)=>{
+        const old=btn&&btn.textContent;
+        if(btn){ btn.disabled=true; btn.textContent='⏳ Готую бекап…'; }
+        let r;
+        try{ r=await window.flowFactoryReset({wipeCloud, file, onProgress:p=>{ if(btn) btn.textContent=progText(p); }}); }
+        finally{ if(btn && !(r&&r.ok)){ btn.disabled=false; btn.textContent=old; } }
         if(r.ok) return;
-        if(r.step==='tap'){ askTap(r, ()=>runReset(wipeCloud, stopMsg, r.file)); return; }
+        if(r.step==='tap'){ askTap(r, ()=>runReset(wipeCloud, stopMsg, r.file, btn)); return; }
         if(r.step!=='backup-confirm'){ flowAlert(stopMsg+r.error); return; }
         setTimeout(()=>{ confirmSheet({title:'Файл бекапу зберігся?',
           sub:'Браузер не каже, чи «'+r.name+'» справді записано. Перевір «Завантаження»: без цього файла стерте не повернути.',
@@ -335,7 +339,7 @@
         const inAcc=!!(window.sbUser&&window.sbUser());
         confirmSheet({title:'Скинути цей пристрій?',
           sub:'Локальні дані буде стерто'+(inAcc?' — після перезапуску вони повернуться з хмари акаунта':'. Входу в акаунт немає, тож вони НЕ відновляться')+'. Спершу бекап збережеться у файл. Книжки з читалки в нього не входять — їх треба буде завантажити знову.',
-          okLabel:'Скинути', onOk:()=>runReset(false, '❌ Скидання зупинено: ')});
+          okLabel:'Скинути', onOk:()=>runReset(false, '❌ Скидання зупинено: ', null, rsDev)});
       };
       const rsAll=host.querySelector('[data-acc-reset-all]');
       if(rsAll) rsAll.onclick=(e)=>{
@@ -345,27 +349,32 @@
           okLabel:'Далі', onOk:()=>{
             /* друге, окреме підтвердження — пауза, щоб перший аркуш встиг закритись */
             setTimeout(()=>{ confirmSheet({title:'Точно стерти все?',
-              sub:'Це незворотно. Єдина копія лишиться у файлі бекапу, який зараз збережеться (з фото, якщо вони є). Книжок з читалки в ньому не буде — їх доведеться завантажити знову.',
-              okLabel:'Стерти назавжди', onOk:()=>runReset(true, '❌ Стирання зупинено: ')}); }, 350);
+              sub:'Це незворотно. Єдина копія лишиться у файлі бекапу, який зараз збережеться, — разом з усіма фото, і тими, що є лише в хмарі (їх спершу докачаємо). Якщо хоч одне фото взяти не вдасться, нічого не стираємо. Книжок з читалки у файлі не буде — їх доведеться завантажити знову.',
+              okLabel:'Стерти назавжди', onOk:()=>runReset(true, '❌ Стирання зупинено: ', null, rsAll)}); }, 350);
           }});
       };
       const mb=n=>n>=1048576?(n/1048576).toFixed(1)+' МБ':Math.max(1,Math.round(n/1024))+' КБ';
+      // хід збирання бекапу для напису на кнопці: скільки фото вже докачано з хмари
+      const progText=p=>(p&&p.stage==='photos')?('⏳ Фото з хмари: '+p.done+' з '+p.total+'…'):'⏳ Пакую фото…';
       /* Бекап зібрано, але дозвіл від натискання минув, поки звіряли хмару й пакували
          фото: аркуш «Поділитися» (iPhone) чи «Зберегти як…» (Mac) відкриються лише з
          нового дотику. Тому окрема кнопка — її onClick одразу віддає готовий файл. */
       const askTap=(r, onTap)=>setTimeout(()=>actionSheet({ title:'Бекап готовий',
         sub:'Файл «'+r.name+'»'+(r.photos?' (разом із '+r.photos+' фото, '+mb(r.bytes||0)+')':'')+' зібрано. Натисни «Зберегти файл» і вибери, куди його покласти.',
         items:[{ ic:'down', label:'Зберегти файл', primary:true, onClick:onTap }], cancel:'Скасувати' }), 350);
-      const exportRun=async (photos)=>{
-        const r=await window.flowBackup.exportToFile(photos?{photos:true}:null);
+      const exportRun=async (photos, onProgress)=>{
+        const r=await window.flowBackup.exportToFile(photos?{photos:true, onProgress}:null);
         if(r.step==='tap'){ askTap(r, async ()=>exportTell(await window.flowBackup.saveFile(r.file))); return; }
         exportTell(r);
       };
       const exportTell=(r)=>{
-        const what=r.photos?' (разом із '+r.photos+' фото, '+mb(r.bytes||0)+')':'';
+        const what=r.photos?' (разом із '+r.photos+' фото'+(r.photosFromCloud?', з них '+r.photosFromCloud+' докачано з хмари':'')+', '+mb(r.bytes||0)+')':'';
+        // фото, яких у файлі нема, — кажемо прямо, а не мовчки віддаємо неповний бекап
+        const gap=r.photosUnchecked ? '\n\n⚠️ Не вдалося перевірити, які фото лежать у хмарі (нема звʼязку?) — у файлі лише фото з цього пристрою.'
+          : (r.photosMissing ? '\n\n⚠️ '+r.photosMissing+' фото з хмари докачати не вдалося — їх у файлі нема. Спробуй ще раз, коли звʼязок буде кращим.' : '');
         // «✅ Збережено» — лише коли файл точно записано; інакше кажемо як є
-        if(r.ok && r.saved) flowAlert('✅ Збережено: '+r.name+what+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
-        else if(r.ok) flowAlert('⬇️ Файл «'+r.name+'»'+what+' передано на завантаження.\n\nПеревір, що він з\'явився в «Завантаженнях», — застосунок цього не бачить. Потім поклади його в надійне місце.');
+        if(r.ok && r.saved) flowAlert('✅ Збережено: '+r.name+what+gap+'\n\nПоклади файл у надійне місце (хмара, пошта собі).');
+        else if(r.ok) flowAlert('⬇️ Файл «'+r.name+'»'+what+' передано на завантаження.'+gap+'\n\nПеревір, що він з\'явився в «Завантаженнях», — застосунок цього не бачить. Потім поклади його в надійне місце.');
         else if(r.cancelled) flowAlert('Збереження скасовано — файл бекапу не записано.');
         else flowAlert('❌ Не вдалося експортувати: '+(r.error||'невідома помилка'));
       };
@@ -375,14 +384,21 @@
       if(exph) exph.onclick=async (e)=>{
         e.stopPropagation();
         if(exph.disabled) return;
-        exph.disabled=true; const old=exph.textContent; exph.textContent='⏳ Пакую фото…';
-        try{ await exportRun(true); }finally{ exph.disabled=false; exph.textContent=old; }
+        exph.disabled=true; const old=exph.textContent; exph.textContent='⏳ Готую бекап…';
+        try{ await exportRun(true, p=>{ exph.textContent=progText(p); }); }finally{ exph.disabled=false; exph.textContent=old; }
       };
-      // лічильник фото: скільки їх і скільки важитиме повний бекап
+      // лічильник фото: скільки їх на пристрої, скільки важать і скільки ще лише в хмарі.
+      // Рахуємо, лише коли розділ «Бекап» відкрито: renderAccount кличуть після кожної
+      // звірки з хмарою, а тут читання всіх фото й запит до хмари
       const phCnt=host.querySelector('[data-acc-ph-count]');
-      if(phCnt && window.flowBackup.photoStats) window.flowBackup.photoStats().then(ps=>{
-        phCnt.textContent = ps.count ? ('Фото: '+ps.count+' · ≈ '+mb(ps.bytes)+' у повному бекапі') : 'Фото поки немає — повний бекап буде таким самим, як звичайний.';
-      }).catch(()=>{ phCnt.textContent=''; });
+      const bkEx=host.querySelector('[data-acc-backup-expand]');
+      if(bkRow) bkRow.onclick=()=>{ toggle('[data-acc-backup-expand]'); if(bkEx && !bkEx.hidden) fillPhCnt(); };
+      const fillPhCnt=()=>{ if(phCnt && window.flowBackup.photoStats) window.flowBackup.photoStats().then(ps=>{
+        const cloud = ps.cloudOnly===null ? ' · що лежить у хмарі — перевірити не вдалось (нема звʼязку?)'
+          : (ps.cloudOnly ? ' · ще '+ps.cloudOnly+' лише в хмарі — повний бекап їх докачає' : '');
+        phCnt.textContent = (ps.count || ps.cloudOnly!==0) ? ('Фото на пристрої: '+ps.count+(ps.count?' · ≈ '+mb(ps.bytes):'')+cloud)
+          : 'Фото поки немає — повний бекап буде таким самим, як звичайний.';
+      }).catch(()=>{ phCnt.textContent=''; }); };
       const imb=host.querySelector('[data-acc-import]');
       const fileInput=host.querySelector('[data-acc-file]');
       if(imb && fileInput){

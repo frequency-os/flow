@@ -185,9 +185,14 @@
      список тем, додані віджети, обкладинку документа, фото (IndexedDB + рядок
      photo:<id> у хмарі), прикріплення в чатах і картки «Прикріплено» в їхніх
      стрічках. Кожне сховище пишемо лише тоді, коли в ньому справді щось змінилось.
-     Повертає true, якщо було що прибирати. */
-  function folderPurge(key){
+     opts.remote — папку видалили на ІНШОМУ пристрої: карту тем (spaces_map_v2)
+     і обкладинки (flowPgCovers) модулі читають лише з локальної копії, тож тут
+     вони можуть бути застарілі. Той пристрій уже прибрав їх у хмарі; ми чистимо
+     лише памʼять — інакше свіжа мітка нашої старої копії затерла б у хмарі його
+     новіші теми й обкладинки. Повертає true, якщо було що прибирати. */
+  function folderPurge(key, opts){
     if(!key) return false;
+    const remote=!!(opts && opts.remote);
     let any=false;
     const f=folders[key];
     const own=k=>k===key || k.indexOf(key+'__sp_')===0;
@@ -209,8 +214,14 @@
       });
       if(ch){ saveBoard(); any=true; }
     }catch(e){ console.error('folderPurge boards',e); }
-    try{ const api=window.__pgCovers; if(api && typeof api.keys==='function') api.keys().filter(own).forEach(k=>{ api.clear(k); any=true; }); }catch(_){}
-    try{ if(spacesMap[key]!==undefined || activeSpaceMap[key]!==undefined){ delete spacesMap[key]; delete activeSpaceMap[key]; saveSpacesMeta(); any=true; } }catch(_){}
+    try{
+      const api=window.__pgCovers;
+      if(api && typeof api.keys==='function') api.keys().filter(own).forEach(k=>{
+        if(remote && typeof api.forget==='function') api.forget(k); else api.clear(k);
+        any=true;
+      });
+    }catch(_){}
+    try{ if(spacesMap[key]!==undefined || activeSpaceMap[key]!==undefined){ delete spacesMap[key]; delete activeSpaceMap[key]; if(!remote) saveSpacesMeta(); any=true; } }catch(_){}
     try{ if(folderWidgets[key]){ delete folderWidgets[key]; saveFolderWidgets(); any=true; } }catch(_){}
     try{
       let ch=false;
@@ -227,26 +238,45 @@
   }
   // Людина видаляє папку (меню папки, агент, «відкотити» агента): надгробок → прибирання → запис
   function folderDelete(key){
-    if(!folders[key]) return false;
+    // вбудовані папки (work) видаляти не можна: після перезапуску вони повертаються
+    // з коду порожніми, а інші пристрої їх не прибирають (див. applyFolderTombsRaw)
+    if(!folders[key] || !folders[key].custom) return false;
     folderTombs.ids[key]=Date.now(); folderTombs=tombsNorm(folderTombs); saveFolderTombs();
     folderPurge(key);
     saveFolders();
     return true;
   }
-  /* Після читання сховища (load у 27-canvas.js): злити надгробки з тими, що вже
-     в памʼяті, і прибрати папки, видалені на іншому пристрої. Пише лише після
-     довіреного читання — як усі автоматичні записи папок. */
-  function applyFolderTombsRaw(raw){
+  /* Крок 1 після читання сховища (load у 27-canvas.js) — ДО застосування конфігу
+     папок: злити надгробки з прочитаного з тими, що в памʼяті. Саме тут reset
+     (мить відновлення з бекапу) знімає давні надгробки. Раніше злиття йшло ПІСЛЯ
+     applyFolderCfgRaw: той ще бачив старий надгробок і відкидав щойно відновлену
+     папку — на другому пристрої вона не зʼявлялась, а його наступне збереження
+     папок стирало її з хмари. Нічого не пише; повертає прочитане (для кроку 2). */
+  function mergeFolderTombsRaw(raw){
     let got={ reset:0, ids:{} };
     try{ const o=raw?JSON.parse(raw):null; if(o&&typeof o==='object') got=tombsNorm(o); }catch(_){}
-    const merged=tombsMerge(folderTombs, got);
-    folderTombs=merged;
+    folderTombs=tombsMerge(folderTombs, got);
+    return got;
+  }
+  /* Крок 2 (після папок і чатів): записати злите й прибрати папки, видалені на
+     іншому пристрої. Пише лише після довіреного читання — як усі автоматичні
+     записи папок. got — те, що повернув крок 1. */
+  function applyFolderTombsRaw(got){
+    got=got||{ reset:0, ids:{} };
+    const merged=folderTombs;
     if(!foldersLoaded) return 0;
     if(!tombsSame(merged, got)) saveFolderTombs();
+    // злите збігається з хмарним, а локальна копія стара — оновити лише її (з міткою
+    // хмари, без запису в хмару): інакше після перезапуску без звʼязку пристрій
+    // стартував би зі старих надгробків
+    else if(window.sbCacheLocal){
+      let loc=null; try{ const r=window.storage.getLocal(FDELKEY); if(r) loc=tombsNorm(JSON.parse(r)); }catch(_){}
+      if(!loc || !tombsSame(merged, loc)) window.sbCacheLocal(FDELKEY, JSON.stringify(merged));
+    }
     const purged=[];
     Object.keys(folderTombs.ids).forEach(k=>{
       if(folders[k] && !folders[k].custom) return;     // вбудовані папки видаляти не можна
-      if(folderPurge(k)) purged.push(k);
+      if(folderPurge(k, {remote:true})) purged.push(k);
     });
     const n=purged.length;
     if(n){ saveFolders({auto:true}); console.warn('[Flow] прибрано папок, видалених на іншому пристрої:', n); }

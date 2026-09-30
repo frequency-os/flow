@@ -1110,6 +1110,8 @@
     }
     if(a==='delete'){
       const key=findKey(inp.folder); if(!key) return '⚠️ папку не знайдено: '+inp.folder;
+      // як і в меню папки: вбудовану (Робота) видалити не можна — лише перейменувати
+      if(!folders[key].custom) return '⚠️ «'+folders[key].name+'» — вбудована папка, її не видаляють (можна перейменувати) — не повторюй';
       const ok=await aiToolConfirm('Видалити папку «'+folders[key].name+'» назавжди',{title:'🗑️ Frequency хоче видалити папку'});
       if(!ok) return 'людина скасувала — не повторюй';
       const nm=folders[key].name;

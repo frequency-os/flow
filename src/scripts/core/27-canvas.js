@@ -395,6 +395,10 @@
     try{ plRescheduleReminders(); plCheckDueReminders(); }catch(_){}
     try{ const rawc=__RAW[RDR_CFG_KEY]; const c=rawc?JSON.parse(rawc):null; if(c&&typeof c==='object') Object.assign(rdrCfg,c); }
     catch{}
+    // надгробки видалених папок — злити ДО конфігу: reset (відновлення з бекапу) мусить
+    // зняти старий надгробок раніше, ніж applyFolderCfgRaw вирішить, чи доливати папку
+    let tombsGot=null;
+    try{ tombsGot=mergeFolderTombsRaw(__RAW[FDELKEY]); }catch(e){ console.error('folder tombs merge',e); }
     // folder customizations + custom folders + order
     try{
       applyFolderCfgRaw(__RAW[FKEY]);
@@ -421,7 +425,7 @@
     }catch(_){}
     try{ applyChatsRaw(__RAW['chats_v1']); }catch(e){ console.error('chats load',e); }
     // папки, видалені на іншому пристрої, — геть разом з документом, темами, фото й посиланнями чатів
-    try{ applyFolderTombsRaw(__RAW[FDELKEY]); }catch(e){ console.error('folder tombs',e); }
+    try{ applyFolderTombsRaw(tombsGot); }catch(e){ console.error('folder tombs',e); }
     // goals data
     try{
       const rawg=__RAW[GKEY];

@@ -144,6 +144,10 @@
       return freed;
     }
     function lcSet(key,raw){
+      /* Скидання вже стирає сховище (flowFactoryReset): фоновий load(), що
+         доробляється після звірки з хмарою, не має дописати туди нічого —
+         інакше після «Стерти все» частина даних пережила б стирання. */
+      if(window.__flowWriteLock) return false;
       try{ localStorage.setItem(LP+key,raw); npWrite(key,raw); return true; }
       catch(e){
         if(isQuotaErr(e)){
@@ -506,6 +510,18 @@
         if(ts > sbLocalVersion(k)) out[k] = window.storage.wrapRaw(k, sbBatchCache[k], ts);
       });
       return out;
+    };
+    /* Покласти в ЛОКАЛЬНУ копію значення, яке збігається з хмарним, — з міткою
+       хмари, тож воно не «новішає» і назад у хмару не їде. Для ключів, де модуль
+       сам злив прочитане з памʼяттю і злите вийшло рівно хмарним (надгробки
+       папок): інакше локальна копія лишалась би старою до першої правки. */
+    window.sbCacheLocal = function(key, value){
+      if(!sb || !sbUserCache || !sbBatchCache || window.__flowWriteLock) return false;
+      const ts = sbBatchTs[key]; if(!ts) return false;
+      if(key in sbWriteQueue || key in sbInFlight) return false;   // своя правка ще летить — вона новіша
+      if(window.storage.localMeta(key).m) return false;            // незвірену копію зводить sbReconcile
+      if(sbLocalVersion(key) > ts) return false;                   // локальна свіжіша — не чіпаємо
+      try{ origSet(key, value, false, { v: ts }); return true; }catch(_){ return false; }
     };
     /* ── ЧИ МОЖНА ВІРИТИ ПОРОЖНЬОМУ ЧИТАННЮ? ──
        Головне питання перед будь-яким автоматичним записом: «у сховищі справді
@@ -932,6 +948,7 @@
     }
     function sbSyncPending(){ try{ window.__flowSync.sbPending = Object.keys(sbWriteQueue).length; }catch(_){} }
     function sbScheduleWrite(key, value){
+      if(window.__flowWriteLock) return;   // скидання: у хмару теж нічого не доливаємо (див. lcSet)
       sbWriteQueue[key] = value;       // той самий ключ удруге — просто нове значення (останнє перемагає)
       sbOutboxSaveSoon(key); sbSyncPending();
       try{ if(window.__setSync) window.__setSync('syncing'); }catch(_){}
@@ -1134,7 +1151,7 @@
     function phTsDrop(id){ try{ const o=phTsGet(); delete o[id]; localStorage.setItem(PH_TS, JSON.stringify(o)); }catch(_){} }
 
     window.sbPhotoPush = async function(id){
-      if(!id) return false;
+      if(!id || window.__flowWriteLock) return false;   // скидання: нічого не доливаємо в хмару
       if(!sb || !sbUserCache){ phPendingAdd(id); return false; }
       try{
         const dataUrl = await window.PhotoDB.get(id);
@@ -1148,13 +1165,25 @@
         return true;
       }catch(_){ phPendingAdd(id); return false; }
     };
-    window.sbPhotoFetch = async function(id){
+    // opts.peek — лише подивитись (для бекапу): локальної копії не буде, тож і мітку не ставимо
+    window.sbPhotoFetch = async function(id, opts){
       if(!id || !sb || !sbUserCache) return null;
       try{
         const { data, error } = await sb.from('user_data').select('value,updated_at').eq('user_id', sbUserCache.id).eq('key', PH_KEY+id).maybeSingle();
         if(error || !data || typeof data.value!=='string') return null;
-        phTsSet(id, Date.parse(data.updated_at)||Date.now());
+        if(!(opts && opts.peek)) phTsSet(id, Date.parse(data.updated_at)||Date.now());
         return data.value;
+      }catch(_){ return null; }
+    };
+    /* Які фото лежать у хмарі (лише id, без самих знімків — запит легкий).
+       Потрібно бекапу: фото, які на цьому пристрої ще не показувались, є ТІЛЬКИ
+       там. null — хмара не відповіла: тоді не можна сказати, чи все є у файлі. */
+    window.sbPhotoList = async function(){
+      if(!sb || !sbUserCache) return null;
+      try{
+        const { data, error } = await sb.from('user_data').select('key').eq('user_id', sbUserCache.id).like('key', PH_KEY+'%');
+        if(error || !Array.isArray(data)) return null;
+        return data.map(r=>String(r.key).slice(PH_KEY.length)).filter(Boolean);
       }catch(_){ return null; }
     };
     window.sbPhotoDel = async function(id){
@@ -1355,18 +1384,48 @@
       let bytes = 0; try{ bytes = new Blob([JSON.stringify(d)]).size; }catch(_){ bytes = JSON.stringify(d).length; }
       return { keys: keys.length, bytes };
     }
-    /* Фото з IndexedDB (PhotoDB): скільки їх і скільки важать — лічильник для
-       кнопки «Повний бекап з фото». Розмір рахуємо з base64 (×3/4), без декодування. */
-    async function photoStats(){
+    // розмір фото з base64 (×3/4), без декодування
+    function phBytes(v){ const i = v.indexOf(','); return i>0 ? Math.floor((v.length-i-1)*3/4) : v.length; }
+    const signedIn = ()=>!!(window.sbUser && window.sbUser());
+    /* Лічильник для кнопки «Повний бекап з фото»: фото з IndexedDB (PhotoDB) на
+       цьому пристрої + з входом у Google — скільки ще лежить ЛИШЕ в хмарі
+       (photo:<id>; їх бекап докачає). cloudOnly === null — хмара не відповіла.
+       opts.cloud:false — лише пристрій, без запиту до хмари;
+       opts.list — уже запущений sbPhotoList() (makeFile пускає його паралельно зі звіркою). */
+    async function photoStats(opts){
       let all = {};
       try{ if(window.PhotoDB && window.PhotoDB.available()) all = await window.PhotoDB.all(); }catch(_){}
       let count = 0, bytes = 0;
       Object.keys(all).forEach(id=>{
-        const v = all[id]; if(typeof v!=='string' || !v) return;
-        count++; const i = v.indexOf(',');
-        bytes += i>0 ? Math.floor((v.length-i-1)*3/4) : v.length;
+        const v = all[id]; if(typeof v!=='string' || !v){ delete all[id]; return; }
+        count++; bytes += phBytes(v);
       });
-      return { count, bytes, all };
+      let cloudOnly = 0, cloudIds = [];
+      if(!(opts && opts.cloud===false) && signedIn() && window.sbPhotoList){
+        const ids = await ((opts && opts.list) || window.sbPhotoList());
+        if(ids){ cloudIds = ids.filter(id=>!Object.prototype.hasOwnProperty.call(all, id)); cloudOnly = cloudIds.length; }
+        else cloudOnly = null;
+      }
+      return { count, bytes, all, cloudOnly, cloudIds };
+    }
+    /* Усі фото для повного бекапу: з пристрою + докачані з хмари ті, яких тут нема.
+       Раніше бралось лише PhotoDB — фото, що жили тільки в хмарі, у файл не йшли,
+       а «Стерти все» потім видаляло їх назавжди.
+       onProgress(done, total) — чесний лічильник докачування для екрана.
+       missing — скільки не вдалося докачати; unchecked — хмара не сказала, що в ній є. */
+    async function gatherPhotos(onProgress, list){
+      const ps = await photoStats({ list });
+      const res = { all: ps.all, count: ps.count, bytes: ps.bytes, fromCloud: 0, missing: 0, unchecked: ps.cloudOnly===null };
+      const need = ps.cloudIds || [];
+      const tell = (d)=>{ try{ if(onProgress) onProgress(d, need.length); }catch(_){} };
+      for(let i=0; i<need.length; i++){
+        tell(i);
+        let v = null; try{ v = await window.sbPhotoFetch(need[i], {peek:true}); }catch(_){}
+        if(typeof v==='string' && v){ res.all[need[i]] = v; res.count++; res.bytes += phBytes(v); res.fromCloud++; }
+        else res.missing++;
+      }
+      if(need.length) tell(need.length);
+      return res;
     }
 
     // Згорнути все у JSON-конверт з метаданими (extra — додаткові поля, напр. опис фото)
@@ -1395,11 +1454,19 @@
       return { mime: m[1]||'application/octet-stream', b64: !!m[2], body: String(v).slice(m[0].length) };
     }
 
-    /* Готовий файл бекапу (ще НЕ збережений): { name, blob, type, photos }.
+    /* Готовий файл бекапу (ще НЕ збережений): { name, blob, type, photos,
+       photosFromCloud, photosMissing, photosUnchecked }.
        opts.photos: true — «повний бекап з фото» (zip: дані + кожне фото окремим
-       файлом); 'auto' — zip лише якщо фото є; інакше — звичайний .json. */
+       файлом); 'auto' — zip лише якщо фото є; інакше — звичайний .json.
+       З входом у Google фото, яких нема на пристрої, докачуються з хмари;
+       opts.cloudPhotos:false — лише фото з пристрою (скидання пристрою: хмара лишається).
+       opts.onProgress({stage:'photos', done, total} | {stage:'zip'}) — для екрана. */
     async function makeFile(opts){
       opts = opts || {};
+      // список фото в хмарі — паралельно зі звіркою нижче, а не після неї: інакше на
+      // повільному звʼязку бекап чекав би два запити поспіль
+      const withCloudPh = !!opts.photos && opts.cloudPhotos!==false && signedIn() && !!window.sbPhotoList;
+      const listP = withCloudPh ? window.sbPhotoList() : null;
       // хмара могла змінитись після останньої звірки — освіжаємо, щоб бекап збігся з екраном.
       // Саме звірка з перечитуванням (як пул при фокусі), а не голий sbPrefetchAll:
       // той зсував мітки без __load, і свіжа правка з телефона потім затиралась старою памʼяттю
@@ -1407,12 +1474,19 @@
         try{ await Promise.race([ window.sbPullAndLoad(), new Promise(r=>setTimeout(r, 8000)) ]); }catch(_){}
       }
       const stamp = ymdLocal();
-      let ps = null;
-      if(opts.photos){ ps = await photoStats(); if(opts.photos==='auto' && !ps.count) ps = null; }
-      if(!ps){
-        return { name:`flow-backup-${stamp}.json`, type:'application/json', photos:0,
-                 blob: new Blob([makeEnvelope()], {type:'application/json'}) };
+      const prog = (p)=>{ try{ if(opts.onProgress) opts.onProgress(p); }catch(_){} };
+      let ps = null, extra = { photosFromCloud:0, photosMissing:0, photosUnchecked:false };
+      if(opts.photos){
+        if(!withCloudPh){ ps = await photoStats({cloud:false}); ps.fromCloud = 0; ps.missing = 0; ps.unchecked = false; }
+        else ps = await gatherPhotos((done, total)=>prog({ stage:'photos', done, total }), listP);
+        extra = { photosFromCloud:ps.fromCloud, photosMissing:ps.missing, photosUnchecked:ps.unchecked };
+        if(opts.photos==='auto' && !ps.count) ps = null;
       }
+      if(!ps){
+        return Object.assign({ name:`flow-backup-${stamp}.json`, type:'application/json', photos:0,
+                 blob: new Blob([makeEnvelope()], {type:'application/json'}) }, extra);
+      }
+      prog({ stage:'zip' });
       const JSZip = await loadZip();
       if(!JSZip) throw new Error('не вдалося завантажити модуль zip — зроби звичайний бекап без фото');
       const zip = new JSZip(), map = {};
@@ -1426,7 +1500,7 @@
       });
       zip.file(ZIP_JSON, makeEnvelope({ photos:map }), { compression:'DEFLATE' });
       const blob = await zip.generateAsync({ type:'blob', mimeType:'application/zip' });
-      return { name:`flow-backup-${stamp}-photos.zip`, type:'application/zip', photos:Object.keys(map).length, blob };
+      return Object.assign({ name:`flow-backup-${stamp}-photos.zip`, type:'application/zip', photos:Object.keys(map).length, blob }, extra);
     }
 
     // Зберегти файл і сказати ПРАВДУ, чи він є. Раніше після a.click() відповідь
@@ -1485,7 +1559,14 @@
     async function saveFile(f){
       const r = await saveBlob(f);
       r.photos = f.photos; r.bytes = f.blob.size;
+      r.photosFromCloud = f.photosFromCloud||0; r.photosMissing = f.photosMissing||0; r.photosUnchecked = !!f.photosUnchecked;
       return r;
+    }
+    // чого з фото бракує у файлі — людськими словами ('' — усе на місці)
+    function photosGap(f){
+      if(f.photosUnchecked) return 'не вдалося перевірити, які фото лежать у хмарі (нема звʼязку?)';
+      if(f.photosMissing) return 'не вдалося докачати з хмари '+f.photosMissing+' фото';
+      return '';
     }
     /* Чи ще діє дозвіл від натискання (user activation). Аркуш «Поділитися» і
        діалог «Зберегти як…» відкриваються лише одразу після дотику, а перед ними
@@ -1500,11 +1581,19 @@
     // Експорт: зібрати файл (opts.photos — див. makeFile) і зберегти його.
     // Дозвіл від натискання минув, поки збирали, — повертаємо крок 'tap' з готовим
     // файлом: екран покаже кнопку «Зберегти», і її свіжий дотик відкриє аркуш.
+    // opts.needAllPhotos — перед «Стерти все»: якщо хоч одного фото з хмари у файлі
+    // нема, зупиняємось ДО збереження (крок 'photos') — стирати не можна.
     async function exportToFile(opts){
       const t0 = Date.now();
       let f;
       try{ f = await makeFile(opts); }catch(e){ return { ok:false, error:String((e&&e.message)||e) }; }
-      if(!tapStillFresh(t0)) return { ok:false, step:'tap', file:f, name:f.name, photos:f.photos, bytes:f.blob.size };
+      const gap = photosGap(f);
+      if(opts && opts.needAllPhotos && gap){
+        return { ok:false, step:'photos', missing:f.photosMissing||0, unchecked:!!f.photosUnchecked,
+                 error: gap+' — без них у файлі хмару стирати не можна. Нічого не стерто; спробуй ще раз, коли звʼязок буде кращим' };
+      }
+      if(!tapStillFresh(t0)) return { ok:false, step:'tap', file:f, name:f.name, photos:f.photos, bytes:f.blob.size,
+                                      photosFromCloud:f.photosFromCloud||0, photosMissing:f.photosMissing||0, photosUnchecked:!!f.photosUnchecked };
       return saveFile(f);
     }
 
@@ -1716,35 +1805,51 @@
     //    разом із ними. Книжки (BookDB) не беремо: вони великі, їх завантажують знову.
     //    Крок 'tap': файл зібрано, але дозвіл від натискання минув (звірка з хмарою,
     //    zip) — екран дає кнопку «Зберегти» і кличе нас знову з o.file (вже зібраним).
+    //    «Стерти все» видаляє і рядки photo:<id> у хмарі — тож фото, яких нема на
+    //    пристрої, спершу докачуємо у файл; не вийшло хоч з одним — зупиняємось
+    //    (крок 'photos'), нічого не стерто. «Скинути пристрій» хмару лишає: у файл —
+    //    фото з пристрою, решта повернеться з хмари.
     if(!o.backupConfirmed){
-      const bk = o.file ? await window.flowBackup.saveFile(o.file) : await window.flowBackup.exportToFile({photos:'auto'});
-      if(bk && bk.step==='tap') return bk;
+      const bk = o.file ? await window.flowBackup.saveFile(o.file)
+        : await window.flowBackup.exportToFile({ photos:'auto', cloudPhotos:!!o.wipeCloud, needAllPhotos:!!o.wipeCloud, onProgress:o.onProgress });
+      if(bk && (bk.step==='tap' || bk.step==='photos')) return bk;
       if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
       if(!bk.saved) return { ok:false, step:'backup-confirm', name:bk.name, error:'не видно, чи файл бекапу збережено' };
     }
+    /* Далі — стирання. Звірка з хмарою перед бекапом чекає не довше 8 с, а load()
+       після неї може доробитись у фоні й дописати сховище (прибирання папок,
+       міграції) — вже ПІСЛЯ стирання. Тож замикаємо всі записи через
+       window.storage (локальні й у хмару); якщо хмару стерти не вдалось —
+       відмикаємо: застосунок працює далі як був. */
+    window.__flowWriteLock = true;
     // 2) хмара — доки сесія ще жива
     if(o.wipeCloud){
       const u = window.sbUser && window.sbUser();
       if(u){
         const wiped = await (window.sbWipeAll ? window.sbWipeAll() : false);
-        if(!wiped) return { ok:false, step:'cloud', error:'хмару не вдалося стерти — дані не чіпав' };
+        if(!wiped){ window.__flowWriteLock = false; return { ok:false, step:'cloud', error:'хмару не вдалося стерти — дані не чіпав' }; }
         try{ if(window.sbSignOut) await window.sbSignOut(); }catch(_){}
       }
     }
     // 3) localStorage: усе, крім сесії Supabase (ключі 'sb-…') при скиданні
-    //    лише пристрою — інакше довелося б входити в Google заново
-    try{
-      const drop=[];
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i); if(!k) continue;
-        if(!o.wipeCloud && k.slice(0,3)==='sb-') continue;
-        drop.push(k);
-      }
-      drop.forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
-    }catch(_){}
-    // 4) прапорець для дочистки IndexedDB + перезапуск
-    try{ localStorage.setItem('__flow_wipe_idb__','1'); }catch(_){}
-    setTimeout(()=>{ try{ location.reload(); }catch(_){} }, 600);
+    //    лише пристрою — інакше довелося б входити в Google заново.
+    //    Двічі: зараз і перед самим перезапуском — прапорці міграцій фоновий
+    //    load() пише повз window.storage, замок їх не бачить.
+    const wipeLocal = ()=>{
+      try{
+        const drop=[];
+        for(let i=0;i<localStorage.length;i++){
+          const k=localStorage.key(i); if(!k) continue;
+          if(!o.wipeCloud && k.slice(0,3)==='sb-') continue;
+          drop.push(k);
+        }
+        drop.forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
+      }catch(_){}
+      // 4) прапорець для дочистки IndexedDB на наступному старті
+      try{ localStorage.setItem('__flow_wipe_idb__','1'); }catch(_){}
+    };
+    wipeLocal();
+    setTimeout(()=>{ wipeLocal(); try{ location.reload(); }catch(_){} }, 600);
     return { ok:true };
   };
 
