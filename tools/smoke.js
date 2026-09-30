@@ -24,7 +24,10 @@ app.whenReady().then(async () => {
   win.webContents.on('console-message', (e) => {
     if (e.level !== 'error') return;
     const where = (e.sourceId || '') + ':' + (e.lineNumber || '');
-    (NOISE.test(e.message) ? noise : errors).push(e.message.slice(0, 300) + '  @' + where.split('/').pop());
+    // Порушення CSP — завжди помилка: їхній текст перелічує дозволені адреси
+    // (з supabase.co), тож NOISE інакше тихо відкидав би їх як мережевий шум.
+    const csp = /Content Security Policy/i.test(e.message);
+    (NOISE.test(e.message) && !csp ? noise : errors).push(e.message.slice(0, 300) + '  @' + where.split('/').pop());
   });
   win.webContents.on('render-process-gone', (_e, d) => errors.push('renderer gone: ' + d.reason));
   const timer = setTimeout(() => { console.log('❌ тайм-аут 60 с'); app.exit(2); }, 60000);

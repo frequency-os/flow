@@ -86,18 +86,22 @@
       const d=last&&last.date?new Date(last.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'}):'';
       const kindTxt=i.kind==='owe'?'Я винен':'Мені винні';
       const opsTxt=i.ops.length>1?` · ${i.ops.length} оп.`:'';
-      const amtHtml=settled?`<div class="settled">✓ Погашено</div>`:`<div class="amt">${sign}${fmt(bal)} ${CUR[i.cur]||i.cur}</div>`;
+      const amtHtml=settled?`<div class="settled">✓ Погашено</div>`:`<div class="amt">${sign}${fmt(bal)} ${esc(CUR[i.cur]||i.cur)}</div>`;
       const syncBtn = (!settled)
         ? (i.synced
-            ? `<button class="debt-sync done" data-debtsync="${i.id}" onclick="event.stopPropagation()">✓ у фінансах</button>`
-            : `<button class="debt-sync" data-debtsync="${i.id}" onclick="event.stopPropagation()">→ у фінанси</button>`)
+            ? `<button class="debt-sync done" data-debtsync="${esc(i.id)}" onclick="event.stopPropagation()">✓ у фінансах</button>`
+            : `<button class="debt-sync" data-debtsync="${esc(i.id)}" onclick="event.stopPropagation()">→ у фінанси</button>`)
         : '';
-      return `<div class="item clickable" style="--c:${c}" onclick="openModal(${i.id})">
-        <div class="who">${initials(i.name)}</div>
+      return `<div class="item clickable" style="--c:${c}" data-debtopen="${esc(i.id)}">
+        <div class="who">${esc(initials(i.name))}</div>
         <div class="mid"><div class="nm">${esc(i.name)}</div><div class="meta">${kindTxt}${d?' · '+d:''}${opsTxt}</div>${syncBtn}</div>
         ${amtHtml}<div class="chev">›</div></div>`;
     }).join('');
     document.querySelectorAll('[data-debtsync]').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation(); toggleDebtSync(b.dataset.debtsync); });
+    // id боргу раніше вклеювався в onclick="openModal(…)" як JS-код: рядковий id (з хмари чи від AI)
+    // або ламав клік, або виконувався. Тепер id лежить у data-атрибуті, а запис шукаємо за ним.
+    list.querySelectorAll('[data-debtopen]').forEach(el=>el.onclick=()=>{
+      const it=debtItems.find(x=>String(x.id)===el.dataset.debtopen); if(it) openModal(it.id); });
   }
 
   function toggleDebtSync(id){
@@ -154,9 +158,12 @@
       const canDel=i.ops.length>1;
       return `<div class="hrow ${dir}"><div class="dot">${icon}</div>
         <div class="htxt"><b>${label}</b><span>${sub||'—'}</span></div>
-        <div class="hamt">${sign}${fmt(o.amount)} ${sym}</div>
-        ${canDel?`<button class="hx" onclick="delOp(${o.id})">×</button>`:''}</div>`;
+        <div class="hamt">${sign}${fmt(o.amount)} ${esc(sym)}</div>
+        ${canDel?`<button class="hx" data-debtopdel="${esc(o.id)}">×</button>`:''}</div>`;
     }).join('');
+    // як і в списку: id операції — у data-атрибуті, а не в JS-коді onclick
+    document.querySelectorAll('#mHist [data-debtopdel]').forEach(el=>el.onclick=()=>{
+      const o=i.ops.find(x=>String(x.id)===el.dataset.debtopdel); if(o) delOp(o.id); });
   }
   function askOp(type){ pendingType=type;
     const i=debtItems.find(x=>x.id===curId), p=document.getElementById('prompt');

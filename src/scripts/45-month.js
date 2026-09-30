@@ -49,13 +49,14 @@ try{
   function goalById(id){
     try{ return (goalsData.goals||[]).find(function(g){ return (g.id||g.name)===id; })||null; }catch(_){ return null; }
   }
+  // колір і емодзі цілі/фокусу — з даних (хмара, AI) і йдуть у HTML як є, тож чистимо
   function mfColor(f,i){
     var g=f&&f.goalId?goalById(f.goalId):null;
-    return (g&&g.color)||f.color||MPAL[i%MPAL.length];
+    return safeColor((g&&g.color)||f.color, MPAL[i%MPAL.length]);
   }
   function mfEmoji(f){
     var g=f&&f.goalId?goalById(f.goalId):null;
-    return (g&&g.emoji)||f.emoji||ic('target',14);
+    return safeEmoji((g&&g.emoji)||f.emoji) || ic('target',14);
   }
   function prevYm(ym){ var y=+ym.slice(0,4), mo=+ym.slice(5,7)-1;
     if(mo<1){ mo=12; y--; } return y+'-'+String(mo).padStart(2,'0'); }
@@ -166,7 +167,7 @@ try{
     /* цілі, які живить місяць */
     var maxG=1; goals.forEach(function(g){ var h=st.byGoal[g.id||g.name]||0; if(h>maxG) maxG=h; });
     var goalsHtml=goals.length? goals.map(function(g){
-      var key=g.id||g.name, h=st.byGoal[key]||0, cc=g.color||'#5b8def';
+      var key=g.id||g.name, h=st.byGoal[key]||0, cc=safeColor(g.color,'#5b8def');
       return '<div class="f26m-g'+(h?'':' zero')+'" data-f26m-goal="'+escA(key)+'">'+
         '<div class="e" style="background:color-mix(in srgb,'+cc+' 20%,transparent);color:'+cc+'">'+(g.emoji?esc2(g.emoji):ic('compass',14))+'</div>'+
         '<div class="m"><h6>'+esc2(g.name||'Ціль')+'</h6>'+
@@ -230,7 +231,7 @@ try{
       var segs='';
       Object.keys(w.byGoal).forEach(function(k){
         var g=k!=='_none'?goalById(k):null;
-        var cc=(g&&g.color)||'rgba(143,138,168,.55)';
+        var cc=safeColor(g&&g.color,'rgba(143,138,168,.55)');
         segs+='<i style="width:'+(w.used?(w.byGoal[k]/w.cap*100):0).toFixed(1)+'%;background:'+cc+'"></i>';
       });
       var d0=+w.days[0].d, d1=+w.days[w.days.length-1].d;
@@ -473,7 +474,7 @@ try{
         var chips='';
         (goalsData.goals||[]).forEach(function(g){
           var k=g.id||g.name; if(used[k]) return;
-          chips+='<button data-c data-rzgoal="'+escA(k)+'" style="--fc:'+(g.color||'#8b7cff')+'">'+esc2(g.emoji||'')+' '+esc2(g.name||'Ціль')+'</button>';
+          chips+='<button data-c data-rzgoal="'+escA(k)+'" style="--fc:'+safeColor(g.color,'#8b7cff')+'">'+esc2(g.emoji||'')+' '+esc2(g.name||'Ціль')+'</button>';
         });
         if(chips) h+='<div class="pl-sheet-l" style="margin-top:14px">З твоїх цілей</div><div class="f26m-dsel">'+chips+'</div>';
         h+='<button class="f26m-ghost" data-rzown style="margin-top:12px">'+ic('plus',13)+'Свій фокус</button>';

@@ -84,7 +84,8 @@
   function plGoalColorFor(b){
     if(b && b.link && b.link.goalId){
       const g=(goalsData.goals||[]).find(x=>(x.id||x.name)===b.link.goalId);
-      if(g && g.color) return g.color;
+      // колір цілі йде в style="…" у кількох місцях — чистимо тут, в одному місці
+      if(g && g.color) return safeColor(g.color, PL_COL[b&&b.c] || '#5b8def');
     }
     return PL_COL[b&&b.c] || '#5b8def';
   }
@@ -169,7 +170,8 @@
   function plTemplateGoalMeta(link){
     if(link && link.goalId){
       const g=(goalsData.goals||[]).find(x=>(x.id||x.name)===link.goalId);
-      if(g) return {emoji:g.emoji||'🎯', color:g.color||'#5b8def', name:g.name||'Ціль'};
+      // емодзі й колір цілі вставляються в HTML як є — тож чистимо (ціль могла прийти з хмари чи від AI)
+      if(g) return {emoji:safeEmoji(g.emoji,'🎯'), color:safeColor(g.color,'#5b8def'), name:g.name||'Ціль'};
     }
     return {emoji:'⏱', color:'#5b8def', name:'Без цілі'};
   }
@@ -190,7 +192,7 @@
       return `<div class="pl-tpl${on?'':' off'}">
         <div class="pl-tpl-ic" style="background:color-mix(in srgb, ${meta.color} 22%, transparent);color:${meta.color}">${meta.emoji}</div>
         <div class="pl-tpl-ti"><h5>${esc(t.t)}</h5><p>${plHM(t.h)}–${plHM(t.endH)} · ${esc(daysLbl)} · ціль: ${esc(meta.name)}</p></div>
-        <div class="pl-tpl-tog${on?' on':''}" data-pltpltoggle="${t.id}"><i></i></div>
+        <div class="pl-tpl-tog${on?' on':''}" data-pltpltoggle="${esc(t.id)}"><i></i></div>
       </div>`;
     }).join('') : `<div class="pl-empty" style="padding:18px 14px">Немає постійних блоків. Додай перший — розставиться одразу на весь місяць.</div>`;
     return `<div class="seclbl" style="display:flex;justify-content:space-between;align-items:center">🔒 Постійні блоки місяця<span class="pl-tpl-add" data-pltpladd>+ додати шаблон</span></div>
@@ -373,7 +375,7 @@
 
     // рівень цілей
     const goalsSub = goals.length ? `<div class="flw-sub"><div class="flw-sub-in">${
-      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${gl.id}"><span class="d"></span><span>${esc(gl.emoji||'🎯')} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
+      goals.map(gl=>{ const p=goalPctP(gl); return `<div class="flw-item ${p>=100?'done':''}" data-pgoal="${esc(gl.id)}"><span class="d"></span><span>${esc(gl.emoji||'🎯')} ${esc(gl.name)} · ${p}%</span></div>`; }).join('')
     }</div></div>` : `<div class="flw-sub"><div class="flw-empty">Цілей ще нема. Додай нижче.</div></div>`;
 
     // рівень "сьогодні" — денні цілі з усіх goals на сьогодні
@@ -421,8 +423,8 @@
       const p=goalPctP(gl);
       const steps=gl.steps||[]; const sd=steps.filter(s=>s.done).length;
       const meta = steps.length? `${sd}/${steps.length} кроків` : 'без кроків';
-      return `<div class="brd-cable" data-pgoal="${gl.id}">
-        <div class="brd-cx"><div class="brd-cn">${gl.emoji||'🎯'} ${esc(gl.name)}</div><div class="brd-cm">${meta}</div></div>
+      return `<div class="brd-cable" data-pgoal="${esc(gl.id)}">
+        <div class="brd-cx"><div class="brd-cn">${safeEmoji(gl.emoji,'🎯')} ${esc(gl.name)}</div><div class="brd-cm">${meta}</div></div>
         ${brdRing(p)}
       </div>`;
     }).join('') : `<div class="brd-empty">Цілей-містків ще нема.<br>Кожна ціль — це трос, що тягне тебе з А до Б.</div>`;
@@ -473,9 +475,9 @@
         body=goalsData.goals.map(gl=>{
           const steps=gl.steps||[]; const sd=steps.filter(s=>s.done).length;
           const gp=steps.length?Math.round(sd/steps.length*100):(gl.progress||0);
-          const cc=gl.color||'#5b8def';
+          const cc=safeColor(gl.color,'#5b8def');
           return `<div class="pl-qgoal" style="--gc:${cc}"><div class="pl-qh">
-            <div class="pl-qemoji" style="background:${cc}2e">${gl.emoji||'🎯'}</div>
+            <div class="pl-qemoji" style="background:${cc}2e">${safeEmoji(gl.emoji,'🎯')}</div>
             <h5>${esc(gl.name)}</h5><span class="pl-qpc" style="color:${cc}">${gp}%</span></div>
             <div class="pl-qbar"><i style="width:${gp}%;background:${cc};box-shadow:0 0 10px ${cc}"></i></div>
             <div class="pl-qmeta"><span class="pl-chip">📋 ${sd}/${steps.length} кроків</span></div></div>`;

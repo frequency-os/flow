@@ -88,11 +88,11 @@
       <div class="spcfg-sec">Стиль карток</div>
       <div class="spcfg-styles" style="grid-template-columns:repeat(3,1fr)">${[['classic','Класика','▢'],['glass','Скло','◇'],['bento','Бенто','▧']].map(([k,n,p])=>`<button class="spcfg-style ${cardSkin===k?'on':''}" data-cardskin="${k}"><span class="ss-p">${p}</span><span class="ss-n">${n}</span></button>`).join('')}</div>
       <div class="spcfg-sec">Простори тут</div>
-      <div class="spcfg-list">${list.map(s=>`<div class="spcfg-row ${s.id===focusId?'flash':''}" data-row="${s.id}" style="--sc:${s.color}">
-        <button class="spcfg-emoji" data-spemoji="${s.id}">${s.emoji}</button>
-        <input class="spcfg-name" value="${escAttr(s.name)}" data-spname="${s.id}" placeholder="Назва простору">
+      <div class="spcfg-list">${list.map(s=>`<div class="spcfg-row ${s.id===focusId?'flash':''}" data-row="${esc(s.id)}" style="--sc:${safeColor(s.color,'#6a7dff')}">
+        <button class="spcfg-emoji" data-spemoji="${esc(s.id)}">${safeEmoji(s.emoji,'📁')}</button>
+        <input class="spcfg-name" value="${escAttr(s.name)}" data-spname="${esc(s.id)}" placeholder="Назва простору">
         <span class="spcfg-cnt">${spaceCountIn(ctx,s.id)}</span>
-        ${s.id==='main'?'<span class="spcfg-lock" title="Головний">🏠</span>':`<button class="spcfg-del" data-spdel="${s.id}">🗑️</button>`}
+        ${s.id==='main'?'<span class="spcfg-lock" title="Головний">🏠</span>':`<button class="spcfg-del" data-spdel="${esc(s.id)}">🗑️</button>`}
       </div>`).join('')}</div>
       <button class="spcfg-add" data-spaddnew>＋ Додати простір</button>
       <button class="spcfg-close" data-spclose>Готово</button>

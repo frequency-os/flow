@@ -19,7 +19,7 @@
   function ptHTML(b){
     var id=b.id; b.steps=b.steps||[]; b.habits=b.habits||[];
     var mode=b.pmode==='half'?'half':'full';
-    var c=b.color||'#7c8cff';
+    var c=safeColor(b.color,'#7c8cff');   // колір із даних сторінки йде в style — чистимо
     var pr=ptProgress(b);
     var br=bridge();
     var linkName=b.link&&br&&br.folderName?br.folderName(b.link):'';
@@ -73,7 +73,7 @@
     var week=ptWeekDays(), todayIdx=(jrParse(jrYmd()).getDay()+6)%7;
     var habHTML=b.habits.map(function(h){
       h.marks=h.marks||{};
-      var streak=ptHabStreak(h.marks), hc=h.color||c;
+      var streak=ptHabStreak(h.marks), hc=safeColor(h.color,c);
       var cells=week.map(function(ymd,i){
         var on=h.marks[ymd]?'on':'', today=i===todayIdx?'today':'';
         return '<button class="pt-hd '+on+' '+today+'" data-pthab="'+id+'|'+h.id+'|'+ymd+'" style="'+(on?'--hc:'+hc:'')+'">'+PT_WD[i][0]+'</button>';

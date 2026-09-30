@@ -56,9 +56,10 @@
       return ov;
     }
 
+    // емодзі й колір папки/чату/блока — з даних (хмара, AI), тож чистимо тут для всіх видів знахідок
     function hitHTML(gs,a,b,emoji,color,title,sub,path){
-      return `<button class="srch-hit" data-gs="${gs}" data-a="${gsEsc(a)}" data-b="${gsEsc(b||'')}" style="--shc:${color}">
-        <span class="sh-ic">${emoji}</span>
+      return `<button class="srch-hit" data-gs="${gs}" data-a="${gsEsc(a)}" data-b="${gsEsc(b||'')}" style="--shc:${safeColor(color,'#8b7cff')}">
+        <span class="sh-ic">${gsEsc(emoji||'')}</span>
         <span class="sh-body">
           <span class="sh-t">${title}</span>
           ${sub?`<span class="sh-s">${sub}</span>`:''}

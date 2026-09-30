@@ -276,9 +276,9 @@
       <div class="fdash-sec"><span>Плани · ${fmt(saved)} ₴${goalSum?' / '+fmt(goalSum):''}</span><span class="lnk" data-wal="env">усі ›</span></div>
       ${envTop.length ? envTop.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-        return `<div class="wal-env" data-envopen="${e.id}" style="--ec:${e.color||'#5b8def'}">
+        return `<div class="wal-env" data-envopen="${esc(e.id)}" style="--ec:${safeColor(e.color,'#5b8def')}">
           <i class="fill" style="width:${pct}%"></i>
-          <span class="e">${e.emoji||'✉️'}</span>
+          <span class="e">${safeEmoji(e.emoji,'✉️')}</span>
           <div class="n">${esc(e.name)}<s>${e.goal?pct+'% · ще '+fmt(Math.max(0,e.goal-sv))+' ₴':'без цілі'}</s></div>
           <b>${fmt(sv)}</b></div>`;
       }).join('') : `<div class="fh-empty">Планів ще немає. Конверт — це ціль із числом і датою.</div>`}
@@ -334,15 +334,15 @@
       <div class="env2-grid">
       ${envelopes.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-        const col=e.color||'#5b8def';
+        const col=safeColor(e.color,'#5b8def');
         const outs=(e.ops||[]).filter(o=>o.t==='out').length;
         const kind=e.kind||(e.wishId?'мрія':'ціль');
-        const tags=[`🎯 ${kind}`]; if(outs) tags.push(`${outs} витрат`);
+        const tags=[`🎯 ${esc(kind)}`]; if(outs) tags.push(`${outs} витрат`);
         const cover=e.cover||e.wishImg||'';
-        return `<div class="env2 ${(e.wishId||cover)?'wishlinked':''}" style="--ec:${col}" data-envopen="${e.id}">
-          ${cover?`<div class="e2cover" style="background-image:url('${esc(cover)}')"></div>`:''}
+        return `<div class="env2 ${(e.wishId||cover)?'wishlinked':''}" style="--ec:${col}" data-envopen="${esc(e.id)}">
+          ${cover?`<div class="e2cover" style="background-image:url('${safeImg(cover)}')"></div>`:''}
           <div class="e2water" style="height:0" data-e2fill="${pct}"></div>
-          <div class="e2top"><span class="e2em">${e.emoji||'✉️'}</span><span class="e2pct">${pct}%</span></div>
+          <div class="e2top"><span class="e2em">${safeEmoji(e.emoji,'✉️')}</span><span class="e2pct">${pct}%</span></div>
           <div class="e2nm">${esc(e.name)}</div>
           <div class="e2amt">${fmt(sv)} / ${fmt(e.goal||0)} ₴</div>
           <div class="e2tags">${tags.map(t=>`<span class="e2tg">${t}</span>`).join('')}</div>
@@ -588,7 +588,7 @@
   function contactsWidgetHtml(b, sz, head){
     const people=Array.isArray(b.people)?b.people:[];
     const rows=people.map((p,i)=>`<div class="ctw-row" data-ctrow="${b.id}|${p.id}">
-      <span class="ctw-ava" style="background:${p.color||CTW_COLORS[i%CTW_COLORS.length]}">${esc(ctwInit(p.name))}</span>
+      <span class="ctw-ava" style="background:${safeColor(p.color,CTW_COLORS[i%CTW_COLORS.length])}">${esc(ctwInit(p.name))}</span>
       <span class="ctw-m"><b>${esc(p.name||'')}</b>${p.note?`<span>${esc(p.note)}</span>`:''}</span>
       ${p.link?`<button class="ctw-go" data-ctgo="${b.id}|${p.id}" title="Відкрити">↗</button>`:''}</div>`).join('');
     return `<div class="tile ${sz} tctw" data-tileid="${b.id}" style="--tc:#34c77b">${head}
@@ -810,7 +810,7 @@
         sub:'Прибуток проєкту: '+fmt(net)+' '+cur,
         items: envelopes.map(e=>{
           const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-          return { ic:(e.emoji||'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
+          return { ic:safeEmoji(e.emoji,'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
             onClick:()=>{
               inputModal({title:'Скільки в «'+e.name+'» (₴)', placeholder:'Сума', onOk:(v)=>{
                 const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
@@ -848,7 +848,7 @@
       sub:'Цей віджет показуватиме обраний конверт',
       items: envelopes.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-        return { ic:(e.emoji||'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
+        return { ic:safeEmoji(e.emoji,'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
           onClick:()=>{ block.envId=e.id; saveBoard(); renderBoard(); } };
       })
     });
@@ -859,17 +859,17 @@
     envMigrate(e);
     const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
     const left=Math.max(0,(e.goal||0)-sv);
-    const col=e.color||'#5b8def';
+    const col=safeColor(e.color,'#5b8def');
     const kind=e.kind||(e.wishId?'мрія':'ціль');
     const cover=e.cover||e.wishImg||'';
     s.style.setProperty('--ec',col);
     s.innerHTML=`<div class="e2grab"></div>
       <div class="e2hero">
-        <div class="e2bg" style="background:${cover?`url('${esc(cover)}')`:`linear-gradient(135deg,${col},#1a1d27)`};background-size:cover;background-position:center"></div>
+        <div class="e2bg" style="background:${cover?`url('${safeImg(cover)}')`:`linear-gradient(135deg,${col},#1a1d27)`};background-size:cover;background-position:center"></div>
         <div class="e2veil"></div>
         <div class="e2htop"><span class="e2chip">🎯 ${esc(kind)}</span><span class="e2chip">${pct}%</span></div>
         <div class="e2htxt">
-          <div class="e2nm2">${e.emoji||'✉️'} ${esc(e.name)}</div>
+          <div class="e2nm2">${safeEmoji(e.emoji,'✉️')} ${esc(e.name)}</div>
           <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${fmt(e.goal||0)} ₴</div>
           <div class="e2prog"><i style="width:${pct}%"></i></div>
           <div class="e2nums"><div class="n">${fmt(sv)} ₴<small>накопичено</small></div>
@@ -911,7 +911,7 @@
     { const cb=s.querySelector('#e2Card'); if(cb) cb.onclick=()=>{
       ensureCards();
       actionSheet({ title:'Картка для поповнень', sub:e.cardId?('Зараз: '+((cardById(e.cardId)||{}).name||'—')):'Зараз: питати щоразу',
-        items: cards.map(c=>({ ic:c.emoji||'💳', label:c.name, sub:fmt(cardBalance(c))+' '+cardSym(c), onClick:()=>{ e.cardId=c.id; saveEnvelopes(); renderEnvSheet(); } }))
+        items: cards.map(c=>({ ic:safeEmoji(c.emoji,'💳'), label:c.name, sub:fmt(cardBalance(c))+' '+cardSym(c), onClick:()=>{ e.cardId=c.id; saveEnvelopes(); renderEnvSheet(); } }))
           .concat([{ ic:'❓', label:'Питати щоразу', onClick:()=>{ delete e.cardId; saveEnvelopes(); renderEnvSheet(); } }])
       });
     }; }

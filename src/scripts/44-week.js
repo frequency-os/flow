@@ -29,9 +29,10 @@ try{
     if(!Array.isArray(p.fd26fx[wk0])) p.fd26fx[wk0]=[];
     return p.fd26fx[wk0];
   }
+  // колір цілі/фокусу — з даних і йде в style="…", тож чистимо (safeColor з core/01-base.js)
   function fxColor(fx,i){
-    try{ if(fx&&fx.goalId){ var g=(goalsData.goals||[]).find(function(x){return (x.id||x.name)===fx.goalId;}); if(g&&g.color) return g.color; } }catch(_){}
-    return (fx&&fx.color)||FXPAL[i%FXPAL.length];
+    try{ if(fx&&fx.goalId){ var g=(goalsData.goals||[]).find(function(x){return (x.id||x.name)===fx.goalId;}); if(g&&g.color) return safeColor(g.color,FXPAL[i%FXPAL.length]); } }catch(_){}
+    return safeColor(fx&&fx.color,FXPAL[i%FXPAL.length]);
   }
   /* ── burndown-історія: p.fd26bd[monday][ds]=remain на ранок ── */
   function bdHist(p,wk0){
