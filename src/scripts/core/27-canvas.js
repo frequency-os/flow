@@ -357,6 +357,16 @@
     })();
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
+    /* SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть,
+       а ручні правки в них чекатимуть звірки з хмарою (02-storage.js, storeMarkRead).
+       Саме тут, після останнього await: далі прочитане синхронно лягає в памʼять.
+       Разом із __RAW — ключі, які дочитують loadValues/loadWishes/loadWishPrice/loadHomeGlass. */
+    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY]); }catch(_){}
+    /* Усе нижче до кінця load() — синхронне застосування прочитаного разом з
+       міграціями й прибираннями. Їхні записи — автоматичні: у ключ, який не
+       прочитався (сховище мовчало), вони не підуть (SYNC-2, storeAuto). */
+    const endAuto = window.storeAutoBegin ? window.storeAutoBegin() : function(){};
+    try{
 
     try{ const raw=__RAW[DEBT_KEY]; debtItems=raw?JSON.parse(raw):[]; }
     catch{ debtItems=[]; }
@@ -467,6 +477,7 @@
     try{ renderDashboard(); }catch(e){ console.error('dashboard',e); }
     try{ if(window.uiMode==='lite') goPlanner(); }catch(_){}
     try{ updateSummaryBg(); }catch(_){}
+    } finally { endAuto(); }
   }
   try{ applyHomeWidgets(); }catch(_){}
   try{ applyTheme(); }catch(_){}

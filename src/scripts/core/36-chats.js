@@ -96,7 +96,11 @@
   /* ── «Вхідні» ── */
   function ensureInboxChat(){
     let c=chatById(INBOX_CHAT);
-    if(!c) c=chatCreate({id:INBOX_CHAT, name:'Вхідні', emoji:'📥', c:'#6a7dff'});
+    /* Створення «Вхідних» — автоматичне (людина його не просила): якщо чати чи
+       дошку ця сесія не прочитала, запис не піде, інакше порожній список чатів
+       і майже порожня дошка затерли б хмару (SYNC-2). */
+    if(!c) c=(window.storeAuto ? window.storeAuto(()=>chatCreate({id:INBOX_CHAT, name:'Вхідні', emoji:'📥', c:'#6a7dff'}))
+                               : chatCreate({id:INBOX_CHAT, name:'Вхідні', emoji:'📥', c:'#6a7dff'}));
     if(!boards[chatBk(INBOX_CHAT)]) boards[chatBk(INBOX_CHAT)]=[];
     return c;
   }
