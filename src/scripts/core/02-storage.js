@@ -657,6 +657,7 @@
         const all = Object.assign({}, sbInFlight, sbWriteQueue);   // новіше з черги перемагає
         if(Object.keys(all).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(all));
         else localStorage.removeItem('flowapp___sb_outbox');
+        sbOutboxKeys = all;   // лише після вдалого запису: це те, що справді лежить у кошику
       }catch(_){}
     }
     /* Кошик пишемо не на КОЖЕН set(), а не частіше ніж раз на 400 мс. Чому:
@@ -666,24 +667,29 @@
        значення ключа. Саме значення вже лежить у localStorage (origSet пише
        синхронно), тож у ці 400 мс ризикує лише позначка «ще не в хмарі».
        Коли застосунок ховають або закривають — кошик пишемо НЕГАЙНО (sbOnHide),
-       і будь-який запис уже після ховання теж іде в кошик одразу. */
+       і будь-який запис уже після ховання теж іде в кошик одразу.
+       Виняток: ключ, який УЖЕ лежить у збереженому кошику, — пишемо одразу.
+       Там його старе значення, і якщо застосунок уб'ють (падіння WebContent
+       на iOS, без pagehide), перезапуск вишле в хмару старе зі свіжою міткою
+       і відкотить заодно й локальну копію. Застаріле гірше за відсутнє. */
     let sbOutboxTimer = null;
+    let sbOutboxKeys = {};  // що зараз лежить у збереженому кошику (дивимось лише на ключі)
     let sbHiding = false;   // pagehide вже був (visibilityState на старих WebKit міг ще лишатись 'visible')
-    function sbOutboxSaveSoon(){
-      if(sbHiding || document.visibilityState==='hidden'){ sbOutboxSave(); return; }
+    function sbOutboxSaveSoon(key){
+      if(sbHiding || document.visibilityState==='hidden' || (key!=null && key in sbOutboxKeys)){ sbOutboxSave(); return; }
       if(!sbOutboxTimer) sbOutboxTimer = setTimeout(sbOutboxSave, 400);
     }
     function sbOutboxLoad(){
       try{
         const raw=localStorage.getItem('flowapp___sb_outbox'); if(!raw) return;
         const o=JSON.parse(raw);
-        if(o && typeof o==='object') Object.keys(o).forEach(k=>{ if(!(k in sbWriteQueue)) sbWriteQueue[k]=o[k]; });
+        if(o && typeof o==='object'){ sbOutboxKeys = o; Object.keys(o).forEach(k=>{ if(!(k in sbWriteQueue)) sbWriteQueue[k]=o[k]; }); }
       }catch(_){}
     }
     function sbSyncPending(){ try{ window.__flowSync.sbPending = Object.keys(sbWriteQueue).length; }catch(_){} }
     function sbScheduleWrite(key, value){
       sbWriteQueue[key] = value;       // той самий ключ удруге — просто нове значення (останнє перемагає)
-      sbOutboxSaveSoon(); sbSyncPending();
+      sbOutboxSaveSoon(key); sbSyncPending();
       try{ if(window.__setSync) window.__setSync('syncing'); }catch(_){}
       if(sbWriteTimer) return;
       sbWriteTimer = setTimeout(sbFlushWrites, 500);
@@ -721,8 +727,20 @@
         // Ключ НЕ повертаємо, якщо новіше значення вже в черзі, ще летить в іншій
         // партії (у sbInFlight лишається лише чуже, своє ми щойно прибрали) або
         // пізніша партія вже дійшла — інакше старе перемогло б новіше.
-        keys.forEach(k=>{ if(!(k in sbWriteQueue) && !(k in sbInFlight) && !((sbDoneSeq[k]||0) > seq)) sbWriteQueue[k]=q[k]; });
+        let back = 0;
+        keys.forEach(k=>{ if(!(k in sbWriteQueue) && !(k in sbInFlight) && !((sbDoneSeq[k]||0) > seq)){ sbWriteQueue[k]=q[k]; back++; } });
         sbOutboxSave(); sbSyncPending();
+        if(!back){
+          /* Жодного ключа не повернули: у кожного вже є новіше значення (дійшло,
+             летить або чекає в черзі), тож ця невдача нічого не втратила.
+             «Помилка» тут збрехала б і застрягла б: повтор побачив би порожню
+             чергу і вийшов, не повернувши «synced». Стан вирішить новіша партія;
+             якщо ж усе вже в хмарі — кажемо це прямо. */
+          if(!Object.keys(sbWriteQueue).length && !Object.keys(sbInFlight).length){
+            try{ if(window.__setSync){ window.__flowSync.sbHadError=false; window.__setSync('synced'); } }catch(_){}
+          }
+          return;
+        }
         window.__flowSync.sbHadError = true;
         try{ if(window.__setSync) window.__setSync('error'); }catch(_){}
         if(!sbWriteTimer) sbWriteTimer=setTimeout(sbFlushWrites, 5000);   // бекоф замість тісного циклу
@@ -960,7 +978,7 @@
       if(u && sb){
         try{ await sb.from('user_data').delete().eq('user_id', u.id).eq('key', key); }catch(_){}
         if(sbBatchCache) delete sbBatchCache[key];
-        if((sbWriteQueue && key in sbWriteQueue) || key in sbInFlight){ delete sbWriteQueue[key]; delete sbInFlight[key]; sbOutboxSaveSoon(); }   // інакше стертий ключ воскрес би з кошика після перезапуску
+        if((sbWriteQueue && key in sbWriteQueue) || key in sbInFlight){ delete sbWriteQueue[key]; delete sbInFlight[key]; sbOutboxSaveSoon(key); }   // інакше стертий ключ воскрес би з кошика після перезапуску
       }
       return localResult;
     };

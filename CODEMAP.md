@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 68 |
-| Рядків JS | 27172 |
+| Рядків JS | 27190 |
 | Файлів CSS | 32 |
 | Рядків CSS | 8633 |
-| Сутностей верхнього рівня | 1678 |
+| Сутностей верхнього рівня | 1679 |
 | Ключів сховища (FLOW_KEYS) | 70 |
 
 ## Файли JS
@@ -37,7 +37,7 @@
 | `src/scripts/45-month.js` | 661 | 0 |
 | `src/scripts/46-mx.js` | 220 | 0 |
 | `src/scripts/core/01-base.js` | 392 | 37 |
-| `src/scripts/core/02-storage.js` | 1310 | 115 |
+| `src/scripts/core/02-storage.js` | 1328 | 116 |
 | `src/scripts/core/03-platform.js` | 60 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 268 | 46 |
 | `src/scripts/core/05-spaces.js` | 681 | 60 |
@@ -276,7 +276,7 @@
 | `push` | функція | `src/scripts/core/01-base.js:381` |
 | `window.flowErrors` | функція | `src/scripts/core/01-base.js:390` |
 
-### `src/scripts/core/02-storage.js` — 115 сутностей
+### `src/scripts/core/02-storage.js` — 116 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -336,65 +336,66 @@
 | `sbFlushSeq` | значення | `src/scripts/core/02-storage.js:650` |
 | `sbDoneSeq` | обʼєкт | `src/scripts/core/02-storage.js:651` |
 | `sbOutboxSave` | функція | `src/scripts/core/02-storage.js:654` |
-| `sbOutboxTimer` | значення | `src/scripts/core/02-storage.js:670` |
-| `sbHiding` | значення | `src/scripts/core/02-storage.js:671` |
-| `sbOutboxSaveSoon` | функція | `src/scripts/core/02-storage.js:672` |
-| `sbOutboxLoad` | функція | `src/scripts/core/02-storage.js:676` |
-| `sbSyncPending` | функція | `src/scripts/core/02-storage.js:683` |
-| `sbScheduleWrite` | функція | `src/scripts/core/02-storage.js:684` |
-| `sbFlushWrites` | функція | `src/scripts/core/02-storage.js:691` |
-| `window.sbFlushWrites` | значення | `src/scripts/core/02-storage.js:740` |
-| `sbOnHide` | функція | `src/scripts/core/02-storage.js:743` |
-| `sbPullChanged` | функція | `src/scripts/core/02-storage.js:778` |
-| `sbLastPull` | значення | `src/scripts/core/02-storage.js:800` |
-| `sbPullFresh` | функція | `src/scripts/core/02-storage.js:801` |
-| `window.sbPullFresh` | значення | `src/scripts/core/02-storage.js:830` |
-| `PH_KEY` | значення | `src/scripts/core/02-storage.js:846` |
-| `PH_PENDING` | значення | `src/scripts/core/02-storage.js:847` |
-| `phPendingGet` | функція | `src/scripts/core/02-storage.js:848` |
-| `phPendingSet` | функція | `src/scripts/core/02-storage.js:849` |
-| `phPendingAdd` | функція | `src/scripts/core/02-storage.js:850` |
-| `phPendingDrop` | функція | `src/scripts/core/02-storage.js:851` |
-| `PH_TS` | значення | `src/scripts/core/02-storage.js:856` |
-| `phTsGet` | функція | `src/scripts/core/02-storage.js:857` |
-| `phTsSet` | функція | `src/scripts/core/02-storage.js:858` |
-| `phTsDrop` | функція | `src/scripts/core/02-storage.js:859` |
-| `window.sbPhotoPush` | функція | `src/scripts/core/02-storage.js:861` |
-| `window.sbPhotoFetch` | функція | `src/scripts/core/02-storage.js:876` |
-| `window.sbPhotoDel` | функція | `src/scripts/core/02-storage.js:885` |
-| `phSyncBusy` | значення | `src/scripts/core/02-storage.js:895` |
-| `sbPhotoSync` | функція | `src/scripts/core/02-storage.js:896` |
-| `window.sbPhotoSync` | значення | `src/scripts/core/02-storage.js:926` |
-| `window.sbWipeAll` | функція | `src/scripts/core/02-storage.js:931` |
-| `prefSet` | функція | `src/scripts/core/02-storage.js:984` |
-| `prefCatchup` | функція | `src/scripts/core/02-storage.js:988` |
-| `UIMODE_KEY` | значення | `src/scripts/core/02-storage.js:1001` |
-| `window.uiMode` | значення | `src/scripts/core/02-storage.js:1002` |
-| `applyUiMode` | функція | `src/scripts/core/02-storage.js:1003` |
-| `setUiMode` | функція | `src/scripts/core/02-storage.js:1004` |
-| `window.setUiMode` | значення | `src/scripts/core/02-storage.js:1012` |
-| `LP` | значення | `src/scripts/core/02-storage.js:1019` |
-| `FORMAT` | значення | `src/scripts/core/02-storage.js:1020` |
-| `APP` | значення | `src/scripts/core/02-storage.js:1021` |
-| `collect` | функція | `src/scripts/core/02-storage.js:1024` |
-| `stats` | функція | `src/scripts/core/02-storage.js:1035` |
-| `makeEnvelope` | функція | `src/scripts/core/02-storage.js:1042` |
-| `exportToFile` | функція | `src/scripts/core/02-storage.js:1061` |
-| `snapshot` | функція | `src/scripts/core/02-storage.js:1106` |
-| `restoreSnapshot` | функція | `src/scripts/core/02-storage.js:1109` |
-| `applyEnvelope` | функція | `src/scripts/core/02-storage.js:1115` |
-| `importFromFile` | функція | `src/scripts/core/02-storage.js:1137` |
-| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1146` |
-| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1160` |
-| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:1207` |
-| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:1245` |
-| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:1251` |
-| `__photoPoke` | функція | `src/scripts/core/02-storage.js:1252` |
-| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:1260` |
-| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:1284` |
-| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:1285` |
-| `window.photoPut` | функція | `src/scripts/core/02-storage.js:1291` |
-| `window.photoDel` | функція | `src/scripts/core/02-storage.js:1300` |
+| `sbOutboxTimer` | значення | `src/scripts/core/02-storage.js:675` |
+| `sbOutboxKeys` | обʼєкт | `src/scripts/core/02-storage.js:676` |
+| `sbHiding` | значення | `src/scripts/core/02-storage.js:677` |
+| `sbOutboxSaveSoon` | функція | `src/scripts/core/02-storage.js:678` |
+| `sbOutboxLoad` | функція | `src/scripts/core/02-storage.js:682` |
+| `sbSyncPending` | функція | `src/scripts/core/02-storage.js:689` |
+| `sbScheduleWrite` | функція | `src/scripts/core/02-storage.js:690` |
+| `sbFlushWrites` | функція | `src/scripts/core/02-storage.js:697` |
+| `window.sbFlushWrites` | значення | `src/scripts/core/02-storage.js:758` |
+| `sbOnHide` | функція | `src/scripts/core/02-storage.js:761` |
+| `sbPullChanged` | функція | `src/scripts/core/02-storage.js:796` |
+| `sbLastPull` | значення | `src/scripts/core/02-storage.js:818` |
+| `sbPullFresh` | функція | `src/scripts/core/02-storage.js:819` |
+| `window.sbPullFresh` | значення | `src/scripts/core/02-storage.js:848` |
+| `PH_KEY` | значення | `src/scripts/core/02-storage.js:864` |
+| `PH_PENDING` | значення | `src/scripts/core/02-storage.js:865` |
+| `phPendingGet` | функція | `src/scripts/core/02-storage.js:866` |
+| `phPendingSet` | функція | `src/scripts/core/02-storage.js:867` |
+| `phPendingAdd` | функція | `src/scripts/core/02-storage.js:868` |
+| `phPendingDrop` | функція | `src/scripts/core/02-storage.js:869` |
+| `PH_TS` | значення | `src/scripts/core/02-storage.js:874` |
+| `phTsGet` | функція | `src/scripts/core/02-storage.js:875` |
+| `phTsSet` | функція | `src/scripts/core/02-storage.js:876` |
+| `phTsDrop` | функція | `src/scripts/core/02-storage.js:877` |
+| `window.sbPhotoPush` | функція | `src/scripts/core/02-storage.js:879` |
+| `window.sbPhotoFetch` | функція | `src/scripts/core/02-storage.js:894` |
+| `window.sbPhotoDel` | функція | `src/scripts/core/02-storage.js:903` |
+| `phSyncBusy` | значення | `src/scripts/core/02-storage.js:913` |
+| `sbPhotoSync` | функція | `src/scripts/core/02-storage.js:914` |
+| `window.sbPhotoSync` | значення | `src/scripts/core/02-storage.js:944` |
+| `window.sbWipeAll` | функція | `src/scripts/core/02-storage.js:949` |
+| `prefSet` | функція | `src/scripts/core/02-storage.js:1002` |
+| `prefCatchup` | функція | `src/scripts/core/02-storage.js:1006` |
+| `UIMODE_KEY` | значення | `src/scripts/core/02-storage.js:1019` |
+| `window.uiMode` | значення | `src/scripts/core/02-storage.js:1020` |
+| `applyUiMode` | функція | `src/scripts/core/02-storage.js:1021` |
+| `setUiMode` | функція | `src/scripts/core/02-storage.js:1022` |
+| `window.setUiMode` | значення | `src/scripts/core/02-storage.js:1030` |
+| `LP` | значення | `src/scripts/core/02-storage.js:1037` |
+| `FORMAT` | значення | `src/scripts/core/02-storage.js:1038` |
+| `APP` | значення | `src/scripts/core/02-storage.js:1039` |
+| `collect` | функція | `src/scripts/core/02-storage.js:1042` |
+| `stats` | функція | `src/scripts/core/02-storage.js:1053` |
+| `makeEnvelope` | функція | `src/scripts/core/02-storage.js:1060` |
+| `exportToFile` | функція | `src/scripts/core/02-storage.js:1079` |
+| `snapshot` | функція | `src/scripts/core/02-storage.js:1124` |
+| `restoreSnapshot` | функція | `src/scripts/core/02-storage.js:1127` |
+| `applyEnvelope` | функція | `src/scripts/core/02-storage.js:1133` |
+| `importFromFile` | функція | `src/scripts/core/02-storage.js:1155` |
+| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1164` |
+| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1178` |
+| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:1225` |
+| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:1263` |
+| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:1269` |
+| `__photoPoke` | функція | `src/scripts/core/02-storage.js:1270` |
+| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:1278` |
+| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:1302` |
+| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:1303` |
+| `window.photoPut` | функція | `src/scripts/core/02-storage.js:1309` |
+| `window.photoDel` | функція | `src/scripts/core/02-storage.js:1318` |
 
 ### `src/scripts/core/03-platform.js` — 14 сутностей
 
