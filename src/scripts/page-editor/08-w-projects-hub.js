@@ -817,8 +817,12 @@
     window.__pgCovers={
       grads:COV_GRADS,
       get:function(k){ return covers[k]||null; },
+      keys:function(){ return Object.keys(covers); },   // видалення папки прибирає і її обкладинки (04-folders-nav.js)
       set:function(k,c){ covers[k]=c; saveCovers(); try{ renderCover(); }catch(_){} },
-      clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} }
+      clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} },
+      // лише з памʼяті, без запису: папку видалили на іншому пристрої, і він уже
+      // прибрав її обкладинку в хмарі — наша копія могла б бути застарілою
+      forget:function(k){ delete covers[k]; }
     };
   }catch(_){}
   function covKey(){ try{ return (bridge()&&bridge().curKey())||''; }catch(_){ return ''; } }

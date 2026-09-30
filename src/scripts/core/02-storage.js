@@ -144,6 +144,10 @@
       return freed;
     }
     function lcSet(key,raw){
+      /* Скидання вже стирає сховище (flowFactoryReset): фоновий load(), що
+         доробляється після звірки з хмарою, не має дописати туди нічого —
+         інакше після «Стерти все» частина даних пережила б стирання. */
+      if(window.__flowWriteLock) return false;
       try{ localStorage.setItem(LP+key,raw); npWrite(key,raw); return true; }
       catch(e){
         if(isQuotaErr(e)){
@@ -302,6 +306,10 @@
         });
         return n;
       },
+      /* Значення у тому вигляді, як воно лежить у localStorage ({_v,d} + версія
+         схеми) — щоб бекап міг покласти поруч із локальними й хмарну копію,
+         якщо вона свіжіша (див. collect у BACKUP нижче). */
+      wrapRaw(key, value, v){ return JSON.stringify({ _v: v || Date.now(), d: stampSv(key, value) }); },
       // ⚡ синхронне читання ЛИШЕ локальної копії (для миттєвого першого рендера до синку з хмарою)
       getLocal(key){
         try{ const l=unwrap(lcGet(key)); return l? this._out(key, l.value) : null; }catch(_){ return null; }
@@ -488,6 +496,33 @@
       }catch(_){ return 0; }
     }
     window.sbPrefetchAll = sbPrefetchAll;
+    /* Ключі, чия хмарна копія свіжіша за локальну. Хмарне значення при читанні
+       віддається модулю, але в localStorage НЕ пишеться — тож на пристрої, де
+       правили з іншого, локальна копія стара, і бекап лише з localStorage
+       зберіг би НЕ те, що людина бачить на екрані. Віддаємо у форматі
+       localStorage ({_v,d}), щоб бекап просто поклав їх поверх локальних. */
+    window.sbCloudFresher = function(){
+      if(!sb || !sbUserCache || !sbBatchCache) return null;
+      const out = {};
+      Object.keys(sbBatchCache).forEach(k=>{
+        if(k in sbWriteQueue || k in sbInFlight) return;   // своя правка ще летить — вона новіша
+        const ts = sbBatchTs[k]||0;
+        if(ts > sbLocalVersion(k)) out[k] = window.storage.wrapRaw(k, sbBatchCache[k], ts);
+      });
+      return out;
+    };
+    /* Покласти в ЛОКАЛЬНУ копію значення, яке збігається з хмарним, — з міткою
+       хмари, тож воно не «новішає» і назад у хмару не їде. Для ключів, де модуль
+       сам злив прочитане з памʼяттю і злите вийшло рівно хмарним (надгробки
+       папок): інакше локальна копія лишалась би старою до першої правки. */
+    window.sbCacheLocal = function(key, value){
+      if(!sb || !sbUserCache || !sbBatchCache || window.__flowWriteLock) return false;
+      const ts = sbBatchTs[key]; if(!ts) return false;
+      if(key in sbWriteQueue || key in sbInFlight) return false;   // своя правка ще летить — вона новіша
+      if(window.storage.localMeta(key).m) return false;            // незвірену копію зводить sbReconcile
+      if(sbLocalVersion(key) > ts) return false;                   // локальна свіжіша — не чіпаємо
+      try{ origSet(key, value, false, { v: ts }); return true; }catch(_){ return false; }
+    };
     /* ── ЧИ МОЖНА ВІРИТИ ПОРОЖНЬОМУ ЧИТАННЮ? ──
        Головне питання перед будь-яким автоматичним записом: «у сховищі справді
        нічого нема» чи «сховище не відповіло»? Досі обидва випадки виглядали
@@ -913,6 +948,7 @@
     }
     function sbSyncPending(){ try{ window.__flowSync.sbPending = Object.keys(sbWriteQueue).length; }catch(_){} }
     function sbScheduleWrite(key, value){
+      if(window.__flowWriteLock) return;   // скидання: у хмару теж нічого не доливаємо (див. lcSet)
       sbWriteQueue[key] = value;       // той самий ключ удруге — просто нове значення (останнє перемагає)
       sbOutboxSaveSoon(key); sbSyncPending();
       try{ if(window.__setSync) window.__setSync('syncing'); }catch(_){}
@@ -1051,10 +1087,19 @@
         if(ae && (ae.tagName==='INPUT' || ae.tagName==='TEXTAREA' || ae.isContentEditable)) return;
       }catch(_){}
       sbLastPull = Date.now();
+      if(await sbPullAndLoad()){ try{ sbPhotoSync(); }catch(_){} }   // заразом доштовхнути фото, що чекають
+    }
+    /* Звірка з хмарою І перечитування в памʼять, якщо там новіше. Окремо від
+       sbPullFresh (без паузи 30 с і перевірки фокуса), бо потрібна ще й бекапу:
+       раніше makeFile тихо оновлював кеш через sbPrefetchAll — мітки зсувались,
+       наступний пул уже не бачив змін, екран і памʼять лишались старими, і перша
+       ж правка на цьому пристрої (saveBoard пише всю дошку) затирала хмару.
+       Правило: хто оновлює кеш і мітки хмари, той і перечитує дані (__load). */
+    async function sbPullAndLoad(){
+      if(!sb || !sbUserCache) return false;
       const before = Object.assign({}, sbBatchTs);  // час-мітки хмари ДО звірки
       let ok=false; try{ ok = await sbPullChanged(); }catch(_){}
-      if(!ok) return;
-      try{ sbPhotoSync(); }catch(_){}   // заразом доштовхнути фото, що чекають
+      if(!ok) return false;
       let changed = false;
       for(const k in sbBatchTs){
         const cloudTs = sbBatchTs[k]||0;
@@ -1066,13 +1111,15 @@
       let migWait=false; try{ migWait=!!(window.__flowMigDeferred && window.__flowMigDeferred()); }catch(_){}
       // є незвірені локальні копії ('u'/'g') — звіряє їх load(), тож хмара відповіла — перечитуємо
       const held = Object.keys(keyMark).some(k=>!sbReconciled(k));
-      if(!changed && !migWait && !held) return;
+      if(!changed && !migWait && !held) return true;
       try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
       try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
       try{ if(window.__setSync){ window.__flowSync.last=Date.now(); window.__setSync('synced'); } }catch(_){}
+      return true;
     }
     window.sbPullFresh = sbPullFresh;
+    window.sbPullAndLoad = sbPullAndLoad;
     document.addEventListener('visibilitychange', ()=>{
       if(document.visibilityState==='visible') sbPullFresh();
     });
@@ -1104,7 +1151,7 @@
     function phTsDrop(id){ try{ const o=phTsGet(); delete o[id]; localStorage.setItem(PH_TS, JSON.stringify(o)); }catch(_){} }
 
     window.sbPhotoPush = async function(id){
-      if(!id) return false;
+      if(!id || window.__flowWriteLock) return false;   // скидання: нічого не доливаємо в хмару
       if(!sb || !sbUserCache){ phPendingAdd(id); return false; }
       try{
         const dataUrl = await window.PhotoDB.get(id);
@@ -1118,13 +1165,37 @@
         return true;
       }catch(_){ phPendingAdd(id); return false; }
     };
-    window.sbPhotoFetch = async function(id){
+    // opts.peek — лише подивитись (для бекапу): локальної копії не буде, тож і мітку не ставимо
+    window.sbPhotoFetch = async function(id, opts){
       if(!id || !sb || !sbUserCache) return null;
       try{
         const { data, error } = await sb.from('user_data').select('value,updated_at').eq('user_id', sbUserCache.id).eq('key', PH_KEY+id).maybeSingle();
         if(error || !data || typeof data.value!=='string') return null;
-        phTsSet(id, Date.parse(data.updated_at)||Date.now());
+        if(!(opts && opts.peek)) phTsSet(id, Date.parse(data.updated_at)||Date.now());
         return data.value;
+      }catch(_){ return null; }
+    };
+    /* Які фото лежать у хмарі (лише id, без самих знімків — запит легкий).
+       Потрібно бекапу: фото, які на цьому пристрої ще не показувались, є ТІЛЬКИ
+       там. null — хмара не відповіла: тоді не можна сказати, чи все є у файлі. */
+    /* Сторінками: Supabase віддає за один запит не більше Max Rows (типово 1000) і
+       мовчки обрізає решту — тоді бекап вважав би, що докачав усе, а «Стерти все»
+       знищило б фото, яких нема у файлі. Крок — фактична довжина сторінки, тож
+       працює й тоді, коли стеля сервера менша за 1000. null — «список невідомий»:
+       тоді «Стерти все» зупиняється, нічого не стерши. */
+    window.sbPhotoList = async function(){
+      if(!sb || !sbUserCache) return null;
+      const out = []; let from = 0;
+      try{
+        for(let page=0; page<500; page++){
+          const { data, error } = await sb.from('user_data').select('key').eq('user_id', sbUserCache.id)
+            .like('key', PH_KEY+'%').order('key', {ascending:true}).range(from, from+999);
+          if(error || !Array.isArray(data)) return null;
+          if(!data.length) return out;
+          data.forEach(r=>{ const id = String(r.key).slice(PH_KEY.length); if(id) out.push(id); });
+          from += data.length;
+        }
+        return null;   // понад 500 сторінок — не віримо, що список повний
       }catch(_){ return null; }
     };
     window.sbPhotoDel = async function(id){
@@ -1280,16 +1351,43 @@
     const LP = 'flowapp_';                 // той самий префікс, що й у storage
     const FORMAT = 1;                       // версія формату бекапу (не плутати з версією схеми даних)
     const APP = 'flow';
+    const ZIP_JSON = 'frequency-backup.json';   // дані всередині «повного бекапу з фото»
+    /* Службові ключі з подвійним підкресленням (flowapp___sb_outbox — кошик
+       синку, ___ph_push / ___ph_ts / ___ph_backfill_* — черга й мітки фото,
+       ___seeded — прапорець Preferences) описують стан ЦЬОГО пристрою, а не
+       дані людини. Раніше вони йшли в бекап, і відновлений старий кошик
+       повторно відправляв би в хмару давні правки. */
+    function isSvc(short){ return String(short).slice(0,2)==='__'; }
+    /* Звірка з FLOW_KEYS (01-base.js): з усього реєстру лише ці пишуться
+       СИРИМИ (без flowapp_), тож збір за префіксом їх не бачив.
+       i18n_content_cache — кеш перекладу, його не беремо. */
+    const RAW_DATA = ['lang_pref'];
+    // ключі, які МУСЯТЬ читатись як JSON — інакше файл пошкоджений і відновлювати не можна
+    const JSON_KEYS = ['folders_cfg','folders_order','folders_deleted_v1','chats_v1','board','goals_data',
+      'diary_entries_v1','diary_books_v1','fin_ops','wishes_board'];
 
-    // Зібрати ВЕСЬ стан Flow з localStorage у один обʼєкт
+    // Зібрати ВЕСЬ стан Flow у один обʼєкт (у форматі localStorage: {_v,d})
     function collect(){
       const data = {};
       try{
         for(const k of Object.keys(localStorage)){
-          if(k.startsWith(LP)) data[k.slice(LP.length)] = localStorage.getItem(k);
+          if(!k.startsWith(LP)) continue;
+          const short = k.slice(LP.length);
+          if(!isSvc(short)) data[short] = localStorage.getItem(k);
         }
       }catch(_){}
+      // з входом у Google хмарна копія буває свіжішою за локальну (правили на
+      // іншому пристрої) — у бекап має піти те, що людина бачить на екрані
+      try{
+        const fr = window.sbCloudFresher && window.sbCloudFresher();
+        if(fr) Object.keys(fr).forEach(k=>{ if(!isSvc(k)) data[k] = fr[k]; });
+      }catch(_){}
       return data;
+    }
+    function collectRaw(){
+      const r = {};
+      RAW_DATA.forEach(k=>{ try{ const v = localStorage.getItem(k); if(v!=null) r[k] = v; }catch(_){} });
+      return r;
     }
 
     // Скільки ключів / приблизний розмір — для UI
@@ -1298,38 +1396,154 @@
       let bytes = 0; try{ bytes = new Blob([JSON.stringify(d)]).size; }catch(_){ bytes = JSON.stringify(d).length; }
       return { keys: keys.length, bytes };
     }
+    // розмір фото з base64 (×3/4), без декодування
+    function phBytes(v){ const i = v.indexOf(','); return i>0 ? Math.floor((v.length-i-1)*3/4) : v.length; }
+    const signedIn = ()=>!!(window.sbUser && window.sbUser());
+    /* Лічильник для кнопки «Повний бекап з фото»: фото з IndexedDB (PhotoDB) на
+       цьому пристрої + з входом у Google — скільки ще лежить ЛИШЕ в хмарі
+       (photo:<id>; їх бекап докачає). cloudOnly === null — хмара не відповіла.
+       opts.cloud:false — лише пристрій, без запиту до хмари;
+       opts.list — уже запущений sbPhotoList() (makeFile пускає його паралельно зі звіркою). */
+    async function photoStats(opts){
+      let all = {};
+      try{ if(window.PhotoDB && window.PhotoDB.available()) all = await window.PhotoDB.all(); }catch(_){}
+      let count = 0, bytes = 0;
+      Object.keys(all).forEach(id=>{
+        const v = all[id]; if(typeof v!=='string' || !v){ delete all[id]; return; }
+        count++; bytes += phBytes(v);
+      });
+      let cloudOnly = 0, cloudIds = [];
+      if(!(opts && opts.cloud===false) && signedIn() && window.sbPhotoList){
+        const ids = await ((opts && opts.list) || window.sbPhotoList());
+        if(ids){ cloudIds = ids.filter(id=>!Object.prototype.hasOwnProperty.call(all, id)); cloudOnly = cloudIds.length; }
+        else cloudOnly = null;
+      }
+      return { count, bytes, all, cloudOnly, cloudIds };
+    }
+    /* Усі фото для повного бекапу: з пристрою + докачані з хмари ті, яких тут нема.
+       Раніше бралось лише PhotoDB — фото, що жили тільки в хмарі, у файл не йшли,
+       а «Стерти все» потім видаляло їх назавжди.
+       onProgress(done, total) — чесний лічильник докачування для екрана.
+       missing — скільки не вдалося докачати; unchecked — хмара не сказала, що в ній є. */
+    async function gatherPhotos(onProgress, list){
+      const ps = await photoStats({ list });
+      const res = { all: ps.all, count: ps.count, bytes: ps.bytes, fromCloud: 0, missing: 0, unchecked: ps.cloudOnly===null };
+      const need = ps.cloudIds || [];
+      const tell = (d)=>{ try{ if(onProgress) onProgress(d, need.length); }catch(_){} };
+      for(let i=0; i<need.length; i++){
+        tell(i);
+        let v = null; try{ v = await window.sbPhotoFetch(need[i], {peek:true}); }catch(_){}
+        if(typeof v==='string' && v){ res.all[need[i]] = v; res.count++; res.bytes += phBytes(v); res.fromCloud++; }
+        else res.missing++;
+      }
+      if(need.length) tell(need.length);
+      /* Докачування може йти хвилинами, а застосунок тим часом живий: фото, додане
+         зараз, уже є в даних, але його не було в першому знімку PhotoDB. Дочитуємо. */
+      if(need.length){
+        try{
+          const now = (window.PhotoDB && window.PhotoDB.available()) ? await window.PhotoDB.all() : {};
+          Object.keys(now).forEach(id=>{
+            const v = now[id];
+            if(typeof v==='string' && v && !Object.prototype.hasOwnProperty.call(res.all, id)){ res.all[id] = v; res.count++; res.bytes += phBytes(v); }
+          });
+        }catch(_){}
+      }
+      return res;
+    }
 
-    // Згорнути все у JSON-конверт з метаданими
-    function makeEnvelope(){
-      return JSON.stringify({
+    // Згорнути все у JSON-конверт з метаданими (extra — додаткові поля, напр. опис фото)
+    function makeEnvelope(extra){
+      const data = collect();
+      return JSON.stringify(Object.assign({
         app: APP,
         format: FORMAT,
         exportedAt: new Date().toISOString(),
-        keyCount: Object.keys(collect()).length,
-        data: collect()
-      }, null, 0);
+        keyCount: Object.keys(data).length,
+        data,
+        raw: collectRaw()
+      }, extra||{}), null, 0);
     }
 
-    // Експорт: зберегти файл flow-backup-YYYY-MM-DD.json і сказати ПРАВДУ,
-    // чи він є. Раніше після a.click() відповідь завжди була ok:true — хоча
-    // в iPhone-обгортці <a download> нічого не пише, а на Mac діалог
-    // збереження можна скасувати. «Стерти все» спиралось на цей «бекап».
+    // JSZip лежить у vendor/ і потрібен рідко — вантажимо лише коли справді треба
+    async function loadZip(){
+      if(window.JSZip) return window.JSZip;
+      try{ if(typeof loadScriptOnce==='function') await loadScriptOnce(['vendor/jszip.min.js','https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js']); }catch(_){}
+      return window.JSZip || null;
+    }
+    const PH_EXT = { 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp', 'image/gif':'gif' };
+    function dataUrlParts(v){
+      const m = /^data:([^;,]*)(;base64)?,/.exec(String(v||''));
+      if(!m) return null;
+      return { mime: m[1]||'application/octet-stream', b64: !!m[2], body: String(v).slice(m[0].length) };
+    }
+
+    /* Готовий файл бекапу (ще НЕ збережений): { name, blob, type, photos,
+       photosFromCloud, photosMissing, photosUnchecked }.
+       opts.photos: true — «повний бекап з фото» (zip: дані + кожне фото окремим
+       файлом); 'auto' — zip лише якщо фото є; інакше — звичайний .json.
+       З входом у Google фото, яких нема на пристрої, докачуються з хмари;
+       opts.cloudPhotos:false — лише фото з пристрою (скидання пристрою: хмара лишається).
+       opts.onProgress({stage:'photos', done, total} | {stage:'zip'}) — для екрана. */
+    async function makeFile(opts){
+      opts = opts || {};
+      // список фото в хмарі — паралельно зі звіркою нижче, а не після неї: інакше на
+      // повільному звʼязку бекап чекав би два запити поспіль
+      const withCloudPh = !!opts.photos && opts.cloudPhotos!==false && signedIn() && !!window.sbPhotoList;
+      const listP = withCloudPh ? window.sbPhotoList() : null;
+      // хмара могла змінитись після останньої звірки — освіжаємо, щоб бекап збігся з екраном.
+      // Саме звірка з перечитуванням (як пул при фокусі), а не голий sbPrefetchAll:
+      // той зсував мітки без __load, і свіжа правка з телефона потім затиралась старою памʼяттю
+      if(window.sbUser && window.sbUser() && window.sbPullAndLoad){
+        try{ await Promise.race([ window.sbPullAndLoad(), new Promise(r=>setTimeout(r, 8000)) ]); }catch(_){}
+      }
+      const stamp = ymdLocal();
+      const prog = (p)=>{ try{ if(opts.onProgress) opts.onProgress(p); }catch(_){} };
+      let ps = null, extra = { photosFromCloud:0, photosMissing:0, photosUnchecked:false };
+      if(opts.photos){
+        if(!withCloudPh){ ps = await photoStats({cloud:false}); ps.fromCloud = 0; ps.missing = 0; ps.unchecked = false; }
+        else ps = await gatherPhotos((done, total)=>prog({ stage:'photos', done, total }), listP);
+        extra = { photosFromCloud:ps.fromCloud, photosMissing:ps.missing, photosUnchecked:ps.unchecked };
+        if(opts.photos==='auto' && !ps.count) ps = null;
+      }
+      if(!ps){
+        return Object.assign({ name:`flow-backup-${stamp}.json`, type:'application/json', photos:0,
+                 blob: new Blob([makeEnvelope()], {type:'application/json'}) }, extra);
+      }
+      prog({ stage:'zip' });
+      const JSZip = await loadZip();
+      if(!JSZip) throw new Error('не вдалося завантажити модуль zip — зроби звичайний бекап без фото');
+      const zip = new JSZip(), map = {};
+      Object.keys(ps.all).forEach(id=>{
+        const p = dataUrlParts(ps.all[id]); if(!p) return;
+        const file = 'photos/'+encodeURIComponent(id)+'.'+(PH_EXT[p.mime]||'bin');
+        // JPEG уже стиснутий — пакуємо як є, стискаємо лише дані JSON
+        if(p.b64) zip.file(file, p.body, { base64:true, compression:'STORE' });
+        else zip.file(file, decodeURIComponent(p.body), { compression:'STORE' });
+        map[id] = { file, mime:p.mime };
+      });
+      zip.file(ZIP_JSON, makeEnvelope({ photos:map }), { compression:'DEFLATE' });
+      const blob = await zip.generateAsync({ type:'blob', mimeType:'application/zip' });
+      return Object.assign({ name:`flow-backup-${stamp}-photos.zip`, type:'application/zip', photos:Object.keys(map).length, blob }, extra);
+    }
+
+    // Зберегти файл і сказати ПРАВДУ, чи він є. Раніше після a.click() відповідь
+    // завжди була ok:true — хоча в iPhone-обгортці <a download> нічого не пише,
+    // а на Mac діалог збереження можна скасувати. «Стерти все» спиралось на цей «бекап».
     //   { ok:true,  saved:true }  — файл точно віддано: діалог «Зберегти як…»
     //                               чи аркуш «Поділитися» завершились успіхом
     //   { ok:true,  saved:false } — віддали браузеру на завантаження; чи
     //                               файл з'явився, сторінка знати не може
     //   { ok:false, cancelled:true } — людина закрила діалог: файлу НЕМА
-    async function exportToFile(){
-      const json = makeEnvelope();
-      const stamp = ymdLocal();
-      const name = `flow-backup-${stamp}.json`;
+    async function saveBlob(f){
+      const { name, blob, type } = f;
+      const ext = name.slice(name.lastIndexOf('.'));
       const cancelled = { ok:false, cancelled:true, name, error:'збереження скасовано — файл не записано' };
       // 1) діалог «Зберегти як…» (Chrome, Edge, застосунок на Mac): результат відомий напевно
       if(typeof window.showSaveFilePicker==='function'){
         try{
           const h = await window.showSaveFilePicker({ suggestedName:name,
-            types:[{ description:'Frequency backup', accept:{'application/json':['.json']} }] });
-          const w = await h.createWritable(); await w.write(json); await w.close();
+            types:[{ description:'Frequency backup', accept:{ [type]:[ext] } }] });
+          const w = await h.createWritable(); await w.write(blob); await w.close();
           return { ok:true, saved:true, how:'picker', name:h.name||name };
         }catch(e){
           if(e && e.name==='AbortError') return cancelled;
@@ -1342,18 +1556,20 @@
                   (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
       if(ios && navigator.share && typeof File==='function'){
         try{
-          const f = new File([json], name, {type:'application/json'});
-          if(!navigator.canShare || navigator.canShare({files:[f]})){
-            await navigator.share({ files:[f], title:name });
+          const file = new File([blob], name, {type});
+          if(!navigator.canShare || navigator.canShare({files:[file]})){
+            await navigator.share({ files:[file], title:name });
             return { ok:true, saved:true, how:'share', name };
           }
         }catch(e){
           if(e && e.name==='AbortError') return cancelled;
+          // в обгортці застосунку <a download> нижче нічого не пише — не вдаємо, що файл
+          // «передано на завантаження»: скидання спитало б «файл є?», а його нема
+          if(window.FLOW_NATIVE) return { ok:false, name, error:'аркуш «Поділитися» не відкрився ('+((e&&e.name)||'помилка')+') — файл не записано' };
         }
       }
       // 3) звичайне завантаження — останній варіант, результат невідомий
       try{
-        const blob = new Blob([json], {type:'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = name; document.body.appendChild(a); a.click();
@@ -1361,6 +1577,47 @@
         setTimeout(()=>{ try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(_){} }, 1500);
         return { ok:true, saved:false, how:'download', name };
       }catch(e){ return { ok:false, error:String(e) }; }
+    }
+    // Зберегти вже зібраний файл (з makeFile) — викликати прямо з натискання
+    async function saveFile(f){
+      const r = await saveBlob(f);
+      r.photos = f.photos; r.bytes = f.blob.size;
+      r.photosFromCloud = f.photosFromCloud||0; r.photosMissing = f.photosMissing||0; r.photosUnchecked = !!f.photosUnchecked;
+      return r;
+    }
+    // чого з фото бракує у файлі — людськими словами ('' — усе на місці)
+    function photosGap(f){
+      if(f.photosUnchecked) return 'не вдалося перевірити, які фото лежать у хмарі (нема звʼязку?)';
+      if(f.photosMissing) return 'не вдалося докачати з хмари '+f.photosMissing+' фото';
+      return '';
+    }
+    /* Чи ще діє дозвіл від натискання (user activation). Аркуш «Поділитися» і
+       діалог «Зберегти як…» відкриваються лише одразу після дотику, а перед ними
+       тепер звірка з хмарою (до 8 с) і пакування zip. Якщо дозвіл минув, на iPhone
+       share кидав помилку і все падало в <a download>, який в обгортці нічого не
+       пише, — а скидання питало «файл є?». Де браузер не каже напевно — вважаємо
+       свіжим лише перші 800 мс. */
+    function tapStillFresh(t0){
+      try{ const ua = navigator.userActivation; if(ua && typeof ua.isActive==='boolean') return ua.isActive; }catch(_){}
+      return Date.now()-t0 < 800;
+    }
+    // Експорт: зібрати файл (opts.photos — див. makeFile) і зберегти його.
+    // Дозвіл від натискання минув, поки збирали, — повертаємо крок 'tap' з готовим
+    // файлом: екран покаже кнопку «Зберегти», і її свіжий дотик відкриє аркуш.
+    // opts.needAllPhotos — перед «Стерти все»: якщо хоч одного фото з хмари у файлі
+    // нема, зупиняємось ДО збереження (крок 'photos') — стирати не можна.
+    async function exportToFile(opts){
+      const t0 = Date.now();
+      let f;
+      try{ f = await makeFile(opts); }catch(e){ return { ok:false, error:String((e&&e.message)||e) }; }
+      const gap = photosGap(f);
+      if(opts && opts.needAllPhotos && gap){
+        return { ok:false, step:'photos', missing:f.photosMissing||0, unchecked:!!f.photosUnchecked,
+                 error: gap+' — без них у файлі хмару стирати не можна. Нічого не стерто; спробуй ще раз, коли звʼязок буде кращим' };
+      }
+      if(!tapStillFresh(t0)) return { ok:false, step:'tap', file:f, name:f.name, photos:f.photos, bytes:f.blob.size,
+                                      photosFromCloud:f.photosFromCloud||0, photosMissing:f.photosMissing||0, photosUnchecked:!!f.photosUnchecked };
+      return saveFile(f);
     }
 
     // Аварійний знімок у самій localStorage (на випадок "зламав — відкоти")
@@ -1371,40 +1628,182 @@
       try{ const s = localStorage.getItem('__flow_snapshot__'); if(!s) return false; return applyEnvelope(s, {makeSafetyCopy:false}); }catch(_){ return false; }
     }
 
-    // Розпакувати конверт назад у localStorage
-    // opts.makeSafetyCopy: перед перезаписом зробити авто-знімок поточного стану
-    function applyEnvelope(json, opts){
-      opts = opts || {};
+    // значення у форматі localStorage ({_v,d} чи сирий рядок) → рядок даних
+    function unwrapVal(raw){
+      try{ const o = JSON.parse(raw); if(o && typeof o==='object' && '_v' in o && 'd' in o) return typeof o.d==='string' ? o.d : JSON.stringify(o.d); }catch(_){}
+      return raw;
+    }
+    // розібраний обʼєкт даних ключа (без обгортки версії схеми {__sv,d}) або null
+    function valOf(env, k){
+      const raw = env.data[k]; if(typeof raw!=='string') return null;
+      try{
+        let o = JSON.parse(unwrapVal(raw));
+        if(o && typeof o==='object' && !Array.isArray(o) && '__sv' in o && 'd' in o) o = o.d;
+        return o;
+      }catch(_){ return null; }
+    }
+    // Перевірити структуру конверта, НІЧОГО не записуючи
+    function checkEnvelope(json){
       let env;
       try{ env = JSON.parse(json); }catch(_){ return { ok:false, error:'Файл не є коректним JSON' }; }
-      if(!env || env.app !== APP || !env.data || typeof env.data !== 'object'){
+      if(!env || env.app !== APP || !env.data || typeof env.data !== 'object' || Array.isArray(env.data)){
         return { ok:false, error:'Це не схоже на бекап Frequency' };
       }
       if(env.format > FORMAT){
         return { ok:false, error:'Бекап з новішої версії застосунку. Онови Frequency.' };
       }
+      const bad = [];
+      Object.keys(env.data).forEach(k=>{
+        const v = env.data[k];
+        if(typeof v!=='string'){ bad.push(k); return; }
+        if(JSON_KEYS.includes(k)){ try{ JSON.parse(unwrapVal(v)); }catch(_){ bad.push(k); } }
+      });
+      if(bad.length) return { ok:false, error:'Файл пошкоджений — не читаються: '+bad.slice(0,5).join(', ') };
+      return { ok:true, env };
+    }
+    function plural(n, one, few, many){
+      const a = n%10, b = n%100;
+      return n+' '+(a===1 && b!==11 ? one : (a>=2 && a<=4 && (b<12 || b>14) ? few : many));
+    }
+    // Підсумок «що буде відновлено» — людина бачить його ДО того, як щось перезапишеться
+    function summarize(env, photos, missing){
+      const parts = [];
+      const fc = valOf(env,'folders_cfg'); if(fc && typeof fc==='object') parts.push(plural(Object.keys(fc).length,'папка','папки','папок'));
+      const ch = valOf(env,'chats_v1'); if(Array.isArray(ch)) parts.push(plural(ch.length,'чат','чати','чатів'));
+      let dn = 0;
+      const de = valOf(env,'diary_entries_v1'); if(de && typeof de==='object') dn += Object.keys(de).length;
+      const db = valOf(env,'diary_books_v1');
+      if(db && db.entries && typeof db.entries==='object') Object.keys(db.entries).forEach(b=>{ if(Array.isArray(db.entries[b])) dn += db.entries[b].length; });
+      if(dn) parts.push(plural(dn,'запис щоденника','записи щоденника','записів щоденника'));
+      const bd = valOf(env,'board');
+      if(bd && typeof bd==='object'){ let n=0; Object.keys(bd).forEach(k=>{ if(Array.isArray(bd[k])) n += bd[k].length; });
+        if(n) parts.push(plural(n,'блок у документах і чатах','блоки в документах і чатах','блоків у документах і чатах')); }
+      const gd = valOf(env,'goals_data'); if(gd && Array.isArray(gd.goals) && gd.goals.length) parts.push(plural(gd.goals.length,'ціль','цілі','цілей'));
+      const fo = valOf(env,'fin_ops'); if(Array.isArray(fo) && fo.length) parts.push(plural(fo.length,'фінансова операція','фінансові операції','фінансових операцій'));
+      const wb = valOf(env,'wishes_board'); if(Array.isArray(wb) && wb.length) parts.push(plural(wb.length,'бажання','бажання','бажань'));
+      const np = photos ? Object.keys(photos).length : 0;
+      parts.push(np ? np+' фото' : 'фото в цьому файлі немає');
+      const keys = Object.keys(env.data).filter(k=>!isSvc(k)).length;
+      let text = 'Буде відновлено: '+parts.join(', ')+' (усього '+plural(keys,'розділ','розділи','розділів')+' даних).';
+      if(missing) text += ' Не вдалося прочитати фото: '+missing+'.';
+      return { parts, keys, photos:np, missing:missing||0, exportedAt:env.exportedAt||'', text };
+    }
+
+    function readFile(file, how){
+      return new Promise((res, rej)=>{
+        const r = new FileReader();
+        r.onload = ()=> res(r.result);
+        r.onerror = ()=> rej(r.error || new Error('read'));
+        if(how==='buf') r.readAsArrayBuffer(file); else r.readAsText(file);
+      });
+    }
+    /* Крок 1 відновлення: прочитати файл (.json чи .zip з фото) і перевірити
+       структуру. НІЧОГО не пише — повертає { ok, env, photos, summary }. */
+    async function inspectFile(file){
+      let text = null, zip = null;
+      try{
+        const head = new Uint8Array(await readFile(file.slice(0,2), 'buf'));
+        if(head[0]===0x50 && head[1]===0x4b){          // 'PK' — це zip
+          const JSZip = await loadZip();
+          if(!JSZip) return { ok:false, error:'Не вдалося відкрити zip: модуль не завантажився' };
+          zip = await JSZip.loadAsync(await readFile(file, 'buf'));
+          const jf = zip.file(ZIP_JSON);
+          if(!jf) return { ok:false, error:'У zip немає '+ZIP_JSON+' — це не бекап Frequency' };
+          text = await jf.async('string');
+        } else text = String(await readFile(file, 'text'));
+      }catch(e){ return { ok:false, error:'Не вдалося прочитати файл: '+String((e&&e.message)||e) }; }
+      const chk = checkEnvelope(text); if(!chk.ok) return chk;
+      const env = chk.env;
+      let photos = null, missing = 0;
+      if(zip && env.photos && typeof env.photos==='object'){
+        photos = {};
+        for(const id of Object.keys(env.photos)){
+          const m = env.photos[id]; const zf = m && m.file && zip.file(m.file);
+          if(!zf){ missing++; continue; }
+          try{ photos[id] = 'data:'+(m.mime||'image/jpeg')+';base64,'+(await zf.async('base64')); }catch(_){ missing++; }
+        }
+      }
+      return { ok:true, env, photos, summary: summarize(env, photos, missing) };
+    }
+
+    // Розпакувати конверт (рядок чи вже перевірений обʼєкт) назад у localStorage
+    // opts.makeSafetyCopy: перед перезаписом зробити авто-знімок поточного стану
+    function applyEnvelope(src, opts){
+      opts = opts || {};
+      let env = src;
+      if(typeof src==='string'){ const c = checkEnvelope(src); if(!c.ok) return c; env = c.env; }
       if(opts.makeSafetyCopy !== false) snapshot();
       let restored = 0;
       try{
         for(const k of Object.keys(env.data)){
+          if(isSvc(k)) continue;           // старі бекапи несли й службові ключі — стан чужого пристрою
           localStorage.setItem(LP + k, env.data[k]);
           restored++;
         }
+        if(env.raw && typeof env.raw==='object') RAW_DATA.forEach(k=>{ if(typeof env.raw[k]==='string') localStorage.setItem(k, env.raw[k]); });
       }catch(e){ return { ok:false, error:'Не вистачило памʼяті: '+String(e), restored }; }
       return { ok:true, restored, exportedAt: env.exportedAt };
     }
 
-    // Імпорт із файлу (через <input type=file>)
-    function importFromFile(file){
-      return new Promise(res=>{
-        const r = new FileReader();
-        r.onload = ()=> res(applyEnvelope(String(r.result), {makeSafetyCopy:true}));
-        r.onerror = ()=> res({ ok:false, error:'Не вдалося прочитати файл' });
-        r.readAsText(file);
-      });
+    /* Відновлене має стати НАЙСВІЖІШИМ записом. Мітка _v у бекапі стара, тож
+       без перепису (а) з входом у Google хмара з новішою міткою перемагала при
+       першому ж читанні — відновлення мовчки не діяло; (б) на iPhone
+       Preferences з новішою міткою так само підняли б старе при старті.
+       Тому кожен ключ даних переписуємо через window.storage.set: свіжа мітка →
+       localStorage + Preferences + черга в хмару. Сирі прапорці міграцій (не
+       {_v,d}) не чіпаємо — вони й не синхронізуються. */
+    async function pushRestored(keys, photos){
+      let n = 0;
+      for(const k of keys){
+        if(isSvc(k)) continue;
+        let wrapped = false;
+        try{ const o = JSON.parse(localStorage.getItem(LP+k)); wrapped = !!(o && typeof o==='object' && '_v' in o && 'd' in o); }catch(_){}
+        if(!wrapped) continue;
+        const v = window.storage.getLocal(k); if(v==null) continue;
+        try{ await window.storage.set(k, v, false); n++; }catch(_){}
+      }
+      if(!(window.sbUser && window.sbUser())) return { cloud:false, keys:n };
+      // відновлення — крок назад у часі: «надгробки» папок, які інші пристрої
+      // ще тримають у памʼяті, більше не діють (інакше вони знову стерли б
+      // щойно відновлені папки). Без входу інших пристроїв нема — не чіпаємо.
+      try{ if(typeof window.folderTombsReset==='function') await window.folderTombsReset(); }catch(_){}
+      // у хмару одразу, не чекаючи таймера: далі сторінка перезапуститься
+      try{ if(window.sbFlushWrites) await window.sbFlushWrites(); }catch(_){}
+      let phOk = 0, phFail = 0;
+      if(photos && window.sbPhotoPush){
+        for(const id of Object.keys(photos)){ try{ if(await window.sbPhotoPush(id)) phOk++; else phFail++; }catch(_){ phFail++; } }
+      }
+      const pending = (window.__flowSync && window.__flowSync.sbPending) || 0;
+      return { cloud:true, keys:n, pending, phOk, phFail };
+    }
+    /* Крок 2 відновлення (після підтвердження людиною): записати дані й фото,
+       зробити їх найсвіжішими і — з входом у Google — відправити в хмару. */
+    async function applyInspected(ins, opts){
+      opts = opts || {};
+      if(!ins || !ins.ok || !ins.env) return { ok:false, error:'Нема що відновлювати' };
+      const r = applyEnvelope(ins.env, { makeSafetyCopy: opts.makeSafetyCopy!==false });
+      if(!r.ok) return r;
+      let ph = 0;
+      if(ins.photos && window.PhotoDB && window.PhotoDB.available()){
+        for(const id of Object.keys(ins.photos)){
+          try{ await window.PhotoDB.put(id, ins.photos[id]); window.__photoCache[id] = ins.photos[id]; ph++; }catch(_){}
+        }
+      }
+      r.photos = ph;
+      const c = await pushRestored(Object.keys(ins.env.data), ins.photos);
+      r.cloud = c.cloud; r.pending = c.pending||0; r.phFail = c.phFail||0;
+      return r;
     }
 
-    window.flowBackup = { collect, stats, exportToFile, importFromFile, snapshot, restoreSnapshot, FORMAT };
+    // Імпорт із файлу одним кроком (перевірка + запис) — для старих викликів
+    async function importFromFile(file){
+      const ins = await inspectFile(file);
+      if(!ins.ok) return ins;
+      return applyInspected(ins, {makeSafetyCopy:true});
+    }
+
+    window.flowBackup = { collect, stats, photoStats, makeFile, saveFile, exportToFile, inspectFile, applyInspected,
+                          importFromFile, snapshot, restoreSnapshot, FORMAT };
   })();
 
   /* ============ СКИДАННЯ ДО ЗАВОДСЬКИХ ============
@@ -1415,6 +1814,7 @@
        • «Стерти все з акаунта» (wipeCloud:true) — плюс видаляє всі рядки
          в хмарі й виходить з акаунта. Незворотно.
      Обидві починаються з експорту бекапу у файл — без нього не рушаємо.
+     Книжки читалки (BookDB) в бекап не входять — екран чесно попереджає.
      IndexedDB тут лише позначається прапорцем: бази видаляє ранній хук
      на наступному старті (див. верх файлу), бо відкриті зʼєднання
      блокують deleteDatabase. ============ */
@@ -1424,34 +1824,55 @@
     //    Якщо файл лише віддано на завантаження (saved:false), сторінка не знає,
     //    чи він є, — повертаємо крок 'backup-confirm': екран спитає людину і
     //    викличе нас знову з backupConfirmed:true (без повторного експорту).
+    //    Фото (PhotoDB) скидання теж стирає — тож якщо вони є, бекап іде zip-ом
+    //    разом із ними. Книжки (BookDB) не беремо: вони великі, їх завантажують знову.
+    //    Крок 'tap': файл зібрано, але дозвіл від натискання минув (звірка з хмарою,
+    //    zip) — екран дає кнопку «Зберегти» і кличе нас знову з o.file (вже зібраним).
+    //    «Стерти все» видаляє і рядки photo:<id> у хмарі — тож фото, яких нема на
+    //    пристрої, спершу докачуємо у файл; не вийшло хоч з одним — зупиняємось
+    //    (крок 'photos'), нічого не стерто. «Скинути пристрій» хмару лишає: у файл —
+    //    фото з пристрою, решта повернеться з хмари.
     if(!o.backupConfirmed){
-      const bk = await window.flowBackup.exportToFile();
+      const bk = o.file ? await window.flowBackup.saveFile(o.file)
+        : await window.flowBackup.exportToFile({ photos:'auto', cloudPhotos:!!o.wipeCloud, needAllPhotos:!!o.wipeCloud, onProgress:o.onProgress });
+      if(bk && (bk.step==='tap' || bk.step==='photos')) return bk;
       if(!bk || !bk.ok) return { ok:false, step:'backup', error:(bk&&bk.error)||'експорт не вдався' };
       if(!bk.saved) return { ok:false, step:'backup-confirm', name:bk.name, error:'не видно, чи файл бекапу збережено' };
     }
+    /* Далі — стирання. Звірка з хмарою перед бекапом чекає не довше 8 с, а load()
+       після неї може доробитись у фоні й дописати сховище (прибирання папок,
+       міграції) — вже ПІСЛЯ стирання. Тож замикаємо всі записи через
+       window.storage (локальні й у хмару); якщо хмару стерти не вдалось —
+       відмикаємо: застосунок працює далі як був. */
+    window.__flowWriteLock = true;
     // 2) хмара — доки сесія ще жива
     if(o.wipeCloud){
       const u = window.sbUser && window.sbUser();
       if(u){
         const wiped = await (window.sbWipeAll ? window.sbWipeAll() : false);
-        if(!wiped) return { ok:false, step:'cloud', error:'хмару не вдалося стерти — дані не чіпав' };
+        if(!wiped){ window.__flowWriteLock = false; return { ok:false, step:'cloud', error:'хмару не вдалося стерти — дані не чіпав' }; }
         try{ if(window.sbSignOut) await window.sbSignOut(); }catch(_){}
       }
     }
     // 3) localStorage: усе, крім сесії Supabase (ключі 'sb-…') при скиданні
-    //    лише пристрою — інакше довелося б входити в Google заново
-    try{
-      const drop=[];
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i); if(!k) continue;
-        if(!o.wipeCloud && k.slice(0,3)==='sb-') continue;
-        drop.push(k);
-      }
-      drop.forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
-    }catch(_){}
-    // 4) прапорець для дочистки IndexedDB + перезапуск
-    try{ localStorage.setItem('__flow_wipe_idb__','1'); }catch(_){}
-    setTimeout(()=>{ try{ location.reload(); }catch(_){} }, 600);
+    //    лише пристрою — інакше довелося б входити в Google заново.
+    //    Двічі: зараз і перед самим перезапуском — прапорці міграцій фоновий
+    //    load() пише повз window.storage, замок їх не бачить.
+    const wipeLocal = ()=>{
+      try{
+        const drop=[];
+        for(let i=0;i<localStorage.length;i++){
+          const k=localStorage.key(i); if(!k) continue;
+          if(!o.wipeCloud && k.slice(0,3)==='sb-') continue;
+          drop.push(k);
+        }
+        drop.forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
+      }catch(_){}
+      // 4) прапорець для дочистки IndexedDB на наступному старті
+      try{ localStorage.setItem('__flow_wipe_idb__','1'); }catch(_){}
+    };
+    wipeLocal();
+    setTimeout(()=>{ wipeLocal(); try{ location.reload(); }catch(_){} }, 600);
     return { ok:true };
   };
 

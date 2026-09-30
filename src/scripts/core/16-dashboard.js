@@ -516,7 +516,7 @@
     // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
     // губився б мовчки. Автоматичну — переобираємо під нове емодзі.
     if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; if(!f.iconSet) f.icon=folderIconFor(v); saveFolders(); renderDashboard(); }}); return; }
-    if(act==='delete'){ confirmSheet({title:'Видалити папку «'+f.name+'»?', onOk:()=>{ const par=f.parent||''; Object.keys(folders).forEach(ck=>{ if(folders[ck]&&(folders[ck].parent||'')===key) folders[ck].parent=par; }); delete folders[key]; order=order.filter(x=>x!==key); saveFolders(); renderDashboard(); closeFolderMenu(); }}); return; }
+    if(act==='delete'){ confirmSheet({title:'Видалити папку «'+f.name+'»?', onOk:()=>{ folderDelete(key); renderDashboard(); closeFolderMenu(); }}); return; }   // з документом, темами, фото й посиланнями чатів — і надгробком для інших пристроїв
   }
   function cycleFolderColor(key){
     const f=folders[key];

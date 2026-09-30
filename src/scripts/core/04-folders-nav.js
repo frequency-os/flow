@@ -142,6 +142,170 @@
     }catch(_){ return false; }
   }
 
+  /* ═══════ «НАДГРОБКИ» ВИДАЛЕНИХ ПАПОК ═══════
+     Конфіг папок при читанні лише ДОЛИВАЄТЬСЯ (applyFolderCfgRaw у 27-canvas.js
+     не прибирає того, чого в сховищі нема). Тому пристрій, що ще тримав
+     видалену папку в памʼяті чи в локальній копії, першим же saveFolders()
+     повертав її в хмару — і вона воскресала на всіх пристроях.
+     Тепер видалення лишає запис {ключ: коли} у синхронізованому ключі
+     folders_deleted_v1, і кожен пристрій після читання прибирає такі папки
+     разом з усім, що їм належало. Ключі папок унікальні ('f_'+час), тож
+     надгробок не зачепить нову папку.
+     reset — мить відновлення з бекапу: давніші надгробки більше не діють
+     (інакше інший пристрій знову стер би щойно відновлені папки). */
+  const FDELKEY='folders_deleted_v1';
+  const FDEL_MAX=300;                      // межа розміру: найстаріші надгробки відкидаємо
+  function tombsNorm(o){
+    const t={ reset:(o&&+o.reset)||0, ids:{} };
+    const ids=(o&&o.ids&&typeof o.ids==='object')?o.ids:{};
+    Object.keys(ids).forEach(k=>{ const ts=+ids[k]||0; if(ts>t.reset) t.ids[k]=ts; });
+    const ks=Object.keys(t.ids);
+    if(ks.length>FDEL_MAX) ks.sort((a,b)=>t.ids[b]-t.ids[a]).slice(FDEL_MAX).forEach(k=>{ delete t.ids[k]; });
+    return t;
+  }
+  // злити дві копії (памʼять цього пристрою + сховище/хмара): жодне видалення не губиться
+  function tombsMerge(a,b){
+    const reset=Math.max(a.reset||0,b.reset||0), ids={};
+    [a,b].forEach(t=>Object.keys(t.ids||{}).forEach(k=>{ const ts=+t.ids[k]||0; if(ts>(ids[k]||0)) ids[k]=ts; }));
+    return tombsNorm({reset, ids});
+  }
+  function tombsSame(a,b){
+    const ka=Object.keys(a.ids), kb=Object.keys(b.ids);
+    return a.reset===b.reset && ka.length===kb.length && ka.every(k=>a.ids[k]===b.ids[k]);
+  }
+  let folderTombs={ reset:0, ids:{} };
+  // одразу з локальної копії: миттєвий рендер (27-canvas.js) не має блиснути видаленою папкою
+  try{ const r=window.storage.getLocal(FDELKEY); if(r) folderTombs=tombsNorm(JSON.parse(r)); }catch(_){}
+  function folderTombed(k){ return !!folderTombs.ids[k]; }
+  function saveFolderTombs(){ try{ const p=window.storage.set(FDELKEY,JSON.stringify(folderTombs),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+  // віддає проміс запису: відновлення з бекапу чекає його, перш ніж штовхати чергу в хмару
+  window.folderTombsReset=function(){ folderTombs={ reset:Date.now(), ids:{} }; return window.storage.set(FDELKEY,JSON.stringify(folderTombs),false); };
+
+  /* Прибрати все, що належить папці: документ і теми (дошки key та key__sp_*),
+     список тем, додані віджети, обкладинку документа, фото (IndexedDB + рядок
+     photo:<id> у хмарі), прикріплення в чатах і картки «Прикріплено» в їхніх
+     стрічках. Кожне сховище пишемо лише тоді, коли в ньому справді щось змінилось.
+     opts.remote — папку видалили на ІНШОМУ пристрої: карту тем (spaces_map_v2)
+     і обкладинки (flowPgCovers) модулі читають лише з локальної копії, тож тут
+     вони можуть бути застарілі. Той пристрій уже прибрав їх у хмарі; ми чистимо
+     лише памʼять — інакше свіжа мітка нашої старої копії затерла б у хмарі його
+     новіші теми й обкладинки. Повертає true, якщо було що прибирати. */
+  function folderPurge(key, opts){
+    if(!key) return false;
+    const remote=!!(opts && opts.remote);
+    let any=false;
+    const f=folders[key];
+    const own=k=>k===key || k.indexOf(key+'__sp_')===0;
+    try{
+      const refs=new Set();
+      if(f && window.photoIsRef(f.photo)) refs.add(String(f.photo));
+      const pid='ph_'+key; if(window.__photoCache && window.__photoCache[pid]) refs.add('idb:'+pid);
+      refs.forEach(r=>{ window.photoDel(r); any=true; });
+    }catch(_){}
+    try{
+      let ch=false;
+      Object.keys(boards).forEach(k=>{
+        if(own(k)){ delete boards[k]; ch=true; return; }
+        if(k.indexOf('chat_')===0 && Array.isArray(boards[k])){
+          const n=boards[k].length;
+          boards[k]=boards[k].filter(b=>!(b && b.type==='flink' && b.folder===key));
+          if(boards[k].length!==n) ch=true;
+        }
+      });
+      if(ch){ saveBoard(); any=true; }
+    }catch(e){ console.error('folderPurge boards',e); }
+    try{
+      const api=window.__pgCovers;
+      if(api && typeof api.keys==='function') api.keys().filter(own).forEach(k=>{
+        if(remote && typeof api.forget==='function') api.forget(k); else api.clear(k);
+        any=true;
+      });
+    }catch(_){}
+    try{ if(spacesMap[key]!==undefined || activeSpaceMap[key]!==undefined){ delete spacesMap[key]; delete activeSpaceMap[key]; if(!remote) saveSpacesMeta(); any=true; } }catch(_){}
+    try{ if(folderWidgets[key]){ delete folderWidgets[key]; saveFolderWidgets(); any=true; } }catch(_){}
+    try{
+      let ch=false;
+      chats.forEach(c=>{ if(c && Array.isArray(c.folders) && c.folders.includes(key)){ c.folders=c.folders.filter(k=>k!==key); ch=true; } });
+      if(ch){ saveChats(); any=true; }
+    }catch(_){}
+    if(f){
+      const par=f.parent||'';
+      Object.keys(folders).forEach(ck=>{ if(folders[ck]&&(folders[ck].parent||'')===key) folders[ck].parent=par; });
+      delete folders[key]; any=true;
+    }
+    if(order.indexOf(key)>=0){ order=order.filter(x=>x!==key); any=true; }
+    return any;
+  }
+  // Людина видаляє папку (меню папки, агент, «відкотити» агента): надгробок → прибирання → запис
+  function folderDelete(key){
+    // вбудовані папки (work) видаляти не можна: після перезапуску вони повертаються
+    // з коду порожніми, а інші пристрої їх не прибирають (див. applyFolderTombsRaw)
+    if(!folders[key] || !folders[key].custom) return false;
+    folderTombs.ids[key]=Date.now(); folderTombs=tombsNorm(folderTombs); saveFolderTombs();
+    folderPurge(key);
+    saveFolders();
+    return true;
+  }
+  /* Крок 1 після читання сховища (load у 27-canvas.js) — ДО застосування конфігу
+     папок: злити надгробки з прочитаного з тими, що в памʼяті. Саме тут reset
+     (мить відновлення з бекапу) знімає давні надгробки. Раніше злиття йшло ПІСЛЯ
+     applyFolderCfgRaw: той ще бачив старий надгробок і відкидав щойно відновлену
+     папку — на другому пристрої вона не зʼявлялась, а його наступне збереження
+     папок стирало її з хмари. Нічого не пише; повертає прочитане (для кроку 2). */
+  function mergeFolderTombsRaw(raw){
+    let got={ reset:0, ids:{} };
+    try{ const o=raw?JSON.parse(raw):null; if(o&&typeof o==='object') got=tombsNorm(o); }catch(_){}
+    folderTombs=tombsMerge(folderTombs, got);
+    return got;
+  }
+  /* Крок 2 (після папок і чатів): записати злите й прибрати папки, видалені на
+     іншому пристрої. Пише лише після довіреного читання — як усі автоматичні
+     записи папок. got — те, що повернув крок 1. */
+  function applyFolderTombsRaw(got){
+    got=got||{ reset:0, ids:{} };
+    const merged=folderTombs;
+    if(!foldersLoaded) return 0;
+    if(!tombsSame(merged, got)) saveFolderTombs();
+    // злите збігається з хмарним, а локальна копія стара — оновити лише її (з міткою
+    // хмари, без запису в хмару): інакше після перезапуску без звʼязку пристрій
+    // стартував би зі старих надгробків
+    else if(window.sbCacheLocal){
+      let loc=null; try{ const r=window.storage.getLocal(FDELKEY); if(r) loc=tombsNorm(JSON.parse(r)); }catch(_){}
+      if(!loc || !tombsSame(merged, loc)) window.sbCacheLocal(FDELKEY, JSON.stringify(merged));
+    }
+    const purged=[];
+    Object.keys(folderTombs.ids).forEach(k=>{
+      if(folders[k] && !folders[k].custom) return;     // вбудовані папки видаляти не можна
+      if(folderPurge(k, {remote:true})) purged.push(k);
+    });
+    const n=purged.length;
+    if(n){ saveFolders({auto:true}); console.warn('[Flow] прибрано папок, видалених на іншому пристрої:', n); }
+    try{ leaveTombedFolder(purged); }catch(e){ console.error('leaveTombedFolder',e); }
+    return n;
+  }
+  /* Папку видалили на іншому пристрої, поки вона відкрита тут. Без цього на
+     екрані лишався її документ, а boardKey вказував на неї — syncBlocks()
+     знову заводив boards[key]=[], і все дописане йшло в невидиму дошку-сироту
+     (та ще й щоразу поверталось у хмару). Скидаємо вказівники ДО syncBlocks
+     у load() і, якщо людина саме в цій папці, повертаємо на Огляд із поясненням.
+     purged — папки, прибрані щойно (тобто видалені деінде): лише про них тост. */
+  function leaveTombedFolder(purged){
+    const gone=k=>!!k && folderTombed(k) && !folders[k];
+    const bBase=String(boardKey||'').split('__sp_')[0];
+    const onBoard=gone(bBase), onFolder=gone(currentFolderKey);
+    if(!onBoard && !onFolder) return false;
+    const act=document.querySelector('.screen.active');
+    // документ папки (scr-page) показує саме boardKey; інші екрани її вмісту не тримають
+    const visible=!!(act && act.id==='scr-page' && onBoard);
+    if(onBoard){ delete boards[boardKey]; boardKey='all'; }
+    if(onFolder) currentFolderKey=null;
+    if(visible){
+      goHome();
+      if((purged||[]).indexOf(bBase)>=0){ try{ plToast('Папку видалено на іншому пристрої'); }catch(_){} }
+    }
+    return true;
+  }
+
   /* ===== додані віджети папок (спільні дані, різні входи) ===== */
   // каталог доступних віджетів, які можна додати в будь-яку папку
   const WIDGET_CATALOG = {

@@ -132,6 +132,7 @@
     'vision_v1','custom_avatar_v1','diary_entries_v1','diary_insights_v1','diary_books_v1','upgrade_profile_v1',
     'lang_pref','i18n_content_cache',
     'chats_v1',
+    'folders_deleted_v1',   // «надгробки» видалених папок — щоб інший пристрій не повернув їх (04-folders-nav.js)
     /* Звірка 30.09.2026 (ARCH-10): ці ключі модулі давно пишуть через
        window.storage / prefSet, але в реєстр вони не потрапили — отже, їх
        не засівав у Preferences npSeed (iPhone) і інспектор бачив «чужими». */
