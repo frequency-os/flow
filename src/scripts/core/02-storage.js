@@ -1178,12 +1178,24 @@
     /* Які фото лежать у хмарі (лише id, без самих знімків — запит легкий).
        Потрібно бекапу: фото, які на цьому пристрої ще не показувались, є ТІЛЬКИ
        там. null — хмара не відповіла: тоді не можна сказати, чи все є у файлі. */
+    /* Сторінками: Supabase віддає за один запит не більше Max Rows (типово 1000) і
+       мовчки обрізає решту — тоді бекап вважав би, що докачав усе, а «Стерти все»
+       знищило б фото, яких нема у файлі. Крок — фактична довжина сторінки, тож
+       працює й тоді, коли стеля сервера менша за 1000. null — «список невідомий»:
+       тоді «Стерти все» зупиняється, нічого не стерши. */
     window.sbPhotoList = async function(){
       if(!sb || !sbUserCache) return null;
+      const out = []; let from = 0;
       try{
-        const { data, error } = await sb.from('user_data').select('key').eq('user_id', sbUserCache.id).like('key', PH_KEY+'%');
-        if(error || !Array.isArray(data)) return null;
-        return data.map(r=>String(r.key).slice(PH_KEY.length)).filter(Boolean);
+        for(let page=0; page<500; page++){
+          const { data, error } = await sb.from('user_data').select('key').eq('user_id', sbUserCache.id)
+            .like('key', PH_KEY+'%').order('key', {ascending:true}).range(from, from+999);
+          if(error || !Array.isArray(data)) return null;
+          if(!data.length) return out;
+          data.forEach(r=>{ const id = String(r.key).slice(PH_KEY.length); if(id) out.push(id); });
+          from += data.length;
+        }
+        return null;   // понад 500 сторінок — не віримо, що список повний
       }catch(_){ return null; }
     };
     window.sbPhotoDel = async function(id){
@@ -1425,6 +1437,17 @@
         else res.missing++;
       }
       if(need.length) tell(need.length);
+      /* Докачування може йти хвилинами, а застосунок тим часом живий: фото, додане
+         зараз, уже є в даних, але його не було в першому знімку PhotoDB. Дочитуємо. */
+      if(need.length){
+        try{
+          const now = (window.PhotoDB && window.PhotoDB.available()) ? await window.PhotoDB.all() : {};
+          Object.keys(now).forEach(id=>{
+            const v = now[id];
+            if(typeof v==='string' && v && !Object.prototype.hasOwnProperty.call(res.all, id)){ res.all[id] = v; res.count++; res.bytes += phBytes(v); }
+          });
+        }catch(_){}
+      }
       return res;
     }
 
