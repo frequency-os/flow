@@ -26,11 +26,19 @@
 
     function setSync(state){ window.__flowSync.state=state; try{ document.dispatchEvent(new CustomEvent('flowsync',{detail:window.__flowSync})); }catch(_){} }
     try{ window.__setSync = setSync; }catch(_){}
-    function wrap(value){ return JSON.stringify({ _v: Date.now(), d: value }); }
+    /* Обгортка локальної копії: _v — мітка часу запису, _m — позначка «ще не
+       звірено з хмарою акаунта» ('u' — записано, коли ключ не прочитався;
+       'g' — записано гостем). Звірку робить storage.get у шарі Supabase (sbReconcile).
+       Порядок полів сталий (_v, _m, d): localMeta читає їх з початку рядка, не
+       розбираючи всю дошку. */
+    function wrap(value, v, m){
+      const ts = (typeof v==='number') ? v : Date.now();
+      return JSON.stringify(m ? { _v: ts, _m: m, d: value } : { _v: ts, d: value });
+    }
     function unwrap(raw){
       if(raw==null) return null;
-      try{ const o=JSON.parse(raw); if(o && typeof o==='object' && '_v' in o && 'd' in o) return { v:o._v, value:(typeof o.d==='string'?o.d:JSON.stringify(o.d)) }; }catch(_){}
-      return { v:0, value:raw };
+      try{ const o=JSON.parse(raw); if(o && typeof o==='object' && '_v' in o && 'd' in o) return { v:o._v, m:o._m||'', w:true, value:(typeof o.d==='string'?o.d:JSON.stringify(o.d)) }; }catch(_){}
+      return { v:0, m:'', w:false, value:raw };
     }
 
     /* ===== МІГРАЦІЇ СХЕМИ ДАНИХ =====
@@ -289,7 +297,8 @@
           const l=unwrap(lcGet(key)); if(!l) return;
           let parsed; try{ parsed=JSON.parse(l.value); }catch(_){ return; }
           const m=migrateParsed(key, parsed); if(!m.changed) return;
-          if(lcSet(key, JSON.stringify({ _v: l.v || Date.now(), d: stampSv(key, JSON.stringify(m.data)) }))) n++;
+          // заводська мітка 0 лишається 0 (SYNC-1), позначка «не звірено» — теж
+          if(lcSet(key, wrap(stampSv(key, JSON.stringify(m.data)), l.w ? l.v : Date.now(), l.m))) n++;
         });
         return n;
       },
@@ -297,15 +306,13 @@
       getLocal(key){
         try{ const l=unwrap(lcGet(key)); return l? this._out(key, l.value) : null; }catch(_){ return null; }
       },
-      /* Дзеркало хмари (SYNC-4): прочитане з хмари кладемо в локальну копію з
-         міткою ХМАРИ, а не «зараз». Без цього пристрій, який ключ лише читає,
-         тримав тижневу давнину: офлайн-старт показував її, а перша ж правка
-         заливала її в хмару поверх свіжого. Мітка хмари лишає звірку «що
-         новіше» чесною. Тихо: не влізло в памʼять — лишаємо стару копію, без
-         банера й очищення кешу (це не запис людини, а лише копія). */
-      _mirror(key, value, ts){
-        try{ localStorage.setItem(LP+key, JSON.stringify({ _v: ts||0, d: stampSv(key, value) })); return true; }
-        catch(_){ return false; }
+      /* Службове про локальну копію без розбору всього значення:
+         has — копія є; w — у нашій обгортці; v — мітка; m — позначка «не звірено». */
+      localMeta(key){
+        const raw = lcGet(key);
+        if(raw==null) return { has:false, w:false, v:0, m:'' };
+        const h = /^\{"_v":(-?\d+)(?:,"_m":"([a-z])")?,"d":/.exec(raw.slice(0,64));
+        return h ? { has:true, w:true, v:+h[1], m:h[2]||'' } : { has:true, w:false, v:0, m:'' };
       },
       async get(key){
         const localRaw = lcGet(key);
@@ -313,9 +320,10 @@
         if(local) return { key, value: this._out(key, local.value), shared:false };
         throw new Error('not found');
       },
-      async set(key, value){
+      // meta (необовʼязково): { v: мітка, m: позначка } — вирішує шар Supabase (sbWriteMeta)
+      async set(key, value, _shared, meta){
         const stamped = stampSv(key, value);     // позначити версією схеми (якщо ключ версіонований)
-        const raw = wrap(stamped);
+        const raw = wrap(stamped, meta && meta.v, meta && meta.m);
         const okLocal = lcSet(key, raw);
         return { key, value, shared:false, _local:okLocal };
       },
@@ -494,59 +502,52 @@
     };
     /* ── ЯКІ КЛЮЧІ ЦЯ СЕСІЯ СПРАВДІ ПРОЧИТАЛА (SYNC-2) ──
        Той самий запобіжник, що в saveFolders({auto:true}), тепер для всіх
-       ключів load(): дошки, чати, щоденник, фінанси… Після читання load()
-       позначає кожен ключ: прочитано (прийшли дані або чесне «порожньо») чи ні
-       (сховище мовчало / дані пошкоджені). АВТОМАТИЧНІ записи — міграції,
-       прибирання, створення заглушок — у непрочитаний ключ не йдуть: інакше
-       порожнеча зі свіжою міткою затре хмару на всіх пристроях. Автоматичним
-       вважається все, що виконується всередині storeAuto(...). Ручні дії
-       людини проходять як і раніше. */
+       ключів load(): дошки, чати, щоденник, фінанси, бажання… Після читання
+       load() позначає кожен ключ: прочитано (прийшли дані або чесне «порожньо»)
+       чи ні (сховище мовчало / дані пошкоджені).
+       • АВТОМАТИЧНІ записи (міграції, прибирання, заглушки — усе всередині
+         storeAuto) у непрочитаний ключ не йдуть: лишаються лише в памʼяті.
+       • Ручні дії людини пишуться завжди. Але якщо ключ не прочитано, у памʼяті
+         лише її правка поверх порожнечі — тож копія лягає локально з позначкою
+         'u' і в хмару не йде, доки не звіримо її з хмарою (sbReconcile): тоді
+         правку ДОДАЄМО до хмарного, а не затираємо хмару порожнечею з правкою. */
     const keyRead = {};    // key → true (прочитано) | false (не відповіло / пошкоджено) | null (невідомо)
-    const keyCloud = {};   // key → true, якщо той прохід load() читав з хмари (sbCloudPass)
+    const keyMark = {};    // key → 'u' | 'g': локальна копія ще не звірена з хмарою акаунта
+    const keyRecon = {};   // key → id акаунта, з хмарою якого ключ уже звірено в цій сесії
+    const keyPending = {}; // key → { uid, cloudVal, cloudTs, mark }: хмарне прочитано, злиття ще не застосовано
+    const sbLastGot = {};  // key → що віддав останній storage.get (для ключів, які load() читає поза __RAW)
     let autoDepth = 0;     // >0 — зараз виконується автоматичний запис
-    // cloudPass — чи читав цей прохід з хмари; load() рахує його ДО читання,
-    // бо за час читання знімок хмари міг щойно прийти, а ключі взято з локальної копії
-    window.storeMarkRead = function(raw, cloudPass){
+    function sbReconciled(key){ return !!sbUserCache && keyRecon[key] === sbUserCache.id; }
+    // raw — {ключ: значення} з пакета __RAW; extra — ключі, які load() дочитує окремо (бажання, цінності…)
+    window.storeMarkRead = function(raw, extra){
       const ready = window.__sbReady === true;
       const trusted = window.sbDataTrusted();
-      const fromCloud = (cloudPass === undefined) ? window.sbCloudPass() : !!cloudPass;
-      Object.keys(raw||{}).forEach(k=>{
-        keyCloud[k] = fromCloud;
-        const v = raw[k];
+      const all = Object.assign({}, raw||{});
+      (extra||[]).forEach(k=>{ all[k] = Object.prototype.hasOwnProperty.call(sbLastGot, k) ? sbLastGot[k] : null; });
+      Object.keys(sbLastGot).forEach(k=>{ delete sbLastGot[k]; });
+      sbCommitReconciled(raw, all);
+      Object.keys(all).forEach(k=>{
+        const v = all[k];
         /* Порожньо, а бібліотека Supabase ще не довантажилась (повільна мережа) —
-           ще не знаємо, гість це чи вхід із Google. Не «ні», а «невідомо» (null):
-           гостю load() більше не повторюється, і «ні» лишилось би до кінця сесії —
-           швидкий запис назавжди просив би «збережи за хвилину». */
+           ще не знаємо, гість це чи вхід із Google. Не «ні», а «невідомо» (null). */
         let ok = (v!=null) ? true : (ready ? trusted : null);
-        if(typeof v==='string' && v.length){ try{ JSON.parse(v); }catch(_){ ok = false; } }
+        // схоже на JSON, але не розбирається — пошкоджено (сирий текст, як аватарка, — ні)
+        if(typeof v==='string' && /^[\[{]/.test(v)){ try{ JSON.parse(v); }catch(_){ ok = false; } }
         keyRead[k] = ok;
+        const m = window.storage.localMeta(k).m;
+        if(m) keyMark[k] = m; else delete keyMark[k];
       });
     };
     // ключ, якого load() не читав, оцінюємо загальною довірою до сховища
     window.storeKeyReady = function(key){
       if(!Object.prototype.hasOwnProperty.call(keyRead, key)) return window.sbDataTrusted();
+      // локальна копія ще не звірена з хмарою, а сесія вже є — її вміст ще не правда акаунта
+      if(keyMark[key] && sbUserCache && !sbReconciled(key)) return false;
       // «невідомо»: сесію перевірено, її нема — гість, локальна порожнеча і є правда.
       // Вхід із Google сюди не дійде: sbInit одразу перечитує load() і перепозначає ключ.
       if(keyRead[key] === null) return window.__sbReady === true && !sbUserCache;
-      if(keyRead[key] === true && sbLocalOnly(key)) return false;
       return keyRead[key];
     };
-    /* Ключ прочитано лише з ЛОКАЛЬНОЇ копії, а хмару цього акаунта пристрій ще
-       не бачив (SYNC-1). Тоді «прочитано» — неправда: після входу в памʼяті
-       лежить гостьова дошка, а хмара ще йде. Швидкий запис у цю мить заливав
-       гостьову дошку поверх хмарної — документи й чати зникали всюди.
-       Два випадки:
-       • сесія вже є, прохід із хмарою ще не завершився — чекаємо його;
-       • сесію ще не перевірено, а пристрій ЖОДНОГО акаунта ще не бачив — якщо
-         зараз виявиться вхід, «хмара головна» замінить цю копію, і правка
-         зникла б з екрана (лишилась би лише в резерві). Коротко почекати краще.
-       Гість після перевірки сесії — локальна копія і є правда, не заважаємо. */
-    function sbLocalOnly(key){
-      if(keyCloud[key]) return false;
-      if(sbUserCache) return !sbCloudSeen(sbUserCache.id);
-      if(window.__sbReady !== true){ try{ return !localStorage.getItem(CLOUD_SEEN); }catch(_){ return true; } }
-      return false;
-    }
     // почати автоматичну ділянку; повертає функцію, що її закриває (для try/finally)
     window.storeAutoBegin = function(){
       autoDepth++; let open = true;
@@ -556,75 +557,143 @@
       const end = window.storeAutoBegin();
       try{ return fn(); } finally { end(); }
     };
-    /* ── ПЕРШИЙ ВХІД НА ЦЬОМУ ПРИСТРОЇ: ХМАРА ГОЛОВНА (SYNC-1) ──
-       Гостьовий перший візит і «Скинути цей пристрій» лишають у сховищі
-       заводські значення (порожня дошка, одна папка «Робота») зі СВІЖОЮ
-       міткою. Після входу звірка «що новіше» віддавала перемогу їм, і перша ж
-       правка заливала заглушку в хмару. Тому, доки цей пристрій жодного разу
-       повністю не прочитав хмару цього акаунта, хмарі віримо без звірки міток.
-       Позначку ставить load() після проходу, що читав з хмари. «Скинути цей
-       пристрій» стирає її разом з усім — і хмара знову головна. */
-    const CLOUD_SEEN = 'flowapp___cloud_seen';
-    function sbCloudSeen(uid){ try{ return localStorage.getItem(CLOUD_SEEN) === uid; }catch(_){ return false; } }
-    // чи йде зараз прохід, що читає з хмари (сесія є і пакетний знімок хмари вдався)
-    window.sbCloudPass = function(){ return !!(sb && sbUserCache && sbBatchCache && window.__sbCloudOk === true); };
-    window.sbMarkCloudSeen = function(){ try{ if(sbUserCache) localStorage.setItem(CLOUD_SEEN, sbUserCache.id); }catch(_){} };
-    /* ── РЕЗЕРВ ЛОКАЛЬНОЇ КОПІЇ ПЕРЕД ПЕРШИМ ВХОДОМ ──
-       «Хмара головна» (SYNC-1) означає, що sbMirror перепише локальну копію
-       хмарною. Але якщо тут до входу працювали гостем (чи правили, доки вхід
-       ще не підтвердився), ця копія — єдине місце, де лежать ті записи, і
-       вони мовчки зникли б із пристрою. Тому перед першим таким перезаписом
-       кладемо непорожню копію, що відрізняється від хмарної, окремо:
-       flowapp___guest_keep_<час> = { at, uid, keys:{ключ: сирий запис} }.
-       Назва без «backup»/«bak»: такі ключі purgeDisposable() вважає кешем і
-       першим стирає, щойно памʼять переповниться. Резерв їде в експорт у файл.
-       Нічого не зливаємо автоматично — лише щоб дані можна було повернути.
-       Межі, щоб резерв не забив памʼять: не більше BK_MAX резервів (найстаріші
-       прибираємо) і BK_CAP символів на один. Що не влізло — попередження в
-       консолі, а перевагу однаково віддаємо хмарі: інакше на наступному старті
-       гостьова заглушка знову «новіша» за хмару. */
-    const BK_PREFIX = 'flowapp___guest_keep_', BK_MAX = 3, BK_CAP = 1000000;
-    let sbBackup = null;   // резерв цієї сесії: { name, keys }
-    // JSON без службового __sv і з ключами по порядку — хмара (jsonb) міняє порядок ключів
-    function sbPlain(str){
-      const canon = x => Array.isArray(x) ? '['+x.map(canon).join(',')+']'
-        : (x && typeof x==='object') ? '{'+Object.keys(x).filter(k=>k!=='__sv').sort().map(k=>JSON.stringify(k)+':'+canon(x[k])).join(',')+'}'
-        : JSON.stringify(x);
-      try{ let p = JSON.parse(str); if(p && typeof p==='object' && !Array.isArray(p) && '__sv' in p && 'd' in p) p = p.d; return canon(p); }
-      catch(_){ return String(str); }
-    }
-    function sbKeepLocal(key, cloudValue){
-      let raw = null;
-      try{ raw = localStorage.getItem('flowapp_'+key); }catch(_){}
-      if(!raw) return;
-      let d = raw;
-      try{ const o = JSON.parse(raw); if(o && typeof o==='object' && '_v' in o && 'd' in o) d = (typeof o.d==='string') ? o.d : JSON.stringify(o.d); }catch(_){}
-      const plain = sbPlain(d);
-      if(plain==='null' || plain==='[]' || plain==='{}' || plain==='""' || plain===sbPlain(cloudValue)) return;
-      try{
-        if(!sbBackup) sbBackup = { name: BK_PREFIX + Date.now(), keys:{} };
-        sbBackup.keys[key] = raw;
-        const str = JSON.stringify({ at: new Date().toISOString(), uid: sbUserCache ? sbUserCache.id : '', keys: sbBackup.keys });
-        if(str.length > BK_CAP) throw new Error('завеликий');
-        localStorage.setItem(sbBackup.name, str);
-        const all = [];
-        for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf(BK_PREFIX)===0) all.push(k); }
-        all.sort(); while(all.length > BK_MAX) localStorage.removeItem(all.shift());
-      }catch(_){
-        if(sbBackup) delete sbBackup.keys[key];
-        try{ console.warn('[Flow storage] резерв локальної копії не влігся — лишається хмарна:', key); }catch(_){}
+    /* Мітка й позначка для локальної копії (storage.set нижче).
+       SYNC-1: заводське значення — автозапис без сесії в ключ, де ще нічого нема
+       (або лежить таке саме заводське), — отримує мітку 0. Раніше мітка була
+       свіжа: після входу гостьова заглушка виходила «новішою» за хмару, і перша
+       ж правка заливала її в хмару. Мітка 0 програє будь-якій хмарній, а гостю
+       без хмари не заважає. Першу ж ручну правку ключа пишемо зі свіжою міткою.
+       Позначки — лише для ключів, які читає load():
+       'g' — ручна правка гостя (сесію перевірено, входу нема). При вході гостьове
+             ЗЛИВАЄТЬСЯ з хмарним, а не «новіше перемагає цілим ключем»: те, що є
+             лише в хмарі, лишається.
+       'u' — ручна правка ключа, який не прочитано (див. вище).
+       Доки ключ не звірено з хмарою цього акаунта, позначка переходить на
+       наступні записи: правка поверх незвіреного — теж незвірена. */
+    function sbWriteMeta(key, auto){
+      const cur = window.storage.localMeta(key);
+      let v = Date.now(), m = '';
+      if(auto && !sbUserCache && (!cur.has || (cur.w && cur.v === 0))) v = 0;
+      if(Object.prototype.hasOwnProperty.call(keyRead, key)){
+        /* На native сесія не відновлюється при старті (вхід — через frequency://auth
+           у самій сесії), тож «без входу» там — звичайна робота з власними даними,
+           а не гість. Позначка 'g' повертала б при вході видалене — лишаємо як було. */
+        const guest = !window.FLOW_NATIVE && window.__sbReady === true && !sbUserCache;
+        if(guest) m = auto ? cur.m : 'g';
+        else if(cur.m && !sbReconciled(key)) m = cur.m;
+        else if(!auto && !window.storeKeyReady(key)) m = 'u';
       }
+      return { v, m };
     }
-    // покласти хмарне значення в локальну копію, якщо вона ще не таке саме (див. storage._mirror);
-    // cloudFirst — перший вхід на пристрої: спершу резерв локальної копії (sbKeepLocal)
-    function sbMirror(key, value, cloudTs, localTs, cloudFirst){
-      if(localTs === cloudTs || String(key).indexOf('photo:') === 0) return;
-      /* Резерв лише там, де «хмара головна» перекрила НОВІШУ локальну копію.
-         Старіша за хмару копія (пристрій, що був у акаунті ще до оновлення)
-         поступилась би хмарі й за звичайною звіркою — свого в ній нема, а у
-         великого акаунта резерв зʼїв би до 40% памʼяті Safari. */
-      if(cloudFirst && localTs > cloudTs) sbKeepLocal(key, value);
-      try{ if(window.storage._mirror) window.storage._mirror(key, value, cloudTs); }catch(_){}
+    /* ── ЗВІРКА НЕЗВІРЕНОЇ КОПІЇ З ХМАРОЮ ──
+       Злиття, а не «хто новіший»: у списках записів з id (блоки, чати, бажання) —
+       усе хмарне плюс локальні записи, яких у хмарі нема; в обʼєктах — ключ за
+       ключем. Спірне (той самий id чи різні прості значення з обох боків):
+       'g' — перемагає гостьове (як і досі, коли новіше перемагало цілим ключем);
+       'u' — перемагає хмарне: правка лягла поверх НЕпрочитаного, тож усе в ній,
+             крім нових записів, — заводські значення памʼяті. Спірне з 'u'
+             кладемо в резерв (sbKeepHeld), щоб його можна було повернути.
+       Значення верхнього рівня (прапорець, аватарка) — завжди локальне: це
+       прямий вибір людини. */
+    function sbMergeHeld(cStr, lStr, preferLocal){
+      let c, l;
+      try{ c = JSON.parse(cStr); l = JSON.parse(lStr); }catch(_){ return { value: lStr, dropped: 0 }; }
+      let dropped = 0;
+      const isObj = x => !!x && typeof x==='object' && !Array.isArray(x);
+      const idOf = x => (isObj(x) && x.id != null) ? String(x.id) : null;
+      const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+      function mg(cv, lv, depth){
+        if(Array.isArray(cv) && Array.isArray(lv)){
+          const out = cv.slice(), at = new Map(), seen = new Set(cv.map(x=>JSON.stringify(x)));
+          out.forEach((x, i)=>{ const id = idOf(x); if(id != null && !at.has(id)) at.set(id, i); });
+          lv.forEach(x=>{
+            const id = idOf(x);
+            if(id != null && at.has(id)){
+              if(same(out[at.get(id)], x)) return;
+              if(preferLocal) out[at.get(id)] = x; else dropped++;
+              return;
+            }
+            if(!seen.has(JSON.stringify(x))) out.push(x);
+          });
+          return out;
+        }
+        if(isObj(cv) && isObj(lv)){
+          const out = Object.assign({}, cv);
+          Object.keys(lv).forEach(k=>{ out[k] = Object.prototype.hasOwnProperty.call(cv, k) ? mg(cv[k], lv[k], depth+1) : lv[k]; });
+          return out;
+        }
+        if(depth === 0 || preferLocal) return lv;
+        if(!same(cv, lv)) dropped++;
+        return cv;
+      }
+      return { value: JSON.stringify(mg(c, l, 0)), dropped };
+    }
+    /* Резерв спірного зі звірки 'u': flowapp___held_keep_<час>_<ключ> = { at, key, value }.
+       Назва без «backup»/«bak»: такі ключі purgeDisposable() стирає першими.
+       Не більше трьох (найстаріші прибираємо) і не більше ~1 МБ на один; їде в експорт. */
+    const HK_PREFIX = 'flowapp___held_keep_';
+    function sbKeepHeld(key, value){
+      try{
+        const str = JSON.stringify({ at: new Date().toISOString(), key, value });
+        if(str.length > 1000000) throw new Error('завеликий');
+        localStorage.setItem(HK_PREFIX + Date.now() + '_' + key, str);
+        const all = [];
+        for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf(HK_PREFIX)===0) all.push(k); }
+        all.sort(); while(all.length > 3) localStorage.removeItem(all.shift());
+        try{ console.warn('[Flow storage] спірне при звірці з хмарою відкладено в резерв:', key); }catch(_){}
+      }catch(_){ try{ console.warn('[Flow storage] спірне при звірці не влізло в резерв:', key); }catch(_){} }
+    }
+    /* Звести незвірену локальну копію з хмарою цього акаунта — у два кроки.
+       1) sbReconcile (кличе storage.get): прочитати хмарне і віддати злите.
+          Нічого не пише і позначку не знімає: load() читає ще інші ключі (з
+          повільною мережею — секунди), а в памʼяті доти стара копія. Зніми ми
+          позначку зараз — правка в цю мить пішла б у хмару поверх злитого.
+       2) sbCommitReconciled (кличе storeMarkRead, коли load() ось-ось застосує
+          прочитане): злити хмарне з ТЕПЕРІШНЬОЮ локальною копією (раптом за цей
+          час додалась правка), записати локально й у хмару, зняти позначку.
+       Повертає { key, value } або null, якщо хмара мовчить — тоді копія лишається
+       незвіреною до наступного load(). */
+    async function sbReconcile(key, mark){
+      const u = sbUserCache;
+      let cloudVal = null, cloudTs = 0, known = false;
+      if(sbBatchCache){
+        known = true;
+        if(Object.prototype.hasOwnProperty.call(sbBatchCache, key)){ cloudVal = sbBatchCache[key]; cloudTs = sbBatchTs[key]||0; }
+      } else {
+        try{
+          const { data, error } = await sb.from('user_data').select('value,updated_at').eq('user_id', u.id).eq('key', key).maybeSingle();
+          if(!error){ known = true; if(data){ cloudVal = sbFromCloud(data.value); cloudTs = Date.parse(data.updated_at)||0; } }
+        }catch(_){}
+      }
+      if(!known || sbUserCache !== u) return null;
+      let local = null;
+      try{ const r = await origGet(key); local = r ? r.value : null; }catch(_){}
+      keyPending[key] = { uid: u.id, cloudVal, cloudTs, mark };
+      const value = (local != null && cloudVal != null) ? sbMergeHeld(cloudVal, local, mark === 'g').value
+                  : (local != null ? local : cloudVal);
+      return { key, value, shared:false };
+    }
+    // raw — пакет __RAW, який load() зараз застосує: злите кладемо і туди
+    function sbCommitReconciled(raw, all){
+      Object.keys(keyPending).forEach(k=>{
+        const p = keyPending[k]; delete keyPending[k];
+        if(!sbUserCache || sbUserCache.id !== p.uid) return;
+        const local = window.storage.getLocal(k);
+        let value = (local != null) ? local : p.cloudVal, changed = (local != null);
+        if(local != null && p.cloudVal != null){
+          const r = sbMergeHeld(p.cloudVal, local, p.mark === 'g');
+          value = r.value; changed = (value !== p.cloudVal);
+          if(r.dropped && p.mark !== 'g') sbKeepHeld(k, local);
+        }
+        keyRecon[k] = p.uid;
+        if(value != null){
+          // незмінене хмарне лишаємо з міткою хмари — локальна копія не має «новішати» без правки
+          try{ origSet(k, value, false, { v: changed ? Date.now() : p.cloudTs }); }catch(_){}   // пише синхронно
+          if(changed) sbScheduleWrite(k, value);
+        }
+        if(raw && Object.prototype.hasOwnProperty.call(raw, k)){ raw[k] = value; all[k] = value; }
+        try{ console.log('[Flow storage] звірено з хмарою (' + p.mark + '):', k); }catch(_){}
+      });
     }
     let sbSigningIn=false;
     window.sbSignInGoogle = async function(){
@@ -745,23 +814,27 @@
     const origDelete = window.storage.delete.bind(window.storage);
     const origList = window.storage.list.bind(window.storage);
 
-    window.storage.get = async function(key){
+    async function sbGet(key){
       const u = sbUserCache;
       if(u && sb){
         // 1) незлитий локальний запис у черзі — він найсвіжіший
         if(typeof sbWriteQueue!=='undefined' && sbWriteQueue && Object.prototype.hasOwnProperty.call(sbWriteQueue,key)){
           return { key, value: sbWriteQueue[key], shared:false };
         }
+        // 1а) локальна копія ще не звірена з хмарою акаунта ('u'/'g') — зводимо
+        //     її з хмарною (sbReconcile), а не міряємося мітками часу
+        const mark = window.storage.localMeta(key).m;
+        if(mark && !sbReconciled(key)){
+          const r = await sbReconcile(key, mark);
+          return r || origGet(key);
+        }
         const localTs = sbLocalVersion(key);
-        // перший вхід на пристрої — локальним міткам не віримо (SYNC-1, див. sbCloudSeen)
-        const cloudFirst = !sbCloudSeen(u.id);
         // 2) є в кеші хмари: віддаємо ХМАРНЕ, тільки якщо воно НЕ старіше за локальне.
         //    Раніше хмара перемагала завжди — і свіжа локальна правка, що не встигла
         //    синхронізуватись, «поверталась назад». Тепер новіше перемагає.
         if(sbBatchCache && Object.prototype.hasOwnProperty.call(sbBatchCache,key)){
           const cloudTs = sbBatchTs[key]||0;
-          if(!cloudFirst && localTs > cloudTs) return origGet(key);   // локальна свіжіша
-          sbMirror(key, sbBatchCache[key], cloudTs, localTs, cloudFirst);
+          if(localTs > cloudTs) return origGet(key);          // локальна свіжіша
           return { key, value: sbBatchCache[key], shared:false };
         }
         // 3) немає в кеші — точковий запит, теж зі звіркою свіжості
@@ -769,16 +842,19 @@
           const { data, error } = await sb.from('user_data').select('value,updated_at').eq('user_id', u.id).eq('key', key).maybeSingle();
           if(!error && data){
             const cloudTs = Date.parse(data.updated_at)||0;
-            if(!cloudFirst && localTs > cloudTs) return origGet(key);  // локальна свіжіша
-            const v = sbFromCloud(data.value);
-            sbMirror(key, v, cloudTs, localTs, cloudFirst);
-            return { key, value: v, shared:false };
+            if(localTs > cloudTs) return origGet(key);         // локальна свіжіша
+            return { key, value: sbFromCloud(data.value), shared:false };
           }
         }catch(_){}
         // хмара порожня/недоступна — фолбек на локальну копію, щоб дані не «зникали»
         return origGet(key);
       }
       return origGet(key);
+    }
+    // запамʼятати, що віддали: storeMarkRead так бачить і ключі, які load() дочитує поза __RAW
+    window.storage.get = async function(key){
+      try{ const r = await sbGet(key); sbLastGot[key] = (r && r.value != null) ? r.value : null; return r; }
+      catch(e){ sbLastGot[key] = null; throw e; }
     };
     // ── групування записів: кілька set() поспіль (напр. під час швидкого
     //    редагування різних розділів) об'єднуються в ОДИН upsert-запит із
@@ -970,7 +1046,9 @@
       // хмара відповіла, а міграції цієї сесії ще відкладені (стартували, поки вона мовчала) —
       // перечитуємо, навіть якщо нового нема: інакше вони чекали б до наступного запуску
       let migWait=false; try{ migWait=!!(window.__flowMigDeferred && window.__flowMigDeferred()); }catch(_){}
-      if(!changed && !migWait) return;
+      // є незвірені локальні копії ('u'/'g') — звіряє їх load(), тож хмара відповіла — перечитуємо
+      const held = Object.keys(keyMark).some(k=>!sbReconciled(k));
+      if(!changed && !migWait && !held) return;
       try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
       try{ const ld=window.__load; if(typeof ld==='function') await ld().catch(()=>{}); }catch(_){}
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
@@ -1088,10 +1166,11 @@
       }catch(_){ return false; }
     };
     window.storage.set = async function(key, value){
+      const auto = autoDepth > 0;
       // SYNC-2: автоматичний запис (усередині storeAuto) у ключ, який ця сесія
-      // не прочитала, не пишемо ні локально, ні в хмару — сховище ще не сказало,
-      // що там лежить, і заглушка затерла б справжні дані.
-      if(autoDepth > 0 && !window.storeKeyReady(key)){
+      // не прочитала, не пишемо ні локально, ні в хмару — лише памʼять: сховище
+      // ще не сказало, що там лежить, і заглушка затерла б справжні дані.
+      if(auto && !window.storeKeyReady(key)){
         try{ console.warn('[Flow storage] автозапис пропущено — ключ не прочитано (сховище мовчало):', key); }catch(_){}
         return { key, value, shared:false, _skipped:true };
       }
@@ -1103,19 +1182,18 @@
         if(empty){ try{ console.warn('[Flow storage] пропущено запис порожнечею в пошкоджений ключ:', key); }catch(_){} return { key, value, shared:false, _skipped:true }; }
         window.__storeCorrupt.delete(key);
       }
+      const meta = sbWriteMeta(key, auto);   // мітка (SYNC-1) і позначка «не звірено» — до першого await
       // ЗАВЖДИ пишемо локально одразу (синхронно всередині origSet) — це страховка
       // на випадок, якщо сторінку закриють до завершення мережевого запиту в Supabase
-      const localResult = await origSet(key, value);
+      const pLocal = origSet(key, value, false, meta);   // сама копія лягає синхронно
+      if(Object.prototype.hasOwnProperty.call(keyRead, key)){ if(meta.m) keyMark[key] = meta.m; else delete keyMark[key]; }
+      const localResult = await pLocal;
+      /* Незвірена копія ('u'/'g') у хмару не йде: це правка поверх непрочитаного
+         чи гостьового. Піде після звірки (sbReconcile) — злитою з хмарним, а не
+         замість нього. Черга/outbox її не тримає: копія з позначкою сама і є
+         «ще не відправлено», і переживає перезапуск. */
+      if(meta.m) return localResult;
       const u = sbUserCache;
-      /* Ручна правка ключа, який load() узяв лише з локальної копії, доки хмару
-         цього акаунта пристрій ще не бачив (перший вхід, знімок хмари ще йде):
-         у хмару НЕ шлемо. Інакше гостьова дошка з цією правкою лягла б поверх
-         хмарної. Прохід із хмарою все одно замінить локальну копію хмарною
-         (SYNC-1), а цю — разом із правкою — покладе в резерв (sbKeepLocal). */
-      if(u && sb && Object.prototype.hasOwnProperty.call(keyRead, key) && sbLocalOnly(key)){
-        try{ console.warn('[Flow storage] у хмару не відправлено — хмару акаунта ще не прочитано:', key); }catch(_){}
-        return localResult;
-      }
       if(u && sb) sbScheduleWrite(key, value);
       return localResult;
     };
@@ -1184,18 +1262,13 @@
     const LP = 'flowapp_';                 // той самий префікс, що й у storage
     const FORMAT = 1;                       // версія формату бекапу (не плутати з версією схеми даних)
     const APP = 'flow';
-    /* Службові позначки синхрону — стан ЦЬОГО пристрою, а не дані людини. У бекап
-       їх не кладемо й з бекапу не відновлюємо: інакше імпорт після «Скинути цей
-       пристрій» повернув би «хмару бачено» (і вимкнув би «хмара головна»), а
-       стара черга відправки залила б у хмару давні значення. */
-    const SERVICE = ['__cloud_seen', '__sb_outbox'];
 
     // Зібрати ВЕСЬ стан Flow з localStorage у один обʼєкт
     function collect(){
       const data = {};
       try{
         for(const k of Object.keys(localStorage)){
-          if(k.startsWith(LP) && SERVICE.indexOf(k.slice(LP.length)) < 0) data[k.slice(LP.length)] = localStorage.getItem(k);
+          if(k.startsWith(LP)) data[k.slice(LP.length)] = localStorage.getItem(k);
         }
       }catch(_){}
       return data;
@@ -1296,7 +1369,6 @@
       let restored = 0;
       try{
         for(const k of Object.keys(env.data)){
-          if(SERVICE.indexOf(k) > -1) continue;   // старі бекапи могли їх нести
           localStorage.setItem(LP + k, env.data[k]);
           restored++;
         }

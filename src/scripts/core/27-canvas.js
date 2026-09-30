@@ -339,8 +339,6 @@
     // 🚀 ОДИН пакет паралельних запитів замість ~30 послідовних await один за
     // одним — усі мережеві звернення летять одночасно, а не в чергу. Логіка
     // застосування значень нижче лишається в тому самому порядку, що й раніше.
-    // чи читає цей прохід з хмари (SYNC-1): тоді наприкінці позначимо «хмару бачено»
-    const cloudPass = (typeof window.sbCloudPass==='function') && window.sbCloudPass();
     const __RAW = await (async ()=>{
       const keys=[DEBT_KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',
@@ -359,13 +357,11 @@
     })();
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass()]); applyHomeGlass(); }catch(_){}
-    /* SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть.
+    /* SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть,
+       а ручні правки в них чекатимуть звірки з хмарою (02-storage.js, storeMarkRead).
        Саме тут, після останнього await: далі прочитане синхронно лягає в памʼять.
-       Позначка раніше (до await) казала «прочитано з хмари», поки в памʼяті ще
-       лежала гостьова дошка, — швидкий запис у цю мить заливав її в хмару.
-       cloudPass: чи цей прохід читав з хмари (ключі, взяті лише з локальної копії
-       до першого прочитання хмари акаунта, ще не «прочитані», див. sbLocalOnly). */
-    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, cloudPass); }catch(_){}
+       Разом із __RAW — ключі, які дочитують loadValues/loadWishes/loadWishPrice/loadHomeGlass. */
+    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY]); }catch(_){}
     /* Усе нижче до кінця load() — синхронне застосування прочитаного разом з
        міграціями й прибираннями. Їхні записи — автоматичні: у ключ, який не
        прочитався (сховище мовчало), вони не підуть (SYNC-2, storeAuto). */
@@ -482,8 +478,6 @@
     try{ if(window.uiMode==='lite') goPlanner(); }catch(_){}
     try{ updateSummaryBg(); }catch(_){}
     } finally { endAuto(); }
-    // прохід читав з хмари — відтепер на цьому пристрої звіряємо мітки як звично
-    try{ if(cloudPass && window.sbMarkCloudSeen) window.sbMarkCloudSeen(); }catch(_){}
   }
   try{ applyHomeWidgets(); }catch(_){}
   try{ applyTheme(); }catch(_){}
