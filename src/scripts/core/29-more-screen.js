@@ -66,7 +66,7 @@
          <div class="mh-rows">${rowHTML({k:'aipriv', emo:'🔒', c:'52,199,123', t:'AI і приватність', d:'Що бачить AI · згода · закриті розділи'})}</div>` +
         ((window.upDevOn&&window.upDevOn())
           ? `<div class="mh-lbl mt">🧪 Розробка</div>
-             <div class="mh-rows">${rowHTML({k:'upgrade', emo:'🧬', c:'139,124,255', t:'Апгрейд', d:'Персонаж, сфери, заявлений шлях'})}</div>`
+             <div class="mh-rows">${rowHTML({k:'upgrade', emo:'🧬', c:'139,124,255', t:'Апгрейд', d:'Персонаж, сфери, заявлений шлях'})}${rowHTML({k:'misto', emo:'🏙️', c:'124,147,255', t:'Гра «Місто дня»', d:'Прототип: місто, персонаж, друзі'})}</div>`
           : '');
       host.querySelectorAll('[data-mh]').forEach(b=>b.addEventListener('click',()=>openMoreSheet(b.dataset.mh)));
       host.querySelectorAll('[data-uimode]').forEach(b=>b.addEventListener('click',()=>{
@@ -78,6 +78,13 @@
     function openMoreSheet(key){
       try{ window.platform.haptic('light'); }catch(_){}
       if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
+      // гра — окрема сторінка поруч (src/web/misto.html), свої дані, назад — кнопкою з іконкою Frequency
+      // без мережі не переходимо: воркер її не кешує, а в застосунку з екрана «Додому» на iPhone
+      // зі сторінки «немає інтернету» нема кнопки «назад» — вийти можна лише закривши застосунок
+      if(key==='misto'){
+        if(navigator.onLine===false){ if(typeof flowAlert==='function') flowAlert('Гра відкривається лише з інтернетом. Спробуй, коли зʼявиться мережа.','Немає мережі'); return; }
+        location.href='misto.html'; return;
+      }
       if(key==='projects'){ if(window.goProjects) window.goProjects(); return; }
       if(key==='aipriv'){ if(window.aiPrivacySheet) window.aiPrivacySheet(); return; }
       if(key==='quick'){ if(window.flowQuickCapture) window.flowQuickCapture(); return; }

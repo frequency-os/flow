@@ -13,8 +13,8 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 69 |
-| Рядків JS | 28710 |
+| Файлів JS | 70 |
+| Рядків JS | 28757 |
 | Файлів CSS | 32 |
 | Рядків CSS | 8661 |
 | Сутностей верхнього рівня | 1797 |
@@ -64,7 +64,7 @@
 | `src/scripts/core/26-blocks-render.js` | 1651 | 16 |
 | `src/scripts/core/27-canvas.js` | 587 | 27 |
 | `src/scripts/core/28-vision.js` | 529 | 42 |
-| `src/scripts/core/29-more-screen.js` | 494 | 22 |
+| `src/scripts/core/29-more-screen.js` | 501 | 22 |
 | `src/scripts/core/30-upgrade.js` | 296 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
@@ -86,7 +86,8 @@
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
 | `src/vendor/pdf.min.js` _(мініфікований вендор)_ | 22 | — |
 | `src/vendor/supabase.min.js` _(мініфікований вендор)_ | 11 | — |
-| `src/web/sw.js` | 101 | 9 |
+| `src/web/misto-assets.js` _(мініфікований вендор)_ | 34 | — |
+| `src/web/sw.js` | 107 | 9 |
 | `tools/make-icon.js` | 40 | 5 |
 | `tools/scriptcheck.js` | 98 | 12 |
 | `tools/smoke.js` | 61 | 5 |
@@ -1625,20 +1626,20 @@
 | `rowHTML` | функція | `src/scripts/core/29-more-screen.js:32` |
 | `renderMore` | функція | `src/scripts/core/29-more-screen.js:41` |
 | `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:78` |
-| `goMore` | функція | `src/scripts/core/29-more-screen.js:91` |
-| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:92` |
-| `escA` | функція | `src/scripts/core/29-more-screen.js:95` |
-| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:96` |
-| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:98` |
-| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:119` |
-| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:137` |
-| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:146` |
-| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:147` |
-| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:162` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:476` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:486` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:487` |
-| `nm` | значення | `src/scripts/core/29-more-screen.js:488` |
+| `goMore` | функція | `src/scripts/core/29-more-screen.js:98` |
+| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:99` |
+| `escA` | функція | `src/scripts/core/29-more-screen.js:102` |
+| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:103` |
+| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:105` |
+| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:126` |
+| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:144` |
+| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:153` |
+| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:154` |
+| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:169` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:483` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:493` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:494` |
+| `nm` | значення | `src/scripts/core/29-more-screen.js:495` |
 
 ### `src/scripts/core/30-upgrade.js` — 30 сутностей
 

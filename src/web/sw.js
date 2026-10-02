@@ -90,7 +90,13 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // Supabase та інші домени — повз кеш
-  if (req.mode === 'navigate') { e.respondWith(navigate(e)); return; }
+  if (req.mode === 'navigate') {
+    // Офлайн-копія — лише сам Frequency (корінь або index.html). Інші сторінки
+    // сайту (гра misto.html) ідуть повз воркер: інакше navigate() записав би
+    // їх у кеш замість застосунку, і Frequency без мережі відкривався б ними.
+    if (!/\/(index\.html)?$/.test(url.pathname)) return;
+    e.respondWith(navigate(e)); return;
+  }
   e.respondWith(caches.open(CACHE).then(async c => {
     const hit = await c.match(req);
     if (hit) return hit;
