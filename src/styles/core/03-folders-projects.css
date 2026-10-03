@@ -576,3 +576,70 @@
   html.t-flat .phone{background-image:none;}
   html.t-flat .stg-go{background:var(--field);color:var(--text);border:1px solid var(--line);}
   html.t-flat .stg-go:active{background:var(--hair);}
+
+  /* ════════ Групи папок (варіант A «Стос») ════════
+     Група = папка, в якій лежать інші. На головній — стос карток (два шари
+     позаду) і мініатюри значків її папок; тап відкриває шторку-список. */
+  /* шари стосу визирають знизу (сітка не зсувається); тінь теми «Глибина» лишаємо, тому селектор сильніший за html.t-flat .fc2-tile */
+  html #folderGrid .fc2.fc2-group{--fgl:color-mix(in srgb,var(--c,#6a7dff) 45%,var(--line));
+    box-shadow:0 7px 0 -4px color-mix(in srgb,var(--c,#6a7dff) 20%,var(--card)),0 7px 0 -3px var(--fgl),
+    0 13px 0 -8px color-mix(in srgb,var(--c,#6a7dff) 11%,var(--card)),0 13px 0 -7px var(--fgl),
+    0 1px 0 var(--dp-edge,transparent) inset,var(--dp-shadow,0 0 0 transparent);}
+  #folderGrid.fv2-grid .fc2-group{margin-bottom:10px;}
+  .fgrp-stat{display:flex;align-items:center;gap:5px;}
+  .fgrp-mini{display:inline-flex;margin-right:2px;}
+  .fgrp-mi{width:18px;height:18px;border-radius:6px;display:grid;place-items:center;color:#fff;
+    background:var(--c,#6a7dff);border:1.5px solid var(--card);margin-left:-6px;}
+  .fgrp-mi:first-child{margin-left:0;}
+  .fgrp-mi .ico{width:10px;height:10px;}
+  .fc2-row .fgrp-mi,.fc2-mag .fgrp-mi{border-color:transparent;}
+
+  /* кнопка «Обʼєднати» поруч із перемикачем вигляду */
+  .fv-row{display:flex;gap:8px;align-items:stretch;}
+  .fv-row .fvseg.fvseg-wide{flex:1;min-width:0;width:auto;}
+  .fv-merge{flex:none;display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:12px;
+    border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;}
+  .fv-merge svg{width:16px;height:16px;color:var(--accent);}
+  .fv-merge:active{background:var(--hair);}
+  .fv-merge:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  /* на вузькому телефоні — менше відступів у перемикачі, щоб підпис «Обʼєднати» лишився видимим */
+  @media (max-width:390px){ .fv-merge{padding:0 10px;gap:5px;} .fv-row .fvseg-wide button{gap:4px;font-size:12px;} .fv-row .fvseg-wide button svg{width:14px;height:14px;} }
+  @media (max-width:340px){ .fv-merge span{display:none;} }
+
+  /* шторка групи */
+  .fgs .fgs-head{display:flex;align-items:center;gap:12px;margin:0 4px 10px;}
+  .fgs .fgs-ht{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .fgs .fgs-ht b{font-size:17px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fgs .fgs-ht small{font-size:12px;color:var(--muted);font-weight:600;}
+  .fgs .fgs-more{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--card);
+    color:var(--text);font-size:18px;font-weight:800;cursor:pointer;flex:none;}
+  .fgs-ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:#fff;flex:none;
+    background:var(--c,#6a7dff);}
+  .fgs-ic .ico,.fgs-ic svg{width:19px;height:19px;}
+  .fgs-ic-lg{width:44px;height:44px;border-radius:14px;}
+  .fgs-ic-lg .ico{width:22px;height:22px;}
+  .fgs-doc{background:color-mix(in srgb,var(--c,#6a7dff) 22%,var(--card));color:var(--c,#6a7dff);}
+  .fgs-row{width:100%;display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:0;
+    background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer;}
+  .fgs-row:hover,.fgs-row:active{background:var(--hair);}
+  .fgs-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+  .fgs-t{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .fgs-t b{font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fgs-t small{font-size:12px;color:var(--muted);font-weight:600;}
+  .fgs-go{color:var(--muted);font-size:18px;font-weight:700;flex:none;}
+  .fgs-add{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+  .fgs-add button{height:44px;border-radius:14px;border:1.5px dashed var(--line);background:none;color:var(--text);
+    font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;}
+  .fgs-add button:active{background:var(--hair);}
+  /* «Обʼєднати»: назва + галочки */
+  .fgm-lbl{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 10px 6px;}
+  .fgm-name{width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--text);
+    font:inherit;font-size:16px;font-weight:700;padding:0 14px;}
+  .fgm-name:focus{outline:2px solid var(--accent);outline-offset:0;}
+  .fgm-chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex:none;display:grid;place-items:center;}
+  .fgs-row.on .fgm-chk{background:var(--accent);border-color:var(--accent);}
+  .fgs-row.on .fgm-chk::after{content:"";width:9px;height:5px;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:translateY(-1px) rotate(-45deg);}
+  .fgm-ok{width:100%;height:50px;margin-top:12px;border-radius:15px;border:0;background:var(--accent);color:#fff;
+    font:inherit;font-size:15px;font-weight:800;cursor:pointer;}
+  .fgm-ok:disabled{background:var(--card-2);color:var(--muted);cursor:default;}
+  .fmi .fmi-sub{display:block;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;}

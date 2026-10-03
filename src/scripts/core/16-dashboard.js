@@ -172,12 +172,16 @@
       const f=folders[k]; if(!f) return;
       const active = (f.widgets||[]).filter(w=>w.ready).length;
       const subCount = childFolderKeys(k).length;
+      // група: у папці лежать інші папки (проєкти не рахуємо — вони живуть на вкладці «Проєкти»)
+      const kids = groupKids(k), isGroup = kids.length>0;
       const emojiShow = (f.emoji && f.emoji.trim()) ? esc(f.emoji.trim()) : esc((f.name||'?').trim().charAt(0).toUpperCase());
       const pinDot = f.pinned ? `<span class="fpin">📌</span>` : '';
-      const subBadge = subCount ? `<span class="fsub">📁 ${subCount}</span>` : '';
+      const subBadge = (subCount && !isGroup) ? `<span class="fsub">📁 ${subCount}</span>` : '';
       // метарядок залежно від ролі папки
       let metaHtml;
-      if(f.role==='project'){
+      if(isGroup){
+        metaHtml=`<div class="fstat fgrp-stat"><span class="fgrp-mini" aria-hidden="true">${kids.slice(0,3).map(ck=>fgIcon(folders[ck],'fgrp-mi')).join('')}</span><b>${kids.length}</b> ${pluralUk(kids.length,'папка','папки','папок')} · група</div>`;
+      } else if(f.role==='project'){
         const st=projStatusMeta(f.status||'active');
         const pr=folderProgress(k);
         const dl=dueLabel(f.due);
@@ -196,7 +200,7 @@
                       : homeFolderView==='deck' ? 'fc2-deck'
                       : homeFolderView==='mag'  ? 'fc2-mag' : 'fc2-row';
       const el=document.createElement('div');
-      el.className='fcard fc2 '+modeClass;
+      el.className='fcard fc2 '+modeClass+(isGroup?' fc2-group':'');
       // Порожній колір НЕ виставляємо: інакше в --c потрапляє сміття,
       // color-mix() у стилях ламається і картка лишається без фону.
       // Краще не задати нічого — тоді спрацює запасне значення в CSS.
@@ -228,6 +232,7 @@
       el.innerHTML=inner;
       el.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
         if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
+        if(isGroup){ openFolderGroup(k); return; }
         goFolder(k); };
       grid.appendChild(el);
     });
@@ -280,8 +285,10 @@
     inp.onkeydown=e=>{ if(e.key==='Enter') ok(); };
   }
 
-  function createFolder(){
-    inputModal({ title:'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'📁',
+  // parent — ключ групи, якщо папку створюють зі шторки групи (з картки «＋» приходить подія — її ігноруємо)
+  function createFolder(parent){
+    const par=(typeof parent==='string' && folders[parent]) ? parent : '';
+    inputModal({ title:par?('Нова папка в «'+folders[par].name+'»'):'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'📁',
       onOk:(name, emojiVal)=>{
         const used=order.length;
         const nm = name || ('Папка '+(used+1));
@@ -290,10 +297,127 @@
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
           emoji:em, icon:folderIconFor(em),
           name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
+        if(par) folders[key].parent=par;
         order.push(key);
         saveFolders(); renderDashboard();
+        if(par) openFolderGroup(par);
       }});
   }
+
+  /* ════════ ГРУПИ ПАПОК (варіант A «Стос», 03.10.2026) ════════
+     Група — звичайна папка, в якій лежать інші (поле parent). На головній вона
+     стосом карток, тап відкриває шторку зі списком її папок. Формат даних той
+     самий, що й у «Перемістити в папку»; усе пишеться лише з дії людини. */
+  function groupKids(key){
+    return childFolderKeys(key).filter(folderVisible).filter(ck=>folders[ck].role!=='project');
+  }
+  function fgIcon(f, cls){
+    return `<span class="${cls||'fgs-ic'}" style="--c:${safeColor(f.c,'#6a7dff')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
+  }
+  function fgSub(ck){
+    const n=groupKids(ck).length;
+    if(n) return n+' '+pluralUk(n,'папка','папки','папок')+' · група';
+    const pr=folderProgress(ck), open=pr.total-pr.done;
+    if(!pr.total) return 'поки порожньо';
+    return open ? (open+' '+pluralUk(open,'справа','справи','справ')+' відкрито') : 'усі справи виконано';
+  }
+  function fgToast(m){ try{ (window.__flowToast||function(){})(m); }catch(_){} }
+  function fgSheet(html, bind){
+    closeFolderMenu();
+    const m=document.createElement('div');
+    m.className='fmenu-sheet'; m.id='fmenuSheet';
+    m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true');
+    m.innerHTML=`<div class="fmenu-in fgs">${html}</div>`;
+    m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
+    document.body.appendChild(m);
+    bind(m);
+    return m;
+  }
+  // шторка групи: нотатки самої папки + її папки + додати
+  function openFolderGroup(key){
+    const g=folders[key]; if(!g) return;
+    const kids=groupKids(key);
+    const go=(k)=>{ closeFolderMenu(); window.__fgNext=key; goFolder(k); window.__fgNext=null; };   // goSpaceFor читає мітку одразу
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fgs-head">${fgIcon(g,'fgs-ic fgs-ic-lg')}
+        <div class="fgs-ht"><b data-i18n-skip="1">${esc(g.name)}</b><small>група · ${kids.length} ${pluralUk(kids.length,'папка','папки','папок')}</small></div>
+        <button class="fgs-more" data-gmore aria-label="Налаштування групи">⋯</button></div>
+      <button class="fgs-row" data-gnotes><span class="fgs-ic fgs-doc" style="--c:${safeColor(g.c,'#6a7dff')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12.5h6M9 16h4"/></svg></span>
+        <span class="fgs-t"><b>Нотатки групи</b><small data-i18n-skip="1">документ папки «${esc(g.name)}»</small></span><span class="fgs-go">›</span></button>
+      ${kids.map(ck=>`<button class="fgs-row" data-gkid="${esc(ck)}">${fgIcon(folders[ck])}
+        <span class="fgs-t"><b data-i18n-skip="1">${esc(folders[ck].name)}</b><small>${esc(fgSub(ck))}</small></span><span class="fgs-go">›</span></button>`).join('')}
+      <div class="fgs-add"><button data-gnew>＋ Нова папка</button><button data-gadd>Додати наявну</button></div>`,
+    m=>{
+      m.querySelector('[data-gmore]').onclick=()=>openFolderMenu(key);
+      m.querySelector('[data-gnotes]').onclick=()=>go(key);
+      m.querySelectorAll('[data-gkid]').forEach(b=>b.onclick=()=>{
+        const ck=b.dataset.gkid;
+        if(groupKids(ck).length){ openFolderGroup(ck); return; }   // група в групі — своя шторка
+        go(ck);
+      });
+      m.querySelector('[data-gnew]').onclick=()=>{ closeFolderMenu(); createFolder(key); };
+      m.querySelector('[data-gadd]').onclick=()=>openFolderGroupAdd(key);
+    });
+    try{ window.platform.haptic('light'); }catch(_){}
+  }
+  // додати в групу папку, що вже є на головній
+  function openFolderGroupAdd(key){
+    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!==key && k!=='work' && folders[k].role!=='project' && !isDescendantFolder(key,k));
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Додати в «<span data-i18n-skip="1">${esc(folders[key].name)}</span>»</div>
+      ${cand.map(k=>`<button class="fgs-row" data-gpick="${esc(k)}">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b></span><span class="fgs-go">＋</span></button>`).join('')
+        || '<div class="fmi-label">На головній немає інших папок</div>'}
+      <button class="fmi" data-gback>‹ Назад до групи</button>`,
+    m=>{
+      m.querySelectorAll('[data-gpick]').forEach(b=>b.onclick=()=>{
+        moveFolderTo(b.dataset.gpick, key);
+        try{ window.platform.haptic('success'); }catch(_){}
+        openFolderGroup(key);
+      });
+      m.querySelector('[data-gback]').onclick=()=>openFolderGroup(key);
+    });
+  }
+  // «Обʼєднати»: кілька папок з головної → нова група
+  function openFolderMerge(){
+    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && folders[k].role!=='project');
+    const sel=new Set();
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Обʼєднати в групу</div>
+      <label class="fgm-lbl" for="fgmName">Назва групи</label>
+      <input class="fgm-name" id="fgmName" maxlength="60" placeholder="напр. Фінанси" autocomplete="off">
+      <div class="fmi-label">Які папки</div>
+      ${cand.map(k=>`<button class="fgs-row" data-gsel="${esc(k)}" aria-pressed="false">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b>${groupKids(k).length?'<small>група</small>':''}</span><span class="fgm-chk" aria-hidden="true"></span></button>`).join('')}
+      <button class="fgm-ok" data-gok disabled>Обери хоча б дві папки</button>`,
+    m=>{
+      const ok=m.querySelector('[data-gok]'), inp=m.querySelector('#fgmName');
+      const sync=()=>{ ok.disabled=sel.size<2; ok.textContent=sel.size<2?'Обери хоча б дві папки':('Обʼєднати '+sel.size+' '+pluralUk(sel.size,'папку','папки','папок')); };
+      m.querySelectorAll('[data-gsel]').forEach(b=>b.onclick=()=>{
+        const k=b.dataset.gsel; if(sel.has(k)) sel.delete(k); else sel.add(k);
+        b.classList.toggle('on',sel.has(k)); b.setAttribute('aria-pressed',sel.has(k)?'true':'false');
+        try{ window.platform.haptic('select'); }catch(_){}
+        sync();
+      });
+      ok.onclick=()=>{
+        if(sel.size<2) return;
+        const picked=cand.filter(k=>sel.has(k));
+        const nm=(inp.value||'').trim()||'Група';
+        const key='f_'+Date.now(), used=order.length;
+        folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length], emoji:'🗂', icon:folderIconFor('🗂'),
+          name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
+        // група стає на місце першої обраної папки
+        const at=order.indexOf(picked[0]);
+        if(at>=0) order.splice(at,0,key); else order.push(key);
+        picked.forEach(k=>{ folders[k].parent=key; });
+        saveFolders(); renderDashboard();
+        try{ window.platform.haptic('success'); }catch(_){}
+        fgToast('Група «'+nm+'»: '+picked.length+' '+pluralUk(picked.length,'папка','папки','папок'));
+        openFolderGroup(key);
+      };
+      setTimeout(()=>{ try{ inp.focus(); }catch(_){} },120);
+    });
+  }
+  { const mb=document.getElementById('folderMergeBtn'); if(mb) mb.onclick=openFolderMerge; }
+  try{ window.openFolderGroup=openFolderGroup; }catch(_){}
   // 🚀 створити папку-проєкт зі шторки «＋»: якщо ми всередині папки — вкладаємо в неї
   function createProjectFolder(){
     inputModal({ title:'Новий проєкт', placeholder:'Назва проєкту', emoji:true, emojiVal:'🚀',
@@ -420,6 +544,7 @@
       ${(window.upDevOn&&window.upDevOn())?`<button class="fmi" data-act="sphere">🏙 ${f.sphere?'Сфера: шаблон / прибрати':'Зробити сферою'}</button>`:''}
       <button class="fmi" data-act="pin">📌 ${f.pinned?'Відкріпити':'Закріпити зверху'}</button>
       <button class="fmi" data-act="rename">✏️ Перейменувати</button>
+      ${groupKids(key).length?`<button class="fmi" data-act="ungroup">🗂 Розгрупувати<small class="fmi-sub">папки виходять з групи, нічого не видаляється</small></button>`:''}
       <button class="fmi" data-act="move">📂 ${f.parent?'Перемістити / на головну':'Перемістити в папку'}</button>
       <button class="fmi" data-act="color">🎨 Змінити колір</button>
       <button class="fmi" data-act="icon"><svg class="ico fmi-ic" aria-hidden="true"><use href="#${folderIcon(f)}"/></svg> Іконка${f.iconSet?'':' · за емодзі'}</button>
@@ -514,6 +639,13 @@
     }
     if(act==='rmphoto'){ const prev=f.photo; f.photo=''; f.photoPos=null;
       window.photoDel(prev); saveFolders(); renderDashboard(); closeFolderMenu(); return; }
+    if(act==='ungroup'){
+      const kids=groupKids(key), up=(f.parent&&folders[f.parent])?f.parent:'';   // батька вже нема — на головну
+      kids.forEach(ck=>{ folders[ck].parent=up; });
+      saveFolders(); renderDashboard(); closeFolderMenu();
+      fgToast('«'+f.name+'» розгруповано: '+kids.length+' '+pluralUk(kids.length,'папка','папки','папок')+' на місці');
+      return;
+    }
     if(act==='pin'){ f.pinned=!f.pinned; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='rename'){ closeFolderMenu(); inputModal({title:'Перейменувати папку',value:f.name,placeholder:'Назва папки',onOk:(v)=>{ if(v){f.name=v;saveFolders();renderDashboard();} }}); return; }
     if(act==='move'){ closeFolderMenu(); openFolderMovePicker(key); return; }

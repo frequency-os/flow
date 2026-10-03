@@ -394,7 +394,8 @@
     return orderedFolderKeys().filter(k=>folders[k] && (folders[k].parent||'')===(parentKey||''));
   }
   function topFolderKeys(){
-    return orderedFolderKeys().filter(k=>folders[k] && !(folders[k].parent||''));
+    // батька нема (видалили на іншому пристрої) — папка лишається на головній, а не зникає
+    return orderedFolderKeys().filter(k=>{ const p=folders[k]&&(folders[k].parent||''); return folders[k] && (!p || !folders[p]); });
   }
   function isDescendantFolder(cand, key){
     let cur=cand, guard=0;

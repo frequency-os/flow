@@ -127,7 +127,15 @@
       if(typeof syncBlocks==='function') syncBlocks();
       spaceFromFolder = String(key).split('__sp_')[0] || (currentFolderKey||null);
       if(typeof window.openFlowPage!=='function'){ goHome(); return; }
-      window.__flowExitPage=function(){ try{ if(typeof goHome==='function'){ goHome(); return; } }catch(_){} if(window.__show)window.__show('scr-home'); };
+      // «назад» з папки, що лежить у групі (або відкрита зі шторки групи), — знову шторка цієї групи
+      const fgBase=String(key).split('__sp_')[0];
+      const fgBack=window.__fgNext || (folders[fgBase] && folders[fgBase].parent) || '';
+      window.__fgNext=null;
+      window.__flowExitPage=function(){
+        try{ if(typeof goHome==='function'){ goHome();
+          if(fgBack && folders[fgBack] && typeof window.openFolderGroup==='function') setTimeout(()=>{ try{ window.openFolderGroup(fgBack); }catch(_){} },60);
+          return; } }catch(_){}
+        if(window.__show)window.__show('scr-home'); };
       window.openFlowPage(opts||null);
     }catch(e){ console.error('goSpaceFor', e); goHome(); }
   }
