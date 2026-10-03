@@ -472,37 +472,112 @@
     const d=document.getElementById('e2Dim'), s=document.getElementById('e2Sheet');
     if(d) d.classList.remove('on'); if(s) s.classList.remove('on'); envOpenId=null;
   }
+  /* ============ ПРОЄКТИ КАБІНЕТУ (fin_projects) ============
+     Проєкт живе тут, а блок «Проєкт» у папці — лише вікно в нього (b.projId),
+     як віджет «Конверт» з envId. Тому один проєкт можна показати в кількох
+     місцях, і цифри скрізь однакові.
+     Блок зберігає копію операцій (b.ops): її читає застосунок, що ще не
+     оновився, і вона ж — запас для відкату. Кожен запис іде в обидва місця.
+     Номер проєкту — 'prj_'+номер блоку: два пристрої, що перенесли той самий
+     блок одночасно, отримають ОДИН проєкт, а не два. */
+  let finProjects=[];
+  const FINPROJKEY='fin_projects';
+  function saveFinProjects(){ try{ const p=window.storage.set(FINPROJKEY,JSON.stringify(finProjects),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+  function finProjId(b){ return 'prj_'+String(b.id); }
+  function finProjById(id){ return id ? (finProjects.find(p=>p&&p.id===id)||null) : null; }
+  // дані для блока: проєкт Кабінету, а якщо його ще нема — сам блок (старі дані)
+  function projData(b){ return (b&&finProjById(b.projId))||b; }
+  function finProjFromBlock(b){
+    return { id:finProjId(b), title:String(b.title||'Проєкт'), cur:b.cur||'€', expected:+b.expected||0,
+      deadline:b.deadline||'', unlocked:!!b.unlocked, splitPreset:b.splitPreset||null,
+      ops:(Array.isArray(b.ops)?b.ops:[]).filter(o=>o&&typeof o==='object').map((o,i)=>Object.assign({},o,o.id!=null?{}:{id:'pop_'+String(b.id)+'_'+i})), delOps:[], created:ymdLocal() };
+  }
+  // усі блоки всіх папок разом із вкладеними (сторінки, групи)
+  function finWalkBlocks(fn){
+    const walk=arr=>(Array.isArray(arr)?arr:[]).forEach(b=>{ if(!b) return; fn(b); if(Array.isArray(b.children)) walk(b.children); });
+    try{ Object.keys(boards||{}).forEach(k=>walk(boards[k])); }catch(_){}
+  }
+  // ручна дія над блоком: проєкт має існувати (створюємо при потребі — це дія людини)
+  function projEnsure(b){
+    let p=finProjById(b.projId);
+    if(!p){ p=finProjById(finProjId(b)); if(!p){ p=finProjFromBlock(b); finProjects.push(p); } b.projId=p.id; }
+    if(!Array.isArray(p.ops)) p.ops=[];
+    if(!Array.isArray(p.delOps)) p.delOps=[];
+    return p;
+  }
+  // копії в блоках-вікнах: те, що бачить застосунок, який ще не оновився
+  function projMirror(p){
+    finWalkBlocks(b=>{ if(b.type==='project' && b.projId===p.id){
+      b.ops=p.ops.map(o=>Object.assign({},o)); b.expected=p.expected; b.unlocked=p.unlocked; b.deadline=p.deadline; b.cur=p.cur;
+    }});
+  }
+  function projCommit(p){ projMirror(p); saveFinProjects(); saveBoard(); }
+
+  /* Перенесення блоків у Кабінет — реєстр MIGRATIONS_ONCE (27-canvas.js), every:true:
+     іде при кожному довіреному load() і пише лише за реальної зміни.
+       1) блок без projId → проєкт з тим самим номером, операції копіюються;
+       2) блок з projId, куди старий застосунок дописав операцію, → вона
+          доливається в проєкт (крім тих, що видалено в проєкті: delOps).
+     Блоки не видаляються й не чистяться — їхні b.ops лишаються копією. */
+  function finProjectsMigrate(){
+    let chP=false, chB=false;
+    finWalkBlocks(b=>{
+      if(b.type!=='project' || b.id==null) return;
+      let p=finProjById(b.projId);
+      if(!p){
+        p=finProjById(finProjId(b));
+        if(!p){ p=finProjFromBlock(b); finProjects.push(p); chP=true; }
+        if(b.projId!==p.id){ b.projId=p.id; chB=true; }
+        return;
+      }
+      if(!Array.isArray(p.ops)) p.ops=[];
+      // старий застосунок натиснув «Отримано» в блоці — очікувану оплату вже прийнято
+      if(+p.expected>0 && b.unlocked===true && !(+b.expected>0)){ p.expected=0; p.unlocked=true; chP=true; }
+      const have=new Set(p.ops.map(o=>String(o.id))), gone=new Set((p.delOps||[]).map(String));
+      (Array.isArray(b.ops)?b.ops:[]).forEach(o=>{
+        if(!o || o.id==null || have.has(String(o.id)) || gone.has(String(o.id))) return;
+        p.ops.push(Object.assign({},o)); have.add(String(o.id)); chP=true;
+      });
+    });
+    if(chP) saveFinProjects();
+    if(chB) saveBoard();
+    return true;
+  }
+
   // ===== Project P&L widget =====
-  function projIncome(b){ return (b.ops||[]).filter(o=>o.t==='in').reduce((s,o)=>s+o.amount,0); }
-  function projExpense(b){ return (b.ops||[]).filter(o=>o.t==='out').reduce((s,o)=>s+o.amount,0); }
+  function projIncome(b){ return (projData(b).ops||[]).filter(o=>o.t==='in').reduce((s,o)=>s+o.amount,0); }
+  function projExpense(b){ return (projData(b).ops||[]).filter(o=>o.t==='out').reduce((s,o)=>s+o.amount,0); }
   function projNet(b){ return projIncome(b)-projExpense(b); }
   function projIsLocked(b){
+    b=projData(b);
     if(b.unlocked) return false;
     if(!b.deadline) return false; // без дати — не блокується
     const today=ymdLocal();
     return today < b.deadline; // заблоковано доки не настала дата
   }
   function projDaysLeft(b){
+    b=projData(b);
     if(!b.deadline) return null;
     const d=Math.ceil((new Date(b.deadline)-new Date())/86400000);
     return d;
   }
   function projectWidgetHtml(b, sz, head){
-    const cur=b.cur||'€';
+    const d=projData(b);   // проєкт Кабінету (або сам блок, поки не перенесено)
+    const cur=d.cur||'€';
     const inc=projIncome(b), exp=projExpense(b), net=projNet(b);
-    const expected=+b.expected||0;
+    const expected=+d.expected||0;
     const locked=projIsLocked(b);
     const dleft=projDaysLeft(b);
     const view=b.pview||1;
-    const lockChip = b.deadline
-      ? `<span class="pj-lock ${locked?'locked':'open'}">${locked?'🔒 до '+fmtDate(b.deadline):'🔓 розблоковано'}</span>`
+    const lockChip = d.deadline
+      ? `<span class="pj-lock ${locked?'locked':'open'}">${locked?'🔒 до '+fmtDate(d.deadline):'🔓 розблоковано'}</span>`
       : `<span class="pj-lock open">🔓 будь-коли</span>`;
     const switcher = `<div class="pj-views">
       ${[['1','P&L'],['2','Журнал'],['3','Колонки'],['4','Маржа']].map(([v,l])=>
         `<button class="pj-vbtn ${String(view)===v?'on':''}" data-pjview="${b.id}|${v}">${l}</button>`).join('')}
     </div>`;
-    const splitBtn = (b.splitPreset && +b.splitPreset.amount>0)
-      ? `<button class="fin-btn pj-split" data-pjsplit="${b.id}" style="background:var(--hab,#34c77b);color:#08160e">💶 ${b.splitPreset.label||'Клієнт'} +${+b.splitPreset.amount}${b.splitPreset.cur||b.cur||'€'}</button>`
+    const splitBtn = (d.splitPreset && +d.splitPreset.amount>0)
+      ? `<button class="fin-btn pj-split" data-pjsplit="${b.id}" style="background:var(--hab,#34c77b);color:#08160e">💶 ${d.splitPreset.label||'Клієнт'} +${+d.splitPreset.amount}${d.splitPreset.cur||d.cur||'€'}</button>`
       : '';
     const actions = `<div class="fin-btns pj-acts">
       ${splitBtn}
@@ -516,7 +591,7 @@
     let bodyHtml='';
     if(view===1){
       const tot=inc+exp||1;
-      const expRow = expected>0 ? `<div class="pj-exp-row">${locked?'🔒':'🔓'} Очікується ще <b>${fmt(expected)} ${cur}</b>${b.deadline?` · ${locked&&dleft>=0?'через '+dleft+' дн':fmtDate(b.deadline)}`:''}</div>` : '';
+      const expRow = expected>0 ? `<div class="pj-exp-row">${locked?'🔒':'🔓'} Очікується ще <b>${fmt(expected)} ${cur}</b>${d.deadline?` · ${locked&&dleft>=0?'через '+dleft+' дн':fmtDate(d.deadline)}`:''}</div>` : '';
       bodyHtml=`
         <div class="pj-pnl">
           <div class="c" style="--pc:var(--hab)"><s>Дохід</s><b>${fmt(inc)} ${cur}</b></div>
@@ -526,7 +601,7 @@
         <div class="pj-barstack"><i class="in" style="width:${inc/tot*100}%"></i><i class="ex" style="width:${exp/tot*100}%"></i></div>
         ${expRow}`;
     } else if(view===2){
-      const ops=(b.ops||[]).slice().reverse();
+      const ops=(d.ops||[]).slice().reverse();
       bodyHtml = ops.length ? ops.map(o=>`<div class="pj-led"><span class="i">${o.t==='in'?'⬆️':'⬇️'}</span>
         <div class="m"><div class="mn">${esc(o.label||(o.t==='in'?'Дохід':'Витрата'))}</div>
           <div class="md">${esc(o.date||'')}${o.src?' · '+esc(o.src):''}</div></div>
@@ -535,7 +610,7 @@
         : `<div class="fh-empty">Рухів ще нема. Додай дохід або витрату.</div>`;
       bodyHtml += `<div class="pj-foot"><span class="l">Чистий прибуток</span><b class="${net<0?'neg':''}">${fmt(net)} ${cur}</b></div>`;
     } else if(view===3){
-      const ins=(b.ops||[]).filter(o=>o.t==='in'), outs=(b.ops||[]).filter(o=>o.t==='out');
+      const ins=(d.ops||[]).filter(o=>o.t==='in'), outs=(d.ops||[]).filter(o=>o.t==='out');
       bodyHtml=`<div class="pj-cols">
         <div class="pj-col inc"><div class="ch">⬆️ Доходи</div>
           ${ins.map(o=>`<div class="row"><span>${esc(o.label||'дохід')}</span><b>${fmt(o.amount)}</b></div>`).join('')||'<div class="row"><span>—</span><b>0</b></div>'}
@@ -766,7 +841,7 @@
 
   // додати дохід/витрату до проєкту
   function projAddMovement(b, t){
-    const cur=b.cur||'€';
+    const P=projEnsure(b), cur=P.cur||'€';   // пишемо в проєкт Кабінету
     const today=ymdLocal();
     if(t==='in'){
       inputModal({title:'Дохід проєкту — за що?', placeholder:'Напр. аванс', onOk:(label)=>{
@@ -774,9 +849,9 @@
           const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
           finAskRate(cur, rate=>{
             const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-            (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:n,label:label||'Дохід',date:today,src:'отримано',finOpId:finId});
-            finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,card:_projCardId()}, n, cur, rate));
-            saveBoard(); saveFinOps(); renderBoard();
+            P.ops.push({id:'pop_'+Date.now(),t:'in',amount:n,label:label||'Дохід',date:today,src:'отримано',finOpId:finId});
+            finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,projId:P.id,card:_projCardId()}, n, cur, rate));
+            projCommit(P); saveFinOps(); renderBoard();
           });
         }});
       }});
@@ -793,49 +868,49 @@
     }
   }
   function projAskExpense(b, src){
-    const cur=b.cur||'€';
+    const P=projEnsure(b), cur=P.cur||'€';   // пишемо в проєкт Кабінету
     const today=ymdLocal();
     inputModal({title:'Витрата — на що?', placeholder:'Напр. реклама', onOk:(label)=>{
       inputModal({title:'Сума витрати ('+cur+')', placeholder:'Напр. 180', onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
         const op={id:'pop_'+Date.now(),t:'out',amount:n,label:label||'Витрата',date:today,src:src==='balance'?'з балансу':'з доходу проєкту'};
-        if(src!=='balance'){ (b.ops=b.ops||[]).push(op); saveBoard(); renderBoard(); return; }
+        if(src!=='balance'){ P.ops.push(op); projCommit(P); renderBoard(); return; }
         finAskRate(cur, rate=>{
           const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
           op.finOpId=finId;
-          finOps.push(finOpFx({id:finId,type:'out',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,card:_projCardId()}, n, cur, rate));
-          (b.ops=b.ops||[]).push(op);
-          saveFinOps(); saveBoard(); renderBoard();
+          finOps.push(finOpFx({id:finId,type:'out',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,projId:P.id,card:_projCardId()}, n, cur, rate));
+          P.ops.push(op);
+          saveFinOps(); projCommit(P); renderBoard();
         });
       }});
     }});
   }
   // отримати очікуваний дохід → розблокувати, додати в Дохід
   function projReceiveExpected(b){
-    const cur=b.cur||'€';
-    const amt=+b.expected||0;
-    if(!(amt>0)){ b.unlocked=true; saveBoard(); renderBoard(); return; }
+    const P=projEnsure(b), cur=P.cur||'€';   // пишемо в проєкт Кабінету
+    const amt=+P.expected||0;
+    if(!(amt>0)){ P.unlocked=true; projCommit(P); renderBoard(); return; }
     const today=ymdLocal();
     finAskRate(cur, rate=>{
       const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-      (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:amt,label:'Оплата проєкту',date:today,src:'отримано',finOpId:finId});
-      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · оплата',date:today,proj:b.id,card:_projCardId()}, amt, cur, rate));
-      b.expected=0; b.unlocked=true;
-      saveBoard(); saveFinOps(); renderBoard();
+      P.ops.push({id:'pop_'+Date.now(),t:'in',amount:amt,label:'Оплата проєкту',date:today,src:'отримано',finOpId:finId});
+      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · оплата',date:today,proj:b.id,projId:P.id,card:_projCardId()}, amt, cur, rate));
+      P.expected=0; P.unlocked=true;
+      projCommit(P); saveFinOps(); renderBoard();
     });
   }
   // ⚡ АВТО-РОЗПОДІЛ: прийняти фіксовану оплату і одним тапом розкидати по конвертах за правилом.
   // Вмикається, якщо у блока є b.splitPreset = { amount, cur, rules:[{envId, pct}] }.
   // rules: pct у частках від суми (0.20 = 20%). Решта лишається як прибуток проєкту.
   function projSplitPreset(b){
-    const ps=b.splitPreset; if(!ps||!(+ps.amount>0)){ return projAddMovement(b,'in'); }
-    const amt=+ps.amount, cur=ps.cur||b.cur||'€', today=ymdLocal();
+    const P=projEnsure(b), ps=P.splitPreset; if(!ps||!(+ps.amount>0)){ return projAddMovement(b,'in'); }
+    const amt=+ps.amount, cur=ps.cur||P.cur||'€', today=ymdLocal();
     const rules=Array.isArray(ps.rules)?ps.rules.filter(r=>r&&r.envId&&+r.pct>0):[];
     finAskRate(cur, rate=>{
       // 1) дохід у проєкт + finOps (у Гаманець — гривні за курсом)
       const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-      (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:amt,label:(ps.label||'Оплата клієнта'),date:today,src:'отримано',finOpId:finId});
-      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · '+(ps.label||'оплата'),date:today,proj:b.id,card:_projCardId()}, amt, cur, rate));
+      P.ops.push({id:'pop_'+Date.now(),t:'in',amount:amt,label:(ps.label||'Оплата клієнта'),date:today,src:'отримано',finOpId:finId});
+      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · '+(ps.label||'оплата'),date:today,proj:b.id,projId:P.id,card:_projCardId()}, amt, cur, rate));
       // 2) авто-переклад у кожен конверт (envAddOp сам дзеркалить у finOps як резерв).
       //    Конверти в гривні — частку рахуємо від суми, вже переведеної в ₴.
       const amtUAH=finFx(amt, cur, rate).amount;
@@ -846,7 +921,7 @@
         envAddOp(e,'in',sum,'Авто з «'+(b.title||'проєкт')+'»',_projCardId());
         moved+=sum; parts.push(fmt(sum)+' ₴ → '+(e.emoji||'✉️')+' '+e.name);
       });
-      saveBoard(); saveFinOps(); renderBoard();
+      projCommit(P); saveFinOps(); renderBoard();
       const rest=Math.round((amtUAH-moved)*100)/100;
       const head='💶 +'+amt+' '+cur+(amtUAH!==amt?' = '+fmt(amtUAH)+' ₴':'');
       try{ flowAlert(head+'\n'+(parts.length?parts.join('\n')+'\n':'')+'Лишилось у прибутку: '+fmt(rest)+' ₴'); }catch(_){}

@@ -853,7 +853,11 @@
       const i=arr.findIndex(x=>String(x.id)===el.dataset.dup);
       if(i<0) return;
       const copy=JSON.parse(JSON.stringify(arr[i]));
-      const reid=o=>{ o.id=Date.now()+Math.random()*1e6; if(isContainer(o)&&Array.isArray(o.children)) o.children.forEach(reid); };
+      const reid=o=>{ o.id=Date.now()+Math.random()*1e6;
+        // копія «Проєкту» — окремий проєкт: без projId (міграція чи перша дія заведе
+        // свій prj_<новий id>) і без звʼязку рухів з операціями Гаманця оригіналу
+        if(o.type==='project'){ delete o.projId; if(Array.isArray(o.ops)) o.ops.forEach(op=>{ if(op) delete op.finOpId; }); }
+        if(isContainer(o)&&Array.isArray(o.children)) o.children.forEach(reid); };
       reid(copy); copy.pinned=false;
       arr.splice(i+1,0,copy); syncBlocks(); saveBoard(); renderBoard();
     });
@@ -1284,27 +1288,32 @@
       const [id,opId]=el.dataset.pjdel.split('|');
       const b=getBlock(id); if(!b) return;
       confirmSheet({title:'Видалити рух?', onOk:()=>{
-        const op=(b.ops||[]).find(o=>String(o.id)===String(opId));
+        // рух живе в проєкті Кабінету; позначка в delOps — щоб копія в блоці
+        // зі старого застосунку не повернула його назад при перенесенні
+        const P=projEnsure(b);
+        const op=P.ops.find(o=>String(o.id)===String(opId));
         if(op&&op.finOpId) finOps=finOps.filter(f=>f.id!==op.finOpId);
-        b.ops=(b.ops||[]).filter(o=>String(o.id)!==String(opId));
-        saveBoard(); saveFinOps(); renderBoard();
+        P.ops=P.ops.filter(o=>String(o.id)!==String(opId));
+        if(!P.delOps.includes(String(opId))) P.delOps.push(String(opId));
+        projCommit(P); saveFinOps(); renderBoard();
       }});
     });
     (window.__btRoot||board).querySelectorAll('[data-pjtitle]').forEach(el=>el.onclick=e=>{
       e.stopPropagation();
       const b=getBlock(el.dataset.pjtitle); if(!b) return;
-      inputModal({title:'Назва проєкту', value:b.title||'', onOk:(v)=>{ if((v||'').trim()){ b.title=v.trim(); saveBoard(); renderBoard(); } }});
+      inputModal({title:'Назва проєкту', value:b.title||'', onOk:(v)=>{ if((v||'').trim()){ b.title=v.trim(); const P=projEnsure(b); P.title=b.title; projCommit(P); renderBoard(); } }});
     });
     (window.__btRoot||board).querySelectorAll('[data-pjsetup]').forEach(el=>el.onclick=e=>{
       e.stopPropagation();
       const b=getBlock(el.dataset.pjsetup); if(!b) return;
-      inputModal({title:'Очікуваний дохід ('+(b.cur||'€')+')', value:String(b.expected||0), placeholder:'Напр. 1000', onOk:(v)=>{
+      const P=projEnsure(b);
+      inputModal({title:'Очікуваний дохід ('+(P.cur||'€')+')', value:String(P.expected||0), placeholder:'Напр. 1000', onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,''))||0;
-        b.expected=n; if(n>0) b.unlocked=false;
-        inputModal({title:'Дедлайн (РРРР-ММ-ДД, або порожньо)', value:b.deadline||'', placeholder:'2026-07-15', onOk:(d)=>{
+        P.expected=n; if(n>0) P.unlocked=false;
+        inputModal({title:'Дедлайн (РРРР-ММ-ДД, або порожньо)', value:P.deadline||'', placeholder:'2026-07-15', onOk:(d)=>{
           d=(d||'').trim();
-          b.deadline = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : '';
-          saveBoard(); renderBoard();
+          P.deadline = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : '';
+          projCommit(P); renderBoard();
         }});
       }});
     });

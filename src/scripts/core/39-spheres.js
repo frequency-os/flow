@@ -82,7 +82,7 @@
     const proj=find('project'), env=find('envelope'), heat=find('heatmap'), prog=bl.find(b=>b.type==='progress'||b.type==='pbar'), kan=find('kanban');
     const r={line:'', pct:null, nums:[], xp:0};
     let inc=0, exp=0, ops=0;
-    if(proj){ try{ inc=projIncome(proj); exp=projExpense(proj); }catch(_){} ops=(proj.ops||[]).length;
+    if(proj){ try{ inc=projIncome(proj); exp=projExpense(proj); }catch(_){} ops=(projData(proj).ops||[]).length;
       r.nums.push({k:'Дохід',v:fmt(inc)+' ₴',tone:'in'},{k:'Витрати',v:fmt(exp)+' ₴',tone:'out'},{k:'Прибуток',v:fmt(inc-exp)+' ₴'}); }
     let envPct=null, envTxt='';
     if(env&&env.envId!=null){ try{ const e=envelopes.find(x=>String(x.id)===String(env.envId)); if(e){ const sv=envSaved(e);

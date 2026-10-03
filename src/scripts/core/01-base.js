@@ -123,6 +123,7 @@
     'spaces_map_v2','active_space_map_v2',
     'goals_data','values_state','wishes_board',
     'envelopes','debts','fin_ops','fin_recurring',
+    'fin_projects',   // проєкти Кабінету «Фінанси» (08-finance.js); блок «Проєкт» — вікно в них
     'income_cards','fx_cfg','spend',
     'work_sessions','work_cfg','work_extras','work_blocks',
     'board','customboards','blockusage',

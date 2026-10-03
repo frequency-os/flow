@@ -45,7 +45,8 @@ const LEGACY = {
   }),
   flowapp_folders_order: W(['f_inbox', 'work', 'f_proj', 'f_agsk_seed', 'f_agsk_c', 'pat', 'f_vision_seed', 'f_space_1']),
   flowapp_board: W({
-    f_proj: [{ id: 1, type: 'note', text: 'нотатка' }, { id: 2, type: 'kanban', title: 'старий віджет' }],
+    f_proj: [{ id: 1, type: 'note', text: 'нотатка' }, { id: 2, type: 'kanban', title: 'старий віджет' },
+      { id: 12, type: 'project', title: 'Живий', cur: '₴', ops: [{ id: 'pop_l', t: 'in', amount: 50 }] }],
     f_inbox: [{ id: 3, type: 'note', text: 'вхідна' }],
     f_inbox__sp_t1: [{ id: 4, type: 'note', text: 'у темі' }],
     f_agsk_seed: [{ id: 5, type: 'note', text: 'агенція' }],
@@ -62,6 +63,27 @@ const LEGACY = {
   flowapp_spend: W([{ id: 111, amount: 20, label: 'кава', date: '2026-08-10', cat: 'food' }]),
   flowapp_wishes_board: W([{ id: 'w1', img: PNG, cap: 'мрія' }]),
 };
+// Пристрій, де старі разові міграції вже пройшли. Перевіряємо перенесення в Кабінет (fin_projects):
+//   · prj_8  — звичайний блок, переїжджає вперше;
+//   · prj_10 — у вкладеній сторінці;
+//   · prj_20 — уже перенесений; «старий телефон» дописав у копію блоку pop_new
+//     (має долитись) і досі тримає pop_del, який у Кабінеті видалено (не має повернутись);
+//     ще й прийняв там очікувану оплату (expected 0, unlocked) — проєкт має це побачити.
+const POSTMIG = Object.assign({ flowtheme: 'dark', theme_flat_default_v1: '1' },
+  Object.fromEntries(FLAGS.map(f => [f, '1'])), {
+  flowapp_folders_cfg: W({ f_fin: { custom: true, name: 'Фінанси', emoji: '💰', c: '#22c55e' } }),
+  flowapp_folders_order: W(['f_fin']),
+  flowapp_board: W({ f_fin: [
+    { id: 8, type: 'project', title: 'Монтаж', cur: '€', expected: 0, ops: [{ id: 'pop_1', t: 'in', amount: 300, label: 'аванс', date: '2026-08-05' }] },
+    { id: 9, type: 'page', title: 'Сторінка', children: [{ id: 10, type: 'project', title: 'Вкладений', cur: '₴', ops: [] }] },
+    { id: 20, type: 'project', title: 'Старий', cur: '₴', projId: 'prj_20', expected: 0, unlocked: true, ops: [
+      { id: 'pop_a', t: 'in', amount: 100 }, { id: 'pop_del', t: 'out', amount: 40 }, { id: 'pop_new', t: 'in', amount: 70 }] },
+  ] }),
+  flowapp_fin_projects: W([{ id: 'prj_20', title: 'Старий', cur: '₴', expected: 500, deadline: '', unlocked: false,
+    ops: [{ id: 'pop_a', t: 'in', amount: 100 }], delOps: ['pop_del'] }]),
+  flowapp_fin_ops: W([{ id: 'o1', type: 'in', amount: 10, card: 'wallet', date: '2026-08-02', label: 'x' }]),
+  flowapp_income_cards: W([{ id: 'wallet', name: 'Гаманець', cur: 'UAH' }]),
+});
 // сесія, яку supabase-js прийме без мережі (термін ще не сплив)
 function fakeSession() {
   const now = Math.floor(Date.now() / 1000);
@@ -132,7 +154,12 @@ async function scenarioA() {
   const board = dataOf(s1, 'board') || {};
   const inbox = board.chat_inbox || [];
   if (inbox.length !== 2) bad(S, 'у чаті «Вхідні» ' + inbox.length + ' записів замість 2');
-  if ((board.f_proj || []).some(b => b.type === 'kanban')) bad(S, 'старий віджет kanban лишився');
+  // legacy_widgets вимкнено 03.10.2026: живі блоки (kanban, project…) на новому пристрої не вирізаються
+  if (!(board.f_proj || []).some(b => b.type === 'kanban')) bad(S, 'живий блок kanban вирізано з дошки');
+  const lp = (board.f_proj || []).find(b => b.type === 'project');
+  if (!lp) bad(S, 'блок «Проєкт» вирізано з дошки на новому пристрої');
+  else if (lp.projId !== 'prj_' + lp.id) bad(S, 'блок «Проєкт» не отримав projId');
+  if (!(dataOf(s1, 'fin_projects') || []).some(x => x.id === 'prj_12')) bad(S, 'проєкт не переїхав у fin_projects на новому пристрої');
   ['f_agsk_seed', 'pat', 'f_space_1', 'f_inbox', 'f_inbox__sp_t1'].forEach(k => { if (board[k]) bad(S, 'дошка ' + k + ' лишилась'); });
   const chats = dataOf(s1, 'chats_v1') || [];
   if (!chats.some(c => c.id === 'inbox')) bad(S, 'нема чату «Вхідні»');
@@ -172,6 +199,42 @@ async function scenarioA() {
   const raw13 = all13.filter(x => !isStore(x));
   if (raw13.length) console.log('   · A: змінились сирі ключі поза сховищем (B3): ' + raw13.join(', '));
   console.log('A (без входу): звіт міграцій =', JSON.stringify(rep1), '· змін при повторі:', d12.length, '· при перезапуску:', d13.length);
+  win.destroy();
+}
+
+async function scenarioP() {
+  const S = 'P (проєкти → Кабінет)';
+  const win = await makeWin('p', false);
+  await seed(win, POSTMIG);
+  await start(win);
+  const s1 = await snap(win);
+  const fp = dataOf(s1, 'fin_projects') || [];
+  const byId = id => fp.find(x => x.id === id);
+  const p8 = byId('prj_8'), p20 = byId('prj_20');
+  if (!p8) bad(S, 'блок не переїхав у fin_projects');
+  else if (!p8.ops || p8.ops.length !== 1 || p8.ops[0].amount !== 300 || p8.cur !== '€') bad(S, 'проєкт перенесено з втратами: ' + JSON.stringify(p8));
+  if (!byId('prj_10')) bad(S, 'вкладений проєкт не переїхав');
+  if (fp.length !== 3) bad(S, 'у fin_projects ' + fp.length + ' проєктів замість 3');
+  const ids20 = ((p20 && p20.ops) || []).map(o => o.id).sort().join(',');
+  if (ids20 !== 'pop_a,pop_new') bad(S, 'prj_20: очікував pop_a,pop_new, маю ' + ids20);
+  if (!p20 || p20.expected !== 0 || !p20.unlocked) bad(S, 'prj_20: оплату, прийняту старим застосунком, не перенесено');
+  const board = (dataOf(s1, 'board') || {}).f_fin || [];
+  const b8 = board.find(x => x.id === 8);
+  if (!b8 || b8.projId !== 'prj_8') bad(S, 'блок не отримав projId');
+  else if (!b8.ops || b8.ops.length !== 1) bad(S, 'копію рухів у блоці втрачено');
+  const b10 = ((board.find(x => x.id === 9) || {}).children || [])[0];
+  if (!b10 || b10.projId !== 'prj_10') bad(S, 'вкладений блок не отримав projId');
+  // повторний load() і перезапуск нічого не переписують
+  await js(win, '(async()=>{ if(typeof window.__load==="function") await window.__load(); })()');
+  await sleep(1500);
+  const s2 = await snap(win);
+  const d12 = diff(s1, s2).filter(isStore);
+  if (d12.length) bad(S, 'повторний load() переписав: ' + d12.join(', '));
+  await start(win);
+  const s3 = await snap(win);
+  const d13 = diff(s1, s3).filter(isStore);
+  if (d13.length) bad(S, 'перезапуск переписав: ' + d13.join(', '));
+  console.log(S + ': проєктів ' + fp.length + ' · змін при повторі: ' + d12.length + ' · при перезапуску: ' + d13.length);
   win.destroy();
 }
 
@@ -216,6 +279,8 @@ app.whenReady().then(async () => {
   const guard = (S, p) => p.catch(e => bad(S, 'виняток: ' + (e && e.stack || e)));
   await Promise.all([
     guard('A', scenarioA()),
+    guard('P', scenarioP()),
+    guard('D', scenarioSilent('d', 'D (проєкти, хмара мовчить)', Object.assign({ [SB_TOKEN_KEY]: fakeSession() }, POSTMIG))),
     guard('B', scenarioSilent('b', 'B (новий пристрій, хмара мовчить)', { [SB_TOKEN_KEY]: fakeSession() })),
     // «старий» пристрій уже пройшов перехід теми 01.09 — вона поза реєстром (див. 05-spaces.js)
     guard('C', scenarioSilent('c', 'C (дані є, хмара мовчить)',

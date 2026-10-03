@@ -166,24 +166,15 @@
     if(changed){ try{ saveFolders({auto:true}); }catch(_){} try{ saveBoard(); }catch(_){} }
     return true;
   }
-  /* ── ОЧИЩЕННЯ 2: старі віджети та проєктні блоки (перенесені зі Простору)
-     видаляємо з усіх папок — на їхнє місце прийшли нові. «Відлік» лишається. */
-  function migLegacyWidgets(){
-    const DEAD={progress:1,fin:1,envelope:1,calendar:1,wpult:1,wstack:1,wpipe:1,wtline:1,
-      wportal:1,wplanday:1,wplanmonth:1,project:1,kanban:1,contacts:1,caseline:1,festival:1};
-    let removed=0;
-    const strip=(arr)=>{
-      if(!Array.isArray(arr))return;
-      for(let i=arr.length-1;i>=0;i--){
-        const b=arr[i];
-        if(b&&DEAD[b.type]){ arr.splice(i,1); removed++; continue; }
-        if(b&&Array.isArray(b.children)) strip(b.children);
-      }
-    };
-    Object.keys(boards).forEach(k=>strip(boards[k]));
-    if(removed){ try{ saveBoard(); }catch(_){} }
-    return true;
-  }
+  /* ── ОЧИЩЕННЯ 2 (вимкнено 03.10.2026) ──
+     Колись прибирала старі віджети (progress, envelope, project, kanban, wplanday…).
+     Але ці типи давно знову живі: їх ставить палітра, шаблони сфер і Кабінет
+     «Фінанси». А прапорець legacy_widgets_purge_v1 — сирий, лише цього пристрою:
+     на новому телефоні чи після «Скинути пристрій» чистка йшла знову, вирізала
+     живі блоки з дошки, що прийшла з хмари, і писала дошку назад — блоки
+     зникали на всіх пристроях. Тепер нічого не робить. Запис у реєстрі й імʼя
+     прапорця лишаються як є (див. правила реєстру нижче). */
+  function migLegacyWidgets(){ return true; }
   // папка «Патерни» відкривається одразу як екран — її простір не використовується, чистимо залишки
   function migBoardPat(){
     if(boards && boards['pat']){ delete boards['pat']; saveBoard(); }
@@ -239,6 +230,8 @@
     { id:'space_to_inbox',  flag:'flowapp_space_removed_v1',       run: inboxMigrateOnce },
     { id:'inbox_to_chat',   flag:'flowapp_inbox_chat_v1',          run: ()=>chatsMigrateInboxOnce() },    // 36-chats.js
     { id:'debt_ops',        every:true,                            run: ()=>migrate() },
+    // блоки «Проєкт» → проєкти Кабінету (08-finance.js); ідемпотентно, лише копіює
+    { id:'fin_projects',    every:true,                            run: ()=>finProjectsMigrate() },
   ];
   let migDeferred=false;   // останній load() відклав міграції (дані не підтверджені)
   function runMigrations(ctx){
@@ -345,7 +338,7 @@
     const __RAW = await (async ()=>{
       const keys=[DEBT_KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',FDELKEY,
-        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
+        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,FINPROJKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
           r=>[k,(r&&typeof r.value!=='undefined')?r.value:null],
@@ -469,6 +462,7 @@
     try{ const raw=__RAW[WKEXTRAKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) workExtras=d; }catch(_){}
     try{ const raw=__RAW[WKBLKKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') wkBlocks=Object.assign(wkBlocks,d); }catch(_){}
     try{ const raw=__RAW[RECKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) recurring=d; }catch(_){}
+    try{ const raw=__RAW[FINPROJKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) finProjects=d.filter(p=>p&&typeof p.id==='string'); }catch(_){}
     try{ const raw=__RAW[CARDKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) cards=d; }catch(_){}
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}
     try{ const raw=__RAW[DIAINS_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaInsights=Object.assign({mood:{},weeks:{}},d); }catch(_){}
