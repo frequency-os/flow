@@ -6,7 +6,7 @@
    · решта файлів (vendor/, іконки, маніфест) — з кешу цієї версії, мережа лише
      якщо файла там ще нема. Вони міняються тільки разом із версією.
    Версію підставляє збірка — новий білд = новий кеш, старі чистяться. */
-const VERSION = '2026-09-30-0601-8a74800';
+const VERSION = '2026-10-03-0956-d61d0ac';
 const CACHE = 'frequency-' + VERSION;
 // Сторінка кешується ОДИН раз, під цим ключем. Раніше './' і './index.html'
 // лежали двома копіями по 2.8 МБ, хоча це той самий файл.
@@ -90,7 +90,13 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // Supabase та інші домени — повз кеш
-  if (req.mode === 'navigate') { e.respondWith(navigate(e)); return; }
+  if (req.mode === 'navigate') {
+    // Офлайн-копія — лише сам Frequency (корінь або index.html). Інші сторінки
+    // сайту (гра misto.html) ідуть повз воркер: інакше navigate() записав би
+    // їх у кеш замість застосунку, і Frequency без мережі відкривався б ними.
+    if (!/\/(index\.html)?$/.test(url.pathname)) return;
+    e.respondWith(navigate(e)); return;
+  }
   e.respondWith(caches.open(CACHE).then(async c => {
     const hit = await c.match(req);
     if (hit) return hit;
