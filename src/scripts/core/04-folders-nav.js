@@ -65,7 +65,8 @@
     const bare=raw.replace(/[\u{FE0E}\u{FE0F}\u{200D}\u{1F3FB}-\u{1F3FF}\u{2640}\u{2642}]/gu,'');
     return EMOJI_ICON[bare] || 'fo-folder';
   }
-  function folderIcon(f){ return (f&&f.icon) ? f.icon : folderIconFor(f&&f.emoji); }
+  // іконка приходить і з хмари — пропускаємо лише ім'я спрайта (літери, цифри, дефіс), інакше за емодзі
+  function folderIcon(f){ return (f&&f.icon&&/^[A-Za-z0-9_-]{1,40}$/.test(String(f.icon))) ? f.icon : folderIconFor(f&&f.emoji); }
   /* Повний перелік іконок для ручного вибору — той самий порядок, що у
      спрайті в index.html. Підписи потрібні лише для підказки при наведенні. */
   const ICON_ALL=[

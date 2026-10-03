@@ -534,7 +534,7 @@
       <div class="fstatus-pick">
         ${PROJECT_STATUSES.map(([s,n,c])=>`<button class="fst-opt ${(f.status||'active')===s?'on':''}" data-status="${s}" style="--stc:${c}">${n}</button>`).join('')}
       </div>
-      <button class="fmi" data-act="due">📅 ${f.due?('Дедлайн: '+f.due):'Встановити дедлайн'}</button>
+      <button class="fmi" data-act="due">📅 ${f.due?('Дедлайн: '+esc(f.due)):'Встановити дедлайн'}</button>
       ${f.due?`<button class="fmi" data-act="rmdue">✖️ Прибрати дедлайн</button>`:''}`:''}
       <div class="fmi-label">Розкладка картки</div>
       <div class="flay-pick">
@@ -547,7 +547,7 @@
       ${groupKids(key).length?`<button class="fmi" data-act="ungroup">🗂 Розгрупувати<small class="fmi-sub">папки виходять з групи, нічого не видаляється</small></button>`:''}
       <button class="fmi" data-act="move">📂 ${f.parent?'Перемістити / на головну':'Перемістити в папку'}</button>
       <button class="fmi" data-act="color">🎨 Змінити колір</button>
-      <button class="fmi" data-act="icon"><svg class="ico fmi-ic" aria-hidden="true"><use href="#${folderIcon(f)}"/></svg> Іконка${f.iconSet?'':' · за емодзі'}</button>
+      <button class="fmi" data-act="icon"><svg class="ico fmi-ic" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg> Іконка${f.iconSet?'':' · за емодзі'}</button>
       <button class="fmi" data-act="emoji">😀 Змінити емодзі</button>
       ${f.custom?`<button class="fmi danger" data-act="delete">🗑️ Видалити папку</button>`:''}
     </div>`;
