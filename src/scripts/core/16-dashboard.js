@@ -418,6 +418,117 @@
   }
   { const mb=document.getElementById('folderMergeBtn'); if(mb) mb.onclick=openFolderMerge; }
   try{ window.openFolderGroup=openFolderGroup; }catch(_){}
+
+  /* ════════ ВЕРХНІЙ БАР ДОКУМЕНТА (крок 2, 03.10.2026) ════════
+     Було: 6 значків без підписів (Темна, Світла, Скасувати, Сховані, Мікрофон,
+     На весь екран) і синій «+» (додати чат). Стало: «‹ · шлях групи · Назва ▾ · ⋯».
+     Старі кнопки лишаються в DOM прихованими (їхні обробники в page-editor),
+     «⋯» просто натискає їх. Мікрофон під час запису видно в барі (клас live). */
+  function pgBarFolder(){ try{ const base=String(boardKey||'').split('__sp_')[0]; return folders[base]?base:''; }catch(_){ return ''; } }
+  // група, між папками якої можна перемикатись: батько папки або вона сама, якщо це група
+  function pgBarSwitchGroup(fk){
+    const f=folders[fk]; if(!f) return '';
+    if(f.parent && folders[f.parent] && groupKids(f.parent).includes(fk)) return f.parent;
+    return groupKids(fk).length ? fk : '';
+  }
+  function pgBarSync(){
+    const crumb=document.getElementById('pgCrumb'), up=document.getElementById('pgCrumbUp'), nm=document.getElementById('pgCrumbName');
+    if(!crumb||!up||!nm) return;
+    const fk=pgBarFolder(), f=fk?folders[fk]:null;
+    if(!f){ crumb.hidden=true; return; }
+    crumb.hidden=false;
+    const par=(f.parent && folders[f.parent] && groupKids(f.parent).includes(fk)) ? f.parent : '';
+    up.hidden=!par;
+    if(par){ up.textContent=folders[par].name+' ›'; up.setAttribute('aria-label','До групи «'+folders[par].name+'»'); }
+    nm.querySelector('.pgb-nm').textContent=f.name||'';
+    const sw=pgBarSwitchGroup(fk);
+    nm.classList.toggle('sw',!!sw); nm.disabled=!sw;
+    nm.setAttribute('aria-label', sw ? ('«'+(f.name||'')+'» — перейти до іншої папки групи') : (f.name||''));
+  }
+  function pgBarHasCond(){
+    let any=false;
+    const walk=a=>(Array.isArray(a)?a:[]).forEach(b=>{ if(any||!b) return; if(b.cond&&b.cond.on){ any=true; return; } if(Array.isArray(b.children)) walk(b.children); });
+    try{ walk(boards[boardKey]); }catch(_){}
+    return any;
+  }
+  // ▾ — інші папки цієї групи
+  function pgBarSwitchSheet(){
+    const fk=pgBarFolder(), g=pgBarSwitchGroup(fk); if(!g) return;
+    const kids=groupKids(g);
+    const row=(k,label,sub)=>`<button class="fgs-row${k===fk?' on':''}" data-pgsw="${esc(k)}"${k===fk?' aria-current="page"':''}>${fgIcon(folders[k])}
+      <span class="fgs-t"><b data-i18n-skip="1">${esc(label)}</b>${sub?`<small>${esc(sub)}</small>`:''}</span><span class="fgs-go">${k===fk?'✓':'›'}</span></button>`;
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Перейти в «<span data-i18n-skip="1">${esc(folders[g].name)}</span>»</div>
+      ${row(g,'Нотатки групи','документ папки «'+folders[g].name+'»')}
+      ${kids.map(k=>row(k,folders[k].name,'')).join('')}`,
+    m=>{
+      m.querySelectorAll('[data-pgsw]').forEach(b=>b.onclick=()=>{
+        const k=b.dataset.pgsw; closeFolderMenu();
+        if(k===fk) return;
+        if(k!==g && groupKids(k).length){ goHome(); setTimeout(()=>openFolderGroup(k),60); return; }   // група в групі — її шторка
+        window.__fgNext=g; goFolder(k); window.__fgNext=null;
+      });
+    });
+  }
+  // ⋯ — рідкісні дії документа + налаштування папки
+  function pgBarMoreSheet(){
+    const fk=pgBarFolder();
+    const undo=document.getElementById('pgUndoBtn'), hid=document.getElementById('pgShowHiddenBtn');
+    const mic=document.getElementById('pgMicBtn'), wide=document.getElementById('pgWideBtn');
+    const theme=document.getElementById('scr-page').classList.contains('pg-paper')?'paper':'ink';
+    const live=!!(mic&&mic.classList.contains('live'));
+    const wideOn=document.getElementById('scr-page').classList.contains('pg-wide');
+    const hasCond=pgBarHasCond(), hidOn=!!(hid&&hid.classList.contains('on'));
+    const r=(act,ic,t,sub,dis)=>`<button class="fmi pgb-row" data-pgm="${act}"${dis?' disabled':''}><span class="pgb-ic" aria-hidden="true">${ic}</span><span class="pgb-tx">${t}${sub?`<small class="fmi-sub">${sub}</small>`:''}</span></button>`;
+    fgSheet(`<div class="fmenu-grip"></div>
+      ${fk?`<div class="fmenu-title" data-i18n-skip="1">${esc(folders[fk].name)}</div>`:''}
+      ${r('undo','↶','Скасувати','', !(undo&&!undo.disabled))}
+      ${r('mic','🎙',live?'Зупинити диктування':'Диктувати','у блок, де стоїть курсор')}
+      ${r('wide','⛶',wideOn?'Звичайна ширина':'На весь екран','')}
+      ${hasCond?r('hid','◌',hidOn?'Ховати блоки з умовою':'Показати сховані блоки','блоки з умовою показу'):''}
+      <div class="fmi-label">Тема документа</div>
+      <div class="pgb-seg" role="group" aria-label="Тема документа">
+        <button data-pgth="ink" class="${theme==='ink'?'on':''}" aria-pressed="${theme==='ink'}">Темна</button>
+        <button data-pgth="paper" class="${theme==='paper'?'on':''}" aria-pressed="${theme==='paper'}">Світла</button></div>
+      ${fk?`<div class="fmi-label">Папка</div>
+      ${r('chats','💬','Чати папки','повʼязати новий чи наявний чат','')}
+      ${r('fmenu','⚙︎','Налаштування папки','назва, колір, група, видалення','')}`:''}`,
+    m=>{
+      const run=(fn)=>{ closeFolderMenu(); setTimeout(fn,60); };
+      m.querySelectorAll('[data-pgm]').forEach(b=>b.onclick=()=>{
+        const a=b.dataset.pgm;
+        if(a==='undo') run(()=>undo&&undo.click());
+        if(a==='mic') run(()=>mic&&mic.click());
+        if(a==='wide') run(()=>wide&&wide.click());
+        if(a==='hid') run(()=>hid&&hid.click());
+        if(a==='chats') run(()=>{ const pa=document.getElementById('pgAddLink'); if(pa) pa.click(); });
+        if(a==='fmenu') run(()=>openFolderMenu(fk));
+      });
+      m.querySelectorAll('[data-pgth]').forEach(b=>b.onclick=()=>{
+        const t=document.querySelector('#pgTheme [data-pgtheme="'+b.dataset.pgth+'"]'); if(t) t.click();
+        m.querySelectorAll('[data-pgth]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
+      });
+    });
+  }
+  function pgBarInit(){
+    const top=document.querySelector('#scr-page .pg-top'); if(!top||top.__pgb) return;
+    top.__pgb=true; top.classList.add('pgb-v2');
+    const up=document.getElementById('pgCrumbUp'), nm=document.getElementById('pgCrumbName'), more=document.getElementById('pgMoreBtn');
+    if(up) up.onclick=()=>{ const f=folders[pgBarFolder()]; const p=f&&f.parent; goHome(); if(p&&folders[p]) setTimeout(()=>openFolderGroup(p),60); };
+    if(nm) nm.onclick=pgBarSwitchSheet;
+    if(more) more.onclick=pgBarMoreSheet;
+    // шлях і назва оновлюються при кожному відкритті документа
+    if(typeof window.openFlowPage==='function' && !window.openFlowPage.__pgb){
+      const orig=window.openFlowPage;
+      const wrapped=function(opts){ orig(opts); try{ pgBarSync(); }catch(e){ console.error('pgBar',e); } };
+      wrapped.__pgb=true; ['__chats','__sph'].forEach(k=>{ if(orig[k]) wrapped[k]=true; });
+      window.openFlowPage=wrapped;
+    }
+  }
+  // openFlowPage зʼявляється в page-editor — пізніше за core, тож чекаємо кінця розбору сторінки
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{ try{ pgBarInit(); }catch(e){ console.error('pgBarInit',e); } });
+  else { try{ pgBarInit(); }catch(e){ console.error('pgBarInit',e); } }
+  try{ window.pgBarSync=pgBarSync; }catch(_){}
   // 🚀 створити папку-проєкт зі шторки «＋»: якщо ми всередині папки — вкладаємо в неї
   function createProjectFolder(){
     inputModal({ title:'Новий проєкт', placeholder:'Назва проєкту', emoji:true, emojiVal:'🚀',

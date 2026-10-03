@@ -643,3 +643,50 @@
     font:inherit;font-size:15px;font-weight:800;cursor:pointer;}
   .fgm-ok:disabled{background:var(--card-2);color:var(--muted);cursor:default;}
   .fmi .fmi-sub{display:block;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;}
+
+  /* ════════ Верхній бар документа (крок 2) ════════
+     «‹ · шлях групи / Назва ▾ · ⋯». Старі значки (тема, скасувати, сховані,
+     мікрофон, на весь екран, «+» чату) сховані — вони в меню «⋯».
+     Мікрофон під час запису лишається видимим, щоб запис можна було зупинити. */
+  #scr-page .pg-top.pgb-v2 .pg-theme{display:none !important;}
+  #scr-page .pg-top.pgb-v2 .pg-theme:has(#pgMicBtn.live){display:flex !important;}
+  #scr-page .pg-top.pgb-v2 .pg-theme:has(#pgMicBtn.live) > :not(#pgMicBtn){display:none !important;}
+  #scr-page .pg-top.pgb-v2 .pg-addlink,
+  #scr-page .pg-top.pgb-v2 > #pgWideBtn{display:none !important;}
+  #scr-page .pg-top.pgb-v2 .pg-top-sp{display:block;flex:1 1 0;min-width:0;}
+  .pgb-crumb{display:flex;flex-direction:column;align-items:flex-start;min-width:0;flex:0 1 auto;
+    padding:3px 4px;border-radius:15px;
+    background:color-mix(in srgb,var(--pgsheet,var(--pg-sheet)) 58%,transparent);
+    backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);
+    border:1px solid color-mix(in srgb,var(--pg-fg) 10%,transparent);
+    box-shadow:0 8px 22px -14px rgba(0,0,0,.55);}
+  .pgb-crumb[hidden]{display:none !important;}
+  .pgb-up,.pgb-name{border:0;background:none;font:inherit;cursor:pointer;max-width:100%;min-width:0;
+    padding:1px 8px;border-radius:10px;text-align:left;}
+  .pgb-up{font-size:11px;font-weight:700;color:color-mix(in srgb,var(--pg-fg) 55%,transparent);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pgb-up[hidden]{display:none;}
+  .pgb-name{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:800;color:var(--pg-fg);}
+  .pgb-name .pgb-nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .pgb-name .pgb-caret{font-size:10px;color:color-mix(in srgb,var(--pg-fg) 50%,transparent);display:none;flex:none;}
+  .pgb-name.sw .pgb-caret{display:inline;}
+  .pgb-name:disabled{cursor:default;opacity:1;}
+  .pgb-up:active,.pgb-name.sw:active{background:color-mix(in srgb,var(--pg-fg) 8%,transparent);}
+  .pgb-up:focus-visible,.pgb-name:focus-visible,.pgb-more:focus-visible{outline:2px solid var(--pg-acc);outline-offset:1px;}
+  .pgb-more{flex:none;width:38px;height:34px;border-radius:15px;cursor:pointer;
+    font:inherit;font-size:19px;font-weight:800;line-height:1;color:color-mix(in srgb,var(--pg-fg) 80%,transparent);
+    background:color-mix(in srgb,var(--pgsheet,var(--pg-sheet)) 58%,transparent);
+    backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);
+    border:1px solid color-mix(in srgb,var(--pg-fg) 10%,transparent);
+    box-shadow:0 8px 22px -14px rgba(0,0,0,.55);}
+  .pgb-more:active{transform:scale(.96);}
+  /* шторка «⋯» */
+  .pgb-row{display:flex !important;align-items:center;gap:12px;}
+  .pgb-row:disabled{opacity:.4;cursor:default;}
+  .pgb-ic{width:30px;height:30px;border-radius:10px;background:var(--hair);display:grid;place-items:center;font-size:15px;flex:none;}
+  .pgb-tx{display:flex;flex-direction:column;}
+  .pgb-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 6px 4px;}
+  .pgb-seg button{height:40px;border-radius:12px;border:1px solid var(--line);background:none;color:var(--text);
+    font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+  .pgb-seg button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);}
+  .fgs-row.on{background:var(--hair);}

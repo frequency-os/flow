@@ -789,7 +789,12 @@
   <section class="screen" id="scr-page">
     <div class="pg-top">
       <button class="pg-back" id="pgBack">‹ Папки</button>
+      <div class="pgb-crumb" id="pgCrumb" hidden>
+        <button class="pgb-up" id="pgCrumbUp" hidden></button>
+        <button class="pgb-name" id="pgCrumbName"><span class="pgb-nm" data-i18n-skip="1"></span><span class="pgb-caret" aria-hidden="true">▾</span></button>
+      </div>
       <div class="pg-top-sp"></div>
+      <button class="pgb-more" id="pgMoreBtn" title="Ще дії" aria-label="Ще дії з документом">⋯</button>
       <div class="pg-theme" id="pgTheme">
         <button data-pgtheme="ink" class="on" title="Темна">◑</button>
         <button data-pgtheme="paper" title="Світла">◐</button>
