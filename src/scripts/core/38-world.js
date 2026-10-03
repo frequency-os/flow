@@ -46,6 +46,12 @@
     // міст зʼявляється лише тоді, коли розробник справді відкрив світ
     if(!window.flowWorldBridge) window.flowWorldBridge=worldBridge();
     const box=document.getElementById('worldFrame');
+    // повторний тап на «Мій світ», коли світ уже відкритий, — назад на карту
+    const here=document.getElementById('scr-world');
+    if(here && here.classList.contains('active') && box && box.firstChild){
+      try{ const w=box.firstChild.contentWindow; if(w&&w.mistoHome) w.mistoHome(); }catch(_){}
+      return;
+    }
     if(box && !box.firstChild){
       // сторінка гри йде повз сервіс-воркер (лише її картинки лягають у кеш версії) — без мережі лише пояснюємо
       if(navigator.onLine===false){

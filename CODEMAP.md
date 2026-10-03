@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 71 |
-| Рядків JS | 28842 |
+| Рядків JS | 28848 |
 | Файлів CSS | 33 |
 | Рядків CSS | 8690 |
 | Сутностей верхнього рівня | 1804 |
@@ -73,7 +73,7 @@
 | `src/scripts/core/35-channel.js` | 702 | 65 |
 | `src/scripts/core/36-chats.js` | 345 | 39 |
 | `src/scripts/core/37-ai-privacy.js` | 203 | 20 |
-| `src/scripts/core/38-world.js` | 75 | 7 |
+| `src/scripts/core/38-world.js` | 81 | 7 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
