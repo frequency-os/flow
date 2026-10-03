@@ -113,17 +113,22 @@
       i.synced=false; i.finOpId=null;
     } else {
       if(!(bal>0)) return;
-      // всі валюти дозволені — сума йде як є, валюта зазначена у назві
-      const opId=Date.now()+'_'+Math.random().toString(36).slice(2,6);
-      const last=i.ops[i.ops.length-1];
-      const date=(last&&last.date)?last.date:ymdLocal();
-      // я винен → майбутня витрата; мені винні → майбутній дохід
-      const type=i.kind==='owe'?'out':'in';
-      const label=(i.kind==='owe'?'Борг (я винен) · ':'Борг (мені винні) · ')+i.name+(i.cur&&i.cur!=='UAH'?' ('+(CUR[i.cur]||i.cur)+')':'');
-      let _mc; try{ ensureCards(); _mc=mainCard().id; }catch(_){}
-      finOps.push({ id:opId, type, amount:bal, label, date, _debtId:i.id, card:_mc });
-      i.synced=true; i.finOpId=opId;
-      saveFinOps();
+      // Гаманець у гривні: борг у €/$/zł переводимо за курсом (питаємо раз)
+      finAskRate(i.cur||'UAH', rate=>{
+        if(i.synced) return;                  // поки питали курс, вже синхронізували
+        const opId=Date.now()+'_'+Math.random().toString(36).slice(2,6);
+        const last=i.ops[i.ops.length-1];
+        const date=(last&&last.date)?last.date:ymdLocal();
+        // я винен → майбутня витрата; мені винні → майбутній дохід
+        const type=i.kind==='owe'?'out':'in';
+        const label=(i.kind==='owe'?'Борг (я винен) · ':'Борг (мені винні) · ')+i.name;
+        let _mc; try{ ensureCards(); _mc=mainCard().id; }catch(_){}
+        finOps.push(finOpFx({ id:opId, type, label, date, _debtId:i.id, card:_mc }, bal, i.cur||'UAH', rate));
+        i.synced=true; i.finOpId=opId;
+        saveFinOps();
+        debtSave(); debtRender(); try{ renderFinance(); }catch(_){}
+      });
+      return;
     }
     debtSave(); debtRender(); try{ renderFinance(); }catch(_){}
   }

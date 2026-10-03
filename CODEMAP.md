@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 72 |
-| Рядків JS | 29211 |
+| Рядків JS | 29301 |
 | Файлів CSS | 35 |
 | Рядків CSS | 8941 |
-| Сутностей верхнього рівня | 1831 |
+| Сутностей верхнього рівня | 1841 |
 | Ключів сховища (FLOW_KEYS) | 72 |
 
 ## Файли JS
@@ -43,7 +43,7 @@
 | `src/scripts/core/05-spaces.js` | 751 | 64 |
 | `src/scripts/core/06-wishes.js` | 1227 | 90 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
-| `src/scripts/core/08-finance.js` | 922 | 92 |
+| `src/scripts/core/08-finance.js` | 976 | 101 |
 | `src/scripts/core/09-goals.js` | 665 | 25 |
 | `src/scripts/core/10-planner.js` | 911 | 49 |
 | `src/scripts/core/11-ai-flow.js` | 258 | 26 |
@@ -53,9 +53,9 @@
 | `src/scripts/core/15-flow-spot.js` | 2064 | 97 |
 | `src/scripts/core/16-dashboard.js` | 563 | 21 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
-| `src/scripts/core/18-debts.js` | 190 | 18 |
+| `src/scripts/core/18-debts.js` | 195 | 18 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
-| `src/scripts/core/20-work.js` | 487 | 50 |
+| `src/scripts/core/20-work.js` | 518 | 51 |
 | `src/scripts/core/21-patterns.js` | 191 | 21 |
 | `src/scripts/core/22-diary.js` | 531 | 54 |
 | `src/scripts/core/23-board.js` | 330 | 32 |
@@ -726,7 +726,7 @@
 | `renderAnti` | функція | `src/scripts/core/07-values.js:145` |
 | `renderDaily` | функція | `src/scripts/core/07-values.js:150` |
 
-### `src/scripts/core/08-finance.js` — 92 сутностей
+### `src/scripts/core/08-finance.js` — 101 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -757,71 +757,80 @@
 | `cardBalance` | функція | `src/scripts/core/08-finance.js:79` |
 | `incomeSummary` | функція | `src/scripts/core/08-finance.js:80` |
 | `_projCardId` | функція | `src/scripts/core/08-finance.js:81` |
-| `ensureCards` | функція | `src/scripts/core/08-finance.js:84` |
-| `migRaw` | функція | `src/scripts/core/08-finance.js:113` |
-| `migRates` | функція | `src/scripts/core/08-finance.js:122` |
-| `migCurByCard` | функція | `src/scripts/core/08-finance.js:127` |
-| `walletSumUAH` | функція | `src/scripts/core/08-finance.js:134` |
-| `WALLET_MIG_FLAG` | значення | `src/scripts/core/08-finance.js:154` |
-| `migrateToWallet` | функція | `src/scripts/core/08-finance.js:159` |
-| `recDayOf` | функція | `src/scripts/core/08-finance.js:197` |
-| `recAutoPost` | функція | `src/scripts/core/08-finance.js:198` |
-| `workCardId` | значення | `src/scripts/core/08-finance.js:221` |
-| `workCard` | функція | `src/scripts/core/08-finance.js:222` |
-| `_isRealExpense` | функція | `src/scripts/core/08-finance.js:225` |
-| `_isRealIncome` | функція | `src/scripts/core/08-finance.js:226` |
-| `monthAgg` | функція | `src/scripts/core/08-finance.js:227` |
-| `finTab` | значення | `src/scripts/core/08-finance.js:232` |
-| `finView` | значення | `src/scripts/core/08-finance.js:233` |
-| `finBalance` | функція | `src/scripts/core/08-finance.js:234` |
-| `renderFinance` | функція | `src/scripts/core/08-finance.js:236` |
-| `MON_UA` | масив | `src/scripts/core/08-finance.js:243` |
-| `renderFinDash` | функція | `src/scripts/core/08-finance.js:249` |
-| `bindFinDash` | функція | `src/scripts/core/08-finance.js:299` |
-| `renderEnvScreen` | функція | `src/scripts/core/08-finance.js:327` |
-| `addFinOp` | функція | `src/scripts/core/08-finance.js:371` |
-| `addFinOpCard` | функція | `src/scripts/core/08-finance.js:375` |
-| `newRecurring` | функція | `src/scripts/core/08-finance.js:386` |
-| `newEnvelope` | функція | `src/scripts/core/08-finance.js:402` |
-| `envOpenId` | значення | `src/scripts/core/08-finance.js:420` |
-| `openEnvSheet` | функція | `src/scripts/core/08-finance.js:421` |
-| `closeEnvSheet` | функція | `src/scripts/core/08-finance.js:426` |
-| `projIncome` | функція | `src/scripts/core/08-finance.js:431` |
-| `projExpense` | функція | `src/scripts/core/08-finance.js:432` |
-| `projNet` | функція | `src/scripts/core/08-finance.js:433` |
-| `projIsLocked` | функція | `src/scripts/core/08-finance.js:434` |
-| `projDaysLeft` | функція | `src/scripts/core/08-finance.js:440` |
-| `projectWidgetHtml` | функція | `src/scripts/core/08-finance.js:445` |
-| `fmtDate` | функція | `src/scripts/core/08-finance.js:521` |
-| `kanbanWidgetHtml` | функція | `src/scripts/core/08-finance.js:525` |
-| `kbwFind` | функція | `src/scripts/core/08-finance.js:539` |
-| `kbwAddCard` | функція | `src/scripts/core/08-finance.js:540` |
-| `kbwCardMenu` | функція | `src/scripts/core/08-finance.js:550` |
-| `kbwColMenu` | функція | `src/scripts/core/08-finance.js:567` |
-| `CTW_COLORS` | масив | `src/scripts/core/08-finance.js:582` |
-| `ctwInit` | функція | `src/scripts/core/08-finance.js:583` |
-| `contactsWidgetHtml` | функція | `src/scripts/core/08-finance.js:588` |
-| `ctwAdd` | функція | `src/scripts/core/08-finance.js:598` |
-| `ctwOpenLink` | функція | `src/scripts/core/08-finance.js:608` |
-| `ctwMenu` | функція | `src/scripts/core/08-finance.js:614` |
-| `clwFmt` | функція | `src/scripts/core/08-finance.js:625` |
-| `caselineWidgetHtml` | функція | `src/scripts/core/08-finance.js:630` |
-| `clwAdd` | функція | `src/scripts/core/08-finance.js:638` |
-| `clwMenu` | функція | `src/scripts/core/08-finance.js:648` |
-| `fstwCountdown` | функція | `src/scripts/core/08-finance.js:657` |
-| `fstwSpent` | функція | `src/scripts/core/08-finance.js:665` |
-| `festivalWidgetHtml` | функція | `src/scripts/core/08-finance.js:666` |
-| `fstwSpend` | функція | `src/scripts/core/08-finance.js:692` |
-| `fstwOpsSheet` | функція | `src/scripts/core/08-finance.js:702` |
-| `fstwSetup` | функція | `src/scripts/core/08-finance.js:710` |
-| `projAddMovement` | функція | `src/scripts/core/08-finance.js:723` |
-| `projAskExpense` | функція | `src/scripts/core/08-finance.js:748` |
-| `projReceiveExpected` | функція | `src/scripts/core/08-finance.js:767` |
-| `projSplitPreset` | функція | `src/scripts/core/08-finance.js:781` |
-| `projDistributeToEnvelope` | функція | `src/scripts/core/08-finance.js:804` |
-| `createEnvelopeFor` | функція | `src/scripts/core/08-finance.js:828` |
-| `pickEnvelopeFor` | функція | `src/scripts/core/08-finance.js:845` |
-| `renderEnvSheet` | функція | `src/scripts/core/08-finance.js:856` |
+| `FX_SYM2CODE` | обʼєкт | `src/scripts/core/08-finance.js:88` |
+| `FX_DEF` | обʼєкт | `src/scripts/core/08-finance.js:89` |
+| `FX_LAST_KEY` | значення | `src/scripts/core/08-finance.js:90` |
+| `finCurCode` | функція | `src/scripts/core/08-finance.js:91` |
+| `finLastRate` | функція | `src/scripts/core/08-finance.js:92` |
+| `finRememberRate` | функція | `src/scripts/core/08-finance.js:98` |
+| `finAskRate` | функція | `src/scripts/core/08-finance.js:103` |
+| `finFx` | функція | `src/scripts/core/08-finance.js:114` |
+| `finOpFx` | функція | `src/scripts/core/08-finance.js:121` |
+| `ensureCards` | функція | `src/scripts/core/08-finance.js:129` |
+| `migRaw` | функція | `src/scripts/core/08-finance.js:158` |
+| `migRates` | функція | `src/scripts/core/08-finance.js:167` |
+| `migCurByCard` | функція | `src/scripts/core/08-finance.js:172` |
+| `walletSumUAH` | функція | `src/scripts/core/08-finance.js:179` |
+| `WALLET_MIG_FLAG` | значення | `src/scripts/core/08-finance.js:199` |
+| `migrateToWallet` | функція | `src/scripts/core/08-finance.js:204` |
+| `recDayOf` | функція | `src/scripts/core/08-finance.js:242` |
+| `recAutoPost` | функція | `src/scripts/core/08-finance.js:243` |
+| `workCardId` | значення | `src/scripts/core/08-finance.js:266` |
+| `workCard` | функція | `src/scripts/core/08-finance.js:267` |
+| `_isRealExpense` | функція | `src/scripts/core/08-finance.js:270` |
+| `_isRealIncome` | функція | `src/scripts/core/08-finance.js:271` |
+| `monthAgg` | функція | `src/scripts/core/08-finance.js:272` |
+| `finTab` | значення | `src/scripts/core/08-finance.js:277` |
+| `finView` | значення | `src/scripts/core/08-finance.js:278` |
+| `finBalance` | функція | `src/scripts/core/08-finance.js:279` |
+| `renderFinance` | функція | `src/scripts/core/08-finance.js:281` |
+| `MON_UA` | масив | `src/scripts/core/08-finance.js:288` |
+| `renderFinDash` | функція | `src/scripts/core/08-finance.js:294` |
+| `bindFinDash` | функція | `src/scripts/core/08-finance.js:344` |
+| `renderEnvScreen` | функція | `src/scripts/core/08-finance.js:372` |
+| `addFinOp` | функція | `src/scripts/core/08-finance.js:416` |
+| `addFinOpCard` | функція | `src/scripts/core/08-finance.js:420` |
+| `newRecurring` | функція | `src/scripts/core/08-finance.js:431` |
+| `newEnvelope` | функція | `src/scripts/core/08-finance.js:447` |
+| `envOpenId` | значення | `src/scripts/core/08-finance.js:465` |
+| `openEnvSheet` | функція | `src/scripts/core/08-finance.js:466` |
+| `closeEnvSheet` | функція | `src/scripts/core/08-finance.js:471` |
+| `projIncome` | функція | `src/scripts/core/08-finance.js:476` |
+| `projExpense` | функція | `src/scripts/core/08-finance.js:477` |
+| `projNet` | функція | `src/scripts/core/08-finance.js:478` |
+| `projIsLocked` | функція | `src/scripts/core/08-finance.js:479` |
+| `projDaysLeft` | функція | `src/scripts/core/08-finance.js:485` |
+| `projectWidgetHtml` | функція | `src/scripts/core/08-finance.js:490` |
+| `fmtDate` | функція | `src/scripts/core/08-finance.js:566` |
+| `kanbanWidgetHtml` | функція | `src/scripts/core/08-finance.js:570` |
+| `kbwFind` | функція | `src/scripts/core/08-finance.js:584` |
+| `kbwAddCard` | функція | `src/scripts/core/08-finance.js:585` |
+| `kbwCardMenu` | функція | `src/scripts/core/08-finance.js:595` |
+| `kbwColMenu` | функція | `src/scripts/core/08-finance.js:612` |
+| `CTW_COLORS` | масив | `src/scripts/core/08-finance.js:627` |
+| `ctwInit` | функція | `src/scripts/core/08-finance.js:628` |
+| `contactsWidgetHtml` | функція | `src/scripts/core/08-finance.js:633` |
+| `ctwAdd` | функція | `src/scripts/core/08-finance.js:643` |
+| `ctwOpenLink` | функція | `src/scripts/core/08-finance.js:653` |
+| `ctwMenu` | функція | `src/scripts/core/08-finance.js:659` |
+| `clwFmt` | функція | `src/scripts/core/08-finance.js:670` |
+| `caselineWidgetHtml` | функція | `src/scripts/core/08-finance.js:675` |
+| `clwAdd` | функція | `src/scripts/core/08-finance.js:683` |
+| `clwMenu` | функція | `src/scripts/core/08-finance.js:693` |
+| `fstwCountdown` | функція | `src/scripts/core/08-finance.js:702` |
+| `fstwSpent` | функція | `src/scripts/core/08-finance.js:710` |
+| `festivalWidgetHtml` | функція | `src/scripts/core/08-finance.js:711` |
+| `fstwSpend` | функція | `src/scripts/core/08-finance.js:737` |
+| `fstwOpsSheet` | функція | `src/scripts/core/08-finance.js:747` |
+| `fstwSetup` | функція | `src/scripts/core/08-finance.js:755` |
+| `projAddMovement` | функція | `src/scripts/core/08-finance.js:768` |
+| `projAskExpense` | функція | `src/scripts/core/08-finance.js:795` |
+| `projReceiveExpected` | функція | `src/scripts/core/08-finance.js:814` |
+| `projSplitPreset` | функція | `src/scripts/core/08-finance.js:830` |
+| `projDistributeToEnvelope` | функція | `src/scripts/core/08-finance.js:858` |
+| `createEnvelopeFor` | функція | `src/scripts/core/08-finance.js:882` |
+| `pickEnvelopeFor` | функція | `src/scripts/core/08-finance.js:899` |
+| `renderEnvSheet` | функція | `src/scripts/core/08-finance.js:910` |
 
 ### `src/scripts/core/09-goals.js` — 25 сутностей
 
@@ -1251,13 +1260,13 @@
 | `debtDel` | функція | `src/scripts/core/18-debts.js:66` |
 | `debtRender` | функція | `src/scripts/core/18-debts.js:68` |
 | `toggleDebtSync` | функція | `src/scripts/core/18-debts.js:107` |
-| `curId` | значення | `src/scripts/core/18-debts.js:132` |
-| `openModal` | функція | `src/scripts/core/18-debts.js:133` |
-| `closeModal` | функція | `src/scripts/core/18-debts.js:136` |
-| `renderModal` | функція | `src/scripts/core/18-debts.js:139` |
-| `askOp` | функція | `src/scripts/core/18-debts.js:168` |
-| `commitOp` | функція | `src/scripts/core/18-debts.js:177` |
-| `delOp` | функція | `src/scripts/core/18-debts.js:186` |
+| `curId` | значення | `src/scripts/core/18-debts.js:137` |
+| `openModal` | функція | `src/scripts/core/18-debts.js:138` |
+| `closeModal` | функція | `src/scripts/core/18-debts.js:141` |
+| `renderModal` | функція | `src/scripts/core/18-debts.js:144` |
+| `askOp` | функція | `src/scripts/core/18-debts.js:173` |
+| `commitOp` | функція | `src/scripts/core/18-debts.js:182` |
+| `delOp` | функція | `src/scripts/core/18-debts.js:191` |
 
 ### `src/scripts/core/19-spending.js` — 14 сутностей
 
@@ -1278,7 +1287,7 @@
 | `exportSpend` | функція | `src/scripts/core/19-spending.js:126` |
 | `clearSpend` | функція | `src/scripts/core/19-spending.js:135` |
 
-### `src/scripts/core/20-work.js` — 50 сутностей
+### `src/scripts/core/20-work.js` — 51 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1322,16 +1331,17 @@
 | `delExtra` | функція | `src/scripts/core/20-work.js:226` |
 | `renderExtras` | функція | `src/scripts/core/20-work.js:227` |
 | `syncSalaryToFin` | функція | `src/scripts/core/20-work.js:246` |
-| `transferPlannedToEnvelopes` | функція | `src/scripts/core/20-work.js:267` |
-| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:284` |
-| `openAllocModal` | функція | `src/scripts/core/20-work.js:288` |
-| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:311` |
-| `allocSave` | функція | `src/scripts/core/20-work.js:322` |
-| `renderWork` | функція | `src/scripts/core/20-work.js:339` |
-| `workShiftMonth` | функція | `src/scripts/core/20-work.js:443` |
-| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:450` |
-| `delWork` | функція | `src/scripts/core/20-work.js:464` |
-| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:474` |
+| `transferPlannedToEnvelopes` | функція | `src/scripts/core/20-work.js:281` |
+| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:298` |
+| `openAllocModal` | функція | `src/scripts/core/20-work.js:302` |
+| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:325` |
+| `allocSave` | функція | `src/scripts/core/20-work.js:336` |
+| `renderWork` | функція | `src/scripts/core/20-work.js:353` |
+| `workShiftMonth` | функція | `src/scripts/core/20-work.js:456` |
+| `pushWorkBatch` | функція | `src/scripts/core/20-work.js:464` |
+| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:477` |
+| `delWork` | функція | `src/scripts/core/20-work.js:495` |
+| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:505` |
 
 ### `src/scripts/core/21-patterns.js` — 21 сутностей
 

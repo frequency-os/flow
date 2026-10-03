@@ -249,15 +249,29 @@
     if(workPostedSal[ymKey]==='deleted') return;
     const dim=new Date(year,month,0).getDate();
     const txDate=`${year}-${String(month).padStart(2,'0')}-${String(Math.min(pday,dim)).padStart(2,'0')}`;
-    const label='Зарплата · '+WK_MONTHS[month-1]+' '+year;
+    // Зарплата пишеться сама, без людини, — курс не питаємо. Раз записаний
+    // курс живе в самій операції (op._fx їде в хмару разом з fin_ops), тож
+    // пристрої рахують однаково і не перебивають одне одного. Перерахунок —
+    // лише коли змінилась зароблена сума чи валюта Роботи.
+    const code=finCurCode(workCur);
     let op=finOps.find(o=>o._autoSal===true && o._salYM===ymKey);
+    const frozen=(op&&op._fx&&op._fx.cur===code&&+op._fx.rate>0)?+op._fx.rate:0;
+    const fx=finFx(amount, code, code==='UAH'?1:(frozen||finLastRate(code)));
+    const label='Зарплата · '+WK_MONTHS[month-1]+' '+year+fx.tail;
+    const autoSave=fn=>{ if(window.storeAuto) window.storeAuto(fn); else fn(); };
     if(op){
-      if(op.amount!==amount || op.date!==txDate){ op.amount=amount; op.date=txDate; op.label=label; saveFinOps(); }
+      const fxSame=JSON.stringify(op._fx||null)===JSON.stringify(fx.fx);
+      if(op.amount!==fx.amount || op.date!==txDate || !fxSame){   // підпис сам по собі не чіпаємо
+        op.amount=fx.amount; op.date=txDate; op.label=label;
+        if(fx.fx) op._fx=fx.fx; else delete op._fx;
+        autoSave(()=>saveFinOps());
+      }
       return;
     }
     let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
-    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc };
-    finOps.push(op); workPostedSal[ymKey]='posted'; saveFinOps(); saveWork();
+    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc };
+    if(fx.fx) op._fx=fx.fx;
+    finOps.push(op); workPostedSal[ymKey]='posted'; autoSave(()=>{ saveFinOps(); saveWork(); });
     // коли зарплата прийшла — перелити заплановане у конверти
     transferPlannedToEnvelopes(ymKey);
     try{ renderFinance(); }catch(_){}
@@ -404,7 +418,7 @@
     // bind
     log.querySelectorAll('[data-wkdel]').forEach(b=>b.onclick=()=>delWork(b.dataset.wkdel));
     log.querySelectorAll('[data-wkpush]').forEach(b=>b.onclick=()=>pushWorkToFin(b.dataset.wkpush));
-    const pa=document.getElementById('wkPushAll'); if(pa) pa.onclick=()=>{ unpushed.forEach(w=>pushWorkToFin(w.id,true)); saveWork(); renderWork(); try{renderFinance();}catch(_){} };
+    const pa=document.getElementById('wkPushAll'); if(pa) pa.onclick=()=>pushWorkBatch(unpushed);
   }
 
   document.getElementById('wkAdd').onclick=()=>{
@@ -437,8 +451,7 @@
   { const el=document.getElementById('wkToFin'); if(el) el.onclick=()=>{
       const unp=workSessions.filter(w=>!w.pushed && String(w.date).slice(0,7)===workMonth);
       if(!unp.length){ flowAlert('Усі зміни цього місяця вже у фінансах (або їх немає).'); return; }
-      unp.forEach(w=>pushWorkToFin(w.id,true)); saveWork(); renderWork(); try{renderFinance();}catch(_){}
-      window.platform.haptic('success');
+      pushWorkBatch(unp);
     }; }
   function workShiftMonth(dir){
     workMonth=ymOffset(workMonth,dir);
@@ -447,13 +460,31 @@
   { const p=document.getElementById('wkCalPrev'); if(p) p.onclick=()=>workShiftMonth(-1); }
   { const n=document.getElementById('wkCalNext'); if(n) n.onclick=()=>workShiftMonth(1); }
 
-  function pushWorkToFin(id, batch){
+  // пачка змін: курс кожної чужої валюти питаємо ОДИН раз, а не на кожну зміну
+  function pushWorkBatch(list){
+    const need=[...new Set(list.map(w=>finCurCode(w.cur)).filter(c=>c!=='UAH'))];
+    const rates={};
+    const next=()=>{
+      const c=need.shift();
+      if(c){ finAskRate(c, r=>{ rates[c]=r; next(); }); return; }
+      list.forEach(w=>pushWorkToFin(w.id,true,rates));
+      saveWork(); renderWork(); try{renderFinance();}catch(_){}
+      try{ window.platform.haptic('success'); }catch(_){}
+    };
+    next();
+  }
+  // rates — {EUR:48.6,…}: курс, уже спитаний для пачки змін; без нього питаємо самі
+  function pushWorkToFin(id, batch, rates){
     const w=workSessions.find(x=>String(x.id)===String(id));
     if(!w || w.pushed) return;
-    const sym=CUR[w.cur]||w.cur;
+    const code=finCurCode(w.cur);
+    if(code!=='UAH' && !(rates&&rates[code]>0)){
+      finAskRate(code, r=>pushWorkToFin(id, batch, Object.assign({}, rates, {[code]:r})));
+      return;
+    }
     const opId=Date.now()+'_'+Math.random().toString(36).slice(2,6);
-    const lbl='Робота · '+fmt(w.hours)+' год'+(w.cur!=='UAH'?(' ('+fmt(w.amount)+' '+sym+')'):'')+(w.note?' · '+w.note:'');
-    finOps.push({ id:opId, type:'in', amount:w.amount, label:lbl, date:w.date, card:WALLET_ID });
+    const lbl='Робота · '+fmt(w.hours)+' год'+(w.note?' · '+w.note:'');
+    finOps.push(finOpFx({ id:opId, type:'in', label:lbl, date:w.date, card:WALLET_ID }, w.amount, code, code==='UAH'?1:rates[code]));
     w.pushed=true; w.opId=opId;
     saveFinOps(); saveWork();
     if(!batch){ renderWork(); try{ renderFinance(); }catch(_){} 

@@ -79,6 +79,51 @@
   function cardBalance(){ return walletBalance(); }
   function incomeSummary(){ try{ return fmt(walletBalance())+' ₴'; }catch(_){ return '—'; } }
   function _projCardId(){ return WALLET_ID; }
+
+  /* ==== Чужа валюта → гривні Гаманця ====
+     Гаманець один і в гривні, а проєкт, зміна на Роботі чи борг можуть бути
+     в €/$/zł. Раніше в Гаманець ішла та сама цифра: 500 € ставали +500 ₴.
+     Тепер питаємо курс (підставляємо останній) і пишемо гривні, а слід
+     лишаємо в op._fx і в підписі — так само, як при міграції на гаманець. */
+  const FX_SYM2CODE={'₴':'UAH','грн':'UAH','€':'EUR','$':'USD','zł':'PLN'};
+  const FX_DEF={EUR:48.6,USD:41.6,PLN:11.4};
+  const FX_LAST_KEY='flowapp___fx_last';   // лише підказка на цьому пристрої, не дані
+  function finCurCode(c){ c=String(c==null?'':c).trim(); if(!c) return 'UAH'; return FX_SYM2CODE[c]||c.toUpperCase(); }
+  function finLastRate(code){
+    try{ const o=JSON.parse(localStorage.getItem(FX_LAST_KEY)||'{}'); if(+o[code]>0) return +o[code]; }catch(_){}
+    // далі — курси людини з fx_cfg (вони синкаються), і лише потім вшиті
+    try{ const r=migRates()[code]; if(+r>0) return +r; }catch(_){}
+    return FX_DEF[code]||0;
+  }
+  function finRememberRate(code,r){
+    try{ const o=JSON.parse(localStorage.getItem(FX_LAST_KEY)||'{}'); o[code]=r; localStorage.setItem(FX_LAST_KEY,JSON.stringify(o)); }catch(_){}
+  }
+  // cb(rate): для гривні одразу 1; для іншої валюти — питаємо курс.
+  // Скасував або ввів не число — cb не кличемо, нічого не записується.
+  function finAskRate(cur, cb){
+    const code=finCurCode(cur);
+    if(code==='UAH'){ cb(1); return; }
+    const sym=(typeof CUR!=='undefined'&&CUR[code])||code;
+    inputModal({title:'Курс: 1 '+sym+' = скільки ₴?', value:String(finLastRate(code)||''), placeholder:'Напр. 48.6', onOk:v=>{
+      const r=parseFloat(String(v||'').replace(',','.').replace(/[^\d.]/g,''));
+      if(!(r>0)){ flowAlert('Курс має бути числом, більшим за нуль. Нічого не записано.'); return; }
+      finRememberRate(code,r); cb(r);
+    }});
+  }
+  // сума у валюті cur → поля операції Гаманця: {amount у ₴, fx-слід, хвіст підпису}
+  function finFx(amount, cur, rate){
+    const code=finCurCode(cur), a=+amount||0;
+    if(code==='UAH' || !(rate>0)) return {amount:a, fx:null, tail:''};
+    const sym=(typeof CUR!=='undefined'&&CUR[code])||code;
+    return {amount:Math.round(a*rate*100)/100, fx:{cur:code, rate, was:a}, tail:' · '+fmt(a)+' '+sym+' × '+rate};
+  }
+  // готова операція Гаманця з урахуванням валюти
+  function finOpFx(base, amount, cur, rate){
+    const x=finFx(amount, cur, rate), op=Object.assign({}, base, {amount:x.amount});
+    op.label=(base.label||'Операція')+x.tail;
+    if(x.fx) op._fx=x.fx;
+    return op;
+  }
   // opts.memOnly — лише в памʼяті: так кличе load(), поки дані сесії не підтверджені
   // (хмара мовчить) — заводський гаманець не має лягти в сховище поверх справжнього
   function ensureCards(opts){
@@ -727,10 +772,12 @@
       inputModal({title:'Дохід проєкту — за що?', placeholder:'Напр. аванс', onOk:(label)=>{
         inputModal({title:'Сума доходу ('+cur+')', placeholder:'Напр. 300', onOk:(v)=>{
           const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
-          const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-          (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:n,label:label||'Дохід',date:today,src:'отримано',finOpId:finId});
-          finOps.push({id:finId,type:'in',amount:n,label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,card:_projCardId()});
-          saveBoard(); saveFinOps(); renderBoard();
+          finAskRate(cur, rate=>{
+            const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
+            (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:n,label:label||'Дохід',date:today,src:'отримано',finOpId:finId});
+            finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,card:_projCardId()}, n, cur, rate));
+            saveBoard(); saveFinOps(); renderBoard();
+          });
         }});
       }});
     } else {
@@ -752,14 +799,14 @@
       inputModal({title:'Сума витрати ('+cur+')', placeholder:'Напр. 180', onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
         const op={id:'pop_'+Date.now(),t:'out',amount:n,label:label||'Витрата',date:today,src:src==='balance'?'з балансу':'з доходу проєкту'};
-        if(src==='balance'){
+        if(src!=='balance'){ (b.ops=b.ops||[]).push(op); saveBoard(); renderBoard(); return; }
+        finAskRate(cur, rate=>{
           const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
           op.finOpId=finId;
-          finOps.push({id:finId,type:'out',amount:n,label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,card:_projCardId()});
-          saveFinOps();
-        }
-        (b.ops=b.ops||[]).push(op);
-        saveBoard(); renderBoard();
+          finOps.push(finOpFx({id:finId,type:'out',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,card:_projCardId()}, n, cur, rate));
+          (b.ops=b.ops||[]).push(op);
+          saveFinOps(); saveBoard(); renderBoard();
+        });
       }});
     }});
   }
@@ -769,11 +816,13 @@
     const amt=+b.expected||0;
     if(!(amt>0)){ b.unlocked=true; saveBoard(); renderBoard(); return; }
     const today=ymdLocal();
-    const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-    (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:amt,label:'Оплата проєкту',date:today,src:'отримано',finOpId:finId});
-    finOps.push({id:finId,type:'in',amount:amt,label:'Проєкт: '+(b.title||'')+' · оплата',date:today,proj:b.id,card:_projCardId()});
-    b.expected=0; b.unlocked=true;
-    saveBoard(); saveFinOps(); renderBoard();
+    finAskRate(cur, rate=>{
+      const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
+      (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:amt,label:'Оплата проєкту',date:today,src:'отримано',finOpId:finId});
+      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · оплата',date:today,proj:b.id,card:_projCardId()}, amt, cur, rate));
+      b.expected=0; b.unlocked=true;
+      saveBoard(); saveFinOps(); renderBoard();
+    });
   }
   // ⚡ АВТО-РОЗПОДІЛ: прийняти фіксовану оплату і одним тапом розкидати по конвертах за правилом.
   // Вмикається, якщо у блока є b.splitPreset = { amount, cur, rules:[{envId, pct}] }.
@@ -782,22 +831,27 @@
     const ps=b.splitPreset; if(!ps||!(+ps.amount>0)){ return projAddMovement(b,'in'); }
     const amt=+ps.amount, cur=ps.cur||b.cur||'€', today=ymdLocal();
     const rules=Array.isArray(ps.rules)?ps.rules.filter(r=>r&&r.envId&&+r.pct>0):[];
-    // 1) дохід у проєкт + finOps
-    const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-    (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:amt,label:(ps.label||'Оплата клієнта'),date:today,src:'отримано',finOpId:finId});
-    finOps.push({id:finId,type:'in',amount:amt,label:'Проєкт: '+(b.title||'')+' · '+(ps.label||'оплата'),date:today,proj:b.id,card:_projCardId()});
-    // 2) авто-переклад у кожен конверт (envAddOp сам дзеркалить у finOps як резерв)
-    let moved=0; const parts=[];
-    rules.forEach(r=>{
-      const e=envelopes.find(x=>String(x.id)===String(r.envId)); if(!e) return;
-      const sum=Math.round(amt*(+r.pct)*100)/100; if(!(sum>0)) return;
-      envAddOp(e,'in',sum,'Авто з «'+(b.title||'проєкт')+'»',_projCardId());
-      moved+=sum; parts.push(sum+' '+cur+' → '+(e.emoji||'✉️')+' '+e.name);
+    finAskRate(cur, rate=>{
+      // 1) дохід у проєкт + finOps (у Гаманець — гривні за курсом)
+      const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
+      (b.ops=b.ops||[]).push({id:'pop_'+Date.now(),t:'in',amount:amt,label:(ps.label||'Оплата клієнта'),date:today,src:'отримано',finOpId:finId});
+      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · '+(ps.label||'оплата'),date:today,proj:b.id,card:_projCardId()}, amt, cur, rate));
+      // 2) авто-переклад у кожен конверт (envAddOp сам дзеркалить у finOps як резерв).
+      //    Конверти в гривні — частку рахуємо від суми, вже переведеної в ₴.
+      const amtUAH=finFx(amt, cur, rate).amount;
+      let moved=0; const parts=[];
+      rules.forEach(r=>{
+        const e=envelopes.find(x=>String(x.id)===String(r.envId)); if(!e) return;
+        const sum=Math.round(amtUAH*(+r.pct)*100)/100; if(!(sum>0)) return;
+        envAddOp(e,'in',sum,'Авто з «'+(b.title||'проєкт')+'»',_projCardId());
+        moved+=sum; parts.push(fmt(sum)+' ₴ → '+(e.emoji||'✉️')+' '+e.name);
+      });
+      saveBoard(); saveFinOps(); renderBoard();
+      const rest=Math.round((amtUAH-moved)*100)/100;
+      const head='💶 +'+amt+' '+cur+(amtUAH!==amt?' = '+fmt(amtUAH)+' ₴':'');
+      try{ flowAlert(head+'\n'+(parts.length?parts.join('\n')+'\n':'')+'Лишилось у прибутку: '+fmt(rest)+' ₴'); }catch(_){}
+      try{ window.platform.haptic('success'); }catch(_){}
     });
-    saveBoard(); saveFinOps(); renderBoard();
-    const rest=Math.round((amt-moved)*100)/100;
-    try{ flowAlert('💶 +'+amt+' '+cur+'\n'+(parts.length?parts.join('\n')+'\n':'')+'Лишилось у прибутку: '+rest+' '+cur); }catch(_){}
-    try{ window.platform.haptic('success'); }catch(_){}
   }
 
   // розподілити прибуток проєкту в конверт (поповнити накопичення)
