@@ -92,6 +92,7 @@ cd ~/frequency && ./tools/check.sh
 | `25-reader.js` | читалка книг (TXT/MD/EPUB/PDF) |
 | `26-blocks-render.js` · `27-canvas.js` | рендер блоків, полотно |
 | `28-vision.js` · `29-more-screen.js` | «Візія», екран «Ще» |
+| `38-world.js` | «Мій світ»: гра «Місто дня» (`src/web/misto.html`) у рамці, міст до Гаманця лише для читання (dev) |
 
 ---
 
