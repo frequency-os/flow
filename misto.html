@@ -112,6 +112,9 @@
  .embed #side{grid-column:2}
  .embed .fab{right:420px;bottom:22px}
 }
+
+/* ── «назад» у вбудованому режимі ── */
+.hback{display:flex;align-items:center;gap:4px;height:44px;padding:0 12px 0 8px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:inherit;font-weight:800;font-size:13.5px;flex:none}
 </style>
 <script>window.MISTO_SITE=1;document.documentElement.classList.add('site');
 /* Гра як вкладка «Мій світ» у Frequency: навігацію дає сам Frequency, тут ховаємо свою. */
@@ -736,12 +739,18 @@ var TAB='city';
 function renderHud(){
  var L=lvl(S.xp), me=power().maxE, p=S.player;
  function rc(i,l,v,mx,c,suf){ var low=v/mx<.3; return '<div class="rc"><div class="rc-h">'+ic(i,c,12,2.3)+l+'</div><div class="rc-v num" style="'+(low?'color:#f87171':'')+'">'+Math.round(v)+'<small>'+suf+'</small></div><div class="bar"><i style="width:'+clamp(v/mx*100,0,100)+'%;background:'+c+'"></i></div></div>'; }
- $('hud').innerHTML='<div class="hud-top"><a class="backf" href="./" aria-label="Назад у Frequency">'+ic('back',null,18,2.4)+'<img src="icon-192.png" alt=""><span>Frequency</span></a><button class="ava" data-act="drw" aria-label="Панель гри: день і пріоритети">'+ring(L.into/L.need,48,'#7c93ff')+'<i style="background-image:url('+chImg()+')"></i><b class="num">'+L.lv+'</b></button>'+
+ $('hud').innerHTML='<div class="hud-top"><a class="backf" href="./" aria-label="Назад у Frequency">'+ic('back',null,18,2.4)+'<img src="icon-192.png" alt=""><span>Frequency</span></a>'+backBtn()+'<button class="ava" data-act="drw" aria-label="Панель гри: день і пріоритети">'+ring(L.into/L.need,48,'#7c93ff')+'<i style="background-image:url('+chImg()+')"></i><b class="num">'+L.lv+'</b></button>'+
   '<div class="hud-meta"><b>'+esc(p.name)+' · '+esc(clsOf(p.cls).n)+'</b><span class="num">Місяць '+monthIdx()+' з 12 · день '+dayIdx()+'</span></div>'+
   '<span class="coins num">'+ic('coin','#fbbf24',16)+S.coins+'</span></div>'+
   '<div class="res">'+rc('energy','Енергія',S.res.energy,me,'#facc15','/'+me)+rc('food','Ситість',S.res.food,100,'#fb923c','/100')+
   walletCard()+'</div>';
 }
+/* Усередині Frequency своєї нижньої панелі нема — тож з будь-якого екрана, крім карти, є «назад».
+   Підекрани ведуть на крок угору (профіль друга → Друзі), решта — на карту. */
+var TPARENT={friend:'friends',visit:'friends',settings:'me',avatar:'me',goals:'me',path:'me',skills:'me',workout:'gym'};
+var TNAME={friends:'Друзі',me:'Я',gym:'Зал',city:'Місто'};
+function backBtn(){ if(!window.MISTO_EMBED||TAB==='city') return ''; var p=TPARENT[TAB]||'city';
+ return '<button class="hback" data-go="'+p+'" aria-label="Назад: '+TNAME[p]+'">'+ic('back',null,18,2.4)+'<span>'+TNAME[p]+'</span></button>'; }
 function clsOf(k){ return CLASSES.filter(function(c){return c.k===k;})[0]||CLASSES[0]; }
 function renderNav(){
  function t(k,l,i){ return '<button class="nv'+(TAB===k||(k==='city'&&/^(room|pc|gym|workout)$/.test(TAB))||(k==='me'&&/^(settings|avatar|goals|path|skills)$/.test(TAB))||(k==='friends'&&/^(friend|visit)$/.test(TAB))?' on':'')+'" data-go="'+k+'">'+ic(i,null,22)+l+'</button>'; }
@@ -1677,6 +1686,7 @@ MQ.addEventListener&&MQ.addEventListener('change',function(){ if(S) render(); })
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('drw').classList.contains('on')) closeDrw(); });
 $('fab').innerHTML=ic('plus','#0c1022',26,2.6);
 // Frequency кличе при поверненні у «Мій світ»: Гаманець міг змінитись
+window.mistoHome=function(){ closeSheet(); closeDrw(); closeHM&&closeHM(); TAB='city'; render(); var v=$('view'); if(v) v.scrollTop=0; };
 window.mistoRefresh=function(){ if(S&&!$('onb').classList.contains('on')) render(); };
 S=load();
 if(S){ tickDay(); render(); }
