@@ -142,21 +142,24 @@
       const bm=document.getElementById('brandMark');
       if(bm){ bm.classList.remove('lg-play'); void bm.offsetWidth; bm.classList.add('lg-play'); } }
     if(id==='scr-finance'){ const nf=document.getElementById('navFinance'); if(nf) nf.classList.add('on'); }
+    if(id==='scr-world'){ const nw=document.getElementById('navWorld'); if(nw) nw.classList.add('on'); }
     if(id==='scr-goals'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
     if(id==='scr-planner'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
     if(id==='scr-more'||id==='scr-projects'||id==='scr-work'){ const nmr=document.getElementById('navMore'); if(nmr) nmr.classList.add('on'); }
     // синхронізація десктопного сайдбару
     const dmap={'scr-home':'home','scr-goals':'planner','scr-projects':'projects',
-                'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home'};
+                'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home','scr-world':'world'};
     const dkey=dmap[id]||'home';
     document.querySelectorAll('.dsb-i').forEach(b=>b.classList.toggle('on', b.dataset.dnav===dkey));
     document.body.classList.toggle('in-home', id==='scr-home');
     document.body.classList.toggle('in-reader', id==='scr-reader');
     // Канал папки: ховає нижню панель і котика (18-channel.css)
     document.body.classList.toggle('in-channel', id==='scr-channel');
+    // «Мій світ» — гра на весь екран над нижньою панеллю (20-world.css)
+    document.body.classList.toggle('in-world', id==='scr-world');
     if(id==='scr-reader'){ try{ initReader(); applyRdrCfg(); }catch(_){} }
     if(id==='scr-nyc'){ try{ if(window.__nycRefresh) window.__nycRefresh(); }catch(_){} }
-    if(id==='scr-home'){ try{ renderRightRail(); }catch(_){} }
+    if(id==='scr-home'){ try{ renderRightRail(); }catch(_){} try{ if(window.worldMoneyChip) window.worldMoneyChip(); }catch(_){} }
     // ВАЖЛИВО: <html> має overflow:hidden, а <body> — position:fixed зі своїм
     // overflow-y:auto. Тобто реальний скрол — на body, а не на window/html.
     // window.scrollTo() тут ЗАВЖДИ був no-op — ось чому попередні спроби

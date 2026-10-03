@@ -35,8 +35,87 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 :root{padding-top:env(safe-area-inset-top,0px)}
+
+/* ── золота карта: квадрат, пересувається ── */
+.stage-wrap.gold{background:#2a2118;justify-content:flex-start;cursor:grab;overscroll-behavior:contain}
+.stage-wrap.gold.drag{cursor:grabbing;user-select:none}
+.stage.city-g{aspect-ratio:1/1;width:calc(170% * var(--z,1));margin:0 auto}
+@media (max-width: 979px){ .stage-wrap.gold{padding:calc(150px + env(safe-area-inset-top,0px)) 0 190px} }
+@media (min-width: 980px){ .stage-wrap.gold{align-items:flex-start;justify-content:flex-start} .stage.city-g{width:calc(max(100%, 1100px) * var(--z,1));border-radius:22px;box-shadow:var(--shadow)} .stage-wrap.gold .lstrip{width:100%} }
+.stage.city-g .fog{background:radial-gradient(ellipse 70% 60% at 50% 50%,transparent 60%,rgba(60,38,14,.25) 82%,rgba(40,26,10,.55) 100%)}
+.stage.city-g .holo{width:12%}
+.bld{position:absolute;width:19%;transform:translate(-50%,-58%);pointer-events:none;z-index:1;filter:drop-shadow(0 10px 14px rgba(40,24,6,.45))}
+.plot{position:absolute;transform:translate(-50%,-50%);z-index:2;display:flex;align-items:center;gap:6px;min-height:44px;padding:6px 14px 6px 6px;border-radius:99px;border:1.5px dashed rgba(255,236,200,.9);background:rgba(40,28,14,.72);backdrop-filter:blur(6px);color:#fff3dc;font-size:13px;font-weight:800;box-shadow:0 8px 18px rgba(30,18,4,.4)}
+.plot svg{width:32px;height:32px;padding:7px;border-radius:50%;background:#fbbf24;box-sizing:border-box}
+.plot.lock{border-style:solid;border-color:rgba(255,236,200,.35);color:#e9d9b8;padding:6px 12px;opacity:.85}
+.plot.lock svg{width:auto;height:auto;padding:0;background:none}
+.libg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.libc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px 8px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-size:11.5px;font-weight:800;color:var(--muted);min-height:44px}
+.libc img{width:100%;max-width:84px;aspect-ratio:1;object-fit:contain}
+.libc.on{border-color:var(--accent);background:rgba(124,147,255,.12);color:var(--text,#e8ebef)}
+
+/* ── кнопка назад у Frequency (сайт, не вбудовано) ── */
+@media (max-width: 420px){ .backf span{display:none} }
+.onb-back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px;margin:calc(4px + env(safe-area-inset-top,0px)) 0 4px;color:var(--muted);font-weight:800;font-size:14px;text-decoration:none}
+/* ── гаманець у HUD ── */
+.rc-w{text-align:left;border:1px solid rgba(74,222,128,.28);color:inherit;font:inherit}
+.rc-w .rc-h svg:last-child{margin-left:auto}
+/* ── панель Б ── */
+.drw-s{position:fixed;inset:0;z-index:40;background:rgba(6,8,11,.55);opacity:0;pointer-events:none;transition:opacity .2s}
+.drw-s.on{opacity:1;pointer-events:auto}
+.drw{position:fixed;left:0;top:0;bottom:0;z-index:41;width:min(88vw,380px);overflow-y:auto;overscroll-behavior:contain;background:var(--surface);border-right:1px solid var(--line-2);box-shadow:20px 0 40px rgba(0,0,0,.45);padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-104%);transition:transform .25s cubic-bezier(.2,.8,.2,1);visibility:hidden}
+.drw.on{transform:none;visibility:visible}
+.drw-h{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.drw-h .g{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
+.drw-h .g b{font-size:16px}
+.drw-h .g span{font-size:12px;color:var(--muted);font-weight:700}
+.ava.sm{width:44px;height:44px;display:block}
+.drw-h .pr-x svg{transform:rotate(45deg)}
+.wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.dwd{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px;padding:6px 0;border-radius:14px;border:1px solid transparent;background:var(--surface-2);color:var(--muted);font-size:11px;font-weight:800}
+.dwd b{font-size:16px;color:var(--text,#e8ebef)}
+.dwd i{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.dwd.t{border-color:var(--line-2)}
+.dwd.on{background:var(--accent);color:var(--accent-ink)}
+.dwd.on b{color:var(--accent-ink)}
+.dwd.on i{background:var(--accent-ink)}
+.dpr{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 10px;border-radius:14px;background:var(--surface-2);min-height:52px}
+.dpr .g{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.dpr .g b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dpr .g span{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);font-weight:700}
+.dpr.done .g b{text-decoration:line-through;color:var(--muted)}
+.pr-c{width:28px;height:28px;flex:none;border-radius:9px;border:2px solid var(--line-2);background:none;display:flex;align-items:center;justify-content:center;position:relative}
+.pr-c:before{content:"";position:absolute;inset:-8px}
+.dpr.done .pr-c{background:#4ade80;border-color:#4ade80}
+.pr-n{font-size:12px;font-weight:800;color:var(--accent)}
+.pr-x{width:44px;height:44px;flex:none;border:0;border-radius:12px;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.pr-add{display:flex;gap:6px;margin-top:8px}
+.pr-add input{flex:1;min-width:0;height:44px;border-radius:12px;border:1px solid var(--line);background:#11151b;padding:0 12px;font-weight:700;font-size:16px;color:inherit}
+.pr-add select{width:96px;height:44px;border-radius:12px;border:1px solid var(--line);background:#11151b;padding:0 6px;font-weight:700;font-size:16px;color:inherit}
+.dmg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.dm{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 2px;min-height:44px;border-radius:14px;border:0;background:var(--surface-2);font-size:11.5px;font-weight:800;color:inherit}
+.dm .ico{width:36px;height:36px;border-radius:11px}
+.fab{display:none}
+/* ── вбудовано у Frequency: своя нижня панель прихована, нижче лише плаваюча «+» ── */
+.embed #nav{display:none}
+.embed .fab{display:flex;position:fixed;right:14px;bottom:14px;z-index:9;width:56px;height:56px;border-radius:18px;border:0;background:var(--accent);align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 20px rgba(124,147,255,.4)}
+@media (max-width: 979px){
+ .embed .float-card{bottom:14px;right:82px}
+ .embed .zbar,.embed .zpm{bottom:122px}
+ .embed .ftog{bottom:186px}
+ .embed .stage-wrap,.embed .stage-wrap.gold{padding-bottom:130px}
+ .embed .page{padding-bottom:90px}
+}
+@media (min-width: 980px){
+ .embed #app{grid-template-columns:minmax(0,1fr) 400px}
+ .embed #main{grid-column:1}
+ .embed #side{grid-column:2}
+ .embed .fab{right:420px;bottom:22px}
+}
 </style>
-<script>window.MISTO_SITE=1;document.documentElement.classList.add('site');</script>
+<script>window.MISTO_SITE=1;document.documentElement.classList.add('site');
+/* Гра як вкладка «Мій світ» у Frequency: навігацію дає сам Frequency, тут ховаємо свою. */
+try{ if(/[?&]embed=1\b/.test(location.search)&&window.parent!==window&&window.parent.location.origin===location.origin){ window.MISTO_EMBED=1; document.documentElement.classList.add('embed'); } }catch(_){}</script>
 <script src="misto-assets.js"></script>
 </head>
 <body>
@@ -501,9 +580,9 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 .ms-b b{font-size:14px}
 .ms.fut{opacity:.6}
 
-.backf{display:none;width:44px;height:44px;border-radius:14px;background:var(--surface);border:1px solid var(--line);align-items:center;justify-content:center;flex:none;overflow:hidden}
-.backf img{width:30px;height:30px;border-radius:8px}
-.site .backf{display:flex}
+.backf{display:none;height:44px;padding:0 12px 0 8px;gap:6px;border-radius:14px;background:var(--surface);border:1px solid var(--line);align-items:center;justify-content:center;flex:none;overflow:hidden;font-size:13px;font-weight:800;color:var(--text,#e8ebef);text-decoration:none}
+.backf img{width:22px;height:22px;border-radius:6px}
+.site:not(.embed) .backf{display:flex}
 </style>
 
 <div id="app">
@@ -517,11 +596,14 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
 <div class="hm" id="hm" role="menu" aria-label="Меню персонажа"></div>
 <div class="onb" id="onb"></div>
+<div class="drw-s" id="drwS"></div>
+<aside class="drw" id="drw" role="dialog" aria-modal="true" aria-label="Панель гри"></aside>
+<button class="fab" id="fab" data-act="quick" aria-label="Записати дію"></button>
 
 <script>
 (function(){
 'use strict';
-var IMG={cityM:MISTO_A.__CITY_M__,cityD:MISTO_A.__CITY_D__,room:MISTO_A.__ROOM__,ch:[MISTO_A.__CH1__,MISTO_A.__CH2__,MISTO_A.__CH3__,MISTO_A.__CH4__],streetM:MISTO_A.__STREET_M__,streetD:MISTO_A.__STREET_D__,desk:MISTO_A.__DESK__,gym:MISTO_A.__GYM__,holo:{car:MISTO_A.__H_CAR__,plane:MISTO_A.__H_PLANE__,tower:MISTO_A.__H_TOWER__},ex:[MISTO_A.__EX1__,MISTO_A.__EX2__,MISTO_A.__EX3__,MISTO_A.__EX4__],fit:[[MISTO_A.__O1B__,MISTO_A.__O1S__,MISTO_A.__O1P__],[MISTO_A.__O2B__,MISTO_A.__O2S__,MISTO_A.__O2P__],[MISTO_A.__O3B__,MISTO_A.__O3S__,MISTO_A.__O3P__],[MISTO_A.__O4B__,MISTO_A.__O4S__,MISTO_A.__O4P__]],froom:MISTO_A.__FROOM__};
+var IMG={gold:MISTO_A.__MAP_GOLD__,bld:{cafe:MISTO_A.__B_CAFE__,school:MISTO_A.__B_SCHOOL__,site:MISTO_A.__B_SITE__,garage:MISTO_A.__B_GARAGE__,studio:MISTO_A.__B_STUDIO__,clinic:MISTO_A.__B_CLINIC__,park:MISTO_A.__B_PARK__,bank:MISTO_A.__B_BANK__},room:MISTO_A.__ROOM__,ch:[MISTO_A.__CH1__,MISTO_A.__CH2__,MISTO_A.__CH3__,MISTO_A.__CH4__],streetM:MISTO_A.__STREET_M__,streetD:MISTO_A.__STREET_D__,desk:MISTO_A.__DESK__,gym:MISTO_A.__GYM__,holo:{car:MISTO_A.__H_CAR__,plane:MISTO_A.__H_PLANE__,tower:MISTO_A.__H_TOWER__},ex:[MISTO_A.__EX1__,MISTO_A.__EX2__,MISTO_A.__EX3__,MISTO_A.__EX4__],fit:[[MISTO_A.__O1B__,MISTO_A.__O1S__,MISTO_A.__O1P__],[MISTO_A.__O2B__,MISTO_A.__O2S__,MISTO_A.__O2P__],[MISTO_A.__O3B__,MISTO_A.__O3S__,MISTO_A.__O3P__],[MISTO_A.__O4B__,MISTO_A.__O4S__,MISTO_A.__O4P__]],froom:MISTO_A.__FROOM__};
 
 /* ── іконки ── */
 var P={
@@ -576,7 +658,21 @@ var PRESETS={
    actions:[{name:'Прогулянка',dur:20,energy:5,food:-3,param:'Спокій',xp:12},{name:'Медитація',dur:10,energy:5,param:'Спокій',xp:15}]}
 };
 var PLOT={m:[84,60],d:[79,70]};
-var HERO={home:{m:[33,55],d:[21,62]},work:{m:[57,37],d:[54,44]},gym:{m:[28,28],d:[24,33]},shop:{m:[78,50],d:[68,50]},park:{m:[27,72],d:[45,86]},plot:{m:[74,66],d:[74,86]}};
+var GPIN={gym:[37,20],work:[58,21],shop:[71,43],home:[37,50],park:[26,77]};
+/* Порожні ділянки на карті. lv — з якого рівня гравця відкривається; px — зсув підпису, якщо поруч інший пін. */
+var PLOTS=[{x:20,y:27,lv:1,px:14},{x:53,y:71,lv:1},{x:80,y:33,lv:3},{x:19,y:48,lv:5},{x:83,y:63,lv:8}];
+/* Бібліотека готових будівель (Higgsfield, один стиль). Своя локація = будівля + назва + параметр. */
+var LIB=[{k:'site',n:'Будова',i:'crane',c:'#f59e0b',p:'Майстерність'},{k:'cafe',n:'Кафе',i:'food',c:'#fb923c',p:'Смак'},{k:'school',n:'Навчання',i:'book',c:'#a78bfa',p:'Знання'},
+ {k:'studio',n:'Студія',i:'music',c:'#f472b6',p:'Творчість'},{k:'garage',n:'Гараж',i:'car',c:'#94a3b8',p:'Техніка'},{k:'clinic',n:'Здоров\'я',i:'heart',c:'#f87171',p:'Самопочуття'},
+ {k:'park',n:'Сквер',i:'leaf',c:'#2dd4bf',p:'Спокій'},{k:'bank',n:'Банк',i:'money',c:'#4ade80',p:'Заощадження'}];
+function libOf(k){ return LIB.filter(function(b){return b.k===k;})[0]; }
+/* Ділянка своєї локації. Старі збереження без ділянки отримують першу вільну — лише в пам'яті, без запису. */
+function plotOf(l){ if(l.plot!=null) return l.plot;
+ var cs=S.locs.filter(function(x){return !x.preset;}), used=cs.filter(function(x){return x.plot!=null;}).map(function(x){return x.plot;});
+ var free=PLOTS.map(function(P,i){return i;}).filter(function(i){return used.indexOf(i)<0;}), k=cs.filter(function(x){return x.plot==null;}).indexOf(l);
+ return k>=0&&k<free.length?free[k]:-1; }
+var HERO={home:{m:[33,55],d:[21,62],g:[45,64]},work:{m:[57,37],d:[54,44],g:[50,43]},gym:{m:[28,28],d:[24,33],g:[45,37]},shop:{m:[78,50],d:[68,50],g:[64,56]},park:{m:[27,72],d:[45,86],g:[34,86]},plot:{m:[74,66],d:[74,86],g:[53,80]}};
+function heroAt(l){ if(l&&l.preset&&HERO[l.preset]) return HERO[l.preset].g; var i=l?plotOf(l):-1; return i>=0?[PLOTS[i].x+6,PLOTS[i].y+9]:HERO.plot.g; }
 var ROOM_Z={kitchen:{n:'Кухня',x:25,y:26,c:'#fb923c',i:'food'},bed:{n:'Сон',x:60,y:22,c:'#7c93ff',i:'bed'},desk:{n:'Комп\'ютер',x:20,y:52,c:'#c4b5fd',i:'laptop'},
  sofa:{n:'Відпочинок',x:52,y:46,c:'#2dd4bf',i:'sofa'},guitar:{n:'Гітара',x:80,y:44,c:'#f472b6',i:'music'}};
 var PERKS=[{lv:2,t:'+5 до максимальної енергії'},{lv:3,t:'Готування дає на 20% більше енергії'},{lv:4,t:'Бокс кожні 4 дії замість 5'},{lv:5,t:'Друга вільна година на день'},
@@ -640,11 +736,11 @@ var TAB='city';
 function renderHud(){
  var L=lvl(S.xp), me=power().maxE, p=S.player;
  function rc(i,l,v,mx,c,suf){ var low=v/mx<.3; return '<div class="rc"><div class="rc-h">'+ic(i,c,12,2.3)+l+'</div><div class="rc-v num" style="'+(low?'color:#f87171':'')+'">'+Math.round(v)+'<small>'+suf+'</small></div><div class="bar"><i style="width:'+clamp(v/mx*100,0,100)+'%;background:'+c+'"></i></div></div>'; }
- $('hud').innerHTML='<div class="hud-top"><a class="backf" href="./" aria-label="Назад у Frequency"><img src="icon-192.png" alt=""></a><button class="ava" data-go="me" aria-label="Мій профіль">'+ring(L.into/L.need,48,'#7c93ff')+'<i style="background-image:url('+chImg()+')"></i><b class="num">'+L.lv+'</b></button>'+
+ $('hud').innerHTML='<div class="hud-top"><a class="backf" href="./" aria-label="Назад у Frequency">'+ic('back',null,18,2.4)+'<img src="icon-192.png" alt=""><span>Frequency</span></a><button class="ava" data-act="drw" aria-label="Панель гри: день і пріоритети">'+ring(L.into/L.need,48,'#7c93ff')+'<i style="background-image:url('+chImg()+')"></i><b class="num">'+L.lv+'</b></button>'+
   '<div class="hud-meta"><b>'+esc(p.name)+' · '+esc(clsOf(p.cls).n)+'</b><span class="num">Місяць '+monthIdx()+' з 12 · день '+dayIdx()+'</span></div>'+
   '<span class="coins num">'+ic('coin','#fbbf24',16)+S.coins+'</span></div>'+
   '<div class="res">'+rc('energy','Енергія',S.res.energy,me,'#facc15','/'+me)+rc('food','Ситість',S.res.food,100,'#fb923c','/100')+
-  '<div class="rc"><div class="rc-h">'+ic('money','#4ade80',12,2.3)+'Баланс</div><div class="rc-v num">'+money(r2(S.res.money))+'</div><div class="bar"><i style="width:100%;background:#4ade80;opacity:.35"></i></div></div></div>';
+  walletCard()+'</div>';
 }
 function clsOf(k){ return CLASSES.filter(function(c){return c.k===k;})[0]||CLASSES[0]; }
 function renderNav(){
@@ -653,23 +749,35 @@ function renderNav(){
 }
 
 /* ── місто ── */
-function renderCity(){ var z=S.zoom||'city'; if(z==='street') renderStreet(); else if(z==='world') renderWorld(); else { renderCityMap(); } $('view').insertAdjacentHTML('beforeend',zoomBar()); if(z==='city'&&ZOOM>1) centerOnHero(); }
+function renderCity(){ var z=S.zoom||'city'; if(z==='street') renderStreet(); else if(z==='world') renderWorld(); else { renderCityMap(); } $('view').insertAdjacentHTML('beforeend',zoomBar()); }
 function renderCityMap(){
- var D=isD(), key=D?'d':'m', img=D?IMG.cityD:IMG.cityM;
- var pins=S.locs.filter(function(l){return l.preset;}).map(function(l){ var pos=PRESETS[l.preset][key];
-   return '<button class="pin" style="left:'+pos[0]+'%;top:'+pos[1]+'%;--c:'+l.color+'" data-act="loc" data-id="'+l.id+'"><span class="pin-t"><span class="pin-i">'+ic(l.icon,'#0d1014',17,2.3)+'</span><span class="pin-n">'+esc(l.name)+'</span><span class="pin-lv num">'+locLevel(l)+'</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>'; }).join('');
- var customs=S.locs.filter(function(l){return !l.preset;});
- var plot=PLOT[key];
- if(customs.length){ var c=customs[0]; pins+='<button class="pin" style="left:'+plot[0]+'%;top:'+plot[1]+'%;--c:'+c.color+'" data-act="loc" data-id="'+c.id+'"><span class="pin-t"><span class="pin-i">'+ic(c.icon,'#0d1014',17,2.3)+'</span><span class="pin-n">'+esc(c.name)+'</span><span class="pin-lv num">'+locLevel(c)+'</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>'; }
- else pins+='<button class="pin add" style="left:'+plot[0]+'%;top:'+plot[1]+'%;--c:#54607a" data-act="addloc"><span class="pin-t"><span class="pin-i">'+ic('plus','#c8d0ec',17,2.4)+'</span><span class="pin-n" style="color:#c8d0ec">Будувати</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>';
- var here=locBy(S.here)||locBy('home'), hp=(HERO[here.preset]||HERO.plot)[key];
- if(LAST_HERE&&LAST_HERE!==S.here){ var ol=locBy(LAST_HERE), op=(HERO[ol&&ol.preset]||HERO.plot)[key]; WALK={l:op[0]+'%',t:op[1]+'%'}; } LAST_HERE=S.here;
- var heroH=D?20:11;
- var k=dk(now()), today=S.log.filter(function(e){return e.day===k;});
- var tip=S.res.food<35?'Ситість '+Math.round(S.res.food)+' — зайди додому й поїж':S.res.energy<30?'Енергії мало — вдома можна відпочити':'Склади вечір з дій удома';
- $('view').innerHTML='<div class="stage-wrap"><div class="stage '+(D?'city-d':'city-m')+'" style="--z:'+ZOOM+';background-image:url('+img+')">'+holoLayer(key)+pins+friendLayer(key)+hero(hp[0],hp[1],heroH)+'</div>'+(D?'<div class="lstrip">'+S.locs.map(function(l){ var tot=l.params.reduce(function(a,p){return a+p.xp/pNeed(p.level);},0)/l.params.length; return '<button class="lc" data-act="loc" data-id="'+l.id+'"><span class="row" style="gap:8px"><span class="ico" style="width:28px;height:28px;border-radius:9px;background:'+l.color+'22">'+ic(l.icon,l.color,16)+'</span><b>'+esc(l.name)+'</b><span class="num" style="margin-left:auto;color:'+l.color+'">'+locLevel(l)+'</span></span><div class="bar"><i style="width:'+Math.round(tot*100)+'%;background:'+l.color+'"></i></div><span>'+l.params.map(function(p){return esc(p.name)+' '+p.level;}).join(' · ')+'</span></button>'; }).join('')+'</div>':'')+'</div>'+
-  '<div class="float-card only-m"><span class="ico" style="background:rgba(124,147,255,.16)">'+ic('clock','#7c93ff',19)+'</span><div class="t"><b>Вільна година '+fhRange()+'</b><span>'+esc(tip)+'</span></div><button class="btn pri sm" data-go="room">Зіграти</button></div>';
- walkHero();
+ var D=isD(), key='g', L=lvl(S.xp).lv;
+ function pin(l,x,y){ return '<button class="pin" style="left:'+x+'%;top:'+y+'%;--c:'+l.color+'" data-act="loc" data-id="'+l.id+'"><span class="pin-t"><span class="pin-i">'+ic(l.icon,'#0d1014',17,2.3)+'</span><span class="pin-n">'+esc(l.name)+'</span><span class="pin-lv num">'+locLevel(l)+'</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>'; }
+ var pins=S.locs.filter(function(l){return l.preset&&GPIN[l.preset];}).map(function(l){ var p=GPIN[l.preset]; return pin(l,p[0],p[1]); }).join('');
+ var taken={}; S.locs.filter(function(l){return !l.preset;}).forEach(function(l){ var i=plotOf(l); if(i>=0) taken[i]=l; });
+ pins+=PLOTS.map(function(P,i){ var l=taken[i];
+  if(l){ var B=libOf(l.bld||'site'); return '<img class="bld" src="'+IMG.bld[B.k]+'" alt="" style="left:'+P.x+'%;top:'+P.y+'%">'+pin(l,P.px||P.x,P.y-7); }
+  if(L<P.lv) return '<button class="plot lock" style="left:'+P.x+'%;top:'+P.y+'%" data-act="plotlock" data-lv="'+P.lv+'" aria-label="Ділянка відкриється з рівня '+P.lv+'">'+ic('lock','#e9d9b8',16,2.3)+'<span class="num">рів. '+P.lv+'</span></button>';
+  return '<button class="plot" style="left:'+P.x+'%;top:'+P.y+'%" data-act="addloc" data-plot="'+i+'" aria-label="Збудувати локацію на ділянці">'+ic('plus','#0d1014',18,2.6)+'<span>Будувати</span></button>'; }).join('');
+ var here=locBy(S.here)||locBy('home'), hp=heroAt(here);
+ if(LAST_HERE&&LAST_HERE!==S.here){ var op=heroAt(locBy(LAST_HERE)); WALK={l:op[0]+'%',t:op[1]+'%'}; } LAST_HERE=S.here;
+ $('view').innerHTML='<div class="stage-wrap gold"><div class="stage city-g" style="--z:'+ZOOM+';background-image:url('+IMG.gold+')">'+holoLayer(key)+pins+friendLayer(key)+hero(hp[0],hp[1],8)+'</div>'+(D?'<div class="lstrip">'+S.locs.map(function(l){ var tot=l.params.reduce(function(a,p){return a+p.xp/pNeed(p.level);},0)/l.params.length; return '<button class="lc" data-act="loc" data-id="'+l.id+'"><span class="row" style="gap:8px"><span class="ico" style="width:28px;height:28px;border-radius:9px;background:'+l.color+'22">'+ic(l.icon,l.color,16)+'</span><b>'+esc(l.name)+'</b><span class="num" style="margin-left:auto;color:'+l.color+'">'+locLevel(l)+'</span></span><div class="bar"><i style="width:'+Math.round(tot*100)+'%;background:'+l.color+'"></i></div><span>'+l.params.map(function(p){return esc(p.name)+' '+p.level;}).join(' · ')+'</span></button>'; }).join('')+'</div>':'')+'</div>'+
+  '<div class="float-card only-m"><span class="ico" style="background:rgba(124,147,255,.16)">'+ic('clock','#7c93ff',19)+'</span><div class="t"><b>Вільна година '+fhRange()+'</b><span>'+esc(tipText())+'</span></div><button class="btn pri sm" data-go="room">Зіграти</button></div>';
+ walkHero(); panMap();
+}
+/* Карту можна пересувати: пальцем — звичайним прокручуванням, мишею — перетягуванням.
+   Позицію пам'ятаємо між перемальовуваннями; на героя центруємо лише при переході. */
+var CAM=null, CAM_HERE=null;
+function panMap(){ var w=$('view').querySelector('.stage-wrap.gold'); if(!w) return;
+ if(CAM&&CAM_HERE===S.here&&CAM.z===ZOOM){ w.scrollLeft=CAM.x; w.scrollTop=CAM.y; } else centerOnHero();
+ CAM_HERE=S.here; CAM={x:w.scrollLeft,y:w.scrollTop,z:ZOOM};
+ w.addEventListener('scroll',function(){ CAM={x:w.scrollLeft,y:w.scrollTop,z:ZOOM}; },{passive:true});
+ var d=null;
+ w.addEventListener('pointerdown',function(e){ if(e.pointerType!=='mouse'||e.button!==0) return; d={x:e.clientX,y:e.clientY,l:w.scrollLeft,t:w.scrollTop,m:false}; });
+ w.addEventListener('pointermove',function(e){ if(!d) return; var dx=e.clientX-d.x, dy=e.clientY-d.y; if(!d.m&&Math.abs(dx)+Math.abs(dy)<6) return;
+  d.m=true; w.classList.add('drag'); w.scrollLeft=d.l-dx; w.scrollTop=d.t-dy; });
+ function up(){ if(d&&d.m){ w.classList.remove('drag'); var stop=function(ev){ ev.stopPropagation(); ev.preventDefault(); }; w.addEventListener('click',stop,{capture:true,once:true}); setTimeout(function(){ w.removeEventListener('click',stop,true); },0); } d=null; }
+ w.addEventListener('pointerup',up); w.addEventListener('pointerleave',up);
 }
 
 /* ── дім зсередини + вільна година ── */
@@ -803,15 +911,20 @@ function addActSheet(locId){ var l=locBy(locId);
 function addParamSheet(locId){ var l=locBy(locId);
  openSheet('<div class="eyebrow">'+esc(l.name)+'</div><h2 style="margin:2px 0 14px">Новий параметр</h2><form id="pf" class="stack"><div class="field"><label for="p-n">Що прокачуємо</label><input id="p-n" required maxlength="24" placeholder="Напр., Випічка"></div><button class="btn pri block" type="submit">Додати</button></form>');
  $('pf').addEventListener('submit',function(ev){ ev.preventDefault(); var n=$('p-n').value.trim(); if(!n) return; l.params.push({name:n,level:1,xp:0}); l.actions.push({id:uid(),name:n+': практика',dur:20,energy:-5,param:n,xp:15}); save(); showLoc(l.id,'params'); }); }
-function addLocSheet(){
- openSheet('<h2 style="margin-bottom:6px">Будуємо нову локацію</h2><p class="hint" style="margin:0 0 14px">На будмайданчику з\'явиться твоя локація: хобі, підробіток, дача, що завгодно.</p><form id="cl" class="stack">'+
-  '<div class="field"><label for="c-n">Назва</label><input id="c-n" required maxlength="20" placeholder="Напр., Студія гітари"></div><div class="field"><label for="c-p">Перший параметр</label><input id="c-p" required maxlength="24" placeholder="Напр., Акорди"></div>'+
-  '<div class="seg" id="c-i">'+['music','star','book','heart','leaf','work'].map(function(i,n){return '<button type="button" class="opt'+(n===0?' on':'')+'" data-i="'+i+'" aria-label="Іконка">'+ic(i,null,18)+'</button>';}).join('')+'</div>'+
+function addLocSheet(plot){
+ var L=lvl(S.xp).lv, free=PLOTS.map(function(P,i){return i;}).filter(function(i){ return L>=PLOTS[i].lv&&!S.locs.some(function(l){return !l.preset&&plotOf(l)===i;}); });
+ if(plot==null||free.indexOf(plot)<0) plot=free[0];
+ if(plot==null){ toast('Вільних ділянок поки нема','<span class="chip xp">Нова — з наступним рівнем</span>'); return; }
+ openSheet('<h2 style="margin-bottom:6px">Будуємо на ділянці</h2><p class="hint" style="margin:0 0 12px">Обери будівлю. Назву й параметр можна змінити під себе: хобі, підробіток, навчання.</p><form id="cl" class="stack">'+
+  '<div class="libg" id="c-b" role="radiogroup" aria-label="Будівля">'+LIB.map(function(B,n){return '<button type="button" class="libc'+(n===0?' on':'')+'" data-k="'+B.k+'" role="radio" aria-checked="'+(n===0)+'"><img src="'+IMG.bld[B.k]+'" alt=""><span>'+esc(B.n)+'</span></button>';}).join('')+'</div>'+
+  '<div class="field"><label for="c-n">Назва</label><input id="c-n" required maxlength="20" value="'+esc(LIB[0].n)+'"></div><div class="field"><label for="c-p">Що прокачуєш</label><input id="c-p" required maxlength="24" value="'+esc(LIB[0].p)+'"></div>'+
   '<button class="btn pri block" type="submit">'+ic('crane','#0c1022',18)+'Збудувати</button></form>');
- $('c-i').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; [].forEach.call($('c-i').children,function(x){x.classList.remove('on');}); b.classList.add('on'); });
- $('cl').addEventListener('submit',function(ev){ ev.preventDefault(); var n=$('c-n').value.trim(), p=$('c-p').value.trim(); if(!n||!p) return; var ico=$('c-i').querySelector('.on').getAttribute('data-i');
-  S.locs.push({id:uid(),preset:null,name:n,icon:ico,color:'#f472b6',params:[{name:p,level:1,xp:0}],actions:[{id:uid(),name:'Попрактикувати',dur:20,energy:-5,param:p,xp:15}]});
-  save(); closeSheet(); render(); toast(n+' — збудовано','<span class="chip xp">Параметр «'+esc(p)+'»</span>'); }); }
+ $('c-b').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; var old=libOf(this.querySelector('.on').getAttribute('data-k')), B=libOf(b.getAttribute('data-k'));
+  [].forEach.call(this.children,function(x){x.classList.remove('on'); x.setAttribute('aria-checked','false');}); b.classList.add('on'); b.setAttribute('aria-checked','true');
+  if($('c-n').value.trim()===old.n||!$('c-n').value.trim()) $('c-n').value=B.n; if($('c-p').value.trim()===old.p||!$('c-p').value.trim()) $('c-p').value=B.p; });
+ $('cl').addEventListener('submit',function(ev){ ev.preventDefault(); var n=$('c-n').value.trim(), p=$('c-p').value.trim(); if(!n||!p) return; var B=libOf($('c-b').querySelector('.on').getAttribute('data-k'));
+  S.locs.push({id:uid(),preset:null,name:n,icon:B.i,color:B.c,bld:B.k,plot:plot,params:[{name:p,level:1,xp:0}],actions:[{id:uid(),name:'Попрактикувати',dur:20,energy:-5,param:p,xp:15}]});
+  CAM=null; save(); closeSheet(); render(); toast(n+' — збудовано','<span class="chip xp">Параметр «'+esc(p)+'»</span>'); }); }
 function quickSheet(){ openSheet('<h2>Що зробив?</h2>'+S.locs.map(function(l){ return '<div class="eyebrow" style="margin:14px 0 8px;color:'+l.color+'">'+esc(l.name)+'</div><div class="stack" style="gap:6px">'+l.actions.map(function(a){ return '<button class="act" data-act="log" data-loc="'+l.id+'" data-a="'+a.id+'"><span class="ico" style="background:'+l.color+'1f">'+ic(l.icon,l.color,17)+'</span><span class="g"><b>'+esc(a.name)+'</b></span>'+ic('chev','#5d6570',18)+'</button>'; }).join('')+'</div>'; }).join('')); }
 
 /* ── день, цілі, я ── */
@@ -912,7 +1025,7 @@ function renderOnb(){
    '<div class="card row"><span style="flex:1;font-size:13.5px;font-weight:700;line-height:1.45">10% кожного заробітку — у скарбничку бажань</span><button class="sw'+(O.wishRule?' on':'')+'" data-act="owrule" aria-label="Скарбничка бажань" aria-pressed="'+(O.wishRule?'true':'false')+'"></button></div>';
  } else if(s===6){ var pr=PRESETS[OLOC];
   h=T('Свої дії на карті','Обери локацію і додай, що ти там робиш. Потім це записується в один тап.')+
-   '<div class="mini-map" style="background-image:url('+IMG.cityD+')">'+['gym','work','home','shop','park'].map(function(k){ var p=PRESETS[k]; return '<button class="'+(OLOC===k?'on':'')+'" style="left:'+p.d[0]+'%;top:'+(p.d[1]+6)+'%;--c:'+p.color+'" data-act="oloc" data-k="'+k+'">'+ic(p.icon,OLOC===k?'#0d1014':p.color,14,2.3)+p.name+'</button>'; }).join('')+'</div>'+
+   '<div class="mini-map" style="background-image:url('+IMG.gold+')">'+['gym','work','home','shop','park'].map(function(k){ var p=PRESETS[k], g=GPIN[k]; return '<button class="'+(OLOC===k?'on':'')+'" style="left:'+g[0]+'%;top:'+(18+(g[1]-15)*0.95)+'%;--c:'+p.color+'" data-act="oloc" data-k="'+k+'">'+ic(p.icon,OLOC===k?'#0d1014':p.color,14,2.3)+p.name+'</button>'; }).join('')+'</div>'+
    '<div class="card stack" style="padding:14px"><div class="field"><label for="o-an">Нова дія в «'+pr.name+'»</label><input id="o-an" placeholder="Напр., Медитація" maxlength="30"></div>'+
    '<div class="seg" id="o-ad">'+[5,10,20,30].map(function(m){return '<button type="button" class="opt'+(m===10?' on':'')+'" data-m="'+m+'">'+m+' хв</button>';}).join('')+'</div>'+
    stepRow('energy','#facc15','Енергія','o-ae',5)+stepRow('money','#4ade80','Гроші, €','o-am',0)+'<button class="btn sec block" data-act="oaddact">'+ic('plus',null,16)+'Додати на карту</button></div>'+
@@ -925,6 +1038,7 @@ function renderOnb(){
  }
  var cta=s0<8?'<button class="btn pri" style="flex:1" data-act="on">Далі</button>':'<button class="btn pri" style="flex:1" data-act="ofinish">'+ic('city','#0c1022',18)+'Увійти в місто</button>';
  if(s0===1&&S) cta='<button class="btn sec" data-act="oclose">Скасувати</button>'+cta;
+ if(s0===1&&window.MISTO_SITE&&!window.MISTO_EMBED) top='<a class="onb-back" href="./">'+ic('back',null,16,2.4)+'Назад у Frequency</a>'+top;
  $('onb').innerHTML='<div class="onb-in">'+top+h+'</div><div class="onb-cta"><div>'+cta+'</div></div>';
  if(s===2){ $('o-sleep').addEventListener('input',function(){ O.body.sleep=parseFloat(this.value); $('o-sv').textContent=O.body.sleep+' год'; }); }
  if(s===4){ $('o-gl').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; [].forEach.call(this.children,function(x){x.classList.remove('on');}); b.classList.add('on'); }); }
@@ -957,7 +1071,7 @@ function ring2(p,c){ c=c||'#7c93ff'; var r=19,C=2*Math.PI*r; return '<span class
 
 /* ── мрії ── */
 var DTYPES={car:{n:'Авто',i:'car',img:'car'},trip:{n:'Поїздка',i:'plane',img:'plane'},home:{n:'Житло',i:'home',img:'tower'},buy:{n:'Покупка',i:'gift',img:null}};
-var HOLO_POS={car:{m:[30,7],d:[11,18]},trip:{m:[82,8],d:[88,15]},home:{m:[82,80],d:[91,62]}};
+var HOLO_POS={car:{m:[30,7],d:[11,18],g:[10,88]},trip:{m:[82,8],d:[88,15],g:[80,11]},home:{m:[82,80],d:[91,62],g:[72,88]}};
 var DIST={car:'Автосалон',trip:'Аеропорт',home:'Нові квартали'};
 function dreams(){ return S.player.wishes||(S.player.wishes=[]); }
 function dpct(w){ return clamp(Math.round(w.saved/w.price*100),0,100); }
@@ -1257,7 +1371,7 @@ function renderVisit(){
 }
 function friendLayer(key){
  if(S.showFriends===false) return '';
- return friends().map(function(f,i){ var p=(HERO[f.loc]||HERO.home)[key], x=p[0]+(key==='m'?10:6)*(i%2?-1:1), h=key==='m'?8.5:15;
+ return friends().map(function(f,i){ var p=(HERO[f.loc]||HERO.home)[key], x=p[0]+(key==='m'?10:key==='g'?5:6)*(i%2?-1:1), h=key==='m'?8.5:key==='g'?7:15;
   return '<button class="fsp" style="left:'+x+'%;top:'+p[1]+'%;height:'+h+'%" data-act="friend" data-id="'+f.id+'" aria-label="'+esc(f.name)+'"><img src="'+fitImg(f.ch,f.fit)+'" alt=""><span class="fb"><b>'+esc(f.name)+'</b> · '+esc(f.act)+'</span></button>'; }).join('');
 }
 function addFriendSheet(){
@@ -1407,12 +1521,58 @@ function renderPath(){
   '<div class="card stack" style="border-color:rgba(124,147,255,.4)"><div class="row" style="gap:10px">'+ic('flag','#7c93ff',20)+'<b style="font-size:16px">Що чекає в точці Б</b></div>'+(goals||'<span class="hint">Додай цілі й мрії, і вони з\'являться тут.</span>')+'</div></div></div>';
 }
 
+
+/* ── міст до Frequency (лише читання) ── */
+function bridge(){ try{ return window.MISTO_EMBED&&window.parent.flowWorldBridge||null; }catch(_){ return null; } }
+function uah(v,sign){ var a=Math.abs(v), t=a.toLocaleString('uk-UA',{maximumFractionDigits:2}); return (sign?(v<0?'−':'+'):(v<0?'−':''))+t+' ₴'; }
+function walletCard(){ var B=bridge(), w=B&&B.wallet();
+ if(!w) return '<div class="rc"><div class="rc-h">'+ic('money','#4ade80',12,2.3)+'Баланс</div><div class="rc-v num">'+money(r2(S.res.money))+'</div><div class="bar"><i style="width:100%;background:#4ade80;opacity:.35"></i></div></div>';
+ return '<button class="rc rc-w" data-act="wallet" aria-label="Гаманець: '+esc(uah(w.balance))+'"><div class="rc-h">'+ic('money','#4ade80',12,2.3)+'Гаманець'+ic('chev','#5d6570',11,2.4)+'</div><div class="rc-v num">'+uah(w.balance)+'</div><div class="bar"><i style="width:100%;background:#4ade80;opacity:.35"></i></div></button>'; }
+function walletSheet(){ var B=bridge(), w=B&&B.wallet(); if(!w) return;
+ var ops=w.ops.map(function(o){ var v=o.type==='in'?o.amount:-o.amount; return '<div class="li"><span class="ico" style="background:'+(v>0?'rgba(74,222,128,.14)':'rgba(248,113,113,.12)')+'">'+ic(v>0?'plus':'minus',v>0?'#4ade80':'#f87171',16,2.4)+'</span><span class="g"><b>'+esc(o.label||'Без назви')+'</b><span class="num">'+esc(o.date||'')+'</span></span><b class="num" style="color:'+(v>0?'#4ade80':'#f87171')+'">'+uah(v,true)+'</b></div>'; }).join('');
+ openSheet('<div class="eyebrow">Гаманець Frequency</div><div class="h1 num" style="margin:2px 0 4px">'+uah(w.balance)+'</div><p class="hint" style="margin:0 0 12px">Справжні гроші з розділу «Гаманець». Гра їх лише показує й нічого не змінює.</p>'+
+  '<div class="card" style="padding:4px 16px">'+(ops||'<p class="hint">Записів ще нема.</p>')+'</div>'+
+  '<button class="btn pri block" style="margin-top:12px" data-act="openfin">'+ic('money','#0c1022',18)+'Відкрити Гаманець</button>'+
+  '<p class="hint" style="margin:10px 2px 0">Ігровий рахунок прототипу: '+money(r2(S.res.money))+'. Згодом години з Роботи йтимуть одразу в Гаманець.</p>'); }
+
+/* ── панель гри (варіант Б): тиждень, головне на день, меню ── */
+var DSEL=null;
+function prios(k){ S.prio=S.prio||{}; return S.prio[k]||(S.prio[k]=[]); }
+function weekDays(){ var t=now(), d=new Date(t), wd=(d.getDay()+6)%7; d.setDate(d.getDate()-wd); var out=[]; for(var i=0;i<7;i++){ out.push(new Date(d)); d.setDate(d.getDate()+1); } return out; }
+function openDrw(){ $('drw').classList.add('on'); $('drwS').classList.add('on'); renderDrw(); var f=$('drw').querySelector('button'); if(f) f.focus({preventScroll:true}); }
+function closeDrw(){ $('drw').classList.remove('on'); $('drwS').classList.remove('on'); }
+function renderDrw(){
+ var L=lvl(S.xp), tk=dk(now()), sel=DSEL||tk, ps=prios(sel), isT=sel===tk;
+ var days=weekDays().map(function(d){ var k=dk(d), n=(S.prio&&S.prio[k]||[]).length;
+  return '<button class="dwd'+(k===sel?' on':'')+(k===tk?' t':'')+'" data-act="dsel" data-k="'+k+'" aria-pressed="'+(k===sel)+'"><span>'+['пн','вт','ср','чт','пт','сб','нд'][(d.getDay()+6)%7]+'</span><b class="num">'+d.getDate()+'</b><i'+(n?'':' style="opacity:0"')+'></i></button>'; }).join('');
+ var list=ps.map(function(p,i){ var l=locBy(p.loc);
+  return '<div class="dpr'+(p.done?' done':'')+'"><button class="pr-c" data-act="pdone" data-i="'+i+'" aria-label="'+(p.done?'Зняти позначку':'Позначити зробленим')+'">'+(p.done?ic('check','#0c1022',14,3):'')+'</button><span class="pr-n num">'+(i+1)+'</span><span class="g"><b>'+esc(p.t)+'</b>'+(l?'<span>'+ic(l.icon,l.color,12,2.3)+esc(l.name)+'</span>':'')+'</span>'+
+   (l&&isT&&!p.done?'<button class="btn pri sm" data-act="pgo" data-id="'+l.id+'">Піти</button>':'')+'<button class="pr-x" data-act="pdel" data-i="'+i+'" aria-label="Прибрати">'+ic('minus',null,15,2.4)+'</button></div>'; }).join('');
+ var d=new Date(sel+'T12:00:00');
+ function m(k,i,c,t){ return '<button class="dm" data-act="dm" data-k="'+k+'">'+'<span class="ico" style="background:'+c+'1f">'+ic(i,c,18)+'</span>'+t+'</button>'; }
+ $('drw').innerHTML='<div class="drw-h"><span class="ava sm"><i style="background-image:url('+chImg()+')"></i></span><div class="g"><b>'+esc(S.player.name)+'</b><span class="num">Рівень '+L.lv+' · місяць '+monthIdx()+' з 12</span></div><button class="pr-x" data-act="drwx" aria-label="Закрити панель">'+ic('plus',null,20,2.4)+'</button></div>'+
+  '<div class="eyebrow" style="margin:6px 0 8px">Тиждень</div><div class="wk">'+days+'</div>'+
+  '<div class="row sp" style="margin:16px 0 8px"><span class="eyebrow">'+(isT?'Головне сьогодні':esc(dayTitle(d)))+'</span><span class="hint num">'+ps.filter(function(p){return p.done;}).length+' / '+ps.length+'</span></div>'+
+  '<div class="stack" style="gap:6px">'+(list||'<p class="hint" style="margin:0">Обери до трьох головних справ. Решта — бонус.</p>')+'</div>'+
+  (ps.length<3?'<form class="pr-add" id="prf"><input id="pr-t" maxlength="40" placeholder="'+(ps.length?'Ще одна справа':'Напр., Зміна на будові')+'" aria-label="Нова головна справа"><select id="pr-l" aria-label="Де">'+'<option value="">—</option>'+S.locs.map(function(l){return '<option value="'+l.id+'">'+esc(l.name)+'</option>';}).join('')+'</select><button class="btn sec sm" type="submit" aria-label="Додати">'+ic('plus',null,18,2.4)+'</button></form>':'')+
+  '<div class="eyebrow" style="margin:18px 0 8px">Меню</div><div class="dmg">'+
+   m('city','city','#7c93ff','Місто')+m('day','list','#7c93ff','День')+m('work','work','#fb923c','Робота')+m('wallet','money','#4ade80','Гаманець')+
+   m('flow','sparkle','#c4b5fd','Флоу')+m('friends','users','#f472b6','Друзі')+m('me','user','#7c93ff','Я')+m('settings','gear','#8a929d','Параметри')+'</div>';
+ var f=$('prf'); if(f) f.addEventListener('submit',function(ev){ ev.preventDefault(); var t=$('pr-t').value.trim(); if(!t) return; prios(sel).push({t:t,loc:$('pr-l').value||null,done:false}); save(); renderDrw(); var x=$('pr-t'); if(x) x.focus(); });
+}
+function drwMenu(k){ closeDrw();
+ if(k==='wallet'){ if(bridge()) walletSheet(); else toast('Гаманець — у Frequency','<span class="chip xp">Відкрий гру з вкладки «Мій світ»</span>'); return; }
+ if(k==='flow'){ var B=bridge(); if(B) B.open('ai'); else toast('Флоу живе у Frequency','<span class="chip xp">Відкрий гру з вкладки «Мій світ»</span>'); return; }
+ if(k==='work'){ goTo('work'); return; }
+ TAB=k; closeSheet(); render(); $('view').scrollTop=0; }
+
 /* ── рендер і події ── */
 function render(){ renderHud(); renderNav();
  if(TAB==='city') renderCity(); else if(TAB==='room') renderRoom(); else if(TAB==='pc') renderPC(); else if(TAB==='gym') renderGym(); else if(TAB==='workout') renderWorkout(); else if(TAB==='settings') renderSettings(); else if(TAB==='avatar') renderAvatar(); else if(TAB==='friends') renderFriends(); else if(TAB==='friend') renderFriend(); else if(TAB==='visit') renderVisit(); else if(TAB==='path') renderPath(); else if(TAB==='skills') renderSkills(); else if(TAB==='day') renderDay(); else if(TAB==='goals') renderGoals(); else renderMe();
  renderSide(); runFX(); }
 
 document.addEventListener('click',function(e){
+ if(e.target&&e.target.id==='drwS'){ closeDrw(); return; }
  if(e.target&&e.target.id==='hm'){ closeHM(); return; }
  var g=e.target.closest('[data-go]'); if(g){ TAB=g.getAttribute('data-go'); closeSheet(); render(); $('view').scrollTop=0; return; }
  var b=e.target.closest('[data-act]'); if(!b) return; var a=b.getAttribute('data-act');
@@ -1470,7 +1630,17 @@ document.addEventListener('click',function(e){
   case 'fh': { var id=b.getAttribute('data-a'); FH[id]=!FH[id]; if(isD()) renderSide(); else renderFH($('fhM')); break; }
   case 'playfh': playFH(); break;
   case 'quick': quickSheet(); break;
-  case 'addloc': addLocSheet(); break;
+  case 'drw': openDrw(); break;
+  case 'drwx': closeDrw(); break;
+  case 'dsel': DSEL=b.getAttribute('data-k'); renderDrw(); break;
+  case 'pdone': { var p=prios(DSEL||dk(now()))[+b.getAttribute('data-i')]; if(p){ p.done=!p.done; save(); renderDrw(); } break; }
+  case 'pdel': prios(DSEL||dk(now())).splice(+b.getAttribute('data-i'),1); save(); renderDrw(); break;
+  case 'pgo': closeDrw(); goTo(b.getAttribute('data-id')); break;
+  case 'dm': drwMenu(b.getAttribute('data-k')); break;
+  case 'wallet': walletSheet(); break;
+  case 'openfin': { closeSheet(); var B=bridge(); if(B) B.open('finance'); break; }
+  case 'addloc': addLocSheet(b.hasAttribute('data-plot')?+b.getAttribute('data-plot'):null); break;
+  case 'plotlock': toast('Ділянка відкриється з рівня '+b.getAttribute('data-lv'),'<span class="chip xp">Рівень росте від досвіду</span>'); break;
   case 'addact': addActSheet(b.getAttribute('data-loc')); break;
   case 'addparam': addParamSheet(b.getAttribute('data-loc')); break;
   case 'mclose': closeModal(); break;
@@ -1504,6 +1674,10 @@ $('scrim').addEventListener('click',closeSheet);
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeSheet(); closeHM(); } });
 MQ.addEventListener&&MQ.addEventListener('change',function(){ if(S) render(); });
 
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('drw').classList.contains('on')) closeDrw(); });
+$('fab').innerHTML=ic('plus','#0c1022',26,2.6);
+// Frequency кличе при поверненні у «Мій світ»: Гаманець міг змінитись
+window.mistoRefresh=function(){ if(S&&!$('onb').classList.contains('on')) render(); };
 S=load();
 if(S){ tickDay(); render(); }
 else { S=sampleState(); tickDay(); render(); startOnb(false); }
