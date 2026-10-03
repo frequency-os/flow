@@ -3,77 +3,85 @@
     /* Лише живі плитки. Заглушки «🚧 У розробці» (звіт тижня, серії звичок, PDF,
        віджети) прибрано 30.09.2026: людина тапала — а там обіцянка. Фокус і цілі
        вже є в Планері й «Плані на рік» — плитки ведуть туди. */
-    const MAIN=[
-      {k:'quick', emo:'⚡', c:'232,132,60',  t:'Швидкий запис', d:'Витрата, нотатка чи задача за 2 сек'},
-      {k:'focus', emo:'⏱️', c:'255,107,157', t:'Фокус-сесія',   d:'Pomodoro 25 хв + підсумок дня'},
+    /* Лише живі пункти. Заглушки «🚧 У розробці» прибрано 30.09.2026.
+       03.10.2026: емодзі → лінійні іконки на кольоровій плашці (window.stgIco,
+       05-spaces.js); «Проєкти» з «Ще» прибрано — Ярослав просив прибрати їх
+       зовсім (з бічної панелі зникли 25.09); сам екран лишився за ⌘5.
+       Режим Lite/Pro переїхав у розділ «Вигляд» (renderSettingsCard). */
+    const TOOLS=[
+      {k:'quick', ic:'bolt',   c:'amber',  t:'Швидкий запис', d:'витрата, нотатка чи задача'},
+      {k:'focus', ic:'timer',  c:'pink',   t:'Фокус-сесія',   d:'Pomodoro 25 хв і підсумок дня'},
+      {k:'inbox', ic:'inbox',  c:'teal',   t:'Вхідні',        d:'записи, що чекають розбору'},
+      {k:'goals', ic:'target', c:'violet', t:'План на рік',   d:'цілі, кроки й прогрес'},
     ];
-    const MORE=[
-      {k:'inbox', emo:'📥', c:'47,182,196',  t:'Вхідні',        d:'Швидкі записи, що чекають розбору'},
-      {k:'goals', emo:'🎯', c:'199,125,255', t:'План на рік',   d:'Цілі, кроки й прогрес'},
-    ];
-    /* Lite ховає «Огляд» з панелі, а підпис обіцяє «решта чекає тут» — ось двері */
+    /* Lite ховає «Огляд» з панелі — сюди ведуть двері до решти */
     const LITE_DOORS=[
-      {k:'home',   emo:'📁', c:'106,125,255', t:'Папки й чати',  d:'Огляд: усі папки, чати й Вхідні'},
-      {k:'diary',  emo:'📔', c:'124,140,255', t:'Щоденник',      d:'Записи дня й зошити'},
-      {k:'wishes', emo:'🧭', c:'240,180,41',  t:'Карта бажань',  d:'Бажання, мудборд і ритуали'},
+      {k:'home',   ic:'folder',  c:'blue',   t:'Папки й чати',  d:'Огляд: усі папки, чати й Вхідні'},
+      {k:'diary',  ic:'book',    c:'violet', t:'Щоденник',      d:'записи дня й зошити'},
+      {k:'wishes', ic:'compass', c:'amber',  t:'Карта бажань',  d:'бажання, колаж і ранковий ритуал'},
+    ];
+    const DEV_ROWS=[
+      {k:'upgrade', ic:'dna',  c:'violet', t:'Апгрейд',          d:'Персонаж, сфери, заявлений шлях'},
+      {k:'misto',   ic:'city', c:'blue',   t:'Гра «Місто дня»',  d:'Прототип: місто, персонаж, друзі'},
     ];
     /* справжній лічильник «Вхідних»: записи, що чекають (виконані задачі не рахуємо);
        нуль або помилка — жодного числа, а не вигадане «3» */
     function inboxWaiting(){
       try{ return (boards[chatBk(INBOX_CHAT)]||[]).filter(b=>b&&!b.done).length; }catch(_){ return 0; }
     }
-    function tileHTML(m){
-      return `<button class="mh-tile" data-mh="${m.k}" style="--mc:rgb(${m.c})">
-        <div class="mh-orb" style="background:rgb(${m.c})"></div>
-        <div class="mh-ico" style="background:rgba(${m.c},.18)">${m.emo}</div>
-        <h4>${m.t}</h4><p>${m.d}</p>
-        ${m.badge?`<span class="mh-badge">${m.badge}</span>`:''}</button>`;
-    }
+    const ico=(n,c)=>(window.stgIco?window.stgIco(n,c):'');
+    const chev=()=>'<span class="mr-chev">'+(window.stgSvg?window.stgSvg('chev'):'›')+'</span>';
     function rowHTML(m){
-      const right = m.pill
-        ? `<span class="mh-pill" style="background:rgba(${m.c},.2);color:rgb(${m.c})">${m.pill}</span>`
-        : `<span class="mh-chev">›</span>`;
-      return `<button class="mh-row" data-mh="${m.k}">
-        <span class="mh-bar" style="background:rgb(${m.c})"></span>
-        <div class="mh-ico" style="background:rgba(${m.c},.18)">${m.emo}</div>
-        <div class="mh-tx"><h4>${m.t}</h4><p>${m.d}</p></div>${right}</button>`;
+      const pill=m.pill?`<span class="mr-pill">${m.pill}</span>`:'';
+      return `<button class="mr-row" data-mh="${m.k}">${ico(m.ic,m.c)}
+        <span class="mr-tx"><b>${m.t}</b><small>${m.d}</small></span>${pill}${chev()}</button>`;
     }
     function renderMore(){
       const host=document.getElementById('moreHybrid'); if(!host) return;
       const _m=(window.uiMode||'pro');
       const nIn=inboxWaiting();
-      const more=MORE.map(m=>m.k==='inbox'&&nIn>0?Object.assign({},m,{pill:String(nIn)}):m);
+      const tools=TOOLS.map(m=>m.k==='inbox'&&nIn>0?Object.assign({},m,{pill:String(nIn)}):m);
       host.innerHTML=
-        `<div class="mh-rows mh-projects">${rowHTML({k:'projects', emo:'🗂️', c:'139,124,255', t:'Проєкти', d:'Робота й твої проєкти'})}</div>
-         <div class="mh-mode">
-           <div class="mh-mode-tx"><b>Режим Frequency</b><span>${_m==='lite'
-             ?'Lite — ядро: Планер · Гроші · Проєкти. Решта чекає тут.'
-             :'Pro — повний Frequency: Огляд, простір, папки, все одразу.'}</span></div>
-           <div class="mh-mode-seg">
-             <button class="${_m==='lite'?'on':''}" data-uimode="lite">Lite</button>
-             <button class="${_m==='pro'?'on':''}" data-uimode="pro">Pro</button>
-           </div>
-         </div>` +
+        `<div class="mr-sl" data-sec="tools">Інструменти</div>
+         <div class="mr-grp mr-tools" data-sec="tools">${tools.map(rowHTML).join('')}</div>` +
         (_m==='lite'
-          ? `<div class="mh-lbl">🚪 Решта Frequency</div>
-             <div class="mh-rows mh-projects">${LITE_DOORS.map(rowHTML).join('')}</div>`
+          ? `<div class="mr-sl" data-sec="lite">Решта Frequency</div>
+             <div class="mr-grp" data-sec="lite">${LITE_DOORS.map(rowHTML).join('')}</div>`
           : '') +
-        `<div class="mh-lbl">⚡ Головне</div>
-         <div class="mh-grid">${MAIN.map(tileHTML).join('')}</div>
-         <div class="mh-lbl mt">🧩 Ще інструменти</div>
-         <div class="mh-rows">${more.map(rowHTML).join('')}</div>
-         <div class="mh-lbl mt">🔒 Приватність</div>
-         <div class="mh-rows">${rowHTML({k:'aipriv', emo:'🔒', c:'52,199,123', t:'AI і приватність', d:'Що бачить AI · згода · закриті розділи'})}</div>` +
         ((window.upDevOn&&window.upDevOn())
-          ? `<div class="mh-lbl mt">🧪 Розробка</div>
-             <div class="mh-rows">${rowHTML({k:'upgrade', emo:'🧬', c:'139,124,255', t:'Апгрейд', d:'Персонаж, сфери, заявлений шлях'})}${rowHTML({k:'misto', emo:'🏙️', c:'124,147,255', t:'Гра «Місто дня»', d:'Прототип: місто, персонаж, друзі'})}</div>`
+          ? `<div class="mr-sl" data-sec="dev">Розробка</div>
+             <div class="mr-grp" data-sec="dev">${DEV_ROWS.map(rowHTML).join('')}</div>`
           : '');
       host.querySelectorAll('[data-mh]').forEach(b=>b.addEventListener('click',()=>openMoreSheet(b.dataset.mh)));
-      host.querySelectorAll('[data-uimode]').forEach(b=>b.addEventListener('click',()=>{
-        (window.setUiMode||function(){})(b.dataset.uimode);
-        renderMore();
-      }));
+      renderMoreIndex();
     }
+
+    /* ── Комп'ютер: розділи ліворуч, вміст одного праворуч (варіант B, 03.10.2026) ──
+       На телефоні всі розділи йдуть одним списком (варіант A). Розмітка однакова:
+       кожен розділ — пара .mr-sl/.mr-grp з data-sec, а що видно на широкому
+       екрані, вирішує атрибут data-msec на #scr-more (22-more-screen.css).
+       «Інструменти» на комп'ютері стоять завжди — це дії, а не налаштування. */
+    const MSEC=[['profile','Профіль'],['data','Дані'],['look','Вигляд'],['pet','Напарник'],
+      ['ai','AI і приватність'],['lite','Решта Frequency'],['dev','Розробка'],['about','Про застосунок'],['danger','Скидання']];
+    function moreIsWide(){ try{ return window.matchMedia('(min-width:1024px)').matches; }catch(_){ return false; } }
+    function renderMoreIndex(){
+      const ix=document.getElementById('moreIndex'), scr=document.getElementById('scr-more'); if(!ix||!scr) return;
+      const present=MSEC.filter(([k])=>scr.querySelector('.mr-grp[data-sec="'+k+'"]'));
+      if(!present.some(([k])=>k===scr.dataset.msec)) scr.dataset.msec='profile';
+      const cur=scr.dataset.msec;
+      ix.innerHTML=present.map(([k,l])=>`<button class="mi${k===cur?' on':''}${k==='danger'?' red':''}" data-msec="${k}"${k===cur?' aria-current="true"':''}>${l}</button>`).join('');
+      ix.querySelectorAll('[data-msec]').forEach(b=>b.onclick=()=>moreShowSection(b.dataset.msec));
+    }
+    function moreShowSection(k, scroll){
+      const scr=document.getElementById('scr-more'); if(!scr) return;
+      // прокручується body, а не вікно (див. show() у 05-spaces.js) — window.scrollTo тут нічого не робить
+      if(moreIsWide()){ scr.dataset.msec=k; renderMoreIndex(); try{ document.body.scrollTop=0; }catch(_){} return; }
+      if(scroll){
+        const el=scr.querySelector('.mr-sl[data-sec="'+k+'"]')||scr.querySelector('[data-sec="'+k+'"]');
+        if(el) try{ el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(_){ el.scrollIntoView(); }
+      }
+    }
+    window.moreShowSection=moreShowSection;
     // кожна плитка — жива дія (колишня шторка «🚧 У розробці» більше не потрібна)
     function openMoreSheet(key){
       try{ window.platform.haptic('light'); }catch(_){}
@@ -95,7 +103,13 @@
       if(key==='diary'){ if(window.goDiary) window.goDiary(); return; }
       if(key==='wishes'){ if(window.goWishes) window.goWishes(); return; }
     }
-    function goMore(){ renderMore(); renderAccount(); const sh=window.__show||window.show||(typeof show==='function'?show:null); if(sh) sh('scr-more'); }
+    function goMore(){
+      renderMore(); renderAccount();
+      try{ if(window.renderSettingsCard) window.renderSettingsCard(); }catch(_){}
+      const scr=document.getElementById('scr-more'); if(scr) scr.dataset.msec='profile';
+      renderMoreIndex();
+      const sh=window.__show||window.show||(typeof show==='function'?show:null); if(sh) sh('scr-more');
+    }
     window.goMore=goMore; window.renderMore=renderMore;
 
     /* ── АКАУНТ + статус синхрону + діагностика ── */
@@ -177,7 +191,7 @@
         :(gUser?((gUser.user_metadata&&gUser.user_metadata.full_name)||gUser.email||'Google'):'Гість');
       const sub=checking?'':(gUser?(gUser.email||'Google'):'без входу · дані лише тут');
       const gPic=gUser&&gUser.user_metadata&&gUser.user_metadata.avatar_url;
-      const av=checking?'⏳':(customAvatar?`<img src="${customAvatar}" alt="">`
+      const av=checking?'⏳':(customAvatar?`<img src="${safeImgA(customAvatar)}" alt="">`
         :(gUser&&gPic?`<img src="${safeImgA(gPic)}" alt="">`:(name||'F').trim().charAt(0).toUpperCase()));
       const [cls,txt]=syncLabel(window.__flowSync?.state||'idle');
       const loggedIn=!!gUser;
@@ -186,14 +200,14 @@
       const loginSub=checking?'Перевіряємо сесію…'
         :gUser?('Google · '+(gUser.email||''))
         :'Не увійдено · дані лише на цьому пристрої';
-      const loginIco=checking?'⏳':(gUser?'🔵':'🔑');
+      const loginIco=checking?ico('sync','slate'):(gUser?ico('user','blue'):ico('key','blue'));
       // «Вийти» доступне лише коли є Google-сесія
       const loginAction=gUser
         ? `<button class="acc-row-out" data-acc-out>Вийти</button>`
         : `<span class="acc-chev">›</span>`;
       const loginExpand=(!loggedIn && !window.FLOW_NATIVE && !checking) ? `
         <div class="acc-expand" data-acc-login-expand hidden>
-          <button class="acc-mini gg" data-acc-google>🔵 Увійти через Google</button>
+          <button class="acc-mini gg" data-acc-google>Увійти через Google</button>
         </div>` : '';
 
       const bkStats=(()=>{const s=window.flowBackup?window.flowBackup.stats():{keys:0,bytes:0};return s.keys+' записів · '+(s.bytes>1024?(s.bytes/1024).toFixed(0)+' КБ':s.bytes+' Б');})();
@@ -209,75 +223,84 @@
         ? errs.slice(-20).reverse().map(e=>`<div class="acc-errlog-i"><b>${escA(errWhen(e.t))}${e.n>1?' ×'+e.n:''}</b> ${escA(e.msg)}${e.src||e.line?` <span>@ ${escA(e.src||'?')}:${+e.line||0}</span>`:''}</div>`).join('')
         : '<div class="acc-errlog-i">Поки порожньо.</div>';
 
+      /* Розділи профілю. Усе лежить в одному #accountCard, бо обробники нижче
+         шукають свої елементи саме тут (host.querySelector). Порядок на екрані
+         задає data-sec (22-more-screen.css): «Про застосунок» і «Скидання» стоять
+         у самому низу, хоч у розмітці вони тут, біля бекапу. */
       host.innerHTML=`<div class="acc-wrap">
-        <div class="acc-head">
-          <div class="acc-av-wrap">
-            <div class="acc-av" data-acc-av-btn>${av}</div>
-            <div class="acc-av-edit" data-acc-av-btn>✎</div>
+        <div class="mr-grp mr-prof" data-sec="profile">
+          <div class="acc-head">
+            <div class="acc-av-wrap">
+              <div class="acc-av" data-acc-av-btn>${av}</div>
+              <div class="acc-av-edit" data-acc-av-btn>✎</div>
+            </div>
+            <div class="acc-hinfo">
+              <div class="acc-hname">${escA(name)}</div>
+              <div class="acc-hsub"><span class="acc-dot ${cls}"></span>${escA(txt)}</div>
+            </div>
+            ${cloud?`<button class="acc-refresh" data-acc-sync aria-label="Синхронізувати">${window.stgSvg?window.stgSvg('sync'):'↻'}</button>`:''}
           </div>
-          <div class="acc-hinfo">
-            <div class="acc-hname">${escA(name)}</div>
-            <div class="acc-hsub"><span class="acc-dot ${cls}"></span>${escA(txt)}</div>
+          <input type="file" accept="image/*" data-acc-av-file style="display:none">
+          ${avHint}
+          ${window.FLOW_NATIVE ? '' : `
+          <div class="acc-row" data-acc-login-row>
+            ${loginIco}
+            <div class="acc-rtext"><div class="acc-rtitle">${loggedIn?'Вхід':'Увійти'}</div><div class="acc-rsub">${escA(loginSub)}</div></div>
+            ${loginAction}
           </div>
-          ${cloud?`<button class="acc-refresh" data-acc-sync>↻</button>`:''}
+          ${loginExpand}`}
         </div>
-        <input type="file" accept="image/*" data-acc-av-file style="display:none">
-        ${avHint}
-        ${window.FLOW_NATIVE ? '' : `
-        <div class="acc-row" data-acc-login-row>
-          <div class="acc-rico">${loginIco}</div>
-          <div class="acc-rtext"><div class="acc-rtitle">${loggedIn?'Вхід':'Увійти'}</div><div class="acc-rsub">${escA(loginSub)}</div></div>
-          ${loginAction}
-        </div>
-        ${loginExpand}`}
-        <div class="acc-row" data-acc-backup-row>
-          <div class="acc-rico">🛟</div>
-          <div class="acc-rtext"><div class="acc-rtitle">Бекап даних</div><div class="acc-rsub">${bkStats}</div></div>
-          <span class="acc-chev">›</span>
-        </div>
-        <div class="acc-expand" data-acc-backup-expand hidden>
-          <button class="acc-mini" data-acc-export>⬇️ Експорт у файл</button>
-          <button class="acc-mini" data-acc-export-ph>📦 Повний бекап з фото</button>
-          <button class="acc-mini" data-acc-import>⬆️ Імпорт з файлу</button>
-          <input type="file" accept="application/json,.json,application/zip,.zip" data-acc-file style="display:none">
-          <p class="acc-hint" data-acc-ph-count>Фото: рахую…</p>
-          <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом: і з цього пристрою, і ті, що поки лежать лише в хмарі (їх бекап спершу докачає). Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
-        </div>
-        <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
-          <div class="acc-rico">💾</div>
-          <div class="acc-rtext" style="flex:1;min-width:0">
-            <div class="acc-rtitle">Пам'ять пристрою</div>
-            <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
+        <div class="mr-sl" data-sec="data">Дані</div>
+        <div class="mr-grp" data-sec="data">
+          <div class="acc-row" data-acc-backup-row>
+            ${ico('backup','blue')}
+            <div class="acc-rtext"><div class="acc-rtitle">Бекап і відновлення</div><div class="acc-rsub">${bkStats}</div></div>
+            ${chev()}
+          </div>
+          <div class="acc-expand" data-acc-backup-expand hidden>
+            <button class="acc-mini" data-acc-export>Експорт у файл</button>
+            <button class="acc-mini" data-acc-export-ph>Повний бекап з фото</button>
+            <button class="acc-mini" data-acc-import>Імпорт з файлу</button>
+            <input type="file" accept="application/json,.json,application/zip,.zip" data-acc-file style="display:none">
+            <p class="acc-hint" data-acc-ph-count>Фото: рахую…</p>
+            <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом: і з цього пристрою, і ті, що поки лежать лише в хмарі (їх бекап спершу докачає). Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
+          </div>
+          <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
+            ${ico('disk','slate')}
+            <div class="acc-rtext" style="flex:1;min-width:0">
+              <div class="acc-rtitle">Пам'ять пристрою</div>
+              <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
+            </div>
           </div>
         </div>
-        <div class="acc-row" data-acc-reset-row>
-          <div class="acc-rico">♻️</div>
-          <div class="acc-rtext"><div class="acc-rtitle">Скидання</div><div class="acc-rsub">до заводських установок</div></div>
-          <span class="acc-chev">›</span>
+        <div class="mr-sl" data-sec="about">Про застосунок</div>
+        <div class="mr-grp" data-sec="about">
+          <div class="acc-row" data-acc-ver style="cursor:default">
+            ${ico('info','slate')}
+            <div class="acc-rtext"><div class="acc-rtitle">Версія</div><div class="acc-rsub">${escA(window.FLOW_BUILD||'невідома')} · дата збірки й код коміту</div></div>
+          </div>
+          <div class="acc-row" data-acc-errlog-row>
+            ${ico('bug','slate')}
+            <div class="acc-rtext"><div class="acc-rtitle">Журнал помилок</div><div class="acc-rsub">${escA(errSub)}</div></div>
+            ${chev()}
+          </div>
+          <div class="acc-expand" data-acc-errlog-expand hidden>
+            <div class="acc-errlog">${errList}</div>
+            <button class="acc-mini" data-acc-errlog-share>Скопіювати / поділитися</button>
+            <p class="acc-hint">Лише на цьому пристрої: журнал не йде ні в хмару, ні в бекап. Надішли його, коли щось зламалось.</p>
+          </div>
         </div>
-        <div class="acc-expand" data-acc-reset-expand hidden>
-          <button class="acc-mini" data-acc-reset-device>♻️ Скинути цей пристрій</button>
-          <button class="acc-mini dng" data-acc-reset-all>🗑 Стерти все з акаунта</button>
-          <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл. «Скинути пристрій» кладе в нього фото з цього пристрою (решта лишається в хмарі). «Стерти все» спершу докачує у файл і фото, що є лише в хмарі, — і нічого не стирає, якщо хоч одне взяти не вдалось. Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
-        </div>
-        <div class="acc-row" data-acc-settings-row>
-          <div class="acc-rico">⚙️</div>
-          <div class="acc-rtext"><div class="acc-rtitle">Всі налаштування</div></div>
-          <span class="acc-chev">›</span>
-        </div>
-        <div class="acc-row" data-acc-errlog-row>
-          <div class="acc-rico">🧾</div>
-          <div class="acc-rtext"><div class="acc-rtitle">Журнал помилок</div><div class="acc-rsub">${escA(errSub)}</div></div>
-          <span class="acc-chev">›</span>
-        </div>
-        <div class="acc-expand" data-acc-errlog-expand hidden>
-          <div class="acc-errlog">${errList}</div>
-          <button class="acc-mini" data-acc-errlog-share>📤 Скопіювати / поділитися</button>
-          <p class="acc-hint">Лише на цьому пристрої: журнал не йде ні в хмару, ні в бекап. Надішли його, коли щось зламалось.</p>
-        </div>
-        <div class="acc-row" data-acc-ver style="cursor:default">
-          <div class="acc-rico">🏷️</div>
-          <div class="acc-rtext"><div class="acc-rtitle">Версія ${escA(window.FLOW_BUILD||'невідома')}</div><div class="acc-rsub">дата і час збірки · код коміту</div></div>
+        <div class="mr-grp mr-danger" data-sec="danger">
+          <div class="acc-row" data-acc-reset-row>
+            ${ico('reset','red')}
+            <div class="acc-rtext"><div class="acc-rtitle">Скидання до заводських</div><div class="acc-rsub">стерти дані на цьому пристрої або всюди</div></div>
+            ${chev()}
+          </div>
+          <div class="acc-expand" data-acc-reset-expand hidden>
+            <button class="acc-mini" data-acc-reset-device>Скинути цей пристрій</button>
+            <button class="acc-mini dng" data-acc-reset-all>Стерти все з акаунта</button>
+            <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл. «Скинути пристрій» кладе в нього фото з цього пристрою (решта лишається в хмарі). «Стерти все» спершу докачує у файл і фото, що є лише в хмарі, — і нічого не стирає, якщо хоч одне взяти не вдалось. Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
+          </div>
         </div>
       </div>`;
 
@@ -438,9 +461,6 @@
             }});
         };
       }
-
-      const setRow=host.querySelector('[data-acc-settings-row]');
-      if(setRow) setRow.onclick=()=>{ if(window.openSettingsSheet) window.openSettingsSheet(); };
 
       const elRow=host.querySelector('[data-acc-errlog-row]');
       if(elRow) elRow.onclick=()=>toggle('[data-acc-errlog-expand]');

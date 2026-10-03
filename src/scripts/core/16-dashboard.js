@@ -334,7 +334,11 @@
     document.body.appendChild(ov);
     var stage=ov.querySelector('[data-pcestage]');
     var im=ov.querySelector('[data-pceimg]');
-    im.style.backgroundImage="url('"+opts.img+"')";
+    /* Через safeImg: фото тут може прийти з імпортованого бекапу, де тип у
+       data-URL підроблено ("image/jpeg'),url('https://…") — без фільтра
+       редактор підвантажив би чужу адресу. Звичайний показ фото це вже
+       відкидав; тепер і кадрування мрій, папок і документів. */
+    im.style.backgroundImage="url('"+safeImg(opts.img)+"')";
     function clampScale(s){ return Math.max(1,Math.min(3,s)); }
     function clampOff(v,scale){ var m=(scale-1)*50; return Math.max(-m,Math.min(m,v)); }
     function apply(){

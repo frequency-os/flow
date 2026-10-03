@@ -11,6 +11,8 @@
     photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>',
     plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
     crop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>',
+    target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>',
+    calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5"/></svg>',
     refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 21v-5h5"/></svg>'
   };
   function icoHtml(name){ return WICONS[name] || (name||'') ; }
@@ -250,13 +252,43 @@
     };
     inp.click();
   }
-  const WISH_SIZES=['sq','tall','wide'];
-  const WISH_SIZE_LABEL={sq:'Квадрат',tall:'Висока',wide:'Широка'};
-  function cycleWishSize(id){
-    const w=wishes.find(x=>x.id===id); if(!w) return;
-    const cur=WISH_SIZES.indexOf(w.size==='tall'?'tall':(w.size==='wide'?'wide':'sq'));
-    w.size=WISH_SIZES[(cur+1)%WISH_SIZES.length];
-    saveWishes(); renderWishes();
+  /* Замінити фото мрії, не чіпаючи підпис, дату, ціль і кроки (03.10.2026).
+     Порядок важливий (рецензія безпеки даних):
+     1) спершу переконуємось, що браузер узагалі може показати картинку —
+        compressImage, якщо не розкрив файл (HEIC у Chrome), віддає оригінал,
+        і замість старого фото лишилась би порожня плитка;
+     2) кладемо знімок у PhotoDB під НОВИМ ключем — під старим інші пристрої
+        мають свою копію і показували б старе фото; а на idb:wi_<id> ще
+        посилаються обкладинки цілей і конвертів (09-goals, 08-finance);
+     3) лише тоді — один запис посилання в мрію. Великий base64 у wishes_board
+        не потрапляє: на майже повній пам'яті він викликав би банер і чистку,
+        а якби лишився там, migrateWishPhotosOnce при наступному старті
+        переписала б ним старе фото під старим ключем.
+     Старий знімок не видаляємо — заміна не повинна нічого стирати. Кадр (w.pos)
+     скидаємо: він підбирався під попереднє фото. */
+  function replaceWishPhoto(id){
+    if(!wishes.find(x=>x.id===id)) return;
+    const inp=document.createElement('input');
+    inp.type='file'; inp.accept='image/*'; inp.style.display='none';
+    document.body.appendChild(inp);
+    inp.onchange=()=>{
+      const f=inp.files&&inp.files[0]; inp.remove();
+      if(!f) return;
+      compressImage(f, async (dataUrl)=>{
+        const shows=await new Promise(res=>{ const im=new Image();
+          im.onload=()=>res(im.naturalWidth>0); im.onerror=()=>res(false); im.src=dataUrl; });
+        if(!shows){ flowAlert('Це фото не вдалося відкрити — старе лишилось на місці. Спробуй JPG або PNG.'); return; }
+        const usePdb=!!(window.PhotoDB && window.PhotoDB.available());
+        let ref=dataUrl;
+        try{ ref=await window.photoPut('wi_'+id+'_'+Date.now().toString(36), dataUrl); }catch(_){}
+        const stored=String(ref).slice(0,4)==='idb:';
+        if(usePdb && !stored){ flowAlert('Не вдалося зберегти нове фото — старе лишилось на місці.'); return; }
+        const w=wishes.find(x=>x.id===id); if(!w) return;   // мрію могли прибрати, поки йшов запис
+        w.img=stored?ref:dataUrl; w.pos=null;
+        saveWishes(); renderWishes();
+      });
+    };
+    inp.click();
   }
   function askWishCap(id){
     const w=wishes.find(x=>x.id===id); if(!w) return;
@@ -433,29 +465,32 @@
     const w=wishes.find(x=>x.id===id); if(!w) return;
     const isVid=w.type==='video';
     const idx=wishes.findIndex(x=>x.id===id);
-    const szNow=w.size==='tall'?'Висока':(w.size==='wide'?'Широка':'Квадрат');
     const items=[];
     if(isVid){
       items.push({ic:'play', label:'Відкрити відео', sub:w.url, primary:true, onClick:()=>openWishVideo(w)});
       items.push({ic:'image', label:w.thumb?'Змінити обкладинку':'Додати обкладинку', sub:'Фото з галереї', onClick:()=>setWishCover(id)});
     }
     items.push({ic:'edit', label:'Підпис', sub:w.cap||'без підпису', onClick:()=>askWishCap(id)});
-    items.push({ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5"/></svg>', label:'Дата', sub:w.targetDate||'без дати', onClick:()=>inputModal({title:'Дата образу', value:w.targetDate||'', placeholder:'Напр. січ 2027, 09.2026 або 2029', onOk:v=>{ w.targetDate=(v||'').trim(); saveWishes(); renderWishes(); }})});
+    items.push({ic:'calendar', label:'Дата', sub:w.targetDate||'без дати', onClick:()=>inputModal({title:'Дата образу', value:w.targetDate||'', placeholder:'Напр. січ 2027, 09.2026 або 2029', onOk:v=>{ w.targetDate=(v||'').trim(); saveWishes(); renderWishes(); }})});
     if(w.goalId && (goalsData.goals||[]).some(g=>g.id===w.goalId)){
-      items.push({ic:'🎯', label:'Відкрити ціль', sub:'Це бажання вже ціль', primary:true, onClick:()=>{ goalsData.tab='goals'; saveGoals(); show('scr-goals'); try{renderGoals();}catch(_){} }});
+      items.push({ic:'target', label:'Відкрити ціль', sub:'Це бажання вже ціль', primary:true, onClick:()=>{ goalsData.tab='goals'; saveGoals(); show('scr-goals'); try{renderGoals();}catch(_){} }});
     } else {
-      items.push({ic:'🎯', label:'Зробити ціллю', sub:'Додати в Цілі з цим фото', primary:true, onClick:()=>wishToGoal(id)});
+      items.push({ic:'target', label:'Зробити ціллю', sub:'Додати в Цілі з цим фото', primary:true, onClick:()=>wishToGoal(id)});
     }
-    items.push({ic:'resize', label:'Розмір плитки', sub:'Зараз: '+szNow+' · тап щоб змінити', onClick:()=>cycleWishSize(id)});
+    if(!isVid) items.push({ic:'photo', label:'Замінити фото', sub:'підпис, дата й ціль лишаються', onClick:()=>replaceWishPhoto(id)});
     /* Кадрування для банера Огляду. Знімок там лежить у широкій картці, тож
        вертикальне фото обрізається по центру — часто не там, де треба.
        Редактор той самий, що й для фото папки (openPhotoCropEditor). */
     { const src = (w.type==='video') ? w.thumb : w.img;
-      if(src) items.push({ic:'image', label:'Кадрувати для Огляду',
+      if(src) items.push({ic:'crop', label:'Кадрувати для Огляду',
         sub: w.pos ? 'Кадр підібрано · тап щоб змінити' : 'Обрати видиму частину',
         onClick:()=>{
           if(typeof openPhotoCropEditor!=='function'){ flowAlert('Редактор кадру недоступний.'); return; }
-          openPhotoCropEditor({ img:src, pos:w.pos||null, title:'Кадр для Огляду',
+          /* src — це адреса у сховищі (idb:wi_…), а не саме фото: відколи знімки
+             переїхали в PhotoDB, редактор отримував її сирою й малював чорне
+             поле — ні зсунути, ні масштабувати (баг 03.10.2026). Розгортаємо
+             так само, як для фото папки (16-dashboard.js). */
+          openPhotoCropEditor({ img:window.photoSrc(src), pos:w.pos||null, title:'Кадр для Огляду',
             onSave:(pos)=>{ w.pos=pos; saveWishes(); try{renderWishes();}catch(_){}
               // тло банера малює updateSummaryBg(), не renderWishBg — назва
               // інша, і без цього виклику кадр застосувався б лише після

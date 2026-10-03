@@ -1,0 +1,181 @@
+
+/* ════════════════════════════════════════════════════════════════════
+   ЕКРАН «ЩЕ» · налаштування й інструменти (03.10.2026)
+   Обрано з полотна: телефон — варіант A (списки з плашками), комп'ютер —
+   варіант B (розділи ліворуч, вміст одного праворуч).
+
+   Як це влаштовано. Екран складають три блоки, кожен зі своїм рендером:
+     #accountCard  (29-more-screen.js, renderAccount)  — профіль, дані,
+                    «Про застосунок», скидання;
+     #settingsCard (05-spaces.js, renderSettingsCard)  — вигляд, напарник, AI;
+     #moreHybrid   (29-more-screen.js, renderMore)     — інструменти, Lite, dev.
+   Обробники бекапу й скидання шукають свої елементи лише всередині
+   #accountCard, тому розмітку НЕ розносимо по різних місцях. Натомість самі
+   блоки стають display:contents — їхні розділи (.mr-sl/.mr-grp з data-sec)
+   опиняються сусідами в одному списку, і порядок задає `order` нижче.
+   Так «Скидання» стоїть у самому низу, хоч у розмітці воно біля бекапу.
+
+   Файл підключається останнім (22- після 21-): досить того самого
+   селектора, щоб перекрити старі стилі «Ще» з 12-pets-more-planner.css.
+   ════════════════════════════════════════════════════════════════════ */
+
+#scr-more.active{display:flex;flex-direction:column;}
+#accountCard,#settingsCard,#moreHybrid,#scr-more .acc-wrap{display:contents;}
+#scr-more>.more-head{order:-10;}
+.more-index{display:none;}
+
+/* порядок розділів на екрані */
+#scr-more [data-sec="profile"]{order:1;}
+#scr-more [data-sec="data"]{order:2;}
+#scr-more [data-sec="look"]{order:3;}
+#scr-more [data-sec="pet"]{order:4;}
+#scr-more [data-sec="ai"]{order:5;}
+#scr-more [data-sec="tools"]{order:6;}
+#scr-more [data-sec="lite"]{order:7;}
+#scr-more [data-sec="dev"]{order:8;}
+#scr-more [data-sec="about"]{order:9;}
+#scr-more [data-sec="danger"]{order:10;}
+
+/* ── підпис розділу і група-картка ── */
+#scr-more .mr-sl{font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:24px 6px 8px;}
+#scr-more .mr-grp{position:relative;background:var(--dp-card,var(--card));border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 0 var(--dp-edge,transparent) inset,var(--dp-shadow,none);}
+
+/* ── рядок: плашка-іконка · текст · керування ── */
+#scr-more .mr-row,
+#scr-more .acc-row{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:11px 14px;
+  border:0;border-bottom:0;background:none;color:inherit;font:inherit;text-align:left;position:relative;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;}
+#scr-more div.mr-row{cursor:default;}
+/* розділювач — від початку тексту, як у налаштуваннях iPhone */
+#scr-more .mr-grp>.mr-row:not(:first-child)::before,
+#scr-more .mr-grp>.acc-row:not(:first-child)::before{content:"";position:absolute;left:56px;right:0;top:0;height:1px;background:var(--line);}
+#scr-more .mr-prof>.acc-row::before{left:14px;}
+@media (hover:hover){
+  #scr-more button.mr-row:hover,
+  #scr-more .acc-row:not([style*="cursor:default"]):hover{background:color-mix(in srgb,var(--text) 4%,transparent);}
+}
+#scr-more button.mr-row:active,
+#scr-more .acc-row:not([style*="cursor:default"]):active{background:color-mix(in srgb,var(--text) 7%,transparent);}
+#scr-more button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:10px;}
+
+/* плашка: біла лінія на кольорі (стиль B, як у «Сферах») */
+#scr-more .mr-ti{width:30px;height:30px;border-radius:9px;background:var(--c);color:#fff;
+  display:grid;place-items:center;flex:none;}
+#scr-more .mr-ti svg{width:17px;height:17px;display:block;}
+
+#scr-more .mr-tx,
+#scr-more .acc-rtext{flex:1;min-width:0;display:block;}
+#scr-more .mr-tx b,
+#scr-more .acc-rtitle{display:block;font-size:14px;font-weight:700;color:var(--text);}
+#scr-more .mr-tx small,
+#scr-more .acc-rsub{display:block;font-size:11.5px;font-weight:500;color:var(--muted);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#scr-more .acc-mem-row .acc-rsub{white-space:normal;}
+#scr-more .mr-chev{display:grid;place-items:center;color:var(--muted);flex:none;opacity:.7;}
+#scr-more .mr-chev svg{width:16px;height:16px;}
+#scr-more .mr-pill{font-size:11px;font-weight:800;background:var(--accent);color:#fff;border-radius:99px;
+  padding:1px 8px;flex:none;}
+
+/* сегменти (Світла/Темна, UA/EN, Lite/Pro) */
+#scr-more .mr-seg{display:flex;flex:none;background:color-mix(in srgb,var(--text) 7%,transparent);border-radius:10px;padding:2px;}
+#scr-more .mr-seg button{border:0;background:none;font:inherit;font-size:12px;font-weight:800;color:var(--muted);
+  padding:6px 11px;border-radius:8px;cursor:pointer;}
+#scr-more .mr-seg button.on{background:color-mix(in srgb,var(--text) 15%,transparent);color:var(--text);}
+
+/* стиль — три мініатюри: тло набору + його акцент */
+#scr-more .mr-sws{display:flex;gap:7px;flex:none;}
+#scr-more .mr-sw{width:28px;height:28px;border-radius:9px;padding:0;cursor:pointer;border:2px solid transparent;
+  background:linear-gradient(135deg,var(--a) 52%,var(--b) 52%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);}
+#scr-more .mr-sw.on{border-color:var(--accent);}
+
+/* перемикач */
+#scr-more .mr-tg{width:44px;height:26px;border-radius:99px;border:0;padding:0;flex:none;cursor:pointer;position:relative;
+  background:color-mix(in srgb,var(--text) 22%,transparent);transition:background .2s;}
+#scr-more .mr-tg::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:99px;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s;}
+#scr-more .mr-tg.on{background:var(--accent);}
+#scr-more .mr-tg.on::after{transform:translateX(18px);}
+#scr-more .mr-go{flex:none;font:inherit;font-size:12px;font-weight:800;color:var(--text);cursor:pointer;
+  background:color-mix(in srgb,var(--text) 8%,transparent);border:0;border-radius:10px;padding:7px 12px;}
+
+/* ── профіль ── */
+#scr-more .mr-prof .acc-head{border-bottom:0;padding:16px 16px 8px;}
+#scr-more .mr-prof .acc-hint-av{padding:0 16px 12px;}
+#scr-more .acc-refresh{display:grid;place-items:center;color:var(--accent);}
+#scr-more .acc-refresh svg{width:16px;height:16px;}
+
+/* розгортки (бекап, журнал, скидання, вхід) — без старої лінії знизу */
+#scr-more .mr-grp .acc-expand{border-bottom:0;padding:2px 14px 14px;}
+
+/* ── небезпечна зона — окремо, червоним, у самому низу ── */
+#scr-more .mr-danger{margin-top:26px;background:transparent;box-shadow:none;
+  border:1.5px solid color-mix(in srgb,#ef5350 42%,transparent);}
+#scr-more .mr-danger .acc-rtitle{color:#ef5350;}
+#scr-more>.mr-grp:last-child,#scr-more [data-sec="danger"]{margin-bottom:8px;}
+
+/* ════════ КОМП'ЮТЕР · розділи ліворуч, вміст одного праворуч ════════ */
+@media (min-width:1024px){
+  #scr-more.active{display:grid;grid-template-columns:210px minmax(0,640px);column-gap:36px;align-content:start;align-items:start;}
+  #scr-more>.more-head{grid-column:1 / -1;}
+  .more-index{display:flex;flex-direction:column;gap:2px;grid-column:1;grid-row:2 / span 30;position:sticky;top:16px;align-self:start;}
+  .more-index .mi{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;font-size:13.5px;font-weight:700;
+    color:var(--muted);padding:9px 12px;border-radius:10px;cursor:pointer;}
+  .more-index .mi:hover{background:color-mix(in srgb,var(--text) 6%,transparent);color:var(--text);}
+  .more-index .mi.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--text);}
+  .more-index .mi.red{color:#ef5350;margin-top:14px;position:relative;}
+  .more-index .mi.red::before{content:"";position:absolute;left:12px;right:12px;top:-8px;height:1px;background:var(--line);}
+
+  #scr-more [data-sec]{grid-column:2;}
+  #scr-more .mr-sl{margin:0 6px 10px;font-size:12px;}
+  #scr-more .mr-danger{margin-top:0;}
+
+  /* видно лише вибраний розділ… */
+  #scr-more[data-msec] .mr-sl[data-sec],
+  #scr-more[data-msec] .mr-grp[data-sec]{display:none;}
+  /* вага як у правила вище (id + атрибут + клас + атрибут) — інакше воно переможе */
+  #scr-more[data-msec="profile"] .mr-sl[data-sec="profile"],
+  #scr-more[data-msec="profile"] .mr-grp[data-sec="profile"],
+  #scr-more[data-msec="data"] .mr-sl[data-sec="data"],
+  #scr-more[data-msec="data"] .mr-grp[data-sec="data"],
+  #scr-more[data-msec="look"] .mr-sl[data-sec="look"],
+  #scr-more[data-msec="look"] .mr-grp[data-sec="look"],
+  #scr-more[data-msec="pet"] .mr-sl[data-sec="pet"],
+  #scr-more[data-msec="pet"] .mr-grp[data-sec="pet"],
+  #scr-more[data-msec="ai"] .mr-sl[data-sec="ai"],
+  #scr-more[data-msec="ai"] .mr-grp[data-sec="ai"],
+  #scr-more[data-msec="lite"] .mr-sl[data-sec="lite"],
+  #scr-more[data-msec="lite"] .mr-grp[data-sec="lite"],
+  #scr-more[data-msec="dev"] .mr-sl[data-sec="dev"],
+  #scr-more[data-msec="dev"] .mr-grp[data-sec="dev"],
+  #scr-more[data-msec="about"] .mr-sl[data-sec="about"],
+  #scr-more[data-msec="about"] .mr-grp[data-sec="about"],
+  #scr-more[data-msec="danger"] .mr-sl[data-sec="danger"],
+  #scr-more[data-msec="danger"] .mr-grp[data-sec="danger"]{display:block;}
+
+  /* …а інструменти стоять завжди, угорі, чотирма плитками */
+  #scr-more[data-msec] .mr-grp[data-sec="tools"]{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+    order:-5;margin-bottom:24px;background:none;box-shadow:none;overflow:visible;}
+  #scr-more .mr-tools .mr-row{flex-direction:column;align-items:flex-start;gap:10px;min-height:0;padding:14px;border-radius:14px;
+    background:var(--dp-card,var(--card));box-shadow:0 1px 0 var(--dp-edge,transparent) inset,var(--dp-shadow-s,none);}
+  #scr-more .mr-tools .mr-row::before,
+  #scr-more .mr-tools .mr-tx small,
+  #scr-more .mr-tools .mr-chev{display:none;}
+  #scr-more .mr-tools .mr-pill{position:absolute;top:12px;right:12px;}
+  #scr-more .mr-tools .mr-ti{width:36px;height:36px;border-radius:11px;}
+  #scr-more .mr-tools .mr-ti svg{width:19px;height:19px;}
+}
+
+/* ── котик-напарник на «Ще» не показується ──
+   #flowCap закріплений у правому нижньому куті, і на цьому екрані лягав
+   просто на керування: при відкритті — на кнопку EN, при прокрутці — на праві
+   краї рядків (elementFromPoint повертав #flowCap замість кнопки). Ховаємо
+   так само, як у Каналі (18-channel.css). Вимикач «Показувати котика» — тут
+   же, у розділі «Напарник»; на решті екранів котик як і був. */
+body:has(#scr-more.active) #flowCap,
+body:has(#scr-more.active) #fcSay{display:none!important;}
+
+@media (prefers-reduced-motion:reduce){
+  #scr-more .mr-tg,#scr-more .mr-tg::after{transition:none;}
+}

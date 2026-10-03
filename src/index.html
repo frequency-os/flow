@@ -851,10 +851,13 @@
   <section class="screen" id="scr-more">
     <div class="more-head">
       <h1>Ще</h1>
-      <p>Інструменти, звіти й налаштування</p>
+      <p>Налаштування й інструменти</p>
     </div>
+    <!-- список розділів ліворуч — лише на комп'ютері (29-more-screen.js, renderMoreIndex) -->
+    <nav class="more-index" id="moreIndex" aria-label="Розділи"></nav>
+    <!-- три блоки розкладаються в один список розділів через data-sec (22-more-screen.css) -->
     <div id="accountCard"></div>
-    <div class="bkp-card" id="settingsCard" hidden></div>
+    <div id="settingsCard"></div>
     <div id="moreHybrid"></div>
   </section>
 
@@ -960,5 +963,6 @@
 <style id="themes-flat">@@INC:styles/19-themes-flat.css@@</style>
 <style id="depth">@@INC:styles/20-depth.css@@</style>
 <style id="hero-week">@@INC:styles/21-hero-week.css@@</style>
+<style id="more-screen">@@INC:styles/22-more-screen.css@@</style>
 </body>
 </html>

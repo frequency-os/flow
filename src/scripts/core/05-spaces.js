@@ -239,55 +239,116 @@
   { const f=document.getElementById('dsbFoot'); if(f) f.onclick=dsbProfileSheet; }
   dsbFillUser();
 
+  /* ═══ ІКОНКИ ЕКРАНА «ЩЕ» ═══
+     Лінійні, білі на кольоровій плашці — «стиль B», той самий, що в «Сферах»
+     (39-spheres.js). Заміна 18 емодзі (рішення Ярослава 03.10.2026): решта
+     застосунку давно на лінійних іконках, налаштування лишались останнім
+     місцем зі старим почерком. 29-more-screen.js бере їх через window.stgIco. */
+  const STG_COL={blue:'#5b8def',violet:'#8b7cff',green:'#22c55e',orange:'#f97316',amber:'#e0a428',
+    pink:'#ec6aa0',teal:'#2bb3c0',slate:'#6b7280',red:'#ef5350'};
+  const STG_IC={
+    user:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+    key:'<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M16 7l3 3M14 9l2 2"/>',
+    backup:'<path d="M7 18a4.5 4.5 0 0 1-.5-9 6 6 0 0 1 11.5 1.5A4 4 0 0 1 17.5 18"/><path d="M12 12v8M9 15l3-3 3 3"/>',
+    sync:'<path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/>',
+    disk:'<ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6"/><path d="M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/>',
+    reset:'<path d="M3.5 12a8.5 8.5 0 1 0 2.5-6"/><path d="M3.5 4v5h5"/>',
+    globe:'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5z"/>',
+    theme:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/>',
+    palette:'<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.8 1.8-1.8 0-1.4-1.4-1.7-1.4-3 0-1 .8-1.7 1.8-1.7h2.3a3.5 3.5 0 0 0 3.5-3.5c0-3.9-3.6-7-8-7z"/><circle cx="7.6" cy="11" r="1.1" fill="currentColor"/><circle cx="10" cy="7.2" r="1.1" fill="currentColor"/><circle cx="14.4" cy="7.4" r="1.1" fill="currentColor"/>',
+    mode:'<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 9.5h17M8 9.5V19"/>',
+    paw:'<circle cx="7" cy="10" r="1.8"/><circle cx="10.5" cy="6.5" r="1.8"/><circle cx="14.5" cy="6.5" r="1.8"/><circle cx="18" cy="10" r="1.8"/><path d="M12 12c-3 0-5.5 3-5.5 5.2 0 1.6 1.3 2.3 2.8 2.3 1.2 0 1.8-.6 2.7-.6s1.5.6 2.7.6c1.5 0 2.8-.7 2.8-2.3C17.5 15 15 12 12 12z"/>',
+    lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
+    bolt:'<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>',
+    timer:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M9.5 2.5h5"/>',
+    inbox:'<path d="M3.5 13.5 6 5.5h12l2.5 8V19a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19z"/><path d="M3.5 13.5h4.5l1.5 2.5h5l1.5-2.5h4.5"/>',
+    target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
+    info:'<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.2"/>',
+    bug:'<rect x="7.5" y="7.5" width="9" height="12" rx="4.5"/><path d="M12 11.5v8M7.5 13H4M20 13h-3.5M8 9 5.5 6.5M16 9l2.5-2.5M7.8 17 5 19M16.2 17l2.8 2M9.5 7.5a2.5 2.5 0 0 1 5 0"/>',
+    code:'<path d="m8.5 8-4.5 4 4.5 4M15.5 8l4.5 4-4.5 4M13.5 5.5l-3 13"/>',
+    lang:'<path d="M4 6h9M8.5 4v2M6 6c.7 3 2.7 5.3 5.5 6.5M11 6c-.8 3.3-3 6-6.5 7.5"/><path d="M13 20l3.5-8.5L20 20M14.2 17.2h4.6"/>',
+    folder:'<path d="M3.5 7a2 2 0 0 1 2-2h3.5l2 2.5h7.5a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>',
+    book:'<path d="M6 3.5h11a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2z"/><path d="M6 3.5v17M9 8h6M9 12h6"/>',
+    compass:'<circle cx="12" cy="12" r="8.5"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+    dna:'<path d="M7 3.5c0 5 10 5 10 10s-10 5-10 7M17 3.5c0 5-10 5-10 10s10 5 10 7M8.5 7h7M8.5 17h7"/>',
+    city:'<path d="M3.5 20.5h17M5 20.5V9l5-3v14.5M10 20.5V4l6 3.5v13M16 20.5V11l3.5 2v7.5"/>',
+    chev:'<path d="m9.5 6 6 6-6 6"/>'
+  };
+  function stgSvg(name){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(STG_IC[name]||'')+'</svg>';
+  }
+  // плашка з іконкою; color — ключ STG_COL або готовий колір
+  function stgIco(name, color){
+    // лише ключ зі STG_COL або hex — стрічка йде в атрибут style
+    const c=STG_COL[color]||(/^#[0-9a-f]{3,8}$/i.test(String(color||''))?color:STG_COL.slate);
+    return '<span class="mr-ti" style="--c:'+c+'">'+stgSvg(name)+'</span>';
+  }
+  try{ window.stgIco=stgIco; window.stgSvg=stgSvg; }catch(_){}
+
   /* ═══ НАЛАШТУВАННЯ ═══
-     Живуть як картка на екрані «Ще» (той самий стиль, що й картка бекапу —
-     перевірена, стабільна верстка, без багів кастомної шторки). Мова, тема,
-     AI-проксі, і (тільки в dev-режимі) переклад власного контенту. */
+     Три розділи екрана «Ще»: Вигляд, Напарник, AI і приватність. Раніше це була
+     окрема картка, схована за рядком «Всі налаштування»; тепер розділи видно
+     одразу, а місце кожного на екрані задає data-sec (22-more-screen.css).
+     Прибрано 03.10.2026: «Живе скло» — у «Робочому столі» перемикач нічого не
+     міняв (єдиний шар, який він чіпає, схований в обох станах; перевірено на
+     живому сайті). Сама логіка homeGlass лишилась — у класичному наборі вона
+     ще діє, просто без перемикача. */
   function renderSettingsCard(){
     const host=document.getElementById('settingsCard'); if(!host) return;
     const lang=(window.flowLang&&window.flowLang())||'uk';
     const devOn=(typeof aiDevOn==='function')&&aiDevOn();
     const ctOn=(function(){ try{ return localStorage.getItem('dev_translate_content')==='1'; }catch(_){ return false; } })();
+    const set=themeSetOf(theme), dark=themeIsDark(theme);
+    const um=(window.uiMode==='lite')?'lite':'pro';
+    const petOn=!(typeof window.petHidden==='function' && window.petHidden());
+    /* AI-проксі — для розробника: адреса за замовчуванням уже вшита (09-goals.js).
+       Показуємо лише в dev-режимі або коли людина колись поставила свою адресу —
+       щоб вона могла її повернути. */
+    let epCustom=false;
+    try{ epCustom = typeof aiEndpoint==='function' && typeof AI_EP_DEFAULT!=='undefined' && aiEndpoint()!==AI_EP_DEFAULT; }catch(_){}
+    const showProxy=!window.FLOW_NATIVE && (devOn || epCustom);
+    // мініатюри наборів: тло темної теми + акцент набору (01-tokens-base.css)
+    const SW={desk:['#101317','#7c93ff'], studio:['#0e1011','#d4a24c'], classic:['#0c0e14','#8b7cff']};
+    const swatches=Object.keys(THEME_SETS).map(id=>{
+      const c=SW[id]||['#222','#888'];
+      return `<button class="mr-sw ${set===id?'on':''}" data-ts="${id}" title="${THEME_SETS[id].name}" aria-label="${THEME_SETS[id].name}" aria-pressed="${set===id}" style="--a:${c[0]};--b:${c[1]}"></button>`;
+    }).join('');
+    const seg=(attr,items,cur)=>'<span class="mr-seg">'+items.map(([v,l])=>`<button data-${attr}="${v}" class="${v===cur?'on':''}" aria-pressed="${v===cur}">${l}</button>`).join('')+'</span>';
     host.innerHTML = `
-      <div class="bkp-t">⚙️ Налаштування</div>
-      <div class="stg-list">
-        <div class="stg-row">
-          <div class="stg-ic c-lang">🌐</div>
-          <div class="stg-tx"><div class="stg-tt">Мова інтерфейсу</div><div class="stg-sub">Interface language</div></div>
-          <div class="stg-seg" id="stgLangSeg">
+      <div class="mr-sl" data-sec="look">Вигляд</div>
+      <div class="mr-grp" data-sec="look">
+        <div class="mr-row">${stgIco('theme','violet')}
+          <span class="mr-tx"><b>Тема</b><small>${THEME_META[theme]?THEME_META[theme][1]:''}</small></span>
+          ${seg('tm',[['light','Світла'],['dark','Темна']],dark?'dark':'light')}</div>
+        <div class="mr-row">${stgIco('palette','pink')}
+          <span class="mr-tx"><b>Стиль</b><small>${THEME_SETS[set].name}</small></span>
+          <span class="mr-sws" id="stgThemeSetSeg">${swatches}</span></div>
+        <div class="mr-row">${stgIco('globe','teal')}
+          <span class="mr-tx"><b>Мова</b><small>Interface language</small></span>
+          <span class="mr-seg" id="stgLangSeg">
             <button data-l="uk" class="${lang==='uk'?'on':''}">UA</button>
-            <button data-l="en" class="${lang==='en'?'on':''}">EN</button>
-          </div>
-        </div>
-        <div class="stg-row">
-          <div class="stg-ic c-theme">🎨</div>
-          <div class="stg-tx"><div class="stg-tt">Набір стилю</div><div class="stg-sub">${THEME_SETS[themeSetOf(theme)].name}</div></div>
-          <div class="stg-seg" id="stgThemeSetSeg">
-            ${Object.keys(THEME_SETS).map(id=>`<button data-ts="${id}" class="${themeSetOf(theme)===id?'on':''}">${THEME_SETS[id].name}</button>`).join('')}
-          </div>
-        </div>
-        <div class="stg-row">
-          <div class="stg-ic c-theme">🌓</div>
-          <div class="stg-tx"><div class="stg-tt">Тема</div><div class="stg-sub">${THEME_META[theme]?THEME_META[theme][1]:'Світла / темна'}</div></div>
-          <button class="stg-go" id="stgThemeBtn">Перемкнути</button>
-        </div>
-        <div class="stg-row">
-          <div class="stg-ic c-theme">✨</div>
-          <div class="stg-tx"><div class="stg-tt">Живе скло</div><div class="stg-sub">Новий вигляд Огляду · аврора та рідкий метал</div></div>
-          <button class="stg-sw ${homeGlass?'on':''}" id="stgHomeGlassSw" aria-label="Живе скло"></button>
-        </div>
-        ${window.FLOW_NATIVE ? '' : `
-        <div class="stg-row">
-          <div class="stg-ic c-ai">🤖</div>
-          <div class="stg-tx"><div class="stg-tt">AI-проксі</div><div class="stg-sub">Endpoint та ключ</div></div>
-          <button class="stg-go" id="stgProxyBtn">Відкрити</button>
-        </div>`}
-        ${devOn ? `
-        <div class="stg-row">
-          <div class="stg-ic c-dev">🧪</div>
-          <div class="stg-tx"><div class="stg-tt">Перекладати мій контент</div><div class="stg-sub">Папки, сторінки, нотатки → EN · dev</div></div>
-          <button class="stg-sw ${ctOn?'on':''}" id="stgCtSw" aria-label="Перекладати контент"></button>
-        </div>` : ''}
+            <button data-l="en" class="${lang==='en'?'on':''}">EN</button></span></div>
+        <div class="mr-row">${stgIco('mode','slate')}
+          <span class="mr-tx"><b>Режим</b><small>${um==='lite'?'Lite: внизу лише Планер і Гроші':'Pro: увесь Frequency з Оглядом'}</small></span>
+          ${seg('uimode',[['lite','Lite'],['pro','Pro']],um)}</div>
+      </div>
+      <div class="mr-sl" data-sec="pet">Напарник</div>
+      <div class="mr-grp" data-sec="pet">
+        <div class="mr-row">${stgIco('paw','orange')}
+          <span class="mr-tx"><b>Показувати котика</b><small>на Огляді й у списках</small></span>
+          <button class="mr-tg ${petOn?'on':''}" id="stgPetSw" role="switch" aria-checked="${petOn}" aria-label="Показувати котика"></button></div>
+      </div>
+      <div class="mr-sl" data-sec="ai">AI і приватність</div>
+      <div class="mr-grp" data-sec="ai">
+        <button class="mr-row" id="stgAiPriv">${stgIco('lock','green')}
+          <span class="mr-tx"><b>AI і приватність</b><small>що бачить AI · згода · закриті розділи</small></span>
+          <span class="mr-chev">${stgSvg('chev')}</span></button>
+        ${showProxy?`<div class="mr-row">${stgIco('code','slate')}
+          <span class="mr-tx"><b>AI-проксі</b><small>для розробника · адреса сервера</small></span>
+          <button class="mr-go" id="stgProxyBtn">Відкрити</button></div>`:''}
+        ${devOn?`<div class="mr-row">${stgIco('lang','slate')}
+          <span class="mr-tx"><b>Перекладати мій контент</b><small>папки, сторінки, нотатки → EN · dev</small></span>
+          <button class="mr-tg ${ctOn?'on':''}" id="stgCtSw" role="switch" aria-checked="${ctOn}" aria-label="Перекладати контент"></button></div>`:''}
       </div>
     `;
     host.querySelectorAll('#stgLangSeg button').forEach(b=>b.onclick=()=>{
@@ -295,30 +356,36 @@
       if(l!==lang && window.flowSetLang) window.flowSetLang(l);
       renderSettingsCard();
     });
-    const tb=document.getElementById('stgThemeBtn'); if(tb) tb.onclick=()=>{ toggleTheme(); };
-    { const seg=document.getElementById('stgThemeSetSeg');
-      if(seg) seg.querySelectorAll('[data-ts]').forEach(b=>b.onclick=()=>setThemeSet(b.dataset.ts)); }
-    const hgs=document.getElementById('stgHomeGlassSw'); if(hgs) hgs.onclick=()=>{ homeGlass=!homeGlass; applyHomeGlass(); saveHomeGlass(); renderSettingsCard(); };
-    const pb=document.getElementById('stgProxyBtn'); if(pb) pb.onclick=()=>{ if(typeof aiConfig==='function') aiConfig(()=>{}); };
+    host.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>{
+      const s=THEME_SETS[themeSetOf(theme)];
+      const want=b.dataset.tm==='dark';
+      if(want!==themeIsDark(theme)) setTheme(want ? s.dark : s.light);
+    });
+    host.querySelectorAll('[data-ts]').forEach(b=>b.onclick=()=>setThemeSet(b.dataset.ts));
+    host.querySelectorAll('[data-uimode]').forEach(b=>b.onclick=()=>{
+      (window.setUiMode||function(){})(b.dataset.uimode);
+      renderSettingsCard();
+      try{ if(window.renderMore) window.renderMore(); }catch(_){}
+    });
+    const ps=document.getElementById('stgPetSw'); if(ps) ps.onclick=()=>{
+      try{ if(typeof window.petHiddenSet==='function') window.petHiddenSet(!window.petHidden()); }catch(_){}
+      renderSettingsCard();
+    };
+    const ap=document.getElementById('stgAiPriv'); if(ap) ap.onclick=()=>{ if(window.aiPrivacySheet) window.aiPrivacySheet(); };
+    const pb=document.getElementById('stgProxyBtn'); if(pb) pb.onclick=()=>{ if(typeof aiConfig==='function') aiConfig(()=>{ renderSettingsCard(); }); };
     const cs=document.getElementById('stgCtSw'); if(cs) cs.onclick=()=>{ if(typeof devContentTranslateToggleSheet==='function') devContentTranslateToggleSheet(); setTimeout(renderSettingsCard,50); };
   }
   window.renderSettingsCard = renderSettingsCard;
   document.addEventListener('flowlangchange', renderSettingsCard);
+  /* Шестірня на Огляді веде на «Ще» до розділу «Вигляд»: на телефоні —
+     прокрутка, на комп'ютері — розділ відкривається праворуч (moreShowSection,
+     29-more-screen.js). Окремої картки, яку треба розгортати, більше немає. */
   function openSettings(){
     if(typeof goMore==='function') goMore();
-    const host=document.getElementById('settingsCard'); if(!host) return;
-    host.hidden=!host.hidden;
-    if(window.__settingsScrollT){ clearTimeout(window.__settingsScrollT); window.__settingsScrollT=null; }
-    if(!host.hidden){
-      renderSettingsCard();
-      window.__settingsScrollT=setTimeout(()=>{
-        // скролимо, лише якщо картка реально виходить за межі видимої області —
-        // якщо вона й так уже вміщується на екрані, зайвий стрибок не потрібен
-        const r=host.getBoundingClientRect();
-        const fits = r.top>=0 && r.bottom<=(window.innerHeight||document.documentElement.clientHeight);
-        if(!fits) host.scrollIntoView({behavior:'smooth',block:'start'});
-      },50);
-    }
+    // 160 мс, не менше: show() скидає прокрутку body двічі — одразу і ще раз
+    // через 80 мс. Раніше прокрутка до «Вигляду» спрацьовувала на 60 мс і
+    // затиралася цим другим скиданням — шестірня вела на «Ще», але нагору.
+    setTimeout(()=>{ try{ if(window.moreShowSection) window.moreShowSection('look', true); }catch(_){} }, 160);
   }
   window.openSettingsSheet = openSettings; // збережено для сумісності викликів нижче
   { const gb=document.getElementById('dashSettingsBtn'); if(gb) gb.onclick=openSettings; }
