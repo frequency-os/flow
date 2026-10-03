@@ -207,6 +207,7 @@
     <div class="sec sec-htabs"><div class="htabs" id="homeTabs">
       <button class="htab on" data-htab="folders"><span class="e">📁</span>Папки<span class="count" id="folderCountBadge">5</span></button>
       <button class="htab" data-htab="chats"><span class="e">💬</span>Чати<span class="count" id="chatCountBadge">0</span></button>
+      <button class="htab" data-htab="spheres" id="sphTabBtn" hidden><span class="e">🏙</span>Сфери<span class="count" id="sphCountBadge">0</span></button>
     </div><div class="sec-actions"><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><div class="fvseg" id="folderViewSeg">
       <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></button>
@@ -217,6 +218,7 @@
       <div class="grid" id="folderGrid"></div>
     </div>
     <div class="chat-list" id="chatList" hidden></div>
+    <div class="sph-list" id="sphereList" hidden></div>
   </section>
 
   <!-- ===== SCREEN: FOLDER ===== -->
@@ -795,6 +797,7 @@
     <div class="pg-doc">
       <div class="pg-cover" id="pgCover"></div>
       <input class="pg-pagetitle" id="pgTitle" placeholder="Без назви">
+      <div class="sph-head" id="pgSphere" hidden></div>
       <div class="pg-links" id="pgLinks" hidden></div>
       <div id="pgEditor" data-i18n-skip="1"></div>
       <button class="pg-addblock" id="pgAddBlock">＋ Додати блок</button>

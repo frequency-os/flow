@@ -115,6 +115,14 @@
 
 /* ── «назад» у вбудованому режимі ── */
 .hback{display:flex;align-items:center;gap:4px;height:44px;padding:0 12px 0 8px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:inherit;font-weight:800;font-size:13.5px;flex:none}
+
+/* ── сфери Frequency на карті ── */
+.pin.sph .pin-t{box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 25%,transparent),0 0 18px color-mix(in srgb,var(--c) 45%,transparent),0 10px 20px rgba(0,0,0,.5)}
+.sph-ns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:12px}
+.sph-n{display:flex;flex-direction:column;gap:2px;padding:9px 11px;border-radius:12px;background:var(--surface-2)}
+.sph-n span{font-size:11.5px;font-weight:700;color:var(--muted)}
+.sph-n b{font-size:16px}
+.sph-n b.in{color:#4ade80}.sph-n b.out{color:#f87171}
 </style>
 <script>window.MISTO_SITE=1;document.documentElement.classList.add('site');
 /* Гра як вкладка «Мій світ» у Frequency: навігацію дає сам Frequency, тут ховаємо свою. */
@@ -606,7 +614,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 <script>
 (function(){
 'use strict';
-var IMG={gold:MISTO_A.__MAP_GOLD__,bld:{cafe:MISTO_A.__B_CAFE__,school:MISTO_A.__B_SCHOOL__,site:MISTO_A.__B_SITE__,garage:MISTO_A.__B_GARAGE__,studio:MISTO_A.__B_STUDIO__,clinic:MISTO_A.__B_CLINIC__,park:MISTO_A.__B_PARK__,bank:MISTO_A.__B_BANK__},room:MISTO_A.__ROOM__,ch:[MISTO_A.__CH1__,MISTO_A.__CH2__,MISTO_A.__CH3__,MISTO_A.__CH4__],streetM:MISTO_A.__STREET_M__,streetD:MISTO_A.__STREET_D__,desk:MISTO_A.__DESK__,gym:MISTO_A.__GYM__,holo:{car:MISTO_A.__H_CAR__,plane:MISTO_A.__H_PLANE__,tower:MISTO_A.__H_TOWER__},ex:[MISTO_A.__EX1__,MISTO_A.__EX2__,MISTO_A.__EX3__,MISTO_A.__EX4__],fit:[[MISTO_A.__O1B__,MISTO_A.__O1S__,MISTO_A.__O1P__],[MISTO_A.__O2B__,MISTO_A.__O2S__,MISTO_A.__O2P__],[MISTO_A.__O3B__,MISTO_A.__O3S__,MISTO_A.__O3P__],[MISTO_A.__O4B__,MISTO_A.__O4S__,MISTO_A.__O4P__]],froom:MISTO_A.__FROOM__};
+var IMG={gold:MISTO_A.__MAP_GOLD__,bld:{cafe:MISTO_A.__B_CAFE__,school:MISTO_A.__B_SCHOOL__,site:MISTO_A.__B_SITE__,garage:MISTO_A.__B_GARAGE__,studio:MISTO_A.__B_STUDIO__,clinic:MISTO_A.__B_CLINIC__,park:MISTO_A.__B_PARK__,bank:MISTO_A.__B_BANK__,dc:MISTO_A.__B_DC__,media:MISTO_A.__B_MEDIA__},room:MISTO_A.__ROOM__,ch:[MISTO_A.__CH1__,MISTO_A.__CH2__,MISTO_A.__CH3__,MISTO_A.__CH4__],streetM:MISTO_A.__STREET_M__,streetD:MISTO_A.__STREET_D__,desk:MISTO_A.__DESK__,gym:MISTO_A.__GYM__,holo:{car:MISTO_A.__H_CAR__,plane:MISTO_A.__H_PLANE__,tower:MISTO_A.__H_TOWER__},ex:[MISTO_A.__EX1__,MISTO_A.__EX2__,MISTO_A.__EX3__,MISTO_A.__EX4__],fit:[[MISTO_A.__O1B__,MISTO_A.__O1S__,MISTO_A.__O1P__],[MISTO_A.__O2B__,MISTO_A.__O2S__,MISTO_A.__O2P__],[MISTO_A.__O3B__,MISTO_A.__O3S__,MISTO_A.__O3P__],[MISTO_A.__O4B__,MISTO_A.__O4S__,MISTO_A.__O4P__]],froom:MISTO_A.__FROOM__};
 
 /* ── іконки ── */
 var P={
@@ -667,7 +675,8 @@ var PLOTS=[{x:20,y:27,lv:1,px:14},{x:53,y:71,lv:1},{x:80,y:33,lv:3},{x:19,y:48,l
 /* Бібліотека готових будівель (Higgsfield, один стиль). Своя локація = будівля + назва + параметр. */
 var LIB=[{k:'site',n:'Будова',i:'crane',c:'#f59e0b',p:'Майстерність'},{k:'cafe',n:'Кафе',i:'food',c:'#fb923c',p:'Смак'},{k:'school',n:'Навчання',i:'book',c:'#a78bfa',p:'Знання'},
  {k:'studio',n:'Студія',i:'music',c:'#f472b6',p:'Творчість'},{k:'garage',n:'Гараж',i:'car',c:'#94a3b8',p:'Техніка'},{k:'clinic',n:'Здоров\'я',i:'heart',c:'#f87171',p:'Самопочуття'},
- {k:'park',n:'Сквер',i:'leaf',c:'#2dd4bf',p:'Спокій'},{k:'bank',n:'Банк',i:'money',c:'#4ade80',p:'Заощадження'}];
+ {k:'park',n:'Сквер',i:'leaf',c:'#2dd4bf',p:'Спокій'},{k:'bank',n:'Банк',i:'money',c:'#4ade80',p:'Заощадження'},
+ {k:'dc',n:'Дата-центр',i:'work',c:'#60a5fa',p:'Зміни'},{k:'media',n:'Медіа-студія',i:'camera',c:'#c084fc',p:'Контент'}];
 function libOf(k){ return LIB.filter(function(b){return b.k===k;})[0]; }
 /* Ділянка своєї локації. Старі збереження без ділянки отримують першу вільну — лише в пам'яті, без запису. */
 function plotOf(l){ if(l.plot!=null) return l.plot;
@@ -675,7 +684,7 @@ function plotOf(l){ if(l.plot!=null) return l.plot;
  var free=PLOTS.map(function(P,i){return i;}).filter(function(i){return used.indexOf(i)<0;}), k=cs.filter(function(x){return x.plot==null;}).indexOf(l);
  return k>=0&&k<free.length?free[k]:-1; }
 var HERO={home:{m:[33,55],d:[21,62],g:[45,64]},work:{m:[57,37],d:[54,44],g:[50,43]},gym:{m:[28,28],d:[24,33],g:[45,37]},shop:{m:[78,50],d:[68,50],g:[64,56]},park:{m:[27,72],d:[45,86],g:[34,86]},plot:{m:[74,66],d:[74,86],g:[53,80]}};
-function heroAt(l){ if(l&&l.preset&&HERO[l.preset]) return HERO[l.preset].g; var i=l?plotOf(l):-1; return i>=0?[PLOTS[i].x+6,PLOTS[i].y+9]:HERO.plot.g; }
+function heroAt(l){ if(!l&&S.here&&SPH_POS[S.here]) return SPH_POS[S.here]; if(l&&l.preset&&HERO[l.preset]) return HERO[l.preset].g; var i=l?plotOf(l):-1; return i>=0?[PLOTS[i].x+6,PLOTS[i].y+9]:HERO.plot.g; }
 var ROOM_Z={kitchen:{n:'Кухня',x:25,y:26,c:'#fb923c',i:'food'},bed:{n:'Сон',x:60,y:22,c:'#7c93ff',i:'bed'},desk:{n:'Комп\'ютер',x:20,y:52,c:'#c4b5fd',i:'laptop'},
  sofa:{n:'Відпочинок',x:52,y:46,c:'#2dd4bf',i:'sofa'},guitar:{n:'Гітара',x:80,y:44,c:'#f472b6',i:'music'}};
 var PERKS=[{lv:2,t:'+5 до максимальної енергії'},{lv:3,t:'Готування дає на 20% більше енергії'},{lv:4,t:'Бокс кожні 4 дії замість 5'},{lv:5,t:'Друга вільна година на день'},
@@ -764,12 +773,20 @@ function renderCityMap(){
  function pin(l,x,y){ return '<button class="pin" style="left:'+x+'%;top:'+y+'%;--c:'+l.color+'" data-act="loc" data-id="'+l.id+'"><span class="pin-t"><span class="pin-i">'+ic(l.icon,'#0d1014',17,2.3)+'</span><span class="pin-n">'+esc(l.name)+'</span><span class="pin-lv num">'+locLevel(l)+'</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>'; }
  var pins=S.locs.filter(function(l){return l.preset&&GPIN[l.preset];}).map(function(l){ var p=GPIN[l.preset]; return pin(l,p[0],p[1]); }).join('');
  var taken={}; S.locs.filter(function(l){return !l.preset;}).forEach(function(l){ var i=plotOf(l); if(i>=0) taken[i]=l; });
+ /* Сфери Frequency (папки з позначкою «сфера»): Спорт і Дім стають підписом над Залом і Домом,
+    решта займає вільні ділянки (рівень гравця тут не важить — це справжнє життя). */
+ var sph=sphList(), sphPlot={}; SPH_POS={};
+ sph.forEach(function(x){ if(x.bld==='gym'||x.bld==='home') return; var i=-1;
+  for(var j=0;j<PLOTS.length;j++){ if(!taken[j]&&!sphPlot[j]){ i=j; break; } }
+  if(i>=0){ sphPlot[i]=x; SPH_POS['sph:'+x.key]=[PLOTS[i].x+6,PLOTS[i].y+9]; } });
+ sph.forEach(function(x){ if(x.bld==='gym'||x.bld==='home'){ var p=GPIN[x.bld]; SPH_POS['sph:'+x.key]=HERO[x.bld].g; pins+=sphPin(x,p[0]+(x.bld==='gym'?0:-2),p[1]-6.5); } });
  pins+=PLOTS.map(function(P,i){ var l=taken[i];
   if(l){ var B=libOf(l.bld||'site'); return '<img class="bld" src="'+IMG.bld[B.k]+'" alt="" style="left:'+P.x+'%;top:'+P.y+'%">'+pin(l,P.px||P.x,P.y-7); }
+  var X=sphPlot[i]; if(X){ var BK=Object.prototype.hasOwnProperty.call(IMG.bld,X.bld)?X.bld:'site'; return '<img class="bld" src="'+IMG.bld[BK]+'" alt="" style="left:'+P.x+'%;top:'+P.y+'%">'+sphPin(X,P.px||P.x,P.y-7); }
   if(L<P.lv) return '<button class="plot lock" style="left:'+P.x+'%;top:'+P.y+'%" data-act="plotlock" data-lv="'+P.lv+'" aria-label="Ділянка відкриється з рівня '+P.lv+'">'+ic('lock','#e9d9b8',16,2.3)+'<span class="num">рів. '+P.lv+'</span></button>';
   return '<button class="plot" style="left:'+P.x+'%;top:'+P.y+'%" data-act="addloc" data-plot="'+i+'" aria-label="Збудувати локацію на ділянці">'+ic('plus','#0d1014',18,2.6)+'<span>Будувати</span></button>'; }).join('');
- var here=locBy(S.here)||locBy('home'), hp=heroAt(here);
- if(LAST_HERE&&LAST_HERE!==S.here){ var op=heroAt(locBy(LAST_HERE)); WALK={l:op[0]+'%',t:op[1]+'%'}; } LAST_HERE=S.here;
+ var here=locBy(S.here)||(SPH_POS[S.here]?null:locBy('home')), hp=heroAt(here);
+ if(LAST_HERE&&LAST_HERE!==S.here){ var ol=locBy(LAST_HERE), op=ol?heroAt(ol):(SPH_POS[LAST_HERE]||HERO.home.g); WALK={l:op[0]+'%',t:op[1]+'%'}; } LAST_HERE=S.here;
  $('view').innerHTML='<div class="stage-wrap gold"><div class="stage city-g" style="--z:'+ZOOM+';background-image:url('+IMG.gold+')">'+holoLayer(key)+pins+friendLayer(key)+hero(hp[0],hp[1],8)+'</div>'+(D?'<div class="lstrip">'+S.locs.map(function(l){ var tot=l.params.reduce(function(a,p){return a+p.xp/pNeed(p.level);},0)/l.params.length; return '<button class="lc" data-act="loc" data-id="'+l.id+'"><span class="row" style="gap:8px"><span class="ico" style="width:28px;height:28px;border-radius:9px;background:'+l.color+'22">'+ic(l.icon,l.color,16)+'</span><b>'+esc(l.name)+'</b><span class="num" style="margin-left:auto;color:'+l.color+'">'+locLevel(l)+'</span></span><div class="bar"><i style="width:'+Math.round(tot*100)+'%;background:'+l.color+'"></i></div><span>'+l.params.map(function(p){return esc(p.name)+' '+p.level;}).join(' · ')+'</span></button>'; }).join('')+'</div>':'')+'</div>'+
   '<div class="float-card only-m"><span class="ico" style="background:rgba(124,147,255,.16)">'+ic('clock','#7c93ff',19)+'</span><div class="t"><b>Вільна година '+fhRange()+'</b><span>'+esc(tipText())+'</span></div><button class="btn pri sm" data-go="room">Зіграти</button></div>';
  walkHero(); panMap();
@@ -1575,6 +1592,22 @@ function drwMenu(k){ closeDrw();
  if(k==='work'){ goTo('work'); return; }
  TAB=k; closeSheet(); render(); $('view').scrollTop=0; }
 
+
+/* ── сфери з Frequency (лише читання через міст) ── */
+var SPH_POS={};
+function sphList(){ var B=bridge(); if(!B||!B.spheres) return []; try{ var a=B.spheres(); return Array.isArray(a)?a:[]; }catch(_){ return []; } }
+function sphBy(key){ return sphList().filter(function(x){return x.key===key;})[0]||null; }
+function sphPin(x,px,py){ return '<button class="pin sph" style="left:'+px+'%;top:'+py+'%;--c:'+esc(x.color)+'" data-act="sph" data-k="'+esc(x.key)+'"><span class="pin-t"><span class="pin-i">'+ic('star','#0d1014',15,2.4)+'</span><span class="pin-n">'+esc(x.name)+'</span><span class="pin-lv num">'+(+x.lv||1)+'</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>'; }
+function sphSheet(key){ var x=sphBy(key); if(!x){ toast('Сферу не знайдено','<span class="chip xp">Онови світ</span>'); return; }
+ var nums=(x.nums||[]).slice(0,4).map(function(n){ return '<div class="sph-n"><span>'+esc(n.k)+'</span><b class="num'+(n.tone==='in'?' in':n.tone==='out'?' out':'')+'">'+esc(n.v)+'</b></div>'; }).join('');
+ var g=x.goal;
+ openSheet('<div class="row" style="gap:14px">'+(x.bld==='gym'||x.bld==='home'?'<img src="'+(x.bld==='gym'?IMG.gym:IMG.room)+'" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:18px">':'<img src="'+(Object.prototype.hasOwnProperty.call(IMG.bld,x.bld)?IMG.bld[x.bld]:IMG.bld.site)+'" alt="" style="width:84px;height:84px;object-fit:contain">')+'<div style="flex:1"><div class="eyebrow" style="color:'+esc(x.color)+'">Сфера · рівень '+(+x.lv||1)+' · '+(+x.xp||0)+' XP</div><h2>'+esc(x.name)+'</h2><span class="hint">'+esc(x.tname)+'</span></div></div>'+
+  (nums?'<div class="sph-ns">'+nums+'</div>':'')+
+  (g?'<div class="card stack" style="margin-top:10px;gap:6px"><div class="row sp"><b>'+esc(g.name||'Ціль')+'</b><b class="num" style="color:'+esc(x.color)+'">'+(+g.pct||0)+'%</b></div><div class="bar" style="height:8px"><i style="width:'+(+g.pct||0)+'%;background:'+esc(x.color)+'"></i></div><span class="hint num">'+esc(g.txt)+'</span></div>':'')+
+  (x.line&&!nums?'<p class="hint" style="margin:10px 2px 0">'+esc(x.line)+'</p>':'')+
+  '<div class="row" style="gap:8px;margin-top:14px"><button class="btn pri" style="flex:1" data-act="sphopen" data-k="'+esc(x.key)+'">'+ic('folder','#0c1022',18)+'Відкрити папку</button><button class="btn sec" data-act="sphgo" data-k="'+esc(x.key)+'">Піти</button></div>'+
+  '<p class="hint" style="margin:10px 2px 0">Ті самі цифри, що в папці Frequency. Записуєш у папці — тут оновлюється.</p>'); }
+
 /* ── рендер і події ── */
 function render(){ renderHud(); renderNav();
  if(TAB==='city') renderCity(); else if(TAB==='room') renderRoom(); else if(TAB==='pc') renderPC(); else if(TAB==='gym') renderGym(); else if(TAB==='workout') renderWorkout(); else if(TAB==='settings') renderSettings(); else if(TAB==='avatar') renderAvatar(); else if(TAB==='friends') renderFriends(); else if(TAB==='friend') renderFriend(); else if(TAB==='visit') renderVisit(); else if(TAB==='path') renderPath(); else if(TAB==='skills') renderSkills(); else if(TAB==='day') renderDay(); else if(TAB==='goals') renderGoals(); else renderMe();
@@ -1640,6 +1673,9 @@ document.addEventListener('click',function(e){
   case 'playfh': playFH(); break;
   case 'quick': quickSheet(); break;
   case 'drw': openDrw(); break;
+  case 'sph': sphSheet(b.getAttribute('data-k')); break;
+  case 'sphopen': { closeSheet(); var B=bridge(); if(B) B.open('folder',b.getAttribute('data-k')); break; }
+  case 'sphgo': { closeSheet(); S.here='sph:'+b.getAttribute('data-k'); save(); TAB='city'; render(); break; }
   case 'drwx': closeDrw(); break;
   case 'dsel': DSEL=b.getAttribute('data-k'); renderDrw(); break;
   case 'pdone': { var p=prios(DSEL||dk(now()))[+b.getAttribute('data-i')]; if(p){ p.done=!p.done; save(); renderDrw(); } break; }
@@ -1687,6 +1723,10 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('drw').c
 $('fab').innerHTML=ic('plus','#0c1022',26,2.6);
 // Frequency кличе при поверненні у «Мій світ»: Гаманець міг змінитись
 window.mistoHome=function(){ closeSheet(); closeDrw(); closeHM&&closeHM(); TAB='city'; render(); var v=$('view'); if(v) v.scrollTop=0; };
+// Frequency кличе, коли прийшли зі сфери: карта, без панелей, будівля сфери по центру
+window.mistoFocus=function(key){ if(!S||$('onb').classList.contains('on')) return; closeSheet(); closeDrw(); TAB='city'; S.zoom='city'; CAM=null; render();
+ var w=$('view').querySelector('.stage-wrap.gold'), p=w&&[].filter.call(w.querySelectorAll('.pin.sph'),function(x){return x.getAttribute('data-k')===key;})[0]; if(!p) return;
+ var pr=p.getBoundingClientRect(), wr=w.getBoundingClientRect(); w.scrollLeft+=(pr.left+pr.width/2)-(wr.left+wr.width/2); w.scrollTop+=(pr.top+pr.height)-(wr.top+wr.height/2); CAM={x:w.scrollLeft,y:w.scrollTop,z:ZOOM}; };
 window.mistoRefresh=function(){ if(S&&!$('onb').classList.contains('on')) render(); };
 S=load();
 if(S){ tickDay(); render(); }

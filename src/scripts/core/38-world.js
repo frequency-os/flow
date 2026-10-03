@@ -34,14 +34,17 @@
       try{ bal=walletBalance(); ops=walletOps().slice(-8).reverse().map(o=>({type:o.type, amount:+o.amount||0, label:String(o.label||''), date:String(o.date||'')})); }catch(_){}
       return {balance:bal, ops};
     },
-    open(sec){
+    // сфери (39-spheres.js): назва, шаблон, будівля й цифри з блоків папки — лише читання
+    spheres(){ try{ return sphForWorld(); }catch(_){ return []; } },
+    open(sec, key){
       if(sec==='finance') goFinance();
       else if(sec==='ai'){ if(window.aiChatSheet) window.aiChatSheet(); }
+      else if(sec==='folder' && typeof key==='string' && Object.prototype.hasOwnProperty.call(folders,key)) goFolder(key);
     }
   }; }
 
 
-  function goWorld(){
+  function goWorld(opts){
     if(!worldOn()){ goHome(); return; }
     // міст зʼявляється лише тоді, коли розробник справді відкрив світ
     if(!window.flowWorldBridge) window.flowWorldBridge=worldBridge();
@@ -49,7 +52,7 @@
     // повторний тап на «Мій світ», коли світ уже відкритий, — назад на карту
     const here=document.getElementById('scr-world');
     if(here && here.classList.contains('active') && box && box.firstChild){
-      try{ const w=box.firstChild.contentWindow; if(w&&w.mistoHome) w.mistoHome(); }catch(_){}
+      try{ const w=box.firstChild.contentWindow; if(opts&&opts.focus&&w&&w.mistoFocus) w.mistoFocus(opts.focus); else if(w&&w.mistoHome) w.mistoHome(); }catch(_){}
       return;
     }
     if(box && !box.firstChild){
@@ -60,10 +63,12 @@
       }
       const f=document.createElement('iframe');
       f.src='misto.html?embed=1'; f.title='Мій світ — гра «Місто дня»';
+      // прийшли зі сфери — коли гра завантажиться, підводимо карту до її будівлі
+      if(opts&&opts.focus) f.addEventListener('load',()=>{ setTimeout(()=>{ try{ const w=f.contentWindow; if(w&&w.mistoFocus) w.mistoFocus(opts.focus); }catch(_){} },300); },{once:true});
       box.appendChild(f);
     } else {
       // повернулись у світ: гаманець міг змінитись — гра перемальовує HUD
-      try{ const w=box.firstChild.contentWindow; if(w&&w.mistoRefresh) w.mistoRefresh(); }catch(_){}
+      try{ const w=box.firstChild.contentWindow; if(opts&&opts.focus&&w&&w.mistoFocus) w.mistoFocus(opts.focus); else if(w&&w.mistoRefresh) w.mistoRefresh(); }catch(_){}
     }
     worldShown=true;
     show('scr-world');

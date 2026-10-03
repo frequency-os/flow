@@ -1,0 +1,57 @@
+/* ════════ Сфери (39-spheres.js): вкладка на Огляді, шаблони, шапка в документі ════════ */
+
+.htab[hidden],.sph-list[hidden],.sph-head[hidden]{display:none;}
+
+/* значок сфери: кольорова заливка, білий лінійний значок (стиль B) */
+.sph-ic{width:48px;height:48px;border-radius:14px;flex:none;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--sc) 100%,#fff 16%),color-mix(in srgb,var(--sc) 72%,#000));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 14px color-mix(in srgb,var(--sc) 30%,transparent);}
+.sph-ic svg{width:24px;height:24px;}
+
+/* список сфер */
+.sph-list{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.sph-row{display:flex;align-items:center;gap:12px;width:100%;min-height:72px;padding:12px;border-radius:18px;
+  border:1px solid var(--line);background:var(--card);color:var(--text);text-align:left;cursor:pointer;font:inherit;}
+.sph-row:active{transform:scale(.99);}
+.sph-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;}
+.sph-top{display:flex;align-items:center;gap:8px;}
+.sph-top b{flex:1;min-width:0;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sph-body small{font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sph-lv{flex:none;font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;color:var(--sc);background:color-mix(in srgb,var(--sc) 18%,transparent);}
+.sph-bar{display:block;height:6px;border-radius:9px;background:var(--hair);overflow:hidden;}
+.sph-bar i{display:block;height:100%;border-radius:9px;background:var(--sc);}
+.sph-empty{display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:18px;border:1px dashed var(--line);color:var(--muted);font-size:13px;}
+.sph-empty b{color:var(--text);font-size:15px;}
+.sph-new{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:16px;border:1.5px dashed var(--line);
+  background:transparent;color:var(--muted);font:inherit;font-weight:800;font-size:14px;cursor:pointer;}
+.sph-new span{font-size:18px;color:var(--accent);}
+
+/* шаблони у шторці */
+.sph-sub{margin:0 2px 12px;font-size:13px;line-height:1.4;color:var(--muted);}
+.sph-tpls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px;}
+.sph-tp{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-height:44px;padding:12px;border-radius:18px;
+  border:1.5px solid var(--line);background:var(--bg-2);color:var(--text);text-align:left;font:inherit;cursor:pointer;}
+.sph-tp.on{border-color:var(--accent);}
+.sph-tp .sph-ic{width:44px;height:44px;margin-bottom:4px;}
+.sph-tp b{font-size:14px;font-weight:800;}
+.sph-tp small{font-size:11.5px;line-height:1.35;color:var(--muted);font-weight:600;}
+.sph-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px;}
+.sph-chips i{font-style:normal;font-size:10.5px;font-weight:800;padding:3px 7px;border-radius:99px;background:var(--hair);color:var(--muted);}
+
+/* шапка сфери над документом папки */
+.sph-head{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin:4px 0 14px;padding:12px;border-radius:20px;border:1px solid var(--line);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--sc) 18%,var(--card)),var(--card));}
+.sph-hb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.sph-hb>small{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sc);}
+.sph-hb>b{font-size:16px;font-weight:800;color:var(--text);}
+.sph-hn{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:3px;}
+.sph-hn i{font-style:normal;font-size:12px;font-weight:700;color:var(--muted);}
+.sph-hn i b{color:var(--text);}
+.sph-hn i.in b{color:#22c55e;}
+.sph-hn i.out b{color:#ef4444;}
+.sph-go{flex:none;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:inherit;font-weight:800;font-size:13px;cursor:pointer;}
+
+/* шторка шаблонів: на телефоні вища за екран — тримаємо в межах і даємо прокрутку */
+.ch-sheet.sph-sheet{max-height:calc(100dvh - env(safe-area-inset-top) - 24px);overflow-y:auto;overscroll-behavior:contain;}
+.sph-cancel{display:block;width:100%;min-height:46px;margin:4px 0 6px;border-radius:14px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:inherit;font-weight:800;font-size:14px;cursor:pointer;}
+@media (max-width:420px){ .sph-tp{padding:10px;} .sph-tp .sph-ic{width:38px;height:38px;border-radius:12px;} .sph-tp .sph-ic svg{width:20px;height:20px;} }

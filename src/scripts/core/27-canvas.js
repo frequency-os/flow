@@ -289,9 +289,11 @@
         // його з емодзі на льоту. У сховище воно потрапить при першому ж
         // saveFolders(); доти емодзі лишається єдиним джерелом правди.
         const ic=c.icon||folderIconFor(c.emoji);
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||''}); }
+        // сфера (39-spheres.js): лише два короткі рядки, усе інше відкидаємо
+        const sph=(c.sphere&&typeof c.sphere.tpl==='string')?{tpl:c.sphere.tpl.slice(0,16),bld:String(c.sphere.bld||'').slice(0,16)}:undefined;
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph}); }
         // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
-        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||''}; }
+        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph}; }
       });
     }
   }
@@ -482,6 +484,7 @@
     syncBlocks();
     try{ debtRender(); }catch(e){ console.error('render',e); }
     try{ chatsInit(); }catch(e){ console.error('chatsInit',e); }
+    try{ spheresInit(); }catch(e){ console.error('spheresInit',e); }
     try{ renderDashboard(); }catch(e){ console.error('dashboard',e); }
     try{ if(window.uiMode==='lite') goPlanner(); }catch(_){}
     try{ updateSummaryBg(); }catch(_){}

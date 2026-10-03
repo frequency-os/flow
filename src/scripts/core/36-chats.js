@@ -16,11 +16,12 @@
   const CHAT_PALETTE=['#5b8def','#34c77b','#e8843c','#c77dff','#ff6b9d','#4ecdc4','#f0b429','#9b8cff'];
   let chats=[];                    // [{id,name,emoji,c,members,folders,at,pinned}]
 
-  /* вкладка Огляду: 'folders' | 'chats' — запам'ятовується як інші дрібні налаштування */
+  /* вкладка Огляду: 'folders' | 'chats' | 'spheres' (39-spheres.js) — запам'ятовується як інші дрібні налаштування */
   const HTAB_KEY='hometab';
+  const HTABS=['folders','chats','spheres'];
   let homeTab='folders';
-  try{ if(localStorage.getItem(HTAB_KEY)==='chats') homeTab='chats'; }catch(_){}
-  prefCatchup(HTAB_KEY, v=>{ homeTab = v==='chats' ? 'chats' : 'folders'; });
+  try{ const v=localStorage.getItem(HTAB_KEY); if(HTABS.includes(v)) homeTab=v; }catch(_){}
+  prefCatchup(HTAB_KEY, v=>{ homeTab = HTABS.includes(v) ? v : 'folders'; });
 
   function chatBk(id){ return 'chat_'+id; }
   function chatById(id){ return chats.find(c=>c&&c.id===id)||null; }
@@ -202,28 +203,32 @@
 
   /* ── Огляд: вкладки і список чатів ── */
   function setHomeTab(t){
-    t = t==='chats' ? 'chats' : 'folders';
+    t = HTABS.includes(t) ? t : 'folders';
     if(t===homeTab) return;
     homeTab=t; try{ prefSet(HTAB_KEY,t); }catch(_){}
     try{ window.platform.haptic('select'); }catch(_){}
     renderDashboard();
   }
   // викликається з renderDashboard (16-dashboard.js): перемикає видимість і лічильники.
-  // true — активна вкладка «Чати», сітку папок малювати не треба.
+  // true — активна вкладка «Чати» чи «Сфери», сітку папок малювати не треба.
   function chatsHomeSync(){
+    // «Сфери» поки лише для розробника: якщо вкладку не видно — повертаємось до папок
+    if(homeTab==='spheres' && !(window.upDevOn&&window.upDevOn())) homeTab='folders';
+    const sph = homeTab==='spheres';
+    try{ if(window.sphHomeSync) window.sphHomeSync(sph); }catch(e){ console.error('sphHomeSync',e); }
     const on = homeTab==='chats';
     const tabs=document.getElementById('homeTabs');
-    if(tabs) tabs.querySelectorAll('[data-htab]').forEach(b=>b.classList.toggle('on', b.dataset.htab===(on?'chats':'folders')));
+    if(tabs) tabs.querySelectorAll('[data-htab]').forEach(b=>b.classList.toggle('on', b.dataset.htab===homeTab));
     const row=document.querySelector('#scr-home .foh-row'), list=document.getElementById('chatList'),
           seg=document.getElementById('folderViewSeg'), add=document.getElementById('chatAddBtn');
-    if(row) row.style.display = on ? 'none' : '';
+    if(row) row.style.display = (on||sph) ? 'none' : '';
     if(list) list.hidden=!on;
-    if(seg) seg.style.display = on ? 'none' : '';
+    if(seg) seg.style.display = (on||sph) ? 'none' : '';
     if(add) add.hidden=!on;
     try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.length; }catch(_){}
     try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).length; }catch(_){}
     if(on) renderChatList();
-    return on;
+    return on||sph;
   }
   // останній запис чату (за часом) — для рядка списку і блоку в документі
   function chatLast(c){

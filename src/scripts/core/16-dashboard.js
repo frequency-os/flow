@@ -413,6 +413,7 @@
         ${['a','b','c','d'].map(L=>`<button class="flay-opt ${(f.flayout||'a')===L?'on':''}" data-lay="${L}">
           <span class="flay-ic flay-ic-${L}"></span><span>${({a:'Збоку',b:'Зверху',c:'На всю',d:'Перехід'})[L]}</span></button>`).join('')}
       </div>
+      ${(window.upDevOn&&window.upDevOn())?`<button class="fmi" data-act="sphere">🏙 ${f.sphere?'Сфера: шаблон / прибрати':'Зробити сферою'}</button>`:''}
       <button class="fmi" data-act="pin">📌 ${f.pinned?'Відкріпити':'Закріпити зверху'}</button>
       <button class="fmi" data-act="rename">✏️ Перейменувати</button>
       <button class="fmi" data-act="move">📂 ${f.parent?'Перемістити / на головну':'Перемістити в папку'}</button>
@@ -497,6 +498,7 @@
   function folderAction(key,act){
     const f=folders[key]; if(!f) return;
     if(act==='due'){ closeFolderMenu(); inputModal({title:'Дедлайн проєкту', value:f.due||'', placeholder:'РРРР-ММ-ДД, напр. 2026-08-01', onOk:(v)=>{ const m=(v||'').match(/^\d{4}-\d{2}-\d{2}$/); if(m){ f.due=v; saveFolders(); renderDashboard(); } else if(v){ flowAlert('Формат дати: РРРР-ММ-ДД'); } }}); return; }
+    if(act==='sphere'){ closeFolderMenu(); try{ sphTemplateSheet(key); }catch(e){ console.error('sphere',e); } return; }
     if(act==='rmdue'){ f.due=''; saveFolders(); renderDashboard(); openFolderMenu(key); return; }
     if(act==='photo'){ pickFolderPhoto(key); return; }
     if(act==='cropphoto'){
