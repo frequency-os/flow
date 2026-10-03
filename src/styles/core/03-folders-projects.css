@@ -690,3 +690,6 @@
     font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
   .pgb-seg button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);}
   .fgs-row.on{background:var(--hair);}
+  /* меню папки (крок 3): щільніші рядки, щоб «Видалити» влазило без прокрутки на 375×812 */
+  .fmenu-in .pgb-row{padding:8px 10px;min-height:46px;}
+  .fmenu-in .fgs-head{margin-bottom:4px;}

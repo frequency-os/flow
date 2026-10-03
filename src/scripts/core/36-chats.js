@@ -347,4 +347,4 @@
       wrapped.__chats=true; window.openFlowPage=wrapped;
     }
   }
-  try{ window.createChat=createChat; window.chatsForFolder=chatsForFolder; }catch(_){}
+  try{ window.createChat=createChat; window.chatsForFolder=chatsForFolder; window.folderAddSheet=folderAddSheet; }catch(_){}
