@@ -55,3 +55,25 @@
 .ch-sheet.sph-sheet{max-height:calc(100dvh - env(safe-area-inset-top) - 24px);overflow-y:auto;overscroll-behavior:contain;}
 .sph-cancel{display:block;width:100%;min-height:46px;margin:4px 0 6px;border-radius:14px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:inherit;font-weight:800;font-size:14px;cursor:pointer;}
 @media (max-width:420px){ .sph-tp{padding:10px;} .sph-tp .sph-ic{width:38px;height:38px;border-radius:12px;} .sph-tp .sph-ic svg{width:20px;height:20px;} }
+
+/* ── «Сьогодні» на Огляді (33-home-widgets.js): одна картка, що згортається ── */
+.today-box{margin:12px 0 16px;border-radius:20px;background:var(--card);border:1px solid var(--line);}
+.today-h{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:0 12px 0 16px;border:0;background:transparent;
+  color:var(--text);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.today-t{font-size:15px;font-weight:800;}
+.today-d{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.today-chev{flex:none;width:32px;height:32px;padding:7px;border-radius:10px;background:var(--bg-2);color:var(--muted);transition:transform .22s ease;}
+.today-box.open .today-chev{transform:rotate(180deg);}
+.today-mini{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 12px;}
+.today-mini[hidden]{display:none;}
+.today-mini .ovm{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border-radius:99px;border:0;cursor:pointer;font:inherit;
+  font-size:13px;font-weight:800;white-space:nowrap;color:var(--ovc,var(--accent));background:color-mix(in srgb,var(--ovc,var(--accent)) 14%,transparent);}
+.today-mini .ovm .hw-ico{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.today-box #homeWidgetsRow{margin:0;padding:0 10px 10px;animation:today-in .22s ease;}
+@keyframes today-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion: reduce){ .today-chev{transition:none;} .today-box #homeWidgetsRow{animation:none;} }
+
+/* ── вигляд папок: окремим рядком під вкладками ── */
+.fv-row{margin:10px 0 2px;}
+.fvseg.fvseg-wide{display:flex;width:100%;}
+.fvseg.fvseg-wide button{flex:1;width:auto;height:36px;display:flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:12.5px;font-weight:800;}

@@ -194,25 +194,31 @@
       <div class="wishdots" id="wishDots"></div>
     </div>
 
-    <!-- «Мій світ» (38-world.js): гроші переїхали з нижньої панелі сюди -->
-    <div class="wld-money" id="homeMoneyChip" role="button" tabindex="0" aria-label="Гаманець" hidden></div>
     <!-- живий Огляд: план дня · гаманець · щоденник (аудит Ф1).
          Заголовка «Огляд» над цим рядом більше немає (25.09.2026): картки
          самі себе називають, а слово над ними робило сторінку купою. Разом
          із заголовком пішло й згортання — applyOv() у 33-home-widgets.js
          тримає ряд відкритим, якщо кнопки в розмітці нема. -->
-    <div id="homeWidgetsRow"></div>
+    <!-- «Сьогодні» (03.10.2026): одна картка, що згортається. Згорнута — три чипи
+         (план · гроші · щоденник), розгорнута — картки. Стан — ключ 'homeov' (33-home-widgets.js).
+         Гроші тут же: окремий рядок «Гаманець» більше не потрібен. -->
+    <div class="today-box" id="homeToday">
+      <button class="today-h" id="homeOvHead" aria-expanded="false" aria-controls="homeWidgetsRow"><span class="today-t">Сьогодні</span><span class="today-d" id="homeTodayDate"></span><svg class="today-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="today-mini" id="homeOvMini"></div>
+      <div id="homeWidgetsRow" hidden></div>
+    </div>
 
     <!-- Огляд: дві вкладки — 📁 Папки (сітка) і 💬 Чати (список, 36-chats.js) -->
     <div class="sec sec-htabs"><div class="htabs" id="homeTabs">
       <button class="htab on" data-htab="folders"><span class="e">📁</span>Папки<span class="count" id="folderCountBadge">5</span></button>
       <button class="htab" data-htab="chats"><span class="e">💬</span>Чати<span class="count" id="chatCountBadge">0</span></button>
       <button class="htab" data-htab="spheres" id="sphTabBtn" hidden><span class="e">🏙</span>Сфери<span class="count" id="sphCountBadge">0</span></button>
-    </div><div class="sec-actions"><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><div class="fvseg" id="folderViewSeg">
-      <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></button>
-      <button data-fv="mag" title="Журнал"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 5v6M8 14v6"/></svg></button>
-    </div></div></div>
+    </div><div class="sec-actions"><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
+    <div class="fv-row" id="folderViewRow"><div class="fvseg fvseg-wide" id="folderViewSeg" role="group" aria-label="Вигляд папок">
+      <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Список</span></button>
+      <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg><span>Сітка</span></button>
+      <button data-fv="mag" title="Журнал"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 5v6M8 14v6"/></svg><span>Журнал</span></button>
+    </div></div>
     <div class="foh-row">
       <div class="proj-rail" id="projRail"></div>
       <div class="grid" id="folderGrid"></div>

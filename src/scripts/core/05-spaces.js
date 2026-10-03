@@ -159,7 +159,7 @@
     document.body.classList.toggle('in-world', id==='scr-world');
     if(id==='scr-reader'){ try{ initReader(); applyRdrCfg(); }catch(_){} }
     if(id==='scr-nyc'){ try{ if(window.__nycRefresh) window.__nycRefresh(); }catch(_){} }
-    if(id==='scr-home'){ try{ renderRightRail(); }catch(_){} try{ if(window.worldMoneyChip) window.worldMoneyChip(); }catch(_){} }
+    if(id==='scr-home'){ try{ renderRightRail(); }catch(_){} }
     // ВАЖЛИВО: <html> має overflow:hidden, а <body> — position:fixed зі своїм
     // overflow-y:auto. Тобто реальний скрол — на body, а не на window/html.
     // window.scrollTo() тут ЗАВЖДИ був no-op — ось чому попередні спроби

@@ -36,9 +36,10 @@
        їх ховає; щоб не втратити суть, числа переїжджають у сам заголовок збоку.
        Стан лежить у ключі 'homeov' поруч з іншими дрібними налаштуваннями. */
     const OV_KEY='homeov';
-    let ovOpen=true;
-    try{ ovOpen = localStorage.getItem(OV_KEY)!=='closed'; }catch(_){}
-    try{ prefCatchup(OV_KEY, v=>{ ovOpen = v!=='closed'; applyOv(); }); }catch(_){}
+    // 03.10.2026: за замовчуванням згорнуто (Ярослав) — відкриваєш, коли треба
+    let ovOpen=false;
+    try{ ovOpen = localStorage.getItem(OV_KEY)==='open'; }catch(_){}
+    try{ prefCatchup(OV_KEY, v=>{ ovOpen = v==='open'; applyOv(); }); }catch(_){}
 
     function applyOv(){
       const head=document.getElementById('homeOvHead'), row=document.getElementById('homeWidgetsRow'),
@@ -50,6 +51,7 @@
          лишилась би схованою назавжди, і відкрити її було б нічим. */
       if(!head){ row.hidden=false; return; }
       head.classList.toggle('closed', !ovOpen);
+      const box=document.getElementById('homeToday'); if(box) box.classList.toggle('open', ovOpen);
       head.setAttribute('aria-expanded', ovOpen?'true':'false');
       row.hidden=!ovOpen;
       if(mini) mini.hidden=ovOpen;
@@ -63,13 +65,12 @@
       try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
     }
     // числа в заголовку: лише те, де справді є що показати
+    // згорнута картка: завжди три чипи — кожен веде у свій розділ
     function miniHTML(nb,bal,spent,st){
-      const chip=(ic,val,tone)=>`<span class="ovm" style="--ovc:${tone}">${hwIco(ic)}${hwEsc(val)}</span>`;
-      let h='';
-      if(nb.length) h+=chip('fo-calendar', nb.length+' '+pluralUk(nb.length,'блок','блоки','блоків'), 'var(--val)');
-      if(bal!==null && (bal!==0||spent>0)) h+=chip('fo-coin', hwFmt(bal)+' ₴', 'var(--fin)');
-      if(st>0) h+=chip('fo-book', st+' '+pluralUk(st,'день','дні','днів'), 'var(--hab)');
-      return h || `<span class="ovm ovm-mut">нічого нового</span>`;
+      const chip=(go,ic,val,tone,lbl)=>`<button class="ovm" data-hw="${go}" style="--ovc:${tone}" aria-label="${hwEsc(lbl)}">${hwIco(ic)}${hwEsc(val)}</button>`;
+      return chip('planner','fo-calendar', nb.length? (nb.length+' '+pluralUk(nb.length,'блок','блоки','блоків')) : 'План', 'var(--val)', 'План на сьогодні')
+        + chip('fin','fo-coin', bal!==null? hwFmt(bal)+' ₴' : 'Гаманець', 'var(--fin)', 'Гаманець')
+        + chip('diary','fo-book', st+' '+pluralUk(st,'день','дні','днів'), 'var(--hab)', 'Щоденник');
     }
 
     function render(){
@@ -98,7 +99,10 @@
         + cardHTML('','fin',finInner)
         + cardHTML('','diary',diaInner)
         + `</div>`;
-      host.querySelectorAll('[data-hw]').forEach(b=>b.onclick=()=>{
+      const mini=document.getElementById('homeOvMini');
+      if(mini) mini.innerHTML=miniHTML(nb,bal,spent,st);
+      try{ const dd=document.getElementById('homeTodayDate'); if(dd) dd.textContent=new Date().toLocaleDateString('uk-UA',{weekday:'long',day:'numeric',month:'long'}); }catch(_){}
+      document.querySelectorAll('#homeWidgetsRow [data-hw], #homeOvMini [data-hw]').forEach(b=>b.onclick=()=>{
         try{ window.platform.haptic('light'); }catch(_){}
         const k=b.dataset.hw;
         try{
@@ -107,9 +111,6 @@
           else if(k==='diary') window.goDiary();
         }catch(e){ console.error('homeWidget',e); }
       });
-      // ті самі дані — у заголовок, щоб згорнутий «Огляд» лишався інформативним
-      const mini=document.getElementById('homeOvMini');
-      if(mini) mini.innerHTML=miniHTML(nb,bal,spent,st);
       const head=document.getElementById('homeOvHead');
       if(head&&!head.__init){ head.__init=true; head.onclick=toggleOv; }
       applyOv();

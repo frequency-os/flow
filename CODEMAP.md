@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 72 |
-| Рядків JS | 29099 |
+| Рядків JS | 29085 |
 | Файлів CSS | 34 |
-| Рядків CSS | 8747 |
-| Сутностей верхнього рівня | 1825 |
+| Рядків CSS | 8760 |
+| Сутностей верхнього рівня | 1823 |
 | Ключів сховища (FLOW_KEYS) | 72 |
 
 ## Файли JS
@@ -68,12 +68,12 @@
 | `src/scripts/core/30-upgrade.js` | 296 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
-| `src/scripts/core/33-home-widgets.js` | 133 | 14 |
+| `src/scripts/core/33-home-widgets.js` | 134 | 14 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
 | `src/scripts/core/35-channel.js` | 702 | 65 |
 | `src/scripts/core/36-chats.js` | 350 | 40 |
 | `src/scripts/core/37-ai-privacy.js` | 203 | 20 |
-| `src/scripts/core/38-world.js` | 86 | 7 |
+| `src/scripts/core/38-world.js` | 71 | 5 |
 | `src/scripts/core/39-spheres.js` | 232 | 20 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
@@ -133,8 +133,8 @@
 | `src/styles/core/17-my-year.css` | 64 | 0 |
 | `src/styles/core/18-channel.css` | 178 | 0 |
 | `src/styles/core/19-chats.css` | 69 | 0 |
-| `src/styles/core/20-world.css` | 29 | 0 |
-| `src/styles/core/21-spheres.css` | 57 | 0 |
+| `src/styles/core/20-world.css` | 20 | 0 |
+| `src/styles/core/21-spheres.css` | 79 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (72)
 
@@ -1736,12 +1736,12 @@
 | `cardHTML` | функція | `src/scripts/core/33-home-widgets.js:30` |
 | `hwIco` | функція | `src/scripts/core/33-home-widgets.js:32` |
 | `OV_KEY` | значення | `src/scripts/core/33-home-widgets.js:38` |
-| `ovOpen` | значення | `src/scripts/core/33-home-widgets.js:39` |
-| `applyOv` | функція | `src/scripts/core/33-home-widgets.js:43` |
-| `toggleOv` | функція | `src/scripts/core/33-home-widgets.js:57` |
-| `miniHTML` | функція | `src/scripts/core/33-home-widgets.js:66` |
-| `render` | функція | `src/scripts/core/33-home-widgets.js:75` |
-| `window.renderHomeWidgets` | значення | `src/scripts/core/33-home-widgets.js:117` |
+| `ovOpen` | значення | `src/scripts/core/33-home-widgets.js:40` |
+| `applyOv` | функція | `src/scripts/core/33-home-widgets.js:44` |
+| `toggleOv` | функція | `src/scripts/core/33-home-widgets.js:59` |
+| `miniHTML` | функція | `src/scripts/core/33-home-widgets.js:69` |
+| `render` | функція | `src/scripts/core/33-home-widgets.js:76` |
+| `window.renderHomeWidgets` | значення | `src/scripts/core/33-home-widgets.js:118` |
 
 ### `src/scripts/core/34-shortcuts.js` — 5 сутностей
 
@@ -1893,17 +1893,15 @@
 | `aiConsentGate` | функція | `src/scripts/core/37-ai-privacy.js:151` |
 | `aiPrivacySheet` | функція | `src/scripts/core/37-ai-privacy.js:164` |
 
-### `src/scripts/core/38-world.js` — 7 сутностей
+### `src/scripts/core/38-world.js` — 5 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
 | `worldShown` | значення | `src/scripts/core/38-world.js:7` |
 | `worldOn` | функція | `src/scripts/core/38-world.js:8` |
-| `worldFmt` | функція | `src/scripts/core/38-world.js:10` |
-| `worldApplyNav` | функція | `src/scripts/core/38-world.js:12` |
-| `worldMoneyChip` | функція | `src/scripts/core/38-world.js:23` |
-| `worldBridge` | функція | `src/scripts/core/38-world.js:31` |
-| `goWorld` | функція | `src/scripts/core/38-world.js:47` |
+| `worldApplyNav` | функція | `src/scripts/core/38-world.js:10` |
+| `worldBridge` | функція | `src/scripts/core/38-world.js:19` |
+| `goWorld` | функція | `src/scripts/core/38-world.js:34` |
 
 ### `src/scripts/core/39-spheres.js` — 20 сутностей
 

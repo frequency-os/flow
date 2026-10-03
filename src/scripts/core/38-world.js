@@ -1,13 +1,11 @@
   /* ════════ «Мій світ»: гра «Місто дня» всередині Frequency ════════
      Поки лише для розробника (ворота upDevOn): у нижній панелі «Мій світ» стає
-     на місце «Гроші», а гроші переїжджають угору Огляду чипом із балансом.
+     на місце «Гроші», а гроші видно в чипі картки «Сьогодні» на Огляді.
      Гра — окрема сторінка misto.html у рамці (iframe), зі своїм сховищем
      misto_dnya_v3. Дані Frequency вона бачить лише через worldBridge і лише
      читає: баланс і останні записи Гаманця. Нічого не пише. */
   let worldShown=false;
   function worldOn(){ try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
-
-  function worldFmt(v){ try{ return fmt(v)+' ₴'; }catch(_){ return Math.round(v)+' ₴'; } }
 
   function worldApplyNav(){
     const on=worldOn();
@@ -15,16 +13,6 @@
     if(nw) nw.hidden=!on;
     if(nf) nf.hidden=on;
     const dw=document.querySelector('.dsb-i[data-dnav="world"]'); if(dw) dw.hidden=!on;
-    const chip=document.getElementById('homeMoneyChip');
-    if(chip){ chip.hidden=!on; if(on) worldMoneyChip(); }
-  }
-
-  // чип балансу вгорі Огляду: гроші не зникають, коли їхнє місце внизу займає «Мій світ»
-  function worldMoneyChip(){
-    const chip=document.getElementById('homeMoneyChip'); if(!chip||chip.hidden) return;
-    let b=0; try{ b=walletBalance(); }catch(_){}
-    chip.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/></svg><span>Гаманець</span><b>'+esc(worldFmt(b))+'</b><svg class="wm-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
-    chip.setAttribute('aria-label','Гаманець: '+worldFmt(b));
   }
 
   // міст для гри: лише читання; open() — перехід у розділ Frequency
@@ -42,7 +30,6 @@
       else if(sec==='folder' && typeof key==='string' && Object.prototype.hasOwnProperty.call(folders,key)) goFolder(key);
     }
   }; }
-
 
   function goWorld(opts){
     if(!worldOn()){ goHome(); return; }
@@ -76,11 +63,9 @@
 
   { const nw=document.getElementById('navWorld'); if(nw) nw.onclick=goWorld; }
   { const dw=document.querySelector('.dsb-i[data-dnav="world"]'); if(dw) dw.onclick=goWorld; }
-  { const chip=document.getElementById('homeMoneyChip'); if(chip) chip.onclick=goFinance; }
 
   // ворота розробника відповідають не одразу (хеш пошти рахується асинхронно)
   worldApplyNav();
   [1200,4000,10000].forEach(t=>setTimeout(worldApplyNav,t));
   try{ document.addEventListener('flowsync',()=>setTimeout(worldApplyNav,300)); }catch(_){}
-  try{ document.addEventListener('visibilitychange',()=>{ if(!document.hidden) worldMoneyChip(); }); }catch(_){}
-  try{ window.goWorld=goWorld; window.worldApplyNav=worldApplyNav; window.worldMoneyChip=worldMoneyChip; }catch(_){}
+  try{ window.goWorld=goWorld; window.worldApplyNav=worldApplyNav; }catch(_){}

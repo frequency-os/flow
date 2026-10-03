@@ -220,7 +220,7 @@
     const tabs=document.getElementById('homeTabs');
     if(tabs) tabs.querySelectorAll('[data-htab]').forEach(b=>b.classList.toggle('on', b.dataset.htab===homeTab));
     const row=document.querySelector('#scr-home .foh-row'), list=document.getElementById('chatList'),
-          seg=document.getElementById('folderViewSeg'), add=document.getElementById('chatAddBtn');
+          seg=document.getElementById('folderViewRow')||document.getElementById('folderViewSeg'), add=document.getElementById('chatAddBtn');
     if(row) row.style.display = (on||sph) ? 'none' : '';
     if(list) list.hidden=!on;
     if(seg) seg.style.display = (on||sph) ? 'none' : '';
