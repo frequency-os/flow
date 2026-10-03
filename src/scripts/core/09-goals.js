@@ -73,10 +73,23 @@
     aiSheetClose();
     const ov=document.createElement('div'); ov.className='ai-ov'; ov.id='aiOv';
     const A=(g.pointA||'').trim(), B=(g.pointB||'').trim();
-    if(!A||!B){
+    const LT=ylLetter().text.trim();
+    if(LT){
+      // лист із точки Б — головне джерело плану; А/Б лишились лише для тих, хто листа ще не писав
+      ov.innerHTML=`<div class="ai-sheet"><h3>✨ Розкласти лист на рік</h3>
+        <div class="sub">З листа згенерується чернетка: цілі з реченням, до якого вони ведуть, віхи по місяцях до ${esc(ylDateTxt(ylDate(ylLetter())))}, розклад у Планері, конверти. Ти переглянеш і вибереш, що взяти.</div>
+        <div class="ai-ab"><b style="color:var(--hab)">Лист</b><p>${esc(LT.length>320?LT.slice(0,320)+'…':LT)}</p></div>
+        <div id="aiBody"></div>
+        <div class="ai-actions" id="aiActs">
+          <button class="pri" data-aigen>✨ Розкласти з AI</button>
+          <button class="sec" data-ailocal>📝 Базова чернетка без AI</button>
+          <button class="ghost" data-aicfg>⚙️ Проксі підключено · змінити</button>
+          <button class="ghost" data-aiclose>Закрити</button>
+        </div></div>`;
+    } else if(!A||!B){
       ov.innerHTML=`<div class="ai-sheet"><h3>✨ AI-старт</h3>
-        <div class="sub">Спершу чесно заповни Точку А (де ти) і Точку Б (куди хочеш) — з них збереться вся система.</div>
-        <div class="ai-actions"><button class="sec" data-aiclose>Зрозуміло, заповню</button></div></div>`;
+        <div class="sub">Спершу напиши лист із точки Б — від себе через рік: як минає день, що є, що змінилось. З нього збереться вся система.</div>
+        <div class="ai-actions"><button class="pri" data-ailetter>Написати лист</button><button class="sec" data-aiclose>Пізніше</button></div></div>`;
     } else {
       ov.innerHTML=`<div class="ai-sheet"><h3>✨ Зібрати систему</h3>
         <div class="sub">З твоїх Точок А і Б згенерується чернетка: цілі з кроками, розклад у Планері, конверти в Грошах. Ти переглянеш і вибереш, що застосувати.</div>
@@ -93,6 +106,7 @@
     ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
     document.body.appendChild(ov);
     ov.querySelectorAll('[data-aiclose]').forEach(b=>b.onclick=()=>ov.remove());
+    { const lb=ov.querySelector('[data-ailetter]'); if(lb) lb.onclick=()=>{ ov.remove(); ylEdit(); }; }
     const cfg=ov.querySelector('[data-aicfg]'); if(cfg) cfg.onclick=()=>aiConfig(()=>{ aiStartSheet(); });
     const loc=ov.querySelector('[data-ailocal]'); if(loc) loc.onclick=()=>aiPreview(aiLocalDraft(),'чернетка без AI');
     const gen=ov.querySelector('[data-aigen]'); if(gen) gen.onclick=()=>{
@@ -112,9 +126,26 @@
         +'"envelopes":[{"name":"назва конверта","emoji":"🛟","goal":1500}]}. '
         +'Правила: 3-5 цілей, у кожної 3-5 конкретних кроків (перший — виконуваний сьогодні). schedule додавай лише де доречний регулярний блок; dows: 0=неділя…6=субота; h/endH — години 0-24. '
         +'1-2 конверти. Реалістично, без води, кроки — дії, не побажання.';
-      const usr='Точка А: '+(g.pointA||'')+'\nТочка Б: '+(g.pointB||'')+'\nВже є цілей: '+(g.goals||[]).length;
+      let usr='Точка А: '+(g.pointA||'')+'\nТочка Б: '+(g.pointB||'')+'\nВже є цілей: '+(g.goals||[]).length;
+      let sysOut=sys;
+      const L=ylLetter();
+      if(L.text.trim()){
+        // лист із точки Б: кожна ціль веде до речення листа і має віхи по місяцях
+        const from=ymdLocal().slice(0,7), to=ylDate(L).slice(0,7);
+        sysOut='Ти — тренер застосунку Frequency. Людина написала лист від себе з майбутнього (точка Б). '
+          +'Знайди в листі речення, що описують бажані зміни, і для кожного склади ціль з віхами по місяцях. '
+          +'Відповідай ВИКЛЮЧНО валідним JSON без markdown, без пояснень, українською. Схема: '
+          +'{"goals":[{"emoji":"🎯","name":"назва цілі","sentence":"дослівний фрагмент листа","steps":["крок 1","крок 2","крок 3"],'
+          +'"months":[{"ym":"'+from+'","t":"віха місяця"}],"schedule":{"dows":[1,3,6],"h":19,"endH":20,"title":"назва блоку"}}],'
+          +'"envelopes":[{"name":"назва конверта","emoji":"🛟","goal":1500}]}. '
+          +'Правила: 3-5 цілей; sentence — ДОСЛІВНО скопійований шматок листа (без змін, без лапок), до якого веде ціль; '
+          +'months — від '+from+' до '+to+' у форматі РРРР-ММ, одна коротка вимірювана віха на місяць (до 50 символів), не обовʼязково кожен місяць, найважче — ближче до кінця; '
+          +'кроки — 3-5 конкретних дій, перший виконуваний сьогодні; schedule лише де доречний регулярний блок (dows 0=нд..6=сб); '
+          +'конверти 0-2, лише якщо в листі є гроші чи покупки. Реалістично, без води.';
+        usr='Лист (дата точки Б '+ylDate(L)+'):\n'+L.text.slice(0,4000)+'\n\nЗараз: '+ymdLocal()+'. Вже є цілей: '+(g.goals||[]).length;
+      }
       const res=await aiFetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
-        body:JSON.stringify({ system:sys, messages:[{role:'user',content:usr}] }) });
+        body:JSON.stringify({ system:sysOut, messages:[{role:'user',content:usr}] }) });
       if(!res.ok) throw new Error('HTTP '+res.status);
       const data=await res.json();
       let txt='';
@@ -135,24 +166,32 @@
   // фолбек без AI: розумні дефолти з ключових слів Точок
   function aiLocalDraft(){
     const g=goalsData;
-    const t=((g.pointA||'')+' '+(g.pointB||'')).toLowerCase();
+    const LT=ylLetter().text;
+    const t=((g.pointA||'')+' '+(g.pointB||'')+' '+LT).toLowerCase();
+    const sents=ylSentences(LT);
+    // правило: слова-ключі → ціль; реченням цілі стає перше речення листа з таким словом
+    const rules=[
+      [/англ|english|b1|b2/, {emoji:'🇬🇧',name:'Англійська — стабільний ритм',
+        steps:['Обрати курс або підручник','20 хв у перерві — 4 тижні поспіль','Пробний тест рівня'],
+        schedule:{dows:[1,3,6],h:19,endH:20,title:'Англійська'}}],
+      [/борг|кредит|debt|фінанс|конверт/, {emoji:'💶',name:'Вийти з боргів',
+        steps:['Зібрати всі борги в одному місці (Гроші → Борги)','Зафіксувати платіж/міс — тапни картку «Вільний від боргу»','Закрити найдорожчий борг першим']}],
+      [/спорт|зал|біг|трену|тіло/, {emoji:'💪',name:'Тіло та енергія',
+        steps:['Обрати 2 фіксовані дні тренувань','4 тижні без пропусків (мікроверсія 15 хв рятує)','Сон 7+ годин'],
+        schedule:{dows:[1,4],h:18,endH:19,title:'Спорт'}}],
+      [/блог|контент|відео|youtube|reels|build|марафон/, {emoji:'📹',name:'Контент build-in-public',
+        steps:['Зафіксувати формат і платформу','Перші 10 постів без оцінки якості','Ритм 3 пости/тиждень'],
+        schedule:{dows:[2,4,0],h:20,endH:21,title:'Пост у блог'}}],
+      [/сон|сплю|спати|00:00|недосип/, {emoji:'😴',name:'Сон 7+ годин',
+        steps:['Лягати до 00:00','Вечірній блок «підготовка до сну» 23:15','14 днів поспіль'],
+        schedule:{dows:[0,1,2,3,4,5,6],h:23,endH:23.5,title:'Підготовка до сну'}}],
+      [/ai|аі|ші|модел|нейро/, {emoji:'🤖',name:'Освоїти AI-інструменти',
+        steps:['Обрати 1 інструмент на місяць','2 практики/тиждень по 45 хв','Перший реальний результат — у блог']}]
+    ];
     const goals=[];
-    if(/англ|english|b1|b2/.test(t)) goals.push({emoji:'🇬🇧',name:'Англійська — стабільний ритм',
-      steps:['Обрати курс або підручник','20 хв у перерві — 4 тижні поспіль','Пробний тест рівня'],
-      schedule:{dows:[1,3,6],h:19,endH:20,title:'Англійська'}});
-    if(/борг|кредит|debt|фінанс|конверт/.test(t)) goals.push({emoji:'💶',name:'Вийти з боргів',
-      steps:['Зібрати всі борги в одному місці (Гроші → Борги)','Зафіксувати платіж/міс — тапни картку «Вільний від боргу»','Закрити найдорожчий борг першим']});
-    if(/спорт|зал|біг|трену|тіло/.test(t)) goals.push({emoji:'💪',name:'Тіло та енергія',
-      steps:['Обрати 2 фіксовані дні тренувань','4 тижні без пропусків (мікроверсія 15 хв рятує)','Сон 7+ годин'],
-      schedule:{dows:[1,4],h:18,endH:19,title:'Спорт'}});
-    if(/блог|контент|відео|youtube|reels|build|марафон/.test(t)) goals.push({emoji:'📹',name:'Контент build-in-public',
-      steps:['Зафіксувати формат і платформу','Перші 10 постів без оцінки якості','Ритм 3 пости/тиждень'],
-      schedule:{dows:[2,4,0],h:20,endH:21,title:'Пост у блог'}});
-    if(/сон|сплю|спати|00:00|недосип/.test(t)) goals.push({emoji:'😴',name:'Сон 7+ годин',
-      steps:['Лягати до 00:00','Вечірній блок «підготовка до сну» 23:15','14 днів поспіль'],
-      schedule:{dows:[0,1,2,3,4,5,6],h:23,endH:23.5,title:'Підготовка до сну'}});
-    if(/ai|аі|ші|модел|нейро/.test(t)) goals.push({emoji:'🤖',name:'Освоїти AI-інструменти',
-      steps:['Обрати 1 інструмент на місяць','2 практики/тиждень по 45 хв','Перший реальний результат — у блог']});
+    rules.forEach(([re,gd])=>{ if(!re.test(t)) return;
+      const s=sents.find(x=>re.test(x.toLowerCase())); if(s) gd.sentence=s;
+      goals.push(gd); });
     if(!goals.length) goals.push({emoji:'🎯',name:'Перша ціль на 90 днів',
       steps:['Сформулювати конкретний результат','Розбити на 3 кроки','Перший крок → 📅 у Планер сьогодні']});
     return { goals:goals.slice(0,5), envelopes:[{name:'Подушка безпеки',emoji:'🛟',goal:1500}] };
@@ -168,9 +207,12 @@
       const sc=gd.schedule;
       const schTxt=(sc&&Array.isArray(sc.dows)&&sc.dows.length)?
         ' · 🗓 '+sc.dows.map(d=>DOW_SHORT[d]||'').filter(Boolean).join('·')+' о '+String(Math.floor(sc.h)).padStart(2,'0')+':00':'';
+      const nMs=aiDraftMonths(gd).length;
+      const sent=aiDraftSentence(gd);
       items.push(`<div class="ai-item on" data-aitem="g${i}"><div class="ck">✓</div>
         <div class="tx"><b>${safeEmoji(gd.emoji,'🎯')} ${esc(gd.name||'Ціль')}</b>
-        <span>${(gd.steps||[]).length} кроків${schTxt}</span></div></div>`);
+        ${sent?`<span class="ai-sent">«${esc(sent.length>90?sent.slice(0,90)+'…':sent)}»</span>`:''}
+        <span>${(gd.steps||[]).length} кроків${nMs?' · '+nMs+' віх':''}${schTxt}</span></div></div>`);
     });
     (draft.envelopes||[]).forEach((ed,i)=>{
       items.push(`<div class="ai-item on" data-aitem="e${i}"><div class="ck">✓</div>
@@ -193,6 +235,18 @@
     const back=body.querySelector('[data-aiback]'); if(back) back.onclick=()=>aiStartSheet();
     const ap=body.querySelector('[data-aiapply]'); if(ap) ap.onclick=()=>{ aiApplyDraft(draft); };
   }
+  /* Відповідь AI — чужі дані: речення беремо, лише якщо воно справді є в листі,
+     віхи — лише формату РРРР-ММ у межах «зараз … точка Б», не більше 24. */
+  function aiDraftSentence(gd){
+    const s=typeof gd.sentence==='string'?gd.sentence.trim().replace(/^[«"']+|[»"']+$/g,''):'';
+    return s && ylLetter().text.indexOf(s)>=0 ? s.slice(0,300) : '';
+  }
+  function aiDraftMonths(gd){
+    const from=ymdLocal().slice(0,7), to=ylDate(ylLetter()).slice(0,7);
+    return (Array.isArray(gd.months)?gd.months:[])
+      .filter(m=>m&&typeof m.ym==='string'&&/^\d{4}-(0[1-9]|1[0-2])$/.test(m.ym)&&m.ym>=from&&m.ym<=to&&String(m.t||'').trim())
+      .slice(0,24);
+  }
   function aiApplyDraft(draft){
     const colors=['#5b8def','#34c77b','#e8843c','#c77dff','#f0b429','#4ecdc4'];
     const p=plData(); const today=plTodayStr();
@@ -204,7 +258,10 @@
         color:colors[goalsData.goals.length%colors.length],
         steps:(gd.steps||[]).slice(0,7).map(s=>({ id:'st_ai_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
           name:String(s).slice(0,120), done:false })),
-        track:{}, days:{}, folderKey:null, open:true });
+        track:{}, days:{}, folderKey:null, open:true,
+        sentence:aiDraftSentence(gd),
+        ms:aiDraftMonths(gd).map((m,mi)=>({ id:'ms_ai_'+Date.now()+'_'+nG+'_'+mi+'_'+Math.random().toString(36).slice(2,5),
+          ym:m.ym, t:String(m.t).trim().slice(0,80), done:false })) });
       nG++;
       const sc=gd.schedule;
       if(sc && Array.isArray(sc.dows) && sc.dows.length && typeof sc.h==='number'){
@@ -242,14 +299,6 @@
     const avg = g.goals.length ? Math.round(g.goals.reduce((s,x)=>s+(x.progress||0),0)/g.goals.length) : 0;
     document.getElementById('goalsSub').textContent = `${g.goals.length} цілей · ${doneCount} виконано · ${avg}% прогрес`;
 
-    const missionTxt = g.mission && g.mission.trim() ? esc(g.mission) : 'Тисни, щоб додати — навіщо ти живеш і що твориш…';
-    const missionCls = g.mission && g.mission.trim() ? 'gmission-filled' : 'gmission-empty';
-
-    const paFilled = g.pointA && g.pointA.trim();
-    const pbFilled = g.pointB && g.pointB.trim();
-    const paTxt = paFilled ? esc(g.pointA) : 'хаос, відкладання…';
-    const pbTxt = pbFilled ? esc(g.pointB) : 'дисципліна, реліз…';
-
     const tabs=[['goals','🎯 Цілі'],['path','🧭 Шлях'],['overview','📊 Огляд'],['q1','Q1'],['q2','Q2'],['q3','Q3'],['q4','Q4']];
     const tabsHtml=tabs.map(([k,l])=>`<button class="gtab ${g.tab===k?'on':''}" data-gtab="${k}">${l}</button>`).join('');
 
@@ -260,39 +309,15 @@
         <div class="gyear-val">${g.year}</div>
         <button class="gyear-nav" data-yr="1">›</button>
       </div>
-      <div class="gmission ${missionCls}" id="gMission">
-        <span class="gm-ico">🌟</span><span class="gm-tx">${missionTxt}</span><span class="gm-edit">✎</span>
-      </div>
-      <div class="gaxis" id="gAxis">
-        <div class="gaxis-row">
-          <div class="gaxis-node gx-a" data-axis="a">
-            <div class="gx-lbl">Точка А</div>
-            <div class="gx-tx ${paFilled?'':'gx-empty'}">${paTxt}</div>
-          </div>
-          <div class="gaxis-arr">→</div>
-          <div class="gaxis-node gx-b" data-axis="b">
-            <div class="gx-lbl">Точка Б</div>
-            <div class="gx-tx ${pbFilled?'':'gx-empty'}">${pbTxt}</div>
-          </div>
-        </div>
-        <div class="gaxis-bar"></div>
-      </div>
-      <button class="ai-startbtn" id="gAiStart">✨ Зібрати систему з Точки А → Б</button>
+      ${ylBlockHtml()}
       <div class="gtabs">${tabsHtml}</div>
       <div id="gTabBody"></div>`;
 
     body.querySelectorAll('[data-gtab]').forEach(b=>b.onclick=()=>{ g.tab=b.dataset.gtab; saveGoals(); renderGoals(); });
     { const pb=body.querySelector('[data-glvl]'); if(pb) pb.onclick=()=>{ try{ goPlanner(); }catch(e){ console.error('goPlans',e); } }; }
     body.querySelectorAll('[data-yr]').forEach(b=>b.onclick=()=>{ g.year+=parseInt(b.dataset.yr); saveGoals(); renderGoals(); });
-    const mis=document.getElementById('gMission');
-    if(mis) mis.onclick=()=>{ inputModal({title:'Місія / візія року', value:g.mission||'', placeholder:'Навіщо ти живеш і що твориш…', onOk:(v)=>{ g.mission=v; saveGoals(); renderGoals(); }}); };
-    { const aib=document.getElementById('gAiStart'); if(aib) aib.onclick=()=>{ try{ aiStartSheet(); }catch(e){ console.error('aiStart',e); } }; }
-    const ax=document.getElementById('gAxis');
-    if(ax) ax.querySelectorAll('[data-axis]').forEach(n=>n.onclick=()=>{
-      const which=n.dataset.axis;
-      if(which==='a') inputModal({title:'Точка А — де я зараз', value:g.pointA||'', placeholder:'Чесно: звички, фінанси, стан…', onOk:(v)=>{ g.pointA=v; saveGoals(); renderGoals(); }});
-      else inputModal({title:'Точка Б — куди йду', value:g.pointB||'', placeholder:'Дисципліна, фінанси під контролем, реліз…', onOk:(v)=>{ g.pointB=v; saveGoals(); renderGoals(); }});
-    });
+    // лист із точки Б і дорога віх замість місії й Точок А/Б (40-year-letter.js)
+    ylBind(body);
 
     renderGoalsTab();
   }

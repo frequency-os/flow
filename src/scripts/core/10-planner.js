@@ -360,7 +360,9 @@
 
   function pathFlowHtml(){
     const g=goalsData;
-    const visionTxt = g.mission&&g.mission.trim()? esc(g.mission) : 'Не задано — додай у вкладці Цілі';
+    // візія = лист із точки Б (40-year-letter.js); стара місія — поки листа нема
+    const LT=ylLetter().text.trim().replace(/\s+/g,' ');
+    const visionTxt = LT ? esc(LT.length>140?LT.slice(0,140)+'…':LT) : g.mission&&g.mission.trim()? esc(g.mission) : 'Не задано — напиши лист із точки Б у вкладці Цілі';
     const aTxt = g.pointA&&g.pointA.trim()? esc(g.pointA) : 'Не задано';
     const bTxt = g.pointB&&g.pointB.trim()? esc(g.pointB) : 'Не задано';
     const goals=g.goals||[];
