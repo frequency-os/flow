@@ -48,7 +48,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-03-1723-12cb85b';
+  var BUILD='2026-10-04-1235-0542f8e';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -2487,6 +2487,9 @@
     font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
   .pgb-seg button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);}
   .fgs-row.on{background:var(--hair);}
+  /* меню папки (крок 3): щільніші рядки, щоб «Видалити» влазило без прокрутки на 375×812 */
+  .fmenu-in .pgb-row{padding:8px 10px;min-height:46px;}
+  .fmenu-in .fgs-head{margin-bottom:4px;}
   /* ===== універсальне меню дій / підтвердження ===== */
   .asheet{position:fixed;inset:0;background:rgba(8,10,16,.55);backdrop-filter:blur(5px);
     display:flex;align-items:flex-end;justify-content:center;z-index:1300;animation:fadein .2s;}
@@ -20699,59 +20702,110 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     });
   }
 
+  /* ════════ МЕНЮ ПАПКИ (крок 3, 03.10.2026) ════════
+     Було 13 рядків упереміш: фото, роль, розкладка, сфера, колір, іконка, емодзі…
+     Стало: шапка → «Папка» (назва, Вигляд ›, Тип ›, Група ›, закріпити) →
+     «Звʼязки» (чат, будівля в грі) → Видалити. Дії ті самі (folderAction),
+     формат даних не змінено. Документні дії — у «⋯» самого документа. */
+  const FM_IC={
+    pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+    look:'<circle cx="12" cy="12" r="8.5"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/><path d="M12 20.5a2.5 2.5 0 0 1 0-5h2"/>',
+    type:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+    group:'<rect x="3.5" y="8" width="13" height="12" rx="2.5"/><path d="M7.5 5h10a3 3 0 0 1 3 3v9"/>',
+    ungroup:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M13.5 7h4M7 13.5v4"/>',
+    pin:'<path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/>',
+    chat:'<path d="M4 5.5h16v10H9l-5 4z"/>',
+    bld:'<path d="M4 20.5h16M6 20.5V8l6-4 6 4v12.5"/><path d="M10 20.5v-4h4v4"/>',
+    del:'<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',
+    photo:'<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 15.5l-4.2-4.2a1.5 1.5 0 0 0-2.1 0L7 19"/>',
+    cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'
+  };
+  function fmIc(n){ return '<span class="pgb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(FM_IC[n]||'')+'</svg></span>'; }
+  function fmRow(act,ic,t,sub,cls){ return `<button class="fmi pgb-row${cls?' '+cls:''}" data-act="${act}">${fmIc(ic)}<span class="pgb-tx">${t}${sub?`<small class="fmi-sub">${sub}</small>`:''}</span></button>`; }
+  const FM_TYPE={area:'Звичайна',project:'Проєкт',page:'Сторінка'};
   function openFolderMenu(key){
     const f=folders[key]; if(!f) return;
-    closeFolderMenu();
-    const m=document.createElement('div');
-    m.className='fmenu-sheet'; m.id='fmenuSheet';
-    m.innerHTML=`<div class="fmenu-in">
-      <div class="fmenu-grip"></div>
-      <div class="fmenu-title">${esc(f.name)}</div>
-      <button class="fmi" data-act="photo"><svg class="fmi-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 15.5l-4.2-4.2a1.5 1.5 0 0 0-2.1 0L7 19"/></svg> ${f.photo?'Змінити фото':'Додати фото'}</button>
-      ${f.photo?`<button class="fmi" data-act="cropphoto">🖼️ Кадрувати фото</button>`:''}
-      ${f.photo?`<button class="fmi" data-act="rmphoto">🗑️ Прибрати фото</button>`:''}
-      <div class="fmi-label">Роль папки</div>
-      <div class="flay-pick frole-pick">
-        ${Object.keys(FOLDER_ROLES).map(r=>`<button class="flay-opt ${(f.role||'area')===r?'on':''}" data-role="${r}" title="${FOLDER_ROLES[r].d}">
-          <span class="frole-e">${FOLDER_ROLES[r].e}</span><span>${FOLDER_ROLES[r].n}</span></button>`).join('')}
-      </div>
-      ${(f.role==='project')?`
+    const kids=groupKids(key);
+    const par=(f.parent&&folders[f.parent])?f.parent:'';
+    const sub=kids.length ? ('група · '+kids.length+' '+pluralUk(kids.length,'папка','папки','папок'))
+            : par ? ('у групі «'+esc(folders[par].name)+'»') : 'папка';
+    const role=f.role||'area';
+    let linked=0; try{ linked=(typeof window.chatsForFolder==='function')?window.chatsForFolder(key).length:0; }catch(_){}
+    const dev=!!(window.upDevOn&&window.upDevOn());
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fgs-head">${fgIcon(f,'fgs-ic fgs-ic-lg')}
+        <div class="fgs-ht"><b data-i18n-skip="1">${esc(f.name)}</b><small data-i18n-skip="1">${sub}</small></div></div>
+      ${role==='project'?`
       <div class="fmi-label">Статус проєкту</div>
       <div class="fstatus-pick">
         ${PROJECT_STATUSES.map(([s,n,c])=>`<button class="fst-opt ${(f.status||'active')===s?'on':''}" data-status="${s}" style="--stc:${c}">${n}</button>`).join('')}
       </div>
-      <button class="fmi" data-act="due">📅 ${f.due?('Дедлайн: '+esc(f.due)):'Встановити дедлайн'}</button>
-      ${f.due?`<button class="fmi" data-act="rmdue">✖️ Прибрати дедлайн</button>`:''}`:''}
-      <div class="fmi-label">Розкладка картки</div>
+      ${fmRow('due','cal',f.due?('Дедлайн: '+esc(f.due)):'Встановити дедлайн','')}
+      ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
+      <div class="fmi-label">Папка</div>
+      ${fmRow('rename','pen','Перейменувати','')}
+      ${fmRow('look','look','Вигляд','колір, значок, емодзі, фото, картка')}
+      ${fmRow('type','type','Тип · '+FM_TYPE[role],'звичайна, проєкт чи сторінка')}
+      ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
+      ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
+      ${fmRow('pin','pin',f.pinned?'Відкріпити':'Закріпити зверху','')}
+      <div class="fmi-label">Звʼязки · за бажанням</div>
+      ${fmRow('chat','chat','Чат',linked?('повʼязано: '+linked):'не повʼязано')}
+      ${dev?fmRow('sphere','bld','Будівля в грі',f.sphere?'повʼязано · змінити чи прибрати':'не повʼязано'):''}
+      ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
+    m=>{
+      m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));
+      m.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{
+        folders[key].status=b.dataset.status; saveFolders(); renderDashboard(); openFolderMenu(key);
+        try{ window.platform.haptic('select'); }catch(_){}
+      });
+    });
+  }
+  // «Вигляд»: усе про те, як папка виглядає, в одній шторці
+  function openFolderLook(key){
+    const f=folders[key]; if(!f) return;
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Вигляд · <span data-i18n-skip="1">${esc(f.name)}</span></div>
+      ${fmRow('color','look','Колір','змінити на наступний')}
+      <button class="fmi pgb-row" data-act="icon"><span class="pgb-ic" aria-hidden="true" style="color:${safeColor(f.c,'var(--accent)')}"><svg class="ico" width="16" height="16"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="pgb-tx">Значок<small class="fmi-sub">${f.iconSet?'обрано вручну':'за емодзі'}</small></span></button>
+      ${fmRow('emoji','pen','Емодзі',f.emoji?esc(f.emoji):'нема')}
+      ${fmRow('photo','photo',f.photo?'Змінити фото':'Додати фото','обкладинка картки')}
+      ${f.photo?fmRow('cropphoto','photo','Кадрувати фото',''):''}
+      ${f.photo?fmRow('rmphoto','del','Прибрати фото',''):''}
+      <div class="fmi-label">Картка на головній</div>
       <div class="flay-pick">
         ${['a','b','c','d'].map(L=>`<button class="flay-opt ${(f.flayout||'a')===L?'on':''}" data-lay="${L}">
           <span class="flay-ic flay-ic-${L}"></span><span>${({a:'Збоку',b:'Зверху',c:'На всю',d:'Перехід'})[L]}</span></button>`).join('')}
       </div>
-      ${(window.upDevOn&&window.upDevOn())?`<button class="fmi" data-act="sphere">🏙 ${f.sphere?'Сфера: шаблон / прибрати':'Зробити сферою'}</button>`:''}
-      <button class="fmi" data-act="pin">📌 ${f.pinned?'Відкріпити':'Закріпити зверху'}</button>
-      <button class="fmi" data-act="rename">✏️ Перейменувати</button>
-      ${groupKids(key).length?`<button class="fmi" data-act="ungroup">🗂 Розгрупувати<small class="fmi-sub">папки виходять з групи, нічого не видаляється</small></button>`:''}
-      <button class="fmi" data-act="move">📂 ${f.parent?'Перемістити / на головну':'Перемістити в папку'}</button>
-      <button class="fmi" data-act="color">🎨 Змінити колір</button>
-      <button class="fmi" data-act="icon"><svg class="ico fmi-ic" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg> Іконка${f.iconSet?'':' · за емодзі'}</button>
-      <button class="fmi" data-act="emoji">😀 Змінити емодзі</button>
-      ${f.custom?`<button class="fmi danger" data-act="delete">🗑️ Видалити папку</button>`:''}
-    </div>`;
-    m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
-    document.body.appendChild(m);
-    m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));
-    m.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{
-      folders[key].flayout=b.dataset.lay; saveFolders(); renderDashboard(); openFolderMenu(key);
+      <button class="fmi" data-back>‹ Назад до меню</button>`,
+    m=>{
+      m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
+        const a=b.dataset.act;
+        if(a==='color'){ cycleFolderColor(key); saveFolders(); renderDashboard(); openFolderLook(key); return; }
+        folderAction(key,a);
+      });
+      m.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{ f.flayout=b.dataset.lay; saveFolders(); renderDashboard(); openFolderLook(key); });
+      m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
     });
-    m.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{
-      folders[key].role=b.dataset.role;
-      if(b.dataset.role==='project'&&!folders[key].status) folders[key].status='active';
-      saveFolders(); renderDashboard(); openFolderMenu(key);
-      window.platform.haptic('select');
-    });
-    m.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{
-      folders[key].status=b.dataset.status; saveFolders(); renderDashboard(); openFolderMenu(key);
-      window.platform.haptic('select');
+  }
+  // «Тип»: звичайна / проєкт / сторінка (раніше «Роль папки»)
+  function openFolderType(key){
+    const f=folders[key]; if(!f) return;
+    const cur=f.role||'area';
+    const D={area:'Документ для планування і нотаток',project:'Має статус і дедлайн, живе на вкладці «Проєкти»',page:'Відкривається одразу як аркуш'};
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Тип · <span data-i18n-skip="1">${esc(f.name)}</span></div>
+      ${Object.keys(FM_TYPE).map(r=>`<button class="fgs-row${cur===r?' on':''}" data-role="${r}" aria-pressed="${cur===r}">
+        <span class="fgs-t"><b>${FM_TYPE[r]}</b><small>${D[r]}</small></span><span class="fgs-go">${cur===r?'✓':''}</span></button>`).join('')}
+      <button class="fmi" data-back>‹ Назад до меню</button>`,
+    m=>{
+      m.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{
+        f.role=b.dataset.role;
+        if(f.role==='project'&&!f.status) f.status='active';
+        saveFolders(); renderDashboard(); openFolderMenu(key);
+        try{ window.platform.haptic('select'); }catch(_){}
+      });
+      m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
     });
   }
   function closeFolderMenu(){ const e=document.getElementById('fmenuSheet'); if(e) e.remove(); }
@@ -20775,7 +20829,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           <svg class="ico" aria-hidden="true"><use href="#${id}"/></svg></button>`).join('')}
       </div>
       <button class="fmi" data-ficauto="1">↺ За емодзі${f.emoji?' ('+esc(f.emoji)+')':''}</button>
-      <button class="fmi" data-ficback="1">‹ Назад до налаштувань</button>
+      <button class="fmi" data-ficback="1">‹ Назад до вигляду</button>
     </div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
@@ -20791,7 +20845,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       try{ window.platform.haptic('select'); }catch(_){}
     };
     const back=m.querySelector('[data-ficback]');
-    if(back) back.onclick=()=>openFolderMenu(key);
+    if(back) back.onclick=()=>openFolderLook(key);
   }
 
   function openFolderMovePicker(key){
@@ -20804,7 +20858,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const em=(tf.emoji&&tf.emoji.trim())?esc(tf.emoji):'📁';
       return `<button class="fmi" data-mv="${esc(k)}"><span class="gfp-em">${em}</span> ${esc(tf.name)}${cur}</button>`; }).join('');
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
-      <div class="fmenu-title">Перемістити «${esc(f.name)}»</div>
+      <div class="fmenu-title">Група для «${esc(f.name)}»</div>
       ${rootRow}${rows||'<div class="fmi-label">Немає інших папок</div>'}</div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
@@ -20813,6 +20867,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function folderAction(key,act){
     const f=folders[key]; if(!f) return;
     if(act==='due'){ closeFolderMenu(); inputModal({title:'Дедлайн проєкту', value:f.due||'', placeholder:'РРРР-ММ-ДД, напр. 2026-08-01', onOk:(v)=>{ const m=(v||'').match(/^\d{4}-\d{2}-\d{2}$/); if(m){ f.due=v; saveFolders(); renderDashboard(); } else if(v){ flowAlert('Формат дати: РРРР-ММ-ДД'); } }}); return; }
+    if(act==='look'){ openFolderLook(key); return; }
+    if(act==='type'){ openFolderType(key); return; }
+    if(act==='chat'){ closeFolderMenu(); try{ if(typeof window.folderAddSheet==='function') window.folderAddSheet(key); }catch(e){ console.error('chat',e); } return; }
     if(act==='sphere'){ closeFolderMenu(); try{ sphTemplateSheet(key); }catch(e){ console.error('sphere',e); } return; }
     if(act==='rmdue'){ f.due=''; saveFolders(); renderDashboard(); openFolderMenu(key); return; }
     if(act==='photo'){ pickFolderPhoto(key); return; }
@@ -28739,7 +28796,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       wrapped.__chats=true; window.openFlowPage=wrapped;
     }
   }
-  try{ window.createChat=createChat; window.chatsForFolder=chatsForFolder; }catch(_){}
+  try{ window.createChat=createChat; window.chatsForFolder=chatsForFolder; window.folderAddSheet=folderAddSheet; }catch(_){}
   /* ============ AI І ПРИВАТНІСТЬ: згода + що бачить AI ============
      Вимога Apple 5.1.2(i): перш ніж дані людини підуть до стороннього AI,
      вона має побачити, ЩО саме піде, КОМУ і НАВІЩО, і погодитись.
