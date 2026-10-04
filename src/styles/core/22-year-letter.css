@@ -65,3 +65,6 @@
   /* рідна .im-in завжди темна; лист довгий і читається — шторки листа йдуть за темою */
   .im-in.ylet-ed,.im-in.ylet-rd{background:var(--card);color:var(--text);}
   .im-in.ylet-ed .im-grip,.im-in.ylet-rd .im-grip{background:var(--line);}
+  .yroad-behind{display:flex;align-items:center;gap:10px;justify-content:space-between;background:color-mix(in srgb,var(--owe,#e86e6e) 12%,transparent);
+    border:1px solid color-mix(in srgb,var(--owe,#e86e6e) 35%,transparent);border-radius:12px;padding:8px 10px;margin:-2px 0 12px;font-size:12.5px;font-weight:700;color:var(--text);}
+  .yroad-behind button{flex:none;border:0;background:var(--accent);color:#fff;font-family:inherit;font-weight:800;font-size:12px;border-radius:9px;padding:7px 10px;min-height:34px;cursor:pointer;}

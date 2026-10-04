@@ -351,7 +351,7 @@
       const ds=plTodayStr();
       if(localStorage.getItem('ai_week_ds')===ds) return;
       localStorage.setItem('ai_week_ds',ds);
-      aiChatSend('Тижневий огляд: подивись останні 7 днів, цілі й фінанси. Скажи: скільки блоків закрито по днях, що просіло, 1-2 чесні висновки і один фокус на наступний тиждень. Стисло, без води.');
+      aiChatSend('Тижневий огляд: подивись останні 7 днів, цілі й фінанси. Скажи: скільки блоків закрито по днях, що просіло, 1-2 чесні висновки і один фокус на наступний тиждень. Якщо є лист із точки Б — скажи мовою листа, яке речення цього тижня наблизилось, яке відстало, і чи встигаю з віхами місяця. Стисло, без води.');
     }catch(e){ console.error('aiWeeklyMaybe',e); }
   }
   function aiAgentStatusFor(name,inp){
@@ -365,7 +365,7 @@
       return (M[inp.action]||'🔧 змінюю планер')+'…';
     }
     if(name==='goals'){
-      const M={add_step:'🎯 додаю крок',check_step:'🎯 відмічаю крок',create_goal:'🎯 створюю ціль'};
+      const M={add_step:'🎯 додаю крок',check_step:'🎯 відмічаю крок',create_goal:'🎯 створюю ціль',add_milestone:'🗓 додаю віху',check_milestone:'🗓 відмічаю віху'};
       return (M[inp.action]||'🎯 працюю з цілями')+'…';
     }
     if(name==='finance'){
@@ -486,9 +486,10 @@
         }, required:['t'] } }
       }, required:['action','blocks'] } },
     { name:'goals',
-      description:'Цілі: add_step (додати крок до цілі), check_step (відмітити крок виконаним), create_goal (нова ціль). goal і t — фрагменти назв.',
+      description:'Цілі: add_step (додати крок до цілі), check_step (відмітити крок виконаним), create_goal (нова ціль), add_milestone (віха місяця в «Дорозі року»: t — текст, ym — місяць РРРР-ММ, порожньо — поточний), check_milestone (відмітити віху зробленою: t — фрагмент віхи). goal і t — фрагменти назв. Лист із точки Б не змінюєш.',
       input_schema:{ type:'object', properties:{
-        action:{ type:'string', enum:['add_step','check_step','create_goal'] },
+        action:{ type:'string', enum:['add_step','check_step','create_goal','add_milestone','check_milestone'] },
+        ym:{ type:'string', description:'місяць віхи РРРР-ММ для add_milestone; порожньо — поточний' },
         goal:{ type:'string', description:'фрагмент назви цілі (add_step/check_step) або назва нової цілі (create_goal)' },
         t:{ type:'string', description:'текст кроку (add_step) або фрагмент наявного кроку (check_step)' },
         emoji:{ type:'string', description:'емодзі для create_goal' }
@@ -610,7 +611,7 @@
         const st=g.steps||[], dn=st.filter(s=>s&&s.done).length;
         const nx=st.filter(s=>s&&!s.done).slice(0,3).map(s=>(s.t||s.text||'')).filter(Boolean);
         return (g.emoji||'🎯')+' '+g.name+' ('+dn+'/'+st.length+')'+(nx.length?' · далі: '+nx.join('; '):'');
-      }).join('\n'))||'цілей немає';
+      }).join('\n')+(ylAiCtx(true).length?'\n\nЛист і віхи по місяцях:\n'+ylAiCtx(true).join('\n'):''))||'цілей немає';
     }
     if((inp.what==='finance'||inp.what==='diary') && aiSectionOff(inp.what)) return aiSectionOffMsg(inp.what);
     if(inp.what==='finance') return aiFinCtx();
@@ -774,6 +775,33 @@
       try{ renderGoals(); }catch(_){}
       try{ plToast('🤖 крок виконано: '+(st.name||st.t)); }catch(_){}
       return 'крок «'+(st.name||st.t)+'» відмічено ✓';
+    }
+    if(a==='add_milestone'){
+      const gl=aiFindGoal(inp.goal); if(!gl) return '⚠️ ціль не знайдена: '+(inp.goal||'')+'. Цілі: '+(goalsData.goals||[]).map(g=>g.name).slice(0,8).join('; ');
+      // без переносів і «» — текст моделі не повинен «дописувати» шторку іншою ціллю
+      const t=String(inp.t||'').replace(/[\r\n«»"]+/g,' ').replace(/\s+/g,' ').trim().slice(0,80); if(!t) return '⚠️ потрібен t (текст віхи)';
+      const cur=ymdLocal().slice(0,7), ym=String(inp.ym||cur).trim();
+      if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(ym)||ym<cur) return '⚠️ ym має бути РРРР-ММ, не раніше '+cur+'. Нічого не змінено';
+      const ok=await aiToolConfirm('Додати віху «'+t+'» на '+ylMonName(ym)+' до цілі «'+(gl.name||'')+'»',{title:'🎯 Frequency хоче змінити ціль'});
+      if(!ok) return 'людина скасувала — не повторюй';
+      if(!Array.isArray(gl.ms)) gl.ms=[];
+      gl.ms.push({ id:'ms_ai_'+Date.now()+'_'+Math.random().toString(36).slice(2,8), ym, t, done:false });
+      saveGoals(); try{ renderGoals(); }catch(_){}
+      try{ plToast('🤖 нова віха: '+t); }catch(_){}
+      const end=ylDate(ylLetter()).slice(0,7);
+      return 'віху «'+t+'» додано на '+ym+(ym>end?' (це пізніше за дату листа '+end+')':'');
+    }
+    if(a==='check_milestone'){
+      const gl=aiFindGoal(inp.goal); if(!gl) return '⚠️ ціль не знайдена: '+(inp.goal||'');
+      const frag=String(inp.t||'').toLowerCase().trim();
+      const open=ylGoalMs(gl).filter(m=>!m.done);
+      const m=frag ? open.find(x=>String(x.t||'').toLowerCase().includes(frag)) : null;
+      if(!m) return '⚠️ невиконану віху «'+(inp.t||'')+'» не знайдено. Відкриті віхи: '+(open.slice(0,6).map(x=>x.ym+' '+x.t).join('; ')||'нема');
+      const ok=await aiToolConfirm('Відмітити зробленою віху «'+m.t+'» ('+ylMonName(m.ym)+') у цілі «'+(gl.name||'')+'»',{title:'🎯 Frequency хоче змінити ціль'});
+      if(!ok) return 'людина скасувала — не повторюй';
+      m.done=true; saveGoals(); try{ renderGoals(); }catch(_){}
+      try{ plToast('🤖 віху зроблено: '+m.t); }catch(_){}
+      return 'віху «'+m.t+'» відмічено ✓'+(ylLit(gl)&&gl.sentence?' — речення листа «'+String(gl.sentence).slice(0,80)+'» проявилось':'');
     }
     if(a==='create_goal'){
       const nm=String(inp.goal||'').trim().slice(0,60); if(!nm) return '⚠️ порожня назва';
@@ -1410,7 +1438,9 @@
         return (gl.emoji||'🎯')+' '+gl.name+' ('+dn+'/'+st.length+' кроків)';
       }).join('; ')||'немає';
       out.push('Цілі: '+goals);
-      out.push('Точка Б: '+(((g.pointB||'').trim().slice(0,400))||'—'));
+      // лист із точки Б замінив Точку Б (40-year-letter.js); без листа — як було
+      if(!ylLetter().text.trim()) out.push('Точка Б: '+(((g.pointB||'').trim().slice(0,400))||'—'));
+      ylAiCtx(false).forEach(l=>out.push(l));
     }
     if(want('fin')) out.push(aiSectionOff('finance') ? 'Фінанси: '+aiSectionOffMsg('finance') : 'Фінанси:\n'+aiFinCtx());
     if(aiMem.length) out.push('ПАМʼЯТЬ ПРО ЛЮДИНУ (з минулих розмов): '+aiMem.join(' | '));
