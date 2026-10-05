@@ -162,7 +162,8 @@
          seedfolders_removed, agency_purged, space_removed, inbox_chat) — з
          префіксом, але це НЕ дані: див. MIGRATIONS_ONCE у 27-canvas.js.
        • службові з префіксом: 'flowapp___sb_outbox', 'flowapp___ph_push',
-         'flowapp___ph_ts', 'flowapp___seeded' (Preferences).
+         'flowapp___ph_ts', 'flowapp___seeded' (Preferences), 'flowapp___owner'
+         (чиї локальні дані — див. sbSetUser у 02-storage.js).
        • 'rit_auto', 'fd_*', 'pet3d*' модулі додають у FLOW_KEYS на льоту, але
          пишуть СИРИМИ — запис у реєстрі для них нічого не дає.
        • лише цей пристрій: ai_agent, ai_dev, ai_usage, ai_brief_ds, ai_week_ds,

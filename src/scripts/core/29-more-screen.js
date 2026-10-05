@@ -199,6 +199,7 @@
       // рядок «Вхід»: показує поточний стан; якщо не увійдено — тап розкриває варіанти
       const loginSub=checking?'Перевіряємо сесію…'
         :gUser?('Google · '+(gUser.email||''))
+        :window.__flowForeign?'Тут дані іншого акаунта · синк вимкнено'
         :'Не увійдено · дані лише на цьому пристрої';
       const loginIco=checking?ico('sync','slate'):(gUser?ico('user','blue'):ico('key','blue'));
       // «Вийти» доступне лише коли є Google-сесія
@@ -325,7 +326,8 @@
       };
 
       const loginRow=host.querySelector('[data-acc-login-row]');
-      if(loginRow) loginRow.onclick=()=>{ if(!loggedIn) toggle('[data-acc-login-expand]'); };
+      // дані іншого акаунта (вікно закрили «Пізніше») — той самий рядок повертає вибір
+      if(loginRow) loginRow.onclick=()=>{ if(window.__flowForeign && window.flowForeignAsk){ window.flowForeignAsk(); return; } if(!loggedIn) toggle('[data-acc-login-expand]'); };
       const outBtn=host.querySelector('[data-acc-out]');
       if(outBtn) outBtn.onclick=(e)=>{ e.stopPropagation(); if(window.sbSignOut) window.sbSignOut(); };
       const gb=host.querySelector('[data-acc-google]');
@@ -501,6 +503,42 @@
       try{ if(typeof window.dsbFillUser==='function') window.dsbFillUser(); }catch(_){}
     }
     window.renderAccount=renderAccount;
+
+    /* ── На пристрої дані іншого акаунта (sbSetUser у 02-storage.js) ──
+       Хмару вже вимкнено — тут лише вибір людини. «Злити разом» навмисно нема.
+       Стирання — те саме скидання пристрою: спершу бекап у файл (лише локальне:
+       сесія для сховища вимкнена, хмару нового акаунта бекап не бачить), сесію
+       лишає, тож після перезапуску тут уже дані того, хто увійшов. */
+    const maskMail=m=>{ const s=String(m||''); const i=s.indexOf('@'); return i>0 ? s.charAt(0)+'•••'+s.slice(i) : (s||'іншому акаунту'); };
+    const foreignWipe=async (file)=>{
+      const stop='❌ Нічого не стерто: ';
+      let r; try{ r=await window.flowFactoryReset({wipeCloud:false, file}); }catch(e){ r={ok:false, error:String((e&&e.message)||e)}; }
+      if(r.ok) return;
+      if(r.step==='tap'){ setTimeout(()=>actionSheet({ title:'Бекап готовий',
+        sub:'Файл «'+r.name+'» зібрано. Натисни «Зберегти файл» і вибери, куди його покласти.',
+        items:[{ ic:'down', label:'Зберегти файл', primary:true, onClick:()=>foreignWipe(r.file) }], cancel:'Скасувати' }), 350); return; }
+      if(r.step!=='backup-confirm'){ flowAlert(stop+r.error); return; }
+      setTimeout(()=>confirmSheet({ title:'Файл бекапу зберігся?',
+        sub:'Браузер не каже, чи «'+r.name+'» справді записано. Перевір «Завантаження»: без цього файла стерте не повернути.',
+        okLabel:'Файл є — стерти', onOk:async ()=>{
+          const r2=await window.flowFactoryReset({wipeCloud:false, backupConfirmed:true});
+          if(!r2.ok) flowAlert(stop+r2.error);
+        }}), 350);
+    };
+    const foreignAsk=()=>{
+      const f=window.__flowForeign; if(!f) return;
+      actionSheet({ title:'На пристрої дані іншого акаунта',
+        sub:'Вхід — '+(f.as||'новий акаунт')+', а дані тут належать '+maskMail(f.owner)+'. Щоб не змішати їх, синхронізацію вимкнено. '+
+            'Збережи їх у файл і зітри з пристрою — після перезапуску тут будуть лише твої дані. Або вийди, і все лишиться як було.',
+        items:[
+          { ic:'down', label:'Зберегти у файл і стерти з пристрою', sub:'Хмари жодного з акаунтів це не торкнеться', primary:true, onClick:()=>foreignWipe(null) },
+          { ic:'refresh', label:'Вийти з акаунта', sub:'Дані на пристрої лишаться як були', onClick:()=>{ if(window.sbSignOut) window.sbSignOut(); } }
+        ], cancel:'Пізніше' });
+    };
+    window.flowForeignAsk=foreignAsk;
+    document.addEventListener('flowforeign', ()=>setTimeout(foreignAsk, 600));
+    if(window.__flowForeign) setTimeout(foreignAsk, 600);
+
     document.addEventListener('flowsync', ()=>{
       if(!document.getElementById('scr-more')?.classList.contains('active')) return;
       // під час старту (load()) прилітає ціла черга подій flowsync — без дебаунсу

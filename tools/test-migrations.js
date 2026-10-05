@@ -135,8 +135,10 @@ function diff(a, b) {   // які ключі зʼявились, зникли а
   });
   return out;
 }
-// «сховище» = ключі flowapp_* (їх несе в хмару window.storage) + прапорці реєстру
-const isStore = x => /^[+~-]flowapp_/.test(x) || FLAGS.includes(x.slice(1));
+// «сховище» = ключі flowapp_* (їх несе в хмару window.storage) + прапорці реєстру.
+// Мітка власника flowapp___owner — не дані: службова, у хмару й бекап не йде,
+// ставиться з першою сесією навіть при мовчазній хмарі (див. sbSetUser у 02-storage.js).
+const isStore = x => (/^[+~-]flowapp_/.test(x) && x.slice(1) !== 'flowapp___owner') || FLAGS.includes(x.slice(1));
 const dataOf = (s, k) => { try { return JSON.parse(JSON.parse(s['flowapp_' + k]).d); } catch (_) { return null; } };
 
 async function scenarioA() {

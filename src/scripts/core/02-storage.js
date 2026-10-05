@@ -364,6 +364,87 @@
     let sbBatchTs = {};      // {key: час оновлення в хмарі, мс} — для звірки «що новіше»
     window.__sbReady = false; // стає true, коли перевірку сесії завершено (успішно чи ні)
 
+    /* ── ЧИЇ ЦЕ ЛОКАЛЬНІ ДАНІ ──
+       «Вийти» лише закриває сесію: дані, фото й кошик незлитих правок лишаються
+       на пристрої. Якщо потім тут увійде ІНШИЙ акаунт, усе це раніше саме їхало
+       в його хмару (кошик, гостьові правки 'g', фото з PhotoDB), а на екрані він
+       бачив чужий щоденник. Тепер пристрій пам'ятає власника локальних даних.
+       Увійшов не він — сесію для сховища не вмикаємо (sbUserCache лишається
+       null): ні читання хмари, ні запису в неї, пристрій живе як без входу, а
+       людина вибирає у вікні (29-more-screen.js): зберегти чуже у файл і стерти
+       з пристрою (flowFactoryReset лишає сесію) або вийти.
+       Власника ставимо при першій сесії, якщо його ще нема: на пристрої з
+       гостьовими даними це законний перший вхід — вони зливаються з акаунтом,
+       як і досі. Ключ службовий (___): у бекап і хмару не йде, скидання стирає.
+       Пристрої, де вийшли ще ДО появи власника: його видно з прапорця фото
+       flowapp___ph_backfill_<id> — він ставиться для кожного акаунта, що тут був.
+       sbTabOwner — чиї дані в ПАМʼЯТІ цієї вкладки. Власник змінився в іншій
+       вкладці (там стерли й увійшли) — ця перезапускається, а не вмикає хмару з
+       чужою памʼяттю; і кошик (sbOutboxSave) вона вже не пише. */
+    const OWNER_KEY = 'flowapp___owner';
+    function sbOwnerRead(){
+      try{ const o = JSON.parse(localStorage.getItem(OWNER_KEY)||'null'); if(o && o.id) return { id:String(o.id), email:String(o.email||'') }; }catch(_){}
+      return null;
+    }
+    // хто тут уже входив до появи мітки власника (за прапорцем фото)
+    function sbPastUsers(){
+      const out = [];
+      try{ for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i)||'';
+        if(k.indexOf('flowapp___ph_backfill_')===0) out.push(k.slice(22)); } }catch(_){}
+      return out;
+    }
+    let sbForeign = null;   // { id, email } власника, коли сесія належить іншому акаунту
+    let sbTabOwner = (sbOwnerRead()||{}).id || null;
+    let sbReloading = false;
+    function sbReloadTab(why){
+      if(sbReloading) return; sbReloading = true;
+      try{ console.warn('[Flow auth] '+why+' — перезапуск вкладки'); }catch(_){}
+      try{ location.reload(); }catch(_){}
+    }
+    function sbSetUser(u){
+      const was = !!sbForeign;
+      sbForeign = null;
+      if(u){
+        let o = sbOwnerRead();
+        if(!o){
+          const past = sbPastUsers();
+          if(past.length && past.indexOf(u.id) < 0) o = { id:past[0], email:'' };
+        }
+        if(o && o.id !== u.id){
+          sbForeign = { id:o.id, email:o.email, as:String(u.email||'') }; u = null;
+          // власника вгадали з прапорця фото — памʼять цієї вкладки теж його: стирання
+          // в іншій вкладці має перезапустити її (слухач storage), а не ввімкнути хмару
+          if(!sbTabOwner) sbTabOwner = o.id;
+        }
+        else if(sbTabOwner && sbTabOwner !== u.id){ u = null; sbReloadTab('власник даних змінився в іншій вкладці'); }
+        else {
+          if(!o){ try{ localStorage.setItem(OWNER_KEY, JSON.stringify({ id:u.id, email:u.email||'' })); }
+                  catch(_){ try{ console.warn('[Flow auth] мітку власника не записано — сховище повне'); }catch(_){} } }
+          sbTabOwner = u.id;
+        }
+      }
+      sbUserCache = u;
+      window.__flowForeign = sbForeign ? { owner: sbForeign.email, as: sbForeign.as } : null;
+      if(sbForeign && !was){
+        try{ console.warn('[Flow auth] на пристрої дані іншого акаунта — хмару вимкнено до вибору людини'); }catch(_){}
+        try{ document.dispatchEvent(new CustomEvent('flowforeign')); }catch(_){}
+      }
+    }
+    // власника стерли чи змінили в іншій вкладці — памʼять цієї вже чужа
+    try{ window.addEventListener('storage', e=>{
+      if(e.key !== OWNER_KEY && e.key !== null) return;   // null — сховище очищено цілком
+      const o = sbOwnerRead();
+      if(sbTabOwner && (!o || o.id !== sbTabOwner)) sbReloadTab('власника даних змінено в іншій вкладці');
+    }); }catch(_){}
+    // чи можна класти чергу цієї вкладки в кошик: не під час скидання і не поверх чужого пристрою
+    function sbOutboxMine(){
+      if(window.__flowWriteLock) return false;
+      // вкладка без власника (гість, старий кошик) пише, лише доки власника нема й на пристрої
+      if(!sbTabOwner) return !sbOwnerRead();
+      const o = sbOwnerRead();
+      return !!o && o.id === sbTabOwner;
+    }
+
     /* Спершу локальна копія з vendor/ (працює без інтернету), потім CDN.
        Версія на CDN зафіксована навмисно: «@2» колись оновиться сама і може
        зламати вхід у момент, коли ти цього не чекаєш. */
@@ -396,7 +477,7 @@
         sb = lib.createClient(SB_URL, SB_KEY);
         try{
           const { data } = await sb.auth.getSession();
-          sbUserCache = data && data.session ? data.session.user : null;
+          sbSetUser(data && data.session ? data.session.user : null);
         }catch(_){}
         window.__sbReady = true; sbReadyEvt();
         try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
@@ -427,7 +508,7 @@
           else setTimeout(refetch, 300); // load() ще міг не встигнути визначитись на цьому етапі скрипта
         }
         sb.auth.onAuthStateChange((_evt, session)=>{
-          sbUserCache = session ? session.user : null;
+          sbSetUser(session ? session.user : null);
           try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
           // прибрати access_token/code з адресного рядка одразу після обробки —
           // інакше він так і висить у видимому URL (ризик, якщо людина скопіює
@@ -791,7 +872,9 @@
             say('Вхід не вдався: ' + error.message);
             return;
           }
-          sbUserCache = data && data.session ? data.session.user : null;
+          sbSetUser(data && data.session ? data.session.user : null);
+          // на пристрої дані іншого акаунта — хмару не чіпаємо, вибір у вікні (flowforeign)
+          if(sbForeign){ try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){} return; }
           try{ if(window.__setSync){ window.__flowSync.quota=false; window.__setSync('synced'); } }catch(_){}
           try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
           try{ await sbPrefetchAll(); }catch(_){}
@@ -810,7 +893,7 @@
       const client = await sbInit();
       if(!client) return;
       await client.auth.signOut();
-      sbUserCache = null;
+      sbSetUser(null);
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
     };
 
@@ -913,6 +996,9 @@
        інакше офлайн-правка, зроблена перед закриттям, губиться назавжди. */
     function sbOutboxSave(){
       if(sbOutboxTimer){ clearTimeout(sbOutboxTimer); sbOutboxTimer=null; }
+      /* Скидання стерло сховище, а черга ще в памʼяті: pagehide перед перезапуском
+         записав би кошик назад — і новий власник відправив би чуже у свою хмару. */
+      if(!sbOutboxMine()) return;
       try{
         const all = Object.assign({}, sbInFlight, sbWriteQueue);   // новіше з черги перемагає
         if(Object.keys(all).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(all));
@@ -957,6 +1043,8 @@
     }
     async function sbFlushWrites(){
       sbWriteTimer = null;
+      // на пристрої дані іншого акаунта — черга чекає в кошику, без повторів і «Помилки»
+      if(sbForeign) return;
       const u = sbUserCache;
       const q = sbWriteQueue; sbWriteQueue = {};   // знімаємо поточну партію
       const keys = Object.keys(q);
@@ -1017,6 +1105,12 @@
     }
     // віддаємо на випадок, якщо треба «доштовхнути» outbox ззовні (напр. після входу)
     window.sbFlushWrites = sbFlushWrites;
+    // скидання: черга в памʼяті більше нічия — викидаємо разом із таймерами (кошик у сховищі стирає wipeLocal)
+    window.sbDropQueue = function(){
+      if(sbWriteTimer){ clearTimeout(sbWriteTimer); sbWriteTimer=null; }
+      if(sbOutboxTimer){ clearTimeout(sbOutboxTimer); sbOutboxTimer=null; }
+      sbWriteQueue = {}; sbInFlight = {}; sbOutboxKeys = {}; sbSyncPending();
+    };
     // застосунок ховають/закривають: відкладений кошик — у localStorage зараз,
     // черга — в хмару зараз (таймери у фоні iOS можуть уже не спрацювати)
     function sbOnHide(){
@@ -1871,6 +1965,11 @@
       // 4) прапорець для дочистки IndexedDB на наступному старті
       try{ localStorage.setItem('__flow_wipe_idb__','1'); }catch(_){}
     };
+    /* Черга незлитих правок у памʼяті: стерте сховище не має отримати її назад
+       з pagehide перед перезапуском (на пристрої тепер може бути інша людина).
+       Тут, а не до кроку хмари: якщо хмару стерти не вдалось, кошик лишається живим.
+       Самі правки є у файлі бекапу, зробленому вище. */
+    try{ if(window.sbDropQueue) window.sbDropQueue(); }catch(_){}
     wipeLocal();
     setTimeout(()=>{ wipeLocal(); try{ location.reload(); }catch(_){} }, 600);
     return { ok:true };
