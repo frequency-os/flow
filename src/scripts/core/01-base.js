@@ -124,6 +124,7 @@
     'goals_data','values_state','wishes_board',
     'envelopes','debts','fin_ops','fin_recurring',
     'fin_projects',   // проєкти Кабінету «Фінанси» (08-finance.js); блок «Проєкт» — вікно в них
+    'world_game',     // стан гри «Мій світ» (38-world.js gameLoad/gameSave; misto.html пише лише його, цілком)
     'income_cards','fx_cfg','spend',
     'work_sessions','work_cfg','work_extras','work_blocks',
     'board','customboards','blockusage',

@@ -3,7 +3,8 @@
      на місце «Гроші», а гроші видно в чипі картки «Сьогодні» на Огляді.
      Гра — окрема сторінка misto.html у рамці (iframe), зі своїм сховищем
      misto_dnya_v3. Дані Frequency вона бачить лише через worldBridge і лише
-     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи). Нічого не пише. */
+     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи). Пише лише
+     власний стан у ключ world_game (gameSave). */
   let worldShown=false;
   function worldOn(){ try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
 
@@ -24,6 +25,26 @@
     },
     // сфери (39-spheres.js): назва, шаблон, будівля й цифри з блоків папки — лише читання
     spheres(){ try{ return sphForWorld(); }catch(_){ return []; } },
+    /* Стан гри в акаунті — ключ world_game. Гра читає й пише ЛИШЕ його і лише цілком,
+       Frequency вміст не розбирає. trusted=false — хмара ще не відповіла: тоді гра в
+       акаунт не пише («порожньо» ≠ «не відповіло», урок 24.09). */
+    async gameLoad(){
+      const trusted=!!(window.sbDataTrusted&&window.sbDataTrusted());
+      let raw=null;
+      try{ const r=await window.storage.get('world_game'); raw=(r&&typeof r.value==='string')?r.value:null; }catch(_){ raw=null; }
+      // id акаунта: гра прив'язує перенесення до нього; гість ('') в акаунт не пише
+      const u=window.sbUser&&window.sbUser();
+      return {trusted, raw, uid:(u&&u.id)?String(u.id):''};
+    },
+    gameSave(raw){
+      if(!(window.sbDataTrusted&&window.sbDataTrusted())) return 'untrusted';
+      if(!(window.sbUser&&window.sbUser())) return 'guest';   // без входу акаунта нема — гра лише в браузері
+      if(typeof raw!=='string') return 'bad';
+      if(raw.length>600000) return 'too_big';             // кілька копій гри ділять ~5 МБ памʼяті браузера
+      try{ const o=JSON.parse(raw); if(!o||typeof o!=='object'||!o.player||typeof o.player!=='object') return 'bad'; }catch(_){ return 'bad'; }
+      try{ const p=window.storage.set('world_game', raw, false); if(p&&p.catch) p.catch(()=>{}); }catch(_){ return 'fail'; }
+      return 'ok';
+    },
     // план на рік (40-year-letter.js): лист і віхи — лише читання
     year(){ try{ return ylForWorld(); }catch(_){ return null; } },
     open(sec, key){

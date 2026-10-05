@@ -737,8 +737,61 @@ function locLevel(L){ return 1+L.params.reduce(function(s,p){return s+(p.level-1
 
 /* ── стан ── */
 var KEY='misto_dnya_v3', S=null;
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(_){} }
+/* ── Акаунт (перенесення 05.10.2026). У Frequency стан гри живе в ключі world_game
+   (міст gameLoad/gameSave у 38-world.js); тут, у браузері, — лише кеш. Правила:
+   • хмара не відповіла або людина не увійшла (гість) → граємо з браузерної копії, в акаунт не пишемо;
+   • в акаунті порожньо, а в браузері гра є → вона копіюється в акаунт;
+   • уперше з цим акаунтом (misto_acc_v1 ≠ id) і гра є з обох боків → лишається та, де більше досвіду;
+   • далі головна — гра з акаунта, але невідправлені дії (misto_pending), новіші за акаунт, несемо туди;
+   • замінена «своя» версія лягає запасом у браузер (…_backup, …_accbackup), нічого не видаляємо.
+   Як відкотити: прибрати цей блок — гра знову читає лише misto_dnya_v3, його не стирали. */
+var ACC=false, ACC_T=null, ACC_FLAG='misto_acc_v1', PEND='misto_pending', SAVE_WARN=false;
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(_){ return false; } }
+// auto=true — службовий запис (новий день): лише браузер, без нової мітки й без акаунта,
+// інакше стара копія «оживала» б свіжою міткою і затирала новішу гру з іншого пристрою
+function save(auto){
+ if(Array.isArray(S.log)&&S.log.length>3000) S.log=S.log.slice(-3000);   // журнал не росте безмежно (місце в браузері)
+ if(!auto){ S._at=Date.now(); lsSet(PEND,String(S._at)); }                 // є невідправлені в акаунт дії
+ if(!lsSet(KEY,JSON.stringify(S))&&!SAVE_WARN){ SAVE_WARN=true; toast('Гру не вдалося зберегти','<span class="chip neg">Памʼять браузера заповнена</span>'); }
+ if(!auto) accPush();
+}
 function load(){ try{ var t=localStorage.getItem(KEY); return t?JSON.parse(t):null; }catch(_){ return null; } }
+function onbOpen(){ var o=document.getElementById('onb'); return !!(o&&o.classList.contains('on')); }
+function accSend(){ ACC_T=null; var B=bridge(); if(!ACC||!S||onbOpen()||!B||!B.gameSave) return;
+ try{ var r=B.gameSave(JSON.stringify(S));
+  if(r==='ok'){ if(lsGet(PEND)===String(S._at)) try{ localStorage.removeItem(PEND); }catch(_){} }
+  else if(r==='too_big') toast('Гра завелика для акаунта','<span class="chip xp">Поки збережено лише на цьому пристрої</span>');
+ }catch(_){} }
+// у акаунт — лише справжня гра (не заготовка онбордингу), лише з входом і коли хмара відповіла
+function accPush(now){ if(!ACC||!S||onbOpen()) return; clearTimeout(ACC_T); if(now) accSend(); else ACC_T=setTimeout(accSend,600); }
+// закрили застосунок одразу після дії — відправляємо, не чекаючи таймера
+window.addEventListener('pagehide',function(){ if(ACC_T){ clearTimeout(ACC_T); accSend(); } });
+document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden'&&ACC_T){ clearTimeout(ACC_T); accSend(); } });
+function accValid(o){ return !!(o&&typeof o==='object'&&o.player&&typeof o.player==='object'); }
+function accBoot(done){
+ var B=bridge(); if(!B||!B.gameLoad){ done(load(),false); return; }
+ B.gameLoad().then(function(r){
+  var loc=load(), acc=null; try{ acc=r&&r.raw?JSON.parse(r.raw):null; }catch(_){ acc=null; }
+  if(!accValid(acc)) acc=null; if(!accValid(loc)) loc=null;
+  var uid=(r&&typeof r.uid==='string')?r.uid:'';
+  if(!r||!r.trusted||!uid){ ACC=false; done(loc,false); return; }   // хмара мовчить або гість — акаунт не чіпаємо
+  var flag=lsGet(ACC_FLAG)||'', pend=+lsGet(PEND)||0, first=flag!==uid, pick;
+  if(!acc) pick=loc;
+  else if(!loc) pick=acc;
+  else if(first) pick=(+loc.xp||0)>(+acc.xp||0)?loc:acc;                // уперше з цим акаунтом: де більше досвіду
+  else pick=(pend&&(+loc._at||0)>(+acc._at||0))?loc:acc;               // свої невідправлені дії новіші — несемо їх
+  var same=!!(loc&&acc)&&JSON.stringify(loc)===JSON.stringify(acc);
+  if(loc&&acc&&!same){
+   // запас — щоразу, коли одна версія замінює іншу (останню замінену): будь-яку втрату можна відновити
+   if(pick===loc) lsSet(KEY+'_accbackup',JSON.stringify(acc));
+   else lsSet(KEY+'_backup',JSON.stringify(loc));
+  }
+  if(pick===acc&&acc&&!same){ lsSet(KEY,JSON.stringify(acc)); try{ localStorage.removeItem(PEND); }catch(_){} }
+  lsSet(ACC_FLAG,uid); ACC=true;
+  done(pick, !!(pick&&pick===loc&&!same));                             // наша гра новіша/єдина — несемо в акаунт
+ }).catch(function(){ done(load(),false); });
+}
 function now(){ return new Date(Date.now()+((S&&S.dayShift)||0)*864e5); }
 function dk(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function dayIdx(){ var a=new Date(S.start+'T00:00:00'), b=new Date(dk(now())+'T00:00:00'); return Math.floor((b-a)/864e5)+1; }
@@ -773,7 +826,7 @@ function sampleState(){
  s.log.push({id:uid(),day:t,t:'18:05',loc:'work',name:'Відпрацювати зміну',sub:'8 год × 20 €',money:160,energy:-48,food:-40,xp:48});
  s.here='work'; return s;
 }
-function tickDay(){ var k=dk(now()); if(S.lastDay!==k){ var n=Math.max(1,Math.round((new Date(k+'T00:00:00')-new Date(S.lastDay+'T00:00:00'))/864e5)); S.res.food=clamp(S.res.food-Math.max(0,(setg().mode==='soft'?10:25)-(sk('h3')?5:0))*n,0,100); S.lastDay=k; S.here='home'; save(); } }
+function tickDay(){ var k=dk(now()); if(S.lastDay!==k){ var n=Math.max(1,Math.round((new Date(k+'T00:00:00')-new Date(S.lastDay+'T00:00:00'))/864e5)); S.res.food=clamp(S.res.food-Math.max(0,(setg().mode==='soft'?10:25)-(sk('h3')?5:0))*n,0,100); S.lastDay=k; S.here='home'; save(true); } }
 
 /* ── форматування ── */
 function money(v,sign){ var a=Math.abs(v), t=(a%1?a.toFixed(2):String(a)).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' '); return (sign?(v<0?'−':'+'):(v<0?'−':''))+t+' '+S.cur; }
@@ -1199,12 +1252,13 @@ function onbSaveInputs(){ if(OSTEP===1){ var n=$('o-name'); if(n) O.name=n.value
  if(OSTEP===2&&$('od-from')){ var st=O.sched.set; st.from=$('od-from').value||st.from; st.to=$('od-to').value||st.to; st.freeAt=$('od-free').value||st.freeAt; st.sleepAt=$('od-sleep').value||st.sleepAt; O.sched.rate=parseFloat($('od-rate').value)||O.sched.rate; O.sched.cur=$('od-cur').value; O.sched.money=parseFloat($('od-money').value)||0; }
  if(OSTEP===3&&$('o-h')){ O.body.h=parseInt($('o-h').value,10)||O.body.h; O.body.w=parseInt($('o-w').value,10)||O.body.w; } }
 function finishOnb(){
+ if(!onbOpen()) return;   // подвійний тап «Увійти в місто» — другий раз нема що завершувати
  onbSaveInputs();
  var keep=S&&S.player?S:null;
  if(!keep){ S=newState(O); } else { var sc=O.sched; delete O.sched; S.player=O; S.rate=sc.rate; S.cur=sc.cur; S.res.money=sc.money; S.set=Object.assign(defSet(),sc.set); }
  ONEW.forEach(function(a){ var l=locBy(a.loc); if(!l) return; var pn=l.params[0].name; l.actions.push({id:uid(),name:a.name,dur:a.dur,energy:a.energy,money:a.money,param:pn,xp:Math.max(5,Math.round(a.dur/2)),zone:a.loc==='home'?'sofa':null}); });
  if(!keep){ var cls=clsOf(O.cls); S.coins=10; }
- if(!keep) S.snap=snapNow(); save(); $('onb').classList.remove('on'); TAB='city'; render();
+ if(!keep) S.snap=snapNow(); save(); $('onb').classList.remove('on'); accPush(true); TAB='city'; render();
  toast('Ласкаво просимо, '+O.name,'<span class="chip xp">Тапни «Дім», щоб зіграти вільну годину</span>');
 }
 
@@ -1848,15 +1902,19 @@ MQ.addEventListener&&MQ.addEventListener('change',function(){ if(S) render(); })
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&$('drw').classList.contains('on')) closeDrw(); });
 $('fab').innerHTML=ic('plus','#0c1022',26,2.6);
 // Frequency кличе при поверненні у «Мій світ»: Гаманець міг змінитись
-window.mistoHome=function(){ closeSheet(); closeDrw(); closeHM&&closeHM(); TAB='city'; render(); var v=$('view'); if(v) v.scrollTop=0; };
+window.mistoHome=function(){ if(!S) return; closeSheet(); closeDrw(); closeHM&&closeHM(); TAB='city'; render(); var v=$('view'); if(v) v.scrollTop=0; };
 // Frequency кличе, коли прийшли зі сфери: карта, без панелей, будівля сфери по центру
 window.mistoFocus=function(key){ if(!S||$('onb').classList.contains('on')) return; closeSheet(); closeDrw(); TAB='city'; S.zoom='city'; CAM=null; render();
  var w=$('view').querySelector('.stage-wrap.gold'), p=w&&[].filter.call(w.querySelectorAll('.pin.sph'),function(x){return x.getAttribute('data-k')===key;})[0]; if(!p) return;
  var pr=p.getBoundingClientRect(), wr=w.getBoundingClientRect(); w.scrollLeft+=(pr.left+pr.width/2)-(wr.left+wr.width/2); w.scrollTop+=(pr.top+pr.height)-(wr.top+wr.height/2); CAM={x:w.scrollLeft,y:w.scrollTop,z:ZOOM}; };
-window.mistoRefresh=function(){ if(S&&!$('onb').classList.contains('on')) render(); };
-S=load();
-if(S){ tickDay(); render(); }
-else { S=sampleState(); tickDay(); render(); startOnb(false); }
+// при поверненні у «Мій світ»: якщо інший пристрій записав новіший стан — беремо його
+window.mistoRefresh=function(){ if(!S||onbOpen()) return; if(ACC_T){ clearTimeout(ACC_T); accSend(); }
+ accBoot(function(st,push){ if(st) S=st; if(push) accPush(true); render(); }); };
+accBoot(function(st,push){
+ S=st;
+ if(S){ tickDay(); render(); if(push) accPush(true); }
+ else { S=sampleState(); tickDay(); render(); startOnb(false); }
+});
 })();
 </script>
 
