@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 73 |
-| Рядків JS | 30089 |
+| Рядків JS | 30107 |
 | Файлів CSS | 36 |
 | Рядків CSS | 9128 |
-| Сутностей верхнього рівня | 1907 |
+| Сутностей верхнього рівня | 1908 |
 | Ключів сховища (FLOW_KEYS) | 73 |
 
 ## Файли JS
@@ -73,9 +73,9 @@
 | `src/scripts/core/35-channel.js` | 702 | 65 |
 | `src/scripts/core/36-chats.js` | 350 | 40 |
 | `src/scripts/core/37-ai-privacy.js` | 203 | 20 |
-| `src/scripts/core/38-world.js` | 71 | 5 |
+| `src/scripts/core/38-world.js` | 77 | 5 |
 | `src/scripts/core/39-spheres.js` | 232 | 20 |
-| `src/scripts/core/40-year-letter.js` | 280 | 29 |
+| `src/scripts/core/40-year-letter.js` | 292 | 30 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
@@ -1959,7 +1959,7 @@
 | `worldOn` | функція | `src/scripts/core/38-world.js:8` |
 | `worldApplyNav` | функція | `src/scripts/core/38-world.js:10` |
 | `worldBridge` | функція | `src/scripts/core/38-world.js:19` |
-| `goWorld` | функція | `src/scripts/core/38-world.js:34` |
+| `goWorld` | функція | `src/scripts/core/38-world.js:40` |
 
 ### `src/scripts/core/39-spheres.js` — 20 сутностей
 
@@ -1986,7 +1986,7 @@
 | `sphForWorld` | функція | `src/scripts/core/39-spheres.js:204` |
 | `spheresInit` | функція | `src/scripts/core/39-spheres.js:211` |
 
-### `src/scripts/core/40-year-letter.js` — 29 сутностей
+### `src/scripts/core/40-year-letter.js` — 30 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2019,6 +2019,7 @@
 | `ylPace` | функція | `src/scripts/core/40-year-letter.js:255` |
 | `ylAskFlow` | функція | `src/scripts/core/40-year-letter.js:260` |
 | `ylAiCtx` | функція | `src/scripts/core/40-year-letter.js:266` |
+| `ylForWorld` | функція | `src/scripts/core/40-year-letter.js:284` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

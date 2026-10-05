@@ -594,6 +594,44 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 .backf{display:none;height:44px;padding:0 12px 0 8px;gap:6px;border-radius:14px;background:var(--surface);border:1px solid var(--line);align-items:center;justify-content:center;flex:none;overflow:hidden;font-size:13px;font-weight:800;color:var(--text,#e8ebef);text-decoration:none}
 .backf img{width:22px;height:22px;border-radius:6px}
 .site:not(.embed) .backf{display:flex}
+/* ── Сезон: трекер звичок і рік із Frequency ── */
+.trk{padding:12px 10px;display:flex;flex-direction:column;gap:7px}
+.trk-r{display:grid;grid-template-columns:minmax(0,2.6fr) repeat(7,minmax(0,1fr));gap:3px;align-items:center}
+.trk-r>b{font-size:10.5px;color:var(--muted);text-align:center;font-weight:800}
+.trk-r>b.t{color:#7c93ff}
+.trk-n{display:flex;flex-direction:column;min-width:0}
+.trk-n b{font-size:12px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.trk-n small{font-size:10.5px;color:var(--muted);font-weight:700}
+.cell{aspect-ratio:1;border-radius:6px;background:#1c232d;display:grid;place-items:center;border:0;padding:0;min-height:24px}
+.cell.y{background:#4ade80}
+.cell.n{background:transparent;border:1.5px dashed #3c4656}
+.cell.p{background:transparent;border:1.5px solid #2f3846}
+.cell.t{outline:2px solid #7c93ff;outline-offset:1px}
+button.cell{cursor:pointer}
+.trk-lg{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+.trk-lg span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:700}
+.trk-lg .cell{width:12px;min-height:12px;border-radius:3px}
+.heat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;max-width:320px}
+.heat i{height:18px;border-radius:4px;background:#1c232d}
+.heat i.a{background:#25543a}.heat i.b{background:#2f8a54}.heat i.c{background:#4ade80}.heat i.x{visibility:hidden}
+.heat i.t{outline:1.5px solid #7c93ff}
+.hd-days{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.hd{min-width:36px;min-height:36px;border-radius:10px;border:1.5px solid #2f3846;background:transparent;color:var(--muted);font-weight:800;font-size:12px}
+.hd.on{background:#7c93ff;border-color:#7c93ff;color:#0c1022}
+.season{flex-direction:column;align-items:stretch;gap:8px}
+.season .sr{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.season .sr b{font-size:13px;margin-right:2px}
+.sch{display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:0 10px;border-radius:10px;font-size:12px;font-weight:800;border:1.5px solid #2f3846;background:transparent;color:var(--text)}
+.sch.d{background:rgba(74,222,128,.16);border-color:rgba(74,222,128,.4);color:#86efac}
+.sbar{flex:1;height:5px;border-radius:9px;background:#232b36;overflow:hidden;min-width:60px}
+.sbar i{display:block;height:100%;background:#7c93ff;border-radius:9px}
+.yl-q{font-family:Georgia,'Times New Roman',serif;font-size:15.5px;line-height:1.6;color:var(--text)}
+.yr-m{display:flex;flex-direction:column;gap:6px;padding-left:18px;position:relative}
+.yr-m::before{content:"";position:absolute;left:4px;top:5px;width:9px;height:9px;border-radius:50%;background:#2f3846}
+.yr-m.now::before{background:#7c93ff;box-shadow:0 0 0 4px rgba(124,147,255,.25)}
+.yms{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:5px 9px;border-radius:9px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.yms.done{opacity:.55;text-decoration:line-through}
+.behind{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);font-size:13px;font-weight:700}
 </style>
 
 <div id="app">
@@ -751,23 +789,24 @@ function renderHud(){
  $('hud').innerHTML='<div class="hud-top"><a class="backf" href="./" aria-label="Назад у Frequency">'+ic('back',null,18,2.4)+'<img src="icon-192.png" alt=""><span>Frequency</span></a>'+backBtn()+'<button class="ava" data-act="drw" aria-label="Панель гри: день і пріоритети">'+ring(L.into/L.need,48,'#7c93ff')+'<i style="background-image:url('+chImg()+')"></i><b class="num">'+L.lv+'</b></button>'+
   '<div class="hud-meta"><b>'+esc(p.name)+' · '+esc(clsOf(p.cls).n)+'</b><span class="num">Місяць '+monthIdx()+' з 12 · день '+dayIdx()+'</span></div>'+
   '<span class="coins num">'+ic('coin','#fbbf24',16)+S.coins+'</span></div>'+
-  '<div class="res">'+rc('energy','Енергія',S.res.energy,me,'#facc15','/'+me)+rc('food','Ситість',S.res.food,100,'#fb923c','/100')+
-  walletCard()+'</div>';
+  // «Сезон»: енергію й ситість не просимо вести вручну — у HUD лише гаманець
+  '<div class="res">'+walletCard()+'</div>';
 }
 /* Усередині Frequency своєї нижньої панелі нема — тож з будь-якого екрана, крім карти, є «назад».
    Підекрани ведуть на крок угору (профіль друга → Друзі), решта — на карту. */
-var TPARENT={friend:'friends',visit:'friends',settings:'me',avatar:'me',goals:'me',path:'me',skills:'me',workout:'gym'};
-var TNAME={friends:'Друзі',me:'Я',gym:'Зал',city:'Місто'};
+var TPARENT={friend:'friends',visit:'friends',friends:'me',settings:'me',avatar:'me',goals:'me',path:'me',skills:'me',workout:'gym'};
+var TNAME={friends:'Друзі',me:'Я',gym:'Зал',city:'Місто',tracker:'Трекер',year:'Рік'};
 function backBtn(){ if(!window.MISTO_EMBED||TAB==='city') return ''; var p=TPARENT[TAB]||'city';
  return '<button class="hback" data-go="'+p+'" aria-label="Назад: '+TNAME[p]+'">'+ic('back',null,18,2.4)+'<span>'+TNAME[p]+'</span></button>'; }
 function clsOf(k){ return CLASSES.filter(function(c){return c.k===k;})[0]||CLASSES[0]; }
 function renderNav(){
- function t(k,l,i){ return '<button class="nv'+(TAB===k||(k==='city'&&/^(room|pc|gym|workout)$/.test(TAB))||(k==='me'&&/^(settings|avatar|goals|path|skills)$/.test(TAB))||(k==='friends'&&/^(friend|visit)$/.test(TAB))?' on':'')+'" data-go="'+k+'">'+ic(i,null,22)+l+'</button>'; }
- $('nav').innerHTML=t('city','Місто','city')+t('day','День','list')+'<button class="nv-plus" data-act="quick" aria-label="Записати дію">'+ic('plus','#0c1022',26,2.6)+'<span>Записати</span></button>'+t('friends','Друзі','users')+t('me','Я','user');
+ function t(k,l,i){ return '<button class="nv'+(TAB===k||(k==='city'&&/^(room|pc|gym|workout)$/.test(TAB))||(k==='me'&&/^(settings|avatar|goals|path|skills|friends|friend|visit)$/.test(TAB))?' on':'')+'" data-go="'+k+'">'+ic(i,null,22)+l+'</button>'; }
+ $('nav').innerHTML=t('city','Місто','city')+t('tracker','Трекер','list')+'<button class="nv-plus" data-act="quick" aria-label="Записати дію">'+ic('plus','#0c1022',26,2.6)+'<span>Записати</span></button>'+t('year','Рік','target')+t('me','Я','user');
 }
 
 /* ── місто ── */
-function renderCity(){ var z=S.zoom||'city'; if(z==='street') renderStreet(); else if(z==='world') renderWorld(); else { renderCityMap(); } $('view').insertAdjacentHTML('beforeend',zoomBar()); }
+// «Сезон»: масштаби Вулиця/Світ сховано (код лишився) — лише Місто
+function renderCity(){ renderCityMap(); }
 function renderCityMap(){
  var D=isD(), key='g', L=lvl(S.xp).lv;
  function pin(l,x,y){ return '<button class="pin" style="left:'+x+'%;top:'+y+'%;--c:'+l.color+'" data-act="loc" data-id="'+l.id+'"><span class="pin-t"><span class="pin-i">'+ic(l.icon,'#0d1014',17,2.3)+'</span><span class="pin-n">'+esc(l.name)+'</span><span class="pin-lv num">'+locLevel(l)+'</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>'; }
@@ -787,8 +826,8 @@ function renderCityMap(){
   return '<button class="plot" style="left:'+P.x+'%;top:'+P.y+'%" data-act="addloc" data-plot="'+i+'" aria-label="Збудувати локацію на ділянці">'+ic('plus','#0d1014',18,2.6)+'<span>Будувати</span></button>'; }).join('');
  var here=locBy(S.here)||(SPH_POS[S.here]?null:locBy('home')), hp=heroAt(here);
  if(LAST_HERE&&LAST_HERE!==S.here){ var ol=locBy(LAST_HERE), op=ol?heroAt(ol):(SPH_POS[LAST_HERE]||HERO.home.g); WALK={l:op[0]+'%',t:op[1]+'%'}; } LAST_HERE=S.here;
- $('view').innerHTML='<div class="stage-wrap gold"><div class="stage city-g" style="--z:'+ZOOM+';background-image:url('+IMG.gold+')">'+holoLayer(key)+pins+friendLayer(key)+hero(hp[0],hp[1],8)+'</div>'+(D?'<div class="lstrip">'+S.locs.map(function(l){ var tot=l.params.reduce(function(a,p){return a+p.xp/pNeed(p.level);},0)/l.params.length; return '<button class="lc" data-act="loc" data-id="'+l.id+'"><span class="row" style="gap:8px"><span class="ico" style="width:28px;height:28px;border-radius:9px;background:'+l.color+'22">'+ic(l.icon,l.color,16)+'</span><b>'+esc(l.name)+'</b><span class="num" style="margin-left:auto;color:'+l.color+'">'+locLevel(l)+'</span></span><div class="bar"><i style="width:'+Math.round(tot*100)+'%;background:'+l.color+'"></i></div><span>'+l.params.map(function(p){return esc(p.name)+' '+p.level;}).join(' · ')+'</span></button>'; }).join('')+'</div>':'')+'</div>'+
-  '<div class="float-card only-m"><span class="ico" style="background:rgba(124,147,255,.16)">'+ic('clock','#7c93ff',19)+'</span><div class="t"><b>Вільна година '+fhRange()+'</b><span>'+esc(tipText())+'</span></div><button class="btn pri sm" data-go="room">Зіграти</button></div>';
+ $('view').innerHTML='<div class="stage-wrap gold"><div class="stage city-g" style="--z:'+ZOOM+';background-image:url('+IMG.gold+')">'+holoLayer(key)+pins+hero(hp[0],hp[1],8)+'</div>'+(D?'<div class="lstrip">'+S.locs.map(function(l){ var tot=l.params.reduce(function(a,p){return a+p.xp/pNeed(p.level);},0)/l.params.length; return '<button class="lc" data-act="loc" data-id="'+l.id+'"><span class="row" style="gap:8px"><span class="ico" style="width:28px;height:28px;border-radius:9px;background:'+l.color+'22">'+ic(l.icon,l.color,16)+'</span><b>'+esc(l.name)+'</b><span class="num" style="margin-left:auto;color:'+l.color+'">'+locLevel(l)+'</span></span><div class="bar"><i style="width:'+Math.round(tot*100)+'%;background:'+l.color+'"></i></div><span>'+l.params.map(function(p){return esc(p.name)+' '+p.level;}).join(' · ')+'</span></button>'; }).join('')+'</div>':'')+'</div>'+
+  seasonCard(true);
  walkHero(); panMap();
 }
 /* Карту можна пересувати: пальцем — звичайним прокручуванням, мишею — перетягуванням.
@@ -970,6 +1009,90 @@ function renderDay(){
   '<div class="card" style="padding:4px 16px">'+(logList(it)||'<div class="empty">Сьогодні ще нічого не записано. Натисни «+».</div>')+'</div></div>';
 }
 function stat(l,v,c){ return '<div class="card" style="padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span class="eyebrow" style="font-size:10.5px">'+l+'</span><span class="num" style="font-size:18px;font-weight:800;color:'+c+'">'+esc(v)+'</span></div>'; }
+/* ══ Сезон: трекер звичок (на діях гри) і рік із Frequency (лише читання) ══
+   Звичка — дія локації з планом днів тижня (a.plan = [0..6], 0 = пн).
+   «Зробив» = у журналі S.log є запис цієї дії в цей день. Пропуск не штрафується — просто видно. */
+var DOWS=['пн','вт','ср','чт','пт','сб','нд'];
+function dowOf(d){ return (d.getDay()+6)%7; }
+function habits(){ var out=[]; S.locs.forEach(function(l){ (l.actions||[]).forEach(function(a){ if(Array.isArray(a.plan)&&a.plan.length) out.push({l:l,a:a}); }); }); return out; }
+function didOn(h,k){ return S.log.some(function(e){ return e.day===k&&e.loc===h.l.id&&e.name===h.a.name; }); }
+function todayHabits(){ var t=dowOf(now()); return habits().filter(function(h){ return h.a.plan.indexOf(t)>=0; }); }
+function yearData(){ try{ var B=bridge(); var Y=B&&B.year?B.year():null; return Y&&typeof Y==='object'&&Array.isArray(Y.months)?Y:null; }catch(_){ return null; } }
+function safeC(c){ return /^#[0-9a-f]{3,8}$/i.test(String(c||''))?c:'#7c93ff'; }
+function weekStats(off){ var wd=weekDays(), from=new Date(wd[0]); from.setDate(from.getDate()+7*off); var to=new Date(from); to.setDate(to.getDate()+7);
+ var a=dk(from), b=dk(to), es=S.log.filter(function(e){ return e.day>=a&&e.day<b; });
+ return {n:es.length, xp:es.reduce(function(x,e){return x+(e.xp||0);},0), inc:es.reduce(function(x,e){return x+(e.money>0?e.money:0);},0), es:es}; }
+
+/* картка сезону: на мапі (телефон) і в боковій панелі (комп'ютер) */
+function seasonCard(onMap){
+ var T=todayHabits(), tk=dk(now()), dn=T.filter(function(h){return didOn(h,tk);}).length, Y=yearData(), m0=Y&&Y.months[0];
+ var row1=T.length?'<div class="sr"><b>Сьогодні '+dn+'/'+T.length+'</b>'+T.slice(0,4).map(function(h){ var d=didOn(h,tk);
+   return d?'<span class="sch d">'+ic('check','#86efac',12,3)+esc(h.a.name)+'</span>':'<button class="sch" data-act="log" data-loc="'+esc(h.l.id)+'" data-a="'+esc(h.a.id)+'">'+esc(h.a.name)+'</button>'; }).join('')+'</div>'
+  :'<div class="sr"><b>Сьогодні</b><button class="sch" data-go="tracker">Обрати звички</button></div>';
+ var row2='';
+ if(m0&&m0.ms.length){ var md=m0.ms.filter(function(x){return x.done;}).length;
+  row2='<div class="sr"><button class="sch" data-go="year" style="border:0;padding:0;min-height:24px">Віхи: '+esc(m0.name)+' '+md+'/'+m0.ms.length+'</button><span class="sbar"><i style="width:'+Math.round(md/m0.ms.length*100)+'%"></i></span>'+
+   (Y.total?'<span class="hint" style="font-size:11.5px">лист '+(+Y.lit||0)+'/'+(+Y.total||0)+'</span>':'')+'</div>'+
+   (Y.pace?'<div class="sr"><span class="hint" style="flex:1;color:#fca5a5">Відстаєш з віхами місяця</span><button class="sch" data-act="yopen" data-s="ai_behind">Спитати Флоу</button></div>':''); }
+ return '<div class="'+(onMap?'float-card only-m ':'card ')+'season">'+row1+row2+'</div>';
+}
+
+function renderTracker(){
+ var H=habits(), wd=weekDays(), tk=dk(now()), grid;
+ if(!H.length) grid='<div class="card stack" style="margin-top:14px"><b style="font-size:16px">Обери звички</b><span class="hint">Звичка — це дія з міста, яку плануєш у певні дні: прибрати, зал, англійська. Тап по сьогоднішній клітинці — записати. Пропуск не штрафується — його просто видно.</span><button class="btn pri" data-act="habits">Обрати звички</button></div>';
+ else grid='<div class="card trk" style="margin-top:14px"><div class="trk-r"><span></span>'+wd.map(function(d,i){ return '<b class="'+(dk(d)===tk?'t':'')+'">'+DOWS[i]+'</b>'; }).join('')+'</div>'+
+  H.map(function(h){ var n=0,p=0;
+   var cells=wd.map(function(d,i){ var k=dk(d), plan=h.a.plan.indexOf(i)>=0, did=didOn(h,k), fut=k>tk; if(plan) p++; if(did) n++;
+    var cls=did?'y':(plan&&!fut&&k!==tk?'n':(plan?'p':'f'));
+    if(k===tk&&!did) return '<button class="cell '+cls+' t" data-act="log" data-loc="'+esc(h.l.id)+'" data-a="'+esc(h.a.id)+'" aria-label="Записати: '+esc(h.a.name)+'"></button>';
+    return '<span class="cell '+cls+(k===tk?' t':'')+'">'+(did?ic('check','#0d1014',12,3):'')+'</span>'; }).join('');
+   return '<div class="trk-r"><span class="trk-n"><b>'+esc(h.a.name)+'</b><small class="num">'+n+'/'+p+' · '+esc(h.l.name)+'</small></span>'+cells+'</div>'; }).join('')+
+  '<div class="trk-lg"><span><i class="cell y"></i>зробив</span><span><i class="cell n"></i>пропуск</span><span><i class="cell p"></i>у плані</span></div></div>';
+ // місяць: скільки записів за кожен день
+ var d0=now(), y=d0.getFullYear(), m=d0.getMonth(), dim=new Date(y,m+1,0).getDate(), lead=dowOf(new Date(y,m,1)), cnt={}, act=0;
+ S.log.forEach(function(e){ cnt[e.day]=(cnt[e.day]||0)+1; });
+ var heat=''; for(var i=0;i<lead;i++) heat+='<i class="x"></i>';
+ for(var dd=1;dd<=dim;dd++){ var k=dk(new Date(y,m,dd)), c=cnt[k]||0; if(c) act++; heat+='<i class="'+(c>=4?'c':c>=2?'b':c?'a':'')+(k===tk?' t':'')+'" title="'+k+': '+c+'"></i>'; }
+ var mName=d0.toLocaleDateString('uk-UA',{month:'long'});
+ var A=weekStats(0), P=weekStats(-1);
+ var nums='<div class="grid3" style="margin:12px 0">'+stat('Дій · було '+P.n,A.n,'#7c93ff')+stat('Досвід',A.xp+' XP','#a5b4fc')+stat('Заробив',money(A.inc),'#4ade80')+'</div>';
+ // неділя — підсумок тижня
+ var sun='';
+ if(dowOf(now())===6){ var best=null; wd.forEach(function(d){ var k=dk(d), c=cnt[k]||0; if(!best||c>best.c) best={d:d,c:c}; });
+  var miss=[]; H.forEach(function(h){ wd.forEach(function(d,i){ var k=dk(d); if(h.a.plan.indexOf(i)>=0&&k<tk&&!didOn(h,k)) miss.push(h.a.name+' '+DOWS[i]); }); });
+  sun='<div class="card stack" style="border-color:rgba(74,222,128,.35)"><span class="eyebrow" style="color:#4ade80">Неділя · підсумок тижня</span><b style="font-size:18px">'+A.n+' '+plural(A.n,'дія','дії','дій')+' за тиждень</b>'+
+   (best&&best.c?'<span class="hint">Найкращий день: '+esc(best.d.toLocaleDateString('uk-UA',{weekday:'long'}))+', '+best.c+'</span>':'')+
+   (miss.length?'<span class="hint">Пропущено: '+esc(miss.slice(0,5).join(', '))+'</span>':'<span class="hint">Без пропусків у плані</span>')+
+   '<button class="btn pri" data-act="yopen" data-s="ai_week">Розбір тижня з Флоу</button></div>'; }
+ $('view').innerHTML='<div class="page"><div class="only-m" style="height:150px"></div><div class="row sp"><div class="h1" style="margin:0">Трекер</div>'+(H.length?'<button class="btn sec sm" data-act="habits">'+ic('gear',null,16)+'Звички</button>':'')+'</div>'+
+  '<span class="hint">'+esc(wd[0].toLocaleDateString('uk-UA',{day:'numeric',month:'short'}))+' – '+esc(wd[6].toLocaleDateString('uk-UA',{day:'numeric',month:'short'}))+'</span>'+
+  grid+nums+sun+
+  '<div class="card stack" style="margin-top:12px"><div class="row sp"><b>'+esc(mName.charAt(0).toUpperCase()+mName.slice(1))+'</b><span class="hint num">'+act+' з '+dim+' днів з дією</span></div><div class="heat">'+heat+'</div></div></div>';
+}
+
+function habitsSheet(){
+ openSheet('<h2>Звички</h2><p class="hint" style="margin:0 0 6px">Обери дні, коли плануєш дію. Без днів — дія не в трекері.</p>'+S.locs.map(function(l){
+  if(!(l.actions||[]).length) return '';
+  return '<div class="eyebrow" style="margin:14px 0 6px;color:'+safeC(l.color)+'">'+esc(l.name)+'</div>'+l.actions.map(function(a){ var p=Array.isArray(a.plan)?a.plan:[];
+   return '<div class="card" style="padding:10px 12px;margin-bottom:6px"><b>'+esc(a.name)+'</b><div class="hd-days">'+DOWS.map(function(dn,i){
+    return '<button class="hd'+(p.indexOf(i)>=0?' on':'')+'" data-act="hday" data-loc="'+esc(l.id)+'" data-a="'+esc(a.id)+'" data-d="'+i+'" aria-pressed="'+(p.indexOf(i)>=0)+'">'+dn+'</button>'; }).join('')+'</div></div>'; }).join(''); }).join(''));
+}
+
+function renderYear(){
+ var Y=yearData(), body;
+ if(!Y) body='<div class="card stack" style="margin-top:14px"><b style="font-size:16px">План на рік живе у Frequency</b><span class="hint">Відкрий гру з вкладки «Мій світ» — тут зʼявиться твій лист із точки Б і дорога віх.</span></div>';
+ else if(!Y.text) body='<div class="card stack" style="margin-top:14px"><b style="font-size:16px">Напиши лист із точки Б</b><span class="hint">Від себе через рік: як минає день, що є, що змінилось. Флоу розкладе його на цілі й віхи, і вони зʼявляться тут і на мапі.</span><button class="btn pri" data-act="yopen" data-s="goals">Відкрити Цілі</button></div>';
+ else { var lit=+Y.lit||0, tot=+Y.total||0;
+  body='<div class="card stack" style="margin-top:14px"><span class="eyebrow">Лист · '+esc(Y.date)+'</span><div class="yl-q">«'+esc(Y.text.length>220?Y.text.slice(0,220)+'…':Y.text)+'»</div>'+
+   (tot?'<span class="hint"><b style="color:var(--text)">'+lit+' з '+tot+'</b> речень проявилось</span><div class="sbar" style="flex:none"><i style="width:'+Math.round(lit/tot*100)+'%;background:#4ade80"></i></div>':'')+'</div>'+
+   (Y.pace?'<div class="behind" style="margin-top:12px"><span>Відстаєш з віхами місяця</span><button class="btn pri sm" data-act="yopen" data-s="ai_behind">Спитати Флоу</button></div>':'')+
+   '<div class="card stack" style="margin-top:12px;gap:14px"><b>Дорога року</b>'+Y.months.map(function(M,i){ var md=M.ms.filter(function(x){return x.done;}).length;
+    return '<div class="yr-m'+(i===0?' now':'')+'"><div class="row sp"><b style="font-size:13px'+(i===0?';color:#a5b4fc':'')+'">'+esc(String(M.name).charAt(0).toUpperCase()+String(M.name).slice(1))+(i===0?' · ти тут':'')+'</b><span class="hint num">'+(M.ms.length?md+'/'+M.ms.length:'')+'</span></div>'+
+     (M.ms.length?'<div class="row" style="gap:5px;flex-wrap:wrap">'+M.ms.map(function(x){ return '<span class="yms'+(x.done?' done':'')+'" style="--c:'+safeC(x.c)+'">'+(x.done?ic('check',safeC(x.c),11,3):'')+esc(x.t)+'</span>'; }).join('')+'</div>':'<span class="hint">віх нема</span>')+'</div>'; }).join('')+
+   '<button class="btn sec" data-act="yopen" data-s="goals">Відкрити в Цілях</button></div>'; }
+ $('view').innerHTML='<div class="page"><div class="only-m" style="height:150px"></div><div class="h1" style="margin:0">Рік</div><span class="hint">Куди рухаюсь — з листа й дороги в Цілях Frequency. Віхи відмічаються там.</span>'+body+'</div>';
+}
+
 function renderGoals(){
  var P=S.player;
  $('view').innerHTML='<div class="page"><div class="only-m" style="height:150px"></div><button class="btn sec sm" data-go="me" style="margin-bottom:10px">'+ic('back',null,18,2.4)+'Я</button><div class="eyebrow">Рік · місяць '+monthIdx()+' з 12</div><div class="h1">Цілі й побажання</div>'+
@@ -988,7 +1111,8 @@ function renderMe(){
   '<div class="eyebrow" style="margin:18px 0 8px">12 місяців гри</div><div class="months">'+months+'</div>'+
   '<div class="eyebrow" style="margin:18px 0 8px">Сила за рівні</div><div class="card" style="padding:4px 16px">'+PERKS.map(function(p){ var g=L.lv>=p.lv; return '<div class="perk '+(g?'got':'lock')+'"><span class="lv num">'+p.lv+'</span><span style="flex:1;font-size:14px;font-weight:700">'+esc(p.t)+'</span>'+(g?ic('check','#7c93ff',18,2.6):ic('lock','#5d6570',16))+'</div>'; }).join('')+'</div>'+
   '<div class="eyebrow" style="margin:18px 0 8px">Frequency</div><div class="card" style="padding:4px 16px">'+[['folder','Папки й замовлення','кожна локація бачить свою папку'],['chat','Чати','спілкування з командою й близькими'],['cal','Планер','зіграна година стає блоками'],['money','Гаманець','гроші гри = гроші Гаманця'],['sparkle','AI Флоу','звіряє дні з твоїми цілями']].map(function(e){ return '<div class="eco"><span class="ico" style="background:rgba(124,147,255,.14)">'+ic(e[0],'#7c93ff',17)+'</span><div class="g"><b>'+e[1]+'</b><span>'+e[2]+'</span></div><span class="soon">скоро</span></div>'; }).join('')+'</div>'+
-  '<button class="btn sec block" style="margin-top:18px" data-go="settings">'+ic('gear',null,18)+'Налаштування</button></div>';
+  '<button class="btn sec block" style="margin-top:18px" data-go="friends">'+ic('users',null,18)+'Друзі · приклад, справжні — згодом</button>'+
+  '<button class="btn sec block" style="margin-top:10px" data-go="settings">'+ic('gear',null,18)+'Налаштування</button></div>';
 }
 function stats(){ var P=S.player, g=function(id){ var l=locBy(id); return l?locLevel(l):1; };
  return [['Тіло','#4ade80',clamp(35+P.body.mood*4+g('gym')*5,0,100)],['Розум','#7c93ff',clamp(40+g('home')*4+(P.values.indexOf('Розвиток')>=0?8:0),0,100)],['Гроші','#facc15',clamp(25+g('work')*4+g('shop')*3,0,100)],['Люди','#f472b6',clamp(40+(P.values.indexOf('Сім\'я')>=0?10:0),0,100)],['Дух','#c4b5fd',clamp(35+g('park')*6,0,100)]]; }
@@ -998,7 +1122,7 @@ function statBars(st){ return st.map(function(s){ return '<div class="stat"><div
 function renderSide(){
  if(!isD()){ $('sidePanel').innerHTML=''; return; }
  var rp=S.run&&procBy(S.run.id);
- $('sidePanel').innerHTML=(rp?'<div class="card row" style="padding:12px 14px;border-color:rgba(124,147,255,.5)"><span class="ico" style="background:rgba(124,147,255,.16)">'+ic('laptop','#7c93ff',18)+'</span><div style="flex:1"><div class="eyebrow">Комп\'ютер · процес</div><b>'+esc(rp.name)+'</b></div><span class="tmr num" data-runt>'+mmss(runLeft())+'</span><button class="btn sec sm" data-go="pc">Відкрити</button></div>':'')+'<div id="fhD"></div><div class="card" style="padding:12px 16px 4px"><div class="row sp" style="margin-bottom:4px"><span class="eyebrow">Сьогодні</span><button class="btn sec sm" data-go="day" style="min-height:32px;padding:0 10px">Усе</button></div>'+(logList(today().slice(0,5),true)||'<div class="empty">Ще нічого</div>')+'</div>';
+ $('sidePanel').innerHTML=seasonCard(false)+(rp?'<div class="card row" style="padding:12px 14px;border-color:rgba(124,147,255,.5)"><span class="ico" style="background:rgba(124,147,255,.16)">'+ic('laptop','#7c93ff',18)+'</span><div style="flex:1"><div class="eyebrow">Комп\'ютер · процес</div><b>'+esc(rp.name)+'</b></div><span class="tmr num" data-runt>'+mmss(runLeft())+'</span><button class="btn sec sm" data-go="pc">Відкрити</button></div>':'')+'<div id="fhD"></div><div class="card" style="padding:12px 16px 4px"><div class="row sp" style="margin-bottom:4px"><span class="eyebrow">Сьогодні</span><button class="btn sec sm" data-go="day" style="min-height:32px;padding:0 10px">Усе</button></div>'+(logList(today().slice(0,5),true)||'<div class="empty">Ще нічого</div>')+'</div>';
  renderFH($('fhD'));
 }
 
@@ -1453,8 +1577,6 @@ function streakDays(){ var n=0, d=new Date(now()); var days={}; S.log.forEach(fu
  while(days[dk(d)]){ n++; d.setDate(d.getDate()-1); } return n; }
 function heroState(){ var st=[];
  if(S.run){ var p=procBy(S.run.id); st.push({k:'work',i:'laptop',c:'#7c93ff',t:'працює'}); }
- if(S.res.energy<25) st.push({k:'tired',i:'moon',c:'#a5b4fc',t:'втомився'});
- if(S.res.food<30) st.push({k:'hungry',i:'food',c:'#fb923c',t:'голодний'});
  var s=streakDays(); if(s>=3) st.push({k:'fire',i:'flame',c:'#fb923c',t:s+' '+plural(s,'день','дні','днів')+' поспіль'});
  return st; }
 var LAST_HERE=null;
@@ -1582,8 +1704,8 @@ function renderDrw(){
   '<div class="stack" style="gap:6px">'+(list||'<p class="hint" style="margin:0">Обери до трьох головних справ. Решта — бонус.</p>')+'</div>'+
   (ps.length<3?'<form class="pr-add" id="prf"><input id="pr-t" maxlength="40" placeholder="'+(ps.length?'Ще одна справа':'Напр., Зміна на будові')+'" aria-label="Нова головна справа"><select id="pr-l" aria-label="Де">'+'<option value="">—</option>'+S.locs.map(function(l){return '<option value="'+l.id+'">'+esc(l.name)+'</option>';}).join('')+'</select><button class="btn sec sm" type="submit" aria-label="Додати">'+ic('plus',null,18,2.4)+'</button></form>':'')+
   '<div class="eyebrow" style="margin:18px 0 8px">Меню</div><div class="dmg">'+
-   m('city','city','#7c93ff','Місто')+m('day','list','#7c93ff','День')+m('work','work','#fb923c','Робота')+m('wallet','money','#4ade80','Гаманець')+
-   m('flow','sparkle','#c4b5fd','Флоу')+m('friends','users','#f472b6','Друзі')+m('me','user','#7c93ff','Я')+m('settings','gear','#8a929d','Параметри')+'</div>';
+   m('city','city','#7c93ff','Місто')+m('tracker','list','#4ade80','Трекер')+m('year','target','#f5c451','Рік')+m('work','work','#fb923c','Робота')+
+   m('wallet','money','#4ade80','Гаманець')+m('flow','sparkle','#c4b5fd','Флоу')+m('me','user','#7c93ff','Я')+m('settings','gear','#8a929d','Параметри')+'</div>';
  var f=$('prf'); if(f) f.addEventListener('submit',function(ev){ ev.preventDefault(); var t=$('pr-t').value.trim(); if(!t) return; prios(sel).push({t:t,loc:$('pr-l').value||null,done:false}); save(); renderDrw(); var x=$('pr-t'); if(x) x.focus(); });
 }
 function drwMenu(k){ closeDrw();
@@ -1610,7 +1732,7 @@ function sphSheet(key){ var x=sphBy(key); if(!x){ toast('Сферу не зна�
 
 /* ── рендер і події ── */
 function render(){ renderHud(); renderNav();
- if(TAB==='city') renderCity(); else if(TAB==='room') renderRoom(); else if(TAB==='pc') renderPC(); else if(TAB==='gym') renderGym(); else if(TAB==='workout') renderWorkout(); else if(TAB==='settings') renderSettings(); else if(TAB==='avatar') renderAvatar(); else if(TAB==='friends') renderFriends(); else if(TAB==='friend') renderFriend(); else if(TAB==='visit') renderVisit(); else if(TAB==='path') renderPath(); else if(TAB==='skills') renderSkills(); else if(TAB==='day') renderDay(); else if(TAB==='goals') renderGoals(); else renderMe();
+ if(TAB==='city') renderCity(); else if(TAB==='room') renderRoom(); else if(TAB==='pc') renderPC(); else if(TAB==='gym') renderGym(); else if(TAB==='workout') renderWorkout(); else if(TAB==='settings') renderSettings(); else if(TAB==='avatar') renderAvatar(); else if(TAB==='friends') renderFriends(); else if(TAB==='friend') renderFriend(); else if(TAB==='visit') renderVisit(); else if(TAB==='path') renderPath(); else if(TAB==='skills') renderSkills(); else if(TAB==='day') renderDay(); else if(TAB==='tracker') renderTracker(); else if(TAB==='year') renderYear(); else if(TAB==='goals') renderGoals(); else renderMe();
  renderSide(); runFX(); }
 
 document.addEventListener('click',function(e){
@@ -1625,7 +1747,11 @@ document.addEventListener('click',function(e){
   case 'zin': ZOOM=Math.min(2.5,ZOOM+0.5); render(); break;
   case 'zout': ZOOM=Math.max(1,ZOOM-0.5); render(); break;
   case 'dream': dreamSheet(b.getAttribute('data-id')); break;
-  case 'hero': heroMenu(b); break;
+  case 'hero': openDrw(); break;
+  case 'habits': habitsSheet(); break;
+  case 'hday': { var hl=locBy(b.getAttribute('data-loc')), ha=hl&&hl.actions.filter(function(x){return x.id===b.getAttribute('data-a');})[0], hd=+b.getAttribute('data-d');
+   if(ha&&hd>=0&&hd<7){ if(!Array.isArray(ha.plan)) ha.plan=[]; var hi=ha.plan.indexOf(hd); if(hi>=0) ha.plan.splice(hi,1); else ha.plan.push(hd); ha.plan.sort(); save(); var hsc=$('sheet').scrollTop; habitsSheet(); $('sheet').scrollTop=hsc; render(); } break; }   // шторка не стрибає вгору
+  case 'yopen': { var YB=bridge(); var sec=b.getAttribute('data-s'); if(YB&&/^(goals|ai_behind|ai_week)$/.test(sec)) YB.open(sec); else toast('План на рік — у Frequency','<span class="chip xp">Відкрий гру з вкладки «Мій світ»</span>'); break; }   // «Сезон»: радіальне меню сховано, усе — у шухляді
   case 'hm': { var hk=b.getAttribute('data-k'); closeHM(); if(hk==='now') nowSheet(); else if(hk==='go') goSheet(); else if(hk==='state') stateSheet(); else { TAB=hk; render(); $('view').scrollTop=0; } break; }
   case 'donow': doNow(); break;
   case 'goto': goTo(b.getAttribute('data-id')); break;

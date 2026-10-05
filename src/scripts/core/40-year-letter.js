@@ -278,3 +278,15 @@
     });
     return out;
   }
+
+  /* Для гри «Мій світ» (38-world.js → worldBridge.year): лише читання, прості дані.
+     Лист, скільки речень проявилось, віхи поточного й двох наступних місяців. */
+  function ylForWorld(){
+    const L=ylLetter(), cur=ymdLocal().slice(0,7), end=ylDate(L).slice(0,7), lk=ylLinked(L);
+    const months=[0,1,2].map(i=>ylYmAdd(cur,i)).filter(ym=>ym<=end).map(ym=>({ym, name:ylMonName(ym), ms:[]}));
+    (goalsData.goals||[]).forEach(gl=>ylGoalMs(gl).forEach(m=>{
+      const M=months.find(x=>x.ym===m.ym); if(M) M.ms.push({t:String(m.t||'').slice(0,80), done:!!m.done, c:ylColor(gl)}); }));
+    const now=months[0]?months[0].ms:[];
+    return { text:L.text.trim().slice(0,600), date:ylDateTxt(ylDate(L)), lit:lk.filter(ylLit).length, total:lk.length,
+      months, pace:ylPace({d:now.filter(m=>m.done).length, t:now.length}) };
+  }

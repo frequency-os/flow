@@ -3,7 +3,7 @@
      на місце «Гроші», а гроші видно в чипі картки «Сьогодні» на Огляді.
      Гра — окрема сторінка misto.html у рамці (iframe), зі своїм сховищем
      misto_dnya_v3. Дані Frequency вона бачить лише через worldBridge і лише
-     читає: баланс і останні записи Гаманця. Нічого не пише. */
+     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи). Нічого не пише. */
   let worldShown=false;
   function worldOn(){ try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
 
@@ -24,9 +24,15 @@
     },
     // сфери (39-spheres.js): назва, шаблон, будівля й цифри з блоків папки — лише читання
     spheres(){ try{ return sphForWorld(); }catch(_){ return []; } },
+    // план на рік (40-year-letter.js): лист і віхи — лише читання
+    year(){ try{ return ylForWorld(); }catch(_){ return null; } },
     open(sec, key){
       if(sec==='finance') goFinance();
       else if(sec==='ai'){ if(window.aiChatSheet) window.aiChatSheet(); }
+      else if(sec==='goals') goGoals();
+      // питання до Флоу — лише фіксовані тексти звідси, гра свого тексту не передає
+      else if(sec==='ai_behind') ylAskFlow('Я відстаю з віхами цього місяця в «Дорозі року». Подивись мої цілі й віхи: що перенести на наступний місяць або спростити, щоб встигнути? Запропонуй, але без моєї згоди нічого не змінюй.');
+      else if(sec==='ai_week') ylAskFlow('Зроби розбір мого тижня: що вдалось, що пропустив і чому, і скажи мовою мого листа із точки Б, яке речення наблизилось. Стисло, один фокус на наступний тиждень.');
       else if(sec==='folder' && typeof key==='string' && Object.prototype.hasOwnProperty.call(folders,key)) goFolder(key);
     }
   }; }
