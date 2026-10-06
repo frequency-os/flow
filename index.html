@@ -48,7 +48,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-05-0457-b209f8c';
+  var BUILD='2026-10-06-0537-1008397';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -7843,6 +7843,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     'goals_data','values_state','wishes_board',
     'envelopes','debts','fin_ops','fin_recurring',
     'fin_projects',   // проєкти Кабінету «Фінанси» (08-finance.js); блок «Проєкт» — вікно в них
+    'world_game',     // стан гри «Мій світ» (38-world.js gameLoad/gameSave; misto.html пише лише його, цілком)
     'income_cards','fx_cfg','spend',
     'work_sessions','work_cfg','work_extras','work_blocks',
     'board','customboards','blockusage',
@@ -7881,7 +7882,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
          seedfolders_removed, agency_purged, space_removed, inbox_chat) — з
          префіксом, але це НЕ дані: див. MIGRATIONS_ONCE у 27-canvas.js.
        • службові з префіксом: 'flowapp___sb_outbox', 'flowapp___ph_push',
-         'flowapp___ph_ts', 'flowapp___seeded' (Preferences).
+         'flowapp___ph_ts', 'flowapp___seeded' (Preferences), 'flowapp___owner'
+         (чиї локальні дані — див. sbSetUser у 02-storage.js).
        • 'rit_auto', 'fd_*', 'pet3d*' модулі додають у FLOW_KEYS на льоту, але
          пишуть СИРИМИ — запис у реєстрі для них нічого не дає.
        • лише цей пристрій: ai_agent, ai_dev, ai_usage, ai_brief_ds, ai_week_ds,
@@ -8488,6 +8490,87 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     let sbBatchTs = {};      // {key: час оновлення в хмарі, мс} — для звірки «що новіше»
     window.__sbReady = false; // стає true, коли перевірку сесії завершено (успішно чи ні)
 
+    /* ── ЧИЇ ЦЕ ЛОКАЛЬНІ ДАНІ ──
+       «Вийти» лише закриває сесію: дані, фото й кошик незлитих правок лишаються
+       на пристрої. Якщо потім тут увійде ІНШИЙ акаунт, усе це раніше саме їхало
+       в його хмару (кошик, гостьові правки 'g', фото з PhotoDB), а на екрані він
+       бачив чужий щоденник. Тепер пристрій пам'ятає власника локальних даних.
+       Увійшов не він — сесію для сховища не вмикаємо (sbUserCache лишається
+       null): ні читання хмари, ні запису в неї, пристрій живе як без входу, а
+       людина вибирає у вікні (29-more-screen.js): зберегти чуже у файл і стерти
+       з пристрою (flowFactoryReset лишає сесію) або вийти.
+       Власника ставимо при першій сесії, якщо його ще нема: на пристрої з
+       гостьовими даними це законний перший вхід — вони зливаються з акаунтом,
+       як і досі. Ключ службовий (___): у бекап і хмару не йде, скидання стирає.
+       Пристрої, де вийшли ще ДО появи власника: його видно з прапорця фото
+       flowapp___ph_backfill_<id> — він ставиться для кожного акаунта, що тут був.
+       sbTabOwner — чиї дані в ПАМʼЯТІ цієї вкладки. Власник змінився в іншій
+       вкладці (там стерли й увійшли) — ця перезапускається, а не вмикає хмару з
+       чужою памʼяттю; і кошик (sbOutboxSave) вона вже не пише. */
+    const OWNER_KEY = 'flowapp___owner';
+    function sbOwnerRead(){
+      try{ const o = JSON.parse(localStorage.getItem(OWNER_KEY)||'null'); if(o && o.id) return { id:String(o.id), email:String(o.email||'') }; }catch(_){}
+      return null;
+    }
+    // хто тут уже входив до появи мітки власника (за прапорцем фото)
+    function sbPastUsers(){
+      const out = [];
+      try{ for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i)||'';
+        if(k.indexOf('flowapp___ph_backfill_')===0) out.push(k.slice(22)); } }catch(_){}
+      return out;
+    }
+    let sbForeign = null;   // { id, email } власника, коли сесія належить іншому акаунту
+    let sbTabOwner = (sbOwnerRead()||{}).id || null;
+    let sbReloading = false;
+    function sbReloadTab(why){
+      if(sbReloading) return; sbReloading = true;
+      try{ console.warn('[Flow auth] '+why+' — перезапуск вкладки'); }catch(_){}
+      try{ location.reload(); }catch(_){}
+    }
+    function sbSetUser(u){
+      const was = !!sbForeign;
+      sbForeign = null;
+      if(u){
+        let o = sbOwnerRead();
+        if(!o){
+          const past = sbPastUsers();
+          if(past.length && past.indexOf(u.id) < 0) o = { id:past[0], email:'' };
+        }
+        if(o && o.id !== u.id){
+          sbForeign = { id:o.id, email:o.email, as:String(u.email||'') }; u = null;
+          // власника вгадали з прапорця фото — памʼять цієї вкладки теж його: стирання
+          // в іншій вкладці має перезапустити її (слухач storage), а не ввімкнути хмару
+          if(!sbTabOwner) sbTabOwner = o.id;
+        }
+        else if(sbTabOwner && sbTabOwner !== u.id){ u = null; sbReloadTab('власник даних змінився в іншій вкладці'); }
+        else {
+          if(!o){ try{ localStorage.setItem(OWNER_KEY, JSON.stringify({ id:u.id, email:u.email||'' })); }
+                  catch(_){ try{ console.warn('[Flow auth] мітку власника не записано — сховище повне'); }catch(_){} } }
+          sbTabOwner = u.id;
+        }
+      }
+      sbUserCache = u;
+      window.__flowForeign = sbForeign ? { owner: sbForeign.email, as: sbForeign.as } : null;
+      if(sbForeign && !was){
+        try{ console.warn('[Flow auth] на пристрої дані іншого акаунта — хмару вимкнено до вибору людини'); }catch(_){}
+        try{ document.dispatchEvent(new CustomEvent('flowforeign')); }catch(_){}
+      }
+    }
+    // власника стерли чи змінили в іншій вкладці — памʼять цієї вже чужа
+    try{ window.addEventListener('storage', e=>{
+      if(e.key !== OWNER_KEY && e.key !== null) return;   // null — сховище очищено цілком
+      const o = sbOwnerRead();
+      if(sbTabOwner && (!o || o.id !== sbTabOwner)) sbReloadTab('власника даних змінено в іншій вкладці');
+    }); }catch(_){}
+    // чи можна класти чергу цієї вкладки в кошик: не під час скидання і не поверх чужого пристрою
+    function sbOutboxMine(){
+      if(window.__flowWriteLock) return false;
+      // вкладка без власника (гість, старий кошик) пише, лише доки власника нема й на пристрої
+      if(!sbTabOwner) return !sbOwnerRead();
+      const o = sbOwnerRead();
+      return !!o && o.id === sbTabOwner;
+    }
+
     /* Спершу локальна копія з vendor/ (працює без інтернету), потім CDN.
        Версія на CDN зафіксована навмисно: «@2» колись оновиться сама і може
        зламати вхід у момент, коли ти цього не чекаєш. */
@@ -8520,7 +8603,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         sb = lib.createClient(SB_URL, SB_KEY);
         try{
           const { data } = await sb.auth.getSession();
-          sbUserCache = data && data.session ? data.session.user : null;
+          sbSetUser(data && data.session ? data.session.user : null);
         }catch(_){}
         window.__sbReady = true; sbReadyEvt();
         try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
@@ -8551,7 +8634,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           else setTimeout(refetch, 300); // load() ще міг не встигнути визначитись на цьому етапі скрипта
         }
         sb.auth.onAuthStateChange((_evt, session)=>{
-          sbUserCache = session ? session.user : null;
+          sbSetUser(session ? session.user : null);
           try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
           // прибрати access_token/code з адресного рядка одразу після обробки —
           // інакше він так і висить у видимому URL (ризик, якщо людина скопіює
@@ -8915,7 +8998,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
             say('Вхід не вдався: ' + error.message);
             return;
           }
-          sbUserCache = data && data.session ? data.session.user : null;
+          sbSetUser(data && data.session ? data.session.user : null);
+          // на пристрої дані іншого акаунта — хмару не чіпаємо, вибір у вікні (flowforeign)
+          if(sbForeign){ try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){} return; }
           try{ if(window.__setSync){ window.__flowSync.quota=false; window.__setSync('synced'); } }catch(_){}
           try{ if(window.__flowSync) window.__flowSync.warmed=false; }catch(_){}
           try{ await sbPrefetchAll(); }catch(_){}
@@ -8934,7 +9019,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const client = await sbInit();
       if(!client) return;
       await client.auth.signOut();
-      sbUserCache = null;
+      sbSetUser(null);
       try{ if(typeof window.renderAccount==='function') window.renderAccount(); }catch(_){}
     };
 
@@ -9037,6 +9122,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
        інакше офлайн-правка, зроблена перед закриттям, губиться назавжди. */
     function sbOutboxSave(){
       if(sbOutboxTimer){ clearTimeout(sbOutboxTimer); sbOutboxTimer=null; }
+      /* Скидання стерло сховище, а черга ще в памʼяті: pagehide перед перезапуском
+         записав би кошик назад — і новий власник відправив би чуже у свою хмару. */
+      if(!sbOutboxMine()) return;
       try{
         const all = Object.assign({}, sbInFlight, sbWriteQueue);   // новіше з черги перемагає
         if(Object.keys(all).length) localStorage.setItem('flowapp___sb_outbox', JSON.stringify(all));
@@ -9081,6 +9169,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     }
     async function sbFlushWrites(){
       sbWriteTimer = null;
+      // на пристрої дані іншого акаунта — черга чекає в кошику, без повторів і «Помилки»
+      if(sbForeign) return;
       const u = sbUserCache;
       const q = sbWriteQueue; sbWriteQueue = {};   // знімаємо поточну партію
       const keys = Object.keys(q);
@@ -9141,6 +9231,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     }
     // віддаємо на випадок, якщо треба «доштовхнути» outbox ззовні (напр. після входу)
     window.sbFlushWrites = sbFlushWrites;
+    // скидання: черга в памʼяті більше нічия — викидаємо разом із таймерами (кошик у сховищі стирає wipeLocal)
+    window.sbDropQueue = function(){
+      if(sbWriteTimer){ clearTimeout(sbWriteTimer); sbWriteTimer=null; }
+      if(sbOutboxTimer){ clearTimeout(sbOutboxTimer); sbOutboxTimer=null; }
+      sbWriteQueue = {}; sbInFlight = {}; sbOutboxKeys = {}; sbSyncPending();
+    };
     // застосунок ховають/закривають: відкладений кошик — у localStorage зараз,
     // черга — в хмару зараз (таймери у фоні iOS можуть уже не спрацювати)
     function sbOnHide(){
@@ -9995,6 +10091,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       // 4) прапорець для дочистки IndexedDB на наступному старті
       try{ localStorage.setItem('__flow_wipe_idb__','1'); }catch(_){}
     };
+    /* Черга незлитих правок у памʼяті: стерте сховище не має отримати її назад
+       з pagehide перед перезапуском (на пристрої тепер може бути інша людина).
+       Тут, а не до кроку хмари: якщо хмару стерти не вдалось, кошик лишається живим.
+       Самі правки є у файлі бекапу, зробленому вище. */
+    try{ if(window.sbDropQueue) window.sbDropQueue(); }catch(_){}
     wipeLocal();
     setTimeout(()=>{ wipeLocal(); try{ location.reload(); }catch(_){} }, 600);
     return { ok:true };
@@ -26622,6 +26723,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       // рядок «Вхід»: показує поточний стан; якщо не увійдено — тап розкриває варіанти
       const loginSub=checking?'Перевіряємо сесію…'
         :gUser?('Google · '+(gUser.email||''))
+        :window.__flowForeign?'Тут дані іншого акаунта · синк вимкнено'
         :'Не увійдено · дані лише на цьому пристрої';
       const loginIco=checking?ico('sync','slate'):(gUser?ico('user','blue'):ico('key','blue'));
       // «Вийти» доступне лише коли є Google-сесія
@@ -26748,7 +26850,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       };
 
       const loginRow=host.querySelector('[data-acc-login-row]');
-      if(loginRow) loginRow.onclick=()=>{ if(!loggedIn) toggle('[data-acc-login-expand]'); };
+      // дані іншого акаунта (вікно закрили «Пізніше») — той самий рядок повертає вибір
+      if(loginRow) loginRow.onclick=()=>{ if(window.__flowForeign && window.flowForeignAsk){ window.flowForeignAsk(); return; } if(!loggedIn) toggle('[data-acc-login-expand]'); };
       const outBtn=host.querySelector('[data-acc-out]');
       if(outBtn) outBtn.onclick=(e)=>{ e.stopPropagation(); if(window.sbSignOut) window.sbSignOut(); };
       const gb=host.querySelector('[data-acc-google]');
@@ -26924,6 +27027,42 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       try{ if(typeof window.dsbFillUser==='function') window.dsbFillUser(); }catch(_){}
     }
     window.renderAccount=renderAccount;
+
+    /* ── На пристрої дані іншого акаунта (sbSetUser у 02-storage.js) ──
+       Хмару вже вимкнено — тут лише вибір людини. «Злити разом» навмисно нема.
+       Стирання — те саме скидання пристрою: спершу бекап у файл (лише локальне:
+       сесія для сховища вимкнена, хмару нового акаунта бекап не бачить), сесію
+       лишає, тож після перезапуску тут уже дані того, хто увійшов. */
+    const maskMail=m=>{ const s=String(m||''); const i=s.indexOf('@'); return i>0 ? s.charAt(0)+'•••'+s.slice(i) : (s||'іншому акаунту'); };
+    const foreignWipe=async (file)=>{
+      const stop='❌ Нічого не стерто: ';
+      let r; try{ r=await window.flowFactoryReset({wipeCloud:false, file}); }catch(e){ r={ok:false, error:String((e&&e.message)||e)}; }
+      if(r.ok) return;
+      if(r.step==='tap'){ setTimeout(()=>actionSheet({ title:'Бекап готовий',
+        sub:'Файл «'+r.name+'» зібрано. Натисни «Зберегти файл» і вибери, куди його покласти.',
+        items:[{ ic:'down', label:'Зберегти файл', primary:true, onClick:()=>foreignWipe(r.file) }], cancel:'Скасувати' }), 350); return; }
+      if(r.step!=='backup-confirm'){ flowAlert(stop+r.error); return; }
+      setTimeout(()=>confirmSheet({ title:'Файл бекапу зберігся?',
+        sub:'Браузер не каже, чи «'+r.name+'» справді записано. Перевір «Завантаження»: без цього файла стерте не повернути.',
+        okLabel:'Файл є — стерти', onOk:async ()=>{
+          const r2=await window.flowFactoryReset({wipeCloud:false, backupConfirmed:true});
+          if(!r2.ok) flowAlert(stop+r2.error);
+        }}), 350);
+    };
+    const foreignAsk=()=>{
+      const f=window.__flowForeign; if(!f) return;
+      actionSheet({ title:'На пристрої дані іншого акаунта',
+        sub:'Вхід — '+(f.as||'новий акаунт')+', а дані тут належать '+maskMail(f.owner)+'. Щоб не змішати їх, синхронізацію вимкнено. '+
+            'Збережи їх у файл і зітри з пристрою — після перезапуску тут будуть лише твої дані. Або вийди, і все лишиться як було.',
+        items:[
+          { ic:'down', label:'Зберегти у файл і стерти з пристрою', sub:'Хмари жодного з акаунтів це не торкнеться', primary:true, onClick:()=>foreignWipe(null) },
+          { ic:'refresh', label:'Вийти з акаунта', sub:'Дані на пристрої лишаться як були', onClick:()=>{ if(window.sbSignOut) window.sbSignOut(); } }
+        ], cancel:'Пізніше' });
+    };
+    window.flowForeignAsk=foreignAsk;
+    document.addEventListener('flowforeign', ()=>setTimeout(foreignAsk, 600));
+    if(window.__flowForeign) setTimeout(foreignAsk, 600);
+
     document.addEventListener('flowsync', ()=>{
       if(!document.getElementById('scr-more')?.classList.contains('active')) return;
       // під час старту (load()) прилітає ціла черга подій flowsync — без дебаунсу
@@ -29038,7 +29177,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      на місце «Гроші», а гроші видно в чипі картки «Сьогодні» на Огляді.
      Гра — окрема сторінка misto.html у рамці (iframe), зі своїм сховищем
      misto_dnya_v3. Дані Frequency вона бачить лише через worldBridge і лише
-     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи). Нічого не пише. */
+     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи). Пише лише
+     власний стан у ключ world_game (gameSave). */
   let worldShown=false;
   function worldOn(){ try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
 
@@ -29059,6 +29199,26 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     },
     // сфери (39-spheres.js): назва, шаблон, будівля й цифри з блоків папки — лише читання
     spheres(){ try{ return sphForWorld(); }catch(_){ return []; } },
+    /* Стан гри в акаунті — ключ world_game. Гра читає й пише ЛИШЕ його і лише цілком,
+       Frequency вміст не розбирає. trusted=false — хмара ще не відповіла: тоді гра в
+       акаунт не пише («порожньо» ≠ «не відповіло», урок 24.09). */
+    async gameLoad(){
+      const trusted=!!(window.sbDataTrusted&&window.sbDataTrusted());
+      let raw=null;
+      try{ const r=await window.storage.get('world_game'); raw=(r&&typeof r.value==='string')?r.value:null; }catch(_){ raw=null; }
+      // id акаунта: гра прив'язує перенесення до нього; гість ('') в акаунт не пише
+      const u=window.sbUser&&window.sbUser();
+      return {trusted, raw, uid:(u&&u.id)?String(u.id):''};
+    },
+    gameSave(raw){
+      if(!(window.sbDataTrusted&&window.sbDataTrusted())) return 'untrusted';
+      if(!(window.sbUser&&window.sbUser())) return 'guest';   // без входу акаунта нема — гра лише в браузері
+      if(typeof raw!=='string') return 'bad';
+      if(raw.length>600000) return 'too_big';             // кілька копій гри ділять ~5 МБ памʼяті браузера
+      try{ const o=JSON.parse(raw); if(!o||typeof o!=='object'||!o.player||typeof o.player!=='object') return 'bad'; }catch(_){ return 'bad'; }
+      try{ const p=window.storage.set('world_game', raw, false); if(p&&p.catch) p.catch(()=>{}); }catch(_){ return 'fail'; }
+      return 'ok';
+    },
     // план на рік (40-year-letter.js): лист і віхи — лише читання
     year(){ try{ return ylForWorld(); }catch(_){ return null; } },
     open(sec, key){
