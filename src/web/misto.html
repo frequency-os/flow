@@ -186,7 +186,7 @@ button{cursor:pointer}
 .ava svg{position:absolute;inset:0}
 .hud-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .hud-meta b{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hud-meta span{font-size:12px;font-weight:700;color:var(--muted)}
+.hud-meta span{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .coins{display:flex;align-items:center;gap:5px;padding:7px 11px 7px 8px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-weight:800;font-size:14px}
 .res{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:7px}
 .rc{background:rgba(21,26,32,.9);border:1px solid rgba(255,255,255,.05);box-shadow:var(--hi);border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -619,6 +619,29 @@ button.cell{cursor:pointer}
 .hd{min-width:36px;min-height:36px;border-radius:10px;border:1.5px solid #2f3846;background:transparent;color:var(--muted);font-weight:800;font-size:12px}
 .hd.on{background:#7c93ff;border-color:#7c93ff;color:#0c1022}
 .season{flex-direction:column;align-items:stretch;gap:8px}
+/* ранок у грі (06.10.2026): небо за порою доби, шпилька Карти бажань, ранки в Трекері */
+.sky{position:absolute;inset:0;pointer-events:none;z-index:1;transition:background .6s}
+.sky.dawn{background:linear-gradient(180deg,rgba(255,150,100,.30),rgba(255,196,120,.12) 45%,rgba(120,150,255,.06));mix-blend-mode:soft-light}
+.sky.day{background:none}
+.sky.eve{background:linear-gradient(180deg,rgba(255,120,70,.30),rgba(140,70,170,.26));mix-blend-mode:multiply}
+.sky.night{background:linear-gradient(180deg,rgba(14,22,70,.62),rgba(8,12,40,.5));mix-blend-mode:multiply}
+.wpin .pin-i{background:#c4b5fd}
+.season .sch.rit{background:linear-gradient(135deg,#ffb27c,#ff8a65);color:#2a1206;border-color:transparent;font-weight:800;display:inline-flex;align-items:center;gap:5px}
+.trk.rit{border-color:rgba(255,157,108,.35)}
+.cell.h{background:linear-gradient(135deg,#2f8a54 50%,#1c232d 50%)}
+.rcal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:340px}
+.rcal em{font-style:normal;font-size:10.5px;font-weight:800;color:var(--muted);text-align:center}
+.rcal .x{visibility:hidden}
+.rcd{min-height:34px;border-radius:9px;border:0;background:#1c232d;color:#aeb4bd;font:inherit;font-size:12px;font-weight:800;display:grid;place-items:center;padding:0}
+button.rcd{cursor:pointer}
+.rcd.f{opacity:.35;background:none}
+.rcd.y{background:#4ade80;color:#06210f}
+.rcd.h{background:linear-gradient(135deg,#2f8a54 50%,#1c232d 50%);color:#e8ebef}
+.rcd.t{outline:1.5px solid #ff9d6c;outline-offset:1px}
+.rcd.s{outline:2px solid #7c93ff;outline-offset:1px}
+.rday{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.rday .rph{width:100%;max-height:200px;object-fit:cover;border-radius:12px}
+.rtx p{margin:2px 0 0;font-size:14px;line-height:1.45;overflow-wrap:anywhere}
 .season .sr{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .season .sr b{font-size:13px;margin-right:2px}
 .sch{display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:0 10px;border-radius:10px;font-size:12px;font-weight:800;border:1.5px solid #2f3846;background:transparent;color:var(--text)}
@@ -840,7 +863,7 @@ function renderHud(){
  var L=lvl(S.xp), me=power().maxE, p=S.player;
  function rc(i,l,v,mx,c,suf){ var low=v/mx<.3; return '<div class="rc"><div class="rc-h">'+ic(i,c,12,2.3)+l+'</div><div class="rc-v num" style="'+(low?'color:#f87171':'')+'">'+Math.round(v)+'<small>'+suf+'</small></div><div class="bar"><i style="width:'+clamp(v/mx*100,0,100)+'%;background:'+c+'"></i></div></div>'; }
  $('hud').innerHTML='<div class="hud-top"><a class="backf" href="./" aria-label="Назад у Frequency">'+ic('back',null,18,2.4)+'<img src="icon-192.png" alt=""><span>Frequency</span></a>'+backBtn()+'<button class="ava" data-act="drw" aria-label="Панель гри: день і пріоритети">'+ring(L.into/L.need,48,'#7c93ff')+'<i style="background-image:url('+chImg()+')"></i><b class="num">'+L.lv+'</b></button>'+
-  '<div class="hud-meta"><b>'+esc(p.name)+' · '+esc(clsOf(p.cls).n)+'</b><span class="num">Місяць '+monthIdx()+' з 12 · день '+dayIdx()+'</span></div>'+
+  '<div class="hud-meta"><b>'+esc(dayTitle(new Date()))+'</b><span class="num">'+PARTN[dayPart()]+' · місяць '+monthIdx()+' · день '+dayIdx()+'</span></div>'+
   '<span class="coins num">'+ic('coin','#fbbf24',16)+S.coins+'</span></div>'+
   // «Сезон»: енергію й ситість не просимо вести вручну — у HUD лише гаманець
   '<div class="res">'+walletCard()+'</div>';
@@ -879,7 +902,7 @@ function renderCityMap(){
   return '<button class="plot" style="left:'+P.x+'%;top:'+P.y+'%" data-act="addloc" data-plot="'+i+'" aria-label="Збудувати локацію на ділянці">'+ic('plus','#0d1014',18,2.6)+'<span>Будувати</span></button>'; }).join('');
  var here=locBy(S.here)||(SPH_POS[S.here]?null:locBy('home')), hp=heroAt(here);
  if(LAST_HERE&&LAST_HERE!==S.here){ var ol=locBy(LAST_HERE), op=ol?heroAt(ol):(SPH_POS[LAST_HERE]||HERO.home.g); WALK={l:op[0]+'%',t:op[1]+'%'}; } LAST_HERE=S.here;
- $('view').innerHTML='<div class="stage-wrap gold"><div class="stage city-g" style="--z:'+ZOOM+';background-image:url('+IMG.gold+')">'+holoLayer(key)+pins+hero(hp[0],hp[1],8)+'</div>'+(D?'<div class="lstrip">'+S.locs.map(function(l){ var tot=l.params.reduce(function(a,p){return a+p.xp/pNeed(p.level);},0)/l.params.length; return '<button class="lc" data-act="loc" data-id="'+l.id+'"><span class="row" style="gap:8px"><span class="ico" style="width:28px;height:28px;border-radius:9px;background:'+l.color+'22">'+ic(l.icon,l.color,16)+'</span><b>'+esc(l.name)+'</b><span class="num" style="margin-left:auto;color:'+l.color+'">'+locLevel(l)+'</span></span><div class="bar"><i style="width:'+Math.round(tot*100)+'%;background:'+l.color+'"></i></div><span>'+l.params.map(function(p){return esc(p.name)+' '+p.level;}).join(' · ')+'</span></button>'; }).join('')+'</div>':'')+'</div>'+
+ $('view').innerHTML='<div class="stage-wrap gold"><div class="stage city-g" style="--z:'+ZOOM+';background-image:url('+IMG.gold+')">'+holoLayer(key)+pins+wishPin()+'<div class="sky '+dayPart()+'"></div>'+hero(hp[0],hp[1],8)+'</div>'+(D?'<div class="lstrip">'+S.locs.map(function(l){ var tot=l.params.reduce(function(a,p){return a+p.xp/pNeed(p.level);},0)/l.params.length; return '<button class="lc" data-act="loc" data-id="'+l.id+'"><span class="row" style="gap:8px"><span class="ico" style="width:28px;height:28px;border-radius:9px;background:'+l.color+'22">'+ic(l.icon,l.color,16)+'</span><b>'+esc(l.name)+'</b><span class="num" style="margin-left:auto;color:'+l.color+'">'+locLevel(l)+'</span></span><div class="bar"><i style="width:'+Math.round(tot*100)+'%;background:'+l.color+'"></i></div><span>'+l.params.map(function(p){return esc(p.name)+' '+p.level;}).join(' · ')+'</span></button>'; }).join('')+'</div>':'')+'</div>'+
   seasonCard(true);
  walkHero(); panMap();
 }
@@ -1071,6 +1094,47 @@ function habits(){ var out=[]; S.locs.forEach(function(l){ (l.actions||[]).forEa
 function didOn(h,k){ return S.log.some(function(e){ return e.day===k&&e.loc===h.l.id&&e.name===h.a.name; }); }
 function todayHabits(){ var t=dowOf(now()); return habits().filter(function(h){ return h.a.plan.indexOf(t)>=0; }); }
 function yearData(){ try{ var B=bridge(); var Y=B&&B.year?B.year():null; return Y&&typeof Y==='object'&&Array.isArray(Y.months)?Y:null; }catch(_){ return null; } }
+/* ── ранок із Frequency (06-wishes.js через міст) — лише читання; заповнює сам Frequency у шторці ── */
+function ritData(){ try{ var B=bridge(); var R=B&&B.ritual?B.ritual():null; return R&&typeof R==='object'&&R.days&&typeof R.days==='object'?R:null; }catch(_){ return null; } }
+function ritDayOf(k){ try{ var B=bridge(); var D=B&&B.ritualDay?B.ritualDay(k):null; return D&&typeof D==='object'?D:null; }catch(_){ return null; } }
+// пора доби за справжнім годинником: світанок, день, вечір, ніч
+function dayPart(){ var h=new Date().getHours(); return h>=5&&h<9?'dawn':h>=9&&h<17?'day':h>=17&&h<21?'eve':'night'; }
+var PARTN={dawn:'ранок',day:'день',eve:'вечір',night:'ніч'};
+function wishPin(){ var R=ritData(); if(!R) return '';
+ return '<button class="pin wpin" style="left:60%;top:52%;--c:#c4b5fd" data-act="wishes" aria-label="Карта бажань"><span class="pin-t"><span class="pin-i">'+ic('star','#0d1014',15,2.4)+'</span><span class="pin-n">Карта бажань</span><span class="pin-lv num">'+(+R.wishes||0)+'</span></span><span class="pin-tail"></span><span class="pin-dot"></span></button>'; }
+var RDSEL=null;
+function ritBlock(){
+ var R=ritData(); if(!R) return '';
+ var tk=dk(new Date()), wd=weekDays();
+ function cls(k){ var r=R.days[k]; return r&&r.done?'y':(r&&r.n>0?'h':(k>tk?'f':(k===tk?'p':'n'))); }
+ var week=wd.map(function(d,i){ var k=dk(d), r=R.days[k], c=cls(k);
+  if(k===tk&&!(r&&r.done)) return '<button class="cell '+c+' t" data-act="ritual" aria-label="Заповнити ранок"></button>';
+  if(k>tk) return '<span class="cell f"></span>';
+  return '<button class="cell '+c+(k===tk?' t':'')+'" data-act="rday" data-k="'+k+'" aria-label="Ранок, '+DOWS[i]+'">'+(r&&r.done?ic('check','#0d1014',12,3):'')+'</button>'; }).join('');
+ var d0=new Date(), y=d0.getFullYear(), m=d0.getMonth(), dim=new Date(y,m+1,0).getDate(), lead=dowOf(new Date(y,m,1)), cal='', full=0;
+ for(var i=0;i<lead;i++) cal+='<i class="x"></i>';
+ for(var dd=1;dd<=dim;dd++){ var k=dk(new Date(y,m,dd)), r=R.days[k], c=r&&r.done?'y':(r&&r.n>0?'h':''); if(r&&r.done) full++;
+  cal+=k>tk?'<span class="rcd f num">'+dd+'</span>':'<button class="rcd '+c+(k===tk?' t':'')+(k===RDSEL?' s':'')+'" data-act="rday" data-k="'+k+'"><span class="num">'+dd+'</span></button>'; }
+ var mName=d0.toLocaleDateString('uk-UA',{month:'long'});
+ return '<div class="card trk rit" style="margin-top:14px"><div class="row sp"><span class="trk-n"><b>Ранок · '+esc(R.tpl||'')+'</b><small class="num">'+(R.done?'зараховано':(R.n+' з '+R.of+' кроків'))+' · серія '+(+R.streak||0)+' · найкраща '+(+R.best||0)+'</small></span>'+
+  (R.done?'':'<button class="btn pri sm" data-act="ritual">'+(R.n?'Продовжити':'Почати')+'</button>')+'</div>'+
+  '<div class="trk-r"><span></span>'+wd.map(function(d,i){ return '<b class="'+(dk(d)===tk?'t':'')+'">'+DOWS[i]+'</b>'; }).join('')+'</div>'+
+  '<div class="trk-r"><span class="trk-n"><small>цей тиждень</small></span>'+week+'</div></div>'+
+  '<div class="card stack" style="margin-top:12px"><div class="row sp"><b>Ранки · '+esc(mName)+'</b><span class="hint num">'+full+' з '+d0.getDate()+' днів</span></div>'+
+  '<div class="rcal">'+DOWS.map(function(n){return '<em>'+n+'</em>';}).join('')+cal+'</div>'+
+  '<div class="trk-lg"><span><i class="cell y"></i>ранок зараховано</span><span><i class="cell h"></i>частково</span></div>'+
+  (RDSEL?ritDayCard(RDSEL):'<span class="hint">Тап на день — що ти тоді записав.</span>')+'</div>';
+}
+function ritDayCard(k){
+ var D=ritDayOf(k), dt=new Date(k+'T12:00:00'), es=S.log.filter(function(e){return e.day===k;}), xp=es.reduce(function(a,e){return a+(e.xp||0);},0), tk=dk(new Date());
+ var body;
+ if(!D) body='<span class="hint">Ранок того дня не записано.</span>';
+ else body='<div class="chips"><span class="chip '+(D.done?'pos':'xp')+' num">'+(D.done?'ранок зараховано':'ранок '+D.n+'/'+D.of)+'</span>'+(D.hasPhoto&&!D.photo?'<span class="chip">фото дня</span>':'')+(D.marks||[]).map(function(t){return '<span class="chip">'+ic('check',null,11,3)+esc(t)+'</span>';}).join('')+'</div>'+
+  (D.photo&&/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(D.photo)?'<img class="rph" src="'+esc(D.photo)+'" alt="Фото дня">':'')+
+  (D.texts||[]).map(function(x){ return '<div class="rtx"><span class="eyebrow">'+esc(x.t)+'</span><p>'+esc(x.v)+'</p></div>'; }).join('');
+ return '<div class="rday"><div class="row sp"><b>'+esc(dayTitle(dt))+'</b>'+(k===tk?'<button class="btn sec sm" data-act="ritual">Відкрити ранок</button>':'')+'</div>'+body+
+  '<span class="hint num">У грі: '+es.length+' '+plural(es.length,'дія','дії','дій')+(xp?' · +'+xp+' XP':'')+'</span></div>';
+}
 function safeC(c){ return /^#[0-9a-f]{3,8}$/i.test(String(c||''))?c:'#7c93ff'; }
 function weekStats(off){ var wd=weekDays(), from=new Date(wd[0]); from.setDate(from.getDate()+7*off); var to=new Date(from); to.setDate(to.getDate()+7);
  var a=dk(from), b=dk(to), es=S.log.filter(function(e){ return e.day>=a&&e.day<b; });
@@ -1087,7 +1151,9 @@ function seasonCard(onMap){
   row2='<div class="sr"><button class="sch" data-go="year" style="border:0;padding:0;min-height:24px">Віхи: '+esc(m0.name)+' '+md+'/'+m0.ms.length+'</button><span class="sbar"><i style="width:'+Math.round(md/m0.ms.length*100)+'%"></i></span>'+
    (Y.total?'<span class="hint" style="font-size:11.5px">лист '+(+Y.lit||0)+'/'+(+Y.total||0)+'</span>':'')+'</div>'+
    (Y.pace?'<div class="sr"><span class="hint" style="flex:1;color:#fca5a5">Відстаєш з віхами місяця</span><button class="sch" data-act="yopen" data-s="ai_behind">Спитати Флоу</button></div>':''); }
- return '<div class="'+(onMap?'float-card only-m ':'card ')+'season">'+row1+row2+'</div>';
+ var R=ritData(), row0='';
+ if(R) row0='<div class="sr"><b>'+(R.done?'Ранок ✓':'Ранок '+(+R.n||0)+'/'+(+R.of||0))+'</b>'+(R.done?'<span class="hint" style="font-size:11.5px">серія '+(+R.streak||0)+'</span>':'<button class="sch rit" data-act="ritual">'+ic('sparkle',null,12,2.4)+(R.n?'Продовжити ранок':'Почати ранок')+'</button>')+'</div>';
+ return '<div class="'+(onMap?'float-card only-m ':'card ')+'season">'+row0+row1+row2+'</div>';
 }
 
 function renderTracker(){
@@ -1119,7 +1185,7 @@ function renderTracker(){
    '<button class="btn pri" data-act="yopen" data-s="ai_week">Розбір тижня з Флоу</button></div>'; }
  $('view').innerHTML='<div class="page"><div class="only-m" style="height:150px"></div><div class="row sp"><div class="h1" style="margin:0">Трекер</div>'+(H.length?'<button class="btn sec sm" data-act="habits">'+ic('gear',null,16)+'Звички</button>':'')+'</div>'+
   '<span class="hint">'+esc(wd[0].toLocaleDateString('uk-UA',{day:'numeric',month:'short'}))+' – '+esc(wd[6].toLocaleDateString('uk-UA',{day:'numeric',month:'short'}))+'</span>'+
-  grid+nums+sun+
+  ritBlock()+grid+nums+sun+
   '<div class="card stack" style="margin-top:12px"><div class="row sp"><b>'+esc(mName.charAt(0).toUpperCase()+mName.slice(1))+'</b><span class="hint num">'+act+' з '+dim+' днів з дією</span></div><div class="heat">'+heat+'</div></div></div>';
 }
 
@@ -1805,6 +1871,9 @@ document.addEventListener('click',function(e){
   case 'habits': habitsSheet(); break;
   case 'hday': { var hl=locBy(b.getAttribute('data-loc')), ha=hl&&hl.actions.filter(function(x){return x.id===b.getAttribute('data-a');})[0], hd=+b.getAttribute('data-d');
    if(ha&&hd>=0&&hd<7){ if(!Array.isArray(ha.plan)) ha.plan=[]; var hi=ha.plan.indexOf(hd); if(hi>=0) ha.plan.splice(hi,1); else ha.plan.push(hd); ha.plan.sort(); save(); var hsc=$('sheet').scrollTop; habitsSheet(); $('sheet').scrollTop=hsc; render(); } break; }   // шторка не стрибає вгору
+  case 'ritual': { var RB=bridge(); if(RB&&ritData()) RB.open('ritual'); else toast('Ранок — у Frequency','<span class="chip xp">Відкрий гру з вкладки «Мій світ»</span>'); break; }
+  case 'wishes': { var WB=bridge(); if(WB) WB.open('wishes'); break; }
+  case 'rday': { var rk=b.getAttribute('data-k'); if(/^\d{4}-\d{2}-\d{2}$/.test(rk)){ RDSEL=RDSEL===rk?null:rk; var vs=$('view').scrollTop; render(); $('view').scrollTop=vs; } break; }
   case 'yopen': { var YB=bridge(); var sec=b.getAttribute('data-s'); if(YB&&/^(goals|ai_behind|ai_week)$/.test(sec)) YB.open(sec); else toast('План на рік — у Frequency','<span class="chip xp">Відкрий гру з вкладки «Мій світ»</span>'); break; }   // «Сезон»: радіальне меню сховано, усе — у шухляді
   case 'hm': { var hk=b.getAttribute('data-k'); closeHM(); if(hk==='now') nowSheet(); else if(hk==='go') goSheet(); else if(hk==='state') stateSheet(); else { TAB=hk; render(); $('view').scrollTop=0; } break; }
   case 'donow': doNow(); break;

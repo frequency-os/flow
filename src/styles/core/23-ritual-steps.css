@@ -1,0 +1,65 @@
+  /* ============ РАНОК ІЗ КРОКІВ (06-wishes.js, 05.10.2026): рядки кроків, конструктор, шторка, кільце-таймер ============ */
+  .rit-cal .cd.part i{background:linear-gradient(90deg,#3ad487 50%,rgba(255,255,255,.18) 50%);}
+
+  .rit-set{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;
+    width:100%;padding:11px 14px;margin-bottom:10px;border-radius:16px;background:var(--field);border:1px solid var(--line);}
+  .rit-set .rs-t b{display:block;font-size:13px;font-weight:800;color:var(--text);}
+  .rit-set .rs-t small{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-top:1px;}
+  .rit-set .rs-e{font-size:12px;font-weight:800;color:var(--accent);}
+  .rit-set .rs-bar{grid-column:1 / -1;height:4px;border-radius:3px;background:var(--line);overflow:hidden;}
+  .rit-set .rs-bar i{display:block;height:100%;border-radius:3px;background:#3ad487;}
+  .rit-set:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .rit-wrap .rstep{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:11px;width:100%;
+    padding:11px 14px;margin-bottom:9px;min-height:56px;}
+  .rit-wrap .rstep:active{transform:scale(.98);}
+  .rit-wrap .rstep:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .rst-ic{width:36px;height:36px;border-radius:12px;flex:none;display:grid;place-items:center;font-size:17px;background:var(--field);}
+  .rst-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .rst-tx b{font-size:13px;font-weight:800;color:var(--text);}
+  .rst-tx small{font-size:10.5px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rst-go{flex:none;font-size:12px;font-weight:800;padding:8px 12px;border-radius:11px;background:var(--accent);color:#fff;}
+  .rst-ok{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#3ad487;color:#06210f;font-weight:900;}
+  .rst-chk{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;border:2px solid var(--line);font-weight:900;}
+  .rst-chk.on{background:#3ad487;border-color:#3ad487;color:#06210f;}
+  .rit-wrap .rstep.done .rst-tx b{color:var(--muted);}
+
+  /* конструктор */
+  .rit-ed .asheet-in{max-height:88vh;overflow-y:auto;overscroll-behavior:contain;}
+  .red-tpls{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px 12px;padding:0 14px;}
+  .red-tpls::-webkit-scrollbar{display:none}
+  .red-tpl{flex:none;font:inherit;font-size:13px;font-weight:800;padding:9px 13px;min-height:40px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--text);cursor:pointer;}
+  .red-tpl.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);}
+  .red-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .red-row{display:flex;align-items:center;gap:9px;padding:7px 8px 7px 10px;border-radius:14px;background:var(--field);border:1px solid var(--line);}
+  .red-b{flex:none;width:36px;height:36px;border-radius:10px;border:0;background:transparent;color:var(--text);font:inherit;font-size:16px;font-weight:800;cursor:pointer;}
+  .red-b:disabled{opacity:.25;cursor:default;}
+  .red-b.x{color:#ff6b6f;}
+  .red-lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 2px 8px;}
+  .red-adds{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .red-add{font:inherit;font-size:12.5px;font-weight:700;padding:8px 11px;min-height:38px;border-radius:11px;border:1px dashed var(--line);background:transparent;color:var(--text);cursor:pointer;}
+  .red-add.own{border-style:solid;color:var(--accent);}
+  .red-ok{width:100%;border:0;border-radius:15px;padding:15px;margin-bottom:9px;font:inherit;font-size:15px;font-weight:800;background:var(--accent);color:#fff;cursor:pointer;}
+  .red-ok:disabled{opacity:.4;}
+
+  /* шторка ранку поверх гри */
+  .rit-sheet .asheet-in{max-height:92vh;overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+  .rsh-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 12px;}
+  .rsh-h b{display:block;font-size:18px;font-weight:800;color:var(--text);}
+  .rsh-h small{display:block;font-size:12px;color:var(--muted);font-weight:700;}
+  .rsh-x{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--text);font:inherit;font-size:15px;cursor:pointer;}
+  .rsh-body .rit-cal{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px;}
+  .rsh-body .vrail{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px;}
+
+  /* візуалізація на весь екран: кільце-таймер, лічильник мрій, «Наступна мрія» */
+  .rmom-top{justify-content:space-between !important;align-items:center;padding-top:calc(16px + env(safe-area-inset-top)) !important;}
+  .rmom-n{font-size:12px;font-weight:800;color:rgba(255,255,255,.85);letter-spacing:.04em;}
+  .rmom-ring{position:relative;width:120px;height:120px;margin-bottom:14px;}
+  .rmom-ring svg{width:100%;height:100%;display:block;}
+  .rmom-ring .rr-bg{fill:rgba(0,0,0,.25);stroke:rgba(255,255,255,.18);stroke-width:6;}
+  .rmom-ring .rr-fg{fill:none;stroke:#b48cff;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+  .rmom-ring .rmom-tm{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-size:26px;letter-spacing:0;color:#fff;font-variant-numeric:tabular-nums;}
+  .rmom-bot{display:flex;flex-direction:column;gap:9px;padding-bottom:calc(30px + env(safe-area-inset-bottom)) !important;}
+  .rmom-next{width:100%;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.35);color:#fff;font:inherit;font-size:14px;font-weight:800;border-radius:15px;padding:14px;cursor:pointer;}
+  .rmom-ov.plain .rmom-bg{background:radial-gradient(120% 70% at 50% 20%,#3a2f6e,#0b0a18 70%);animation:none;}
+  @media (prefers-reduced-motion:reduce){ .rmom-bg{animation:none !important;} .rmom-ring .rr-fg{transition:none;} }

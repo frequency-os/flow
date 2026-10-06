@@ -539,14 +539,78 @@
   // ═══ FD26T · РАНКОВИЙ РИТУАЛ «Стрічка дня» — ефір + щоденник + відео-полиця ═══
   const RIT_KEY='ritual_board';
   let RIT={days:{},mix:[],links:[]};
-  try{ if(Array.isArray(window.FLOW_KEYS)&&window.FLOW_KEYS.indexOf(RIT_KEY)<0) window.FLOW_KEYS.push(RIT_KEY); }catch(_){}
-  async function loadRitual(){ try{ const r=await window.storage.get(RIT_KEY,false);
-    if(r&&r.value){ const d=JSON.parse(r.value); if(d&&typeof d==='object'){ RIT={days:d.days||{},mix:d.mix||[],links:d.links||[]}; } } }catch(_){} }
+  /* Набір кроків ранку (06.10.2026) — окремим ключем: стара збірка (Mac, старий кеш)
+     переписує ritual_board цілком і не знає про кроки, тож у тому ключі вона б їх стерла.
+     Порожньо — діє шаблон «Мій теперішній ранок». */
+  const RIT_STEPS_KEY='ritual_steps';
+  let RIT_STEPS=null;
+  try{ [RIT_KEY,RIT_STEPS_KEY].forEach(k=>{ if(Array.isArray(window.FLOW_KEYS)&&window.FLOW_KEYS.indexOf(k)<0) window.FLOW_KEYS.push(k); }); }catch(_){}
+  /* Читається двічі: одразу при старті (локальна копія — щоб ранок відкрився вранці без очікування)
+     і в load() (27-canvas.js) разом з усім — тоді ключі позначені прочитаними (storeMarkRead),
+     і перша правка зливається з хмарою, а не затирає її. Після читання ранок на екрані
+     перемальовується, щоб тап не пішов у старий обʼєкт дня. */
+  async function loadRitual(){
+    try{ const r=await window.storage.get(RIT_KEY,false);
+      if(r&&r.value){ const d=JSON.parse(r.value); if(d&&typeof d==='object'){ RIT={days:d.days||{},mix:d.mix||[],links:d.links||[]}; } } }catch(_){}
+    try{ const r2=await window.storage.get(RIT_STEPS_KEY,false);
+      if(r2&&r2.value){ const a=JSON.parse(r2.value); if(Array.isArray(a)) RIT_STEPS=a; } }catch(_){}
+    try{ ritualRerender(); }catch(_){}
+  }
   function saveRitual(){ try{ const p=window.storage.set(RIT_KEY,JSON.stringify(RIT),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+  function saveRitSteps(){ try{ const p=window.storage.set(RIT_STEPS_KEY,JSON.stringify(RIT_STEPS||[]),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
   let __ritLoad=null; try{ __ritLoad=loadRitual(); }catch(_){}
 
-  function ritualRerender(){ try{ const s=document.getElementById('scr-wishes');
+  function ritualRerender(){ try{
+    // ранок у шторці (відкрита з «Мого світу») — перемальовуємо і її
+    const sh=document.getElementById('ritSheetBody');
+    if(sh){ sh.innerHTML=ritualInnerHTML(); ritualBind(sh); }
+    const s=document.getElementById('scr-wishes');
     if(s&&s.classList.contains('active')) renderWishes(); }catch(_){} }
+  // ранок шторкою поверх будь-якого екрана (вхід із гри); записує, як і завжди, сам Frequency
+  function ritualSheet(opts){ try{
+    opts=opts||{};
+    const old=document.getElementById('ritSheet'); if(old) old.remove();
+    const ov=document.createElement('div'); ov.className='asheet rit-sheet'; ov.id='ritSheet';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Ранковий ритуал');
+    const dt=new Date().toLocaleDateString('uk-UA',{weekday:'long',day:'numeric',month:'long'});
+    ov.innerHTML=`<div class="asheet-in"><div class="asheet-grip"></div>
+      <div class="rsh-h"><span><b>Ранок</b><small>${esc(dt)}</small></span><button type="button" class="rsh-x" aria-label="Закрити">✕</button></div>
+      <div class="rit-wrap rsh-body" id="ritSheetBody"></div></div>`;
+    document.body.appendChild(ov);
+    const close=()=>{ ritStopAll(); ov.remove(); if(opts.onClose) try{ opts.onClose(); }catch(_){} };
+    ov.querySelector('.rsh-x').onclick=close;
+    ov.onclick=e=>{ if(e.target===ov) close(); };
+    (__ritLoad||Promise.resolve()).then(()=>ritualRerender());
+  }catch(e){ console.error('ritualSheet',e); } }
+  try{ window.ritualSheet=ritualSheet; }catch(_){}
+  /* Для «Мого світу» (міст 38-world.js) — лише читання. Гра отримує копії простих значень,
+     не самі обʼєкти RIT, тож змінити дані ранку звідти не може. */
+  function ritForWorld(){
+    const today=ritDs(0), steps=ritSteps(), td=RIT.days[today]||{}, days={};
+    for(let i=0;i<70;i++){ const ds=ritDs(-i), r=RIT.days[ds]; if(!r) continue;
+      days[ds]=i===0?{done:!!r.done, n:steps.filter(s=>ritStepDone(s,r)).length, of:steps.length}
+                    :{done:!!r.done, n:Math.max(0,+r.n||0), of:Math.max(0,+r.of||0)}; }
+    const st=ritStreak();
+    return {today, done:!!td.done, n:steps.filter(s=>ritStepDone(s,td)).length, of:steps.length,
+      streak:st.s, best:st.best, tpl:ritTplName(), wishes:wishes.length, days};
+  }
+  function ritDayForWorld(ds){
+    if(typeof ds!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(ds)) return null;
+    const r=RIT.days[ds]; if(!r) return null;
+    const own={}; ritSteps().forEach(s=>{ own[s.id]=s; });
+    const texts=[], marks=[];
+    Object.keys(r).forEach(k=>{
+      const c=ritCat(k), m=c||(Object.prototype.hasOwnProperty.call(own,k)?own[k]:null); if(!m) return;
+      const meta=ritMeta(c?{id:k}:m);
+      if(meta.ty==="text" && typeof r[k]==="string" && r[k].trim()) texts.push({t:String(meta.t), v:r[k].trim().slice(0,300)});
+      else if((meta.ty==="check"||meta.ty==="timer"||meta.ty==="mix"||meta.ty==="link") && r[k]) marks.push(String(meta.t));
+    });
+    let photo="";
+    try{ if(r.photo&&r.photo.url){ const u=window.photoSrc?window.photoSrc(r.photo.url):r.photo.url;
+      // гра (CSP misto.html) показує лише вбудовані картинки; фото з хмари — тільки позначкою hasPhoto
+      if(typeof u==="string"&&/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(u)) photo=u; } }catch(_){}
+    return {ds, done:!!r.done, n:Math.max(0,+r.n||0), of:Math.max(0,+r.of||0), texts:texts.slice(0,6), marks:marks.slice(0,8), photo, hasPhoto:!!r.photo};
+  }
   function goRitual(){ try{ renderWishes(); show('scr-wishes');
     setTimeout(()=>{ try{ const el=document.getElementById('ritInline');
       if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(_){}} ,180);
@@ -609,13 +673,14 @@
         fr.onload=()=>{ const a=fr.result;
           if(slot==='mix') RIT.mix.push({id:'m'+Date.now(),label:'Запис · '+ritDs(0).slice(5),a,dur:sec});
           else { const d=ritDay(ritDs(0)); d[slot]={a,dur:sec}; }
-          saveRitual(); ritualRerender();
+          if(slot==='mix') ritDay(ritDs(0)).mix=1;
+          ritSaveToday(); ritualRerender();
           try{ window.platform.haptic('medium'); }catch(_){}
         };
         fr.readAsDataURL(blob);
       };
       ritRec.start(); ritRecT=setInterval(()=>{ ritRecSec++;
-        const t=document.getElementById('ritRecTm'); if(t) t.textContent='● '+fmtDur(ritRecSec); },1000);
+        document.querySelectorAll('.rit-rectm').forEach(t=>{ t.textContent='● '+fmtDur(ritRecSec); }); },1000);
       ritualRerender(); // покаже стан запису
       try{ plToast('🎙 Говори — тап ще раз, щоб зупинити'); }catch(_){}
     }catch(e){ ritRec=null; try{ plToast('⚠️ Нема доступу до мікрофона'); }catch(_){} }
@@ -632,6 +697,7 @@
     if(ritMixOn){ ritStopAll(); ritualRerender(); return; }
     ritMixQ=RIT.mix.map(m=>m.a); if(!ritMixQ.length){ try{plToast('Спершу запиши себе 🎙');}catch(_){} return; }
     ritMixOn=true; let i=0;
+    { const dd=ritDay(ritDs(0)); if(!dd.mix){ dd.mix=1; ritSaveToday(); } }
     const next=()=>{ if(!ritMixOn||i>=ritMixQ.length){ ritMixOn=false; ritualRerender(); return; }
       try{ ritAudio=new Audio(ritMixQ[i++]); ritAudio.onended=next; ritAudio.play().catch(()=>{ next(); }); }catch(_){ next(); } };
     next(); ritualRerender();
@@ -642,8 +708,8 @@
     if(!cur){ ritRecord(slot); return; }
     actionSheet({title:'Аудіо · '+fmtDur(cur.dur||0), items:[
       {ic:WICONS.play, label:'Прослухати', onClick:()=>ritPlay(cur.a)},
-      {ic:'edit', label:'Перезаписати', onClick:()=>{ delete d[slot]; saveRitual(); ritRecord(slot); }},
-      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d[slot]; saveRitual(); ritualRerender(); }}
+      {ic:'edit', label:'Перезаписати', onClick:()=>{ delete d[slot]; ritSaveToday(); ritRecord(slot); }},
+      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d[slot]; ritSaveToday(); ritualRerender(); }}
     ]});
   }
   function ritMixMenu(){
@@ -674,85 +740,187 @@
     ]});
   }
 
-  const RIT_J=[['j1','a1','Я — людина, яка…','…дописуй речення про свою ідентичність'],
-               ['j2','a2','Вчорашній доказ','Що вчора підтвердило, що ти вже ця людина?'],
-               ['j3','a3','Намір на сьогодні','Одна дія, яка наближає твою дату']];
+  // ── Ранок із кроків (05.10.2026): ритуал = набір кроків каталогу, а не три сталі записи ──
+  // Значення кроку лежить у дні під його id (d.j1, d.grat, d.water…), голос — під a1..a3 або 'a_'+id.
+  // Поки людина не змінила набір, діє шаблон «Мій теперішній ранок» — це рівно те, що було раніше.
+  const RIT_CAT={
+    mix:{t:'Голос із майбутнього', ty:'mix', ic:'🎙'},
+    j1:{t:'Я — людина, яка…', ty:'text', ph:'…дописуй речення про свою ідентичність', a:'a1', ic:'🪞'},
+    j2:{t:'Вчорашній доказ', ty:'text', ph:'Що вчора підтвердило, що ти вже ця людина?', a:'a2', ic:'🧾'},
+    j3:{t:'Намір на сьогодні', ty:'text', ph:'Одна дія, яка наближає твою дату', a:'a3', ic:'🎯'},
+    grat:{t:'Вдячність', ty:'text', ph:'За що ти вдячний(а) цього ранку?', ic:'💛'},
+    photo:{t:'Фото дня', ty:'photo', ic:'📸'},
+    video:{t:'Відео-полиця', ty:'link', ic:'▶️'},
+    vis:{t:'Візуалізація', ty:'timer', sec:150, sub:'на фото з Карти бажань', ic:'✨'},
+    breath:{t:'Дихання 4·7·8', ty:'timer', sec:120, sub:'вдих 4 · затримка 7 · видих 8', ic:'🌬'},
+    med:{t:'Медитація', ty:'timer', sec:300, sub:'тиша і дихання', ic:'🧘'},
+    water:{t:'Склянка води', ty:'check', ic:'💧'},
+    move:{t:'Рух / зарядка', ty:'check', ic:'🏃'}
+  };
+  const RIT_TPL=[
+    {k:'now',   t:'Мій теперішній ранок', s:['mix','j1','j2','j3','photo','video']},
+    {k:'m5',    t:'5 хвилин',             s:['water','j3','vis']},
+    {k:'calm',  t:'Тиха голова',          s:['breath','grat','med','j3']},
+    {k:'sport', t:'Спорт зранку',         s:['water','move','j3']}
+  ];
+  const RIT_TY={text:'текст', check:'галочка', timer:'таймер', mix:'аудіо', photo:'фото', link:'посилання'};
+  // крок із даних → безпечний обʼєкт; чуже/зіпсоване відкидаємо
+  function ritCleanStep(s){
+    if(!s||typeof s!=='object'||typeof s.id!=='string') return null;
+    if(Object.prototype.hasOwnProperty.call(RIT_CAT,s.id)) return {id:s.id};
+    if(!/^c_[a-z0-9]{2,16}$/.test(s.id)) return null;
+    const ty=['text','check','timer'].indexOf(s.ty)>=0?s.ty:'check';
+    const t=String(s.t||'').trim().slice(0,80); if(!t) return null;
+    const o={id:s.id, ty, t};
+    if(ty==='timer') o.sec=Math.max(30,Math.min(3600,(+s.sec|0)||180));
+    return o;
+  }
+  function ritSteps(){
+    const arr=Array.isArray(RIT_STEPS)?RIT_STEPS.map(ritCleanStep).filter(Boolean):[];
+    return arr.length?arr:RIT_TPL[0].s.map(id=>({id}));
+  }
+  const RIT_OWN_IC={text:'✍️', check:'☑️', timer:'⏱'};
+  function ritCat(id){ return Object.prototype.hasOwnProperty.call(RIT_CAT,id)?RIT_CAT[id]:null; }
+  function ritMeta(s){ const c=ritCat(s.id); return c?Object.assign({id:s.id},c):Object.assign({ic:RIT_OWN_IC[s.ty]||'•'},s); }
+  /* Голос — лише в трьох старих записах (a1..a3). Аудіо лягає в ritual_board цілим base64,
+     тож голос у кожному новому кроці швидко з'їв би памʼять браузера. */
+  function ritAudioKey(s){ const c=ritCat(s.id); return (c&&c.a)||null; }
+  function ritStepDone(s,d){
+    const m=ritMeta(s);
+    if(m.ty==='text'){ const ak=ritAudioKey(s); return !!((d[s.id]&&String(d[s.id]).trim())||(ak&&d[ak])); }
+    if(m.ty==='photo') return !!d.photo;
+    return !!d[s.id]; // mix / link / timer / check — позначка 1 у дні
+  }
+  // день знає, скільки кроків тоді було і скільки зроблено (для календаря, навіть коли набір зміниться)
+  function ritTouch(d){ try{ const st=ritSteps(); d.of=st.length; d.n=st.filter(s=>ritStepDone(s,d)).length; }catch(_){} }
+  function ritSaveToday(){ ritTouch(ritDay(ritDs(0))); saveRitual(); }
+  function ritTplName(){
+    const ids=ritSteps().map(s=>s.id).join(',');
+    const t=RIT_TPL.find(x=>x.s.join(',')===ids);
+    return t?t.t:'свій набір';
+  }
+  // кроки, у яких своя картка (мікс, фото, відео); решта — однаковий рядок
+  function ritStepHTML(s,d){
+    const m=ritMeta(s);
+    if(m.ty==='mix') return ritMixHTML();
+    if(m.ty==='photo') return ritPhotoCardHTML(d);
+    if(m.ty==='link') return ritLinksHTML();
+    if(m.ty==='text'){
+      const val=d[s.id]||'', ak=ritAudioKey(s), au=ak?d[ak]:null;
+      const ph=m.ph||'Тап — написати';
+      return `<div class="glass jr">
+        <div class="lb">${esc(m.t)}</div>
+        <div class="tx ${val?'':'ph'}" data-rjr="${esc(s.id)}">${val?esc(val):esc(ph)}</div>
+        ${ak?`<span class="mic ${au?'has':''}" data-rmic="${esc(ak)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></span>`:''}
+        ${au?`<span class="adur">${fmtDur(au.dur||0)}</span>`:''}
+      </div>`;
+    }
+    const done=ritStepDone(s,d);
+    const sub=m.ty==='timer'?(fmtDur(m.sec||180)+(m.sub?' · '+m.sub:'')):(m.sub||RIT_TY[m.ty]);
+    const right=m.ty==='timer'
+      ? (done?'<span class="rst-ok">✓</span>':`<span class="rst-go">Почати</span>`)
+      : `<span class="rst-chk ${done?'on':''}">${done?'✓':''}</span>`;
+    return `<button type="button" class="glass rstep ${done?'done':''}" data-rstep="${esc(s.id)}">
+      <span class="rst-ic">${esc(m.ic||'•')}</span>
+      <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(sub)}</small></span>${right}</button>`;
+  }
+  function ritMixHTML(){
+    const mixDur=RIT.mix.reduce((s,m)=>s+(m.dur||0),0), recLive=!!ritRec;
+    return `<div class="glass mix">
+        <button class="pl" data-rmixpl="1">${ritMixOn?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6v12M15 6v12"/></svg>':WICONS.play}</button>
+        <span class="tx"><b>Ранковий мікс · ${fmtDur(mixDur)}</b>
+          <small>${RIT.mix.length?('твій голос · '+RIT.mix.length+' зап. · тап ▸ слухати'):'запиши себе з майбутнього — 30–60 с'}</small></span>
+        <span class="tm rit-rectm">${recLive?'● '+fmtDur(ritRecSec):''}</span>
+        <button class="rec ${recLive?'live':''}" data-rmixrec="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></button>
+      </div>`;
+  }
+  function ritLinksHTML(){
+    const links=RIT.links.map(l=>{ const id=ytId(l.url);
+      const th=id?`background-image:url('https://img.youtube.com/vi/${id}/hqdefault.jpg')`:'';
+      const dom=l.url.replace(/^https?:\/\/(www\.)?/,'').split('/')[0];
+      return `<div class="vcard" data-rlk="${esc(l.id)}">
+        <div class="vth ${id?'':'vempty'}" style="${th}">
+          <span class="pb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><polygon points="8 5 18 12 8 19" fill="currentColor" stroke="none"/></svg></span>
+          <button class="vmn" data-rlmenu="${esc(l.id)}">⋯</button></div>
+        <div class="vin"><b>${esc(l.title)}</b><small><span class="src">▶</span>${esc(dom)}</small></div>
+      </div>`; }).join('');
+    return `<div class="rit-sec"><span>Візія · відео</span><span class="add" data-raddlk="1">＋ посилання</span></div>
+      <div class="vrail">${links||'<div class="vhint">Додай відео, які повертають тебе в стан «я вже там»</div>'}</div>`;
+  }
   function ritualInnerHTML(){
-    const today=ritDs(0), d=ritDay(today), st=ritStreak();
+    const today=ritDs(0), d=ritDay(today), st=ritStreak(), steps=ritSteps();
     const DW=['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
     // місячний %
     const now=new Date(); let mDone=0,mDays=now.getDate();
     for(let i=1;i<=mDays;i++){ const ds=ymdLocal(new Date(now.getFullYear(),now.getMonth(),i));
       if(RIT.days[ds]&&RIT.days[ds].done) mDone++; }
+    const nDone=steps.filter(s=>ritStepDone(s,d)).length;
     const cal=[]; for(let i=-10;i<=2;i++){ const dd=new Date(); dd.setDate(dd.getDate()+i);
       const ds=ymdLocal(dd), rec=RIT.days[ds];
-      cal.push(`<div class="cd ${i===0?'today':''} ${rec&&rec.done?'done':(i<0?'miss':'')}"${i===0?' id="ritToday"':''}>
+      // сьогодні рахуємо наживо за поточним набором, минулі дні — за тим, що збереглось того дня
+      const n=i===0?nDone:(rec&&rec.n)||0;
+      const cls=rec&&rec.done?'done':(n>0?'part':(i<0?'miss':''));
+      cal.push(`<div class="cd ${i===0?'today':''} ${cls}"${i===0?' data-rtoday="1"':''}>
         <s>${DW[dd.getDay()]}</s><b>${dd.getDate()}</b><i></i></div>`); }
-    const mixDur=RIT.mix.reduce((s,m)=>s+(m.dur||0),0);
-    const recLive=!!ritRec;
-    const jr=RIT_J.map(([jk,ak,lb,ph])=>{
-      const val=d[jk]||'', au=d[ak];
-      return `<div class="glass jr" >
-        <div class="lb">${lb}</div>
-        <div class="tx ${val?'':'ph'}" data-rjr="${jk}">${val?esc(val):esc(ph)}</div>
-        <span class="mic ${au?'has':''}" data-rmic="${ak}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></span>
-        ${au?`<span class="adur">${fmtDur(au.dur||0)}</span>`:''}
-      </div>`; }).join('');
-    const links=RIT.links.map(l=>{ const id=ytId(l.url);
-      const th=id?`background-image:url('https://img.youtube.com/vi/${id}/hqdefault.jpg')`:'';
-      const dom=l.url.replace(/^https?:\/\/(www\.)?/,'').split('/')[0];
-      return `<div class="vcard" data-rlk="${l.id}">
-        <div class="vth ${id?'':'vempty'}" style="${th}">
-          <span class="pb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><polygon points="8 5 18 12 8 19" fill="currentColor" stroke="none"/></svg></span>
-          <button class="vmn" data-rlmenu="${l.id}">⋯</button></div>
-        <div class="vin"><b>${esc(l.title)}</b><small><span class="src">▶</span>${esc(dom)}</small></div>
-      </div>`; }).join('');
     return `
       <div class="rit-cal">${cal.join('')}</div>
       <div class="rit-streak">🔥 <b>стрік ${st.s} ${st.s===1?'день':(st.s>=2&&st.s<=4?'дні':'днів')}</b> · найкращий — ${st.best} · ${mDays?Math.round(mDone/mDays*100):0}% місяця</div>
-      <div class="glass mix">
-        <button class="pl" id="ritMixPl">${ritMixOn?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6v12M15 6v12"/></svg>':WICONS.play}</button>
-        <span class="tx"><b>Ранковий мікс · ${fmtDur(mixDur)}</b>
-          <small>${RIT.mix.length?('твій голос · '+RIT.mix.length+' зап. · тап ▸ слухати'):'запиши себе з майбутнього — 30–60 с'}</small></span>
-        <span class="tm" id="ritRecTm">${recLive?'● '+fmtDur(ritRecSec):''}</span>
-        <button class="rec ${recLive?'live':''}" id="ritMixRec">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></button>
-      </div>
-      ${jr}
-      ${ritPhotoCardHTML(d)}
-      <div class="rit-sec"><span>Візія · відео</span><span class="add" id="ritAddLk">＋ посилання</span></div>
-      <div class="vrail">${links||'<div class="vhint">Додай відео, які повертають тебе в стан «я вже там»</div>'}</div>
-      <button class="rit-done ${d.done?'ok':''}" id="ritDone">${d.done?'✓ День зараховано':'🔥 День зараховано'}</button>`;
+      <button type="button" class="rit-set" data-rset="1">
+        <span class="rs-t"><b>Мій ранок · ${esc(ritTplName())}</b><small>${nDone} з ${steps.length} кроків</small></span>
+        <span class="rs-e">Змінити</span>
+        <span class="rs-bar"><i style="width:${steps.length?Math.round(nDone/steps.length*100):0}%"></i></span></button>
+      ${steps.map(s=>ritStepHTML(s,d)).join('')}
+      <button class="rit-done ${d.done?'ok':''}" data-rdone="1">${d.done?'✓ День зараховано':'🔥 День зараховано'}</button>`;
   }
-  function ritualBind(){
+  // root — контейнер ранку (у Карті бажань або в шторці поверх гри); id не вживаємо, бо ранок буває на екрані двічі
+  function ritualBind(root){
+    root=root||document.getElementById('ritInline'); if(!root) return;
     const today=ritDs(0), d=ritDay(today);
+    const $q=sel=>root.querySelector(sel), $a=sel=>root.querySelectorAll(sel);
     // календар одразу відкритий на сьогодні (без анімації, щоб не смикалось)
     requestAnimationFrame(()=>{ try{
-      const t=document.getElementById('ritToday'), c=t&&t.parentElement;
+      const t=$q('[data-rtoday]'), c=t&&t.parentElement;
       if(c) c.scrollLeft=Math.max(0, t.offsetLeft-(c.clientWidth-t.offsetWidth)/2);
     }catch(_){}});
-    // bind
-    document.getElementById('ritMixPl').onclick=e=>ritMixPlay(e.currentTarget);
-    document.getElementById('ritMixRec').onclick=()=>ritRec?ritRecord('mix'):ritMixRecTap();
-    document.getElementById('ritAddLk').onclick=ritAddLink;
-    document.querySelectorAll('[data-rjr]').forEach(el=>el.onclick=()=>{
-      const jk=el.dataset.rjr, meta=RIT_J.find(x=>x[0]===jk);
-      inputModal({title:meta[2], value:d[jk]||'', placeholder:meta[3],
-        onOk:v=>{ d[jk]=(v||'').trim(); saveRitual(); ritualRerender(); }}); });
-    document.querySelectorAll('[data-rmic]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritFieldMic(el.dataset.rmic); });
-    { const pc=document.getElementById('ritPhotoCard'); if(pc) pc.onclick=(e)=>{
+    const pl=$q('[data-rmixpl]'); if(pl) pl.onclick=e=>ritMixPlay(e.currentTarget);
+    const rc=$q('[data-rmixrec]'); if(rc) rc.onclick=()=>ritRec?ritRecord('mix'):ritMixRecTap();
+    const al=$q('[data-raddlk]'); if(al) al.onclick=ritAddLink;
+    const rs=$q('[data-rset]'); if(rs) rs.onclick=ritEditor;
+    $a('[data-rjr]').forEach(el=>el.onclick=()=>{
+      const id=el.dataset.rjr, m=ritMeta(ritSteps().find(s=>s.id===id)||{id});
+      inputModal({title:m.t, value:d[id]||'', placeholder:m.ph||'',
+        onOk:v=>{ d[id]=(v||'').trim().slice(0,2000); ritSaveToday(); ritualRerender(); }}); });
+    $a('[data-rmic]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritFieldMic(el.dataset.rmic); });
+    $a('[data-rstep]').forEach(el=>el.onclick=()=>{
+      const s=ritSteps().find(x=>x.id===el.dataset.rstep); if(!s) return;
+      const m=ritMeta(s);
+      if(m.ty==='check'){ if(d[s.id]) delete d[s.id]; else d[s.id]=1; ritSaveToday(); ritualRerender();
+        try{ window.platform.haptic('light'); }catch(_){} return; }
+      if(m.ty!=='timer') return;
+      const mark=()=>{ const d2=ritDay(today); d2[s.id]=1; ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} };
+      if(s.id==='vis') ritEnterMoment({seconds:m.sec, label:'Візуалізація', doneLabel:'Готово', onDone:mark,
+        emptyMsg:'Додай фото в Карту бажань — тоді візуалізація йтиме на твоїх мріях'});
+      else ritEnterMoment({seconds:m.sec, plain:true, label:'Крок ранку', cap:m.t, hint:m.sub||'Побудь у цьому кілька хвилин', doneLabel:'Готово', onDone:mark});
+    });
+    { const pc=$q('#ritPhotoCard'); if(pc) pc.onclick=(e)=>{
         if(e.target.closest('[data-rphomenu]')) return;
         const dd=ritDay(today); if(dd.photo) ritEnterMoment(); else ritPhotoTap();
       }; }
-    document.querySelectorAll('[data-rphomenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritPhotoMenu(); });
-    document.querySelectorAll('[data-rlk]').forEach(el=>el.onclick=()=>{
+    $a('[data-rphomenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritPhotoMenu(); });
+    $a('[data-rlk]').forEach(el=>el.onclick=()=>{
       const l=RIT.links.find(x=>x.id===el.dataset.rlk); if(!l) return;
+      const dd=ritDay(today); if(!dd.video){ dd.video=1; ritSaveToday(); }
       try{ window.platform.openLink(l.url); }catch(_){ try{ window.open(l.url,'_blank'); }catch(__){} } });
-    document.querySelectorAll('[data-rlmenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritLinkMenu(el.dataset.rlmenu); });
-    document.getElementById('ritDone').onclick=()=>{
+    $a('[data-rlmenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritLinkMenu(el.dataset.rlmenu); });
+    const dn=$q('[data-rdone]'); if(dn) dn.onclick=()=>{
       const dd=ritDay(today);
-      if(dd.done){ delete dd.done; saveRitual(); ritualRerender(); return; }
+      if(dd.done){ delete dd.done; ritSaveToday(); ritualRerender(); return; }
+      const finish=()=>{ const d2=ritDay(today); d2.done=1; ritSaveToday(); ritualRerender();
+        try{ window.platform.haptic('medium'); plToast('🔥 День у стріку'); }catch(_){} };
+      // у ранку вже є крок «Візуалізація» — не повторюємо її на фініші
+      if(ritSteps().some(s=>s.id==='vis')){ finish(); return; }
       try{ plToast('✨ Перейти до візуалізації мрій…'); }catch(_){}
       setTimeout(()=>{
         ritEnterMoment({
@@ -761,13 +929,68 @@
           hint:'Уяви, що цей день сьогодні — саме цей: як ти його відчуваєш, як проживаєш?',
           doneLabel:'Зарахувати день',
           emptyMsg:'День зараховано — додай образи в Карту бажань, щоб бачити тут миті',
-          onClose:()=>{
-            const d2=ritDay(today); d2.done=1; saveRitual(); ritualRerender();
-            try{ window.platform.haptic('medium'); plToast('🔥 День у стріку'); }catch(_){}
-          }
+          onClose:finish
         });
       },550);
     };
+  }
+  // ── Конструктор ранку: шаблон, порядок, додати/прибрати крок, своє питання ──
+  function ritEditor(){
+    let work=ritSteps().map(s=>Object.assign({},s));
+    const ov=document.createElement('div'); ov.className='asheet rit-ed';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML='<div class="asheet-in"></div>';
+    document.body.appendChild(ov);
+    const box=ov.firstChild;   // шторка зʼявляється один раз, далі міняємо лише вміст (без повторної анімації)
+    const close=()=>ov.remove();
+    const draw=()=>{
+      const ids=work.map(s=>s.id).join(',');
+      const tpls=RIT_TPL.map(t=>`<button type="button" class="red-tpl ${t.s.join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
+      const rows=work.map((s,i)=>{ const m=ritMeta(s);
+        return `<div class="red-row"><span class="rst-ic">${esc(m.ic||'•')}</span>
+          <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(m.ty==='text'&&m.a?'текст · голос':(RIT_TY[m.ty]||''))}${m.ty==='timer'?' · '+fmtDur(m.sec||180):''}</small></span>
+          <button type="button" class="red-b" data-rup="${i}" aria-label="Вище" ${i?'':'disabled'}>↑</button>
+          <button type="button" class="red-b" data-rdn="${i}" aria-label="Нижче" ${i<work.length-1?'':'disabled'}>↓</button>
+          <button type="button" class="red-b x" data-rdel="${i}" aria-label="Прибрати">✕</button></div>`; }).join('');
+      const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)).map(k=>
+        `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(RIT_CAT[k].t)}</button>`).join('');
+      box.innerHTML=`<div class="asheet-grip"></div>
+        <div class="asheet-title">Мій ранок</div>
+        <div class="asheet-sub">Шаблон або свій набір. Твої записи за минулі дні лишаються.</div>
+        <div class="red-tpls">${tpls}</div>
+        <div class="red-list">${rows||'<div class="vhint">Додай хоча б один крок</div>'}</div>
+        <div class="red-lbl">Додати крок</div>
+        <div class="red-adds">${add}<button type="button" class="red-add own" data-rown="1">＋ Своє питання</button></div>
+        <button type="button" class="red-ok" data-rok="1" ${work.length?'':'disabled'}>Готово</button>
+        <button type="button" class="asheet-cancel">Скасувати</button>`;
+      ov.querySelector('.asheet-cancel').onclick=close;
+      ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=RIT_TPL.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(id=>({id})); draw(); } });
+      ov.querySelectorAll('[data-rup]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rup; if(i>0){ const x=work[i]; work[i]=work[i-1]; work[i-1]=x; draw(); } });
+      ov.querySelectorAll('[data-rdn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rdn; if(i<work.length-1){ const x=work[i]; work[i]=work[i+1]; work[i+1]=x; draw(); } });
+      ov.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{ work.splice(+b.dataset.rdel,1); draw(); });
+      ov.querySelectorAll('[data-radd]').forEach(b=>b.onclick=()=>{ work.push({id:b.dataset.radd}); draw(); });
+      const own=ov.querySelector('[data-rown]'); if(own) own.onclick=()=>{
+        inputModal({title:'Своє питання чи дія', placeholder:'Напр. Що я сьогодні не робитиму?', onOk:t=>{
+          t=(t||'').trim().slice(0,80); if(!t) return;
+          const id='c_'+Date.now().toString(36);
+          const put=(ty,sec)=>{ const s=ritCleanStep({id,ty,t,sec}); if(s){ work.push(s); draw(); } };
+          actionSheet({title:'Як відповідати?', items:[
+            {ic:'edit', label:'Текст', sub:'запис у кілька рядків', onClick:()=>put('text')},
+            {ic:'✓', label:'Галочка', sub:'зробив / не зробив', onClick:()=>put('check')},
+            {ic:'⏱', label:'Таймер', sub:'скільки хвилин', onClick:()=>inputModal({title:'Скільки хвилин?', value:'3', placeholder:'3',
+              onOk:v=>put('timer', Math.round((parseFloat(String(v||'').replace(',','.'))||3)*60))})}
+          ]});
+        }});
+      };
+      const ok=ov.querySelector('[data-rok]'); if(ok) ok.onclick=()=>{
+        if(!work.length) return;
+        RIT_STEPS=work.map(ritCleanStep).filter(Boolean); saveRitSteps();
+        ritSaveToday(); close(); ritualRerender();
+        try{ plToast('Ранок оновлено · '+RIT_STEPS.length+' кр.'); }catch(_){}
+      };
+    };
+    draw();
+    ov.onclick=e=>{ if(e.target===ov) close(); };
   }
   // ── Фото дня: запис живого зображення (з зошита/телефону) + пауза «Момент» ──
   const RPH_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>';
@@ -816,7 +1039,7 @@
         if(data && data.url) saved={ts:Date.now(),url:data.url,local:false};
       }
     }catch(_){ /* нема мережі/проксі — лишаємось з локальним фото, спробуємо синхронізувати пізніше */ }
-    d.photo=saved; saveRitual(); ritualRerender();
+    d.photo=saved; ritSaveToday(); ritualRerender();
     try{ window.platform.haptic('medium'); }catch(_){}
     ritEnterMoment();
   }
@@ -825,42 +1048,60 @@
     actionSheet({title:'Фото дня', items:[
       {ic:WICONS.play, label:'Зайти в момент', onClick:()=>ritEnterMoment()},
       {ic:'edit', label:'Перезняти', onClick:()=>ritPhotoTap()},
-      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d.photo; saveRitual(); ritualRerender(); }}
+      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d.photo; ritSaveToday(); ritualRerender(); }}
     ]});
   }
   // ── Повноекранна пауза «Момент»: рандомне фото з Карти бажань, щоб пару хвилин пожити в ньому ──
   let rmomTimer=null;
+  // opts: seconds, label, cap, hint, doneLabel, emptyMsg, plain (без фото — для дихання/медитації),
+  //       onDone — людина завершила (кнопка або ✕ після кінця таймера), onClose — будь-яке закриття
   function ritEnterMoment(opts){
     opts=opts||{};
-    const pool=wishes.filter(w=> (w.type==='video') ? !!w.thumb : !!w.img);
-    if(!pool.length){
+    const pool=opts.plain?[]:wishes.filter(w=> (w.type==='video') ? !!w.thumb : !!w.img);
+    if(!opts.plain && !pool.length){
       try{ plToast(opts.emptyMsg||'📸 Фото дня збережено — додай образи в Карту бажань, щоб бачити тут миті'); }catch(_){}
       if(opts.onClose) opts.onClose();
       return;
     }
-    const w=pool[Math.floor(Math.random()*pool.length)];
-    const img = w.type==='video' ? w.thumb : w.img;
-    const secTotal=opts.seconds||75;
-    const ov=document.createElement('div'); ov.className='rmom-ov'; ov.id='rmomOv';
+    if(rmomTimer){ clearInterval(rmomTimer); rmomTimer=null; }
+    { const o=document.getElementById('rmomOv'); if(o) o.remove(); }
+    let wi=pool.length?Math.floor(Math.random()*pool.length):0;
+    const secTotal=opts.seconds||75, R=54, C=2*Math.PI*R;
+    const ov=document.createElement('div'); ov.className='rmom-ov'+(opts.plain?' plain':''); ov.id='rmomOv';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
     ov.innerHTML=`
-      <div class="rmom-bg" style="background-image:url('${safeImg(img)}')"></div>
-      <div class="rmom-top"><button class="rmom-x" id="rmomX">✕</button></div>
+      <div class="rmom-bg"></div>
+      <div class="rmom-top">${pool.length>1?'<span class="rmom-n"></span>':'<span></span>'}<button class="rmom-x" aria-label="Закрити">✕</button></div>
       <div class="rmom-mid">
-        <div class="rmom-tm" id="rmomTm">${fmtDur(secTotal)}</div>
+        <div class="rmom-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${R}" class="rr-bg"/><circle cx="60" cy="60" r="${R}" class="rr-fg" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="0" transform="rotate(-90 60 60)"/></svg><b class="rmom-tm">${fmtDur(secTotal)}</b></div>
         <div class="rmom-lb">${esc(opts.label||'Проживи цю мить')}</div>
-        <div class="rmom-cap">${esc(w.cap||'Це вже твоє сьогодні')}</div>
+        <div class="rmom-cap"></div>
         <div class="rmom-hint">${esc(opts.hint||'Кілька хвилин уяви, що ти вже тут — як це відчувається, що бачиш, що чуєш')}</div>
       </div>
-      <div class="rmom-bot"><button class="rmom-done" id="rmomDone">${esc(opts.doneLabel||'Завершити')}</button></div>`;
+      <div class="rmom-bot">${pool.length>1?'<button class="rmom-next">Наступна мрія ›</button>':''}<button class="rmom-done">${esc(opts.doneLabel||'Завершити')}</button></div>`;
     document.body.appendChild(ov);
-    let sec=secTotal;
-    const tm=document.getElementById('rmomTm');
-    const tick=()=>{ if(tm) tm.textContent=fmtDur(sec); if(sec<=0){ clearInterval(rmomTimer); rmomTimer=null;
-        const btn=document.getElementById('rmomDone'); if(btn) btn.textContent='✓ Готово'; } sec--; };
+    const bg=ov.querySelector('.rmom-bg'), cap=ov.querySelector('.rmom-cap'), num=ov.querySelector('.rmom-n');
+    const show=()=>{
+      if(opts.plain){ cap.textContent=opts.cap||''; return; }
+      const w=pool[wi], img=w.type==='video'?w.thumb:w.img;
+      bg.style.backgroundImage="url('"+safeImg(img)+"')";
+      cap.textContent=opts.cap||w.cap||'Це вже твоє сьогодні';
+      if(num) num.textContent='Мрія '+(wi+1)+' з '+pool.length;
+    };
+    show();
+    let sec=secTotal; const tm=ov.querySelector('.rmom-tm'), fg=ov.querySelector('.rr-fg'), btn=ov.querySelector('.rmom-done');
+    const tick=()=>{ if(tm) tm.textContent=fmtDur(Math.max(0,sec));
+      if(fg) fg.setAttribute('stroke-dashoffset',(C*(1-Math.max(0,sec)/secTotal)).toFixed(1));
+      if(sec<=0){ clearInterval(rmomTimer); rmomTimer=null; if(btn) btn.textContent='✓ '+(opts.doneLabel||'Готово');
+        try{ window.platform.haptic('medium'); }catch(_){} }
+      sec--; };
     tick(); rmomTimer=setInterval(tick,1000);
-    const close=()=>{ if(rmomTimer){ clearInterval(rmomTimer); rmomTimer=null; } ov.remove(); if(opts.onClose) opts.onClose(); };
-    document.getElementById('rmomX').onclick=close;
-    document.getElementById('rmomDone').onclick=close;
+    const close=(finished)=>{ if(rmomTimer){ clearInterval(rmomTimer); rmomTimer=null; } ov.remove();
+      if(finished&&opts.onDone) opts.onDone();
+      if(opts.onClose) opts.onClose(); };
+    ov.querySelector('.rmom-x').onclick=()=>close(sec<0);
+    btn.onclick=()=>close(true);
+    const nx=ov.querySelector('.rmom-next'); if(nx) nx.onclick=()=>{ wi=(wi+1)%pool.length; show(); };
   }
   function ritMixRecTap(){ if(RIT.mix.length) ritMixLongOrRec(); else ritRecord('mix'); }
   function ritMixLongOrRec(){

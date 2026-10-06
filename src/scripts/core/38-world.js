@@ -3,7 +3,8 @@
      на місце «Гроші», а гроші видно в чипі картки «Сьогодні» на Огляді.
      Гра — окрема сторінка misto.html у рамці (iframe), зі своїм сховищем
      misto_dnya_v3. Дані Frequency вона бачить лише через worldBridge і лише
-     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи). Пише лише
+     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи), дні ранку.
+     Ранок заповнюється в шторці самого Frequency (open('ritual')). Пише лише
      власний стан у ключ world_game (gameSave). */
   let worldShown=false;
   function worldOn(){ try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
@@ -47,10 +48,16 @@
     },
     // план на рік (40-year-letter.js): лист і віхи — лише читання
     year(){ try{ return ylForWorld(); }catch(_){ return null; } },
+    // ранок (06-wishes.js): дні ритуалу й один день — лише читання; заповнює ранок сам Frequency (шторка ritualSheet)
+    ritual(){ try{ return ritForWorld(); }catch(_){ return null; } },
+    ritualDay(ds){ try{ return ritDayForWorld(ds); }catch(_){ return null; } },
     open(sec, key){
       if(sec==='finance') goFinance();
       else if(sec==='ai'){ if(window.aiChatSheet) window.aiChatSheet(); }
       else if(sec==='goals') goGoals();
+      // ранок шторкою поверх гри; після закриття гра перемальовує календар і картку сезону
+      else if(sec==='ritual') ritualSheet({onClose:()=>{ try{ const f=document.querySelector('#worldFrame iframe'), w=f&&f.contentWindow; if(w&&w.mistoRefresh) w.mistoRefresh(); }catch(_){} }});
+      else if(sec==='wishes'){ if(window.goWishes) window.goWishes(); }
       // питання до Флоу — лише фіксовані тексти звідси, гра свого тексту не передає
       else if(sec==='ai_behind') ylAskFlow('Я відстаю з віхами цього місяця в «Дорозі року». Подивись мої цілі й віхи: що перенести на наступний місяць або спростити, щоб встигнути? Запропонуй, але без моєї згоди нічого не змінюй.');
       else if(sec==='ai_week') ylAskFlow('Зроби розбір мого тижня: що вдалось, що пропустив і чому, і скажи мовою мого листа із точки Б, яке речення наблизилось. Стисло, один фокус на наступний тиждень.');
