@@ -1,15 +1,37 @@
   /* ============ DASHBOARD RENDER ============ */
-  // глобальний вигляд папок v2: list (full-bleed) | grid (обкладинки) | deck (колода)
-  const FV_ORDER=['list','grid','mag'];
-  const FV_NAME={list:'Список', grid:'Сітка', mag:'Журнал'};
-  let homeFolderView='grid';
-  try{ const sv=localStorage.getItem('folderview');
-    if(sv==='cover'||sv==='compact'||sv==='deck') homeFolderView='grid';  // міграція старих режимів
-    else if(sv&&FV_ORDER.includes(sv)) homeFolderView=sv; }catch(_){}
-  prefCatchup('folderview', v=>{ if(v&&FV_ORDER.includes(v)) homeFolderView=v; else if(v==='cover'||v==='compact'||v==='deck') homeFolderView='grid'; });
+  /* Вигляд папок на Огляді (06.10.2026): Галерея (за замовчуванням) · Секції ·
+     Бенто — обкладинки на всю плитку (.fc3); Список і Журнал — колишні .fc2.
+     Вибір — у шторці ⚙ (openFolderViewSheet). Старе 'grid' (і ще давніші
+     cover/compact/deck) читаємо як «Галерею» лише в памʼяті: при старті нічого
+     не переписуємо, ключ зміниться, коли людина сама вибере вигляд. */
+  const FV_ORDER=['gallery','sections','bento','list','mag'];
+  const FV_NAME={gallery:'Галерея', sections:'Секції', bento:'Бенто', list:'Список', mag:'Журнал'};
+  const FV_COVER=['gallery','sections','bento'];
+  function fvNorm(v){ return FV_ORDER.includes(v) ? v : (v==='grid'||v==='cover'||v==='compact'||v==='deck') ? 'gallery' : null; }
+  let homeFolderView='gallery';
+  try{ const sv=fvNorm(localStorage.getItem('folderview')); if(sv) homeFolderView=sv; }catch(_){}
+  prefCatchup('folderview', v=>{ const n=fvNorm(v); if(n){ homeFolderView=n; try{ renderDashboard(); }catch(_){} } });
+  /* розмір плиток (s/m/l), порядок (вручну/за назвою), фото на всю плитку —
+     одним легким налаштуванням 'folderopts' (prefSet: сирий ключ + копія в хмарі) */
+  const FOPT_DEF={size:'m', sort:'manual', covers:1};
+  function foptParse(raw){
+    let o={}; try{ o=JSON.parse(raw||'{}')||{}; }catch(_){}
+    return { size:['s','m','l'].includes(o.size)?o.size:'m',
+             sort:o.sort==='name'?'name':'manual',
+             covers:o.covers===0?0:1 };
+  }
+  let folderOpts=Object.assign({},FOPT_DEF);
+  try{ folderOpts=foptParse(localStorage.getItem('folderopts')); }catch(_){}
+  prefCatchup('folderopts', v=>{ folderOpts=foptParse(v); try{ renderDashboard(); }catch(_){} });
+  function setFolderOpt(k,v){
+    folderOpts[k]=v;
+    try{ prefSet('folderopts', JSON.stringify(folderOpts)); }catch(_){}
+    renderDashboard();
+    try{ window.platform.haptic('select'); }catch(_){}
+  }
   function applyFolderViewIcon(){
-    const seg=document.getElementById('folderViewSeg');
-    if(seg) seg.querySelectorAll('[data-fv]').forEach(b=>b.classList.toggle('on', b.dataset.fv===homeFolderView));
+    const b=document.getElementById('folderLookBtn');
+    if(b) b.setAttribute('aria-label','Вигляд папок: '+FV_NAME[homeFolderView]);
   }
   function setFolderView(v){
     if(!FV_ORDER.includes(v)||v===homeFolderView){ applyFolderViewIcon(); return; }
@@ -18,8 +40,6 @@
     applyFolderViewIcon(); renderDashboard();
     try{ window.platform.haptic('select'); }catch(_){}
   }
-  { const seg=document.getElementById('folderViewSeg');
-    if(seg) seg.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>setFolderView(b.dataset.fv)); }
 
   const R=20, C=2*Math.PI*R;
 
@@ -81,7 +101,8 @@
         const okey=it.key, r=it.r, relX=(lastX-r.left)/r.width;
         const forbidden=isDescendantFolder(okey, st.key);
         if(!forbidden && relX>0.28 && relX<0.72){ st.mode='into'; st.targetKey=okey; intoEl=it.el; }
-        else if((folders[okey].parent||'')===(folders[st.key].parent||'')){
+        // «За назвою» порядок задає абетка — переставляти нема чого (вкласти в папку можна)
+        else if(folderOpts.sort!=='name' && (folders[okey].parent||'')===(folders[st.key].parent||'')){
           const before=relX<0.5; st.mode='reorder'; st.targetKey=before?okey:nextAfterCached(okey);
           const gr=grid.getBoundingClientRect();
           lineStyle={ top:(r.top-gr.top+r.height*0.15), height:(r.height*0.7),
@@ -115,7 +136,7 @@
     }
 
     grid.addEventListener('pointerdown',e=>{
-      if(e.target.closest('.fmenu')||e.target.closest('.fadd')) return;
+      if(e.target.closest('.fmenu')||e.target.closest('.fadd')||e.target.closest('.fc3-photo')) return;
       // ручка перетягування — миттєвий старт без утримання
       const handle=e.target.closest('.fdrag-handle');
       const card=e.target.closest('.fcard[data-fkey]'); if(!card||!grid.contains(card)) return;
@@ -141,34 +162,130 @@
     grid.addEventListener('pointercancel',()=>{ if(st) finish(false); else cancelPending(); });
   }
 
-  function renderProjRail(){
-    const rail=document.getElementById('projRail'); if(!rail) return;
-    const projs=(typeof projFolderKeys==='function')?projFolderKeys():[];
-    if(!projs.length){ rail.style.display='none'; rail.innerHTML=''; return; }
-    rail.style.display='flex';
-    rail.innerHTML = projs.map(k=>{
-      const f=folders[k]; if(!f) return '';
-      return '<div class="proj-rail-i" data-projrail="'+esc(k)+'" style="--pc:'+safeColor(f.c,'#6a7dff')+'" title="'+esc(f.name||'')+'">'+esc(f.emoji||'🚀')+'</div>';
-    }).join('') + '<div class="proj-rail-add" data-projraddd title="Новий проєкт">＋</div>';
-    rail.querySelectorAll('[data-projrail]').forEach(el=>{
-      el.onclick=()=>{ try{ window.platform.haptic('select'); }catch(_){} goFolder(el.dataset.projrail); };
+  /* ════════ ОБКЛАДИНКИ: Галерея · Секції · Бенто (06.10.2026) ════════
+     Фото на всю плитку, назва на матовому склі. Папка без фото — кольорова
+     обкладинка з великою іконкою і кнопкою «фото» (одразу вибір знімка).
+     Ліву колонку проєктів прибрано: проєкти — «Ще → Проєкти» і шторка ⚙. */
+  const FC3_IC={
+    pin:'<path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/>',
+    cam:'<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'
+  };
+  function fc3Svg(n){ return '<svg class="fc3-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(FC3_IC[n]||'')+'</svg>'; }
+  // підпис під назвою: лише те, що справді щось каже («0 активних» — шум)
+  function fc3Meta(k,f){
+    const n=groupKids(k).length;
+    if(n) return 'група · '+n+' '+pluralUk(n,'папка','папки','папок');
+    if(f.role==='page') return 'сторінка';
+    const active=(f.widgets||[]).filter(w=>w.ready).length;
+    return active ? (active+' '+pluralUk(active,'активний','активні','активних')) : '';
+  }
+  // плитка-обкладинка; shape: '' | 'wide' (карусель секцій) | 'big' | 'tall' (бенто)
+  function fc3Tile(k, shape){
+    const f=folders[k];
+    const isGroup=groupKids(k).length>0;
+    const photo=!!(f.photo && folderOpts.covers);
+    const el=document.createElement('div');
+    el.className='fcard fc3 '+(photo?'fc3-has-photo':'fc3-color')+(isGroup?' fc3-group':'')+(shape?' fc3-'+shape:'');
+    { const sc=safeColor(f.c,''); if(sc) el.style.setProperty('--c', sc); }   // порожній/чужий колір не ставимо — спрацює запасний у CSS
+    el.dataset.fkey=k;
+    const meta=fc3Meta(k,f);
+    const emojiShow=(f.emoji&&f.emoji.trim())?esc(f.emoji.trim()):esc((f.name||'?').trim().charAt(0).toUpperCase());
+    let h='';
+    if(photo){
+      const pp=f.photoPos;
+      const xf=pp?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
+      h+=`<div class="fc3-bg" style="background-image:url('${esc(safeImg(window.photoSrc(f.photo)))}');${xf}"></div><div class="fc3-veil"></div>`;
+    } else {
+      h+=`<svg class="ico fc3-wm" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`;
+      // емодзі й лінійна іконка — обидва; яку показати, вирішує тема (як у .fc2)
+      h+=`<span class="fc3-ic"><span class="fc2-emj">${emojiShow}</span><svg class="ico fc2-ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
+      // камера — лише коли фото справді нема: при вимкненому «Фото на всю плитку»
+      // знімок у папки є, і новий тихо затер би його (той самий id 'ph_'+key, і в хмарі)
+      if(!f.photo) h+=`<button class="fc3-photo" data-fphoto="${esc(k)}" aria-label="Додати фото-обкладинку">${fc3Svg('cam')}</button>`;
+    }
+    h+=`<div class="fc3-label"><div class="fc3-name" data-i18n-skip="1">${f.pinned?`<span class="fc3-pin" title="Закріплена">${fc3Svg('pin')}</span>`:''}${esc(f.name)}</div>${meta?`<div class="fc3-meta">${esc(meta)}</div>`:''}</div>`;
+    h+=`<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню папки «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
+    el.innerHTML=h;
+    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
+      if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
+      if(isGroup){ openFolderGroup(k); return; }
+      goFolder(k); };
+    return el;
+  }
+  // група в «Секціях»: рядок зі стосом мініатюр (сама група + до двох її папок)
+  function fc3GroupRow(k){
+    const f=folders[k], kids=groupKids(k);
+    const el=document.createElement('div');
+    el.className='fcard fc3-grow'; el.dataset.fkey=k;
+    { const sc=safeColor(f.c,''); if(sc) el.style.setProperty('--c', sc); }
+    const th=[k].concat(kids).slice(0,3).map((ck,i)=>{
+      const cf=folders[ck], ph=!!(cf.photo&&folderOpts.covers);
+      return `<span class="fc3-th" style="--i:${i};--c:${safeColor(cf.c,'#6a7dff')};${ph?`background-image:url('${esc(safeImg(window.photoSrc(cf.photo)))}')`:''}"></span>`;
+    }).reverse().join('');
+    el.innerHTML=`<span class="fc3-stack" aria-hidden="true">${th}</span>`+
+      `<span class="fc3-gt"><b data-i18n-skip="1">${esc(f.name)}</b><small>${kids.length} ${pluralUk(kids.length,'папка','папки','папок')} всередині</small></span>`+
+      `<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню групи «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
+    el.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
+      if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
+      openFolderGroup(k); };
+    return el;
+  }
+  function fc3Add(){
+    const a=document.createElement('button'); a.type='button'; a.className='fc3-add';
+    a.innerHTML='<span class="fc3-plus" aria-hidden="true">＋</span><span>Нова папка</span>';
+    a.onclick=()=>createFolder();
+    return a;
+  }
+  function renderFolderCovers(grid, keys){
+    const v=homeFolderView;
+    grid.classList.add('fsz-'+folderOpts.size);
+    if(v==='sections'){
+      const pinned=keys.filter(k=>folders[k].pinned);
+      const groups=keys.filter(k=>!folders[k].pinned && groupKids(k).length);
+      const rest=keys.filter(k=>!folders[k].pinned && !groupKids(k).length);
+      const sec=(title,n,cls)=>{
+        const s=document.createElement('div'); s.className='fsec';
+        s.innerHTML=`<div class="fsec-h"><span>${title}</span>${n?`<small>${n}</small>`:''}</div><div class="${cls}"></div>`;
+        grid.appendChild(s); return s.lastElementChild;
+      };
+      if(pinned.length){ const row=sec('Закріплені',pinned.length,'fsec-row'); pinned.forEach(k=>row.appendChild(fc3Tile(k,'wide'))); }
+      if(groups.length){ const box=sec('Групи',groups.length,'fsec-groups'); groups.forEach(k=>box.appendChild(fc3GroupRow(k))); }
+      const all=sec((pinned.length||groups.length)?'Усі папки':'Папки',0,'fsec-grid');
+      rest.forEach(k=>all.appendChild(fc3Tile(k,'')));
+      all.appendChild(fc3Add());
+      return;
+    }
+    // Бенто: перша закріплена — велика, групи — високі, решта — квадрати
+    let bigUsed=false;
+    keys.forEach(k=>{
+      let shape='';
+      if(v==='bento'){
+        if(!bigUsed && folders[k].pinned){ shape='big'; bigUsed=true; }
+        else if(groupKids(k).length) shape='tall';
+      }
+      grid.appendChild(fc3Tile(k,shape));
     });
-    const addBtn=rail.querySelector('[data-projraddd]');
-    if(addBtn) addBtn.onclick=()=>{ if(typeof goProjects==='function') goProjects(); };
+    grid.appendChild(fc3Add());
   }
   function renderDashboard(){
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
-    try{ renderProjRail(); }catch(_){}
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
-    grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag');
+    grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag',
+      'fv2-gallery','fv2-sections','fv2-bento','fsz-s','fsz-m','fsz-l');
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
     try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
-    topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).forEach((k,idx)=>{
+    let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project'));
+    // «за назвою»: закріплені однаково зверху, решта — за абеткою
+    if(folderOpts.sort==='name') keys=keys.slice().sort((a,b)=>
+      ((folders[b].pinned?1:0)-(folders[a].pinned?1:0)) || String(folders[a].name||'').localeCompare(String(folders[b].name||''),'uk'));
+    if(FV_COVER.includes(homeFolderView)) renderFolderCovers(grid, keys);
+    else {
+    keys.forEach((k,idx)=>{
       const f=folders[k]; if(!f) return;
       const active = (f.widgets||[]).filter(w=>w.ready).length;
       const subCount = childFolderKeys(k).length;
@@ -195,10 +312,8 @@
       } else {
         metaHtml=`<div class="fstat"><b>${active}</b> ${pluralUk(active,'активний','активні','активних')}${f.pct?` · ${f.pct}%`:''}</div>`;
       }
-      // ── v2: єдина розмітка, режим вирішує лише клас-обгортку ──
-      const modeClass = homeFolderView==='grid' ? 'fc2-tile'
-                      : homeFolderView==='deck' ? 'fc2-deck'
-                      : homeFolderView==='mag'  ? 'fc2-mag' : 'fc2-row';
+      // ── v2 (Список · Журнал): єдина розмітка, режим вирішує лише клас-обгортку ──
+      const modeClass = homeFolderView==='mag' ? 'fc2-mag' : 'fc2-row';
       const el=document.createElement('div');
       el.className='fcard fc2 '+modeClass+(isGroup?' fc2-group':'');
       // Порожній колір НЕ виставляємо: інакше в --c потрапляє сміття,
@@ -219,14 +334,7 @@
       // перемикання теми міняє вигляд миттєво, без перемальовування списку.
       inner+=`<div class="fc2-em"><span class="fc2-emj">${emojiShow}</span>`+
              `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></div>`;
-      if(homeFolderView==='deck'){
-        let dpct=0;
-        if(f.role==='project'){ const pr=folderProgress(k); dpct=pr.total?pr.pct:0; }
-        else dpct=Math.max(0,Math.min(100, +f.pct||0));
-        inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}<div class="fc2-prog"><i style="width:${dpct}%"></i></div></div>`;
-      } else {
-        inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}</div>`;
-      }
+      inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}</div>`;
       inner+=`<button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування">⋮</button>`+
              `<button class="fdrag-handle" title="Перетягнути" aria-label="Перетягнути">⠿</button>`;
       el.innerHTML=inner;
@@ -238,12 +346,15 @@
     });
     // add-folder card — під поточний режим
     const add=document.createElement('div');
-    add.className='fc2 fc2-add '+(homeFolderView==='grid'?'fc2-tile-add':homeFolderView==='deck'?'fc2-deck-add':homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
+    add.className='fc2 fc2-add '+(homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
     add.innerHTML=`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
     add.onclick=createFolder;
     grid.appendChild(add);
+    }
     // bind menus
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
+    // «фото» на кольоровій обкладинці — одразу вибір знімка
+    grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pickFolderPhoto(b.dataset.fphoto); });
     try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=topFolderKeys().filter(folderVisible).length; }catch(_){}
     if(!grid.__dragInit){ grid.__dragInit=true; enableFolderDrag(grid); }
     try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
@@ -416,7 +527,52 @@
       setTimeout(()=>{ try{ inp.focus(); }catch(_){} },120);
     });
   }
-  { const mb=document.getElementById('folderMergeBtn'); if(mb) mb.onclick=openFolderMerge; }
+  /* ── шторка ⚙ «Вигляд папок» (06.10.2026): замість рядка «Список · Сітка ·
+     Журнал · Обʼєднати» на головній. Кожен вибір застосовується одразу. ── */
+  const FV_PREV={
+    gallery:'<i></i><i></i><i></i><i></i>',
+    sections:'<i class="w"></i><i class="r"></i><i></i><i></i>',
+    bento:'<i class="w"></i><i class="t"></i><i></i><i></i>',
+    list:'<i class="r"></i><i class="r"></i><i class="r"></i>',
+    mag:'<i class="m"></i><i class="m"></i>'
+  };
+  function openFolderViewSheet(){
+    const seg=(name,label,opts,cur)=>`<div class="fvs-lbl">${label}</div><div class="fvs-seg" role="group" aria-label="${label}">`+
+      opts.map(([v,t])=>`<button type="button" data-fo="${name}" data-v="${v}" class="${cur===v?'on':''}" aria-pressed="${cur===v}">${t}</button>`).join('')+`</div>`;
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fvs-head"><b>Вигляд папок</b><button type="button" class="fvs-done" data-fvdone>Готово</button></div>
+      <div class="fvs-views">${FV_ORDER.map(v=>`<button type="button" class="fvs-view${v===homeFolderView?' on':''}" data-fv="${v}" aria-pressed="${v===homeFolderView}"><span class="fvs-prev fvs-prev-${v}" aria-hidden="true">${FV_PREV[v]}</span><span class="fvs-vn">${FV_NAME[v]}</span></button>`).join('')}</div>
+      ${seg('size','Розмір плиток',[['l','Великі'],['m','Звичайні'],['s','Дрібні']],folderOpts.size)}
+      ${seg('sort','Порядок',[['manual','Вручну'],['name','За назвою']],folderOpts.sort)}
+      <button type="button" class="fvs-tog" data-fotog role="switch" aria-checked="${folderOpts.covers?'true':'false'}"><span class="fvs-tt">Фото на всю плитку<small>вимкнеш — усі папки будуть кольоровими обкладинками</small></span><i class="fvs-sw" aria-hidden="true"></i></button>
+      <div class="fvs-acts">
+        ${fmRow('merge','group','Обʼєднати папки в групу','')}
+        ${fmRow('newf','plus','Нова папка','')}
+        ${fmRow('projects','proj','Проєкти','окремий екран зі статусами й дедлайнами')}
+      </div>`,
+    m=>{
+      m.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{
+        setFolderView(b.dataset.fv);
+        m.querySelectorAll('[data-fv]').forEach(x=>{ const on=x.dataset.fv===homeFolderView; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+      });
+      m.querySelectorAll('[data-fo]').forEach(b=>b.onclick=()=>{
+        const k=b.dataset.fo; setFolderOpt(k,b.dataset.v);
+        m.querySelectorAll('[data-fo="'+k+'"]').forEach(x=>{ const on=x.dataset.v===folderOpts[k]; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+      });
+      const tg=m.querySelector('[data-fotog]');
+      tg.onclick=()=>{ setFolderOpt('covers', folderOpts.covers?0:1); tg.setAttribute('aria-checked',folderOpts.covers?'true':'false'); };
+      m.querySelector('[data-fvdone]').onclick=closeFolderMenu;
+      m.querySelectorAll('.fvs-acts [data-act]').forEach(b=>b.onclick=()=>{
+        const a=b.dataset.act;
+        if(a==='merge'){ openFolderMerge(); return; }
+        closeFolderMenu();
+        if(a==='newf') createFolder();
+        else if(a==='projects'){ try{ goProjects(); }catch(e){ console.error('goProjects',e); } }
+      });
+    });
+    try{ window.platform.haptic('light'); }catch(_){}
+  }
+  { const b=document.getElementById('folderLookBtn'); if(b) b.onclick=openFolderViewSheet; }
   try{ window.openFolderGroup=openFolderGroup; }catch(_){}
 
   /* ════════ ВЕРХНІЙ БАР ДОКУМЕНТА (крок 2, 03.10.2026) ════════
@@ -640,7 +796,9 @@
     bld:'<path d="M4 20.5h16M6 20.5V8l6-4 6 4v12.5"/><path d="M10 20.5v-4h4v4"/>',
     del:'<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',
     photo:'<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 15.5l-4.2-4.2a1.5 1.5 0 0 0-2.1 0L7 19"/>',
-    cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'
+    cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    proj:'<path d="M12 3.5c3 3 5 5.5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2.5-5 .3 1.6 1 2.5 2 3 0-3 .2-5 .5-7z"/>'
   };
   function fmIc(n){ return '<span class="pgb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(FM_IC[n]||'')+'</svg></span>'; }
   function fmRow(act,ic,t,sub,cls){ return `<button class="fmi pgb-row${cls?' '+cls:''}" data-act="${act}">${fmIc(ic)}<span class="pgb-tx">${t}${sub?`<small class="fmi-sub">${sub}</small>`:''}</span></button>`; }
@@ -654,9 +812,21 @@
     const role=f.role||'area';
     let linked=0; try{ linked=(typeof window.chatsForFolder==='function')?window.chatsForFolder(key).length:0; }catch(_){}
     const dev=!!(window.upDevOn&&window.upDevOn());
+    /* обкладинка — першою (06.10.2026): раніше фото ховалось у «Вигляд» → «Додати фото» */
+    const ph=!!f.photo, pp=f.photoPos;
+    const xf=(ph&&pp)?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
+    const curC=String(f.c||'').toLowerCase();
     fgSheet(`<div class="fmenu-grip"></div>
-      <div class="fgs-head">${fgIcon(f,'fgs-ic fgs-ic-lg')}
-        <div class="fgs-ht"><b data-i18n-skip="1">${esc(f.name)}</b><small data-i18n-skip="1">${sub}</small></div></div>
+      <div class="fmc${ph?' fmc-photo':''}" style="--c:${safeColor(f.c,'#6a7dff')}">
+        ${ph?`<div class="fmc-bg" style="background-image:url('${esc(safeImg(window.photoSrc(f.photo)))}');${xf}"></div>`
+            :`<svg class="ico fmc-wm" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}
+        <div class="fmc-t"><small>Обкладинка</small><b data-i18n-skip="1">${esc(f.name)}</b><span data-i18n-skip="1">${sub}</span></div>
+      </div>
+      <div class="fmc-acts">
+        <button type="button" class="fmc-btn fmc-main" data-act="photo">${fmIc('photo')}${ph?'Змінити фото':'Додати фото'}</button>
+        ${ph?`<button type="button" class="fmc-btn" data-act="cropphoto">Кадрувати</button><button type="button" class="fmc-btn fmc-del" data-act="rmphoto" aria-label="Прибрати фото">${fmIc('del')}</button>`:''}
+      </div>
+      <div class="fmc-colors"><span>Колір</span>${FOLDER_COLORS.map(c=>`<button type="button" class="fmc-sw${curC===c?' on':''}" data-fcolor="${c}" style="--sw:${c}" aria-label="Колір обкладинки" aria-pressed="${curC===c}"></button>`).join('')}</div>
       ${role==='project'?`
       <div class="fmi-label">Статус проєкту</div>
       <div class="fstatus-pick">
@@ -666,7 +836,7 @@
       ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
       <div class="fmi-label">Папка</div>
       ${fmRow('rename','pen','Перейменувати','')}
-      ${fmRow('look','look','Вигляд','колір, значок, емодзі, фото, картка')}
+      ${fmRow('look','look','Значок','лінійна іконка чи емодзі')}
       ${fmRow('type','type','Тип · '+FM_TYPE[role],'звичайна, проєкт чи сторінка')}
       ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
       ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
@@ -677,28 +847,25 @@
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));
+      m.querySelectorAll('[data-fcolor]').forEach(b=>b.onclick=()=>{
+        folders[key].c=b.dataset.fcolor; saveFolders(); renderDashboard(); openFolderMenu(key);
+        try{ window.platform.haptic('select'); }catch(_){}
+      });
       m.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{
         folders[key].status=b.dataset.status; saveFolders(); renderDashboard(); openFolderMenu(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
     });
   }
-  // «Вигляд»: усе про те, як папка виглядає, в одній шторці
+  /* «Значок»: колір і фото — нагорі меню папки (обкладинка). Вибір «Картка на
+     головній» (flayout) прибрано 06.10.2026: жоден рендер його не читав, кнопки
+     нічого не змінювали. Поле в даних лишається як було. */
   function openFolderLook(key){
     const f=folders[key]; if(!f) return;
     fgSheet(`<div class="fmenu-grip"></div>
-      <div class="fmenu-title">Вигляд · <span data-i18n-skip="1">${esc(f.name)}</span></div>
-      ${fmRow('color','look','Колір','змінити на наступний')}
+      <div class="fmenu-title">Значок · <span data-i18n-skip="1">${esc(f.name)}</span></div>
       <button class="fmi pgb-row" data-act="icon"><span class="pgb-ic" aria-hidden="true" style="color:${safeColor(f.c,'var(--accent)')}"><svg class="ico" width="16" height="16"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="pgb-tx">Значок<small class="fmi-sub">${f.iconSet?'обрано вручну':'за емодзі'}</small></span></button>
       ${fmRow('emoji','pen','Емодзі',f.emoji?esc(f.emoji):'нема')}
-      ${fmRow('photo','photo',f.photo?'Змінити фото':'Додати фото','обкладинка картки')}
-      ${f.photo?fmRow('cropphoto','photo','Кадрувати фото',''):''}
-      ${f.photo?fmRow('rmphoto','del','Прибрати фото',''):''}
-      <div class="fmi-label">Картка на головній</div>
-      <div class="flay-pick">
-        ${['a','b','c','d'].map(L=>`<button class="flay-opt ${(f.flayout||'a')===L?'on':''}" data-lay="${L}">
-          <span class="flay-ic flay-ic-${L}"></span><span>${({a:'Збоку',b:'Зверху',c:'На всю',d:'Перехід'})[L]}</span></button>`).join('')}
-      </div>
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
@@ -706,7 +873,6 @@
         if(a==='color'){ cycleFolderColor(key); saveFolders(); renderDashboard(); openFolderLook(key); return; }
         folderAction(key,a);
       });
-      m.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{ f.flayout=b.dataset.lay; saveFolders(); renderDashboard(); openFolderLook(key); });
       m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
     });
   }
@@ -802,8 +968,12 @@
         onSave:(pos)=>{ f.photoPos=pos; saveFolders(); renderDashboard(); } });
       return;
     }
-    if(act==='rmphoto'){ const prev=f.photo; f.photo=''; f.photoPos=null;
-      window.photoDel(prev); saveFolders(); renderDashboard(); closeFolderMenu(); return; }
+    // кошик стоїть поруч із «Кадрувати» — промах стер би фото і з хмари, тож спершу питаємо
+    if(act==='rmphoto'){ closeFolderMenu();
+      confirmSheet({ title:'Прибрати фото обкладинки?', sub:'Знімок зітреться з цього пристрою і з хмари. Повернути його можна лише з бекапу.', okLabel:'Прибрати фото',
+        onOk:()=>{ const prev=f.photo; f.photo=''; f.photoPos=null;
+          window.photoDel(prev); saveFolders(); renderDashboard(); } });
+      return; }
     if(act==='ungroup'){
       const kids=groupKids(key), up=(f.parent&&folders[f.parent])?f.parent:'';   // батька вже нема — на головну
       kids.forEach(ck=>{ folders[ck].parent=up; });

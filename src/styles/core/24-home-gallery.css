@@ -1,0 +1,209 @@
+/* ════════ ОГЛЯД · ПАПКИ-ОБКЛАДИНКИ (06.10.2026) ════════
+   Вкладки-капсула, ⚙ «Вигляд папок», Галерея · Секції · Бенто (.fc3),
+   шторка вигляду (.fvs-*) і обкладинка в меню папки (.fmc-*).
+   Лише токени тем (--card, --text, --muted, --line, --accent, --shadow) —
+   тож живе у всіх темах, світлих і темних. Теми (19-themes-flat.css,
+   20-depth.css) підключаються ПІСЛЯ цього файла, тому селектори тут
+   тримаються за #homeTabs / #folderGrid — інакше тема їх перебила б. */
+
+/* ── вкладки-капсула + ⚙ ──────────────────────────────────────────────── */
+#scr-home .sec-htabs{display:flex;align-items:center;gap:10px;margin:18px 0 14px;}
+#homeTabs.htabs{flex:1;min-width:0;display:flex;align-items:stretch;gap:2px;padding:4px;
+  border-radius:24px;background:color-mix(in srgb,var(--text) 8%,transparent);}
+#homeTabs .htab{flex:1 1 0;min-width:0;height:38px;justify-content:center;gap:6px;padding:0 8px;
+  border:0;border-radius:19px;background:transparent;color:var(--muted);
+  font:inherit;font-size:13.5px;font-weight:700;letter-spacing:0;text-transform:none;white-space:nowrap;}
+#homeTabs .htab.on{background:var(--card);color:var(--text);font-weight:800;
+  box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 12px -4px var(--shadow);}
+#homeTabs .htab[hidden]{display:none;}
+#homeTabs .htab-ic{width:16px;height:16px;flex:none;}
+#homeTabs .htab .count{background:none;box-shadow:none;border:0;padding:0;min-width:0;
+  font-size:11px;font-weight:800;letter-spacing:0;color:inherit;opacity:.7;}
+#homeTabs .htab.on .count{color:var(--accent);opacity:1;}
+#scr-home .sec-htabs .sec-actions{display:flex;gap:8px;padding:0;flex:none;}
+#scr-home .sec-htabs .htab-add,
+.htab-cfg{width:46px;height:46px;border-radius:50%;padding:0;display:grid;place-items:center;cursor:pointer;flex:none;}
+.htab-cfg{border:0;background:var(--text);color:var(--bg);}
+.htab-cfg svg{width:19px;height:19px;}
+#scr-home .sec-htabs .htab-add[hidden],.htab-cfg[hidden]{display:none;}
+.htab-cfg:active{transform:scale(.94);}
+/* широкий екран: капсула за вмістом, ⚙ праворуч — а не дві вкладки на 900px */
+@media (min-width:700px){
+  #homeTabs.htabs{flex:0 1 auto;}
+  #homeTabs .htab{flex:0 0 auto;padding:0 18px;}
+  #scr-home .sec-htabs .sec-actions{margin-left:auto;}
+}
+
+/* ── сітка: без лівої колонки і без від'ємних полів ──────────────────── */
+#scr-home .foh-row>#folderGrid{flex:1 1 auto;min-width:0;}
+#folderGrid{--fc3-min:148px;--fc3-row:118px;}
+#folderGrid.fsz-s{--fc3-min:96px;--fc3-row:96px;}
+#folderGrid.fsz-l{--fc3-min:240px;--fc3-row:150px;}
+@media (min-width:700px){
+  #folderGrid{--fc3-min:190px;}
+  #folderGrid.fsz-s{--fc3-min:130px;}
+  #folderGrid.fsz-l{--fc3-min:320px;}
+}
+#folderGrid.fv2-gallery,
+#folderGrid.fv2-bento{display:grid;margin:0;gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(var(--fc3-min),1fr));}
+#folderGrid.fv2-bento{grid-auto-rows:var(--fc3-row);grid-auto-flow:row dense;}
+#folderGrid.fv2-sections{display:block;margin:0;}
+
+/* ── плитка-обкладинка ─────────────────────────────────────────────────── */
+#folderGrid .fc3{position:relative;overflow:hidden;isolation:isolate;border-radius:24px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .18s;min-height:0;
+  background:color-mix(in srgb,var(--c,#6a7dff) 22%,var(--card));color:var(--text);
+  box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 24px -14px var(--shadow);}
+#folderGrid .fc3:active{transform:scale(.985);}
+#folderGrid.fv2-gallery .fc3{aspect-ratio:3/4;}
+#folderGrid.fv2-gallery.fsz-l .fc3{aspect-ratio:16/10;}
+#folderGrid .fc3-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;}
+#folderGrid .fc3-veil{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.42));}
+#folderGrid .fc3-wm{position:absolute;right:-14%;bottom:-10%;width:74%;height:74%;z-index:0;
+  color:var(--c,#6a7dff);opacity:.17;stroke-width:1.2;}
+#folderGrid .fc3-ic{position:absolute;left:12px;top:12px;width:44px;height:44px;border-radius:14px;z-index:2;
+  display:grid;place-items:center;background:var(--card);color:var(--c,#6a7dff);font-size:21px;line-height:1;
+  box-shadow:0 4px 12px -6px var(--shadow);}
+#folderGrid .fc3-ic .fc2-ico{width:21px;height:21px;}
+#folderGrid .fc3-photo{position:absolute;right:52px;top:12px;width:34px;height:34px;border-radius:50%;border:0;padding:0;
+  z-index:3;display:grid;place-items:center;cursor:pointer;
+  background:color-mix(in srgb,var(--card) 74%,transparent);color:var(--text);}
+#folderGrid .fc3-svg{width:15px;height:15px;}
+/* ⋯ — сильніший селектор за html.t-flat .fmenu (теми ідуть після цього файла) */
+#folderGrid .fc3-menu{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:0;padding:0;
+  z-index:4;display:grid;place-items:center;font-size:19px;line-height:1;cursor:pointer;
+  background:color-mix(in srgb,var(--card) 74%,transparent);color:var(--text);}
+#folderGrid .fc3-has-photo .fc3-menu{background:rgba(255,255,255,.2);color:#fff;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+#folderGrid .fc3-label{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;}
+#folderGrid .fc3-name{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1.2;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto;}
+#folderGrid .fc3-meta{margin-top:3px;font-size:12px;font-weight:700;
+  color:color-mix(in srgb,var(--text) 62%,var(--c,#6a7dff));}
+#folderGrid .fc3-pin .fc3-svg{width:13px;height:13px;margin-right:4px;vertical-align:-1px;color:var(--c,var(--accent));}
+/* з фото: назва на матовому склі */
+#folderGrid .fc3-has-photo .fc3-label{left:8px;right:8px;bottom:8px;padding:9px 11px;border-radius:16px;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);}
+#folderGrid .fc3-has-photo .fc3-name{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.35);}
+#folderGrid .fc3-has-photo .fc3-meta{color:rgba(255,255,255,.86);}
+#folderGrid .fc3-has-photo .fc3-pin .fc3-svg{color:#fff;}
+/* група — стос карток під плиткою */
+#folderGrid .fc3-group{box-shadow:0 6px 0 -2px color-mix(in srgb,var(--c,#6a7dff) 32%,var(--card)),
+  0 11px 0 -4px color-mix(in srgb,var(--c,#6a7dff) 18%,var(--card));margin-bottom:6px;}
+/* дрібні плитки — лише значок і назва */
+#folderGrid.fsz-s .fc3-ic{left:8px;top:8px;width:34px;height:34px;border-radius:11px;font-size:17px;}
+#folderGrid.fsz-s .fc3-ic .fc2-ico{width:17px;height:17px;}
+#folderGrid.fsz-s .fc3-photo,#folderGrid.fsz-s .fc3-meta,#folderGrid.fsz-s .fc3-wm{display:none;}
+#folderGrid.fsz-s .fc3-name{font-size:13px;}
+#folderGrid.fsz-s .fc3-label{left:8px;right:8px;bottom:8px;}
+#folderGrid.fsz-s .fc3-has-photo .fc3-label{left:5px;right:5px;bottom:5px;padding:6px 8px;border-radius:12px;}
+#folderGrid.fsz-s .fc3-menu{top:2px;right:2px;width:36px;height:36px;font-size:16px;background:transparent;}
+#folderGrid.fsz-l .fc3-name{font-size:20px;}
+
+/* ── Бенто ─────────────────────────────────────────────────────────────── */
+#folderGrid.fv2-bento .fc3-big{grid-column:1/-1;grid-row:span 2;}
+#folderGrid.fv2-bento .fc3-tall{grid-row:span 2;}
+#folderGrid.fv2-bento .fc3-big .fc3-name{font-size:21px;}
+/* звичайна клітинка бенто низька: підпис ховаємо, щоб не наліз на значок */
+#folderGrid.fv2-bento .fc3:not(.fc3-big):not(.fc3-tall) .fc3-meta{display:none;}
+@media (min-width:700px){ #folderGrid.fv2-bento .fc3-big{grid-column:span 2;} }
+
+/* ── Секції ────────────────────────────────────────────────────────────── */
+#folderGrid .fsec+.fsec{margin-top:22px;}
+#folderGrid .fsec-h{display:flex;align-items:baseline;gap:6px;margin:0 2px 10px;
+  font-size:18px;font-weight:800;letter-spacing:-.01em;color:var(--text);}
+#folderGrid .fsec-h small{font-size:13px;font-weight:700;color:var(--muted);}
+#folderGrid .fsec-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:2px 0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+#folderGrid .fsec-row::-webkit-scrollbar{display:none;}
+#folderGrid .fsec-row .fc3{flex:0 0 min(80%,320px);aspect-ratio:16/10;scroll-snap-align:start;}
+#folderGrid .fsec-row .fc3-name{font-size:20px;}
+#folderGrid .fsec-groups{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));}
+#folderGrid .fsec-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(var(--fc3-min),1fr));}
+#folderGrid .fsec-grid .fc3,#folderGrid .fsec-grid .fc3-add{aspect-ratio:1/1;}
+#folderGrid .fc3-grow{position:relative;display:flex;align-items:center;gap:14px;min-height:76px;box-sizing:border-box;
+  padding:12px 52px 12px 14px;border-radius:22px;background:var(--card);border:1px solid var(--line);cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px -14px var(--shadow);}
+#folderGrid .fc3-stack{position:relative;width:78px;height:50px;flex:none;}
+#folderGrid .fc3-th{position:absolute;top:0;left:calc(var(--i) * 14px);width:46px;height:46px;border-radius:14px;
+  border:2px solid var(--card);background-color:color-mix(in srgb,var(--c,#6a7dff) 34%,var(--card));
+  background-size:cover;background-position:center;}
+#folderGrid .fc3-gt{flex:1;min-width:0;}
+#folderGrid .fc3-gt b{display:block;font-size:16px;font-weight:800;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#folderGrid .fc3-gt small{display:block;margin-top:2px;font-size:12.5px;font-weight:700;color:var(--muted);}
+#folderGrid .fc3-grow .fc3-menu{top:50%;right:8px;transform:translateY(-50%);background:transparent;}
+
+/* ── «Нова папка» ──────────────────────────────────────────────────────── */
+#folderGrid .fc3-add{min-height:96px;border-radius:24px;border:1.5px dashed color-mix(in srgb,var(--text) 22%,transparent);
+  background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:800;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+#folderGrid .fc3-plus{font-size:24px;line-height:1;}
+#folderGrid.fv2-gallery .fc3-add{aspect-ratio:3/4;}
+#folderGrid.fv2-gallery.fsz-l .fc3-add{aspect-ratio:16/10;}
+
+/* ── шторка ⚙ «Вигляд папок» ──────────────────────────────────────────── */
+.fvs-head{display:flex;align-items:center;margin:6px 0 14px;}
+.fvs-head b{flex:1;font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--text);}
+.fvs-done{height:38px;padding:0 16px;border-radius:19px;border:0;cursor:pointer;
+  background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);font:inherit;font-size:14px;font-weight:800;}
+.fvs-views{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;}
+@media (max-width:420px){ .fvs-views{grid-template-columns:repeat(3,minmax(0,1fr));} }
+.fvs-view{display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 4px;min-height:84px;box-sizing:border-box;
+  border-radius:16px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:700;}
+.fvs-view.on{border:2px solid var(--text);padding:9px 3px;color:var(--text);font-weight:800;}
+.fvs-prev{display:grid;grid-template-columns:repeat(2,16px);gap:3px;height:40px;align-content:center;}
+.fvs-prev i{display:block;height:18px;border-radius:5px;background:color-mix(in srgb,var(--text) 18%,transparent);}
+.fvs-view.on .fvs-prev i{background:color-mix(in srgb,var(--accent) 60%,transparent);}
+.fvs-prev i.w{grid-column:1/-1;height:13px;}
+.fvs-prev i.r{grid-column:1/-1;height:7px;}
+.fvs-prev i.t{grid-row:span 2;height:auto;}
+.fvs-prev-list,.fvs-prev-mag{grid-template-columns:35px;}
+.fvs-prev i.m{height:15px;}
+.fvs-lbl{margin:16px 2px 8px;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.fvs-seg{display:flex;padding:3px;border-radius:13px;background:color-mix(in srgb,var(--text) 7%,transparent);}
+.fvs-seg button{flex:1;height:38px;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;
+  font:inherit;font-size:13.5px;font-weight:700;}
+.fvs-seg button.on{background:var(--card);color:var(--text);font-weight:800;box-shadow:0 1px 4px var(--shadow);}
+.fvs-tog{width:100%;display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 2px;min-height:56px;
+  border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;color:var(--text);
+  font:inherit;text-align:left;cursor:pointer;}
+.fvs-tt{flex:1;font-size:15px;font-weight:700;}
+.fvs-tt small{display:block;margin-top:2px;font-size:12px;font-weight:600;color:var(--muted);}
+.fvs-sw{position:relative;flex:none;width:46px;height:28px;border-radius:14px;
+  background:color-mix(in srgb,var(--text) 20%,transparent);transition:background .18s;}
+.fvs-sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s;}
+.fvs-tog[aria-checked="true"] .fvs-sw{background:var(--accent);}
+.fvs-tog[aria-checked="true"] .fvs-sw::after{transform:translateX(18px);}
+.fvs-acts{margin-top:6px;}
+@media (prefers-reduced-motion: reduce){ .fvs-sw,.fvs-sw::after{transition:none;} }
+
+/* ── меню папки: обкладинка першою ────────────────────────────────────── */
+.fmc{position:relative;height:150px;margin:6px 0 10px;border-radius:22px;overflow:hidden;isolation:isolate;
+  background:color-mix(in srgb,var(--c,#6a7dff) 26%,var(--card));}
+.fmc-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;}
+.fmc-photo::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55));}
+.fmc-wm{position:absolute;right:-6%;bottom:-20%;width:55%;height:120%;z-index:0;color:var(--c,#6a7dff);opacity:.18;stroke-width:1.2;}
+.fmc-t{position:absolute;left:16px;right:16px;bottom:14px;z-index:2;color:var(--text);}
+.fmc-t small{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.7;}
+.fmc-t b{display:block;margin-top:2px;font-size:21px;font-weight:800;letter-spacing:-.01em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fmc-t span{display:block;margin-top:1px;font-size:12.5px;font-weight:700;opacity:.75;}
+.fmc-photo .fmc-t{color:#fff;}
+.fmc-acts{display:flex;gap:8px;}
+.fmc-btn{flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;
+  border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;
+  font:inherit;font-size:14px;font-weight:800;}
+.fmc-btn .pgb-ic{display:inline-grid;place-items:center;width:18px;height:18px;margin:0;background:none;color:inherit;}
+.fmc-main{flex:1.4;border:0;background:var(--text);color:var(--bg);}
+.fmc-del{flex:0 0 44px;padding:0;color:#c0392b;}
+.fmc-colors{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:12px 0 4px;}
+.fmc-colors>span{margin-right:6px;font-size:12.5px;font-weight:700;color:var(--muted);}
+.fmc-sw{width:36px;height:36px;padding:0;border-radius:50%;cursor:pointer;
+  border:4px solid var(--sheet,var(--card));background:var(--sw);box-shadow:0 0 0 1px var(--line);}
+.fmc-sw.on{box-shadow:0 0 0 2px var(--text);}

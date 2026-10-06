@@ -225,6 +225,8 @@
     if(list) list.hidden=!on;
     if(seg) seg.style.display = (on||sph) ? 'none' : '';
     if(add) add.hidden=!on;
+    // ⚙ «Вигляд папок» (16-dashboard.js) — лише на вкладці «Папки»
+    const look=document.getElementById('folderLookBtn'); if(look) look.hidden=(on||sph);
     try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.length; }catch(_){}
     try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).length; }catch(_){}
     if(on) renderChatList();
