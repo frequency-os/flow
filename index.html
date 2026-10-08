@@ -48,7 +48,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-06-0537-1008397';
+  var BUILD='2026-10-08-2050-058bd94';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -6653,6 +6653,280 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .yroad-behind{display:flex;align-items:center;gap:10px;justify-content:space-between;background:color-mix(in srgb,var(--owe,#e86e6e) 12%,transparent);
     border:1px solid color-mix(in srgb,var(--owe,#e86e6e) 35%,transparent);border-radius:12px;padding:8px 10px;margin:-2px 0 12px;font-size:12.5px;font-weight:700;color:var(--text);}
   .yroad-behind button{flex:none;border:0;background:var(--accent);color:#fff;font-family:inherit;font-weight:800;font-size:12px;border-radius:9px;padding:7px 10px;min-height:34px;cursor:pointer;}
+  /* ============ РАНОК ІЗ КРОКІВ (06-wishes.js, 05.10.2026): рядки кроків, конструктор, шторка, кільце-таймер ============ */
+  .rit-cal .cd.part i{background:linear-gradient(90deg,#3ad487 50%,rgba(255,255,255,.18) 50%);}
+
+  .rit-set{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;
+    width:100%;padding:11px 14px;margin-bottom:10px;border-radius:16px;background:var(--field);border:1px solid var(--line);}
+  .rit-set .rs-t b{display:block;font-size:13px;font-weight:800;color:var(--text);}
+  .rit-set .rs-t small{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-top:1px;}
+  .rit-set .rs-e{font-size:12px;font-weight:800;color:var(--accent);}
+  .rit-set .rs-bar{grid-column:1 / -1;height:4px;border-radius:3px;background:var(--line);overflow:hidden;}
+  .rit-set .rs-bar i{display:block;height:100%;border-radius:3px;background:#3ad487;}
+  .rit-set:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .rit-wrap .rstep{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:11px;width:100%;
+    padding:11px 14px;margin-bottom:9px;min-height:56px;}
+  .rit-wrap .rstep:active{transform:scale(.98);}
+  .rit-wrap .rstep:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .rst-ic{width:36px;height:36px;border-radius:12px;flex:none;display:grid;place-items:center;font-size:17px;background:var(--field);}
+  .rst-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .rst-tx b{font-size:13px;font-weight:800;color:var(--text);}
+  .rst-tx small{font-size:10.5px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rst-go{flex:none;font-size:12px;font-weight:800;padding:8px 12px;border-radius:11px;background:var(--accent);color:#fff;}
+  .rst-ok{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#3ad487;color:#06210f;font-weight:900;}
+  .rst-chk{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;border:2px solid var(--line);font-weight:900;}
+  .rst-chk.on{background:#3ad487;border-color:#3ad487;color:#06210f;}
+  .rit-wrap .rstep.done .rst-tx b{color:var(--muted);}
+
+  /* конструктор */
+  .rit-ed .asheet-in{max-height:88vh;overflow-y:auto;overscroll-behavior:contain;}
+  .red-tpls{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px 12px;padding:0 14px;}
+  .red-tpls::-webkit-scrollbar{display:none}
+  .red-tpl{flex:none;font:inherit;font-size:13px;font-weight:800;padding:9px 13px;min-height:40px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--text);cursor:pointer;}
+  .red-tpl.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);}
+  .red-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .red-row{display:flex;align-items:center;gap:9px;padding:7px 8px 7px 10px;border-radius:14px;background:var(--field);border:1px solid var(--line);}
+  .red-b{flex:none;width:36px;height:36px;border-radius:10px;border:0;background:transparent;color:var(--text);font:inherit;font-size:16px;font-weight:800;cursor:pointer;}
+  .red-b:disabled{opacity:.25;cursor:default;}
+  .red-b.x{color:#ff6b6f;}
+  .red-lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:0 2px 8px;}
+  .red-adds{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .red-add{font:inherit;font-size:12.5px;font-weight:700;padding:8px 11px;min-height:38px;border-radius:11px;border:1px dashed var(--line);background:transparent;color:var(--text);cursor:pointer;}
+  .red-add.own{border-style:solid;color:var(--accent);}
+  .red-ok{width:100%;border:0;border-radius:15px;padding:15px;margin-bottom:9px;font:inherit;font-size:15px;font-weight:800;background:var(--accent);color:#fff;cursor:pointer;}
+  .red-ok:disabled{opacity:.4;}
+
+  /* шторка ранку поверх гри */
+  .rit-sheet .asheet-in{max-height:92vh;overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+  .rsh-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 12px;}
+  .rsh-h b{display:block;font-size:18px;font-weight:800;color:var(--text);}
+  .rsh-h small{display:block;font-size:12px;color:var(--muted);font-weight:700;}
+  .rsh-x{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--text);font:inherit;font-size:15px;cursor:pointer;}
+  .rsh-body .rit-cal{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px;}
+  .rsh-body .vrail{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px;}
+
+  /* візуалізація на весь екран: кільце-таймер, лічильник мрій, «Наступна мрія» */
+  .rmom-top{justify-content:space-between !important;align-items:center;padding-top:calc(16px + env(safe-area-inset-top)) !important;}
+  .rmom-n{font-size:12px;font-weight:800;color:rgba(255,255,255,.85);letter-spacing:.04em;}
+  .rmom-ring{position:relative;width:120px;height:120px;margin-bottom:14px;}
+  .rmom-ring svg{width:100%;height:100%;display:block;}
+  .rmom-ring .rr-bg{fill:rgba(0,0,0,.25);stroke:rgba(255,255,255,.18);stroke-width:6;}
+  .rmom-ring .rr-fg{fill:none;stroke:#b48cff;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+  .rmom-ring .rmom-tm{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-size:26px;letter-spacing:0;color:#fff;font-variant-numeric:tabular-nums;}
+  .rmom-bot{display:flex;flex-direction:column;gap:9px;padding-bottom:calc(30px + env(safe-area-inset-bottom)) !important;}
+  .rmom-next{width:100%;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.35);color:#fff;font:inherit;font-size:14px;font-weight:800;border-radius:15px;padding:14px;cursor:pointer;}
+  .rmom-ov.plain .rmom-bg{background:radial-gradient(120% 70% at 50% 20%,#3a2f6e,#0b0a18 70%);animation:none;}
+  @media (prefers-reduced-motion:reduce){ .rmom-bg{animation:none !important;} .rmom-ring .rr-fg{transition:none;} }
+/* ════════ ОГЛЯД · ПАПКИ-ОБКЛАДИНКИ (06.10.2026) ════════
+   Вкладки-капсула, ⚙ «Вигляд папок», Галерея · Секції · Бенто (.fc3),
+   шторка вигляду (.fvs-*) і обкладинка в меню папки (.fmc-*).
+   Лише токени тем (--card, --text, --muted, --line, --accent, --shadow) —
+   тож живе у всіх темах, світлих і темних. Теми (19-themes-flat.css,
+   20-depth.css) підключаються ПІСЛЯ цього файла, тому селектори тут
+   тримаються за #homeTabs / #folderGrid — інакше тема їх перебила б. */
+
+/* ── вкладки-капсула + ⚙ ──────────────────────────────────────────────── */
+#scr-home .sec-htabs{display:flex;align-items:center;gap:10px;margin:18px 0 14px;}
+#homeTabs.htabs{flex:1;min-width:0;display:flex;align-items:stretch;gap:2px;padding:4px;
+  border-radius:24px;background:color-mix(in srgb,var(--text) 8%,transparent);}
+#homeTabs .htab{flex:1 1 0;min-width:0;height:38px;justify-content:center;gap:6px;padding:0 8px;
+  border:0;border-radius:19px;background:transparent;color:var(--muted);
+  font:inherit;font-size:13.5px;font-weight:700;letter-spacing:0;text-transform:none;white-space:nowrap;}
+#homeTabs .htab.on{background:var(--card);color:var(--text);font-weight:800;
+  box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 12px -4px var(--shadow);}
+#homeTabs .htab[hidden]{display:none;}
+#homeTabs .htab-ic{width:16px;height:16px;flex:none;}
+#homeTabs .htab .count{background:none;box-shadow:none;border:0;padding:0;min-width:0;
+  font-size:11px;font-weight:800;letter-spacing:0;color:inherit;opacity:.7;}
+#homeTabs .htab.on .count{color:var(--accent);opacity:1;}
+#scr-home .sec-htabs .sec-actions{display:flex;gap:8px;padding:0;flex:none;}
+#scr-home .sec-htabs .htab-add,
+.htab-cfg{width:46px;height:46px;border-radius:50%;padding:0;display:grid;place-items:center;cursor:pointer;flex:none;}
+.htab-cfg{border:0;background:var(--text);color:var(--bg);}
+.htab-cfg svg{width:19px;height:19px;}
+#scr-home .sec-htabs .htab-add[hidden],.htab-cfg[hidden]{display:none;}
+.htab-cfg:active{transform:scale(.94);}
+/* широкий екран: капсула за вмістом, ⚙ праворуч — а не дві вкладки на 900px */
+@media (min-width:700px){
+  #homeTabs.htabs{flex:0 1 auto;}
+  #homeTabs .htab{flex:0 0 auto;padding:0 18px;}
+  #scr-home .sec-htabs .sec-actions{margin-left:auto;}
+}
+
+/* ── сітка: без лівої колонки і без від'ємних полів ──────────────────── */
+#scr-home .foh-row>#folderGrid{flex:1 1 auto;min-width:0;}
+#folderGrid{--fc3-min:148px;--fc3-row:118px;}
+#folderGrid.fsz-s{--fc3-min:96px;--fc3-row:96px;}
+#folderGrid.fsz-l{--fc3-min:240px;--fc3-row:150px;}
+@media (min-width:700px){
+  #folderGrid{--fc3-min:190px;}
+  #folderGrid.fsz-s{--fc3-min:130px;}
+  #folderGrid.fsz-l{--fc3-min:320px;}
+}
+#folderGrid.fv2-gallery,
+#folderGrid.fv2-bento{display:grid;margin:0;gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(var(--fc3-min),1fr));}
+#folderGrid.fv2-bento{grid-auto-rows:var(--fc3-row);grid-auto-flow:row dense;}
+#folderGrid.fv2-sections{display:block;margin:0;}
+
+/* ── плитка-обкладинка ─────────────────────────────────────────────────── */
+#folderGrid .fc3{position:relative;overflow:hidden;isolation:isolate;border-radius:24px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .18s;min-height:0;
+  background:color-mix(in srgb,var(--c,#6a7dff) 22%,var(--card));color:var(--text);
+  box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 24px -14px var(--shadow);}
+#folderGrid .fc3:active{transform:scale(.985);}
+#folderGrid.fv2-gallery .fc3{aspect-ratio:3/4;}
+#folderGrid.fv2-gallery.fsz-l .fc3{aspect-ratio:16/10;}
+#folderGrid .fc3-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;}
+#folderGrid .fc3-veil{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.42));}
+#folderGrid .fc3-wm{position:absolute;right:-14%;bottom:-10%;width:74%;height:74%;z-index:0;
+  color:var(--c,#6a7dff);opacity:.17;stroke-width:1.2;}
+#folderGrid .fc3-ic{position:absolute;left:12px;top:12px;width:44px;height:44px;border-radius:14px;z-index:2;
+  display:grid;place-items:center;background:var(--card);color:var(--c,#6a7dff);font-size:21px;line-height:1;
+  box-shadow:0 4px 12px -6px var(--shadow);}
+#folderGrid .fc3-ic .fc2-ico{width:21px;height:21px;}
+#folderGrid .fc3-photo{position:absolute;right:52px;top:12px;width:34px;height:34px;border-radius:50%;border:0;padding:0;
+  z-index:3;display:grid;place-items:center;cursor:pointer;
+  background:color-mix(in srgb,var(--card) 74%,transparent);color:var(--text);}
+#folderGrid .fc3-svg{width:15px;height:15px;}
+/* ⋯ — сильніший селектор за html.t-flat .fmenu (теми ідуть після цього файла) */
+#folderGrid .fc3-menu{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:0;padding:0;
+  z-index:4;display:grid;place-items:center;font-size:19px;line-height:1;cursor:pointer;
+  background:color-mix(in srgb,var(--card) 74%,transparent);color:var(--text);}
+#folderGrid .fc3-has-photo .fc3-menu{background:rgba(255,255,255,.2);color:#fff;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+#folderGrid .fc3-label{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;}
+#folderGrid .fc3-name{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1.2;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto;}
+#folderGrid .fc3-meta{margin-top:3px;font-size:12px;font-weight:700;
+  color:color-mix(in srgb,var(--text) 62%,var(--c,#6a7dff));}
+#folderGrid .fc3-pin .fc3-svg{width:13px;height:13px;margin-right:4px;vertical-align:-1px;color:var(--c,var(--accent));}
+/* з фото: назва на матовому склі */
+#folderGrid .fc3-has-photo .fc3-label{left:8px;right:8px;bottom:8px;padding:9px 11px;border-radius:16px;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);}
+#folderGrid .fc3-has-photo .fc3-name{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.35);}
+#folderGrid .fc3-has-photo .fc3-meta{color:rgba(255,255,255,.86);}
+#folderGrid .fc3-has-photo .fc3-pin .fc3-svg{color:#fff;}
+/* група — стос карток під плиткою */
+#folderGrid .fc3-group{box-shadow:0 6px 0 -2px color-mix(in srgb,var(--c,#6a7dff) 32%,var(--card)),
+  0 11px 0 -4px color-mix(in srgb,var(--c,#6a7dff) 18%,var(--card));margin-bottom:6px;}
+/* дрібні плитки — лише значок і назва */
+#folderGrid.fsz-s .fc3-ic{left:8px;top:8px;width:34px;height:34px;border-radius:11px;font-size:17px;}
+#folderGrid.fsz-s .fc3-ic .fc2-ico{width:17px;height:17px;}
+#folderGrid.fsz-s .fc3-photo,#folderGrid.fsz-s .fc3-meta,#folderGrid.fsz-s .fc3-wm{display:none;}
+#folderGrid.fsz-s .fc3-name{font-size:13px;}
+#folderGrid.fsz-s .fc3-label{left:8px;right:8px;bottom:8px;}
+#folderGrid.fsz-s .fc3-has-photo .fc3-label{left:5px;right:5px;bottom:5px;padding:6px 8px;border-radius:12px;}
+#folderGrid.fsz-s .fc3-menu{top:2px;right:2px;width:36px;height:36px;font-size:16px;background:transparent;}
+#folderGrid.fsz-l .fc3-name{font-size:20px;}
+
+/* ── Бенто ─────────────────────────────────────────────────────────────── */
+#folderGrid.fv2-bento .fc3-big{grid-column:1/-1;grid-row:span 2;}
+#folderGrid.fv2-bento .fc3-tall{grid-row:span 2;}
+#folderGrid.fv2-bento .fc3-big .fc3-name{font-size:21px;}
+/* звичайна клітинка бенто низька: підпис ховаємо, щоб не наліз на значок */
+#folderGrid.fv2-bento .fc3:not(.fc3-big):not(.fc3-tall) .fc3-meta{display:none;}
+@media (min-width:700px){ #folderGrid.fv2-bento .fc3-big{grid-column:span 2;} }
+
+/* ── Секції ────────────────────────────────────────────────────────────── */
+#folderGrid .fsec+.fsec{margin-top:22px;}
+#folderGrid .fsec-h{display:flex;align-items:baseline;gap:6px;margin:0 2px 10px;
+  font-size:18px;font-weight:800;letter-spacing:-.01em;color:var(--text);}
+#folderGrid .fsec-h small{font-size:13px;font-weight:700;color:var(--muted);}
+#folderGrid .fsec-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:2px 0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+#folderGrid .fsec-row::-webkit-scrollbar{display:none;}
+#folderGrid .fsec-row .fc3{flex:0 0 min(80%,320px);aspect-ratio:16/10;scroll-snap-align:start;}
+#folderGrid .fsec-row .fc3-name{font-size:20px;}
+#folderGrid .fsec-groups{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));}
+#folderGrid .fsec-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(var(--fc3-min),1fr));}
+#folderGrid .fsec-grid .fc3,#folderGrid .fsec-grid .fc3-add{aspect-ratio:1/1;}
+#folderGrid .fc3-grow{position:relative;display:flex;align-items:center;gap:14px;min-height:76px;box-sizing:border-box;
+  padding:12px 52px 12px 14px;border-radius:22px;background:var(--card);border:1px solid var(--line);cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px -14px var(--shadow);}
+#folderGrid .fc3-stack{position:relative;width:78px;height:50px;flex:none;}
+#folderGrid .fc3-th{position:absolute;top:0;left:calc(var(--i) * 14px);width:46px;height:46px;border-radius:14px;
+  border:2px solid var(--card);background-color:color-mix(in srgb,var(--c,#6a7dff) 34%,var(--card));
+  background-size:cover;background-position:center;}
+#folderGrid .fc3-gt{flex:1;min-width:0;}
+#folderGrid .fc3-gt b{display:block;font-size:16px;font-weight:800;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#folderGrid .fc3-gt small{display:block;margin-top:2px;font-size:12.5px;font-weight:700;color:var(--muted);}
+#folderGrid .fc3-grow .fc3-menu{top:50%;right:8px;transform:translateY(-50%);background:transparent;}
+
+/* ── «Нова папка» ──────────────────────────────────────────────────────── */
+#folderGrid .fc3-add{min-height:96px;border-radius:24px;border:1.5px dashed color-mix(in srgb,var(--text) 22%,transparent);
+  background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:800;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+#folderGrid .fc3-plus{font-size:24px;line-height:1;}
+#folderGrid.fv2-gallery .fc3-add{aspect-ratio:3/4;}
+#folderGrid.fv2-gallery.fsz-l .fc3-add{aspect-ratio:16/10;}
+
+/* ── шторка ⚙ «Вигляд папок» ──────────────────────────────────────────── */
+.fvs-head{display:flex;align-items:center;margin:6px 0 14px;}
+.fvs-head b{flex:1;font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--text);}
+.fvs-done{height:38px;padding:0 16px;border-radius:19px;border:0;cursor:pointer;
+  background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);font:inherit;font-size:14px;font-weight:800;}
+.fvs-views{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;}
+@media (max-width:420px){ .fvs-views{grid-template-columns:repeat(3,minmax(0,1fr));} }
+.fvs-view{display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 4px;min-height:84px;box-sizing:border-box;
+  border-radius:16px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;
+  font:inherit;font-size:12.5px;font-weight:700;}
+.fvs-view.on{border:2px solid var(--text);padding:9px 3px;color:var(--text);font-weight:800;}
+.fvs-prev{display:grid;grid-template-columns:repeat(2,16px);gap:3px;height:40px;align-content:center;}
+.fvs-prev i{display:block;height:18px;border-radius:5px;background:color-mix(in srgb,var(--text) 18%,transparent);}
+.fvs-view.on .fvs-prev i{background:color-mix(in srgb,var(--accent) 60%,transparent);}
+.fvs-prev i.w{grid-column:1/-1;height:13px;}
+.fvs-prev i.r{grid-column:1/-1;height:7px;}
+.fvs-prev i.t{grid-row:span 2;height:auto;}
+.fvs-prev-list,.fvs-prev-mag{grid-template-columns:35px;}
+.fvs-prev i.m{height:15px;}
+.fvs-lbl{margin:16px 2px 8px;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.fvs-seg{display:flex;padding:3px;border-radius:13px;background:color-mix(in srgb,var(--text) 7%,transparent);}
+.fvs-seg button{flex:1;height:38px;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;
+  font:inherit;font-size:13.5px;font-weight:700;}
+.fvs-seg button.on{background:var(--card);color:var(--text);font-weight:800;box-shadow:0 1px 4px var(--shadow);}
+.fvs-tog{width:100%;display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 2px;min-height:56px;
+  border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;color:var(--text);
+  font:inherit;text-align:left;cursor:pointer;}
+.fvs-tt{flex:1;font-size:15px;font-weight:700;}
+.fvs-tt small{display:block;margin-top:2px;font-size:12px;font-weight:600;color:var(--muted);}
+.fvs-sw{position:relative;flex:none;width:46px;height:28px;border-radius:14px;
+  background:color-mix(in srgb,var(--text) 20%,transparent);transition:background .18s;}
+.fvs-sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s;}
+.fvs-tog[aria-checked="true"] .fvs-sw{background:var(--accent);}
+.fvs-tog[aria-checked="true"] .fvs-sw::after{transform:translateX(18px);}
+.fvs-acts{margin-top:6px;}
+@media (prefers-reduced-motion: reduce){ .fvs-sw,.fvs-sw::after{transition:none;} }
+
+/* ── меню папки: обкладинка першою ────────────────────────────────────── */
+.fmc{position:relative;height:150px;margin:6px 0 10px;border-radius:22px;overflow:hidden;isolation:isolate;
+  background:color-mix(in srgb,var(--c,#6a7dff) 26%,var(--card));}
+.fmc-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;}
+.fmc-photo::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55));}
+.fmc-wm{position:absolute;right:-6%;bottom:-20%;width:55%;height:120%;z-index:0;color:var(--c,#6a7dff);opacity:.18;stroke-width:1.2;}
+.fmc-t{position:absolute;left:16px;right:16px;bottom:14px;z-index:2;color:var(--text);}
+.fmc-t small{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.7;}
+.fmc-t b{display:block;margin-top:2px;font-size:21px;font-weight:800;letter-spacing:-.01em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fmc-t span{display:block;margin-top:1px;font-size:12.5px;font-weight:700;opacity:.75;}
+.fmc-photo .fmc-t{color:#fff;}
+.fmc-acts{display:flex;gap:8px;}
+.fmc-btn{flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;
+  border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;
+  font:inherit;font-size:14px;font-weight:800;}
+.fmc-btn .pgb-ic{display:inline-grid;place-items:center;width:18px;height:18px;margin:0;background:none;color:inherit;}
+.fmc-main{flex:1.4;border:0;background:var(--text);color:var(--bg);}
+.fmc-del{flex:0 0 44px;padding:0;color:#c0392b;}
+.fmc-colors{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:12px 0 4px;}
+.fmc-colors>span{margin-right:6px;font-size:12.5px;font-weight:700;color:var(--muted);}
+.fmc-sw{width:36px;height:36px;padding:0;border-radius:50%;cursor:pointer;
+  border:4px solid var(--sheet,var(--card));background:var(--sw);box-shadow:0 0 0 1px var(--line);}
+.fmc-sw.on{box-shadow:0 0 0 2px var(--text);}
 </style>
 <style id="patterns-css">
 /* ===== PATTERNS MODULE (перехват + трансформація) ===== */
@@ -6999,33 +7273,20 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <div class="wishdots" id="wishDots"></div>
     </div>
 
-    <!-- живий Огляд: план дня · гаманець · щоденник (аудит Ф1).
-         Заголовка «Огляд» над цим рядом більше немає (25.09.2026): картки
-         самі себе називають, а слово над ними робило сторінку купою. Разом
-         із заголовком пішло й згортання — applyOv() у 33-home-widgets.js
-         тримає ряд відкритим, якщо кнопки в розмітці нема. -->
-    <!-- «Сьогодні» (03.10.2026): одна картка, що згортається. Згорнута — три чипи
-         (план · гроші · щоденник), розгорнута — картки. Стан — ключ 'homeov' (33-home-widgets.js).
-         Гроші тут же: окремий рядок «Гаманець» більше не потрібен. -->
-    <div class="today-box" id="homeToday">
-      <button class="today-h" id="homeOvHead" aria-expanded="false" aria-controls="homeWidgetsRow"><span class="today-t">Сьогодні</span><span class="today-d" id="homeTodayDate"></span><svg class="today-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="today-mini" id="homeOvMini"></div>
-      <div id="homeWidgetsRow" hidden></div>
-    </div>
+    <!-- «Сьогодні» з Огляду прибрано (06.10.2026, рішення Ярослава): план, гроші й
+         щоденник мають свої розділи. 33-home-widgets.js без цієї розмітки нічого не
+         малює — він сам перевіряє, чи є #homeWidgetsRow. -->
 
-    <!-- Огляд: дві вкладки — 📁 Папки (сітка) і 💬 Чати (список, 36-chats.js) -->
+    <!-- Огляд: вкладки-капсула Папки · Чати · Сфери (36-chats.js) і ⚙ вигляду папок
+         (06.10.2026). «Список · Сітка · Журнал · Обʼєднати» живуть у шторці ⚙
+         (openFolderViewSheet, 16-dashboard.js); ліву колонку проєктів прибрано —
+         проєкти в «Ще → Проєкти» і в пункті шторки. -->
     <div class="sec sec-htabs"><div class="htabs" id="homeTabs">
-      <button class="htab on" data-htab="folders"><span class="e">📁</span>Папки<span class="count" id="folderCountBadge">5</span></button>
-      <button class="htab" data-htab="chats"><span class="e">💬</span>Чати<span class="count" id="chatCountBadge">0</span></button>
-      <button class="htab" data-htab="spheres" id="sphTabBtn" hidden><span class="e">🏙</span>Сфери<span class="count" id="sphCountBadge">0</span></button>
-    </div><div class="sec-actions"><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
-    <div class="fv-row" id="folderViewRow"><div class="fvseg fvseg-wide" id="folderViewSeg" role="group" aria-label="Вигляд папок">
-      <button data-fv="list" title="Список"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Список</span></button>
-      <button data-fv="grid" title="Сітка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg><span>Сітка</span></button>
-      <button data-fv="mag" title="Журнал"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 5v6M8 14v6"/></svg><span>Журнал</span></button>
-    </div><button class="fv-merge" id="folderMergeBtn" title="Обʼєднати папки в групу" aria-label="Обʼєднати папки в групу"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="13" height="12" rx="2.5"/><path d="M7.5 5h10a3 3 0 0 1 3 3v9"/></svg><span>Обʼєднати</span></button></div>
+      <button class="htab on" data-htab="folders"><svg class="htab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>Папки<span class="count" id="folderCountBadge">5</span></button>
+      <button class="htab" data-htab="chats"><svg class="htab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 5.5h15v10H9.5l-5 4z"/></svg>Чати<span class="count" id="chatCountBadge">0</span></button>
+      <button class="htab" data-htab="spheres" id="sphTabBtn" hidden><svg class="htab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.4 5.4 3.4 8.5s-1 6.1-3.4 8.5c-2.4-2.4-3.4-5.4-3.4-8.5s1-6.1 3.4-8.5z"/></svg>Сфери<span class="count" id="sphCountBadge">0</span></button>
+    </div><div class="sec-actions"><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><button class="htab-cfg" id="folderLookBtn" aria-label="Вигляд папок" title="Вигляд папок"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div></div>
     <div class="foh-row">
-      <div class="proj-rail" id="projRail"></div>
       <div class="grid" id="folderGrid"></div>
     </div>
     <div class="chat-list" id="chatList" hidden></div>
@@ -7862,6 +8123,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     'ritual_board','collage_board',                      // 06-wishes.js (теж на льоту)
     // легкі налаштування (prefSet у 02-storage.js — сирий ключ + копія тут)
     'flowtheme','flowprotheme','flowcardskin','folderview','homewidgets','hometab','homeov',
+    'folderopts',                                        // розмір/порядок/фото плиток папок (16-dashboard.js, 06.10.2026)
     'sidebarcol','spacefull','fx_mode','fx_say','ai_pet','ai_voice','pet_hidden','pet_pos','pet_sleep',
     'forcedesktop','forcemobile'                         // фічу видалено; у сховищі лишається '0'
   ];
@@ -12016,14 +12278,78 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // ═══ FD26T · РАНКОВИЙ РИТУАЛ «Стрічка дня» — ефір + щоденник + відео-полиця ═══
   const RIT_KEY='ritual_board';
   let RIT={days:{},mix:[],links:[]};
-  try{ if(Array.isArray(window.FLOW_KEYS)&&window.FLOW_KEYS.indexOf(RIT_KEY)<0) window.FLOW_KEYS.push(RIT_KEY); }catch(_){}
-  async function loadRitual(){ try{ const r=await window.storage.get(RIT_KEY,false);
-    if(r&&r.value){ const d=JSON.parse(r.value); if(d&&typeof d==='object'){ RIT={days:d.days||{},mix:d.mix||[],links:d.links||[]}; } } }catch(_){} }
+  /* Набір кроків ранку (06.10.2026) — окремим ключем: стара збірка (Mac, старий кеш)
+     переписує ritual_board цілком і не знає про кроки, тож у тому ключі вона б їх стерла.
+     Порожньо — діє шаблон «Мій теперішній ранок». */
+  const RIT_STEPS_KEY='ritual_steps';
+  let RIT_STEPS=null;
+  try{ [RIT_KEY,RIT_STEPS_KEY].forEach(k=>{ if(Array.isArray(window.FLOW_KEYS)&&window.FLOW_KEYS.indexOf(k)<0) window.FLOW_KEYS.push(k); }); }catch(_){}
+  /* Читається двічі: одразу при старті (локальна копія — щоб ранок відкрився вранці без очікування)
+     і в load() (27-canvas.js) разом з усім — тоді ключі позначені прочитаними (storeMarkRead),
+     і перша правка зливається з хмарою, а не затирає її. Після читання ранок на екрані
+     перемальовується, щоб тап не пішов у старий обʼєкт дня. */
+  async function loadRitual(){
+    try{ const r=await window.storage.get(RIT_KEY,false);
+      if(r&&r.value){ const d=JSON.parse(r.value); if(d&&typeof d==='object'){ RIT={days:d.days||{},mix:d.mix||[],links:d.links||[]}; } } }catch(_){}
+    try{ const r2=await window.storage.get(RIT_STEPS_KEY,false);
+      if(r2&&r2.value){ const a=JSON.parse(r2.value); if(Array.isArray(a)) RIT_STEPS=a; } }catch(_){}
+    try{ ritualRerender(); }catch(_){}
+  }
   function saveRitual(){ try{ const p=window.storage.set(RIT_KEY,JSON.stringify(RIT),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+  function saveRitSteps(){ try{ const p=window.storage.set(RIT_STEPS_KEY,JSON.stringify(RIT_STEPS||[]),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
   let __ritLoad=null; try{ __ritLoad=loadRitual(); }catch(_){}
 
-  function ritualRerender(){ try{ const s=document.getElementById('scr-wishes');
+  function ritualRerender(){ try{
+    // ранок у шторці (відкрита з «Мого світу») — перемальовуємо і її
+    const sh=document.getElementById('ritSheetBody');
+    if(sh){ sh.innerHTML=ritualInnerHTML(); ritualBind(sh); }
+    const s=document.getElementById('scr-wishes');
     if(s&&s.classList.contains('active')) renderWishes(); }catch(_){} }
+  // ранок шторкою поверх будь-якого екрана (вхід із гри); записує, як і завжди, сам Frequency
+  function ritualSheet(opts){ try{
+    opts=opts||{};
+    const old=document.getElementById('ritSheet'); if(old) old.remove();
+    const ov=document.createElement('div'); ov.className='asheet rit-sheet'; ov.id='ritSheet';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Ранковий ритуал');
+    const dt=new Date().toLocaleDateString('uk-UA',{weekday:'long',day:'numeric',month:'long'});
+    ov.innerHTML=`<div class="asheet-in"><div class="asheet-grip"></div>
+      <div class="rsh-h"><span><b>Ранок</b><small>${esc(dt)}</small></span><button type="button" class="rsh-x" aria-label="Закрити">✕</button></div>
+      <div class="rit-wrap rsh-body" id="ritSheetBody"></div></div>`;
+    document.body.appendChild(ov);
+    const close=()=>{ ritStopAll(); ov.remove(); if(opts.onClose) try{ opts.onClose(); }catch(_){} };
+    ov.querySelector('.rsh-x').onclick=close;
+    ov.onclick=e=>{ if(e.target===ov) close(); };
+    (__ritLoad||Promise.resolve()).then(()=>ritualRerender());
+  }catch(e){ console.error('ritualSheet',e); } }
+  try{ window.ritualSheet=ritualSheet; }catch(_){}
+  /* Для «Мого світу» (міст 38-world.js) — лише читання. Гра отримує копії простих значень,
+     не самі обʼєкти RIT, тож змінити дані ранку звідти не може. */
+  function ritForWorld(){
+    const today=ritDs(0), steps=ritSteps(), td=RIT.days[today]||{}, days={};
+    for(let i=0;i<70;i++){ const ds=ritDs(-i), r=RIT.days[ds]; if(!r) continue;
+      days[ds]=i===0?{done:!!r.done, n:steps.filter(s=>ritStepDone(s,r)).length, of:steps.length}
+                    :{done:!!r.done, n:Math.max(0,+r.n||0), of:Math.max(0,+r.of||0)}; }
+    const st=ritStreak();
+    return {today, done:!!td.done, n:steps.filter(s=>ritStepDone(s,td)).length, of:steps.length,
+      streak:st.s, best:st.best, tpl:ritTplName(), wishes:wishes.length, days};
+  }
+  function ritDayForWorld(ds){
+    if(typeof ds!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(ds)) return null;
+    const r=RIT.days[ds]; if(!r) return null;
+    const own={}; ritSteps().forEach(s=>{ own[s.id]=s; });
+    const texts=[], marks=[];
+    Object.keys(r).forEach(k=>{
+      const c=ritCat(k), m=c||(Object.prototype.hasOwnProperty.call(own,k)?own[k]:null); if(!m) return;
+      const meta=ritMeta(c?{id:k}:m);
+      if(meta.ty==="text" && typeof r[k]==="string" && r[k].trim()) texts.push({t:String(meta.t), v:r[k].trim().slice(0,300)});
+      else if((meta.ty==="check"||meta.ty==="timer"||meta.ty==="mix"||meta.ty==="link") && r[k]) marks.push(String(meta.t));
+    });
+    let photo="";
+    try{ if(r.photo&&r.photo.url){ const u=window.photoSrc?window.photoSrc(r.photo.url):r.photo.url;
+      // гра (CSP misto.html) показує лише вбудовані картинки; фото з хмари — тільки позначкою hasPhoto
+      if(typeof u==="string"&&/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(u)) photo=u; } }catch(_){}
+    return {ds, done:!!r.done, n:Math.max(0,+r.n||0), of:Math.max(0,+r.of||0), texts:texts.slice(0,6), marks:marks.slice(0,8), photo, hasPhoto:!!r.photo};
+  }
   function goRitual(){ try{ renderWishes(); show('scr-wishes');
     setTimeout(()=>{ try{ const el=document.getElementById('ritInline');
       if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(_){}} ,180);
@@ -12086,13 +12412,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         fr.onload=()=>{ const a=fr.result;
           if(slot==='mix') RIT.mix.push({id:'m'+Date.now(),label:'Запис · '+ritDs(0).slice(5),a,dur:sec});
           else { const d=ritDay(ritDs(0)); d[slot]={a,dur:sec}; }
-          saveRitual(); ritualRerender();
+          if(slot==='mix') ritDay(ritDs(0)).mix=1;
+          ritSaveToday(); ritualRerender();
           try{ window.platform.haptic('medium'); }catch(_){}
         };
         fr.readAsDataURL(blob);
       };
       ritRec.start(); ritRecT=setInterval(()=>{ ritRecSec++;
-        const t=document.getElementById('ritRecTm'); if(t) t.textContent='● '+fmtDur(ritRecSec); },1000);
+        document.querySelectorAll('.rit-rectm').forEach(t=>{ t.textContent='● '+fmtDur(ritRecSec); }); },1000);
       ritualRerender(); // покаже стан запису
       try{ plToast('🎙 Говори — тап ще раз, щоб зупинити'); }catch(_){}
     }catch(e){ ritRec=null; try{ plToast('⚠️ Нема доступу до мікрофона'); }catch(_){} }
@@ -12109,6 +12436,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(ritMixOn){ ritStopAll(); ritualRerender(); return; }
     ritMixQ=RIT.mix.map(m=>m.a); if(!ritMixQ.length){ try{plToast('Спершу запиши себе 🎙');}catch(_){} return; }
     ritMixOn=true; let i=0;
+    { const dd=ritDay(ritDs(0)); if(!dd.mix){ dd.mix=1; ritSaveToday(); } }
     const next=()=>{ if(!ritMixOn||i>=ritMixQ.length){ ritMixOn=false; ritualRerender(); return; }
       try{ ritAudio=new Audio(ritMixQ[i++]); ritAudio.onended=next; ritAudio.play().catch(()=>{ next(); }); }catch(_){ next(); } };
     next(); ritualRerender();
@@ -12119,8 +12447,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(!cur){ ritRecord(slot); return; }
     actionSheet({title:'Аудіо · '+fmtDur(cur.dur||0), items:[
       {ic:WICONS.play, label:'Прослухати', onClick:()=>ritPlay(cur.a)},
-      {ic:'edit', label:'Перезаписати', onClick:()=>{ delete d[slot]; saveRitual(); ritRecord(slot); }},
-      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d[slot]; saveRitual(); ritualRerender(); }}
+      {ic:'edit', label:'Перезаписати', onClick:()=>{ delete d[slot]; ritSaveToday(); ritRecord(slot); }},
+      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d[slot]; ritSaveToday(); ritualRerender(); }}
     ]});
   }
   function ritMixMenu(){
@@ -12151,85 +12479,187 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     ]});
   }
 
-  const RIT_J=[['j1','a1','Я — людина, яка…','…дописуй речення про свою ідентичність'],
-               ['j2','a2','Вчорашній доказ','Що вчора підтвердило, що ти вже ця людина?'],
-               ['j3','a3','Намір на сьогодні','Одна дія, яка наближає твою дату']];
+  // ── Ранок із кроків (05.10.2026): ритуал = набір кроків каталогу, а не три сталі записи ──
+  // Значення кроку лежить у дні під його id (d.j1, d.grat, d.water…), голос — під a1..a3 або 'a_'+id.
+  // Поки людина не змінила набір, діє шаблон «Мій теперішній ранок» — це рівно те, що було раніше.
+  const RIT_CAT={
+    mix:{t:'Голос із майбутнього', ty:'mix', ic:'🎙'},
+    j1:{t:'Я — людина, яка…', ty:'text', ph:'…дописуй речення про свою ідентичність', a:'a1', ic:'🪞'},
+    j2:{t:'Вчорашній доказ', ty:'text', ph:'Що вчора підтвердило, що ти вже ця людина?', a:'a2', ic:'🧾'},
+    j3:{t:'Намір на сьогодні', ty:'text', ph:'Одна дія, яка наближає твою дату', a:'a3', ic:'🎯'},
+    grat:{t:'Вдячність', ty:'text', ph:'За що ти вдячний(а) цього ранку?', ic:'💛'},
+    photo:{t:'Фото дня', ty:'photo', ic:'📸'},
+    video:{t:'Відео-полиця', ty:'link', ic:'▶️'},
+    vis:{t:'Візуалізація', ty:'timer', sec:150, sub:'на фото з Карти бажань', ic:'✨'},
+    breath:{t:'Дихання 4·7·8', ty:'timer', sec:120, sub:'вдих 4 · затримка 7 · видих 8', ic:'🌬'},
+    med:{t:'Медитація', ty:'timer', sec:300, sub:'тиша і дихання', ic:'🧘'},
+    water:{t:'Склянка води', ty:'check', ic:'💧'},
+    move:{t:'Рух / зарядка', ty:'check', ic:'🏃'}
+  };
+  const RIT_TPL=[
+    {k:'now',   t:'Мій теперішній ранок', s:['mix','j1','j2','j3','photo','video']},
+    {k:'m5',    t:'5 хвилин',             s:['water','j3','vis']},
+    {k:'calm',  t:'Тиха голова',          s:['breath','grat','med','j3']},
+    {k:'sport', t:'Спорт зранку',         s:['water','move','j3']}
+  ];
+  const RIT_TY={text:'текст', check:'галочка', timer:'таймер', mix:'аудіо', photo:'фото', link:'посилання'};
+  // крок із даних → безпечний обʼєкт; чуже/зіпсоване відкидаємо
+  function ritCleanStep(s){
+    if(!s||typeof s!=='object'||typeof s.id!=='string') return null;
+    if(Object.prototype.hasOwnProperty.call(RIT_CAT,s.id)) return {id:s.id};
+    if(!/^c_[a-z0-9]{2,16}$/.test(s.id)) return null;
+    const ty=['text','check','timer'].indexOf(s.ty)>=0?s.ty:'check';
+    const t=String(s.t||'').trim().slice(0,80); if(!t) return null;
+    const o={id:s.id, ty, t};
+    if(ty==='timer') o.sec=Math.max(30,Math.min(3600,(+s.sec|0)||180));
+    return o;
+  }
+  function ritSteps(){
+    const arr=Array.isArray(RIT_STEPS)?RIT_STEPS.map(ritCleanStep).filter(Boolean):[];
+    return arr.length?arr:RIT_TPL[0].s.map(id=>({id}));
+  }
+  const RIT_OWN_IC={text:'✍️', check:'☑️', timer:'⏱'};
+  function ritCat(id){ return Object.prototype.hasOwnProperty.call(RIT_CAT,id)?RIT_CAT[id]:null; }
+  function ritMeta(s){ const c=ritCat(s.id); return c?Object.assign({id:s.id},c):Object.assign({ic:RIT_OWN_IC[s.ty]||'•'},s); }
+  /* Голос — лише в трьох старих записах (a1..a3). Аудіо лягає в ritual_board цілим base64,
+     тож голос у кожному новому кроці швидко з'їв би памʼять браузера. */
+  function ritAudioKey(s){ const c=ritCat(s.id); return (c&&c.a)||null; }
+  function ritStepDone(s,d){
+    const m=ritMeta(s);
+    if(m.ty==='text'){ const ak=ritAudioKey(s); return !!((d[s.id]&&String(d[s.id]).trim())||(ak&&d[ak])); }
+    if(m.ty==='photo') return !!d.photo;
+    return !!d[s.id]; // mix / link / timer / check — позначка 1 у дні
+  }
+  // день знає, скільки кроків тоді було і скільки зроблено (для календаря, навіть коли набір зміниться)
+  function ritTouch(d){ try{ const st=ritSteps(); d.of=st.length; d.n=st.filter(s=>ritStepDone(s,d)).length; }catch(_){} }
+  function ritSaveToday(){ ritTouch(ritDay(ritDs(0))); saveRitual(); }
+  function ritTplName(){
+    const ids=ritSteps().map(s=>s.id).join(',');
+    const t=RIT_TPL.find(x=>x.s.join(',')===ids);
+    return t?t.t:'свій набір';
+  }
+  // кроки, у яких своя картка (мікс, фото, відео); решта — однаковий рядок
+  function ritStepHTML(s,d){
+    const m=ritMeta(s);
+    if(m.ty==='mix') return ritMixHTML();
+    if(m.ty==='photo') return ritPhotoCardHTML(d);
+    if(m.ty==='link') return ritLinksHTML();
+    if(m.ty==='text'){
+      const val=d[s.id]||'', ak=ritAudioKey(s), au=ak?d[ak]:null;
+      const ph=m.ph||'Тап — написати';
+      return `<div class="glass jr">
+        <div class="lb">${esc(m.t)}</div>
+        <div class="tx ${val?'':'ph'}" data-rjr="${esc(s.id)}">${val?esc(val):esc(ph)}</div>
+        ${ak?`<span class="mic ${au?'has':''}" data-rmic="${esc(ak)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></span>`:''}
+        ${au?`<span class="adur">${fmtDur(au.dur||0)}</span>`:''}
+      </div>`;
+    }
+    const done=ritStepDone(s,d);
+    const sub=m.ty==='timer'?(fmtDur(m.sec||180)+(m.sub?' · '+m.sub:'')):(m.sub||RIT_TY[m.ty]);
+    const right=m.ty==='timer'
+      ? (done?'<span class="rst-ok">✓</span>':`<span class="rst-go">Почати</span>`)
+      : `<span class="rst-chk ${done?'on':''}">${done?'✓':''}</span>`;
+    return `<button type="button" class="glass rstep ${done?'done':''}" data-rstep="${esc(s.id)}">
+      <span class="rst-ic">${esc(m.ic||'•')}</span>
+      <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(sub)}</small></span>${right}</button>`;
+  }
+  function ritMixHTML(){
+    const mixDur=RIT.mix.reduce((s,m)=>s+(m.dur||0),0), recLive=!!ritRec;
+    return `<div class="glass mix">
+        <button class="pl" data-rmixpl="1">${ritMixOn?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6v12M15 6v12"/></svg>':WICONS.play}</button>
+        <span class="tx"><b>Ранковий мікс · ${fmtDur(mixDur)}</b>
+          <small>${RIT.mix.length?('твій голос · '+RIT.mix.length+' зап. · тап ▸ слухати'):'запиши себе з майбутнього — 30–60 с'}</small></span>
+        <span class="tm rit-rectm">${recLive?'● '+fmtDur(ritRecSec):''}</span>
+        <button class="rec ${recLive?'live':''}" data-rmixrec="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></button>
+      </div>`;
+  }
+  function ritLinksHTML(){
+    const links=RIT.links.map(l=>{ const id=ytId(l.url);
+      const th=id?`background-image:url('https://img.youtube.com/vi/${id}/hqdefault.jpg')`:'';
+      const dom=l.url.replace(/^https?:\/\/(www\.)?/,'').split('/')[0];
+      return `<div class="vcard" data-rlk="${esc(l.id)}">
+        <div class="vth ${id?'':'vempty'}" style="${th}">
+          <span class="pb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><polygon points="8 5 18 12 8 19" fill="currentColor" stroke="none"/></svg></span>
+          <button class="vmn" data-rlmenu="${esc(l.id)}">⋯</button></div>
+        <div class="vin"><b>${esc(l.title)}</b><small><span class="src">▶</span>${esc(dom)}</small></div>
+      </div>`; }).join('');
+    return `<div class="rit-sec"><span>Візія · відео</span><span class="add" data-raddlk="1">＋ посилання</span></div>
+      <div class="vrail">${links||'<div class="vhint">Додай відео, які повертають тебе в стан «я вже там»</div>'}</div>`;
+  }
   function ritualInnerHTML(){
-    const today=ritDs(0), d=ritDay(today), st=ritStreak();
+    const today=ritDs(0), d=ritDay(today), st=ritStreak(), steps=ritSteps();
     const DW=['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
     // місячний %
     const now=new Date(); let mDone=0,mDays=now.getDate();
     for(let i=1;i<=mDays;i++){ const ds=ymdLocal(new Date(now.getFullYear(),now.getMonth(),i));
       if(RIT.days[ds]&&RIT.days[ds].done) mDone++; }
+    const nDone=steps.filter(s=>ritStepDone(s,d)).length;
     const cal=[]; for(let i=-10;i<=2;i++){ const dd=new Date(); dd.setDate(dd.getDate()+i);
       const ds=ymdLocal(dd), rec=RIT.days[ds];
-      cal.push(`<div class="cd ${i===0?'today':''} ${rec&&rec.done?'done':(i<0?'miss':'')}"${i===0?' id="ritToday"':''}>
+      // сьогодні рахуємо наживо за поточним набором, минулі дні — за тим, що збереглось того дня
+      const n=i===0?nDone:(rec&&rec.n)||0;
+      const cls=rec&&rec.done?'done':(n>0?'part':(i<0?'miss':''));
+      cal.push(`<div class="cd ${i===0?'today':''} ${cls}"${i===0?' data-rtoday="1"':''}>
         <s>${DW[dd.getDay()]}</s><b>${dd.getDate()}</b><i></i></div>`); }
-    const mixDur=RIT.mix.reduce((s,m)=>s+(m.dur||0),0);
-    const recLive=!!ritRec;
-    const jr=RIT_J.map(([jk,ak,lb,ph])=>{
-      const val=d[jk]||'', au=d[ak];
-      return `<div class="glass jr" >
-        <div class="lb">${lb}</div>
-        <div class="tx ${val?'':'ph'}" data-rjr="${jk}">${val?esc(val):esc(ph)}</div>
-        <span class="mic ${au?'has':''}" data-rmic="${ak}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></span>
-        ${au?`<span class="adur">${fmtDur(au.dur||0)}</span>`:''}
-      </div>`; }).join('');
-    const links=RIT.links.map(l=>{ const id=ytId(l.url);
-      const th=id?`background-image:url('https://img.youtube.com/vi/${id}/hqdefault.jpg')`:'';
-      const dom=l.url.replace(/^https?:\/\/(www\.)?/,'').split('/')[0];
-      return `<div class="vcard" data-rlk="${l.id}">
-        <div class="vth ${id?'':'vempty'}" style="${th}">
-          <span class="pb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><polygon points="8 5 18 12 8 19" fill="currentColor" stroke="none"/></svg></span>
-          <button class="vmn" data-rlmenu="${l.id}">⋯</button></div>
-        <div class="vin"><b>${esc(l.title)}</b><small><span class="src">▶</span>${esc(dom)}</small></div>
-      </div>`; }).join('');
     return `
       <div class="rit-cal">${cal.join('')}</div>
       <div class="rit-streak">🔥 <b>стрік ${st.s} ${st.s===1?'день':(st.s>=2&&st.s<=4?'дні':'днів')}</b> · найкращий — ${st.best} · ${mDays?Math.round(mDone/mDays*100):0}% місяця</div>
-      <div class="glass mix">
-        <button class="pl" id="ritMixPl">${ritMixOn?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6v12M15 6v12"/></svg>':WICONS.play}</button>
-        <span class="tx"><b>Ранковий мікс · ${fmtDur(mixDur)}</b>
-          <small>${RIT.mix.length?('твій голос · '+RIT.mix.length+' зап. · тап ▸ слухати'):'запиши себе з майбутнього — 30–60 с'}</small></span>
-        <span class="tm" id="ritRecTm">${recLive?'● '+fmtDur(ritRecSec):''}</span>
-        <button class="rec ${recLive?'live':''}" id="ritMixRec">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></button>
-      </div>
-      ${jr}
-      ${ritPhotoCardHTML(d)}
-      <div class="rit-sec"><span>Візія · відео</span><span class="add" id="ritAddLk">＋ посилання</span></div>
-      <div class="vrail">${links||'<div class="vhint">Додай відео, які повертають тебе в стан «я вже там»</div>'}</div>
-      <button class="rit-done ${d.done?'ok':''}" id="ritDone">${d.done?'✓ День зараховано':'🔥 День зараховано'}</button>`;
+      <button type="button" class="rit-set" data-rset="1">
+        <span class="rs-t"><b>Мій ранок · ${esc(ritTplName())}</b><small>${nDone} з ${steps.length} кроків</small></span>
+        <span class="rs-e">Змінити</span>
+        <span class="rs-bar"><i style="width:${steps.length?Math.round(nDone/steps.length*100):0}%"></i></span></button>
+      ${steps.map(s=>ritStepHTML(s,d)).join('')}
+      <button class="rit-done ${d.done?'ok':''}" data-rdone="1">${d.done?'✓ День зараховано':'🔥 День зараховано'}</button>`;
   }
-  function ritualBind(){
+  // root — контейнер ранку (у Карті бажань або в шторці поверх гри); id не вживаємо, бо ранок буває на екрані двічі
+  function ritualBind(root){
+    root=root||document.getElementById('ritInline'); if(!root) return;
     const today=ritDs(0), d=ritDay(today);
+    const $q=sel=>root.querySelector(sel), $a=sel=>root.querySelectorAll(sel);
     // календар одразу відкритий на сьогодні (без анімації, щоб не смикалось)
     requestAnimationFrame(()=>{ try{
-      const t=document.getElementById('ritToday'), c=t&&t.parentElement;
+      const t=$q('[data-rtoday]'), c=t&&t.parentElement;
       if(c) c.scrollLeft=Math.max(0, t.offsetLeft-(c.clientWidth-t.offsetWidth)/2);
     }catch(_){}});
-    // bind
-    document.getElementById('ritMixPl').onclick=e=>ritMixPlay(e.currentTarget);
-    document.getElementById('ritMixRec').onclick=()=>ritRec?ritRecord('mix'):ritMixRecTap();
-    document.getElementById('ritAddLk').onclick=ritAddLink;
-    document.querySelectorAll('[data-rjr]').forEach(el=>el.onclick=()=>{
-      const jk=el.dataset.rjr, meta=RIT_J.find(x=>x[0]===jk);
-      inputModal({title:meta[2], value:d[jk]||'', placeholder:meta[3],
-        onOk:v=>{ d[jk]=(v||'').trim(); saveRitual(); ritualRerender(); }}); });
-    document.querySelectorAll('[data-rmic]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritFieldMic(el.dataset.rmic); });
-    { const pc=document.getElementById('ritPhotoCard'); if(pc) pc.onclick=(e)=>{
+    const pl=$q('[data-rmixpl]'); if(pl) pl.onclick=e=>ritMixPlay(e.currentTarget);
+    const rc=$q('[data-rmixrec]'); if(rc) rc.onclick=()=>ritRec?ritRecord('mix'):ritMixRecTap();
+    const al=$q('[data-raddlk]'); if(al) al.onclick=ritAddLink;
+    const rs=$q('[data-rset]'); if(rs) rs.onclick=ritEditor;
+    $a('[data-rjr]').forEach(el=>el.onclick=()=>{
+      const id=el.dataset.rjr, m=ritMeta(ritSteps().find(s=>s.id===id)||{id});
+      inputModal({title:m.t, value:d[id]||'', placeholder:m.ph||'',
+        onOk:v=>{ d[id]=(v||'').trim().slice(0,2000); ritSaveToday(); ritualRerender(); }}); });
+    $a('[data-rmic]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritFieldMic(el.dataset.rmic); });
+    $a('[data-rstep]').forEach(el=>el.onclick=()=>{
+      const s=ritSteps().find(x=>x.id===el.dataset.rstep); if(!s) return;
+      const m=ritMeta(s);
+      if(m.ty==='check'){ if(d[s.id]) delete d[s.id]; else d[s.id]=1; ritSaveToday(); ritualRerender();
+        try{ window.platform.haptic('light'); }catch(_){} return; }
+      if(m.ty!=='timer') return;
+      const mark=()=>{ const d2=ritDay(today); d2[s.id]=1; ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} };
+      if(s.id==='vis') ritEnterMoment({seconds:m.sec, label:'Візуалізація', doneLabel:'Готово', onDone:mark,
+        emptyMsg:'Додай фото в Карту бажань — тоді візуалізація йтиме на твоїх мріях'});
+      else ritEnterMoment({seconds:m.sec, plain:true, label:'Крок ранку', cap:m.t, hint:m.sub||'Побудь у цьому кілька хвилин', doneLabel:'Готово', onDone:mark});
+    });
+    { const pc=$q('#ritPhotoCard'); if(pc) pc.onclick=(e)=>{
         if(e.target.closest('[data-rphomenu]')) return;
         const dd=ritDay(today); if(dd.photo) ritEnterMoment(); else ritPhotoTap();
       }; }
-    document.querySelectorAll('[data-rphomenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritPhotoMenu(); });
-    document.querySelectorAll('[data-rlk]').forEach(el=>el.onclick=()=>{
+    $a('[data-rphomenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritPhotoMenu(); });
+    $a('[data-rlk]').forEach(el=>el.onclick=()=>{
       const l=RIT.links.find(x=>x.id===el.dataset.rlk); if(!l) return;
+      const dd=ritDay(today); if(!dd.video){ dd.video=1; ritSaveToday(); }
       try{ window.platform.openLink(l.url); }catch(_){ try{ window.open(l.url,'_blank'); }catch(__){} } });
-    document.querySelectorAll('[data-rlmenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritLinkMenu(el.dataset.rlmenu); });
-    document.getElementById('ritDone').onclick=()=>{
+    $a('[data-rlmenu]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritLinkMenu(el.dataset.rlmenu); });
+    const dn=$q('[data-rdone]'); if(dn) dn.onclick=()=>{
       const dd=ritDay(today);
-      if(dd.done){ delete dd.done; saveRitual(); ritualRerender(); return; }
+      if(dd.done){ delete dd.done; ritSaveToday(); ritualRerender(); return; }
+      const finish=()=>{ const d2=ritDay(today); d2.done=1; ritSaveToday(); ritualRerender();
+        try{ window.platform.haptic('medium'); plToast('🔥 День у стріку'); }catch(_){} };
+      // у ранку вже є крок «Візуалізація» — не повторюємо її на фініші
+      if(ritSteps().some(s=>s.id==='vis')){ finish(); return; }
       try{ plToast('✨ Перейти до візуалізації мрій…'); }catch(_){}
       setTimeout(()=>{
         ritEnterMoment({
@@ -12238,13 +12668,68 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           hint:'Уяви, що цей день сьогодні — саме цей: як ти його відчуваєш, як проживаєш?',
           doneLabel:'Зарахувати день',
           emptyMsg:'День зараховано — додай образи в Карту бажань, щоб бачити тут миті',
-          onClose:()=>{
-            const d2=ritDay(today); d2.done=1; saveRitual(); ritualRerender();
-            try{ window.platform.haptic('medium'); plToast('🔥 День у стріку'); }catch(_){}
-          }
+          onClose:finish
         });
       },550);
     };
+  }
+  // ── Конструктор ранку: шаблон, порядок, додати/прибрати крок, своє питання ──
+  function ritEditor(){
+    let work=ritSteps().map(s=>Object.assign({},s));
+    const ov=document.createElement('div'); ov.className='asheet rit-ed';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML='<div class="asheet-in"></div>';
+    document.body.appendChild(ov);
+    const box=ov.firstChild;   // шторка зʼявляється один раз, далі міняємо лише вміст (без повторної анімації)
+    const close=()=>ov.remove();
+    const draw=()=>{
+      const ids=work.map(s=>s.id).join(',');
+      const tpls=RIT_TPL.map(t=>`<button type="button" class="red-tpl ${t.s.join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
+      const rows=work.map((s,i)=>{ const m=ritMeta(s);
+        return `<div class="red-row"><span class="rst-ic">${esc(m.ic||'•')}</span>
+          <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(m.ty==='text'&&m.a?'текст · голос':(RIT_TY[m.ty]||''))}${m.ty==='timer'?' · '+fmtDur(m.sec||180):''}</small></span>
+          <button type="button" class="red-b" data-rup="${i}" aria-label="Вище" ${i?'':'disabled'}>↑</button>
+          <button type="button" class="red-b" data-rdn="${i}" aria-label="Нижче" ${i<work.length-1?'':'disabled'}>↓</button>
+          <button type="button" class="red-b x" data-rdel="${i}" aria-label="Прибрати">✕</button></div>`; }).join('');
+      const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)).map(k=>
+        `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(RIT_CAT[k].t)}</button>`).join('');
+      box.innerHTML=`<div class="asheet-grip"></div>
+        <div class="asheet-title">Мій ранок</div>
+        <div class="asheet-sub">Шаблон або свій набір. Твої записи за минулі дні лишаються.</div>
+        <div class="red-tpls">${tpls}</div>
+        <div class="red-list">${rows||'<div class="vhint">Додай хоча б один крок</div>'}</div>
+        <div class="red-lbl">Додати крок</div>
+        <div class="red-adds">${add}<button type="button" class="red-add own" data-rown="1">＋ Своє питання</button></div>
+        <button type="button" class="red-ok" data-rok="1" ${work.length?'':'disabled'}>Готово</button>
+        <button type="button" class="asheet-cancel">Скасувати</button>`;
+      ov.querySelector('.asheet-cancel').onclick=close;
+      ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=RIT_TPL.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(id=>({id})); draw(); } });
+      ov.querySelectorAll('[data-rup]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rup; if(i>0){ const x=work[i]; work[i]=work[i-1]; work[i-1]=x; draw(); } });
+      ov.querySelectorAll('[data-rdn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rdn; if(i<work.length-1){ const x=work[i]; work[i]=work[i+1]; work[i+1]=x; draw(); } });
+      ov.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{ work.splice(+b.dataset.rdel,1); draw(); });
+      ov.querySelectorAll('[data-radd]').forEach(b=>b.onclick=()=>{ work.push({id:b.dataset.radd}); draw(); });
+      const own=ov.querySelector('[data-rown]'); if(own) own.onclick=()=>{
+        inputModal({title:'Своє питання чи дія', placeholder:'Напр. Що я сьогодні не робитиму?', onOk:t=>{
+          t=(t||'').trim().slice(0,80); if(!t) return;
+          const id='c_'+Date.now().toString(36);
+          const put=(ty,sec)=>{ const s=ritCleanStep({id,ty,t,sec}); if(s){ work.push(s); draw(); } };
+          actionSheet({title:'Як відповідати?', items:[
+            {ic:'edit', label:'Текст', sub:'запис у кілька рядків', onClick:()=>put('text')},
+            {ic:'✓', label:'Галочка', sub:'зробив / не зробив', onClick:()=>put('check')},
+            {ic:'⏱', label:'Таймер', sub:'скільки хвилин', onClick:()=>inputModal({title:'Скільки хвилин?', value:'3', placeholder:'3',
+              onOk:v=>put('timer', Math.round((parseFloat(String(v||'').replace(',','.'))||3)*60))})}
+          ]});
+        }});
+      };
+      const ok=ov.querySelector('[data-rok]'); if(ok) ok.onclick=()=>{
+        if(!work.length) return;
+        RIT_STEPS=work.map(ritCleanStep).filter(Boolean); saveRitSteps();
+        ritSaveToday(); close(); ritualRerender();
+        try{ plToast('Ранок оновлено · '+RIT_STEPS.length+' кр.'); }catch(_){}
+      };
+    };
+    draw();
+    ov.onclick=e=>{ if(e.target===ov) close(); };
   }
   // ── Фото дня: запис живого зображення (з зошита/телефону) + пауза «Момент» ──
   const RPH_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>';
@@ -12293,7 +12778,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         if(data && data.url) saved={ts:Date.now(),url:data.url,local:false};
       }
     }catch(_){ /* нема мережі/проксі — лишаємось з локальним фото, спробуємо синхронізувати пізніше */ }
-    d.photo=saved; saveRitual(); ritualRerender();
+    d.photo=saved; ritSaveToday(); ritualRerender();
     try{ window.platform.haptic('medium'); }catch(_){}
     ritEnterMoment();
   }
@@ -12302,42 +12787,60 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     actionSheet({title:'Фото дня', items:[
       {ic:WICONS.play, label:'Зайти в момент', onClick:()=>ritEnterMoment()},
       {ic:'edit', label:'Перезняти', onClick:()=>ritPhotoTap()},
-      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d.photo; saveRitual(); ritualRerender(); }}
+      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d.photo; ritSaveToday(); ritualRerender(); }}
     ]});
   }
   // ── Повноекранна пауза «Момент»: рандомне фото з Карти бажань, щоб пару хвилин пожити в ньому ──
   let rmomTimer=null;
+  // opts: seconds, label, cap, hint, doneLabel, emptyMsg, plain (без фото — для дихання/медитації),
+  //       onDone — людина завершила (кнопка або ✕ після кінця таймера), onClose — будь-яке закриття
   function ritEnterMoment(opts){
     opts=opts||{};
-    const pool=wishes.filter(w=> (w.type==='video') ? !!w.thumb : !!w.img);
-    if(!pool.length){
+    const pool=opts.plain?[]:wishes.filter(w=> (w.type==='video') ? !!w.thumb : !!w.img);
+    if(!opts.plain && !pool.length){
       try{ plToast(opts.emptyMsg||'📸 Фото дня збережено — додай образи в Карту бажань, щоб бачити тут миті'); }catch(_){}
       if(opts.onClose) opts.onClose();
       return;
     }
-    const w=pool[Math.floor(Math.random()*pool.length)];
-    const img = w.type==='video' ? w.thumb : w.img;
-    const secTotal=opts.seconds||75;
-    const ov=document.createElement('div'); ov.className='rmom-ov'; ov.id='rmomOv';
+    if(rmomTimer){ clearInterval(rmomTimer); rmomTimer=null; }
+    { const o=document.getElementById('rmomOv'); if(o) o.remove(); }
+    let wi=pool.length?Math.floor(Math.random()*pool.length):0;
+    const secTotal=opts.seconds||75, R=54, C=2*Math.PI*R;
+    const ov=document.createElement('div'); ov.className='rmom-ov'+(opts.plain?' plain':''); ov.id='rmomOv';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
     ov.innerHTML=`
-      <div class="rmom-bg" style="background-image:url('${safeImg(img)}')"></div>
-      <div class="rmom-top"><button class="rmom-x" id="rmomX">✕</button></div>
+      <div class="rmom-bg"></div>
+      <div class="rmom-top">${pool.length>1?'<span class="rmom-n"></span>':'<span></span>'}<button class="rmom-x" aria-label="Закрити">✕</button></div>
       <div class="rmom-mid">
-        <div class="rmom-tm" id="rmomTm">${fmtDur(secTotal)}</div>
+        <div class="rmom-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${R}" class="rr-bg"/><circle cx="60" cy="60" r="${R}" class="rr-fg" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="0" transform="rotate(-90 60 60)"/></svg><b class="rmom-tm">${fmtDur(secTotal)}</b></div>
         <div class="rmom-lb">${esc(opts.label||'Проживи цю мить')}</div>
-        <div class="rmom-cap">${esc(w.cap||'Це вже твоє сьогодні')}</div>
+        <div class="rmom-cap"></div>
         <div class="rmom-hint">${esc(opts.hint||'Кілька хвилин уяви, що ти вже тут — як це відчувається, що бачиш, що чуєш')}</div>
       </div>
-      <div class="rmom-bot"><button class="rmom-done" id="rmomDone">${esc(opts.doneLabel||'Завершити')}</button></div>`;
+      <div class="rmom-bot">${pool.length>1?'<button class="rmom-next">Наступна мрія ›</button>':''}<button class="rmom-done">${esc(opts.doneLabel||'Завершити')}</button></div>`;
     document.body.appendChild(ov);
-    let sec=secTotal;
-    const tm=document.getElementById('rmomTm');
-    const tick=()=>{ if(tm) tm.textContent=fmtDur(sec); if(sec<=0){ clearInterval(rmomTimer); rmomTimer=null;
-        const btn=document.getElementById('rmomDone'); if(btn) btn.textContent='✓ Готово'; } sec--; };
+    const bg=ov.querySelector('.rmom-bg'), cap=ov.querySelector('.rmom-cap'), num=ov.querySelector('.rmom-n');
+    const show=()=>{
+      if(opts.plain){ cap.textContent=opts.cap||''; return; }
+      const w=pool[wi], img=w.type==='video'?w.thumb:w.img;
+      bg.style.backgroundImage="url('"+safeImg(img)+"')";
+      cap.textContent=opts.cap||w.cap||'Це вже твоє сьогодні';
+      if(num) num.textContent='Мрія '+(wi+1)+' з '+pool.length;
+    };
+    show();
+    let sec=secTotal; const tm=ov.querySelector('.rmom-tm'), fg=ov.querySelector('.rr-fg'), btn=ov.querySelector('.rmom-done');
+    const tick=()=>{ if(tm) tm.textContent=fmtDur(Math.max(0,sec));
+      if(fg) fg.setAttribute('stroke-dashoffset',(C*(1-Math.max(0,sec)/secTotal)).toFixed(1));
+      if(sec<=0){ clearInterval(rmomTimer); rmomTimer=null; if(btn) btn.textContent='✓ '+(opts.doneLabel||'Готово');
+        try{ window.platform.haptic('medium'); }catch(_){} }
+      sec--; };
     tick(); rmomTimer=setInterval(tick,1000);
-    const close=()=>{ if(rmomTimer){ clearInterval(rmomTimer); rmomTimer=null; } ov.remove(); if(opts.onClose) opts.onClose(); };
-    document.getElementById('rmomX').onclick=close;
-    document.getElementById('rmomDone').onclick=close;
+    const close=(finished)=>{ if(rmomTimer){ clearInterval(rmomTimer); rmomTimer=null; } ov.remove();
+      if(finished&&opts.onDone) opts.onDone();
+      if(opts.onClose) opts.onClose(); };
+    ov.querySelector('.rmom-x').onclick=()=>close(sec<0);
+    btn.onclick=()=>close(true);
+    const nx=ov.querySelector('.rmom-next'); if(nx) nx.onclick=()=>{ wi=(wi+1)%pool.length; show(); };
   }
   function ritMixRecTap(){ if(RIT.mix.length) ritMixLongOrRec(); else ritRecord('mix'); }
   function ritMixLongOrRec(){
@@ -20211,17 +20714,39 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
 
   /* ============ DASHBOARD RENDER ============ */
-  // глобальний вигляд папок v2: list (full-bleed) | grid (обкладинки) | deck (колода)
-  const FV_ORDER=['list','grid','mag'];
-  const FV_NAME={list:'Список', grid:'Сітка', mag:'Журнал'};
-  let homeFolderView='grid';
-  try{ const sv=localStorage.getItem('folderview');
-    if(sv==='cover'||sv==='compact'||sv==='deck') homeFolderView='grid';  // міграція старих режимів
-    else if(sv&&FV_ORDER.includes(sv)) homeFolderView=sv; }catch(_){}
-  prefCatchup('folderview', v=>{ if(v&&FV_ORDER.includes(v)) homeFolderView=v; else if(v==='cover'||v==='compact'||v==='deck') homeFolderView='grid'; });
+  /* Вигляд папок на Огляді (06.10.2026): Галерея (за замовчуванням) · Секції ·
+     Бенто — обкладинки на всю плитку (.fc3); Список і Журнал — колишні .fc2.
+     Вибір — у шторці ⚙ (openFolderViewSheet). Старе 'grid' (і ще давніші
+     cover/compact/deck) читаємо як «Галерею» лише в памʼяті: при старті нічого
+     не переписуємо, ключ зміниться, коли людина сама вибере вигляд. */
+  const FV_ORDER=['gallery','sections','bento','list','mag'];
+  const FV_NAME={gallery:'Галерея', sections:'Секції', bento:'Бенто', list:'Список', mag:'Журнал'};
+  const FV_COVER=['gallery','sections','bento'];
+  function fvNorm(v){ return FV_ORDER.includes(v) ? v : (v==='grid'||v==='cover'||v==='compact'||v==='deck') ? 'gallery' : null; }
+  let homeFolderView='gallery';
+  try{ const sv=fvNorm(localStorage.getItem('folderview')); if(sv) homeFolderView=sv; }catch(_){}
+  prefCatchup('folderview', v=>{ const n=fvNorm(v); if(n){ homeFolderView=n; try{ renderDashboard(); }catch(_){} } });
+  /* розмір плиток (s/m/l), порядок (вручну/за назвою), фото на всю плитку —
+     одним легким налаштуванням 'folderopts' (prefSet: сирий ключ + копія в хмарі) */
+  const FOPT_DEF={size:'m', sort:'manual', covers:1};
+  function foptParse(raw){
+    let o={}; try{ o=JSON.parse(raw||'{}')||{}; }catch(_){}
+    return { size:['s','m','l'].includes(o.size)?o.size:'m',
+             sort:o.sort==='name'?'name':'manual',
+             covers:o.covers===0?0:1 };
+  }
+  let folderOpts=Object.assign({},FOPT_DEF);
+  try{ folderOpts=foptParse(localStorage.getItem('folderopts')); }catch(_){}
+  prefCatchup('folderopts', v=>{ folderOpts=foptParse(v); try{ renderDashboard(); }catch(_){} });
+  function setFolderOpt(k,v){
+    folderOpts[k]=v;
+    try{ prefSet('folderopts', JSON.stringify(folderOpts)); }catch(_){}
+    renderDashboard();
+    try{ window.platform.haptic('select'); }catch(_){}
+  }
   function applyFolderViewIcon(){
-    const seg=document.getElementById('folderViewSeg');
-    if(seg) seg.querySelectorAll('[data-fv]').forEach(b=>b.classList.toggle('on', b.dataset.fv===homeFolderView));
+    const b=document.getElementById('folderLookBtn');
+    if(b) b.setAttribute('aria-label','Вигляд папок: '+FV_NAME[homeFolderView]);
   }
   function setFolderView(v){
     if(!FV_ORDER.includes(v)||v===homeFolderView){ applyFolderViewIcon(); return; }
@@ -20230,8 +20755,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     applyFolderViewIcon(); renderDashboard();
     try{ window.platform.haptic('select'); }catch(_){}
   }
-  { const seg=document.getElementById('folderViewSeg');
-    if(seg) seg.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>setFolderView(b.dataset.fv)); }
 
   const R=20, C=2*Math.PI*R;
 
@@ -20293,7 +20816,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const okey=it.key, r=it.r, relX=(lastX-r.left)/r.width;
         const forbidden=isDescendantFolder(okey, st.key);
         if(!forbidden && relX>0.28 && relX<0.72){ st.mode='into'; st.targetKey=okey; intoEl=it.el; }
-        else if((folders[okey].parent||'')===(folders[st.key].parent||'')){
+        // «За назвою» порядок задає абетка — переставляти нема чого (вкласти в папку можна)
+        else if(folderOpts.sort!=='name' && (folders[okey].parent||'')===(folders[st.key].parent||'')){
           const before=relX<0.5; st.mode='reorder'; st.targetKey=before?okey:nextAfterCached(okey);
           const gr=grid.getBoundingClientRect();
           lineStyle={ top:(r.top-gr.top+r.height*0.15), height:(r.height*0.7),
@@ -20327,7 +20851,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     }
 
     grid.addEventListener('pointerdown',e=>{
-      if(e.target.closest('.fmenu')||e.target.closest('.fadd')) return;
+      if(e.target.closest('.fmenu')||e.target.closest('.fadd')||e.target.closest('.fc3-photo')) return;
       // ручка перетягування — миттєвий старт без утримання
       const handle=e.target.closest('.fdrag-handle');
       const card=e.target.closest('.fcard[data-fkey]'); if(!card||!grid.contains(card)) return;
@@ -20353,34 +20877,130 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     grid.addEventListener('pointercancel',()=>{ if(st) finish(false); else cancelPending(); });
   }
 
-  function renderProjRail(){
-    const rail=document.getElementById('projRail'); if(!rail) return;
-    const projs=(typeof projFolderKeys==='function')?projFolderKeys():[];
-    if(!projs.length){ rail.style.display='none'; rail.innerHTML=''; return; }
-    rail.style.display='flex';
-    rail.innerHTML = projs.map(k=>{
-      const f=folders[k]; if(!f) return '';
-      return '<div class="proj-rail-i" data-projrail="'+esc(k)+'" style="--pc:'+safeColor(f.c,'#6a7dff')+'" title="'+esc(f.name||'')+'">'+esc(f.emoji||'🚀')+'</div>';
-    }).join('') + '<div class="proj-rail-add" data-projraddd title="Новий проєкт">＋</div>';
-    rail.querySelectorAll('[data-projrail]').forEach(el=>{
-      el.onclick=()=>{ try{ window.platform.haptic('select'); }catch(_){} goFolder(el.dataset.projrail); };
+  /* ════════ ОБКЛАДИНКИ: Галерея · Секції · Бенто (06.10.2026) ════════
+     Фото на всю плитку, назва на матовому склі. Папка без фото — кольорова
+     обкладинка з великою іконкою і кнопкою «фото» (одразу вибір знімка).
+     Ліву колонку проєктів прибрано: проєкти — «Ще → Проєкти» і шторка ⚙. */
+  const FC3_IC={
+    pin:'<path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/>',
+    cam:'<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'
+  };
+  function fc3Svg(n){ return '<svg class="fc3-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(FC3_IC[n]||'')+'</svg>'; }
+  // підпис під назвою: лише те, що справді щось каже («0 активних» — шум)
+  function fc3Meta(k,f){
+    const n=groupKids(k).length;
+    if(n) return 'група · '+n+' '+pluralUk(n,'папка','папки','папок');
+    if(f.role==='page') return 'сторінка';
+    const active=(f.widgets||[]).filter(w=>w.ready).length;
+    return active ? (active+' '+pluralUk(active,'активний','активні','активних')) : '';
+  }
+  // плитка-обкладинка; shape: '' | 'wide' (карусель секцій) | 'big' | 'tall' (бенто)
+  function fc3Tile(k, shape){
+    const f=folders[k];
+    const isGroup=groupKids(k).length>0;
+    const photo=!!(f.photo && folderOpts.covers);
+    const el=document.createElement('div');
+    el.className='fcard fc3 '+(photo?'fc3-has-photo':'fc3-color')+(isGroup?' fc3-group':'')+(shape?' fc3-'+shape:'');
+    { const sc=safeColor(f.c,''); if(sc) el.style.setProperty('--c', sc); }   // порожній/чужий колір не ставимо — спрацює запасний у CSS
+    el.dataset.fkey=k;
+    const meta=fc3Meta(k,f);
+    const emojiShow=(f.emoji&&f.emoji.trim())?esc(f.emoji.trim()):esc((f.name||'?').trim().charAt(0).toUpperCase());
+    let h='';
+    if(photo){
+      const pp=f.photoPos;
+      const xf=pp?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
+      h+=`<div class="fc3-bg" style="background-image:url('${esc(safeImg(window.photoSrc(f.photo)))}');${xf}"></div><div class="fc3-veil"></div>`;
+    } else {
+      h+=`<svg class="ico fc3-wm" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`;
+      // емодзі й лінійна іконка — обидва; яку показати, вирішує тема (як у .fc2)
+      h+=`<span class="fc3-ic"><span class="fc2-emj">${emojiShow}</span><svg class="ico fc2-ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
+      // камера — лише коли фото справді нема: при вимкненому «Фото на всю плитку»
+      // знімок у папки є, і новий тихо затер би його (той самий id 'ph_'+key, і в хмарі)
+      if(!f.photo) h+=`<button class="fc3-photo" data-fphoto="${esc(k)}" aria-label="Додати фото-обкладинку">${fc3Svg('cam')}</button>`;
+    }
+    h+=`<div class="fc3-label"><div class="fc3-name" data-i18n-skip="1">${f.pinned?`<span class="fc3-pin" title="Закріплена">${fc3Svg('pin')}</span>`:''}${esc(f.name)}</div>${meta?`<div class="fc3-meta">${esc(meta)}</div>`:''}</div>`;
+    h+=`<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню папки «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
+    el.innerHTML=h;
+    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
+      if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
+      if(isGroup){ openFolderGroup(k); return; }
+      goFolder(k); };
+    return el;
+  }
+  // група в «Секціях»: рядок зі стосом мініатюр (сама група + до двох її папок)
+  function fc3GroupRow(k){
+    const f=folders[k], kids=groupKids(k);
+    const el=document.createElement('div');
+    el.className='fcard fc3-grow'; el.dataset.fkey=k;
+    { const sc=safeColor(f.c,''); if(sc) el.style.setProperty('--c', sc); }
+    const th=[k].concat(kids).slice(0,3).map((ck,i)=>{
+      const cf=folders[ck], ph=!!(cf.photo&&folderOpts.covers);
+      return `<span class="fc3-th" style="--i:${i};--c:${safeColor(cf.c,'#6a7dff')};${ph?`background-image:url('${esc(safeImg(window.photoSrc(cf.photo)))}')`:''}"></span>`;
+    }).reverse().join('');
+    el.innerHTML=`<span class="fc3-stack" aria-hidden="true">${th}</span>`+
+      `<span class="fc3-gt"><b data-i18n-skip="1">${esc(f.name)}</b><small>${kids.length} ${pluralUk(kids.length,'папка','папки','папок')} всередині</small></span>`+
+      `<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню групи «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
+    el.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
+      if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
+      openFolderGroup(k); };
+    return el;
+  }
+  function fc3Add(){
+    const a=document.createElement('button'); a.type='button'; a.className='fc3-add';
+    a.innerHTML='<span class="fc3-plus" aria-hidden="true">＋</span><span>Нова папка</span>';
+    a.onclick=()=>createFolder();
+    return a;
+  }
+  function renderFolderCovers(grid, keys){
+    const v=homeFolderView;
+    grid.classList.add('fsz-'+folderOpts.size);
+    if(v==='sections'){
+      const pinned=keys.filter(k=>folders[k].pinned);
+      const groups=keys.filter(k=>!folders[k].pinned && groupKids(k).length);
+      const rest=keys.filter(k=>!folders[k].pinned && !groupKids(k).length);
+      const sec=(title,n,cls)=>{
+        const s=document.createElement('div'); s.className='fsec';
+        s.innerHTML=`<div class="fsec-h"><span>${title}</span>${n?`<small>${n}</small>`:''}</div><div class="${cls}"></div>`;
+        grid.appendChild(s); return s.lastElementChild;
+      };
+      if(pinned.length){ const row=sec('Закріплені',pinned.length,'fsec-row'); pinned.forEach(k=>row.appendChild(fc3Tile(k,'wide'))); }
+      if(groups.length){ const box=sec('Групи',groups.length,'fsec-groups'); groups.forEach(k=>box.appendChild(fc3GroupRow(k))); }
+      const all=sec((pinned.length||groups.length)?'Усі папки':'Папки',0,'fsec-grid');
+      rest.forEach(k=>all.appendChild(fc3Tile(k,'')));
+      all.appendChild(fc3Add());
+      return;
+    }
+    // Бенто: перша закріплена — велика, групи — високі, решта — квадрати
+    let bigUsed=false;
+    keys.forEach(k=>{
+      let shape='';
+      if(v==='bento'){
+        if(!bigUsed && folders[k].pinned){ shape='big'; bigUsed=true; }
+        else if(groupKids(k).length) shape='tall';
+      }
+      grid.appendChild(fc3Tile(k,shape));
     });
-    const addBtn=rail.querySelector('[data-projraddd]');
-    if(addBtn) addBtn.onclick=()=>{ if(typeof goProjects==='function') goProjects(); };
+    grid.appendChild(fc3Add());
   }
   function renderDashboard(){
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
-    try{ renderProjRail(); }catch(_){}
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
-    grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag');
+    grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag',
+      'fv2-gallery','fv2-sections','fv2-bento','fsz-s','fsz-m','fsz-l');
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
     try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
-    topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).forEach((k,idx)=>{
+    let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project'));
+    // «за назвою»: закріплені однаково зверху, решта — за абеткою
+    if(folderOpts.sort==='name') keys=keys.slice().sort((a,b)=>
+      ((folders[b].pinned?1:0)-(folders[a].pinned?1:0)) || String(folders[a].name||'').localeCompare(String(folders[b].name||''),'uk'));
+    if(FV_COVER.includes(homeFolderView)) renderFolderCovers(grid, keys);
+    else {
+    keys.forEach((k,idx)=>{
       const f=folders[k]; if(!f) return;
       const active = (f.widgets||[]).filter(w=>w.ready).length;
       const subCount = childFolderKeys(k).length;
@@ -20407,10 +21027,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       } else {
         metaHtml=`<div class="fstat"><b>${active}</b> ${pluralUk(active,'активний','активні','активних')}${f.pct?` · ${f.pct}%`:''}</div>`;
       }
-      // ── v2: єдина розмітка, режим вирішує лише клас-обгортку ──
-      const modeClass = homeFolderView==='grid' ? 'fc2-tile'
-                      : homeFolderView==='deck' ? 'fc2-deck'
-                      : homeFolderView==='mag'  ? 'fc2-mag' : 'fc2-row';
+      // ── v2 (Список · Журнал): єдина розмітка, режим вирішує лише клас-обгортку ──
+      const modeClass = homeFolderView==='mag' ? 'fc2-mag' : 'fc2-row';
       const el=document.createElement('div');
       el.className='fcard fc2 '+modeClass+(isGroup?' fc2-group':'');
       // Порожній колір НЕ виставляємо: інакше в --c потрапляє сміття,
@@ -20431,14 +21049,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       // перемикання теми міняє вигляд миттєво, без перемальовування списку.
       inner+=`<div class="fc2-em"><span class="fc2-emj">${emojiShow}</span>`+
              `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></div>`;
-      if(homeFolderView==='deck'){
-        let dpct=0;
-        if(f.role==='project'){ const pr=folderProgress(k); dpct=pr.total?pr.pct:0; }
-        else dpct=Math.max(0,Math.min(100, +f.pct||0));
-        inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}<div class="fc2-prog"><i style="width:${dpct}%"></i></div></div>`;
-      } else {
-        inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}</div>`;
-      }
+      inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}</div>`;
       inner+=`<button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування">⋮</button>`+
              `<button class="fdrag-handle" title="Перетягнути" aria-label="Перетягнути">⠿</button>`;
       el.innerHTML=inner;
@@ -20450,12 +21061,15 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     });
     // add-folder card — під поточний режим
     const add=document.createElement('div');
-    add.className='fc2 fc2-add '+(homeFolderView==='grid'?'fc2-tile-add':homeFolderView==='deck'?'fc2-deck-add':homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
+    add.className='fc2 fc2-add '+(homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
     add.innerHTML=`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
     add.onclick=createFolder;
     grid.appendChild(add);
+    }
     // bind menus
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
+    // «фото» на кольоровій обкладинці — одразу вибір знімка
+    grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pickFolderPhoto(b.dataset.fphoto); });
     try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=topFolderKeys().filter(folderVisible).length; }catch(_){}
     if(!grid.__dragInit){ grid.__dragInit=true; enableFolderDrag(grid); }
     try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
@@ -20628,7 +21242,52 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       setTimeout(()=>{ try{ inp.focus(); }catch(_){} },120);
     });
   }
-  { const mb=document.getElementById('folderMergeBtn'); if(mb) mb.onclick=openFolderMerge; }
+  /* ── шторка ⚙ «Вигляд папок» (06.10.2026): замість рядка «Список · Сітка ·
+     Журнал · Обʼєднати» на головній. Кожен вибір застосовується одразу. ── */
+  const FV_PREV={
+    gallery:'<i></i><i></i><i></i><i></i>',
+    sections:'<i class="w"></i><i class="r"></i><i></i><i></i>',
+    bento:'<i class="w"></i><i class="t"></i><i></i><i></i>',
+    list:'<i class="r"></i><i class="r"></i><i class="r"></i>',
+    mag:'<i class="m"></i><i class="m"></i>'
+  };
+  function openFolderViewSheet(){
+    const seg=(name,label,opts,cur)=>`<div class="fvs-lbl">${label}</div><div class="fvs-seg" role="group" aria-label="${label}">`+
+      opts.map(([v,t])=>`<button type="button" data-fo="${name}" data-v="${v}" class="${cur===v?'on':''}" aria-pressed="${cur===v}">${t}</button>`).join('')+`</div>`;
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fvs-head"><b>Вигляд папок</b><button type="button" class="fvs-done" data-fvdone>Готово</button></div>
+      <div class="fvs-views">${FV_ORDER.map(v=>`<button type="button" class="fvs-view${v===homeFolderView?' on':''}" data-fv="${v}" aria-pressed="${v===homeFolderView}"><span class="fvs-prev fvs-prev-${v}" aria-hidden="true">${FV_PREV[v]}</span><span class="fvs-vn">${FV_NAME[v]}</span></button>`).join('')}</div>
+      ${seg('size','Розмір плиток',[['l','Великі'],['m','Звичайні'],['s','Дрібні']],folderOpts.size)}
+      ${seg('sort','Порядок',[['manual','Вручну'],['name','За назвою']],folderOpts.sort)}
+      <button type="button" class="fvs-tog" data-fotog role="switch" aria-checked="${folderOpts.covers?'true':'false'}"><span class="fvs-tt">Фото на всю плитку<small>вимкнеш — усі папки будуть кольоровими обкладинками</small></span><i class="fvs-sw" aria-hidden="true"></i></button>
+      <div class="fvs-acts">
+        ${fmRow('merge','group','Обʼєднати папки в групу','')}
+        ${fmRow('newf','plus','Нова папка','')}
+        ${fmRow('projects','proj','Проєкти','окремий екран зі статусами й дедлайнами')}
+      </div>`,
+    m=>{
+      m.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{
+        setFolderView(b.dataset.fv);
+        m.querySelectorAll('[data-fv]').forEach(x=>{ const on=x.dataset.fv===homeFolderView; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+      });
+      m.querySelectorAll('[data-fo]').forEach(b=>b.onclick=()=>{
+        const k=b.dataset.fo; setFolderOpt(k,b.dataset.v);
+        m.querySelectorAll('[data-fo="'+k+'"]').forEach(x=>{ const on=x.dataset.v===folderOpts[k]; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+      });
+      const tg=m.querySelector('[data-fotog]');
+      tg.onclick=()=>{ setFolderOpt('covers', folderOpts.covers?0:1); tg.setAttribute('aria-checked',folderOpts.covers?'true':'false'); };
+      m.querySelector('[data-fvdone]').onclick=closeFolderMenu;
+      m.querySelectorAll('.fvs-acts [data-act]').forEach(b=>b.onclick=()=>{
+        const a=b.dataset.act;
+        if(a==='merge'){ openFolderMerge(); return; }
+        closeFolderMenu();
+        if(a==='newf') createFolder();
+        else if(a==='projects'){ try{ goProjects(); }catch(e){ console.error('goProjects',e); } }
+      });
+    });
+    try{ window.platform.haptic('light'); }catch(_){}
+  }
+  { const b=document.getElementById('folderLookBtn'); if(b) b.onclick=openFolderViewSheet; }
   try{ window.openFolderGroup=openFolderGroup; }catch(_){}
 
   /* ════════ ВЕРХНІЙ БАР ДОКУМЕНТА (крок 2, 03.10.2026) ════════
@@ -20852,7 +21511,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     bld:'<path d="M4 20.5h16M6 20.5V8l6-4 6 4v12.5"/><path d="M10 20.5v-4h4v4"/>',
     del:'<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',
     photo:'<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 15.5l-4.2-4.2a1.5 1.5 0 0 0-2.1 0L7 19"/>',
-    cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'
+    cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    proj:'<path d="M12 3.5c3 3 5 5.5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2.5-5 .3 1.6 1 2.5 2 3 0-3 .2-5 .5-7z"/>'
   };
   function fmIc(n){ return '<span class="pgb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(FM_IC[n]||'')+'</svg></span>'; }
   function fmRow(act,ic,t,sub,cls){ return `<button class="fmi pgb-row${cls?' '+cls:''}" data-act="${act}">${fmIc(ic)}<span class="pgb-tx">${t}${sub?`<small class="fmi-sub">${sub}</small>`:''}</span></button>`; }
@@ -20866,9 +21527,21 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const role=f.role||'area';
     let linked=0; try{ linked=(typeof window.chatsForFolder==='function')?window.chatsForFolder(key).length:0; }catch(_){}
     const dev=!!(window.upDevOn&&window.upDevOn());
+    /* обкладинка — першою (06.10.2026): раніше фото ховалось у «Вигляд» → «Додати фото» */
+    const ph=!!f.photo, pp=f.photoPos;
+    const xf=(ph&&pp)?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
+    const curC=String(f.c||'').toLowerCase();
     fgSheet(`<div class="fmenu-grip"></div>
-      <div class="fgs-head">${fgIcon(f,'fgs-ic fgs-ic-lg')}
-        <div class="fgs-ht"><b data-i18n-skip="1">${esc(f.name)}</b><small data-i18n-skip="1">${sub}</small></div></div>
+      <div class="fmc${ph?' fmc-photo':''}" style="--c:${safeColor(f.c,'#6a7dff')}">
+        ${ph?`<div class="fmc-bg" style="background-image:url('${esc(safeImg(window.photoSrc(f.photo)))}');${xf}"></div>`
+            :`<svg class="ico fmc-wm" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}
+        <div class="fmc-t"><small>Обкладинка</small><b data-i18n-skip="1">${esc(f.name)}</b><span data-i18n-skip="1">${sub}</span></div>
+      </div>
+      <div class="fmc-acts">
+        <button type="button" class="fmc-btn fmc-main" data-act="photo">${fmIc('photo')}${ph?'Змінити фото':'Додати фото'}</button>
+        ${ph?`<button type="button" class="fmc-btn" data-act="cropphoto">Кадрувати</button><button type="button" class="fmc-btn fmc-del" data-act="rmphoto" aria-label="Прибрати фото">${fmIc('del')}</button>`:''}
+      </div>
+      <div class="fmc-colors"><span>Колір</span>${FOLDER_COLORS.map(c=>`<button type="button" class="fmc-sw${curC===c?' on':''}" data-fcolor="${c}" style="--sw:${c}" aria-label="Колір обкладинки" aria-pressed="${curC===c}"></button>`).join('')}</div>
       ${role==='project'?`
       <div class="fmi-label">Статус проєкту</div>
       <div class="fstatus-pick">
@@ -20878,7 +21551,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
       <div class="fmi-label">Папка</div>
       ${fmRow('rename','pen','Перейменувати','')}
-      ${fmRow('look','look','Вигляд','колір, значок, емодзі, фото, картка')}
+      ${fmRow('look','look','Значок','лінійна іконка чи емодзі')}
       ${fmRow('type','type','Тип · '+FM_TYPE[role],'звичайна, проєкт чи сторінка')}
       ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
       ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
@@ -20889,28 +21562,25 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));
+      m.querySelectorAll('[data-fcolor]').forEach(b=>b.onclick=()=>{
+        folders[key].c=b.dataset.fcolor; saveFolders(); renderDashboard(); openFolderMenu(key);
+        try{ window.platform.haptic('select'); }catch(_){}
+      });
       m.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{
         folders[key].status=b.dataset.status; saveFolders(); renderDashboard(); openFolderMenu(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
     });
   }
-  // «Вигляд»: усе про те, як папка виглядає, в одній шторці
+  /* «Значок»: колір і фото — нагорі меню папки (обкладинка). Вибір «Картка на
+     головній» (flayout) прибрано 06.10.2026: жоден рендер його не читав, кнопки
+     нічого не змінювали. Поле в даних лишається як було. */
   function openFolderLook(key){
     const f=folders[key]; if(!f) return;
     fgSheet(`<div class="fmenu-grip"></div>
-      <div class="fmenu-title">Вигляд · <span data-i18n-skip="1">${esc(f.name)}</span></div>
-      ${fmRow('color','look','Колір','змінити на наступний')}
+      <div class="fmenu-title">Значок · <span data-i18n-skip="1">${esc(f.name)}</span></div>
       <button class="fmi pgb-row" data-act="icon"><span class="pgb-ic" aria-hidden="true" style="color:${safeColor(f.c,'var(--accent)')}"><svg class="ico" width="16" height="16"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="pgb-tx">Значок<small class="fmi-sub">${f.iconSet?'обрано вручну':'за емодзі'}</small></span></button>
       ${fmRow('emoji','pen','Емодзі',f.emoji?esc(f.emoji):'нема')}
-      ${fmRow('photo','photo',f.photo?'Змінити фото':'Додати фото','обкладинка картки')}
-      ${f.photo?fmRow('cropphoto','photo','Кадрувати фото',''):''}
-      ${f.photo?fmRow('rmphoto','del','Прибрати фото',''):''}
-      <div class="fmi-label">Картка на головній</div>
-      <div class="flay-pick">
-        ${['a','b','c','d'].map(L=>`<button class="flay-opt ${(f.flayout||'a')===L?'on':''}" data-lay="${L}">
-          <span class="flay-ic flay-ic-${L}"></span><span>${({a:'Збоку',b:'Зверху',c:'На всю',d:'Перехід'})[L]}</span></button>`).join('')}
-      </div>
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
@@ -20918,7 +21588,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         if(a==='color'){ cycleFolderColor(key); saveFolders(); renderDashboard(); openFolderLook(key); return; }
         folderAction(key,a);
       });
-      m.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{ f.flayout=b.dataset.lay; saveFolders(); renderDashboard(); openFolderLook(key); });
       m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
     });
   }
@@ -21014,8 +21683,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         onSave:(pos)=>{ f.photoPos=pos; saveFolders(); renderDashboard(); } });
       return;
     }
-    if(act==='rmphoto'){ const prev=f.photo; f.photo=''; f.photoPos=null;
-      window.photoDel(prev); saveFolders(); renderDashboard(); closeFolderMenu(); return; }
+    // кошик стоїть поруч із «Кадрувати» — промах стер би фото і з хмари, тож спершу питаємо
+    if(act==='rmphoto'){ closeFolderMenu();
+      confirmSheet({ title:'Прибрати фото обкладинки?', sub:'Знімок зітреться з цього пристрою і з хмари. Повернути його можна лише з бекапу.', okLabel:'Прибрати фото',
+        onOk:()=>{ const prev=f.photo; f.photo=''; f.photoPos=null;
+          window.photoDel(prev); saveFolders(); renderDashboard(); } });
+      return; }
     if(act==='ungroup'){
       const kids=groupKids(key), up=(f.parent&&folders[f.parent])?f.parent:'';   // батька вже нема — на головну
       kids.forEach(ck=>{ folders[ck].parent=up; });
@@ -25764,12 +26437,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     })();
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     // aiPrivLoad — згода й закриті від AI розділи (37-ai-privacy.js): так вони синкаються між пристроями
-    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass(), aiPrivLoad()]); applyHomeGlass(); }catch(_){}
+    // loadRitual — ранок і його кроки (06-wishes.js): без цього ранок жив лише з локальної копії й затирав хмару
+    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass(), aiPrivLoad(), loadRitual()]); applyHomeGlass(); }catch(_){}
     /* SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть,
        а ручні правки в них чекатимуть звірки з хмарою (02-storage.js, storeMarkRead).
        Саме тут, після останнього await: далі прочитане синхронно лягає в памʼять.
        Разом із __RAW — ключі, які дочитують loadValues/loadWishes/loadWishPrice/loadHomeGlass. */
-    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY, 'ai_privacy_v1']); }catch(_){}
+    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY, 'ai_privacy_v1', RIT_KEY, RIT_STEPS_KEY]); }catch(_){}
     /* Усе нижче до кінця load() — синхронне застосування прочитаного разом з
        міграціями й прибираннями. Їхні записи — автоматичні: у ключ, який не
        прочитався (сховище мовчало), вони не підуть (SYNC-2, storeAuto). */
@@ -28846,6 +29520,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(list) list.hidden=!on;
     if(seg) seg.style.display = (on||sph) ? 'none' : '';
     if(add) add.hidden=!on;
+    // ⚙ «Вигляд папок» (16-dashboard.js) — лише на вкладці «Папки»
+    const look=document.getElementById('folderLookBtn'); if(look) look.hidden=(on||sph);
     try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.length; }catch(_){}
     try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).length; }catch(_){}
     if(on) renderChatList();
@@ -29177,7 +29853,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      на місце «Гроші», а гроші видно в чипі картки «Сьогодні» на Огляді.
      Гра — окрема сторінка misto.html у рамці (iframe), зі своїм сховищем
      misto_dnya_v3. Дані Frequency вона бачить лише через worldBridge і лише
-     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи). Пише лише
+     читає: баланс і записи Гаманця, сфери, план на рік (лист і віхи), дні ранку.
+     Ранок заповнюється в шторці самого Frequency (open('ritual')). Пише лише
      власний стан у ключ world_game (gameSave). */
   let worldShown=false;
   function worldOn(){ try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
@@ -29221,10 +29898,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     },
     // план на рік (40-year-letter.js): лист і віхи — лише читання
     year(){ try{ return ylForWorld(); }catch(_){ return null; } },
+    // ранок (06-wishes.js): дні ритуалу й один день — лише читання; заповнює ранок сам Frequency (шторка ritualSheet)
+    ritual(){ try{ return ritForWorld(); }catch(_){ return null; } },
+    ritualDay(ds){ try{ return ritDayForWorld(ds); }catch(_){ return null; } },
     open(sec, key){
       if(sec==='finance') goFinance();
       else if(sec==='ai'){ if(window.aiChatSheet) window.aiChatSheet(); }
       else if(sec==='goals') goGoals();
+      // ранок шторкою поверх гри; після закриття гра перемальовує календар і картку сезону
+      else if(sec==='ritual') ritualSheet({onClose:()=>{ try{ const f=document.querySelector('#worldFrame iframe'), w=f&&f.contentWindow; if(w&&w.mistoRefresh) w.mistoRefresh(); }catch(_){} }});
+      else if(sec==='wishes'){ if(window.goWishes) window.goWishes(); }
       // питання до Флоу — лише фіксовані тексти звідси, гра свого тексту не передає
       else if(sec==='ai_behind') ylAskFlow('Я відстаю з віхами цього місяця в «Дорозі року». Подивись мої цілі й віхи: що перенести на наступний місяць або спростити, щоб встигнути? Запропонуй, але без моєї згоди нічого не змінюй.');
       else if(sec==='ai_week') ylAskFlow('Зроби розбір мого тижня: що вдалось, що пропустив і чому, і скажи мовою мого листа із точки Б, яке речення наблизилось. Стисло, один фокус на наступний тиждень.');
