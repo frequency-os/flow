@@ -465,8 +465,8 @@
     const segs=[['day','День'],['week','Тиждень'],['month','Місяць']];
 
     let hero;
-    if(p.scope==='day'){
-      hero='';   // «День» — стрічка 42-day.js (тиждень у ній самій)
+    if(p.scope==='day'||p.scope==='week'){
+      hero='';   // «День» і «Тиждень» — 42-day.js (свої шапки)
     } else {
       hero=`<div class="pl-hero"><div class="pl-hero-row">${plRing(pct,'var(--accent)')}
         <div class="pl-hero-info"><h3>${titles[p.scope]}</h3><p>Прогрес періоду · ${done}/${periodTasks.length}</p>
@@ -493,8 +493,10 @@
       body=`<div class="seclbl">${plIco('goal',13)} Цілі кварталу</div>${body}`;
     } else if(p.scope==='day'){
       body=dyDayHTML();   // етап 5: матриця, «Вхідні», перенесення, підсумок і фокус з екрана прибрано — дані лишились
+    } else if(p.scope==='week'){
+      body=dyWeekHTMLFull();   // етап 6: бюджет місій + теплова карта; старі «Задачі тижня» з екрана прибрано — дані лишились
     } else {
-      const lbl=p.scope==='week'?'✅ Задачі тижня':'📅 Плани місяця';
+      const lbl='📅 Плани місяця';
       const items=periodTasks.length?periodTasks.map((t)=>plTaskCard(t)).join('')
         :`<div class="pl-empty">Поки порожньо. Додай першу задачу.</div>`;
       const calHtml=p.scope==='month'?(plTemplateListHTML()+plMonthCalHTML()):'';
@@ -502,7 +504,7 @@
     }
 
     const addLabel='+ Нова задача';
-    const addBtnHtml=p.scope==='day'?'':`<button class="pl-add" data-pladd>${addLabel}</button>`;
+    const addBtnHtml=(p.scope==='day'||p.scope==='week')?'':`<button class="pl-add" data-pladd>${addLabel}</button>`;
     const toplvl=`<div class="pl-toplvl"><button class="on">📅 Плани</button><button data-plhor>🎯 Горизонт</button></div>`;
 
     c.innerHTML=`
@@ -680,6 +682,7 @@
       const rn=c.querySelector('[data-plronope]'); if(rn) rn.onclick=()=>{ p.rolloverDismissed=plTodayStr(); saveGoals(); plRerender(); };
     }
     if(p.scope==='day') dyBind(c);
+    else if(p.scope==='week') dyWeekBind(c);
   }
 
   // ===== Живий Pomodoro =====

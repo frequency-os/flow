@@ -319,16 +319,7 @@ try{
     draw(); document.body.appendChild(ov);
   }
 
-  /* ══ хук: перехоплюємо рендер тижня, все інше — як було ══ */
-  var _rp=window.renderPlanner;
-  if(typeof _rp==='function'){
-    window.renderPlanner=function(c){
-      try{
-        var p=plData();
-        if(p && p.scope==='week' && window.uiMode!=='lite'){ fdWeekRender(c); return; }
-      }catch(e){ console.error('fd26week',e); }
-      _rp(c);
-    };
-  }
+  /* ══ хук вимкнено 09.10.2026: «Тиждень» тепер малює core/42-day.js (бюджет місій + теплова карта).
+     Старий тиждень із фокусами більше не перехоплює рендер; дані p.fd26fx і задачі тижня лишаються як були. ══ */
 }catch(e){ console.error('fd26js-week',e); }
 })();

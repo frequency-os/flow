@@ -51,7 +51,7 @@
   .dy-now .dy-t{color:#ff4d6d;font-weight:800;}
   .dy-now i{flex:1;height:2px;border-radius:1px;background:#ff4d6d;position:relative;}
   .dy-now i::before{content:'';position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:#ff4d6d;}
-  .dy-pad{height:110px;}
+  .dy-pad{height:170px;}   /* нижня панель (77) + котик-напарник праворуч над нею */
 
   /* шторка «Взяти з місій» (у спільній jnOverlay) */
   .dy-fm-sub{font-size:13px;color:var(--muted);line-height:1.4;}
@@ -60,3 +60,70 @@
     background:color-mix(in srgb,var(--c) 10%,var(--card));border:1px solid var(--line);border-left:4px solid var(--c);border-radius:16px;}
   .dy-fm-i .dy-tx{flex:1;}
   .dy-fm-i i{font-style:normal;flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:800;color:#fff;background:var(--c);}
+
+  /* ============ ПЛАНЕР · ТИЖДЕНЬ (етап 6): бюджет місій, теплова карта, справи дня ============ */
+  .dw-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;}
+  .dw-nav>button{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;font-size:26px;font-weight:700;color:var(--text);
+    background:var(--card);border:1px solid var(--line);border-radius:50%;box-sizing:border-box;}
+  .dw-nav>div{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;}
+  .dw-nav b{font-size:19px;font-weight:800;color:var(--text);text-align:center;}
+  .dw-nav small{font-size:12px;color:var(--muted);font-weight:600;}
+  .dw-now{all:unset;cursor:pointer;font-size:13px;font-weight:800;color:var(--accent);padding:4px 8px;}
+  .dw-sec{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:6px 0 8px;font-size:12px;font-weight:800;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.07em;}
+  .dw-sec span:last-child{text-transform:none;letter-spacing:0;font-size:13px;}
+  .dw-m{display:flex;flex-direction:column;gap:6px;padding:11px 13px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;}
+  .dw-m-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .dw-m-n{font-size:15px;font-weight:700;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dw-m-v{flex:none;font-size:13px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
+  .dw-bar{display:flex;height:10px;border-radius:6px;background:var(--field);overflow:hidden;}
+  .dw-bar i{display:block;height:100%;}
+  .dw-bar i.d{background:var(--c);}
+  .dw-bar i.p{background:color-mix(in srgb,var(--c) 38%,transparent);}
+  .dw-lack{font-size:12px;font-weight:700;color:#e8930c;}
+  .dw-set{all:unset;cursor:pointer;align-self:flex-start;font-size:13px;font-weight:700;color:var(--accent);padding:6px 0;}
+  .dw-leg{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:-2px 0 14px;}
+  .dw-leg span{display:flex;align-items:center;gap:5px;}
+  .dw-leg i{width:14px;height:8px;border-radius:3px;background:var(--accent);}
+  .dw-leg i.p{background:color-mix(in srgb,var(--accent) 38%,transparent);}
+
+  .dw-heat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:14px;}
+  .dw-d{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 6px;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;min-width:0;}
+  .dw-d small{font-size:10.5px;color:var(--muted);font-weight:700;}
+  .dw-d b{font-size:15px;font-weight:800;color:var(--text);}
+  .dw-col{width:16px;height:46px;border-radius:5px;background:var(--field);display:flex;align-items:flex-end;overflow:hidden;}
+  .dw-col i{display:block;width:100%;background:var(--accent);border-radius:5px;}
+  .dw-d.today{border-color:var(--accent);}
+  .dw-d.on{background:var(--accent);border-color:var(--accent);}
+  .dw-d.on small,.dw-d.on b{color:#fff;}
+  .dw-d.on .dw-col{background:rgba(255,255,255,.25);}
+  .dw-d.on .dw-col i{background:#fff;}
+  .dw-open{all:unset;cursor:pointer;box-sizing:border-box;display:block;width:100%;text-align:center;min-height:46px;padding:13px;margin-top:10px;
+    font-size:14px;font-weight:800;color:var(--accent);background:var(--card);border:1px solid var(--line);border-radius:14px;}
+
+  /* шторка «На який день?» */
+  .dy-pick{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}
+  .dy-pick button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:58px;padding:8px 0;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;}
+  .dy-pick button small{font-size:11px;color:var(--muted);font-weight:700;}
+  .dy-pick button b{font-size:17px;font-weight:800;color:var(--text);}
+  .dy-pick button.today{border-color:var(--accent);}
+  .dy-pick button[disabled]{opacity:.35;cursor:default;}
+  .dy-pick-nav button{all:unset;cursor:pointer;box-sizing:border-box;display:block;width:100%;text-align:center;min-height:46px;padding:12px;
+    font-size:14px;font-weight:700;color:var(--accent);border:1px dashed var(--line);border-radius:14px;}
+
+  /* задачі тижня без дня */
+  .dw-th-b{display:flex;gap:4px;}
+  .dw-th-b button{all:unset;cursor:pointer;font-size:13px;font-weight:800;color:var(--accent);text-transform:none;letter-spacing:0;padding:10px 6px;}
+  .dw-th-b button+button{color:var(--muted);}
+  .dw-th-hid{all:unset;cursor:pointer;box-sizing:border-box;display:block;width:100%;min-height:44px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--muted);
+    border:1px dashed var(--line);border-radius:14px;}
+  .dw-th-hid b{color:var(--accent);}
+  .dw-tasks{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .dw-t{display:flex;align-items:center;gap:8px;}
+  .dw-t-ck{all:unset;cursor:pointer;box-sizing:border-box;flex:none;width:44px;height:44px;border-radius:50%;border:2.5px solid var(--line);}
+  .dw-t-b{all:unset;cursor:pointer;box-sizing:border-box;flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;min-height:54px;padding:8px 12px;
+    background:var(--card);border:1px dashed var(--line);border-radius:16px;}
+  .dw-t-b b{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dw-t-b small{font-size:12px;color:var(--muted);}
