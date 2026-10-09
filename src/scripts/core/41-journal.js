@@ -179,13 +179,10 @@
       return;
     }
     if(jnTab==='month'){
-      // поки старий «Місяць» Планера (етап 7 його переробить): малюємо його сюди без шапки Планера
-      const p=plData(), old=p.scope; p.scope='month';
-      try{ body.innerHTML='<div class="jn-month"></div><div class="jn-pad"></div>'; window.renderPlanner(body.firstChild); }
-      catch(err){ console.error('jnMonth',err); } finally{ p.scope=old; }
-      // тап по дню календаря місяця — у Журналі це вкладка «День» з цією датою
-      body.querySelectorAll('[data-plcalday]').forEach(el=>el.onclick=()=>{ jnTab='day'; jnDayDs=el.dataset.plcalday===td?'':el.dataset.plcalday; jnRender(); jnTop(); });
-      if(sub){ const cm=String(p.calMonth||td.slice(0,7)); sub.textContent='місяць · '+(PL_MONTH_NAMES[+cm.slice(5,7)-1]||'').toLowerCase()+' '+cm.slice(0,4); }
+      // етап 7: новий «Місяць» (43-month.js) — картки місій, гроші, календар; старий місяць Планера з екрана прибрано, дані лишились
+      body.innerHTML=moMonthHTML();
+      moBind(body,{onOpenDay:ds=>{ jnTab='day'; jnDayDs=ds===td?'':ds; jnRender(); jnTop(); }});
+      if(sub){ const ym=moYm(); sub.textContent='місяць · '+MO_NAMES[+ym.slice(5,7)-1].toLowerCase()+' '+ym.slice(0,4); }
       return;
     }
     if(jnDayDs&&jnDayDs!==td){ jnRenderOtherDay(body,jnDayDs); return; }

@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 75 |
-| Рядків JS | 31782 |
-| Файлів CSS | 40 |
-| Рядків CSS | 9821 |
-| Сутностей верхнього рівня | 2056 |
+| Файлів JS | 76 |
+| Рядків JS | 31946 |
+| Файлів CSS | 41 |
+| Рядків CSS | 9920 |
+| Сутностей верхнього рівня | 2080 |
 | Ключів сховища (FLOW_KEYS) | 75 |
 
 ## Файли JS
@@ -76,8 +76,9 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 232 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 710 | 61 |
+| `src/scripts/core/41-journal.js` | 707 | 61 |
 | `src/scripts/core/42-day.js` | 314 | 35 |
+| `src/scripts/core/43-month.js` | 167 | 24 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
@@ -144,6 +145,7 @@
 | `src/styles/core/24-home-gallery.css` | 209 | 0 |
 | `src/styles/core/25-journal.css` | 290 | 0 |
 | `src/styles/core/26-day.css` | 129 | 0 |
+| `src/styles/core/27-month.css` | 99 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (75)
 
@@ -2121,29 +2123,29 @@
 | `jnFocusCard` | функція | `src/scripts/core/41-journal.js:152` |
 | `jnTaskRow` | функція | `src/scripts/core/41-journal.js:164` |
 | `jnRender` | функція | `src/scripts/core/41-journal.js:171` |
-| `jnTop` | функція | `src/scripts/core/41-journal.js:196` |
-| `jnFloatRender` | функція | `src/scripts/core/41-journal.js:198` |
-| `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:212` |
-| `jnRenderToday` | функція | `src/scripts/core/41-journal.js:220` |
-| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:293` |
-| `jnDone` | функція | `src/scripts/core/41-journal.js:306` |
-| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:311` |
-| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:315` |
-| `jnStoryView` | функція | `src/scripts/core/41-journal.js:341` |
-| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:372` |
-| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:381` |
-| `jnOverlay` | функція | `src/scripts/core/41-journal.js:397` |
-| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:410` |
-| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:418` |
-| `jnTplDows` | функція | `src/scripts/core/41-journal.js:421` |
-| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:428` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:449` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:562` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:567` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:645` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:656` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:692` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:703` |
+| `jnTop` | функція | `src/scripts/core/41-journal.js:193` |
+| `jnFloatRender` | функція | `src/scripts/core/41-journal.js:195` |
+| `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:209` |
+| `jnRenderToday` | функція | `src/scripts/core/41-journal.js:217` |
+| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:290` |
+| `jnDone` | функція | `src/scripts/core/41-journal.js:303` |
+| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:308` |
+| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:312` |
+| `jnStoryView` | функція | `src/scripts/core/41-journal.js:338` |
+| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:369` |
+| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:378` |
+| `jnOverlay` | функція | `src/scripts/core/41-journal.js:394` |
+| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:407` |
+| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:415` |
+| `jnTplDows` | функція | `src/scripts/core/41-journal.js:418` |
+| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:425` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:446` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:559` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:564` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:642` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:653` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:689` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:700` |
 
 ### `src/scripts/core/42-day.js` — 35 сутностей
 
@@ -2184,6 +2186,35 @@
 | `dyWeekTasksHTML` | функція | `src/scripts/core/42-day.js:278` |
 | `dyTaskToDay` | функція | `src/scripts/core/42-day.js:286` |
 | `dyWeekTasksBind` | функція | `src/scripts/core/42-day.js:295` |
+
+### `src/scripts/core/43-month.js` — 24 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `moState` | обʼєкт | `src/scripts/core/43-month.js:7` |
+| `MO_NAMES` | масив | `src/scripts/core/43-month.js:8` |
+| `MO_SHORT` | масив | `src/scripts/core/43-month.js:9` |
+| `MO_Q` | масив | `src/scripts/core/43-month.js:10` |
+| `moYm` | функція | `src/scripts/core/43-month.js:12` |
+| `moShift` | функція | `src/scripts/core/43-month.js:13` |
+| `moDim` | функція | `src/scripts/core/43-month.js:14` |
+| `moQ` | функція | `src/scripts/core/43-month.js:15` |
+| `moTitle` | функція | `src/scripts/core/43-month.js:16` |
+| `moMoney` | функція | `src/scripts/core/43-month.js:17` |
+| `moPassed` | функція | `src/scripts/core/43-month.js:19` |
+| `moLate` | функція | `src/scripts/core/43-month.js:20` |
+| `moMissions` | функція | `src/scripts/core/43-month.js:21` |
+| `moQuarters` | функція | `src/scripts/core/43-month.js:24` |
+| `moCard` | функція | `src/scripts/core/43-month.js:28` |
+| `moMoneyHTML` | функція | `src/scripts/core/43-month.js:41` |
+| `moCalHTML` | функція | `src/scripts/core/43-month.js:56` |
+| `moMonthHTML` | функція | `src/scripts/core/43-month.js:66` |
+| `moBind` | функція | `src/scripts/core/43-month.js:78` |
+| `moMoneySheet` | функція | `src/scripts/core/43-month.js:87` |
+| `moMissionPage` | функція | `src/scripts/core/43-month.js:104` |
+| `moPathTab` | функція | `src/scripts/core/43-month.js:131` |
+| `moFolderTab` | функція | `src/scripts/core/43-month.js:156` |
+| `moChatsTab` | функція | `src/scripts/core/43-month.js:162` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
