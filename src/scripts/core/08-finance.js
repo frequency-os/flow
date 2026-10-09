@@ -68,7 +68,10 @@
   function walletCard(){
     return { id:WALLET_ID, name:'Гаманець', emoji:'💳', type:'custom', cur:'UAH', color:'#5b8def', main:true };
   }
-  function walletOps(){ return finOps.filter(o=>!o.envSpend); }
+  /* Додаткові баланси (етап 2 валют): операція з op.cur ≠ головна живе лише у своєму балансі.
+     Без cur (усі старі) — головна. Підсумки місяця, План, правила, призи, місії — лише головна валюта. */
+  function opMain(o){ return !(o&&o.cur)||o.cur===mainCur()||!curOk(o.cur); }   // невідомий код — у головному, гроші не губляться
+  function walletOps(){ return finOps.filter(o=>!o.envSpend&&opMain(o)); }
   function walletBalance(){ return walletOps().reduce((s,o)=>s+(o.type==='in'?o.amount:-o.amount),0); }
   // сумісність зі старим API карток
   function mainCard(){ ensureCards(); return cards[0]; }
@@ -90,12 +93,15 @@
     try{ if((finOps||[]).some(o=>o&&!String(o.id||'').startsWith('start_'))) return 'UAH'; }catch(_){}
     return curLocale();
   }
-  function curSym(c){ const k=c?finCurCode(c):mainCur(); return (CUR_LIST[k]&&CUR_LIST[k].s)||k; }
+  function curOk(k){ return !!k&&Object.prototype.hasOwnProperty.call(CUR_LIST,k); }
+  // код валюти з даних (хмара/бекап) — лише з CUR_LIST; невідомий → головна (ніякий сирий рядок не йде в HTML)
+  function curKey(c){ const k=c?finCurCode(c):mainCur(); return curOk(k)?k:mainCur(); }
+  function curSym(c){ const k=curKey(c); return (CUR_LIST[k]&&CUR_LIST[k].s)||'₴'; }
   // «₴1 250», «€1 250», «1 250 zł» — злотий пишуть після числа
-  function money(n,c){ const v=Math.round(+n||0), k=c?finCurCode(c):mainCur(), sy=curSym(k), a=Math.abs(v).toLocaleString('uk-UA');
+  function money(n,c){ const v=Math.round(+n||0), k=curKey(c), sy=curSym(k), a=Math.abs(v).toLocaleString('uk-UA');
     return (v<0?'−':'')+(k==='PLN'?a+' '+sy:sy+a); }
   function moneyK(n,c){ n=Math.round(+n||0); const a=Math.abs(n); if(a<10000) return money(n,c);
-    const k=c?finCurCode(c):mainCur(), sy=curSym(k), t=(Math.round(a/100)/10).toLocaleString('uk-UA')+'k';
+    const k=curKey(c), sy=curSym(k), t=(Math.round(a/100)/10).toLocaleString('uk-UA')+'k';
     return (n<0?'−':'')+(k==='PLN'?t+' '+sy:sy+t); }
   // Суми не перераховуються — тому головну валюту вибирають, поки в Гаманці ще нема записів (старт).
   // Коли записи є, вони вже в цій валюті: зміна значка зробила б їх неправдивими, а Робота перерахувала б
@@ -328,8 +334,11 @@
   function workCard(){ return cardById(workCardId)||cards.find(c=>c.type==='work')||mainCard(); }
 
   /* ============ АНАЛІТИКА · ріст і спад ============ */
-  function _isRealExpense(o){ return o.type==='out' && !o._tr && !(o.envId && !o.envSpend); }
-  function _isRealIncome(o){ return o.type==='in' && !o._tr; }
+  // без огляду на валюту — для балансів інших валют і віджетів папки з валютою
+  function _isExpAny(o){ return o.type==='out' && !o._tr && !(o.envId && !o.envSpend); }
+  function _isIncAny(o){ return o.type==='in' && !o._tr; }
+  function _isRealExpense(o){ return _isExpAny(o) && opMain(o); }
+  function _isRealIncome(o){ return _isIncAny(o) && opMain(o); }
   function monthAgg(ym){ let inn=0,out=0; finOps.forEach(o=>{ if(String(o.date||'').slice(0,7)!==ym) return; if(_isRealIncome(o)) inn+=o.amount; else if(_isRealExpense(o)) out+=o.amount; }); return {in:inn,out}; }
 
   /* ============ МОЯ ФІНАНСОВА ГРАМОТНІСТЬ ============ */
@@ -337,7 +346,7 @@
 
   let finTab='overview'; // legacy (kept for compatibility)
   let finView='dash'; // 'dash' | 'envelopes'
-  function finBalance(){ return finOps.reduce((s,o)=>s+(o.type==='in'?o.amount:(o.envSpend?0:-o.amount)),0); }
+  function finBalance(){ return finOps.reduce((s,o)=>s+(!opMain(o)?0:o.type==='in'?o.amount:(o.envSpend?0:-o.amount)),0); }
 
   function renderFinance(){
     try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджети «Гроші» в папці й на Огляді бачать ту саму зміну

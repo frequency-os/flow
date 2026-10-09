@@ -631,7 +631,7 @@
         return (b.done?'✓ ':'· ')+String(b.t||'блок').slice(0,60)+(gn?' ['+gn+']':''); });
       const extra=[];
       const en=h.energy&&typeof h.energy[ds]==='number'?h.energy[ds]:null; if(en!==null) extra.push('енергія '+en);
-      if(!finOff){ try{ const ops=walletOps().filter(o=>o&&o.date===ds); const inS=ops.filter(o=>o.type==='in').reduce((a,o)=>a+(+o.amount||0),0), outS=ops.filter(o=>o.type!=='in').reduce((a,o)=>a+(+o.amount||0),0);
+      if(!finOff){ try{ const ops=walletOps().filter(o=>o&&o.date===ds&&!o._tr); const inS=ops.filter(o=>o.type==='in').reduce((a,o)=>a+(+o.amount||0),0), outS=ops.filter(o=>o.type!=='in').reduce((a,o)=>a+(+o.amount||0),0);
         if(inS) extra.push('дохід '+money(inS)); if(outS) extra.push('витрати '+money(outS)); }catch(_){} }
       if(!diaOff){ try{ if(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim()) extra.push('є запис у щоденнику'); }catch(_){} }
       if(!items.length&&!extra.length){ out.push(ds+': —'); continue; }
@@ -1439,7 +1439,7 @@
     try{
       const ym=ymLocal(); let inc=0,out=0;
       (finOps||[]).forEach(o=>{ if(o.envSpend) return; if(String(o.date||'').slice(0,7)!==ym) return;
-        if(o.type==='in') inc+=o.amount; else out+=o.amount; });
+        if(_isRealIncome(o)) inc+=o.amount; else if(_isRealExpense(o)) out+=o.amount; });   // без переказів, обмінів, поповнень конвертів і чужої валюти
       return inc-out;
     }catch(_){ return null; }
   }
@@ -1448,7 +1448,7 @@
     try{
       const ym=ymLocal(); let inc=0,out=0;
       (finOps||[]).forEach(o=>{ if(o.envSpend) return; if(String(o.date||'').slice(0,7)!==ym) return;
-        if(o.type==='in') inc+=o.amount; else out+=o.amount; });
+        if(_isRealIncome(o)) inc+=o.amount; else if(_isRealExpense(o)) out+=o.amount; });   // без переказів, обмінів, поповнень конвертів і чужої валюти
       parts.push('Місяць: +'+fmt(inc)+' / -'+fmt(out));
     }catch(_){}
     try{ parts.push('Гаманець: '+incomeSummary()); }catch(_){}

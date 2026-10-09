@@ -86,7 +86,7 @@
 
   // ── 3) «Скарбничка» і 4) «Зарплата» (дохід), 5) «Бюджет» (витрата): після запису операції в Гаманці ──
   function rlOnOp(op){
-    if(!op) return;
+    if(!op||!opMain(op)) return;   // правила (скарбничка, зарплата, бюджет) — лише головна валюта (етап 3 навчить інших)
     if(op.type==='in'){
       const sal=rlOn('salary')&&(+op.amount>=Math.max(1,+rlN('salary')||10000)||/зарплат|salary|зп\b/i.test(String(op.label||'')));
       if(sal&&(envelopes||[]).length){ setTimeout(()=>rlSalarySheet(+op.amount),250); return; }

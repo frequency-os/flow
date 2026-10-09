@@ -126,6 +126,7 @@
     'fin_projects',   // проєкти Кабінету «Фінанси» (08-finance.js); блок «Проєкт» — вікно в них
     'world_game',     // стан гри «Мій світ» (38-world.js gameLoad/gameSave; misto.html пише лише його, цілком)
     'main_cur',       // головна валюта акаунта (08-finance.js setMainCur, prefSet; 09.10.2026)
+    'fin_curs',       // додаткові баланси в інших валютах — список кодів (46-wallet.js, prefSet; 09.10.2026)
     'income_cards','fx_cfg','spend',
     'work_sessions','work_cfg','work_extras','work_blocks',
     'board','customboards','blockusage',
