@@ -80,3 +80,26 @@
   .wl-cb small{font-size:11px;font-weight:800;color:var(--muted);} .wl-cb b{font-size:15px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
   .wl-cb.add{border-style:dashed;} .wl-cb.add small{color:var(--accent);} .wl-cb.add b{font-size:12.5px;font-weight:700;color:var(--muted);}
   .wl-cbig{display:flex;flex-direction:column;gap:3px;margin:4px 0 8px;} .wl-cbig b{font-size:32px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;} .wl-cbig small{font-size:12.5px;color:var(--muted);}
+  /* плитки Місія · Конверти · Борги у Гаманці (48-widgets.js) */
+  .wl-wg{margin:0 0 6px;}
+  /* конверти витрат: стартовий набір і вибір конверта у витраті (10.10.2026) */
+  .wl-starter{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:18px;
+    background:linear-gradient(135deg,color-mix(in srgb,#34c77b 18%,var(--card)),var(--card));border:1px dashed color-mix(in srgb,#34c77b 50%,var(--line));margin-bottom:6px;}
+  .wl-starter>span:first-child{font-size:24px;} .wl-starter>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:2px;}
+  .wl-starter b{font-size:15px;font-weight:800;color:var(--text);} .wl-starter small{font-size:12.5px;color:var(--muted);line-height:1.35;} .wl-starter i{font-style:normal;color:var(--muted);font-size:20px;}
+  .wl-tpl-g{font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px;}
+  .wl-tpl{display:flex;flex-direction:column;gap:6px;}
+  .wl-tpl-r{display:flex;align-items:center;gap:8px;}
+  .wl-tpl-t{all:unset;cursor:pointer;box-sizing:border-box;flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 12px;border-radius:14px;background:var(--card);border:2px solid var(--line);}
+  .wl-tpl-t span{font-size:20px;} .wl-tpl-t b{flex:1;font-size:14.5px;font-weight:700;color:var(--text);} .wl-tpl-t small{font-size:11.5px;color:var(--muted);}
+  .wl-tpl-t.on{border-color:#34c77b;background:color-mix(in srgb,#34c77b 14%,var(--card));}
+  .wl-tpl-t.on::after{content:"✓";font-weight:800;color:#34c77b;}
+  .wl-tpl-r.ex .wl-tpl-t{opacity:.5;cursor:default;}
+  .jn-ed .wl-tpl-r input{flex:none;width:118px;min-height:48px;margin:0;}
+  .wl-tpl-foot{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;}
+  .wl-envpick{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;} .wl-envpick::-webkit-scrollbar{display:none;}
+  .wl-envpick button{all:unset;cursor:pointer;box-sizing:border-box;flex:none;width:76px;min-height:76px;padding:7px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    background:color-mix(in srgb,var(--c) 14%,var(--card));border:2px solid transparent;text-align:center;}
+  .wl-envpick button span{font-size:22px;} .wl-envpick button small{font-size:11px;font-weight:700;color:var(--text);max-width:68px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wl-envpick button i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .wl-envpick button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 28%,var(--card));}

@@ -36,10 +36,12 @@
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
       <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="folders"${wlState.tab==='folders'?' class="on"':''}>Папки</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
     const plan=wlState.tab==='plan'&&typeof rlPlanHTML==='function';   // план місяця (47-rules.js)
+    if(wlState.tab==='overview'&&typeof wgWalletHTML==='function') h+=wgWalletHTML();   // плитки Місія · Конверти · Борги (48-widgets.js)
     h+=plan?rlPlanHTML(ym):wlState.tab==='missions'?wlMissionsHTML(ops):wlState.tab==='folders'?wlFoldersHTML(ops):wlOverviewHTML(ops,all,ym);
     body.innerHTML=h+'<div class="jn-pad"></div>';
     wlBind(body);
     if(plan) rlPlanBind(body,ym);
+    try{ if(typeof wgHome==='function') wgHome(body); }catch(e){ console.error('wgHome',e); }
     wlQuestCheck(ym,all);
   }
   function wlOverviewHTML(ops,all,ym){
@@ -66,7 +68,7 @@
     h+=`<div class="wl-sec"><span>Конверти й скарбнички</span><button data-wlenv>усі ›</button></div>`;
     h+=envTop.length?envTop.map(e=>{ const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
       return `<button class="wl-env" data-envopen="${esc(e.id)}" style="--c:${safeColor(e.color,'#5b8def')}"><i style="width:${pct}%"></i><span>${safeEmoji(e.emoji,'✉️')}</span><span><b>${esc(e.name)}</b><small>${e.goal?pct+'% · ще '+wlMoney(Math.max(0,e.goal-sv)):'без цілі'}</small></span><b>${wlMoney(sv)}</b></button>`; }).join('')
-      :`<div class="dy-empty"><span>Конвертів ще нема.</span></div>`;
+      :`<button class="wl-starter" data-wlstarter><span>🗂</span><span><b>Розклади гроші по конвертах</b><small>Продукти, кафе, транспорт, житло… — вибери стандартні або створи свої</small></span><i>›</i></button>`;
     let debts='—'; try{ debts=debtSummary(); }catch(_){}
     h+=`<button class="wl-env" data-wldebts><span>🤝</span><span><b>Борги</b><small>нетто</small></span><b>${esc(String(debts))}</b></button>`;
     return h;
@@ -116,6 +118,7 @@
     c.querySelectorAll('[data-wltab]').forEach(b=>b.onclick=()=>{ wlState.tab=b.dataset.wltab; renderFinance(); });
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
+    { const st=c.querySelector('[data-wlstarter]'); if(st) st.onclick=()=>wlEnvStarter(); }
     { const ev=c.querySelector('[data-wlenv]'); if(ev) ev.onclick=()=>{ finView='envelopes'; renderFinance(); }; }
     { const d=c.querySelector('[data-wldebts]'); if(d) d.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
     c.querySelectorAll('[data-envopen]').forEach(el=>el.onclick=()=>openEnvSheet(el.dataset.envopen));
@@ -143,6 +146,7 @@
       ${curs.length?`<div class="jn-f"><span>Баланс</span><div class="wl-chips" id="wlCurC">${[mainCur()].concat(curs).map(c=>`<button data-wlc="${c}"${c===cur?' class="on"':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</button>`).join('')}</div></div>`:''}
       <label class="jn-f"><span id="wlAmtL">Сума, ${esc(curSym(cur))}</span><input id="wlAmt" type="number" inputmode="decimal" min="0" step="1" placeholder="Напр. 500"></label>
       <label class="jn-f"><span>На що</span><input id="wlLbl" maxlength="80" value="${esc(String(opt.label||'').slice(0,80))}" placeholder="${type==='in'?'Зарплата, оплата від клієнта…':'Їжа, таксі, підручник…'}"></label>
+      ${type==='out'&&wlSpendEnvs().length?`<div class="jn-f" id="wlEnvF"${cur!==mainCur()?' hidden':''}><span>З конверта (необовʼязково)</span><div class="wl-envpick" id="wlEnvP">${wlSpendEnvs().map(e=>`<button data-wlenvp="${esc(e.id)}" style="--c:${safeColor(e.color,'#5b8def')}"><span>${safeEmoji(e.emoji,'✉️')}</span><small>${esc(String(e.name||'').slice(0,12))}</small><i>${esc(moneyK(envSaved(e)))}</i></button>`).join('')}</div></div>`:''}
       ${type==='in'?`<div class="jn-f"><span>Тип доходу</span><div class="wl-chips" id="wlSrc">${Object.keys(WL_SRC).map(k=>`<button data-wlsrc="${k}"${k===src?' class="on"':''}>${WL_SRC[k][0]} ${WL_SRC[k][1]}</button>`).join('')}</div></div>`:''}
       ${fk?`<small class="mo-note">📁 Запишеться з міткою папки «${esc(wlFolderName(fk))}»</small>`:''}
       ${ms.length?`<div class="jn-f" id="wlMisF"${cur!==mainCur()?' hidden':''}><span>До місії (необовʼязково)</span><div class="wl-chips" id="wlChips">${chips()}</div><small class="mo-note" id="wlBud">${budTxt()}</small></div>`:''}
@@ -151,13 +155,32 @@
       bindChips();
       ov.querySelectorAll('[data-wlc]').forEach(b=>b.onclick=()=>{ cur=b.dataset.wlc; ov.querySelectorAll('[data-wlc]').forEach(x=>x.classList.toggle('on',x===b));
         const l=ov.querySelector('#wlAmtL'); if(l) l.textContent='Сума, '+curSym(cur);
-        const mf=ov.querySelector('#wlMisF'); if(mf) mf.hidden=cur!==mainCur(); });   // місії рахують лише головну валюту
+        const mf=ov.querySelector('#wlMisF'); if(mf) mf.hidden=cur!==mainCur();
+        const ef=ov.querySelector('#wlEnvF'); if(ef){ ef.hidden=cur!==mainCur(); if(ef.hidden){ envId=''; ov.querySelectorAll('[data-wlenvp]').forEach(x=>x.classList.remove('on')); } } });   // місії рахують лише головну валюту
+      let envId='';
+      ov.querySelectorAll('[data-wlenvp]').forEach(b=>b.onclick=()=>{ envId=envId===b.dataset.wlenvp?'':b.dataset.wlenvp; ov.querySelectorAll('[data-wlenvp]').forEach(x=>x.classList.toggle('on',x.dataset.wlenvp===envId));
+        const lb=ov.querySelector('#wlLbl'), e=(envelopes||[]).find(x=>String(x.id)===envId); if(e&&lb&&!lb.value.trim()) lb.placeholder=e.name; });
       ov.querySelectorAll('[data-wlsrc]').forEach(b=>b.onclick=()=>{ src=b.dataset.wlsrc; ov.querySelectorAll('[data-wlsrc]').forEach(x=>x.classList.toggle('on',x===b)); });
       setTimeout(()=>{ try{ ov.querySelector('#wlAmt').focus(); }catch(_){} },80);
       ov.querySelector('[data-wlok]').onclick=()=>{
         const amount=Math.round(parseFloat(String(ov.querySelector('#wlAmt').value||'').replace(',','.'))*100)/100;
         if(!(amount>0)){ plToast('Вкажи суму'); return; }
-        const label=String(ov.querySelector('#wlLbl').value||'').trim().slice(0,80)||t;
+        const env=envId&&cur===mainCur()?(envelopes||[]).find(x=>String(x.id)===envId):null;
+        const typed=String(ov.querySelector('#wlLbl').value||'').trim().slice(0,80), label=typed||(env?env.name:t);
+        // з конверта: гроші вже відкладені — витрата йде з конверта (envAddOp 'out' = envSpend, баланс удруге не списує).
+        // Якщо в конверті менше — пишемо звичайну витрату з вільних і кажемо про це (з мінусом у конверт не йдемо).
+        if(env){
+          const sv=envSaved(env);
+          if(amount<=sv+1e-9){
+            envAddOp(env,'out',amount,typed||'Витрата');   // підпис в історії: «Продукти · <що>», без «Продукти · Продукти»
+            const fo=finOps[finOps.length-1]; if(fo&&fo.envId===env.id){ if(gid&&wlGoal(gid)) fo.goalId=String(gid); if(fk&&wlFolderName(fk)) fo.folderKey=fk; saveFinOps();
+              try{ if(typeof rlOnOp==='function') rlOnOp(fo); }catch(err){ console.error('rlOnOp',err); } }   // правила (бюджет місії) — як для звичайної витрати
+            ov.remove(); renderFinance(); try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}
+            plToast((env.emoji?safeEmoji(env.emoji,'✉️')+' ':'')+'−'+money(amount)+' з «'+env.name+'» · лишилось '+money(envSaved(env)));
+            return;
+          }
+          plToast('У «'+env.name+'» лише '+money(sv)+' — витрату записано з вільних грошей');
+        }
         const op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type, amount, label, date:ymdLocal(), card:mainCard().id };
         if(cur!==mainCur()) op.cur=cur;
         else if(gid&&wlGoal(gid)) op.goalId=String(gid);
@@ -311,6 +334,49 @@
         // справжній курс із банку — підказка для наступного разу
         if(a===m) finRememberRate(b, Math.round(give/get*10000)/10000); else if(b===m) finRememberRate(a, Math.round(get/give*10000)/10000);
         ov.remove(); renderFinance(); plToast('⇄ '+money(give,a)+' → '+money(get,b));
+      };
+    });
+  }
+
+  /* ════ Конверти витрат: стартовий набір (10.10.2026) ════
+     Як у YNAB / Goodbudget / Monefy: готові категорії групами, людина відмічає потрібні й задає ліміт на місяць
+     (goal конверта), решту — «＋ Свій конверт». Модель конверта та сама: поповнюєш із вільних (чи правилом
+     «Зарплата по конвертах»), витрата з конверта (шторка «− Витрата» → іконка) не списує баланс удруге.
+     Створює лише тап людини; наявні конверти з такою ж назвою не дублюються. */
+  const WL_ENV_TPL=[
+    {g:'Щодня',    items:[['food','🛒','Продукти',1],['cafe','☕','Кафе',1],['trans','🚇','Транспорт',1],['home','🧴','Побут',0]]},
+    {g:'Рахунки',  items:[['rent','🏠','Житло',1],['util','💡','Комуналка',1],['net','📱','Звʼязок та інтернет',0]]},
+    {g:'Для себе', items:[['fun','🎬','Розваги',0],['clothes','👕','Одяг',0],['health','💊','Здоровʼя',0],['gift','🎁','Подарунки',0]]},
+    {g:'Запас',    items:[['cushion','🛟','Подушка',0]]},
+  ];
+  const WL_ENV_COLORS=['#34c77b','#ff9f43','#5b8def','#4ecdc4','#c48cff','#f0b429','#7f8cff','#ff6b9d','#e8843c','#ff4d6d','#3ec7b4','#8b93a3'];
+  // конверти, з яких можна платити: без скарбничок призів
+  function wlSpendEnvs(){ return (envelopes||[]).filter(e=>e&&e.id&&e.kind!=='приз'); }
+  function wlEnvStarter(){
+    // конверти ще не прочитано (хмара не відповіла / вхід звіряється) — інакше після злиття вийдуть дублі за назвою
+    if(window.storeKeyReady&&!window.storeKeyReady(ENVKEY)){ plToast('Конверти ще завантажуються — спробуй за хвилину'); return; }
+    const have=new Set((envelopes||[]).map(e=>String(e&&e.name||'').trim().toLowerCase()));
+    const sel={}; WL_ENV_TPL.forEach(gr=>gr.items.forEach(([k,,n,on])=>{ if(on&&!have.has(n.toLowerCase())) sel[k]=true; }));
+    jnOverlay(`<div class="jn-ed-h"><b>🗂 Конверти витрат</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">Відміть, на що зазвичай ідуть гроші. Ліміт на місяць — необовʼязково. Потім можна перейменувати, видалити чи додати свої.</small>
+      ${WL_ENV_TPL.map(gr=>`<div class="wl-tpl-g">${esc(gr.g)}</div><div class="wl-tpl">${gr.items.map(([k,em,n])=>{ const ex=have.has(n.toLowerCase());
+        return `<div class="wl-tpl-r${ex?' ex':''}" data-tplr="${k}"><button class="wl-tpl-t${sel[k]?' on':''}" data-tpl="${k}"${ex?' disabled':''} aria-pressed="${!!sel[k]}"><span>${em}</span><b>${esc(n)}</b>${ex?'<small>вже є</small>':''}</button>
+          <input type="number" inputmode="numeric" min="0" step="100" data-tpll="${k}" placeholder="ліміт, ${esc(curSym())}" aria-label="Ліміт для ${esc(n)}"${sel[k]?'':' hidden'}></div>`; }).join('')}</div>`).join('')}
+      <div class="jn-ed-foot wl-tpl-foot"><button class="jn-btn ghost" data-tplown>＋ Свій конверт</button><button class="jn-btn" data-tplok></button></div>`, ov=>{
+      const cnt=()=>{ const n=Object.keys(sel).filter(k=>sel[k]).length; const b=ov.querySelector('[data-tplok]'); b.textContent=n?'Створити '+n+' '+pluralUk(n,'конверт','конверти','конвертів'):'Нічого не вибрано'; b.disabled=!n; };
+      ov.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{ const k=b.dataset.tpl; sel[k]=!sel[k]; b.classList.toggle('on',!!sel[k]); b.setAttribute('aria-pressed',String(!!sel[k]));
+        const i=ov.querySelector('[data-tpll="'+k+'"]'); if(i) i.hidden=!sel[k]; cnt(); });
+      cnt();
+      ov.querySelector('[data-tplown]').onclick=()=>{ ov.remove(); try{ newEnvelope(); }catch(_){} };
+      ov.querySelector('[data-tplok]').onclick=()=>{
+        let n=0, ci=(envelopes||[]).length;
+        WL_ENV_TPL.forEach(gr=>gr.items.forEach(([k,em,nm])=>{ if(!sel[k]||have.has(nm.toLowerCase())) return;
+          const li=ov.querySelector('[data-tpll="'+k+'"]'), goal=Math.max(0,Math.round(parseFloat(String(li&&li.value||'').replace(',','.'))||0));
+          envelopes.push({id:'env_'+k+'_'+Date.now().toString(36)+n, name:nm, emoji:em, color:WL_ENV_COLORS[(ci++)%WL_ENV_COLORS.length], goal, saved:0, ops:[], kind:'витрати', link:'main', linkLabel:'головна папка'});
+          n++; }));
+        if(!n) return;
+        saveEnvelopes(); ov.remove(); renderFinance();
+        plToast('🗂 Створено '+n+' '+pluralUk(n,'конверт','конверти','конвертів')+' — поповни їх із вільних чи правилом «Зарплата по конвертах»');
       };
     });
   }

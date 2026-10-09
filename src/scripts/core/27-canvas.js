@@ -409,13 +409,22 @@
       const gotCfg = !!__RAW[FKEY];
       const trustedEmpty = (typeof window.sbDataTrusted==='function') ? window.sbDataTrusted() : true;
       markFoldersLoaded(gotCfg || trustedEmpty);
+      if(gotCfg || trustedEmpty){
+        window.__fldReadOk=true;
+        // повторний load() (після перевірки сесії) підтвердив дані — прибираємо нашу плашку, якщо вона висить
+        try{ const t=document.getElementById('quotaBannerTitle'), b=document.getElementById('quotaBanner');
+          if(b&&t&&t.textContent==='Папки не завантажились'){ b.style.display='none'; window.__quotaHit=false; } }catch(_){}
+      }
       if(!gotCfg && !trustedEmpty){
+        window.__fldReadOk=false;
         console.warn('[Flow] папки не прочитано (сховище мовчить) — автозапис заблоковано');
-        // Порожній Огляд без пояснення виглядає як «усе пропало». Кажемо прямо,
-        // що це збій зв'язку і дані на місці — і що чіпати нічого не треба.
-        try{ if(typeof window.showQuotaBanner==='function')
-          window.showQuotaBanner('Сховище не відповіло, тому папки не показані. Нічого не видалено — дані чекають. Перевір зв\'язок і онови сторінку.',
-                                 'Папки не завантажились'); }catch(_){}
+        // Порожній Огляд без пояснення виглядає як «усе пропало». Кажемо прямо, що це збій зв'язку і дані на місці.
+        // Але не одразу: на старті сесію ще перевіряють (sbReady), і порожнє сховище нової людини теж виглядає «не прочитаним».
+        // Показуємо, лише якщо за 6 с дані так і не підтвердились (повторний load() ставить __fldReadOk).
+        setTimeout(()=>{ if(window.__fldReadOk) return;
+          try{ if(typeof window.showQuotaBanner==='function')
+            window.showQuotaBanner('Сховище не відповіло, тому папки не показані. Нічого не видалено — дані чекають. Перевір зв\'язок і онови сторінку.',
+                                   'Папки не завантажились'); }catch(_){} }, 6000);
       }
     }catch(_){}
     try{ applyChatsRaw(__RAW['chats_v1']); }catch(e){ console.error('chats load',e); }

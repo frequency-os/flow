@@ -3,8 +3,8 @@
      місії, План місяця, правила), віджет лише показує їх і відкриває ті самі шторки. Запис — лише тапом людини.
      Типи блоків сторінки папки (boards): wgwallet · wgmission · wgenv · wgdebt · wgmoney{kind:'in'|'out', src, label, goal}.
      «Доходи»/«Витрати» (wgmoney) — поєднання A+C: операції з них мають мітку папки (op.folderKey) і тип доходу (op.src);
-     у папці місії — ще й мітку місії. На Огляді — ряд із 4 плиток (вимикається в ⚙ Огляду, folderOpts.money).
-     Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), на Огляді — #homeMoney. */
+     у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
+     Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
   const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1};
   function wgIs(t){ return !!WG_TYPES[t]; }
@@ -116,22 +116,14 @@
     host.innerHTML=html||'<div class="wg-t c-none"><small>Віджет недоступний</small></div>';
     if(!host.__wgBound){ host.__wgBound=true; host.addEventListener('click',e=>wgAct(e,host)); }
   }
-  // сторінка папки: хости від редактора; Огляд — #homeMoney
+  // сторінка папки: хости від редактора; Гаманець — [data-wghome]
   function wgFillPage(root){
     const fk=wgCtxFolder();
     (root||document).querySelectorAll('[data-wghost]').forEach(h=>{ let b=null; try{ b=getBlock(h.dataset.wghost); }catch(_){} if(b) wgFill(h,b,fk); });
   }
-  function wgHome(){
-    const box=document.getElementById('homeMoney'); if(!box) return;
-    let on=1; try{ on=folderOpts.money; }catch(_){}
-    if(!on){ box.hidden=true; box.innerHTML=''; return; }
-    box.hidden=false;
-    if(!box.querySelector('.wg-grid')) box.innerHTML='<div class="wg-grid"></div>';
-    const grid=box.querySelector('.wg-grid');
-    const want=['wgwallet','wgmission','wgenv','wgdebt'];
-    if(grid.children.length!==want.length){ grid.innerHTML=want.map(t=>`<div class="wg-host" data-wghome="${t}"></div>`).join(''); }
-    grid.querySelectorAll('[data-wghome]').forEach(h=>wgFill(h,{type:h.dataset.wghome},''));
-  }
+  // плитки в Гаманці (вкладка «Огляд», під кнопками): картка балансу вже зверху, тож без «Гаманця»
+  function wgWalletHTML(){ return '<div class="wg-home wl-wg"><div class="wg-grid">'+['wgmission','wgenv','wgdebt'].map(t=>`<div class="wg-host" data-wghome="${t}"></div>`).join('')+'</div></div>'; }
+  function wgHome(root){ (root||document).querySelectorAll('[data-wghome]').forEach(h=>wgFill(h,{type:h.dataset.wghome},'')); }
   // після будь-якого запису грошей — перемалювати всі видимі віджети
   function wgRefresh(){ try{ wgFillPage(document); }catch(_){} try{ wgHome(); }catch(_){} }
 

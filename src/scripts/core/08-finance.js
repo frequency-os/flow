@@ -468,6 +468,7 @@
         </div>`;
       }).join('')}
         <div class="env2 add" id="fhNewEnv">＋<br>Новий конверт</div>
+        <div class="env2 add" id="fhTplEnv">🗂<br>Зі стандартних</div>
       </div>
       <div class="fh-secl"><svg class="fin-ico"><use href="#fi-repeat"/></svg> Регулярні платежі</div>
       ${recurring.map(r=>`<div class="fin-reg" data-regdel="${r.id}"><span><svg class="fin-ico"><use href="#fi-repeat"/></svg> ${esc(r.name)}</span><b>${money(r.amount)}/міс</b></div>`).join('')
@@ -477,6 +478,7 @@
     const bk=document.getElementById('envScreenBack'); if(bk) bk.onclick=()=>{ finView='dash'; renderFinance(); };
     body.querySelectorAll('[data-envopen]').forEach(el=>el.onclick=()=>openEnvSheet(el.dataset.envopen));
     const ne=document.getElementById('fhNewEnv'); if(ne) ne.onclick=newEnvelope;
+    { const te=document.getElementById('fhTplEnv'); if(te) te.onclick=()=>{ if(typeof wlEnvStarter==='function') wlEnvStarter(); }; }   // 46-wallet.js
     const nr=document.getElementById('fhNewRec'); if(nr) nr.onclick=newRecurring;
     body.querySelectorAll('[data-regdel]').forEach(el=>el.onclick=()=>{
       confirmSheet({title:'Видалити регулярний платіж?', onOk:()=>{ recurring=recurring.filter(r=>String(r.id)!==String(el.dataset.regdel)); saveRecurring(); renderFinance(); }});
