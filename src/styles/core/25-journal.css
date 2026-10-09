@@ -158,7 +158,9 @@
   .jn-av.sm{width:40px;height:40px;font-size:17px;border-width:2px;}
   .jn-me-b{display:flex;flex-direction:column;gap:3px;min-width:0;}
   .jn-me-b b{font-size:17px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .jn-me .jn-xp{width:130px;}
+  .jn-me{flex:1;}   /* праворуч може стояти ще й значок 🏆 — імʼя й рівень стискаються, а не лізуть під нього */
+  .jn-me .jn-me-b{flex:1;}
+  .jn-me .jn-xp{width:100%;max-width:130px;}
   .jn-fire{flex:none;font-size:13px;font-weight:800;color:#fff;border-radius:999px;padding:7px 12px;
     background:linear-gradient(135deg,#ff9f43,#ff4d6d);box-shadow:0 4px 14px rgba(255,77,109,.3);}
   .jn-fire.zero{background:var(--field);color:var(--muted);box-shadow:none;}

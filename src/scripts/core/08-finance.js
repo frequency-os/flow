@@ -135,7 +135,10 @@
     // витрати ІЗ конверта не мають вдруге списувати баланс
     try{
       envelopes.forEach(e=>{ (e.ops||[]).forEach(op=>{
-        if(op.t==='out'&&op.finOpId){ const f=finOps.find(x=>String(x.id)===String(op.finOpId)); if(f&&!f.envSpend){ f.envSpend=true; ch=true; } }
+        // повернення з конверта на рахунок (скарбничка призу, 44-prizes.js) пишеться як t:'back' — це не витрата, баланс має зрости.
+        // Якщо стара збірка встигла позначити такий запис витратою (envSpend) — знімаємо позначку
+        if(op.t==='out'&&op.finOpId&&!op.back){ const f=finOps.find(x=>String(x.id)===String(op.finOpId)); if(f&&!f.envSpend){ f.envSpend=true; ch=true; } }
+        else if(op.back&&op.finOpId){ const f=finOps.find(x=>String(x.id)===String(op.finOpId)); if(f&&f.type==='in'&&f.envSpend){ delete f.envSpend; ch=true; } }
       });});
     }catch(_){}
     // операції без рахунку → у гаманець
@@ -306,6 +309,7 @@
       <div class="wal-head">
         <div class="wal-lab">Гаманець</div>
         <div class="wal-bal">${fmt(bal)} <small>₴</small></div>
+        ${(()=>{ try{ const pz=typeof pzTotal==='function'?pzTotal():0; return pz>0?`<div class="wal-split"><span>вільно <b>${fmt(bal)} ₴</b></span><span>🏆 на призи <b>${fmt(pz)} ₴</b></span></div>`:''; }catch(_){ return ''; } })()}
         <div class="wal-sub">${finOps.length} ${finOps.length===1?'операція':(finOps.length%10>=2&&finOps.length%10<=4&&(finOps.length%100<10||finOps.length%100>=20)?'операції':'операцій')} · один рахунок</div>
       </div>
 
@@ -380,7 +384,7 @@
       ${envelopes.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
         const col=safeColor(e.color,'#5b8def');
-        const outs=(e.ops||[]).filter(o=>o.t==='out').length;
+        const outs=(e.ops||[]).filter(o=>o.t==='out'&&!o.back).length;
         const kind=e.kind||(e.wishId?'мрія':'ціль');
         const tags=[`🎯 ${esc(kind)}`]; if(outs) tags.push(`${outs} витрат`);
         const cover=e.cover||e.wishImg||'';

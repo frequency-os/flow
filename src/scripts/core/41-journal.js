@@ -236,10 +236,11 @@
       <div class="jn-top">
         <button class="jn-me" data-jnhero><span class="jn-av sm">${jnAvatar()}</span>
           <span class="jn-me-b"><b>${esc(jnName())}</b><span class="jn-xp"><span class="jn-bar gold"><i style="width:${Math.round(xpIn/JN_XP_LVL*100)}%"></i></span>рів. ${lvl}</span></span></button>
-        <span class="jn-fire${streak?'':' zero'}">🔥 ${streak} ${pluralUk(streak,'день','дні','днів')}</span>
+        <span class="jn-top-r">${pzPillHTML()}<span class="jn-fire${streak?'':' zero'}">🔥 ${streak} ${pluralUk(streak,'день','дні','днів')}</span></span>
       </div>
       <div class="jn-sts">${stories.map(jnStory).join('')}
         <button class="jn-st add" data-jnadd><span class="jn-st-r"><span class="jn-st-i">＋</span></span><small>Місія</small></button></div>
+      ${pzStripHTML()}
       ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
       ${jnFocusCard(list)}
       <div class="jn-sec"><span>${jnFullDay?'Стрічка дня':'Далі сьогодні'}</span><button data-dyfrom>＋ З місій</button></div>
@@ -268,6 +269,7 @@
       jnFocus=bl.id; jnRender(); try{ body.querySelector('.jn-fc').scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} });
     { const d=body.querySelector('[data-jndone]'); if(d) d.onclick=()=>{ const bl=list.find(x=>x.id===d.dataset.jndone); if(bl) jnDone(bl); }; }
     dyBind(body,td,{onDone:jnDone});   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
+    pzBind(body);   // 🏆 у шапці і смужка призу (44-prizes.js)
     body.querySelectorAll('[data-jnfull]').forEach(f=>f.onclick=()=>{ jnFullDay=!jnFullDay; jnRender(); });
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
@@ -457,7 +459,7 @@
       dows:Array.isArray(sc.dows)?sc.dows.slice():[], min:+sc.min||45, h:typeof sc.h==='number'?sc.h:18,
       start:sc.start||ymdLocal(), end:sc.end||'', plan:sc.plan!==false,
       hWeek:(gl&&gl.budget&&+gl.budget.hWeek)||'', money:(gl&&gl.budget&&+gl.budget.money)||'',
-      rt:(gl&&gl.reward&&gl.reward.t)||'', rs:(gl&&gl.reward&&+gl.reward.sum)||'', folderKey:gl?gl.folderKey||null:null };
+      rt:(gl&&gl.reward&&gl.reward.t)||'', rs:(gl&&gl.reward&&+gl.reward.sum)||'', re:(gl&&gl.reward&&gl.reward.emoji)||'', rl:(gl&&gl.reward&&gl.reward.lv)||'', folderKey:gl?gl.folderKey||null:null };
     const seg=(name,opts,val)=>`<div class="jn-seg" data-seg="${name}">${opts.map(([v,l])=>`<button class="${val===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div>`;
     const lvRow=(m,i)=>`<div class="jn-lv${m.done?' done':''}" data-i="${i}"><button class="jn-lv-ck" data-lvck="${i}" aria-label="Досягнуто">${m.done?'✓':''}</button>
       <input value="${esc(m.t)}" data-lvt="${i}" maxlength="80" placeholder="Рівень, напр. B1"><input type="date" value="${esc(m.due)}" data-lvd="${i}">
@@ -480,8 +482,10 @@
       <label class="jn-check"><input type="checkbox" id="jnPlan"${d.plan?' checked':''}> Ставити в Планер у ці дні</label>
       <div class="jn-row3"><label class="jn-f"><span>Годин / тиждень</span><input type="number" id="jnHW" min="0" max="168" step="0.5" value="${esc(String(d.hWeek))}" placeholder="авто"></label>
         <label class="jn-f"><span>₴ / місяць</span><input type="number" id="jnMoney" min="0" step="100" value="${esc(String(d.money))}" placeholder="0"></label></div>
-      <div class="jn-row3"><label class="jn-f"><span>Нагорода</span><input id="jnRT" maxlength="60" value="${esc(d.rt)}" placeholder="Поїздка, річ…"></label>
-        <label class="jn-f"><span>Ціна, ₴</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label></div>
+      <div class="jn-f pz-ed"><span>🎁 Приз за місію</span>
+        <div class="jn-row"><input class="jn-emo" id="jnRE" maxlength="4" value="${esc(d.re)}" placeholder="🎁" aria-label="Емодзі призу"><input class="jn-name" id="jnRT" maxlength="60" value="${esc(d.rt)}" placeholder="Що отримаєш: поїздка, річ…"></div></div>
+      <div class="jn-row3"><label class="jn-f"><span>Ціна, ₴</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label>
+        <label class="jn-f"><span>Коли забрати</span><select id="jnRL" class="pz-sel"><option value="">уся місія</option>${d.levels.filter(m=>m.id).map(m=>`<option value="${esc(m.id)}"${String(d.rl)===String(m.id)?' selected':''}>рівень: ${esc(String(m.t).slice(0,30))}</option>`).join('')}</select></label></div>
       <div class="jn-f"><span>Папка</span><button class="jn-mini" data-jnfold>${folderTxt()}</button></div>
       <div class="jn-ed-foot">
         ${isNew?'':`<button class="jn-btn ghost" data-jngoals>Кроки й трекер</button><button class="jn-btn danger" data-jndel>Видалити</button>`}
@@ -505,7 +509,12 @@
       q('[data-jnfold]').onclick=()=>pickFolderForGoal(k=>{ d.folderKey=k||null; const b=q('[data-jnfold]'); if(b) b.innerHTML=folderTxt(); });
       if(!isNew){
         q('[data-jngoals]').onclick=()=>{ ov.remove(); try{ goGoals(); }catch(_){} };
-        q('[data-jndel]').onclick=()=>confirmSheet({title:'Видалити місію «'+String(gl.name||'').slice(0,40)+'»?',
+        q('[data-jndel]').onclick=()=>{ const c0=(goalsData.goals||[]).find(x=>x&&x.id===gl.id);
+          // місію з грошима в скарбничці призу не видаляємо: гроші лишились би в конверті без власника
+          // перевіряємо і без c0.reward: старша збірка на іншому пристрої могла затерти приз, а конверт із грошима лишився (знаходиться за goalId)
+          if(c0&&typeof pzSaved==='function'&&pzSaved(c0)>0){ const pe=pzEnv(c0), pn=(c0.reward&&c0.reward.t)||(pe&&pe.name)||'приз';
+            actionSheet({title:'Спершу поверни гроші зі скарбнички', sub:'У скарбничці «'+String(pn)+'» лежить ₴'+Math.round(pzSaved(c0)).toLocaleString('uk-UA')+'. Поверни їх у Гаманець — тоді місію можна видалити.', items:[{ic:'refresh', label:'Відкрити скарбничку', onClick:()=>{ ov.remove(); if(c0.reward&&String(c0.reward.t||'').trim()) pzJarSheet(c0); else { try{ goEnvelopes(); }catch(_){} } }}]}); return; }
+          confirmSheet({title:'Видалити місію «'+String(gl.name||'').slice(0,40)+'»?',
           sub:'Зникнуть її рівні, кроки й трекер, а з Планера — невиконані блоки місії від сьогодні. Виконані лишаться. Можна натомість перенести в архів.',
           okLabel:'Видалити', onOk:()=>{
             const cur=(goalsData.goals||[]).find(x=>x&&x.id===gl.id);
@@ -514,7 +523,7 @@
             const p=plData(), ids=['rt_m_'+cur.id].concat(jnOtherTpls(cur).filter(t=>/^rt_ai_/.test(String(t.id))).map(t=>t.id));
             p.recurring=(p.recurring||[]).filter(t=>!(t&&ids.includes(t.id))); ids.forEach(jnClearFuture);
             goalsData.goals=goalsData.goals.filter(x=>!(x&&x.id===cur.id));
-            saveGoals(); ov.remove(); jnRender(); try{ renderGoals(); }catch(_){} try{ plToast('Місію видалено'); }catch(_){} }});
+            saveGoals(); ov.remove(); jnRender(); try{ renderGoals(); }catch(_){} try{ plToast('Місію видалено'); }catch(_){} }}); };
       }
       q('[data-jnsave]').onclick=()=>{
         pull();
@@ -543,13 +552,20 @@
         const hw=+q('#jnHW').value, mo=+q('#jnMoney').value;
         g.budget={ hWeek:hw>0?Math.min(168,hw):Math.round(g.sched.dows.length*g.sched.min/60*4)/4, money:mo>0?Math.round(mo):0 };
         const rt=String(q('#jnRT').value||'').trim().slice(0,60), rs=+q('#jnRS').value;
-        g.reward=rt?{ t:rt, sum:rs>0?Math.round(rs):0 }:null;
+        const rlv=String(q('#jnRL')&&q('#jnRL').value||''), rem=String(q('#jnRE')&&q('#jnRE').value||'').trim();
+        const oldR=g.reward&&typeof g.reward==='object'?g.reward:null;
+        // приз із грошима в скарбничці не зникає, доки їх не повернути (поля envId/claimed зберігаємо)
+        let pzKeep=false;
+        if(!rt&&oldR&&typeof pzSaved==='function'&&pzSaved(g)>0){ pzKeep=true; }
+        else g.reward=rt?Object.assign({},oldR||{},{ t:rt, sum:rs>0?Math.round(rs):0, emoji:rem?safeEmoji(rem,'🎁'):'', lv:(g.ms||[]).some(m=>m&&String(m.id)===rlv)?rlv:'' }):null;
+        // назва/ціна призу → його конверт у Фінансах
+        try{ const e=g.reward&&typeof pzEnv==='function'?pzEnv(g):null; if(e){ e.name=String(g.reward.t).slice(0,60); e.goal=+g.reward.sum||0; e.emoji=safeEmoji(g.reward.emoji,'🎁'); saveEnvelopes(); } }catch(_){}
         g.folderKey=d.folderKey&&folders[d.folderKey]?d.folderKey:null;
         if(isNew){ if(!Array.isArray(goalsData.goals)) goalsData.goals=[]; goalsData.goals.push(g); }
         const willOn=g.sched.dows.length&&g.sched.plan&&g.status==='active'&&g.role!=='wait';
         jnSyncRecur(g, willOn?adopt.map(t=>t.id):[], (willOn&&adopt[0]&&adopt[0].active===false)?false:undefined);
         saveGoals(); ov.remove(); jnRender(); try{ renderGoals(); }catch(_){}
-        try{ plToast(isNew?'Місію додано':'Збережено'); }catch(_){}
+        try{ plToast(pzKeep?'Збережено, але приз лишився: спершу поверни гроші зі скарбнички':(isNew?'Місію додано':'Збережено')); }catch(_){}
       };
     });
   }

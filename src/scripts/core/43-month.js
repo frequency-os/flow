@@ -41,16 +41,19 @@
   function moMoneyHTML(ym){
     const h=jnHero(), g=(h.money&&typeof h.money==='object'&&h.money[ym])||null;
     const ops=(()=>{ try{ return walletOps().filter(o=>o&&String(o.date||'').slice(0,7)===ym&&!String(o.id||'').startsWith('start_')); }catch(_){ return []; } })();
-    const inc=ops.filter(o=>o.type==='in').reduce((s,o)=>s+(+o.amount||0),0), out=ops.filter(o=>o.type==='out').reduce((s,o)=>s+(+o.amount||0),0);
+    // ті самі правила, що в Гаманці: перекази й рухи конвертів — не дохід і не витрата
+    const inc=ops.filter(o=>_isRealIncome(o)).reduce((s,o)=>s+(+o.amount||0),0), out=ops.filter(o=>_isRealExpense(o)).reduce((s,o)=>s+(+o.amount||0),0);
+    const svd=Math.max(0,typeof pzMonthSaved==='function'?pzMonthSaved(ym):0);
     const mark=Math.round(moPassed(ym)*100);
     const bar=(val,goal,cls)=>`<span class="mo-bar ${cls}"><i style="width:${goal>0?Math.min(100,Math.round(val/goal*100)):0}%"></i>${goal>0&&mark>0&&mark<100?`<s style="left:${mark}%"></s>`:''}</span>`;
-    if(!g||!(+g.earn>0||+g.spend>0)) return `<div class="mo-card"><div class="mo-h"><span>Гроші · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span></div>
+    if(!g||!(+g.earn>0||+g.spend>0||+g.save>0)) return `<div class="mo-card"><div class="mo-h"><span>Гроші · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span></div>
       <div class="mo-fact"><span>Зароблено <b>${moMoney(inc)}</b></span><span>Витрачено <b>${moMoney(out)}</b></span></div>
       <button class="mo-set" data-moset>Задати цілі місяця</button></div>`;
-    const earn=+g.earn||0, spend=+g.spend||0;
+    const earn=+g.earn||0, spend=+g.spend||0, save=+g.save||0;
     return `<div class="mo-card"><div class="mo-h"><span>Гроші · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><button data-moset>змінити</button></div>
       ${earn?`<div class="mo-m"><span class="mo-m-r"><span>Заробити</span><span>${moMoney(inc)} / ${moMoney(earn)}</span></span>${bar(inc,earn,'in')}</div>`:''}
       ${spend?`<div class="mo-m"><span class="mo-m-r"><span>Витратити не більше</span><span>${moMoney(out)} / ${moMoney(spend)}</span></span>${bar(out,spend,out>spend?'over':'out')}</div>`:''}
+      ${save?`<div class="mo-m"><span class="mo-m-r"><span>🏆 Відкласти на призи</span><span>${moMoney(svd)} / ${moMoney(save)}</span></span>${bar(svd,save,'sv')}</div>`:''}
       ${mark>0&&mark<100?`<small class="mo-note">риска — скільки місяця минуло (${mark}%)</small>`:''}</div>`;
   }
   function moCalHTML(ym){
@@ -90,11 +93,12 @@
       <small class="dy-fm-sub">Скільки хочеш заробити і скільки готовий витратити цього місяця. Факт рахується із записів Гаманця.</small>
       <label class="jn-f"><span>Заробити, ₴</span><input id="moEarn" type="number" inputmode="numeric" min="0" step="100" value="${+g.earn>0?+g.earn:''}" placeholder="Напр. 30000"></label>
       <label class="jn-f"><span>Витратити не більше, ₴</span><input id="moSpend" type="number" inputmode="numeric" min="0" step="100" value="${+g.spend>0?+g.spend:''}" placeholder="Напр. 15000"></label>
+      <label class="jn-f"><span>🏆 Відкласти на призи, ₴</span><input id="moSave" type="number" inputmode="numeric" min="0" step="100" value="${+g.save>0?+g.save:''}" placeholder="Напр. 5000"></label>
       <div class="jn-ed-foot"><button class="jn-btn" data-mosave>Зберегти</button></div>`, ov=>{
       ov.querySelector('[data-mosave]').onclick=()=>{
-        const e=Math.max(0,Math.round(+ov.querySelector('#moEarn').value||0)), s=Math.max(0,Math.round(+ov.querySelector('#moSpend').value||0));
+        const e=Math.max(0,Math.round(+ov.querySelector('#moEarn').value||0)), s=Math.max(0,Math.round(+ov.querySelector('#moSpend').value||0)), sv=Math.max(0,Math.round(+ov.querySelector('#moSave').value||0));
         const hh=jnHero(); if(!hh.money||typeof hh.money!=='object'||Array.isArray(hh.money)) hh.money={};   // масив із хмари мовчки загубив би ключ місяця
-        if(e||s) hh.money[ym]={earn:e, spend:s}; else delete hh.money[ym];
+        if(e||s||sv) hh.money[ym]={earn:e, spend:s, save:sv}; else delete hh.money[ym];
         saveGoals(); ov.remove(); jnRender();
       };
     });
