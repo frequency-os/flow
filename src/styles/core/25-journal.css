@@ -291,3 +291,11 @@
   #scr-journal .jn-pad,#scr-journal .dy-pad{height:200px;}   /* нижня панель + плаваючий перемикач + котик */
   /* на «Рік» (Горизонт) теж плаває перемикач періоду — останні кнопки мають підніматись над ним */
   #scr-goals::after{content:"";display:block;height:80px;}
+
+  /* напарник у кутку фото героя (41-journal.js jnMateHTML, 09.10.2026) */
+  .jn-duo{position:relative;display:flex;flex:1;min-width:0;}
+  .jn-mate{all:unset;box-sizing:border-box;cursor:pointer;position:absolute;left:24px;top:22px;width:30px;height:30px;
+    border-radius:50%;display:grid;place-items:center;box-shadow:0 0 0 2px var(--bg),0 2px 8px rgba(0,0,0,.35);}
+  .jn-mate svg{width:30px;height:30px;}
+  .jn-mate:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .jn-mate-n{font-weight:700;color:var(--muted);}

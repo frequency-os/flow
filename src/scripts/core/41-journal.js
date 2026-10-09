@@ -86,6 +86,16 @@
     const out=[]; for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); out.push(ymdLocal(d)); } return out;
   }
 
+  /* напарник поруч із героєм (09.10.2026): кружечок у кутку фото й « + імʼя» — ти й він на одному рівні.
+     Вимкнений на екрані напарник («Показувати на екрані») тут теж не показується. */
+  function jnMateOn(){ try{ return !(window.petHidden&&window.petHidden()) && petCur()!=='dev'; }catch(_){ return false; } }
+  function jnMateName(){ if(!jnMateOn()) return ''; try{ return '<span class="jn-mate-n"> + '+esc(FLOW_PETS[petCur()].name)+'</span>'; }catch(_){ return ''; } }
+  function jnMateHTML(){
+    if(!jnMateOn()) return '';
+    try{ const id=petCur(), p=FLOW_PETS[id];
+      return '<button class="jn-mate" data-jnmate aria-label="'+esc(p.name)+(p.hero?' — шафа':' — напарник')+'" style="--pc:'+p.glow+'">'+petSVG(id,30)+'</button>';
+    }catch(_){ return ''; }
+  }
   function jnAvatar(){
     try{ if(typeof customAvatar==='string'&&customAvatar) return `<img src="${safeImg(customAvatar)}" alt="">`; }catch(_){}
     const u=window.sbUser&&window.sbUser(), pic=u&&u.user_metadata&&u.user_metadata.avatar_url;
@@ -239,8 +249,8 @@
     body.innerHTML=`
       ${hero.started?'':jnStartCard()}
       <div class="jn-top">
-        <button class="jn-me" data-jnhero><span class="jn-av sm">${jnAvatar()}</span>
-          <span class="jn-me-b"><b>${esc(jnName())}</b><span class="jn-xp"><span class="jn-bar gold"><i style="width:${Math.round(xpIn/JN_XP_LVL*100)}%"></i></span>рів. ${lvl}</span></span></button>
+        <span class="jn-duo"><button class="jn-me" data-jnhero><span class="jn-av sm">${jnAvatar()}</span>
+          <span class="jn-me-b"><b>${esc(jnName())}${jnMateName()}</b><span class="jn-xp"><span class="jn-bar gold"><i style="width:${Math.round(xpIn/JN_XP_LVL*100)}%"></i></span>рів. ${lvl}</span></span></button>${jnMateHTML()}</span>
         <span class="jn-top-r">${pzPillHTML()}<span class="jn-fire${streak?'':' zero'}">🔥 ${streak} ${pluralUk(streak,'день','дні','днів')}</span></span>
       </div>
       <div class="jn-sts">${stories.map(jnStory).join('')}
@@ -280,6 +290,8 @@
     if(typeof rlJournalBind==='function') rlJournalBind(body);   // картки правил і Книга правил (47-rules.js)
     body.querySelectorAll('[data-jnfull]').forEach(f=>f.onclick=()=>{ jnFullDay=!jnFullDay; jnRender(); });
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
+    { const m=body.querySelector('[data-jnmate]'); if(m) m.onclick=e=>{ e.stopPropagation();
+        try{ const id=petCur(); if(FLOW_PETS[id]&&FLOW_PETS[id].hero) heroWardrobe(id); else petPickerSheet(); }catch(_){} }; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
     { const m=body.querySelector('[data-jnmap]'); if(m) m.onclick=()=>{ if(window.goWorld) window.goWorld(); }; }
     { const st=body.querySelector('[data-jnstart]'); if(st) st.onclick=()=>jnStart(+jnHero().startStep||1); }
