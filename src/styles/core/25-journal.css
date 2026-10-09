@@ -17,7 +17,7 @@
   .jn-xp{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
   .jn-xp .jn-bar{flex:1;}
 
-  .jn-res{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;}
+  .jn-res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;}
   .jn-r{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:1px;min-height:64px;min-width:0;
     background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 9px;}
   .jn-r small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -100,7 +100,7 @@
     border-radius:13px;padding:13px 12px;background:var(--accent);color:#fff;}
   .jn-btn.ghost{background:var(--field);color:var(--text);border:1px solid var(--line);}
   .jn-btn.danger{flex:0 0 auto;background:transparent;color:var(--danger,#ff5a5f);border:1px solid color-mix(in srgb,var(--danger,#ff5a5f) 45%,transparent);}
-  @media (max-width:380px){ .jn-res{grid-template-columns:repeat(2,minmax(0,1fr));} .jn-lv{grid-template-columns:32px 1fr 138px 30px;} }
+  @media (max-width:380px){ .jn-r{padding:8px 7px;} .jn-lv{grid-template-columns:32px 1fr 138px 30px;} }
   .jn-note{font-size:12.5px;color:var(--muted);background:var(--field);border-radius:10px;padding:8px 10px;line-height:1.4;}
 
   /* старт гри, налаштування, журнал днів, розбори (етап 4) */
@@ -151,3 +151,119 @@
   .jd-grid small{display:block;font-size:10.5px;color:var(--muted);} .jd-grid b{font-size:15px;color:var(--text);font-variant-numeric:tabular-nums;}
   .jd-grid b.in{color:var(--fin,#34c77b);}
   .jd-dia{font-size:13.5px;line-height:1.5;color:var(--text);background:var(--field);border-radius:12px;padding:10px 12px;white-space:pre-wrap;}
+
+  /* ── «Сторіс» (09.10.2026): кружечки місій, велика картка справи, свято, перегляд місії ── */
+  .jn-top{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .jn-me{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-width:0;min-height:44px;}
+  .jn-av.sm{width:40px;height:40px;font-size:17px;border-width:2px;}
+  .jn-me-b{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .jn-me-b b{font-size:17px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .jn-me .jn-xp{width:130px;}
+  .jn-fire{flex:none;font-size:13px;font-weight:800;color:#fff;border-radius:999px;padding:7px 12px;
+    background:linear-gradient(135deg,#ff9f43,#ff4d6d);box-shadow:0 4px 14px rgba(255,77,109,.3);}
+  .jn-fire.zero{background:var(--field);color:var(--muted);box-shadow:none;}
+
+  .jn-sts{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 4px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .jn-sts::-webkit-scrollbar{display:none;}
+  .jn-st{all:unset;cursor:pointer;flex:none;width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .jn-st-r{width:70px;height:70px;border-radius:50%;padding:3px;box-sizing:border-box;display:block;
+    background:conic-gradient(var(--c) calc(var(--p,0)*1%),color-mix(in srgb,var(--c) 22%,var(--field)) 0);}
+  .jn-st-i{width:100%;height:100%;border-radius:50%;box-sizing:border-box;border:3px solid var(--bg,#0b0f17);display:grid;place-items:center;
+    font-size:28px;background:color-mix(in srgb,var(--c) 25%,var(--card)) center/cover no-repeat;}
+  .jn-st small{font-size:11.5px;font-weight:700;color:var(--text);max-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .jn-st.off{opacity:.5;}
+  .jn-st.add .jn-st-r{background:var(--line);}
+  .jn-st.add .jn-st-i{font-size:26px;color:var(--muted);background:var(--card);}
+  .jn-st.add small{color:var(--muted);}
+
+  .jn-fc{position:relative;overflow:hidden;min-height:230px;border-radius:24px;display:flex;align-items:flex-end;
+    background:linear-gradient(150deg,color-mix(in srgb,var(--c) 85%,#000),color-mix(in srgb,var(--c) 45%,#05070c)) center/cover no-repeat;
+    box-shadow:0 10px 28px color-mix(in srgb,var(--c) 28%,transparent);}
+  .jn-fc.ph{background-size:cover;background-position:center;}
+  .jn-fc-em{position:absolute;right:16px;top:12px;font-size:76px;line-height:1;opacity:.9;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));}
+  .jn-fc-v{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.6));}
+  .jn-fc-b{position:relative;display:flex;flex-direction:column;gap:4px;padding:16px 18px 18px;width:100%;box-sizing:border-box;}
+  .jn-fc-b small{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.85);}
+  .jn-fc-b b{font-size:26px;line-height:1.12;font-weight:800;color:#fff;overflow-wrap:anywhere;}
+  .jn-fc-btn{all:unset;cursor:pointer;align-self:flex-start;margin-top:10px;background:#fff;color:#0b0f17;font-weight:800;font-size:16px;
+    border-radius:999px;padding:13px 24px;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+  .jn-fc-btn:active{transform:scale(.97);}
+  .jn-fc.empty{min-height:0;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;background:var(--card);border:1px solid var(--line);box-shadow:none;
+    font-size:13px;color:var(--muted);line-height:1.45;}
+  .jn-fc.empty b{font-size:18px;color:var(--text);}
+  .jn-fc.empty .jn-fc-btn{background:var(--accent);color:#fff;font-size:14px;padding:12px 18px;margin-top:4px;box-shadow:none;}
+  .jn-fc.win{background:linear-gradient(140deg,color-mix(in srgb,var(--hab,#34c77b) 22%,var(--card)),var(--card));}
+
+  .jn-tks{display:flex;flex-direction:column;gap:7px;}
+  .jn-tk{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:11px;min-height:54px;padding:8px 12px;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;}
+  .jn-tk-ic{flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:18px;
+    background:color-mix(in srgb,var(--c) 20%,var(--field));color:var(--c);font-weight:800;}
+  .jn-tk-b{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .jn-tk-b b{font-size:14.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .jn-tk-b small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .jn-tk.done{opacity:.6;} .jn-tk.done b{text-decoration:line-through;}
+  .jn-tk.done .jn-tk-ic{background:var(--c);color:#fff;}
+
+  /* свято «Зроблено» */
+  .jn-cel{position:fixed;inset:0;z-index:1300;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;
+    background:radial-gradient(120% 80% at 50% 30%,color-mix(in srgb,var(--c) 70%,#0b0f17),#05070c);animation:jnIn .25s ease-out;}
+  .jn-cel-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;max-width:360px;color:#fff;}
+  .jn-cel-ok{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-size:58px;font-weight:900;color:color-mix(in srgb,var(--c) 70%,#0b0f17);
+    background:#fff;box-shadow:0 0 0 16px rgba(255,255,255,.14),0 0 0 34px rgba(255,255,255,.06);margin-bottom:18px;animation:jnPop .45s cubic-bezier(.2,1.6,.4,1);}
+  .jn-cel-in b{font-size:30px;line-height:1.12;font-weight:900;overflow-wrap:anywhere;}
+  .jn-cel-in p{margin:0;font-size:15px;line-height:1.45;color:rgba(255,255,255,.82);}
+  .jn-cel-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .jn-cel-chips span{font-size:14px;font-weight:800;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.16);}
+  .jn-cel-go{all:unset;cursor:pointer;margin-top:12px;background:#fff;color:#0b0f17;font-weight:800;font-size:17px;border-radius:999px;padding:15px 28px;
+    max-width:100%;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .jn-cel-undo{all:unset;cursor:pointer;font-size:14px;font-weight:700;color:rgba(255,255,255,.7);padding:12px 16px;}
+  .jn-conf{position:absolute;left:50%;top:40px;width:0;height:0;pointer-events:none;}
+  .jn-conf i{position:absolute;width:9px;height:14px;border-radius:2px;opacity:0;animation:jnConf 1.1s ease-out forwards;}
+  .jn-conf i:nth-child(3n){background:#ffd166;} .jn-conf i:nth-child(3n+1){background:#ff6b9d;} .jn-conf i:nth-child(3n+2){background:#7ce0c3;}
+  @keyframes jnIn{from{opacity:0}to{opacity:1}}
+  @keyframes jnPop{0%{transform:scale(.3)}100%{transform:scale(1)}}
+  @keyframes jnConf{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(320deg)}}
+  @media (prefers-reduced-motion:reduce){.jn-cel,.jn-cel-ok,.jn-conf i{animation:none;}}
+
+  /* перегляд місії «сторіс» */
+  .jn-sv{position:fixed;inset:0;z-index:1250;background:#05070c;color:#fff;animation:jnIn .2s ease-out;}
+  .jn-sv-bg{position:absolute;inset:0;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 80%,#000),#05070c 75%);}
+  .jn-sv-big{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);font-size:150px;line-height:1;filter:drop-shadow(0 18px 40px rgba(0,0,0,.4));}
+  .jn-sv-bg.ph{background-size:cover;background-position:center;}
+  .jn-sv-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,0) 30%,rgba(0,0,0,.75) 70%);}
+  .jn-sv-in{position:relative;height:100%;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));box-sizing:border-box;max-width:560px;margin:0 auto;}
+  .jn-sv-seg{display:flex;gap:4px;}
+  .jn-sv-seg i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);}
+  .jn-sv-seg i.on,.jn-sv-seg i.cur{background:#fff;}
+  .jn-sv-h{position:relative;z-index:2;display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .jn-sv-em{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:color-mix(in srgb,var(--c) 45%,rgba(0,0,0,.4));border:2px solid var(--c);}
+  .jn-sv-h>span:nth-child(2){flex:1;display:flex;flex-direction:column;min-width:0;}
+  .jn-sv-h b{font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .jn-sv-h small{font-size:12px;color:rgba(255,255,255,.75);}
+  .jn-sv-h button{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;font-size:20px;color:#fff;}
+  .jn-sv-tap{position:absolute;top:90px;bottom:40%;width:40%;z-index:1;cursor:pointer;}
+  .jn-sv-tap.l{left:0;} .jn-sv-tap.r{right:0;}
+  .jn-sv-b{position:relative;z-index:2;margin-top:auto;display:flex;flex-direction:column;gap:12px;}
+  .jn-sv-pct{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .jn-sv-pct b{font-size:54px;line-height:1;font-weight:900;}
+  .jn-sv-pct span{font-size:16px;font-weight:700;color:rgba(255,255,255,.85);}
+  .jn-sv-b .jn-bar{height:8px;background:rgba(255,255,255,.2);}
+  .jn-sv-lv{display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:rgba(255,255,255,.8);}
+  .jn-sv-lv .ok{color:#fff;font-weight:700;}
+  .jn-sv-row{display:flex;flex-direction:column;gap:5px;font-size:14px;color:rgba(255,255,255,.85);}
+  .jn-sv-ed{all:unset;cursor:pointer;text-align:center;background:#fff;color:#0b0f17;font-weight:800;font-size:16px;border-radius:999px;padding:15px;margin-top:4px;}
+  .jn-conf i:nth-child(1){--x:-120px;--y:-90px;animation-delay:0.00s;}
+  .jn-conf i:nth-child(2){--x:110px;--y:-100px;animation-delay:0.05s;}
+  .jn-conf i:nth-child(3){--x:-150px;--y:10px;animation-delay:0.10s;}
+  .jn-conf i:nth-child(4){--x:140px;--y:0px;animation-delay:0.15s;}
+  .jn-conf i:nth-child(5){--x:-80px;--y:-150px;animation-delay:0.00s;}
+  .jn-conf i:nth-child(6){--x:70px;--y:-160px;animation-delay:0.05s;}
+  .jn-conf i:nth-child(7){--x:-170px;--y:-60px;animation-delay:0.10s;}
+  .jn-conf i:nth-child(8){--x:170px;--y:-50px;animation-delay:0.15s;}
+  .jn-conf i:nth-child(9){--x:-40px;--y:-170px;animation-delay:0.00s;}
+  .jn-conf i:nth-child(10){--x:30px;--y:-120px;animation-delay:0.05s;}
+  .jn-conf i:nth-child(11){--x:-110px;--y:70px;animation-delay:0.10s;}
+  .jn-conf i:nth-child(12){--x:120px;--y:60px;animation-delay:0.15s;}
+  .jn-conf i:nth-child(13){--x:0px;--y:-180px;animation-delay:0.00s;}
+  .jn-conf i:nth-child(14){--x:-20px;--y:90px;animation-delay:0.05s;}

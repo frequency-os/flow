@@ -119,52 +119,105 @@
       </span></button>`;
   }
 
+  /* ── Вигляд «Сторіс» (09.10.2026): кружечки місій, велика картка найближчої справи, свято «Зроблено» ── */
+  let jnFocus='';   // id блоку, який людина вибрала великою карткою (лише в памʼяті)
+
+  // фото місії — фото мрії з Карти бажань, привʼязаної до цієї цілі; інакше '' (фон кольору місії)
+  function jnMissionPhoto(gl){
+    try{
+      const w=(wishes||[]).find(x=>x&&x.goalId&&String(x.goalId)===String(gl.id)&&(x.type==='video'?x.thumb:x.img));
+      if(!w) return '';
+      return safeImg(w.type==='video'?w.thumb:w.img)||'';
+    }catch(_){ return ''; }
+  }
+  function jnGoalById(id){ return (goalsData.goals||[]).find(g=>g&&String(g.id||g.name)===String(id))||null; }
+  function jnBg(gl){
+    const ph=gl?jnMissionPhoto(gl):'';
+    return ph?`background-image:url('${ph}')`:'';
+  }
+  function jnStory(gl){
+    const c=safeColor(gl.color,'#3ec7b4'), pct=jnPct(gl), ph=jnMissionPhoto(gl), off=jnStatus(gl)!=='active'||jnRole(gl)==='wait';
+    return `<button class="jn-st${off?' off':''}" data-jnstory="${esc(gl.id)}" style="--c:${c};--p:${pct}">
+      <span class="jn-st-r"><span class="jn-st-i"${ph?` style="background-image:url('${ph}')"`:''}>${ph?'':safeEmoji(gl.emoji,'🎯')}</span></span>
+      <small>${esc(gl.name||'Місія')}</small></button>`;
+  }
+  // справи дня: спершу невиконані за часом, потім виконані
+  function jnTodayList(){
+    const all=jnDayBlocks(ymdLocal());
+    return all.filter(b=>!b.done).concat(all.filter(b=>b.done));
+  }
+  function jnFocusCard(list){
+    const undone=list.filter(b=>!b.done);
+    if(!list.length) return `<div class="jn-fc empty"><b>На сьогодні справ нема</b><span>Додай справу в Планері або дай місії розклад — тоді вона зʼявиться тут.</span><button class="jn-fc-btn" data-jnplan>Відкрити Планер</button></div>`;
+    if(!undone.length) return `<div class="jn-fc empty win"><b>Усе на сьогодні зроблено 🎉</b><span>${list.length} ${pluralUk(list.length,'справа','справи','справ')} закрито. Серія тримається.</span></div>`;
+    const b=undone.find(x=>x.id===jnFocus)||undone[0], gl=jnGoalById(jnBlockGoal(b));
+    const c=gl?safeColor(gl.color,'#3ec7b4'):'var(--accent)', bg=jnBg(gl);
+    return `<div class="jn-fc${bg?' ph':''}" style="--c:${c};${bg}">
+      ${bg?'':`<span class="jn-fc-em">${gl?safeEmoji(gl.emoji,'🎯'):'⏱'}</span>`}
+      <span class="jn-fc-v"></span>
+      <span class="jn-fc-b"><small>${gl?esc(gl.name||'Місія')+' · ':''}${jnHm(b.h)}</small><b>${esc(b.t||'Справа')}</b>
+        <button class="jn-fc-btn" data-jndone="${esc(b.id)}">Зроблено</button></span></div>`;
+  }
+  function jnTaskRow(b){
+    const gl=jnGoalById(jnBlockGoal(b)), c=gl?safeColor(gl.color,'#3ec7b4'):'var(--accent)';
+    return `<button class="jn-tk${b.done?' done':''}" data-jnfocus="${esc(b.id)}" style="--c:${c}">
+      <span class="jn-tk-ic">${b.done?'✓':(gl?safeEmoji(gl.emoji,'🎯'):'⏱')}</span>
+      <span class="jn-tk-b"><b>${esc(b.t||'Справа')}</b><small>${gl?esc(gl.name||'')+' · ':''}${jnHm(b.h)}</small></span></button>`;
+  }
+
   function jnRender(){
     const body=jnEl('jnBody'); if(!body) return;
     const goals=(goalsData.goals||[]).filter(g=>g&&g.id);
     const act=goals.filter(g=>jnStatus(g)!=='archive');
-    const main=act.filter(g=>jnRole(g)==='main'), side=act.filter(g=>jnRole(g)==='side'&&jnStatus(g)==='active');
-    const wait=act.filter(g=>jnRole(g)==='wait'||(jnRole(g)==='side'&&jnStatus(g)==='pause'));
+    const order=g=>jnRole(g)==='main'?0:(jnRole(g)==='side'&&jnStatus(g)==='active')?1:2;
+    const stories=act.slice().sort((a,b)=>order(a)-order(b));
     const arch=goals.filter(g=>jnStatus(g)==='archive');
     const xp=jnHeroXP(), lvl=1+Math.floor(xp/JN_XP_LVL), xpIn=xp%JN_XP_LVL;
     const hero=jnHero(), td=ymdLocal(), en=hero.energy&&typeof hero.energy[td]==='number'?hero.energy[td]:null;
     const free=jnFreeHours(); let bal=null; try{ bal=walletBalance(); }catch(_){}
     const sub=jnEl('jnSub'); if(sub) sub.textContent=act.length?(act.length+' '+pluralUk(act.length,'місія','місії','місій')+' · рівень '+lvl):'почни з головної місії';
-    const now=new Date();
+    const now=new Date(), streak=jnStreak();
+    const list=jnTodayList(), focus=(list.filter(b=>!b.done).find(x=>x.id===jnFocus)||list.find(b=>!b.done)||{}).id;
+    const rest=list.filter(b=>b.id!==focus);
     const week=jnWeek().map(ds=>{ const l=jnDayLevel(ds), d=new Date(ds+'T12:00:00');
       return `<button class="jn-d${ds===td?' today':''}${ds>td?' fut':''}" data-jnday="${ds}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></button>`; }).join('');
     const dev=!!(window.upDevOn&&window.upDevOn());
     body.innerHTML=`
       ${hero.started?'':jnStartCard()}
-      <button class="jn-hero" data-jnhero>
-        <span class="jn-av">${jnAvatar()}</span>
-        <span class="jn-hero-b"><span class="jn-cls">${esc(hero.cls||'обери клас')} · рів. ${lvl}</span>
-          <b>${esc(jnName())}</b>
-          <span class="jn-xp"><span class="jn-bar gold"><i style="width:${Math.round(xpIn/JN_XP_LVL*100)}%"></i></span>${xpIn}/${JN_XP_LVL} XP</span></span>
-      </button>
+      <div class="jn-top">
+        <button class="jn-me" data-jnhero><span class="jn-av sm">${jnAvatar()}</span>
+          <span class="jn-me-b"><b>${esc(jnName())}</b><span class="jn-xp"><span class="jn-bar gold"><i style="width:${Math.round(xpIn/JN_XP_LVL*100)}%"></i></span>рів. ${lvl}</span></span></button>
+        <span class="jn-fire${streak?'':' zero'}">🔥 ${streak} ${pluralUk(streak,'день','дні','днів')}</span>
+      </div>
+      <div class="jn-sts">${stories.map(jnStory).join('')}
+        <button class="jn-st add" data-jnadd><span class="jn-st-r"><span class="jn-st-i">＋</span></span><small>Місія</small></button></div>
+      ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
+      <div class="jn-sec"><span>Сьогодні · ${JN_DOW[now.getDay()]}, ${now.getDate()} ${JN_MON[now.getMonth()]}</span><button data-jnplan>Планер ›</button></div>
+      ${jnFocusCard(list)}
+      ${rest.length?`<div class="jn-tks">${rest.map(jnTaskRow).join('')}</div>`:''}
+      <div class="jn-wk-h"><span>Тиждень</span><span><button data-jnhist>Історія</button></span></div>
+      <div class="jn-wk">${week}</div>
       <div class="jn-res">
         <button class="jn-r t" data-jnres="time"><small>Час</small><b>${free===null?'—':String(free).replace('.',',')+' год'}</b><small>вільно сьогодні</small></button>
         <button class="jn-r c" data-jnres="money"><small>Гроші</small><b>${bal===null?'—':jnMoney(bal)}</b><small>Гаманець</small></button>
         <button class="jn-r e" data-jnres="energy"><small>Енергія</small><b>${en===null?'оцінити':en}</b><small>${en===null?'тапни':'зі 100'}</small></button>
-        <button class="jn-r s" data-jnres="streak"><small>Серія</small><b>${jnStreak()}</b><small>днів поспіль</small></button>
       </div>
-      <div class="jn-wk-h"><span>${JN_DOW[now.getDay()]}, ${now.getDate()} ${JN_MON[now.getMonth()]}</span><span><button data-jnhist>Історія</button><button data-jnplan>Планер ›</button></span></div>
-      <div class="jn-wk">${week}</div>
-      <div class="jn-sec"><span>Журнал місій</span><button data-jnadd>+ Місія</button></div>
-      ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
-      ${main.map(jnMissionCard).join('')}
-      ${side.map(jnMissionCard).join('')}
-      ${wait.length?`<div class="jn-sub">Чекають і на паузі · ${wait.length}</div>${wait.map(jnMissionCard).join('')}`:''}
-      ${arch.length?`<button class="jn-arch" data-jnarch>${jnShowArchive?'Сховати архів':'Архів · '+arch.length}</button>${jnShowArchive?arch.map(jnMissionCard).join(''):''}`:''}
+      ${arch.length?`<button class="jn-arch" data-jnarch>${jnShowArchive?'Сховати архів':'Архів місій · '+arch.length}</button>${jnShowArchive?arch.map(jnMissionCard).join(''):''}`:''}
       <div class="jn-sec"><span>Розбір з Флоу</span></div>
       <div class="jn-ai"><button data-jnai="day">День</button><button data-jnai="week">Тиждень</button><button data-jnai="month">Місяць</button></div>
       <button class="jn-arch" data-jnset>Налаштування гри</button>
       ${dev?`<button class="jn-map" data-jnmap>Карта · «Мій світ» (розробник)</button>`:''}
       <div class="jn-pad"></div>`;
     body.querySelectorAll('[data-jnm]').forEach(b=>b.onclick=()=>{ const gl=goals.find(g=>String(g.id)===b.dataset.jnm); if(gl) jnEditor(gl); });
+    body.querySelectorAll('[data-jnstory]').forEach(b=>b.onclick=()=>{ const i=stories.findIndex(g=>String(g.id)===b.dataset.jnstory); if(i>=0) jnStoryView(stories,i); });
     body.querySelectorAll('[data-jnadd]').forEach(b=>b.onclick=()=>jnEditor(null));
+    body.querySelectorAll('[data-jnplan]').forEach(p=>p.onclick=()=>{ try{ goPlanner(); }catch(_){} });
+    body.querySelectorAll('[data-jnfocus]').forEach(b=>b.onclick=()=>{
+      const bl=list.find(x=>x.id===b.dataset.jnfocus); if(!bl) return;
+      if(bl.done){ jnUndoSheet(bl); return; }
+      jnFocus=bl.id; jnRender(); try{ body.querySelector('.jn-fc').scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} });
+    { const d=body.querySelector('[data-jndone]'); if(d) d.onclick=()=>{ const bl=list.find(x=>x.id===d.dataset.jndone); if(bl) jnDone(bl); }; }
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
-    { const p=body.querySelector('[data-jnplan]'); if(p) p.onclick=()=>{ try{ goPlanner(); }catch(_){} }; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
     { const m=body.querySelector('[data-jnmap]'); if(m) m.onclick=()=>{ if(window.goWorld) window.goWorld(); }; }
     { const st=body.querySelector('[data-jnstart]'); if(st) st.onclick=()=>jnStart(+jnHero().startStep||1); }
@@ -178,6 +231,87 @@
       else if(k==='money'){ try{ goFinance(); }catch(_){} }
       else if(k==='energy') jnEnergySheet();
     });
+  }
+
+  /* «Зроблено»: та сама функція Планера, що й галочка в ньому (plCompleteBlock — звичка/крок/дохід).
+     Повторюваний блок, якого ще нема в дні, Планер створює тим самим plBlocksFor — як при відкритті дня. */
+  function jnToggleBlock(b){
+    const p=plData(), old=p.selDate, td=plTodayStr(); let real=null;
+    p.selDate=td;
+    try{
+      const list=plBlocksFor(td);
+      real=b.fromRecur&&b.virtual?list.find(x=>x.fromRecur===b.fromRecur):list.find(x=>x.id===b.id);
+      if(real) plCompleteBlock(real.id);
+    }catch(err){ console.error('jnToggleBlock',err); }
+    finally{ p.selDate=old; }
+    // plCompleteBlock зберіг уже з сьогоднішнім selDate — зберігаємо ще раз, щоб у сховищі був день, який людина дивилась у Планері
+    if(real){ try{ saveGoals(); plRerender(); }catch(_){} }
+    return real;
+  }
+  function jnDone(b){
+    const real=jnToggleBlock(b); if(!real||!real.done){ jnRender(); return; }
+    jnFocus=''; jnRender();
+    jnCelebrate(real);
+  }
+  function jnUndoSheet(b){
+    actionSheet({title:b.t||'Справа', sub:'Уже зроблено сьогодні', items:[
+      {ic:'refresh', label:'Зняти позначку «зроблено»', onClick:()=>{ const r=jnToggleBlock(b); jnRender(); return r; }} ]});
+  }
+  function jnCelebrate(b){
+    const gl=jnGoalById(jnBlockGoal(b)), c=gl?safeColor(gl.color,'#3ec7b4'):'#3ec7b4';
+    const next=jnTodayList().find(x=>!x.done);
+    let prog='';
+    if(gl){ const lv=jnLevels(gl), nx=lv.find(m=>!m.done);
+      prog='Місія «'+esc(gl.name||'Місія')+'» рушила'+(lv.length?': '+lv.filter(m=>m.done).length+' з '+lv.length+' '+pluralUk(lv.length,'рівня','рівнів','рівнів'):'')+'.'
+        +(nx?' Далі — '+esc(nx.t)+(nx.due?' до '+jnDateTxt(nx.due):'')+'.':''); }
+    const streak=jnStreak();
+    const old=document.querySelector('.jn-cel'); if(old) old.remove();
+    const ov=document.createElement('div'); ov.className='jn-cel'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.style.setProperty('--c',c);
+    ov.innerHTML=`<div class="jn-cel-in">
+      <span class="jn-conf" aria-hidden="true">${'<i></i>'.repeat(14)}</span>
+      <span class="jn-cel-ok">✓</span>
+      <b>${esc(b.t||'Справа')} — зроблено!</b>
+      ${prog?`<p>${prog}</p>`:''}
+      <span class="jn-cel-chips">${gl?'<span>+15 XP</span>':''}<span>🔥 ${streak} ${pluralUk(streak,'день','дні','днів')}</span></span>
+      <button class="jn-cel-go" data-jncgo>${next?'Далі: '+esc(next.t||'Справа'):'Чудово'}</button>
+      <button class="jn-cel-undo" data-jncundo>Скасувати</button></div>`;
+    document.body.appendChild(ov);
+    const close=()=>ov.remove();
+    ov.querySelector('[data-jncgo]').onclick=()=>{ if(next) jnFocus=next.id; close(); jnRender(); };
+    ov.querySelector('[data-jncundo]').onclick=()=>{ jnToggleBlock(b); close(); jnRender(); };
+  }
+
+  /* перегляд місії «сторіс»: на весь екран, тап праворуч/ліворуч — наступна/попередня */
+  function jnStoryView(arr, i){
+    const old=document.querySelector('.jn-sv'); if(old) old.remove();
+    const ov=document.createElement('div'); ov.className='jn-sv'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    document.body.appendChild(ov);
+    const draw=()=>{
+      const gl=arr[i], c=safeColor(gl.color,'#3ec7b4'), pct=jnPct(gl), lv=jnLevels(gl), bg=jnBg(gl);
+      const today=jnDayBlocks(ymdLocal()).filter(b=>jnBlockGoal(b)===String(gl.id));
+      ov.style.setProperty('--c',c);
+      ov.innerHTML=`<div class="jn-sv-bg${bg?' ph':''}" style="${bg}">${bg?'':`<span class="jn-sv-big">${safeEmoji(gl.emoji,'🎯')}</span>`}</div><div class="jn-sv-veil"></div>
+        <div class="jn-sv-in">
+          <div class="jn-sv-seg">${arr.map((_,k)=>`<i class="${k<i?'on':k===i?'cur':''}"></i>`).join('')}</div>
+          <div class="jn-sv-h"><span class="jn-sv-em">${safeEmoji(gl.emoji,'🎯')}</span>
+            <span><b>${esc(gl.name||'Місія')}</b><small>${jnRole(gl)==='main'?'головна місія':jnRole(gl)==='wait'?'чекає':'місія'}${jnStatus(gl)==='pause'?' · пауза':''}</small></span>
+            <button data-svx aria-label="Закрити">✕</button></div>
+          <span class="jn-sv-tap l" data-svprev aria-hidden="true"></span><span class="jn-sv-tap r" data-svnext aria-hidden="true"></span>
+          <div class="jn-sv-b">
+            <div class="jn-sv-pct"><b>${pct}%</b><span>${(gl.from||gl.to)?esc(gl.from||'?')+' → '+esc(gl.to||'?'):'шлях місії'}</span></div>
+            <span class="jn-bar"><i style="width:${pct}%"></i></span>
+            ${lv.length?`<div class="jn-sv-lv">${lv.slice(0,6).map(m=>`<span class="${m.done?'ok':''}">${m.done?'✓':'○'} ${esc(m.t)}${m.due?' · '+jnDateTxt(m.due):''}</span>`).join('')}${lv.length>6?`<span>ще ${lv.length-6}…</span>`:''}</div>`:''}
+            <div class="jn-sv-row"><span>📅 ${esc(today.length?'Сьогодні '+today.map(b=>jnHm(b.h)+(b.done?' ✓':'')).join(', '):jnSchedTxt(gl))}</span>
+              ${gl.reward&&gl.reward.t?`<span>🎁 ${esc(gl.reward.t)}</span>`:''}</div>
+            <button class="jn-sv-ed" data-sved>Редагувати місію</button>
+          </div></div>`;
+      ov.querySelector('[data-svx]').onclick=()=>ov.remove();
+      ov.querySelector('[data-sved]').onclick=()=>{ ov.remove(); jnEditor(gl); };
+      ov.querySelector('[data-svprev]').onclick=()=>{ if(i>0){ i--; draw(); } else ov.remove(); };
+      ov.querySelector('[data-svnext]').onclick=()=>{ if(i<arr.length-1){ i++; draw(); } else ov.remove(); };
+    };
+    draw();
   }
 
   function jnEnergySheet(){
