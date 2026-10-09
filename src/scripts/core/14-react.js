@@ -113,6 +113,8 @@
   }
   /* ── сплячі очі: універсальна накладка поверх petSVG ── */
   function petSVGSleep(id,size){
+    // у героїв загону є власний кадр зі сплячими очима — повіки-накладка їм не пасує
+    try{ if(FLOW_PETS[id]&&FLOW_PETS[id].hero){ const h=heroSVG(id,size,5); return h||petSVG(id,size); } }catch(_){}
     const g='pg'+id+Math.round(size);
     const patch=`<ellipse cx="36" cy="48" rx="10.5" ry="9.5" fill="url(#${g})"/><ellipse cx="64" cy="48" rx="10.5" ry="9.5" fill="url(#${g})"/>`
       +`<path d="M29.5 50 q6.5 5.5 13 0 M57.5 50 q6.5 5.5 13 0" stroke="#0b0d1a" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;

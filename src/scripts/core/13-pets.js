@@ -27,6 +27,13 @@
     rex:{name:'Рекс',kind:'бульдог',vibe:'воля',glow:'#9aa8c8',c:['#8a94ac','#4a5268'],male:1,
       line:'Сказав — зробив. Інших варіантів нема.',
       persona:'ХАРАКТЕР: ти Рекс — бульдог залізної волі. Тон: прямий, чесний, тримає за слово. Нагадуєш про обіцянки собі, фіксуєш «сказав → зробив».'},
+    // герої «загону Frequency» (48-hero.js): кадри-картинки замість SVG, поле hero = набір кадрів
+    mia:{name:'Міа',kind:'героїня загону',vibe:'тепло',glow:'#ff8ab0',c:['#ff9cc0','#c2508a'],hero:'girl',
+      line:'Я поруч. Робимо крок — і святкуємо.',
+      persona:'ХАРАКТЕР: ти Міа — дівчина в рожевій балаклаві із загону Frequency. Тон: теплий, жвавий, на «ти», з легкою іронією. Підбадьорюєш, помічаєш дрібні перемоги, нагадуєш дбати про себе, але тримаєш курс на ціль.'},
+    rey:{name:'Рей',kind:'герой загону',vibe:'впевненість',glow:'#8b7cff',c:['#5b4a9e','#2a2342'],hero:'guy',male:1,
+      line:'Без шуму. Наступний крок — і вперед.',
+      persona:'ХАРАКТЕР: ти Рей — хлопець у кепці й балаклаві із загону Frequency. Тон: спокійний, впевнений, коротко й по ділу, трохи вуличного сленгу без грубощів. Тримаєш фокус і темп, прямо кажеш, що робити далі.'},
   };
   FLOW_PETS.dev={name:'Нокс',kind:'чорний лис',vibe:'dev-режим',glow:'#5ce0a8',c:['#2a2e3d','#12141f'],male:true,
     line:'root@flow:~#',
@@ -34,6 +41,7 @@
   function petCur(){ try{ if(localStorage.getItem('ai_dev')==='1') return 'dev'; const p=localStorage.getItem('ai_pet'); return FLOW_PETS[p]&&p!=='dev'?p:'spark'; }catch(_){ return 'spark'; } }
   function petPersona(){ return FLOW_PETS[petCur()].persona+' Ти залишаєшся Флоу-асистентом системи: усі правила і формат відповіді незмінні, характер впливає лише на тон.'; }
   function petSVG(id,size){
+    try{ const h=heroSVG(id,size); if(h) return h; }catch(_){ }   // герої загону — кадри з 48-hero.js
     try{ const r=window.fd26PetSVG&&window.fd26PetSVG(id,size); if(r) return r; }catch(_){ } // fd26: 3D-скін, фолбек нижче
     const p=FLOW_PETS[id]||FLOW_PETS.spark;
     const c1=p.c[0], c2=p.c[1], g='pg'+id+Math.round(size);
@@ -75,6 +83,7 @@
     </svg>`;
   }
   function petPickerSheet(){
+    try{ heroLoad(); }catch(_){}   // кадри героїв загону — щоб у сітці були справжні портрети
     const ov=document.createElement('div'); ov.className='ai-ov'; ov.id='petOv';
     const cards=Object.keys(FLOW_PETS).filter(id=>id!=='dev').map(id=>{ const q=FLOW_PETS[id];
       return `<div class="pet-card${id===petCur()?' on':''}" data-pet="${id}" style="--pc:${q.glow};border-color:${id===petCur()?q.glow:'var(--line)'}">
