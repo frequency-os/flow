@@ -103,3 +103,8 @@
   .wl-envpick button span{font-size:22px;} .wl-envpick button small{font-size:11px;font-weight:700;color:var(--text);max-width:68px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .wl-envpick button i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;}
   .wl-envpick button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 28%,var(--card));}
+  /* Apple Pay через Команди (50-quickadd.js) */
+  .qa-steps{margin:10px 0;padding-left:20px;display:flex;flex-direction:column;gap:7px;font-size:14px;line-height:1.45;color:var(--text);}
+  .qa-steps code{font-size:12.5px;background:var(--field,rgba(127,127,127,.15));padding:1px 5px;border-radius:6px;}
+  .qa-url{font:600 12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;padding:10px 12px;border-radius:12px;background:var(--card);border:1px dashed var(--line);color:var(--text);margin-bottom:10px;}
+  .wl-fromlink{padding:9px 12px;border-radius:12px;font-size:13px;font-weight:700;line-height:1.4;color:var(--text);background:color-mix(in srgb,#f0b429 22%,var(--card));border:1px solid color-mix(in srgb,#f0b429 50%,var(--line));margin-bottom:8px;}

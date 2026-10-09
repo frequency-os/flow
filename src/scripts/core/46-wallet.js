@@ -71,6 +71,7 @@
       :`<button class="wl-starter" data-wlstarter><span>🗂</span><span><b>Розклади гроші по конвертах</b><small>Продукти, кафе, транспорт, житло… — вибери стандартні або створи свої</small></span><i>›</i></button>`;
     let debts='—'; try{ debts=debtSummary(); }catch(_){}
     h+=`<button class="wl-env" data-wldebts><span>🤝</span><span><b>Борги</b><small>нетто</small></span><b>${esc(String(debts))}</b></button>`;
+    if(typeof qaGuide==='function') h+=`<button class="wl-link" data-wlqa>💳 Записувати покупки з Apple Pay автоматично ›</button>`;   // 50-quickadd.js
     return h;
   }
   function wlMissionsHTML(ops){
@@ -119,6 +120,7 @@
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
     { const st=c.querySelector('[data-wlstarter]'); if(st) st.onclick=()=>wlEnvStarter(); }
+    { const qa=c.querySelector('[data-wlqa]'); if(qa) qa.onclick=()=>qaGuide(); }
     { const ev=c.querySelector('[data-wlenv]'); if(ev) ev.onclick=()=>{ finView='envelopes'; renderFinance(); }; }
     { const d=c.querySelector('[data-wldebts]'); if(d) d.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
     c.querySelectorAll('[data-envopen]').forEach(el=>el.onclick=()=>openEnvSheet(el.dataset.envopen));
@@ -144,7 +146,8 @@
     const budTxt=()=>{ const g=wlGoal(gid); if(!g||type!=='out'||!(g.budget&&+g.budget.money>0)) return ''; const a=wlAgg(wlMonthOps(wlYm()),g.id); return 'Бюджет «'+esc(g.name||'')+'» на місяць: '+wlMoney(a.out)+' з '+wlMoney(g.budget.money); };
     jnOverlay(`<div class="jn-ed-h"><b>${type==='in'?'＋':'−'} ${t}</b><button data-jnx aria-label="Закрити">✕</button></div>
       ${curs.length?`<div class="jn-f"><span>Баланс</span><div class="wl-chips" id="wlCurC">${[mainCur()].concat(curs).map(c=>`<button data-wlc="${c}"${c===cur?' class="on"':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</button>`).join('')}</div></div>`:''}
-      <label class="jn-f"><span id="wlAmtL">Сума, ${esc(curSym(cur))}</span><input id="wlAmt" type="number" inputmode="decimal" min="0" step="1" placeholder="Напр. 500"></label>
+      ${opt.fromLink?`<div class="wl-fromlink">🔗 Відкрито з посилання — перевір суму й назву, перш ніж записати</div>`:''}
+      <label class="jn-f"><span id="wlAmtL">Сума, ${esc(curSym(cur))}</span><input id="wlAmt" type="number" inputmode="decimal" min="0" step="1" placeholder="Напр. 500" value="${+opt.amount>0?esc(String(Math.round(+opt.amount*100)/100)):''}"></label>
       <label class="jn-f"><span>На що</span><input id="wlLbl" maxlength="80" value="${esc(String(opt.label||'').slice(0,80))}" placeholder="${type==='in'?'Зарплата, оплата від клієнта…':'Їжа, таксі, підручник…'}"></label>
       ${type==='out'&&wlSpendEnvs().length?`<div class="jn-f" id="wlEnvF"${wlEnvPick(cur)?'':' hidden'}><span>З конверта (необовʼязково)</span><div class="wl-envpick" id="wlEnvP">${wlEnvPick(cur)}</div></div>`:''}
       ${type==='in'?`<div class="jn-f"><span>Тип доходу</span><div class="wl-chips" id="wlSrc">${Object.keys(WL_SRC).map(k=>`<button data-wlsrc="${k}"${k===src?' class="on"':''}>${WL_SRC[k][0]} ${WL_SRC[k][1]}</button>`).join('')}</div></div>`:''}
