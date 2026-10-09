@@ -132,9 +132,10 @@
     const sub=jnEl('jnSub'); if(sub) sub.textContent=act.length?(act.length+' '+pluralUk(act.length,'місія','місії','місій')+' · рівень '+lvl):'почни з головної місії';
     const now=new Date();
     const week=jnWeek().map(ds=>{ const l=jnDayLevel(ds), d=new Date(ds+'T12:00:00');
-      return `<span class="jn-d${ds===td?' today':''}${ds>td?' fut':''}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></span>`; }).join('');
+      return `<button class="jn-d${ds===td?' today':''}${ds>td?' fut':''}" data-jnday="${ds}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></button>`; }).join('');
     const dev=!!(window.upDevOn&&window.upDevOn());
     body.innerHTML=`
+      ${hero.started?'':jnStartCard()}
       <button class="jn-hero" data-jnhero>
         <span class="jn-av">${jnAvatar()}</span>
         <span class="jn-hero-b"><span class="jn-cls">${esc(hero.cls||'обери клас')} · рів. ${lvl}</span>
@@ -147,7 +148,7 @@
         <button class="jn-r e" data-jnres="energy"><small>Енергія</small><b>${en===null?'оцінити':en}</b><small>${en===null?'тапни':'зі 100'}</small></button>
         <button class="jn-r s" data-jnres="streak"><small>Серія</small><b>${jnStreak()}</b><small>днів поспіль</small></button>
       </div>
-      <div class="jn-wk-h"><span>${JN_DOW[now.getDay()]}, ${now.getDate()} ${JN_MON[now.getMonth()]}</span><button data-jnplan>Планер ›</button></div>
+      <div class="jn-wk-h"><span>${JN_DOW[now.getDay()]}, ${now.getDate()} ${JN_MON[now.getMonth()]}</span><span><button data-jnhist>Історія</button><button data-jnplan>Планер ›</button></span></div>
       <div class="jn-wk">${week}</div>
       <div class="jn-sec"><span>Журнал місій</span><button data-jnadd>+ Місія</button></div>
       ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
@@ -155,6 +156,9 @@
       ${side.map(jnMissionCard).join('')}
       ${wait.length?`<div class="jn-sub">Чекають і на паузі · ${wait.length}</div>${wait.map(jnMissionCard).join('')}`:''}
       ${arch.length?`<button class="jn-arch" data-jnarch>${jnShowArchive?'Сховати архів':'Архів · '+arch.length}</button>${jnShowArchive?arch.map(jnMissionCard).join(''):''}`:''}
+      <div class="jn-sec"><span>Розбір з Флоу</span></div>
+      <div class="jn-ai"><button data-jnai="day">День</button><button data-jnai="week">Тиждень</button><button data-jnai="month">Місяць</button></div>
+      <button class="jn-arch" data-jnset>Налаштування гри</button>
       ${dev?`<button class="jn-map" data-jnmap>Карта · «Мій світ» (розробник)</button>`:''}
       <div class="jn-pad"></div>`;
     body.querySelectorAll('[data-jnm]').forEach(b=>b.onclick=()=>{ const gl=goals.find(g=>String(g.id)===b.dataset.jnm); if(gl) jnEditor(gl); });
@@ -163,6 +167,11 @@
     { const p=body.querySelector('[data-jnplan]'); if(p) p.onclick=()=>{ try{ goPlanner(); }catch(_){} }; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
     { const m=body.querySelector('[data-jnmap]'); if(m) m.onclick=()=>{ if(window.goWorld) window.goWorld(); }; }
+    { const st=body.querySelector('[data-jnstart]'); if(st) st.onclick=()=>jnStart(+jnHero().startStep||1); }
+    { const hs=body.querySelector('[data-jnhist]'); if(hs) hs.onclick=()=>jnDaySheet(ymdLocal()); }
+    { const se=body.querySelector('[data-jnset]'); if(se) se.onclick=jnSettings; }
+    body.querySelectorAll('[data-jnday]').forEach(b=>b.onclick=()=>jnDaySheet(b.dataset.jnday));
+    body.querySelectorAll('[data-jnai]').forEach(b=>b.onclick=()=>jnAskReview(b.dataset.jnai));
     body.querySelectorAll('[data-jnres]').forEach(b=>b.onclick=()=>{
       const k=b.dataset.jnres;
       if(k==='time'){ try{ goPlanner(); }catch(_){} }
@@ -176,8 +185,7 @@
     actionSheet({title:'Енергія сьогодні', sub:'Від неї залежить, скільки брати на день',
       items:vals.map(([v,l])=>({ic:'', label:v+' · '+l, onClick:()=>{
         const h=jnHero(); if(!h.energy||typeof h.energy!=='object') h.energy={};
-        h.energy[ymdLocal()]=v;
-        const ks=Object.keys(h.energy).sort(); while(ks.length>60) delete h.energy[ks.shift()];
+        h.energy[ymdLocal()]=v;   // історію енергії не обрізаємо — це журнал гравця
         saveGoals(); jnRender(); }}))});
   }
 
@@ -358,6 +366,148 @@
         try{ plToast(isNew?'Місію додано':'Збережено'); }catch(_){}
       };
     });
+  }
+
+  /* ─── СТАРТ ГРИ: 5 кроків, усе вводить людина (жодних прикладів і заготовок) ───
+     Кожен крок пише лише після «Далі». Пройдений старт запамʼятовується (hero.started) і сам ніколи не скидається. */
+  function jnStartCard(){
+    const st=+jnHero().startStep||0;
+    return `<div class="jn-start"><b>${st>1?'Продовжити старт гри':'Почни гру'}</b><span>5 кроків: куди йдеш, хто ти, з чим стартуєш, місії, перший день.</span>
+      <button data-jnstart>${st>1?'Продовжити · крок '+st+' з 5':'Почати · 5 кроків'}</button></div>`;
+  }
+  function jnStart(step){
+    step=Math.min(5,Math.max(1,+step||1));
+    const h=jnHero(), L=ylLetter(), p=plData();
+    let bal=null, ops=0; try{ ops=walletOps().length; bal=walletBalance(); }catch(_){}
+    const signedIn=!!(window.sbUser&&window.sbUser());
+    const finReady=signedIn&&!!(window.storeKeyReady&&window.storeKeyReady('fin_ops'));
+    const hours=(a,b,v)=>{ let o=''; a=Math.min(a,v); b=Math.max(b,v); for(let x=a;x<=b;x++) o+=`<option value="${x}"${x===v?' selected':''}>${String(x).padStart(2,'0')}:00</option>`; return o; };
+    const act=(goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)!=='archive');
+    let body='';
+    if(step===1) body=`<b class="jn-q">Куди ти йдеш?</b>
+      <p class="jn-p">Напиши, як виглядає твоє життя в точці Б, — як лист собі в майбутнє. Своїми словами: з цього листа виростуть місії.</p>
+      <textarea id="jsLetter" rows="7" maxlength="2000" placeholder="Через рік я…">${esc(L.text)}</textarea>
+      <label class="jn-f"><span>До якої дати</span><input type="date" id="jsDate" value="${esc(ylDate(L))}"></label>`;
+    else if(step===2) body=`<b class="jn-q">Хто ти в грі</b>
+      <div class="jn-ed-av"><span class="jn-av big">${jnAvatar()}</span><small>Фото — у «Ще → Профіль»</small></div>
+      <label class="jn-f"><span>Імʼя героя</span><input id="jsName" maxlength="40" value="${esc(h.name||'')}" placeholder="Як тебе звати в грі"></label>
+      <div class="jn-f"><span>Клас</span><div class="jn-chips" id="jsCls">${JN_CLASSES.map(c=>`<button class="jn-chip${h.cls===c?' on':''}" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`;
+    else if(step===3) body=`<b class="jn-q">З чим стартуєш</b>
+      <p class="jn-p">Твої справжні ресурси. Нічого не підставляємо — лише те, що введеш.</p>
+      ${ops?`<div class="jn-note">У Гаманці вже є записи: зараз <b>${jnMoney(bal)}</b>. Стартовий залишок не потрібен.</div>`
+        :finReady?`<label class="jn-f"><span>Скільки зараз на рахунку, ₴</span><input type="number" id="jsBal" min="0" step="100" inputmode="decimal" placeholder="Напр. 12000"></label>`
+        :signedIn?`<div class="jn-note">Гаманець ще звіряється з хмарою. Суму можна буде додати в Гаманці — так нічого не задвоїться.</div>`
+        :`<div class="jn-note">Без входу в акаунт стартову суму краще внести в Гаманці після входу — інакше вона може задвоїтись із записами акаунта.</div>`}
+      <label class="jn-f"><span>Скільки годин на тиждень маєш на місії</span><input type="number" id="jsHW" min="0" max="112" step="0.5" value="${h.hWeek?esc(String(h.hWeek)):''}" placeholder="Напр. 10"></label>
+      <div class="jn-row3"><label class="jn-f"><span>День починається</span><select id="jsDS">${hours(4,12,+p.dayStart||0)}</select></label>
+        <label class="jn-f"><span>і закінчується</span><select id="jsDE">${hours(16,24,+p.dayEnd||24)}</select></label></div>`;
+    else if(step===4) body=`<b class="jn-q">Твої місії</b>
+      <p class="jn-p">Флоу може розкласти лист на місії — ти переглянеш і підтвердиш кожну. Або додай свої вручну. Одна — головна.</p>
+      ${act.length?act.map(g=>`<div class="jn-mini-m" style="--c:${safeColor(g.color,'#3ec7b4')}"><span>${safeEmoji(g.emoji,'🎯')}</span><b>${esc(g.name||'Місія')}</b><u>${jnRole(g)==='main'?'головна':jnRole(g)==='wait'?'чекає':''}</u></div>`).join(''):'<div class="jn-note">Місій ще нема.</div>'}
+      <div class="jn-row3"><button class="jn-btn ghost" data-jsai>Розкласти лист з Флоу</button><button class="jn-btn ghost" data-jsadd>+ Місія вручну</button></div>`;
+    else body=`<b class="jn-q">Готово до старту</b>
+      <div class="jn-sum"><span>Герой</span><b>${esc(h.name||jnName())}${h.cls?' · '+esc(h.cls):''}</b>
+        <span>Точка Б</span><b>${L.text.trim()?'до '+esc(ylDateTxt(ylDate(L))):'не задано'}</b>
+        <span>Гаманець</span><b>${bal===null?'—':jnMoney(bal)}</b>
+        <span>На місії</span><b>${h.hWeek?esc(String(h.hWeek))+' год / тиждень':'не задано'}</b>
+        <span>Місій</span><b>${act.length}</b></div>
+      <p class="jn-p">Після старту все зберігається: дні, місії, гроші й енергія лишаються в історії. Скинути можна лише вручну в «Налаштуваннях гри».</p>`;
+    const snap=()=>{ try{ return JSON.stringify([goalsData.letter||null, h.name||'', h.cls||'', h.hWeek||0, h.started||'', p.dayStart, p.dayEnd]); }catch(_){ return ''; } };
+    const before=snap();
+    jnOverlay(`<div class="jn-ed-h"><b>Старт гри</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <div class="jn-steps">${[1,2,3,4,5].map(i=>`<i class="${i<=step?'on':''}"></i>`).join('')}</div>
+      <span class="jn-k">Крок ${step} з 5</span>${body}
+      <div class="jn-ed-foot">${step>1?'<button class="jn-btn ghost" data-jnback>Назад</button>':''}<button class="jn-btn" data-jnnext>${step===5?'Почати гру':'Далі'}</button></div>`, ov=>{
+      const q=x=>ov.querySelector(x);
+      let cls=h.cls||'';
+      ov.querySelectorAll('#jsCls [data-v]').forEach(b=>b.onclick=()=>{ cls=(cls===b.dataset.v)?'':b.dataset.v; ov.querySelectorAll('#jsCls [data-v]').forEach(x=>x.classList.toggle('on',x.dataset.v===cls)); });
+      const ai=q('[data-jsai]'); if(ai) ai.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); try{ aiStartSheet(); }catch(e){ console.error('aiStart',e); } };
+      const ad=q('[data-jsadd]'); if(ad) ad.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); jnEditor(null); };
+      const bk=q('[data-jnback]'); if(bk) bk.onclick=()=>jnStart(step-1);
+      q('[data-jnnext]').onclick=()=>{
+        if(step===1){
+          const text=String(q('#jsLetter').value||'').trim().slice(0,2000);
+          if(!text){ q('#jsLetter').focus(); try{ plToast('Напиши хоч кілька речень про точку Б'); }catch(_){} return; }
+          const dv=String(q('#jsDate').value||'');
+          goalsData.letter={ text, date:/^\d{4}-\d{2}-\d{2}$/.test(dv)?dv:ylDate(L), wishId:L.wishId||'' };
+        } else if(step===2){
+          h.name=String(q('#jsName').value||'').trim().slice(0,40); h.cls=cls;
+        } else if(step===3){
+          const hw=+(q('#jsHW')&&q('#jsHW').value); h.hWeek=hw>0?Math.min(112,hw):0;
+          const ds=+q('#jsDS').value, de=+q('#jsDE').value; if(de>ds){ p.dayStart=ds; p.dayEnd=de; }
+          const bi=q('#jsBal'), amount=bi?parseFloat(String(bi.value||'').replace(',','.')):0;
+          // стартовий залишок — лише в прочитаний і порожній Гаманець (інакше задвоїли б хмарні записи)
+          if(amount>0 && window.sbUser && window.sbUser() && window.storeKeyReady && window.storeKeyReady('fin_ops') && !walletOps().length){
+            try{ ensureCards(); finOps.push({ id:'start_'+Date.now(), type:'in', amount:Math.round(amount*100)/100, label:'Стартовий залишок', date:ymdLocal(), card:mainCard().id }); saveFinOps(); }
+            catch(e){ console.error('start balance',e); }
+          }
+        } else if(step===5){
+          h.started=ymdLocal(); delete h.startStep;
+          saveGoals(); ov.remove(); jnRender(); try{ plToast('Гру почато — успіхів, '+jnName()+'!'); }catch(_){} return;
+        }
+        h.startStep=step+1;
+        if(snap()!==before) saveGoals();   // нічого не змінилось — не перезаписуємо ключ цілком (крок лишиться в памʼяті)
+        jnStart(step+1);
+      };
+    });
+  }
+
+  /* ─── НАЛАШТУВАННЯ ГРИ: нічого не скидається саме; лише ці дві дії і лише рукою ─── */
+  function jnSettings(){
+    actionSheet({title:'Налаштування гри', sub:'Історія днів, місії, гроші й лист не скидаються ніколи — лише те, що вибереш тут.', items:[
+      {ic:'refresh', label:'Пройти старт ще раз', sub:'Нічого не видаляє — лише відкриває кроки старту', onClick:()=>jnStart(1)},
+      {ic:'edit', label:'Герой: імʼя і клас', onClick:jnHeroSheet},
+      {ic:'trash', label:'Скинути налаштування гри', sub:'Герой і бюджет годин; місії та історія лишаються', danger:true, onClick:()=>confirmSheet({
+        title:'Скинути налаштування гри?', sub:'Скинуться імʼя героя, клас, бюджет годин і позначка старту. Місії, рівні, історія днів, енергія, гроші й лист лишаються.',
+        okLabel:'Скинути', onOk:()=>{ const h=jnHero(); delete h.name; delete h.cls; delete h.hWeek; delete h.started; delete h.startStep; saveGoals(); jnRender(); try{ plToast('Налаштування гри скинуто'); }catch(_){} }})}
+    ]});
+  }
+
+  /* ─── ЖУРНАЛ ДНІВ: будь-який день — що зроблено, енергія, гроші, щоденник. Лише читання ─── */
+  function jnDaySheet(ds, ym){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) ds=ymdLocal();
+    ym=/^\d{4}-\d{2}$/.test(ym||'')?ym:ds.slice(0,7);
+    const td=ymdLocal(), goals=goalsData.goals||[];
+    const gById=id=>goals.find(g=>g&&String(g.id)===String(id));
+    const bl=ds>=td?jnDayBlocks(ds):(()=>{ try{ const s=plData().blocksByDay[ds]; return Array.isArray(s)?s.filter(Boolean).slice().sort((a,b)=>(+a.h||0)-(+b.h||0)):[]; }catch(_){ return []; } })();
+    const done=bl.filter(b=>b.done);
+    const moved=[...new Set(done.map(jnBlockGoal).filter(Boolean))].map(gById).filter(Boolean);
+    const h=jnHero(), en=h.energy&&typeof h.energy[ds]==='number'?h.energy[ds]:null;
+    let ops=[]; try{ ops=walletOps().filter(o=>o&&o.date===ds); }catch(_){}
+    const inS=ops.filter(o=>o.type==='in').reduce((s,o)=>s+(+o.amount||0),0), outS=ops.filter(o=>o.type!=='in').reduce((s,o)=>s+(+o.amount||0),0);
+    let dia=''; try{ const e=diaryEntries[ds]; if(e&&e.text&&e.text.trim()) dia=e.text.trim(); }catch(_){}
+    const d=new Date(ds+'T12:00:00');
+    // календар місяця
+    const y=+ym.slice(0,4), m=+ym.slice(5,7)-1, first=new Date(y,m,1), days=new Date(y,m+1,0).getDate(), lead=(first.getDay()+6)%7;
+    let cal=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(x=>`<i class="jc-h">${x}</i>`).join('')+'<i></i>'.repeat(lead);
+    for(let i=1;i<=days;i++){ const dd=ymdLocal(new Date(y,m,i)), l=dd>td?-1:jnDayLevel(dd);
+      cal+=`<button class="jc-d jl${l<0?'x':l}${dd===ds?' sel':''}${dd===td?' td':''}" data-jcd="${dd}">${i}</button>`; }
+    const prevYm=ymdLocal(new Date(y,m-1,1)).slice(0,7), nextYm=ymdLocal(new Date(y,m+1,1)).slice(0,7);
+    jnOverlay(`<div class="jn-ed-h"><b>Журнал днів</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <div class="jc-nav"><button data-jcm="${prevYm}" aria-label="Попередній місяць">‹</button><b>${YL_MON[m]} ${y}</b><button data-jcm="${nextYm}" aria-label="Наступний місяць">›</button></div>
+      <div class="jc">${cal}</div>
+      <div class="jd-h"><b>${JN_DOW[d.getDay()]}, ${d.getDate()} ${JN_MON[d.getMonth()]}${ds===td?' · сьогодні':''}</b><small>${bl.length?done.length+' з '+bl.length+' зроблено':'план порожній'}</small></div>
+      ${bl.length?`<div class="jd-list">${bl.map(b=>{ const g=gById(jnBlockGoal(b)); return `<div class="jd-b${b.done?' ok':''}" style="--c:${safeColor(g&&g.color,'#8a96b0')}"><span>${jnHm(b.h)}</span><b>${esc(b.t||'Блок')}</b><u>${b.done?'✓':'—'}</u></div>`; }).join('')}</div>`:''}
+      ${moved.length?`<div class="jn-f"><span>Місії, що рушили</span><div class="jn-chips">${moved.map(g=>`<span class="jd-chip" style="--c:${safeColor(g.color,'#3ec7b4')}">${safeEmoji(g.emoji,'🎯')} ${esc(g.name||'')}</span>`).join('')}</div></div>`:''}
+      <div class="jd-grid"><div><small>Енергія</small><b>${en===null?'—':en}</b></div><div><small>Дохід</small><b class="in">${inS?jnMoney(inS):'—'}</b></div><div><small>Витрати</small><b>${outS?jnMoney(outS):'—'}</b></div></div>
+      ${dia?`<div class="jd-dia">${esc(dia.slice(0,280))}${dia.length>280?'…':''}</div>`:''}
+      <div class="jn-ed-foot"><button class="jn-btn ghost" data-jddia>${dia?'Щоденник цього дня':'Написати в щоденник'}</button><button class="jn-btn" data-jdai>Розбір дня з Флоу</button></div>`, ov=>{
+      ov.querySelectorAll('[data-jcd]').forEach(b=>b.onclick=()=>jnDaySheet(b.dataset.jcd, ym));
+      ov.querySelectorAll('[data-jcm]').forEach(b=>b.onclick=()=>jnDaySheet(ds, b.dataset.jcm));
+      ov.querySelector('[data-jddia]').onclick=()=>{ ov.remove(); try{ goDiary(ds); }catch(_){} };
+      ov.querySelector('[data-jdai]').onclick=()=>{ ov.remove(); jnAskReview('day', ds); };
+    });
+  }
+
+  /* ─── РОЗБОРИ З ФЛОУ: лише фіксовані питання; Флоу читає дані через get_data і нічого не змінює без згоди ─── */
+  function jnAskReview(kind, ds){
+    const day=ds&&/^\d{4}-\d{2}-\d{2}$/.test(ds)?ds:ymdLocal();
+    const q={
+      day:'Зроби розбір мого дня '+day+' у «Журналі героя»: що зроблено з місій, що ні й чому, як була енергія і гроші. Що одне взяти на завтра? Стисло. Подивись мої місії й історію днів (get_data journal), без моєї згоди нічого не змінюй.',
+      week:'Зроби розбір мого тижня в «Журналі героя»: які місії рухались, а які стояли, скільки годин пішло проти бюджету, енергія, гроші. Один фокус на наступний тиждень. Подивись місії й історію днів (get_data journal), без моєї згоди нічого не змінюй.',
+      month:'Зроби розбір мого місяця в «Журналі героя»: прогрес кожної місії й рівнів, години й гроші проти плану, серії, енергія, що заважало. Чи встигаю до точки Б? 3 висновки й 1 зміна на наступний місяць. Подивись місії й історію днів (get_data journal, 31 день), без моєї згоди нічого не змінюй.'
+    }[kind];
+    if(q) ylAskFlow(q);
   }
 
   function goJournal(){ try{ jnRender(); show('scr-journal'); }catch(e){ console.error('goJournal',e); } }

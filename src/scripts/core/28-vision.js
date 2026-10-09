@@ -213,8 +213,7 @@
   function vzRzToggle(id){
     const arr=vzRzToday(); const i=arr.indexOf(id);
     if(i>=0) arr.splice(i,1); else arr.push(id);
-    // прибирання старих днів (тримаємо 90)
-    try{ const keys=Object.keys(vzData.ritual.doneBy).sort(); while(keys.length>90){ delete vzData.ritual.doneBy[keys.shift()]; } }catch(_){}
+    // історію ранку більше не обрізаємо (09.10.2026: журнал днів гравця — назавжди; день — кілька байтів)
     vzSave(); renderVision(); try{window.platform.haptic('success');}catch(_){}
   }
   function vzRzMenu(){

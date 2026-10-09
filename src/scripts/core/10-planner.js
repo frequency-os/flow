@@ -206,7 +206,10 @@
     const tpl=p.recurring.find(x=>x.id===id); if(!tpl) return;
     tpl.active = !(tpl.active!==false);
     if(!tpl.active){
+      // лише від сьогодні вперед: минулі дні — це історія (що було в плані й не зроблено), її не переписуємо
+      const td=plTodayStr();
       Object.keys(p.blocksByDay).forEach(ds=>{
+        if(ds<td) return;
         p.blocksByDay[ds]=p.blocksByDay[ds].filter(b=>!(b.fromRecur===tpl.id && !b.done));
       });
     }
