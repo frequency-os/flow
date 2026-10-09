@@ -87,7 +87,7 @@
   }
 
   // цілі грошей місяця — пишуться лише кнопкою «Зберегти»; порожні поля = ціль не задано
-  function moMoneySheet(ym){
+  function moMoneySheet(ym,after){
     const h=jnHero(), g=(h.money&&h.money[ym])||{};
     jnOverlay(`<div class="jn-ed-h"><b>Гроші · ${esc(moTitle(ym).toLowerCase())}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">Скільки хочеш заробити і скільки готовий витратити цього місяця. Факт рахується із записів Гаманця.</small>
@@ -99,7 +99,7 @@
         const e=Math.max(0,Math.round(+ov.querySelector('#moEarn').value||0)), s=Math.max(0,Math.round(+ov.querySelector('#moSpend').value||0)), sv=Math.max(0,Math.round(+ov.querySelector('#moSave').value||0));
         const hh=jnHero(); if(!hh.money||typeof hh.money!=='object'||Array.isArray(hh.money)) hh.money={};   // масив із хмари мовчки загубив би ключ місяця
         if(e||s||sv) hh.money[ym]={earn:e, spend:s, save:sv}; else delete hh.money[ym];
-        saveGoals(); ov.remove(); jnRender();
+        saveGoals(); ov.remove(); jnRender(); if(typeof after==='function') after();
       };
     });
   }

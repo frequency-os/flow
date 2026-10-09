@@ -285,6 +285,8 @@
     const body=document.getElementById('financeBody'); if(!body) return;
     document.getElementById('finSub').textContent='гаманець і плани';
     if(finView==='envelopes'){ renderEnvScreen(body); return; }
+    // 09.10.2026: головний екран — «Гаманець героя» (46-wallet.js); старий renderFinDash лишається запасним
+    if(typeof wlRender==='function'){ try{ wlRender(body); return; }catch(err){ console.error('wlRender',err); } }
     renderFinDash(body);
   }
 
@@ -418,6 +420,8 @@
 
 
   function addFinOp(type){
+    // нова шторка з полем «До місії» (46-wallet.js)
+    if(typeof wlOpSheet==='function'){ try{ return wlOpSheet(type,''); }catch(err){ console.error('wlOpSheet',err); } }
     ensureCards();
     addFinOpCard(type, mainCard());   // рахунок один — питати нема про що
   }
