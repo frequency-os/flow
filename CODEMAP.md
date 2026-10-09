@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 83 |
-| Рядків JS | 33026 |
+| Файлів JS | 84 |
+| Рядків JS | 33170 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10314 |
-| Сутностей верхнього рівня | 2226 |
+| Рядків CSS | 10336 |
+| Сутностей верхнього рівня | 2243 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -80,10 +80,11 @@
 | `src/scripts/core/43-month.js` | 244 | 32 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
-| `src/scripts/core/46-wallet.js` | 398 | 36 |
-| `src/scripts/core/47-rules.js` | 327 | 29 |
+| `src/scripts/core/46-wallet.js` | 400 | 36 |
+| `src/scripts/core/47-rules.js` | 337 | 29 |
 | `src/scripts/core/48-hero.js` | 316 | 36 |
 | `src/scripts/core/48-widgets.js` | 191 | 20 |
+| `src/scripts/core/49-finlit.js` | 132 | 17 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 883 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 595 | 27 |
@@ -156,7 +157,7 @@
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
 | `src/styles/core/30-wallet.css` | 105 | 0 |
-| `src/styles/core/31-rules.css` | 54 | 0 |
+| `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 59 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (78)
@@ -2281,23 +2282,23 @@
 | `wlSrc` | функція | `src/scripts/core/46-wallet.js:133` |
 | `wlFolderName` | функція | `src/scripts/core/46-wallet.js:134` |
 | `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:136` |
-| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:199` |
-| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:219` |
-| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:225` |
-| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:238` |
-| `wlCurList` | функція | `src/scripts/core/46-wallet.js:260` |
-| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:265` |
-| `curBalance` | функція | `src/scripts/core/46-wallet.js:266` |
-| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:267` |
-| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:269` |
-| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:274` |
-| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:285` |
-| `wlExchange` | функція | `src/scripts/core/46-wallet.js:302` |
-| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:348` |
-| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:354` |
-| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:356` |
-| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:358` |
-| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:359` |
+| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:201` |
+| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:221` |
+| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:227` |
+| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:240` |
+| `wlCurList` | функція | `src/scripts/core/46-wallet.js:262` |
+| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:267` |
+| `curBalance` | функція | `src/scripts/core/46-wallet.js:268` |
+| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:269` |
+| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:271` |
+| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:276` |
+| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:287` |
+| `wlExchange` | функція | `src/scripts/core/46-wallet.js:304` |
+| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:350` |
+| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:356` |
+| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:358` |
+| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:360` |
+| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:361` |
 
 ### `src/scripts/core/47-rules.js` — 29 сутностей
 
@@ -2315,23 +2316,23 @@
 | `rlOffer` | функція | `src/scripts/core/47-rules.js:38` |
 | `rlOnBlockDone` | функція | `src/scripts/core/47-rules.js:51` |
 | `rlOnOp` | функція | `src/scripts/core/47-rules.js:88` |
-| `rlSalarySheet` | функція | `src/scripts/core/47-rules.js:111` |
-| `rlEasyCand` | функція | `src/scripts/core/47-rules.js:142` |
-| `rlJournalHTML` | функція | `src/scripts/core/47-rules.js:160` |
-| `rlJournalBind` | функція | `src/scripts/core/47-rules.js:170` |
-| `rlBook` | функція | `src/scripts/core/47-rules.js:186` |
-| `rlSalaryTpl` | функція | `src/scripts/core/47-rules.js:216` |
-| `rlPlan` | функція | `src/scripts/core/47-rules.js:238` |
-| `rlRowCur` | функція | `src/scripts/core/47-rules.js:247` |
-| `rlPlanFact` | функція | `src/scripts/core/47-rules.js:248` |
-| `rlPrevYm` | функція | `src/scripts/core/47-rules.js:249` |
-| `rlRecurring` | функція | `src/scripts/core/47-rules.js:251` |
-| `rlForecast` | функція | `src/scripts/core/47-rules.js:252` |
-| `rlPlanOpen` | функція | `src/scripts/core/47-rules.js:260` |
-| `rlPlanHTML` | функція | `src/scripts/core/47-rules.js:265` |
-| `rlPlanBind` | функція | `src/scripts/core/47-rules.js:284` |
-| `rlPlanEdit` | функція | `src/scripts/core/47-rules.js:292` |
-| `rlPlanRowMenu` | функція | `src/scripts/core/47-rules.js:313` |
+| `rlSalarySheet` | функція | `src/scripts/core/47-rules.js:114` |
+| `rlEasyCand` | функція | `src/scripts/core/47-rules.js:147` |
+| `rlJournalHTML` | функція | `src/scripts/core/47-rules.js:165` |
+| `rlJournalBind` | функція | `src/scripts/core/47-rules.js:175` |
+| `rlBook` | функція | `src/scripts/core/47-rules.js:192` |
+| `rlSalaryTpl` | функція | `src/scripts/core/47-rules.js:224` |
+| `rlPlan` | функція | `src/scripts/core/47-rules.js:248` |
+| `rlRowCur` | функція | `src/scripts/core/47-rules.js:257` |
+| `rlPlanFact` | функція | `src/scripts/core/47-rules.js:258` |
+| `rlPrevYm` | функція | `src/scripts/core/47-rules.js:259` |
+| `rlRecurring` | функція | `src/scripts/core/47-rules.js:261` |
+| `rlForecast` | функція | `src/scripts/core/47-rules.js:262` |
+| `rlPlanOpen` | функція | `src/scripts/core/47-rules.js:270` |
+| `rlPlanHTML` | функція | `src/scripts/core/47-rules.js:275` |
+| `rlPlanBind` | функція | `src/scripts/core/47-rules.js:294` |
+| `rlPlanEdit` | функція | `src/scripts/core/47-rules.js:302` |
+| `rlPlanRowMenu` | функція | `src/scripts/core/47-rules.js:323` |
 
 ### `src/scripts/core/48-hero.js` — 36 сутностей
 
@@ -2398,6 +2399,28 @@
 | `WG_OLD` | обʼєкт | `src/scripts/core/48-widgets.js:162` |
 | `wgOldScan` | функція | `src/scripts/core/48-widgets.js:163` |
 | `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:170` |
+
+### `src/scripts/core/49-finlit.js` — 17 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `flCushionEnv` | функція | `src/scripts/core/49-finlit.js:18` |
+| `flMonthAgg` | функція | `src/scripts/core/49-finlit.js:19` |
+| `flPrevYm` | функція | `src/scripts/core/49-finlit.js:20` |
+| `flSavedIn` | функція | `src/scripts/core/49-finlit.js:22` |
+| `flAvgSpend` | функція | `src/scripts/core/49-finlit.js:25` |
+| `flOnIncome` | функція | `src/scripts/core/49-finlit.js:28` |
+| `flH24` | функція | `src/scripts/core/49-finlit.js:49` |
+| `flReviewHTML` | функція | `src/scripts/core/49-finlit.js:67` |
+| `flReviewBind` | функція | `src/scripts/core/49-finlit.js:79` |
+| `FL_NEEDS` | значення | `src/scripts/core/49-finlit.js:84` |
+| `FL_SAVE` | значення | `src/scripts/core/49-finlit.js:85` |
+| `fl503020` | функція | `src/scripts/core/49-finlit.js:86` |
+| `flApply503020` | функція | `src/scripts/core/49-finlit.js:95` |
+| `FL_LESSONS` | масив | `src/scripts/core/49-finlit.js:101` |
+| `flCushionHTML` | функція | `src/scripts/core/49-finlit.js:109` |
+| `flSchoolHTML` | функція | `src/scripts/core/49-finlit.js:117` |
+| `flSchoolBind` | функція | `src/scripts/core/49-finlit.js:122` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

@@ -94,12 +94,15 @@
       const sal=rlOn('salary')&&(amtMain>=Math.max(1,+rlN('salary')||10000)||/зарплат|salary|зп\b/i.test(String(op.label||'')));
       if(sal&&(envelopes||[]).some(e=>e&&e.id&&inCur(e))){ setTimeout(()=>rlSalarySheet(+op.amount,oc),250); return; }
       const g=op.goalId?(goalsData.goals||[]).find(x=>String(x.id)===String(op.goalId)):null;
+      let jarOffered=false;
       if(rlOn('jar')&&g&&g.reward&&String(g.reward.t||'').trim()&&!g.reward.claimed&&typeof pzSaved==='function'&&pzCur(g)===oc){
         const rest=Math.max(0,Math.round(+g.reward.sum||0)-pzSaved(g)); let free=0; try{ free=curFree(oc); }catch(_){}
         const amt=Math.min(rest, Math.round(+op.amount*(+rlN('jar')||10)/100), Math.floor(free));
+        if(amt>0) jarOffered=true;
         if(amt>0) setTimeout(()=>rlOffer('🏆','Скарбничка', (op.label||'Дохід')+' +'+money(op.amount,oc)+' · '+(g.name||'')+'. Відкласти '+rlN('jar')+'% ('+money(amt,oc)+') на «'+g.reward.t+'»?',
           'Відкласти '+money(amt,oc),'Не зараз',()=>{ let f2=0; try{ f2=curFree(oc); }catch(_){} const a2=Math.min(amt,Math.floor(f2)); if(!(a2>0)){ plToast('Зараз вільних грошей нема'); return; } pzDeposit(g,a2); rlMark('jar',true,a2); saveGoals(); try{ renderFinance(); }catch(_){} }, ()=>{ rlMark('jar',false); saveGoals(); }),250);
       }
+      if(!jarOffered&&typeof flOnIncome==='function') flOnIncome(op);   // «Спершу собі» (49-finlit.js)
     } else if(op.type==='out'&&!oc&&rlOn('budget')&&op.goalId){
       const g=(goalsData.goals||[]).find(x=>String(x.id)===String(op.goalId)), bud=g&&g.budget&&+g.budget.money>0?+g.budget.money:0;
       if(bud){ const a=wlAgg(wlMonthOps(wlYm()),g.id);
@@ -117,7 +120,9 @@
       <div class="rl-split">${envs.map(e=>`<label class="rl-sp"><span>${safeEmoji(e.emoji,'✉️')}</span><span class="rl-sp-n">${esc(e.name)}</span>
         <input type="number" inputmode="numeric" min="0" max="100" step="5" data-rlpct="${esc(e.id)}" value="${pctOf(e)||''}" placeholder="0" aria-label="Відсоток для ${esc(e.name)}"><i>%</i><b data-rlamt="${esc(e.id)}"></b></label>`).join('')}</div>
       <div class="rl-split-tot" id="rlTot"></div>
+      ${typeof fl503020==='function'&&envs.length?`<button class="mo-set" data-rl532>🥧 Заповнити за 50/30/20</button>`:''}
       <div class="jn-ed-foot"><button class="jn-btn" data-rlgo>Розкласти</button></div>`, ov=>{
+      { const b=ov.querySelector('[data-rl532]'); if(b) b.onclick=()=>flApply503020(ov,envs); }
       const upd=()=>{ let sum=0; ov.querySelectorAll('[data-rlpct]').forEach(i=>{ const p=Math.max(0,Math.min(100,+i.value||0)); sum+=p;
           const b=ov.querySelector('[data-rlamt="'+CSS.escape(i.dataset.rlpct)+'"]'); if(b) b.textContent=p?M(Math.round(total*p/100)):''; });
         const t=ov.querySelector('#rlTot'); t.textContent=sum>100?'Разом '+sum+'% — більше 100%':'Розкласти '+sum+'% ('+M(Math.round(total*sum/100))+') · вільними '+M(total-Math.round(total*sum/100));
@@ -158,7 +163,7 @@
     return null;
   }
   function rlJournalHTML(){
-    let h='';
+    let h=typeof flReviewHTML==='function'?flReviewHTML():'';   // «Огляд місяця» (49-finlit.js)
     const d=rlDiscipline();
     if(d.all>=3) h+=`<button class="rl-disc" data-rlbook><span class="rl-ring" style="--p:${Math.round(d.ok/d.all*100)}"><em>${Math.round(d.ok/d.all*100)}%</em></span><span><b>Дисципліна тижня</b><small>правила дотримано ${d.ok} з ${d.all} ${pluralUk(d.all,'разу','разів','разів')}</small></span><i>›</i></button>`;
     const c=rlEasyCand();
@@ -169,6 +174,7 @@
   }
   function rlJournalBind(c){
     c.querySelectorAll('[data-rlbook]').forEach(b=>b.onclick=()=>rlBook());
+    try{ if(typeof flReviewBind==='function') flReviewBind(c); }catch(_){}
     c.querySelectorAll('[data-rleasy]').forEach(b=>b.onclick=()=>{
       const g=(goalsData.goals||[]).find(x=>String(x.id)===b.dataset.rleasy); if(!g) return;
       const td=ymdLocal(); let ds=td, h=dyFreeSlot(td,0.25);
@@ -199,8 +205,10 @@
             <div class="rl-bk-f">${rlFlow(r).map(x=>`<span>${esc(x)}</span>`).join('<i>→</i>')}</div>
             <div class="rl-bk-s"><small>${esc(stat)}</small>${r.n!==undefined?`<button class="rl-n" data-rln2="${r.id}">${r.unit==='cur'?money(rlN(r.id)):rlN(r.id)+(r.unit==='%'?'%':' '+esc(rlUnit(r,rlN(r.id))))}</button>`:''}
             <button class="rl-tg${on?' on':''}" data-rltg="${r.id}" role="switch" aria-checked="${on}" aria-label="${esc(r.t)}"></button></div></div>`; }).join('')}</div>`).join('')}
+        ${typeof flSchoolHTML==='function'?flSchoolHTML():''}
         <small class="mo-note">Правила, що чіпають гроші, лише пропонують — записують після твого тапу. «Трекер сам» знімає свою ✓, якщо зняти «Зроблено».</small></div>`;
       ov.querySelector('[data-rlbx]').onclick=()=>{ ov.remove(); try{ jnRender(); }catch(_){} };
+      try{ if(typeof flSchoolBind==='function') flSchoolBind(ov,draw); }catch(_){}
       ov.querySelectorAll('[data-rltg]').forEach(b=>b.onclick=()=>{ const id=b.dataset.rltg, hh=jnHero(); if(!hh.rules||typeof hh.rules!=='object'||Array.isArray(hh.rules)) hh.rules={};
         hh.rules[id]=Object.assign({},hh.rules[id]||{},{on:!rlOn(id)}); saveGoals(); draw(); });
       ov.querySelectorAll('[data-rln2]').forEach(b=>b.onclick=()=>{ const r=rlDef(b.dataset.rln2); if(!r) return;
@@ -222,7 +230,9 @@
       <div class="rl-split">${envs.map(e=>`<label class="rl-sp"><span>${safeEmoji(e.emoji,'✉️')}</span><span class="rl-sp-n">${esc(e.name)}</span>
         <input type="number" inputmode="numeric" min="0" max="100" step="5" data-rlpct="${esc(e.id)}" value="${pctOf(e)||''}" placeholder="0" aria-label="Відсоток для ${esc(e.name)}"><i>%</i></label>`).join('')}</div>
       <div class="rl-split-tot" id="rlTot"></div>
+      ${typeof fl503020==='function'&&envs.length?`<button class="mo-set" data-rl532>🥧 Заповнити за 50/30/20</button>`:''}
       <div class="jn-ed-foot"><button class="jn-btn" data-rlsave>Зберегти шаблон</button></div>`, ov=>{
+      { const b=ov.querySelector('[data-rl532]'); if(b) b.onclick=()=>flApply503020(ov,envs); }
       const upd=()=>{ let s=0; ov.querySelectorAll('[data-rlpct]').forEach(i=>s+=Math.max(0,Math.min(100,+i.value||0)));
         const t=ov.querySelector('#rlTot'); t.textContent=s>100?'Разом '+s+'% — більше 100%':'Разом '+s+'% · вільними лишиться '+(100-s)+'%'; t.classList.toggle('bad',s>100); return s; };
       ov.querySelectorAll('[data-rlpct]').forEach(i=>i.oninput=upd); upd();

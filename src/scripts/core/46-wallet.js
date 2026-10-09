@@ -168,6 +168,8 @@
         const amount=Math.round(parseFloat(String(ov.querySelector('#wlAmt').value||'').replace(',','.'))*100)/100;
         if(!(amount>0)){ plToast('Вкажи суму'); return; }
         const env=envId?(envelopes||[]).find(x=>String(x.id)===envId&&(envCur(x)||mainCur())===cur)||null:null;
+        // «Правило 24 годин» (49-finlit.js): велика витрата з вільних у головній валюті — спершу пропозиція почекати
+        if(type==='out'&&!env&&cur===mainCur()&&!ov.__h24ok&&typeof flH24==='function'&&flH24(amount,String(ov.querySelector('#wlLbl').value||'').trim()||t,()=>{ ov.__h24ok=true; const b=ov.querySelector('[data-wlok]'); if(b) b.click(); },()=>ov.remove())) return;
         const typed=String(ov.querySelector('#wlLbl').value||'').trim().slice(0,80), label=typed||(env?env.name:t);
         // з конверта: гроші вже відкладені — витрата йде з конверта (envAddOp 'out' = envSpend, баланс удруге не списує).
         // Якщо в конверті менше — пишемо звичайну витрату з вільних і кажемо про це (з мінусом у конверт не йдемо).

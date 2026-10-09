@@ -52,3 +52,25 @@
   .rl-pr-n b{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .rl-pr-n small{font-size:11.5px;color:var(--muted);}
   .rl-pr>b{flex:none;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;} .rl-pr>b.in{color:var(--hab,#34c77b);} .rl-pr>b.out{color:var(--text);}
   .rl-pr.ok .rl-pr-d{background:color-mix(in srgb,#34c77b 25%,transparent);color:#34c77b;} .rl-pr.ok .rl-pr-n small{color:#34c77b;}
+  /* фінансові звички і «Школа грошей» (49-finlit.js) */
+  .fl-rev{padding:14px;border-radius:20px;margin:10px 0;background:linear-gradient(135deg,color-mix(in srgb,#7f8cff 18%,var(--card)),var(--card));border:1px solid var(--line);}
+  .fl-rev.good{background:linear-gradient(135deg,color-mix(in srgb,#34c77b 20%,var(--card)),var(--card));}
+  .fl-rev-h{display:flex;align-items:center;gap:8px;} .fl-rev-h span{font-size:18px;} .fl-rev-h b{flex:1;font-size:15px;font-weight:800;color:var(--text);}
+  .fl-rev-h button{all:unset;cursor:pointer;width:44px;height:36px;display:grid;place-items:center;margin:-8px -8px -8px 0;color:var(--muted);}
+  .fl-rev-k{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;}
+  .fl-rev-k span{display:flex;flex-direction:column;gap:1px;} .fl-rev-k small{font-size:11px;color:var(--muted);font-weight:700;} .fl-rev-k b{font-size:15px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
+  .fl-rev-bar{position:relative;height:8px;border-radius:9px;background:var(--field,rgba(127,127,127,.18));overflow:visible;}
+  .fl-rev-bar i{display:block;height:100%;border-radius:inherit;background:#34c77b;}
+  .fl-rev-bar u{position:absolute;top:-3px;width:2px;height:14px;background:var(--text);opacity:.5;}
+  .fl-rev p{margin:8px 0 0;font-size:13.5px;line-height:1.45;color:var(--text);}
+  .fl-cush{padding:13px 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);margin-bottom:8px;display:flex;flex-direction:column;gap:7px;}
+  .fl-cush-h{display:flex;align-items:center;gap:8px;} .fl-cush-h span{font-size:20px;} .fl-cush-h b{flex:1;font-size:15px;font-weight:800;color:var(--text);} .fl-cush-h small{font-size:12px;color:var(--muted);}
+  .fl-cush-n{display:flex;flex-direction:column;gap:1px;} .fl-cush-n b{font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;} .fl-cush-n small,.fl-cush-e{font-size:12.5px;color:var(--muted);}
+  .fl-school{display:flex;flex-direction:column;gap:6px;}
+  .fl-l{border-radius:16px;background:var(--card);border:1px solid var(--line);padding:0 14px;}
+  .fl-l summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:52px;}
+  .fl-l summary::-webkit-details-marker{display:none;}
+  .fl-l summary span{font-size:20px;} .fl-l summary b{flex:1;font-size:15px;font-weight:800;color:var(--text);} .fl-l summary i{font-style:normal;color:var(--muted);transition:transform .2s;}
+  .fl-l[open] summary i{transform:rotate(90deg);}
+  .fl-l p{margin:0 0 10px;font-size:14px;line-height:1.5;color:var(--text);}
+  .fl-l .mo-set{margin-bottom:12px;} .fl-on{display:block;font-size:12.5px;color:#34c77b;font-weight:700;margin-bottom:12px;}
