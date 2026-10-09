@@ -30,7 +30,42 @@
   };
   const HERO_COLORS=['#ffffff','#1a1726','#ff8ab0','#b9a9ff','#f5c84c','#5fdc9a'];
   const HERO_TECH={emb:'Вишивка', puff:'Пуф', flat:'Принт'};
-  const HERO_LOOK_DEF={outfit:'logo', text:'', font:'block', color:'#ffffff', tech:'emb'};
+  const HERO_LOOK_DEF={outfit:'logo', text:'', font:'block', color:'#ffffff', tech:'emb', patch:'none', tat:'none'};
+  /* Нашивки й тату (крок 3, 09.10.2026). need — що відкриває річ; рахується з наявних даних
+     (рівень Журналу, віхи, призи, серія), нічого нового не зберігається. Річ, що знову
+     закрилась (серія обнулилась), просто не малюється — вибір у hero_look лишається. */
+  const HERO_ICON={
+    wave:'<path d="M2 13 C4 6 6.5 5 8 10 C9.5 16 11 19 13 13 C14.5 8 15.5 2 17.5 6 C18.5 8.5 19.5 11 22 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    bolt:'<path d="M13 2 L5 14 L11 14 L9 22 L19 9 L13 9 Z" fill="currentColor"/>',
+    heart:'<path d="M12 21 C5 15 2 11 2 7.5 C2 4.5 4.3 2.5 7 2.5 C9 2.5 10.8 3.6 12 5.4 C13.2 3.6 15 2.5 17 2.5 C19.7 2.5 22 4.5 22 7.5 C22 11 19 15 12 21 Z" fill="currentColor"/>',
+    star:'<path d="M12 1.5 L14.6 9.4 L22.5 12 L14.6 14.6 L12 22.5 L9.4 14.6 L1.5 12 L9.4 9.4 Z" fill="currentColor"/>',
+    crown:'<path d="M3 18 L4.5 7 L9.5 12 L12 4.5 L14.5 12 L19.5 7 L21 18 Z" fill="currentColor"/>',
+    shield:'<path d="M12 2 L20 5 V11 C20 16 16.5 20 12 22 C7.5 20 4 16 4 11 V5 Z" fill="currentColor"/>',
+    fire:'<path d="M12 2 C13 7 18 9 18 15 A6 6 0 0 1 6 15 C6 11 9 10 9 6 C11 8 12 9 12 2 Z" fill="currentColor"/>',
+    tear:'<path d="M12 2.5 C16 9 19 12.5 19 16 A7 7 0 0 1 5 16 C5 12.5 8 9 12 2.5 Z" fill="none" stroke="currentColor" stroke-width="2.6"/>'
+  };
+  const HERO_NEED={
+    lvl3:{t:'рівень 3', ok:u=>u.lvl>=3},   lvl10:{t:'рівень 10', ok:u=>u.lvl>=10},
+    ms:{t:'перша віха', ok:u=>u.ms},       prize:{t:'приз місії', ok:u=>u.prize},
+    fire7:{t:'серія 7 днів', ok:u=>u.streak>=7}
+  };
+  const HERO_PATCHES={
+    none:{n:'Без'},
+    wave:{n:'Frequency', bg:'#6d5cf0', fg:'#ffffff'},
+    bolt:{n:'Блискавка', bg:'#1b1726', fg:'#ffd75c'},
+    heart:{n:'Серце', bg:'#ff8ab0', fg:'#ffffff'},
+    star:{n:'Зірка', bg:'#22305e', fg:'#f5c84c', need:'lvl3'},
+    crown:{n:'Корона', bg:'#f5c84c', fg:'#3a2a00', need:'prize'},
+    shield:{n:'Щит', bg:'#2e9e6e', fg:'#ffffff', need:'lvl10'},
+    fire:{n:'Вогонь', bg:'#ff6a3d', fg:'#ffffff', need:'fire7'}
+  };
+  const HERO_TATS={
+    none:{n:'Без'}, heart:{n:'Серце'}, tear:{n:'Сльоза'},
+    star:{n:'Зірка', need:'lvl3'}, wave:{n:'Хвиля', need:'ms'}, crown:{n:'Корона', need:'prize'}
+  };
+  // нашивка — на лівому рукаві (праворуч на кадрі); тату — на шкірі біля ока (у Міи ліве сердечко вже намальоване)
+  const HERO_PATCH_AT={ girl:{x:424,y:478,s:46,r:-9}, guy:{x:424,y:470,s:46,r:-9} };
+  const HERO_TAT_AT={ girl:{x:306,y:201,s:15}, guy:{x:302,y:171,s:12} };
   let heroLoading=false, heroOutfitsLoading=false;
 
   function heroOf(id){ const p=FLOW_PETS[id]; return p&&p.hero?p.hero:''; }
@@ -48,7 +83,9 @@
       text: String(l.text==null?'':l.text).replace(/[\u0000-\u001f]/g,'').slice(0,16),
       font: HERO_FONTS[l.font]?l.font:HERO_LOOK_DEF.font,
       color: HERO_COLORS.includes(l.color)?l.color:HERO_LOOK_DEF.color,
-      tech: HERO_TECH[l.tech]?l.tech:HERO_LOOK_DEF.tech
+      tech: HERO_TECH[l.tech]?l.tech:HERO_LOOK_DEF.tech,
+      patch: Object.prototype.hasOwnProperty.call(HERO_PATCHES,l.patch)?l.patch:'none',
+      tat: Object.prototype.hasOwnProperty.call(HERO_TATS,l.tat)?l.tat:'none'
     };
   }
   function heroLook(id){ return heroLookNorm(heroLookAll()[id]); }
@@ -133,6 +170,30 @@
     return `<text text-anchor="middle" dominant-baseline="middle" fill="${look.color}" fill-opacity="${op}" style="${style}"${extra}>${spans}</text>`;
   }
 
+  /* що відкрито: рівень Журналу, віхи, призи, серія — з наявних даних, кожне у своєму try */
+  function heroUnlocks(){
+    const u={lvl:1, ms:false, prize:false, streak:0};
+    try{ u.lvl=1+Math.floor(jnHeroXP()/JN_XP_LVL); }catch(_){}
+    try{ u.ms=(goalsData.goals||[]).some(g=>g&&jnLevels(g).some(m=>m.done)); }catch(_){}
+    try{ u.prize=pzGoals().some(g=>g.reward.claimed); }catch(_){}
+    try{ u.streak=jnStreak(); }catch(_){}
+    return u;
+  }
+  function heroItemOpen(item,u){ return !item.need || HERO_NEED[item.need].ok(u||heroUnlocks()); }
+  function heroPatchSVG(kind,L,u){
+    const it=HERO_PATCHES[L.patch]; if(!it||!it.bg||!heroItemOpen(it,u)) return '';
+    const P=HERO_PATCH_AT[kind], h=P.s/2, k=P.s*.62/24;
+    return `<g transform="translate(${P.x} ${P.y}) rotate(${P.r})">`
+      +`<rect x="${-h}" y="${-h}" width="${P.s}" height="${P.s}" rx="8" fill="${it.bg}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>`
+      +`<rect x="${-h+3}" y="${-h+3}" width="${P.s-6}" height="${P.s-6}" rx="6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.2" stroke-dasharray="3 2.4"/>`
+      +`<g transform="translate(${-12*k} ${-12*k}) scale(${k.toFixed(3)})" style="color:${it.fg}">${HERO_ICON[L.patch]}</g></g>`;
+  }
+  function heroTatSVG(kind,L,u){
+    const it=HERO_TATS[L.tat]; if(!it||L.tat==='none'||!heroItemOpen(it,u)) return '';
+    const T=HERO_TAT_AT[kind], k=T.s/24;
+    return `<g transform="translate(${T.x-T.s/2} ${T.y-T.s/2}) scale(${k.toFixed(3)})" style="color:#2a1c18" opacity=".82">${HERO_ICON[L.tat]}</g>`;
+  }
+
   /* SVG-обгортка над кадром, щоб герой ліг усюди, де зараз стоїть petSVG():
      size<90 — голова в кружечку (аватар, плаваючий напарник), більше — весь бюст.
      Повертає null, поки кадри не підвантажились. look — для прев'ю в шафі. */
@@ -148,13 +209,15 @@
       else heroOutfitsLoad();
     }
     const s=Math.round(size), uid=id+s+Math.round(Math.random()*1e6);
+    const U=(L.patch!=='none'||L.tat!=='none')?heroUnlocks():null;
     const label=`${esc(FLOW_PETS[id].name)} — ${HERO_MOOD_NAME[m]}`;
     if(s>=90){
       // кадр вписано в квадрат 100×100 по висоті, по центру; усе всередині — у пікселях кадру
       const k=100/A.h, ox=(50-A.w*k/2).toFixed(2);
       const inner=`<image href="${src}" width="${A.w}" height="${A.h}"/>`
         +(osrc?`<image href="${osrc}" width="${A.w}" height="${A.h}"/>`:'')
-        +(osrc?heroChestText(kind,L,uid):'');   // напис лише на одязі без лого
+        +(osrc?heroChestText(kind,L,uid):'')   // напис лише на одязі без лого
+        +heroPatchSVG(kind,L,U)+heroTatSVG(kind,L,U);
       return `<svg viewBox="0 0 100 100" width="${s}" height="${s}" style="display:block;overflow:visible" role="img" aria-label="${label}">`
         +`<defs><filter id="hp${uid}" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.6" flood-color="#000" flood-opacity=".45"/><feDropShadow dx="0" dy="-1" stdDeviation=".4" flood-color="#fff" flood-opacity=".35"/></filter></defs>`
         +`<g transform="translate(${ox} 0) scale(${k.toFixed(5)})">${inner}</g></svg>`;
@@ -165,7 +228,7 @@
       +`<defs><clipPath id="${cid}"><circle cx="50" cy="50" r="49"/></clipPath></defs>`
       +`<circle cx="50" cy="50" r="49" fill="#2a2342"/>`
       +`<g clip-path="url(#${cid})"><g transform="${tr}"><image href="${src}" width="${A.w}" height="${A.h}"/>`
-      +(osrc?`<image href="${osrc}" width="${A.w}" height="${A.h}"/>`:'')+`</g></g>`
+      +(osrc?`<image href="${osrc}" width="${A.w}" height="${A.h}"/>`:'')+heroTatSVG(kind,L,U)+`</g></g>`
       +`<circle cx="50" cy="50" r="49" fill="none" stroke="${FLOW_PETS[id].glow}" stroke-opacity=".55" stroke-width="2"/></svg>`;
   }
 
@@ -193,11 +256,21 @@
     heroRerender();
     try{ flowReact('celebrate',{say:false}); }catch(_){}
   }
+  /* кнопка нашивки/тату в шафі: значок + назва; закрита — із замочком і «за що» */
+  function heroWardItem(field,key,it,U){
+    const open=heroItemOpen(it,U);
+    const ic=key==='none'?'○':`<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="color:${field==='patch'?it.fg:'currentColor'}">${HERO_ICON[key]}</svg>`;
+    const sw=field==='patch'&&it.bg?` style="--hwbg:${it.bg}"`:'';
+    return `<button type="button" class="hw-chip hw-item${field==='patch'&&it.bg?' hw-patch':''}${open?'':' locked'}" data-hw="${field}:${key}"${sw}`
+      +(open?'':` aria-disabled="true" aria-label="${esc(it.n)} — закрито, відкривається за: ${HERO_NEED[it.need].t}"`)+`>`
+      +`<span class="hw-ic">${ic}</span>${esc(it.n)}${open?'':`<small>🔒 ${HERO_NEED[it.need].t}</small>`}</button>`;
+  }
   function heroWardrobe(id){
     id=id||petCur(); if(!heroOf(id)) return;
     heroLoad(); heroOutfitsLoad();
     heroWard={id, look:heroLook(id)};
     const old=document.getElementById('heroWardOv'); if(old) old.remove();
+    const U=heroUnlocks();
     const chip=(k,v,t,extra)=>`<button type="button" class="hw-chip" data-hw="${k}:${v}"${extra||''}>${t}</button>`;
     const ov=document.createElement('div'); ov.className='ai-ov'; ov.id='heroWardOv';
     ov.innerHTML=`<div class="ai-sheet hw-sheet"><h3>👕 Шафа · ${esc(FLOW_PETS[id].name)}</h3>
@@ -210,6 +283,10 @@
       <div class="hw-row">${Object.keys(HERO_FONTS).map(k=>chip('font',k,HERO_FONTS[k].n,` style="font-family:${HERO_FONTS[k].f};font-weight:${HERO_FONTS[k].w}"`)).join('')}</div>
       <div class="hw-row">${HERO_COLORS.map(c=>chip('color',c,'',` style="background:${c}" aria-label="Колір ${c}"`).replace('hw-chip','hw-chip hw-sw')).join('')}</div>
       <div class="hw-row">${Object.keys(HERO_TECH).map(k=>chip('tech',k,HERO_TECH[k])).join('')}</div>
+      <div class="hw-h">Нашивка на рукаві</div>
+      <div class="hw-row">${Object.keys(HERO_PATCHES).map(k=>heroWardItem('patch',k,HERO_PATCHES[k],U)).join('')}</div>
+      <div class="hw-h">Тату біля ока</div>
+      <div class="hw-row">${Object.keys(HERO_TATS).map(k=>heroWardItem('tat',k,HERO_TATS[k],U)).join('')}</div>
       <div class="ai-actions"><button class="sec" data-hwclose>Скасувати</button><button class="pri" data-hwsave>Зберегти</button></div></div>`;
     document.body.appendChild(ov);
     const inp=ov.querySelector('#hwText'); inp.value=heroWard.look.text;
@@ -217,6 +294,7 @@
     ov.addEventListener('click',e=>{
       if(e.target===ov||e.target.closest('[data-hwclose]')){ ov.remove(); heroWard=null; return; }
       const b=e.target.closest('[data-hw]');
+      if(b&&b.getAttribute('aria-disabled')==='true'){ try{ window.platform.haptic('light'); }catch(_){} return; }
       if(b){ const i=b.dataset.hw.indexOf(':'); heroWard.look[b.dataset.hw.slice(0,i)]=b.dataset.hw.slice(i+1);
         try{ window.platform.haptic('light'); }catch(_){} heroWardRedraw(); return; }
       if(e.target.closest('[data-hwsave]')){
