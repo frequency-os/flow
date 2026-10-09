@@ -6,7 +6,7 @@
    · решта файлів (vendor/, іконки, маніфест) — з кешу цієї версії, мережа лише
      якщо файла там ще нема. Вони міняються тільки разом із версією.
    Версію підставляє збірка — новий білд = новий кеш, старі чистяться. */
-const VERSION = '2026-10-09-2221-58006dd';
+const VERSION = '2026-10-09-2334-7a4cc8b';
 const CACHE = 'frequency-' + VERSION;
 // Сторінка кешується ОДИН раз, під цим ключем. Раніше './' і './index.html'
 // лежали двома копіями по 2.8 МБ, хоча це той самий файл.
@@ -14,6 +14,8 @@ const INDEX = './index.html';
 const PRECACHE = [
   INDEX,
   './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png',
+  './hero-assets.js',     // кадри героїв загону (48-hero.js), ліниво після старту
+  './hero-outfits.js',    // одяг героїв (шафа 48-hero.js)
   './fonts-caveat.css',   // рукописний шрифт, вантажиться після першого кадру (01-base.js)
   './vendor/jszip.min.js', './vendor/pdf.min.js', './vendor/supabase.min.js',
 ];
