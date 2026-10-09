@@ -178,6 +178,11 @@
       if(sub) sub.textContent='тиждень · '+dyWeekRange(dyWk.mon);
       return;
     }
+    if(jnTab==='year'){
+      body.innerHTML=yrHTML(); yrBind(body);
+      if(sub) sub.textContent='рік · база цілей · '+yrYear();
+      return;
+    }
     if(jnTab==='month'){
       // етап 7: новий «Місяць» (43-month.js) — картки місій, гроші, календар; старий місяць Планера з екрана прибрано, дані лишились
       body.innerHTML=moMonthHTML();
@@ -199,7 +204,7 @@
     f.innerHTML=tabs.map(([k,l])=>`<button data-jntab="${k}"${cur===k?' class="on" aria-pressed="true"':''}>${l}</button>`).join('');
     f.querySelectorAll('[data-jntab]').forEach(b=>b.onclick=()=>{
       const k=b.dataset.jntab;
-      if(k==='year'){ try{ goGoals(); jnTop(); }catch(_){} return; }   // «Рік» — нинішній Горизонт (лист і Дорога року)
+      // «Рік» — База цілей (45-year.js); лист і Дорога року (Горизонт) — смужкою в ній
       if(k==='day'&&jnTab==='day'){ jnDayDs=''; }
       const sj=jnEl('scr-journal'), inJ=sj&&sj.classList.contains('active');
       jnTab=k; if(inJ) jnRender(); else goJournal(); jnTop();

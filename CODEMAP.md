@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 77 |
-| Рядків JS | 32209 |
-| Файлів CSS | 42 |
-| Рядків CSS | 9982 |
-| Сутностей верхнього рівня | 2111 |
+| Файлів JS | 78 |
+| Рядків JS | 32359 |
+| Файлів CSS | 43 |
+| Рядків CSS | 10066 |
+| Сутностей верхнього рівня | 2132 |
 | Ключів сховища (FLOW_KEYS) | 75 |
 
 ## Файли JS
@@ -76,10 +76,11 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 232 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 723 | 61 |
+| `src/scripts/core/41-journal.js` | 728 | 61 |
 | `src/scripts/core/42-day.js` | 314 | 35 |
 | `src/scripts/core/43-month.js` | 244 | 32 |
 | `src/scripts/core/44-prizes.js` | 166 | 23 |
+| `src/scripts/core/45-year.js` | 145 | 21 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
@@ -148,6 +149,7 @@
 | `src/styles/core/26-day.css` | 129 | 0 |
 | `src/styles/core/27-month.css` | 115 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
+| `src/styles/core/29-year.css` | 84 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (75)
 
@@ -2125,29 +2127,29 @@
 | `jnFocusCard` | функція | `src/scripts/core/41-journal.js:152` |
 | `jnTaskRow` | функція | `src/scripts/core/41-journal.js:164` |
 | `jnRender` | функція | `src/scripts/core/41-journal.js:171` |
-| `jnTop` | функція | `src/scripts/core/41-journal.js:193` |
-| `jnFloatRender` | функція | `src/scripts/core/41-journal.js:195` |
-| `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:209` |
-| `jnRenderToday` | функція | `src/scripts/core/41-journal.js:217` |
-| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:292` |
-| `jnDone` | функція | `src/scripts/core/41-journal.js:305` |
-| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:310` |
-| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:314` |
-| `jnStoryView` | функція | `src/scripts/core/41-journal.js:340` |
-| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:371` |
-| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:380` |
-| `jnOverlay` | функція | `src/scripts/core/41-journal.js:396` |
-| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:409` |
-| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:417` |
-| `jnTplDows` | функція | `src/scripts/core/41-journal.js:420` |
-| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:427` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:448` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:575` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:580` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:658` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:669` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:705` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:716` |
+| `jnTop` | функція | `src/scripts/core/41-journal.js:198` |
+| `jnFloatRender` | функція | `src/scripts/core/41-journal.js:200` |
+| `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:214` |
+| `jnRenderToday` | функція | `src/scripts/core/41-journal.js:222` |
+| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:297` |
+| `jnDone` | функція | `src/scripts/core/41-journal.js:310` |
+| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:315` |
+| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:319` |
+| `jnStoryView` | функція | `src/scripts/core/41-journal.js:345` |
+| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:376` |
+| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:385` |
+| `jnOverlay` | функція | `src/scripts/core/41-journal.js:401` |
+| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:414` |
+| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:422` |
+| `jnTplDows` | функція | `src/scripts/core/41-journal.js:425` |
+| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:432` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:453` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:580` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:585` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:663` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:674` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:710` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:721` |
 
 ### `src/scripts/core/42-day.js` — 35 сутностей
 
@@ -2253,6 +2255,32 @@
 | `pzDeposit` | функція | `src/scripts/core/44-prizes.js:120` |
 | `pzWithdraw` | функція | `src/scripts/core/44-prizes.js:132` |
 | `pzCelebrate` | функція | `src/scripts/core/44-prizes.js:146` |
+
+### `src/scripts/core/45-year.js` — 21 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `yrState` | обʼєкт | `src/scripts/core/45-year.js:7` |
+| `YR_MX_KEY` | значення | `src/scripts/core/45-year.js:8` |
+| `yrMxOpen` | функція | `src/scripts/core/45-year.js:9` |
+| `yrSetMxOpen` | функція | `src/scripts/core/45-year.js:10` |
+| `yrYear` | функція | `src/scripts/core/45-year.js:11` |
+| `yrCurQ` | функція | `src/scripts/core/45-year.js:12` |
+| `yrWide` | функція | `src/scripts/core/45-year.js:13` |
+| `yrMissions` | функція | `src/scripts/core/45-year.js:14` |
+| `yrLv` | функція | `src/scripts/core/45-year.js:22` |
+| `yrChip` | функція | `src/scripts/core/45-year.js:23` |
+| `yrPrize` | функція | `src/scripts/core/45-year.js:27` |
+| `yrKpi` | функція | `src/scripts/core/45-year.js:32` |
+| `yrHead` | функція | `src/scripts/core/45-year.js:38` |
+| `yrTableHTML` | функція | `src/scripts/core/45-year.js:47` |
+| `yrPhoneHTML` | функція | `src/scripts/core/45-year.js:62` |
+| `yrHTML` | функція | `src/scripts/core/45-year.js:86` |
+| `yrFind` | функція | `src/scripts/core/45-year.js:89` |
+| `yrMove` | функція | `src/scripts/core/45-year.js:90` |
+| `yrLvMenu` | функція | `src/scripts/core/45-year.js:98` |
+| `yrAddLevel` | функція | `src/scripts/core/45-year.js:105` |
+| `yrBind` | функція | `src/scripts/core/45-year.js:116` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
