@@ -97,3 +97,19 @@
   .mo-fl b{font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .mo-fl small{font-size:12px;color:var(--muted);}
   .mo-fl i{font-style:normal;color:var(--muted);font-size:18px;}
+
+  /* папка місії (крок Б): трекер, нотатки, бачення */
+  .mo-set.solid{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .mo-tk{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;min-height:38px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:700;
+    color:var(--text);background:var(--field);border:1.5px solid transparent;}
+  .mo-tk.on{background:var(--c,var(--accent));color:#fff;}
+  .mo-tk.td{border-color:var(--c,var(--accent));}
+  .mo-tk.fut{opacity:.4;cursor:default;}
+  .mo-tk:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .mo-nt{font-size:14px;line-height:1.45;color:var(--text);padding:9px 11px;border-radius:12px;background:var(--field);overflow-wrap:anywhere;white-space:pre-wrap;}
+  .mo-nt small{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;}
+  .mo-vis p{margin:0;font-size:16px;line-height:1.45;font-weight:600;color:var(--text);overflow-wrap:anywhere;white-space:pre-wrap;}
+  .mo-vis{background:linear-gradient(150deg,color-mix(in srgb,var(--c,var(--accent)) 16%,var(--card)),var(--card));}
+  .mo-ta{box-sizing:border-box;width:100%;min-height:150px;font:inherit;font-size:16px;line-height:1.45;color:var(--text);background:var(--field);
+    border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical;}
+  .mo-ta:focus{outline:2px solid var(--accent);outline-offset:0;}

@@ -107,7 +107,7 @@
     document.body.appendChild(ov);
     const draw=()=>{
       const g=(goalsData.goals||[]).find(x=>String(x.id)===String(gl.id)); if(!g){ ov.remove(); return; }
-      const c=safeColor(g.color,'#3ec7b4'), pct=jnPct(g), fk=g.folderKey&&typeof folders!=='undefined'&&folders[g.folderKey]?g.folderKey:'';
+      const c=safeColor(g.color,'#3ec7b4'), pct=jnPct(g), fk=moOwnFolder(g.folderKey)?g.folderKey:'';
       let chats=[]; try{ if(fk&&window.chatsForFolder) chats=window.chatsForFolder(fk); }catch(_){}
       ov.style.setProperty('--c',c);
       ov.innerHTML=`<div class="mo-mp-in">
@@ -122,7 +122,8 @@
       ov.querySelector('[data-mped]').onclick=()=>{ ov.remove(); jnEditor(g); };
       ov.querySelectorAll('[data-mptab]').forEach(b=>b.onclick=()=>{ tab=b.dataset.mptab; draw(); });
       ov.querySelectorAll('[data-mpfolder]').forEach(b=>b.onclick=()=>{ ov.remove(); try{ goFolder(fk); }catch(_){} });
-      ov.querySelectorAll('[data-mpchat]').forEach(b=>b.onclick=()=>{ ov.remove(); try{ goChat(b.dataset.mpchat); }catch(_){} });
+      ov.querySelectorAll('[data-mpchat]').forEach(b=>b.onclick=()=>{ ov.remove(); try{ goChat(b.dataset.mpchat,fk?{from:'page',key:fk}:undefined); }catch(_){} });
+      moBindMission(ov,g,draw);
       ov.querySelectorAll('[data-mplv]').forEach(b=>b.onclick=()=>{ ov.remove(); jnEditor(g); });
     };
     draw();
@@ -153,15 +154,87 @@
     });
     return h+`</div><button class="mo-set" data-mplv>＋ Рівень або змінити шлях</button>`;
   }
+  /* ── Папка місії (крок Б): звичайна папка Frequency, привʼязана полем g.folderKey.
+     Трекер (блок calendar/heatmap), нотатки (type note) і бачення (note з vision:true) лежать у boards[fk].
+     Усі записи — лише після натискання людини: saveFolders()/saveBoard()/saveGoals()/chatCreate(). ── */
+  // лише власні ключі folders (не __proto__ із зіпсованих даних)
+  function moOwnFolder(k){ return !!k&&typeof folders!=='undefined'&&Object.prototype.hasOwnProperty.call(folders,k)&&!!folders[k]; }
+  function moBoard(fk){ return Array.isArray(boards[fk])?boards[fk]:[]; }
+  // лише календар-трекер: звички з рівнями (heatmap) у привʼязаній папці — чужі, їх тут не чіпаємо
+  function moTracker(fk){ return moBoard(fk).find(b=>b&&b.type==='calendar'&&b.marks&&typeof b.marks==='object'&&!Array.isArray(b.marks))||null; }
+  function moNotes(fk){ return moBoard(fk).filter(b=>b&&b.type==='note'&&!b.vision&&String(b.text||'').trim()).sort((a,b)=>(+a.at||0)-(+b.at||0)).slice(-3).reverse(); }
+  function moVision(fk){ return moBoard(fk).find(b=>b&&b.type==='note'&&b.vision)||null; }
+  function moMarked(t,ds){ const v=t.marks[ds]; return t.type==='heatmap'?(+v>0):!!v; }
   function moFolderTab(g,fk){
-    if(!fk) return `<div class="dy-empty"><b>Папки місії ще нема</b><span>Тут будуть трекер місяця, нотатки й бачення цієї місії. Створення папки місії — наступний крок.</span></div>`;
-    const f=folders[fk];
-    return `<button class="mo-fl" data-mpfolder><span class="mo-fl-em">${safeEmoji(f.emoji,'📁')}</span><span><b>${esc(f.name||'Папка')}</b><small>папка місії · трекери, нотатки, документи</small></span><i>›</i></button>
-      <small class="mo-note">Вміст папки прямо тут (трекер місяця, нотатки, бачення) — наступний крок.</small>`;
+    // папку вже привʼязано, але її ще нема в памʼяті (не завантажилась / щойно створена на іншому пристрої) — не пропонуємо створювати нову
+    if(!fk&&g.folderKey) return `<div class="dy-empty"><b>Папка місії ще завантажується</b><span>Якщо вона не зʼявиться, перевір звʼязок або привʼяжи іншу папку.</span></div><button class="mo-set" data-mplink>Привʼязати наявну папку</button>`;
+    if(!fk) return `<div class="dy-empty"><b>Папки місії ще нема</b><span>У папці житимуть трекер, нотатки й бачення цієї місії. Вона створюється порожньою — наповнюєш сам.</span></div>
+      <button class="mo-set solid" data-mpcreate>＋ Створити папку місії</button><button class="mo-set" data-mplink>Привʼязати наявну папку</button>`;
+    const f=folders[fk], t=moTracker(fk), ym=ymdLocal().slice(0,7), td=ymdLocal(), notes=moNotes(fk), vis=moVision(fk);
+    let tr;
+    if(t){
+      const first=new Date(ym+'-01T12:00:00'), lead=(first.getDay()+6)%7, dim=moDim(ym);
+      let n=0; let cells=DY_DOW.map(d=>`<b>${d}</b>`).join('')+'<span class="e"></span>'.repeat(lead);
+      for(let d=1;d<=dim;d++){ const ds=ym+'-'+String(d).padStart(2,'0'), on=moMarked(t,ds); if(on) n++;
+        cells+=`<button class="mo-tk${on?' on':''}${ds===td?' td':''}${ds>td?' fut':''}" data-mptk="${ds}"${ds>td?' disabled':''} aria-pressed="${on}" aria-label="${d} ${JN_MON[+ym.slice(5,7)-1]}${on?', відмічено':''}">${d}</button>`; }
+      tr=`<div class="mo-card"><div class="mo-h"><span>${esc(t.title||'Трекер')} · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><span class="mo-hint">${n} з ${+td.slice(8)}</span></div><div class="mo-cal">${cells}</div></div>`;
+    } else tr=`<div class="mo-card"><div class="mo-h"><span>Трекер</span></div><span class="mo-note">Відмічай дні, коли рухав місію. Трекер ляже в папку.</span><button class="mo-set" data-mpaddtk>＋ Трекер</button></div>`;
+    const nt=`<div class="mo-card"><div class="mo-h"><span>Нотатки</span><button data-mpnote>＋ нотатка</button></div>
+      ${notes.length?notes.map(b=>`<div class="mo-nt"><small>${b.at?jnDateTxt(ymdLocal(new Date(+b.at))):''}</small>${esc(String(b.text).slice(0,280))}</div>`).join(''):'<span class="mo-note">Ще нема нотаток. Записуй сюди думки, слова, висновки.</span>'}</div>`;
+    const vs=`<div class="mo-card mo-vis"><div class="mo-h"><span>Бачення</span><button data-mpvis>${vis?'змінити':'записати'}</button></div>
+      ${vis?`<p>${esc(String(vis.text||'').slice(0,600))}</p>`:'<span class="mo-note">Як виглядає результат, коли місію пройдено? Одним-двома реченнями.</span>'}</div>`;
+    return tr+nt+vs+`<button class="mo-fl" data-mpfolder><span class="mo-fl-em">${safeEmoji(f.emoji,'📁')}</span><span><b>${esc(f.name||'Папка')}</b><small>відкрити всю папку</small></span><i>›</i></button>`;
   }
   function moChatsTab(g,fk,chats){
-    if(!fk) return `<div class="dy-empty"><b>Чатів місії ще нема</b><span>Чати привʼязуються до папки місії. Коли зʼявиться папка, тут будуть її чати.</span></div>`;
-    if(!chats.length) return `<div class="dy-empty"><b>Чатів ще нема</b><span>Привʼяжи чат до папки «${esc((folders[fk]&&folders[fk].name)||'')}» — він зʼявиться тут.</span></div>
-      <button class="mo-set" data-mpfolder>Відкрити папку</button>`;
-    return chats.map(ch=>`<button class="mo-fl" data-mpchat="${esc(ch.id)}"><span class="mo-fl-em">${safeEmoji(ch.emoji,'💬')}</span><span><b>${esc(ch.name||'Чат')}</b><small>чат папки місії</small></span><i>›</i></button>`).join('');
+    if(!fk&&g.folderKey) return `<div class="dy-empty"><b>Папка місії ще завантажується</b><span>Чати зʼявляться, коли папка підтягнеться.</span></div>`;
+    if(!fk) return `<div class="dy-empty"><b>Чати живуть у папці місії</b><span>Створи або привʼяжи папку — тоді тут можна вести чати цієї місії.</span></div>
+      <button class="mo-set solid" data-mpcreate>＋ Створити папку місії</button>`;
+    return (chats.length?chats.map(ch=>`<button class="mo-fl" data-mpchat="${esc(ch.id)}"><span class="mo-fl-em">${safeEmoji(ch.emoji,'💬')}</span><span><b>${esc(ch.name||'Чат')}</b><small>чат папки місії</small></span><i>›</i></button>`).join('')
+      :'<div class="dy-empty"><span>Чатів місії ще нема.</span></div>')+`<button class="mo-set" data-mpnewchat>＋ Новий чат місії</button>`;
+  }
+  // поле для довшого тексту (нотатка, бачення) у спільній шторці Журналу
+  function moTextSheet(title,val,ph,onSave){
+    jnOverlay(`<div class="jn-ed-h"><b>${esc(title)}</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <textarea class="mo-ta" id="moTa" maxlength="2000" placeholder="${esc(ph)}">${esc(val||'')}</textarea>
+      <div class="jn-ed-foot"><button class="jn-btn" data-mosv>Зберегти</button></div>`, ov=>{
+      const ta=ov.querySelector('#moTa'); setTimeout(()=>{ try{ ta.focus(); }catch(_){} },80);
+      ov.querySelector('[data-mosv]').onclick=()=>{ const v=String(ta.value||'').trim().slice(0,2000); ov.remove(); onSave(v); };
+    });
+  }
+  function moBindMission(ov,g,redraw){
+    const fk=()=>{ const q=(goalsData.goals||[]).find(x=>String(x.id)===String(g.id)); return q&&moOwnFolder(q.folderKey)?q.folderKey:''; };
+    const goal=()=>(goalsData.goals||[]).find(x=>String(x.id)===String(g.id));
+    ov.querySelectorAll('[data-mpcreate]').forEach(b=>b.onclick=()=>{
+      const q=goal(); if(!q||fk()||q.folderKey) return;   // не перезаписуємо наявну привʼязку
+      const key='f_'+Date.now()+'_'+Math.random().toString(36).slice(2,4), used=order.length, em=safeEmoji(q.emoji,'🎯');
+      folders[key]={key, c:safeColor(q.color,FOLDER_COLORS[used%FOLDER_COLORS.length]), emoji:em, icon:(typeof folderIconFor==='function'?folderIconFor(em):''),
+        name:String(q.name||'Місія').slice(0,40), pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[]};
+      order.push(key); saveFolders();
+      q.folderKey=key; saveGoals();
+      try{ renderDashboard(); }catch(_){}
+      plToast('📁 Папку «'+folders[key].name+'» створено'); redraw();
+    });
+    // шторка вибору папки живе нижче сторінки місії (z-index) — ховаємо сторінку на час вибору й відкриваємо знову
+    ov.querySelectorAll('[data-mplink]').forEach(b=>b.onclick=()=>{ ov.remove(); pickFolderForGoal(k=>{ const q=goal(); if(!q) return; if(moOwnFolder(k)){ q.folderKey=k; saveGoals(); } moMissionPage(q,'folder'); }); });
+    ov.querySelectorAll('[data-mpaddtk]').forEach(b=>b.onclick=()=>{ const k=fk(), q=goal(); if(!k||!q||moTracker(k)) return;
+      if(!Array.isArray(boards[k])) boards[k]=[];
+      const t=buildBlock('calendar'); t.title='Трекер · '+String(q.name||'місія').slice(0,30); boards[k].push(t); saveBoard(); redraw(); });
+    ov.querySelectorAll('[data-mptk]').forEach(b=>b.onclick=()=>{ const k=fk(); const t=k&&moTracker(k); if(!t) return; const ds=b.dataset.mptk;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)||ds>ymdLocal()) return;
+      if(moMarked(t,ds)) delete t.marks[ds]; else t.marks[ds]=t.type==='heatmap'?3:true;
+      saveBoard(); redraw(); });
+    ov.querySelectorAll('[data-mpnote]').forEach(b=>b.onclick=()=>moTextSheet('Нотатка місії','','Що хочеш запамʼятати?',v=>{ const k=fk(); if(!k||!v) return;
+      if(!Array.isArray(boards[k])) boards[k]=[];
+      boards[k].push({id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), type:'note', text:v, title:'', at:Date.now(), by:'me'}); saveBoard(); redraw(); }));
+    ov.querySelectorAll('[data-mpvis]').forEach(b=>b.onclick=()=>{ const k=fk(); if(!k) return; const cur=moVision(k);
+      moTextSheet('Бачення місії',cur?cur.text:'','Напр. Говорю з клієнтами англійською без підготовки.',v=>{
+        const k2=fk(); if(!k2) return; if(!Array.isArray(boards[k2])) boards[k2]=[];
+        const ex=moVision(k2);
+        if(ex){ if(v) ex.text=v; else boards[k2]=boards[k2].filter(x=>x!==ex); }
+        else if(v) boards[k2].push({id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), type:'note', title:'Бачення', text:v, vision:true, at:Date.now(), by:'me'});
+        saveBoard(); redraw(); }); });
+    ov.querySelectorAll('[data-mpnewchat]').forEach(b=>b.onclick=()=>{ const k=fk(), q=goal(); if(!k||!q) return;
+      const c=chatCreate({name:String(q.name||'Місія').slice(0,30)+' · чат', emoji:'💬', folders:[k]});
+      try{ renderDashboard(); }catch(_){}
+      if(c&&c.id){ ov.remove(); goChat(c.id,{from:'page',key:k}); } else redraw(); });
   }

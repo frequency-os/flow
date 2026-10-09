@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 76 |
-| Рядків JS | 31946 |
+| Рядків JS | 32019 |
 | Файлів CSS | 41 |
-| Рядків CSS | 9920 |
-| Сутностей верхнього рівня | 2080 |
+| Рядків CSS | 9937 |
+| Сутностей верхнього рівня | 2088 |
 | Ключів сховища (FLOW_KEYS) | 75 |
 
 ## Файли JS
@@ -78,7 +78,7 @@
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
 | `src/scripts/core/41-journal.js` | 707 | 61 |
 | `src/scripts/core/42-day.js` | 314 | 35 |
-| `src/scripts/core/43-month.js` | 167 | 24 |
+| `src/scripts/core/43-month.js` | 240 | 32 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
@@ -143,9 +143,9 @@
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
 | `src/styles/core/24-home-gallery.css` | 209 | 0 |
-| `src/styles/core/25-journal.css` | 290 | 0 |
+| `src/styles/core/25-journal.css` | 291 | 0 |
 | `src/styles/core/26-day.css` | 129 | 0 |
-| `src/styles/core/27-month.css` | 99 | 0 |
+| `src/styles/core/27-month.css` | 115 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (75)
 
@@ -2187,7 +2187,7 @@
 | `dyTaskToDay` | функція | `src/scripts/core/42-day.js:286` |
 | `dyWeekTasksBind` | функція | `src/scripts/core/42-day.js:295` |
 
-### `src/scripts/core/43-month.js` — 24 сутностей
+### `src/scripts/core/43-month.js` — 32 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2212,9 +2212,17 @@
 | `moBind` | функція | `src/scripts/core/43-month.js:78` |
 | `moMoneySheet` | функція | `src/scripts/core/43-month.js:87` |
 | `moMissionPage` | функція | `src/scripts/core/43-month.js:104` |
-| `moPathTab` | функція | `src/scripts/core/43-month.js:131` |
-| `moFolderTab` | функція | `src/scripts/core/43-month.js:156` |
-| `moChatsTab` | функція | `src/scripts/core/43-month.js:162` |
+| `moPathTab` | функція | `src/scripts/core/43-month.js:132` |
+| `moOwnFolder` | функція | `src/scripts/core/43-month.js:161` |
+| `moBoard` | функція | `src/scripts/core/43-month.js:162` |
+| `moTracker` | функція | `src/scripts/core/43-month.js:164` |
+| `moNotes` | функція | `src/scripts/core/43-month.js:165` |
+| `moVision` | функція | `src/scripts/core/43-month.js:166` |
+| `moMarked` | функція | `src/scripts/core/43-month.js:167` |
+| `moFolderTab` | функція | `src/scripts/core/43-month.js:168` |
+| `moChatsTab` | функція | `src/scripts/core/43-month.js:188` |
+| `moTextSheet` | функція | `src/scripts/core/43-month.js:196` |
+| `moBindMission` | функція | `src/scripts/core/43-month.js:204` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
