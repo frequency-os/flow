@@ -121,6 +121,9 @@
 
   /* ── Вигляд «Сторіс» (09.10.2026): кружечки місій, велика картка найближчої справи, свято «Зроблено» ── */
   let jnFocus='';   // id блоку, який людина вибрала великою карткою (лише в памʼяті)
+  /* 09.10.2026: Планер переїхав у Журнал — плаваючий перемикач День · Тиждень · Місяць · Рік (варіант C).
+     Стан вкладки лише в памʼяті екрана, у сховище не пишеться. */
+  let jnTab='day', jnDayDs='', jnFullDay=false;
 
   // фото місії — фото мрії з Карти бажань, привʼязаної до цієї цілі; інакше '' (фон кольору місії)
   function jnMissionPhoto(gl){
@@ -148,7 +151,7 @@
   }
   function jnFocusCard(list){
     const undone=list.filter(b=>!b.done);
-    if(!list.length) return `<div class="jn-fc empty"><b>На сьогодні справ нема</b><span>Додай справу в Планері або дай місії розклад — тоді вона зʼявиться тут.</span><button class="jn-fc-btn" data-jnplan>Відкрити Планер</button></div>`;
+    if(!list.length) return `<div class="jn-fc empty"><b>На сьогодні справ нема</b><span>Візьми справу з місії, додай у вільний час або дай місії розклад — тоді вона зʼявиться тут.</span><button class="jn-fc-btn" data-jnfull>Розписати день</button></div>`;
     if(!undone.length) return `<div class="jn-fc empty win"><b>Усе на сьогодні зроблено 🎉</b><span>${list.length} ${pluralUk(list.length,'справа','справи','справ')} закрито. Серія тримається.</span></div>`;
     const b=undone.find(x=>x.id===jnFocus)||undone[0], gl=jnGoalById(jnBlockGoal(b));
     const c=gl?safeColor(gl.color,'#3ec7b4'):'var(--accent)', bg=jnBg(gl);
@@ -167,6 +170,54 @@
 
   function jnRender(){
     const body=jnEl('jnBody'); if(!body) return;
+    jnFloatRender();
+    const td=ymdLocal(), sub=jnEl('jnSub');
+    if(jnTab==='week'){
+      body.innerHTML=dyWeekHTMLFull();
+      dyWeekBind(body,{onOpenDay:ds=>{ jnTab='day'; jnDayDs=ds===td?'':ds; jnRender(); jnTop(); }});
+      if(sub) sub.textContent='тиждень · '+dyWeekRange(dyWk.mon);
+      return;
+    }
+    if(jnTab==='month'){
+      // поки старий «Місяць» Планера (етап 7 його переробить): малюємо його сюди без шапки Планера
+      const p=plData(), old=p.scope; p.scope='month';
+      try{ body.innerHTML='<div class="jn-month"></div><div class="jn-pad"></div>'; window.renderPlanner(body.firstChild); }
+      catch(err){ console.error('jnMonth',err); } finally{ p.scope=old; }
+      // тап по дню календаря місяця — у Журналі це вкладка «День» з цією датою
+      body.querySelectorAll('[data-plcalday]').forEach(el=>el.onclick=()=>{ jnTab='day'; jnDayDs=el.dataset.plcalday===td?'':el.dataset.plcalday; jnRender(); jnTop(); });
+      if(sub){ const cm=String(p.calMonth||td.slice(0,7)); sub.textContent='місяць · '+(PL_MONTH_NAMES[+cm.slice(5,7)-1]||'').toLowerCase()+' '+cm.slice(0,4); }
+      return;
+    }
+    if(jnDayDs&&jnDayDs!==td){ jnRenderOtherDay(body,jnDayDs); return; }
+    jnDayDs='';
+    jnRenderToday(body);
+  }
+  // прокручується body (html — overflow:hidden), тож скидаємо всі три
+  function jnTop(){ try{ window.scrollTo(0,0); document.body.scrollTop=0; const s=jnEl('scr-journal'); if(s) s.scrollTop=0; }catch(_){} }
+  // force='year' — підсвітити «Рік», коли відкрито Горизонт
+  function jnFloatRender(force){
+    const f=jnEl('jnFloat'); if(!f) return;
+    const cur=force||jnTab;
+    const tabs=[['day','День'],['week','Тиждень'],['month','Місяць'],['year','Рік']];
+    f.innerHTML=tabs.map(([k,l])=>`<button data-jntab="${k}"${cur===k?' class="on" aria-pressed="true"':''}>${l}</button>`).join('');
+    f.querySelectorAll('[data-jntab]').forEach(b=>b.onclick=()=>{
+      const k=b.dataset.jntab;
+      if(k==='year'){ try{ goGoals(); jnTop(); }catch(_){} return; }   // «Рік» — нинішній Горизонт (лист і Дорога року)
+      if(k==='day'&&jnTab==='day'){ jnDayDs=''; }
+      const sj=jnEl('scr-journal'), inJ=sj&&sj.classList.contains('active');
+      jnTab=k; if(inJ) jnRender(); else goJournal(); jnTop();
+    });
+  }
+  // інший день (з тижня «Відкрити день»): лише стрічка цього дня
+  function jnRenderOtherDay(body,ds){
+    const bl=plBlocksFor(ds), done=bl.filter(b=>b.done).length;
+    const sub=jnEl('jnSub'); if(sub) sub.textContent=dyDayTitle(ds).toLowerCase()+(bl.length?' · '+done+'/'+bl.length+' зроблено':'');
+    body.innerHTML=`<div class="jn-dayh"><button data-jnback>‹ Сьогодні</button><b>${esc(dyDayTitle(ds))}</b><button class="dy-from" data-dyfrom>＋ З місій</button></div>
+      ${dyRibbonHTML(ds)}<div class="jn-pad"></div>`;
+    dyBind(body,ds);
+    const bk=body.querySelector('[data-jnback]'); if(bk) bk.onclick=()=>{ jnDayDs=''; jnRender(); jnTop(); };
+  }
+  function jnRenderToday(body){
     const goals=(goalsData.goals||[]).filter(g=>g&&g.id);
     const act=goals.filter(g=>jnStatus(g)!=='archive');
     const order=g=>jnRole(g)==='main'?0:(jnRole(g)==='side'&&jnStatus(g)==='active')?1:2;
@@ -175,10 +226,11 @@
     const xp=jnHeroXP(), lvl=1+Math.floor(xp/JN_XP_LVL), xpIn=xp%JN_XP_LVL;
     const hero=jnHero(), td=ymdLocal(), en=hero.energy&&typeof hero.energy[td]==='number'?hero.energy[td]:null;
     const free=jnFreeHours(); let bal=null; try{ bal=walletBalance(); }catch(_){}
-    const sub=jnEl('jnSub'); if(sub) sub.textContent=act.length?(act.length+' '+pluralUk(act.length,'місія','місії','місій')+' · рівень '+lvl):'почни з головної місії';
     const now=new Date(), streak=jnStreak();
     const list=jnTodayList(), focus=(list.filter(b=>!b.done).find(x=>x.id===jnFocus)||list.find(b=>!b.done)||{}).id;
     const rest=list.filter(b=>b.id!==focus);
+    { const sub=jnEl('jnSub'); if(sub) sub.textContent='сьогодні · '+JN_DOW[now.getDay()].toLowerCase()+', '+now.getDate()+' '+JN_MON[now.getMonth()]+(list.length?' · '+list.filter(b=>b.done).length+'/'+list.length+' зроблено':''); }
+    const nextUp=rest.filter(b=>!b.done).slice(0,3);
     const week=jnWeek().map(ds=>{ const l=jnDayLevel(ds), d=new Date(ds+'T12:00:00');
       return `<button class="jn-d${ds===td?' today':''}${ds>td?' fut':''}" data-jnday="${ds}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></button>`; }).join('');
     const dev=!!(window.upDevOn&&window.upDevOn());
@@ -192,11 +244,12 @@
       <div class="jn-sts">${stories.map(jnStory).join('')}
         <button class="jn-st add" data-jnadd><span class="jn-st-r"><span class="jn-st-i">＋</span></span><small>Місія</small></button></div>
       ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
-      <div class="jn-sec"><span>Сьогодні · ${JN_DOW[now.getDay()]}, ${now.getDate()} ${JN_MON[now.getMonth()]}</span><button data-jnplan>Планер ›</button></div>
       ${jnFocusCard(list)}
-      ${rest.length?`<div class="jn-tks">${rest.map(jnTaskRow).join('')}</div>`:''}
-      <div class="jn-wk-h"><span>Тиждень</span><span><button data-jnhist>Історія</button></span></div>
-      <div class="jn-wk">${week}</div>
+      <div class="jn-sec"><span>${jnFullDay?'Стрічка дня':'Далі сьогодні'}</span><button data-dyfrom>＋ З місій</button></div>
+      ${jnFullDay?dyRibbonHTML(td)
+        :(nextUp.length?`<div class="dy-list">${nextUp.map(dyRow).join('')}</div>`:`<div class="jn-none">${list.length?'Більше справ на сьогодні нема.':'Справ ще нема — візьми з місій або розпиши день.'}</div>`)}
+      <button class="jn-more" data-jnfull>${jnFullDay?'Згорнути стрічку':'Уся стрічка дня'+(list.length?' · '+list.length+' '+pluralUk(list.length,'справа','справи','справ'):'')+' ›'}</button>
+      <div class="jn-sec"><span>Ресурси</span><button data-jnhist>Історія днів ›</button></div>
       <div class="jn-res">
         <button class="jn-r t" data-jnres="time"><small>Час</small><b>${free===null?'—':String(free).replace('.',',')+' год'}</b><small>вільно сьогодні</small></button>
         <button class="jn-r c" data-jnres="money"><small>Гроші</small><b>${bal===null?'—':jnMoney(bal)}</b><small>Гаманець</small></button>
@@ -217,6 +270,8 @@
       if(bl.done){ jnUndoSheet(bl); return; }
       jnFocus=bl.id; jnRender(); try{ body.querySelector('.jn-fc').scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} });
     { const d=body.querySelector('[data-jndone]'); if(d) d.onclick=()=>{ const bl=list.find(x=>x.id===d.dataset.jndone); if(bl) jnDone(bl); }; }
+    dyBind(body,td,{onDone:jnDone});   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
+    body.querySelectorAll('[data-jnfull]').forEach(f=>f.onclick=()=>{ jnFullDay=!jnFullDay; jnRender(); });
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
     { const m=body.querySelector('[data-jnmap]'); if(m) m.onclick=()=>{ if(window.goWorld) window.goWorld(); }; }
@@ -644,7 +699,10 @@
     if(q) ylAskFlow(q);
   }
 
-  function goJournal(){ try{ jnRender(); show('scr-journal'); }catch(e){ console.error('goJournal',e); } }
+  // opts: {tab:'day'|'week'|'month', ds:'YYYY-MM-DD'} — так сюди ведуть старі входи в Планер (goPlanner)
+  function goJournal(opts){ try{
+    if(opts&&typeof opts==='object'){ if(opts.tab) jnTab=opts.tab; if(jnTab==='day') jnDayDs=(opts.ds&&opts.ds!==ymdLocal())?opts.ds:''; }
+    jnRender(); show('scr-journal'); }catch(e){ console.error('goJournal',e); } }
   { const nj=document.getElementById('navJournal'); if(nj) nj.onclick=goJournal; }
   { const dj=document.querySelector('.dsb-i[data-dnav="journal"]'); if(dj) dj.onclick=goJournal; }
   // дані підтягнулись з хмари — Журнал, якщо відкритий, перемальовується

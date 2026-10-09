@@ -1695,8 +1695,12 @@
       const b=aiOpBlock(dn); if(!b||b.done) return;
       const p=plData();
       undo.dones.push({ds:ds,id:b.id});
-      if((p.selDate||plTodayStr())===ds){ plCompleteBlock(b.id); }   // повні ефекти (ціль/звичка/дохід)
-      else b.done=true;
+      /* повні ефекти (звичка/крок цілі) і для невибраного дня: plCompleteBlock працює з днем у selDate — ставимо ds на мить.
+         Дохід (link fin) — як раніше лише для вибраного дня: відкат пакета прибирає звичку/крок, але не операцію Гаманця */
+      if((p.selDate||plTodayStr())===ds || !(b.link&&b.link.type==='fin')){
+        const old=p.selDate; p.selDate=ds; try{ plCompleteBlock(b.id); }catch(err){ console.error('ai done',err); } finally{ p.selDate=old; }
+      }
+      if(!b.done) b.done=true;
       nop++;
     });
     // видалити блоки

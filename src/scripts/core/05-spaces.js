@@ -152,12 +152,14 @@
     if(id==='scr-finance'){ const nf=document.getElementById('navFinance'); if(nf) nf.classList.add('on'); }
     if(id==='scr-world'){ const nw=document.getElementById('navWorld'); if(nw) nw.classList.add('on'); }
     if(id==='scr-journal'){ const nj=document.getElementById('navJournal'); if(nj) nj.classList.add('on'); }
-    if(id==='scr-goals'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
-    if(id==='scr-planner'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
+    // перемикач періоду — у Журналі і на «Рік» (Горизонт), щоб повертатись одним тапом
+    { const jf=document.getElementById('jnFloat'); if(jf){ jf.hidden=!(id==='scr-journal'||id==='scr-goals'); if(!jf.hidden&&typeof jnFloatRender==='function') jnFloatRender(id==='scr-goals'?'year':null); } }
+    // Горизонт («Рік») і старий Планер тепер частина Журналу — світиться «Журнал»
+    if(id==='scr-goals'||id==='scr-planner'){ const nj=document.getElementById('navJournal'); if(nj) nj.classList.add('on'); }
     if(id==='scr-more'||id==='scr-projects'||id==='scr-work'){ const nmr=document.getElementById('navMore'); if(nmr) nmr.classList.add('on'); }
     // синхронізація десктопного сайдбару
-    const dmap={'scr-journal':'journal','scr-home':'home','scr-goals':'planner','scr-projects':'projects',
-                'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home','scr-world':'world'};
+    const dmap={'scr-journal':'journal','scr-home':'home','scr-goals':'journal','scr-projects':'projects',
+                'scr-finance':'finance','scr-planner':'journal','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home','scr-world':'world'};
     const dkey=dmap[id]||'home';
     document.querySelectorAll('.dsb-i').forEach(b=>b.classList.toggle('on', b.dataset.dnav===dkey));
     document.body.classList.toggle('in-home', id==='scr-home');
@@ -737,7 +739,10 @@
   function goProjects(){ try{ renderProjects(); show('scr-projects'); }catch(e){ console.error('goProjects',e); } }
   try{ window.goProjects=goProjects; window.renderProjects=renderProjects; }catch(_){}
   // keepDay=true — не скидати обраний день (навмисний перехід на конкретну дату)
+  /* 09.10.2026: Планер живе в Журналі (вкладки День · Тиждень · Місяць). Усі старі входи сюди ведуть туди ж;
+     keepDay=true — відкрити саме вибраний день Планера. */
   function goPlanner(keepDay){ try{
+    if(typeof goJournal==='function'){ const pp=plData(); goJournal({tab:'day', ds:keepDay?pp.selDate:''}); return; }
     if(!keepDay){ const pp=plData(); const td=plTodayStr();
       if(pp.selDate!==td){ pp.selDate=td; pp.calMonth=td.slice(0,7); saveGoals(); } }
     const c=document.getElementById('plannerBody'); if(c) renderPlanner(c); show('scr-planner'); const sb=document.getElementById('plSettingsBtn'); if(sb) sb.onclick=()=>plRangeSheet(); const ab=document.getElementById('plAiBtn'); if(ab) ab.onclick=()=>aiChatSheet(); }catch(e){ console.error('goPlanner',e); } }

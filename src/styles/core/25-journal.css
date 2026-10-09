@@ -267,3 +267,24 @@
   .jn-conf i:nth-child(12){--x:120px;--y:60px;animation-delay:0.15s;}
   .jn-conf i:nth-child(13){--x:0px;--y:-180px;animation-delay:0.00s;}
   .jn-conf i:nth-child(14){--x:-20px;--y:90px;animation-delay:0.05s;}
+
+  /* ── Планер у Журналі (09.10.2026): плаваючий перемикач періоду, стрічка дня, інший день, місяць ── */
+  /* ліворуч, а не по центру: праворуч над панеллю живе котик-напарник (flowCap), він не має лягати на кнопки */
+  .jn-float{position:fixed;left:16px;z-index:60;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);
+    display:flex;gap:2px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--card) 88%,transparent);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 26px rgba(0,0,0,.35);}
+  .jn-float button{all:unset;cursor:pointer;box-sizing:border-box;min-height:40px;padding:0 11px;border-radius:999px;display:inline-flex;align-items:center;
+    font-size:13.5px;font-weight:800;color:var(--muted);}
+  .jn-float button.on{background:var(--text);color:var(--bg,#0b0f17);}
+  .jn-float button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (min-width:900px){ .jn-float{left:50%;transform:translateX(-50%);} }
+  .jn-more{all:unset;cursor:pointer;box-sizing:border-box;display:block;text-align:center;min-height:44px;padding:12px;font-size:13.5px;font-weight:800;
+    color:var(--accent);border:1px dashed var(--line);border-radius:14px;}
+  .jn-none{font-size:13px;color:var(--muted);padding:6px 2px;}
+  .jn-dayh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
+  .jn-dayh b{font-size:20px;font-weight:800;color:var(--text);text-align:center;flex:1;min-width:0;}
+  .jn-dayh [data-jnback]{all:unset;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;font-size:14px;font-weight:800;color:var(--accent);}
+  .jn-month .pl-toplvl,.jn-month .pl-seg,.jn-month .pl-add{display:none;}   /* «+ Нова задача» читала б scope, повернутий після рендеру */
+  #scr-journal .jn-pad,#scr-journal .dy-pad{height:200px;}   /* нижня панель + плаваючий перемикач + котик */
+  /* на «Рік» (Горизонт) теж плаває перемикач періоду — останні кнопки мають підніматись над ним */
+  #scr-goals::after{content:"";display:block;height:80px;}

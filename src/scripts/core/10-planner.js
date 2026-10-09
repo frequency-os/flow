@@ -449,6 +449,8 @@
 
   // рендерить планер у активний контейнер (новий екран scr-planner або старий під-таб gTabBody)
   function plRerender(){
+    // Планер у Журналі: перемальовуємо Журнал (вкладка сама знає, що показати)
+    const js=document.getElementById('scr-journal'); if(js && js.classList.contains('active') && typeof jnRender==='function'){ jnRender(); return; }
     const scr=document.getElementById('scr-planner');
     if(scr && scr.classList.contains('active')){ const c=document.getElementById('plannerBody'); if(c) renderPlanner(c); return; }
     const c=document.getElementById('gTabBody'); if(c) renderPlanner(c); else renderGoalsTab();
