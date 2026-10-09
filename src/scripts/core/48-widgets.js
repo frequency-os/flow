@@ -58,12 +58,12 @@
         ${rw?`<small class="wg-pz">${safeEmoji(rw.emoji,'🎁')} ${rp}% на «${esc(String(rw.t).slice(0,18))}»</small>`:''}`,` style="--mc:${safeColor(g.color,'#34c77b')}"`);
     }
     if(t==='wgenv'){
-      const envs=(envelopes||[]).filter(e=>e&&e.id); let tot=0; envs.forEach(e=>{ try{ tot+=envSaved(e); }catch(_){} });
+      const envs=(envelopes||[]).filter(e=>e&&e.id&&!envCur(e)); let tot=0; envs.forEach(e=>{ try{ tot+=envSaved(e); }catch(_){} });   // сума — лише головна валюта
       let rows=[]; try{ rows=rlPlanOpen(ym).slice(0,2); }catch(_){}
       const td=+ymdLocal().slice(8,10);
       return wgTile('c-env',`<button class="wg-hit" data-wga="envs" aria-label="Конверти"></button>
         <span class="wg-h">✉️ Конверти</span><b class="wg-big">${wgK(tot)}</b>
-        ${rows.length?rows.map(x=>`<button class="wg-li" data-wga="plan" data-wgp="${x.k}|${esc(x.r.id)}"><span>${esc(String(x.r.t||'').slice(0,14))}${x.r.day?` · ${+x.r.day<td?'<i>прострочено</i>':esc(String(x.r.day))+'-го'}`:''}</span><b>${x.k==='in'?'+':'−'}${wgK(x.rest)}</b></button>`).join('')
+        ${rows.length?rows.map(x=>`<button class="wg-li" data-wga="plan" data-wgp="${x.k}|${esc(x.r.id)}"><span>${esc(String(x.r.t||'').slice(0,14))}${x.r.day?` · ${+x.r.day<td?'<i>прострочено</i>':esc(String(x.r.day))+'-го'}`:''}</span><b>${x.k==='in'?'+':'−'}${esc(moneyK(x.rest,rlRowCur(x.r)))}</b></button>`).join('')
           :`<button class="wg-li" data-wga="planadd"><span>План місяця порожній</span><b>＋</b></button>`}`);
     }
     if(t==='wgdebt'){

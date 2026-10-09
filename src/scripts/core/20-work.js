@@ -286,6 +286,7 @@
     if(workPostedSal['planDone:'+ymKey]==='1') return;
     let moved=false;
     envelopes.forEach(e=>{
+      if(typeof envCur==='function'&&envCur(e)) return;   // €-конверт: заплановане в гривнях не переносимо сам (етап 3 валют)
       const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
       if(p>0){
         if(typeof envAddOp==='function'){ let _wc2; try{ ensureCards(); _wc2=workCard().id; }catch(_){} envAddOp(e,'in',p,'Із зарплати ('+ymKey+')',_wc2); }
@@ -311,7 +312,7 @@
       flowAlert('Спершу створи конверти у Фінансах → ✉️ Конверти (напр. «Подушка», «Оренда»).'); return;
     }
     const list=document.getElementById('allocList');
-    list.innerHTML=envelopes.map(e=>{
+    list.innerHTML=envelopes.filter(e=>!(typeof envCur==='function'&&envCur(e))).map(e=>{   // лише головна валюта
       const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
       const goalTxt=e.goal?`ціль ${fmt(e.goal)} · є ${fmt(e.saved||0)}`:`є ${fmt(e.saved||0)}`;
       return `<div class="alloc-env">

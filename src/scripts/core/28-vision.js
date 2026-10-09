@@ -36,7 +36,7 @@
   /* ── живі значення зі звʼязаних модулів (нічого не копіюємо — читаємо напряму) ── */
   function vzFin(){ try{
     const base=(fx&&fx.base)||'UAH'; const sym=(typeof CUR==='object'&&CUR[base])||'₴';
-    const tot=envTotalSaved(); const goal=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
+    const tot=envTotalSaved(); const goal=envelopes.reduce((s,e)=>s+(typeof envCur==='function'&&envCur(e)?0:(+e.goal||0)),0);
     return { bal:fmt(finBalance())+' '+sym, envPct:goal?Math.min(100,Math.round(tot/goal*100)):null };
   }catch(_){ return {bal:'—', envPct:null}; } }
   function vzDay(){ try{ const l=plBlocksFor(plTodayStr());

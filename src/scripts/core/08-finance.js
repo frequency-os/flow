@@ -16,8 +16,13 @@
     return e;
   }
   function envSaved(e){ envMigrate(e); const v=e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0); e.saved=v; return v; }
-  function envTotalSaved(){ return envelopes.reduce((s,e)=>s+envSaved(e),0); }
+  function envTotalSaved(){ return envelopes.reduce((s,e)=>s+(envCur(e)?0:envSaved(e)),0); }   // лише головна валюта
 
+  /* Валюта конверта (етап 3 валют, 10.10.2026): e.cur — код неголовної валюти; без нього (усі старі) — головна.
+     Рух конверта йде в баланс ТІЄЇ Ж валюти: op.cur на віддзеркаленні у finOps. */
+  function envCur(e){ const c=e&&e.cur; return c&&curOk(c)&&c!==mainCur()?c:''; }
+  // вільні гроші у валюті c ('' — головна)
+  function curFree(c){ try{ return c?curBalance(c):walletBalance(); }catch(_){ return 0; } }
   // додати рух у конверт + віддзеркалити у finOps (вплив на Дохід/Розхід/Баланс)
   function envAddOp(e, t, amount, label, cardId){
     envMigrate(e);
@@ -32,6 +37,7 @@
     const fo={ id:finId, type:'out', amount, label:finLabel, date, env:e.name, envId:e.id };
     if(t==='in'){ try{ fo.card = cardId || e.cardId || (cards.length?mainCard().id:undefined); }catch(_){} }
     else { fo.envSpend=true; }
+    { const ec=envCur(e); if(ec) fo.cur=ec; }   // €-конверт — у €-балансі
     finOps.push(fo);
     saveEnvelopes(); saveFinOps();
     try{ flowReact(t==='in'?'save':'spend',{amount:amount}); }catch(_){}
@@ -370,7 +376,7 @@
     const ym=ymLocal(), m=monthAgg(ym);
     const mi=parseInt(ym.slice(5,7),10)-1;
     const saved=envTotalSaved();
-    const goalSum=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
+    const goalSum=envelopes.reduce((s,e)=>s+(envCur(e)?0:(+e.goal||0)),0);
     const ops=finOps.slice().reverse().slice(0,8);
     let debts='—'; try{ debts=debtSummary(); }catch(_){}
     const envTop=envelopes.slice(0,4);
@@ -445,7 +451,7 @@
   // ===== Envelopes sub-screen (grid + recurring) =====
   function renderEnvScreen(body){
     const tot=envTotalSaved();
-    const goalSum=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
+    const goalSum=envelopes.reduce((s,e)=>s+(envCur(e)?0:(+e.goal||0)),0);
     body.innerHTML=`
       <button class="back" id="envScreenBack" style="--c:var(--skl);margin-bottom:14px">‹ Фінанси</button>
       <div class="env2-tot"><div><div class="l">Накопичено у конвертах</div></div>
@@ -456,14 +462,14 @@
         const col=safeColor(e.color,'#5b8def');
         const outs=(e.ops||[]).filter(o=>o.t==='out'&&!o.back).length;
         const kind=e.kind||(e.wishId?'мрія':'ціль');
-        const tags=[`🎯 ${esc(kind)}`]; if(outs) tags.push(`${outs} витрат`);
+        const tags=[`🎯 ${esc(kind)}`]; if(outs) tags.push(`${outs} витрат`); if(envCur(e)) tags.unshift(esc(curSym(envCur(e))));
         const cover=e.cover||e.wishImg||'';
         return `<div class="env2 ${(e.wishId||cover)?'wishlinked':''}" style="--ec:${col}" data-envopen="${esc(e.id)}">
           ${cover?`<div class="e2cover" style="background-image:url('${safeImg(cover)}')"></div>`:''}
           <div class="e2water" style="height:0" data-e2fill="${pct}"></div>
           <div class="e2top"><span class="e2em">${safeEmoji(e.emoji,'✉️')}</span><span class="e2pct">${pct}%</span></div>
           <div class="e2nm">${esc(e.name)}</div>
-          <div class="e2amt">${fmt(sv)} / ${money(e.goal||0)}</div>
+          <div class="e2amt">${fmt(sv)} / ${esc(money(e.goal||0,envCur(e)))}</div>
           <div class="e2tags">${tags.map(t=>`<span class="e2tg">${t}</span>`).join('')}</div>
         </div>`;
       }).join('')}
@@ -698,7 +704,7 @@
     const e=envelopes.find(x=>String(x.id)===String(envOpenId)); if(!e){ closeEnvSheet(); return; }
     envMigrate(e);
     const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-    const left=Math.max(0,(e.goal||0)-sv);
+    const left=Math.max(0,(e.goal||0)-sv), ec=envCur(e);
     const col=safeColor(e.color,'#5b8def');
     const kind=e.kind||(e.wishId?'мрія':'ціль');
     const cover=e.cover||e.wishImg||'';
@@ -710,10 +716,10 @@
         <div class="e2htop"><span class="e2chip">🎯 ${esc(kind)}</span><span class="e2chip">${pct}%</span></div>
         <div class="e2htxt">
           <div class="e2nm2">${safeEmoji(e.emoji,'✉️')} ${esc(e.name)}</div>
-          <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${money(e.goal||0)}</div>
+          <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${esc(money(e.goal||0,ec))}</div>
           <div class="e2prog"><i style="width:${pct}%"></i></div>
-          <div class="e2nums"><div class="n">${money(sv)}<small>накопичено</small></div>
-            <div class="n" style="text-align:right">${money(left)}<small>лишилось</small></div></div>
+          <div class="e2nums"><div class="n">${esc(money(sv,ec))}<small>накопичено</small></div>
+            <div class="n" style="text-align:right">${esc(money(left,ec))}<small>лишилось</small></div></div>
         </div>
       </div>
       <div class="e2body">
@@ -722,32 +728,39 @@
           <button class="out" id="e2Out">− Витрата на ціль<small>піде в Розходи</small></button>
         </div>
         <div class="e2secl"><span>Рухи (${e.ops.length})</span><span>усе по конверту</span></div>
-        ${e.ops.length? e.ops.map(o=>`<div class="e2op" data-eopdel="${o.id}">
+        ${e.ops.length? e.ops.map(o=>`<div class="e2op" data-eopdel="${esc(o.id)}">
           <div class="l"><span class="ic">${o.t==='in'?'⬆️':'⬇️'}</span>
             <div>${esc(o.label||'')}<s>${esc(o.date||'')}</s></div></div>
-          <b class="${o.t}">${o.t==='in'?'+':'−'}${money(o.amount)}</b></div>`).join('')
+          <b class="${o.t==='in'?'in':'out'}">${o.t==='in'?'+':'−'}${esc(money(o.amount,ec))}</b></div>`).join('')
           : `<div class="fh-empty">Ще немає рухів. Поповни конверт або запиши витрату.</div>`}
         <div class="e2edit">
           <button id="e2Name">✎ Назва</button>
           <button id="e2Goal">🎯 Ціль</button>
-          <button id="e2Card">💳 Картка</button>
+          ${(typeof wlCurList==='function'&&wlCurList().length)||ec?`<button id="e2Cur">💱 ${esc(curSym(ec))}</button>`:`<button id="e2Card">💳 Картка</button>`}
           <button id="e2Del" class="e2del">Видалити</button>
         </div>
       </div>`;
     s.querySelector('#e2In').onclick=()=>{
-      const ask=(c)=>inputModal({title:'Поповнити «'+e.name+'» ('+cardSym(c)+')', placeholder:'Сума', onOk:(v)=>{
+      const ask=(c)=>inputModal({title:'Поповнити «'+e.name+'» ('+curSym(ec)+')', placeholder:'Сума · вільно '+money(curFree(ec),ec), onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
+        if(n>curFree(ec)+1e-9){ flowAlert('Вільно лише '+money(curFree(ec),ec)+'. Нічого не записано.'); return; }   // конверт — гроші з вільних, не в борг
         envAddOp(e,'in',n,'З картки: '+c.name,c.id); renderEnvSheet(); renderFinance();
       }});
       ask(mainCard());
     };
     s.querySelector('#e2Out').onclick=()=>inputModal({title:'Витрата на «'+e.name+'»', placeholder:'На що…', onOk:(label)=>{
-      inputModal({title:'Сума витрати ('+curSym()+')', placeholder:'Напр. 500', onOk:(v)=>{
+      inputModal({title:'Сума витрати ('+curSym(ec)+')', placeholder:'Напр. 500', onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
         envAddOp(e,'out',n,label||'Витрата'); renderEnvSheet(); renderFinance();
       }});
     }});
     s.querySelector('#e2Name').onclick=()=>inputModal({title:'Назва конверта', value:e.name, onOk:(v)=>{ if((v||'').trim()){ e.name=v.trim(); saveEnvelopes(); renderEnvSheet(); renderFinance(); } }});
+    { const cu=s.querySelector('#e2Cur'); if(cu) cu.onclick=()=>{
+      // валюту міняємо лише порожньому конверту: інакше старі рухи опинились би в чужому балансі
+      if(e.ops.length){ flowAlert('Валюту можна змінити лише в новому конверті без рухів. Створи окремий конверт у потрібній валюті.'); return; }
+      const opts=[mainCur()].concat(typeof wlCurList==='function'?wlCurList():[]);
+      actionSheet({title:'Валюта конверта', sub:'Поповнення й витрати йдуть з балансу цієї валюти.', items:opts.map(c=>({ic:c===(ec||mainCur())?'target':'refresh', label:curSym(c)+'  '+((CUR_LIST[c]||{}).n||c)+(c===mainCur()?' · головна':''), onClick:()=>{ if(c===mainCur()) delete e.cur; else e.cur=c; saveEnvelopes(); renderEnvSheet(); renderFinance(); }}))});
+    }; }
     { const cb=s.querySelector('#e2Card'); if(cb) cb.onclick=()=>{
       ensureCards();
       actionSheet({ title:'Картка для поповнень', sub:e.cardId?('Зараз: '+((cardById(e.cardId)||{}).name||'—')):'Зараз: питати щоразу',
@@ -762,10 +775,12 @@
       if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))){ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); return; }   // інакше стара копія ляже поверх хмари
       const sv=Math.round(envSaved(e)*100)/100;
       const del=()=>{ envelopes=envelopes.filter(x=>String(x.id)!==String(e.id)); saveEnvelopes(); closeEnvSheet(); renderFinance(); };
-      if(sv>0) confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'У ньому '+money(sv)+' — вони повернуться у вільні гроші. Історія витрат лишиться.', okLabel:'Повернути '+money(sv)+' і видалити', onOk:()=>{
+      if(sv>0) confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'У ньому '+money(sv,envCur(e))+' — вони повернуться у вільні гроші. Історія витрат лишиться.', okLabel:'Повернути '+money(sv,envCur(e))+' і видалити', onOk:()=>{
         let card; try{ card=mainCard().id; }catch(_){}
-        finOps.push({id:'fin_'+Date.now()+Math.random().toString(36).slice(2,6), type:'in', amount:sv, label:'З конверта: '+e.name, date:ymdLocal(), env:e.name, card, _tr:true, envBack:true});
-        saveFinOps(); del(); try{ plToast('↩ '+money(sv)+' повернуто у вільні'); }catch(_){} }});
+        const bo={id:'fin_'+Date.now()+Math.random().toString(36).slice(2,6), type:'in', amount:sv, label:'З конверта: '+e.name, date:ymdLocal(), env:e.name, card, _tr:true, envBack:true};
+        if(envCur(e)) bo.cur=envCur(e);   // повертаємо в баланс валюти конверта
+        finOps.push(bo);
+        saveFinOps(); del(); try{ plToast('↩ '+money(sv,envCur(e))+' повернуто у вільні'); }catch(_){} }});
       else confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'Він порожній. Історія витрат лишиться.', onOk:del});
     };
     s.querySelectorAll('[data-eopdel]').forEach(el=>el.onclick=()=>{ confirmSheet({title:'Видалити цей рух?', onOk:()=>{ envDelOp(e, el.dataset.eopdel); renderEnvSheet(); renderFinance(); }}); });

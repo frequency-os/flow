@@ -479,7 +479,7 @@
       dows:Array.isArray(sc.dows)?sc.dows.slice():[], min:+sc.min||45, h:typeof sc.h==='number'?sc.h:18,
       start:sc.start||ymdLocal(), end:sc.end||'', plan:sc.plan!==false,
       hWeek:(gl&&gl.budget&&+gl.budget.hWeek)||'', money:(gl&&gl.budget&&+gl.budget.money)||'',
-      rt:(gl&&gl.reward&&gl.reward.t)||'', rs:(gl&&gl.reward&&+gl.reward.sum)||'', re:(gl&&gl.reward&&gl.reward.emoji)||'', rl:(gl&&gl.reward&&gl.reward.lv)||'', folderKey:gl?gl.folderKey||null:null };
+      rt:(gl&&gl.reward&&gl.reward.t)||'', rs:(gl&&gl.reward&&+gl.reward.sum)||'', rc:(gl&&gl.reward&&typeof pzCur==='function'?pzCur(gl):'')||mainCur(), re:(gl&&gl.reward&&gl.reward.emoji)||'', rl:(gl&&gl.reward&&gl.reward.lv)||'', folderKey:gl?gl.folderKey||null:null };
     const seg=(name,opts,val)=>`<div class="jn-seg" data-seg="${name}">${opts.map(([v,l])=>`<button class="${val===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div>`;
     const lvRow=(m,i)=>`<div class="jn-lv${m.done?' done':''}" data-i="${i}"><button class="jn-lv-ck" data-lvck="${i}" aria-label="Досягнуто">${m.done?'✓':''}</button>
       <input value="${esc(m.t)}" data-lvt="${i}" maxlength="80" placeholder="Рівень, напр. B1"><input type="date" value="${esc(m.due)}" data-lvd="${i}">
@@ -504,13 +504,15 @@
         <label class="jn-f"><span>${curSym()} / місяць</span><input type="number" id="jnMoney" min="0" step="100" value="${esc(String(d.money))}" placeholder="0"></label></div>
       <div class="jn-f pz-ed"><span>🎁 Приз за місію</span>
         <div class="jn-row"><input class="jn-emo" id="jnRE" maxlength="4" value="${esc(d.re)}" placeholder="🎁" aria-label="Емодзі призу"><input class="jn-name" id="jnRT" maxlength="60" value="${esc(d.rt)}" placeholder="Що отримаєш: поїздка, річ…"></div></div>
-      <div class="jn-row3"><label class="jn-f"><span>Ціна, ${curSym()}</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label>
+      <div class="jn-row3"><label class="jn-f"><span id="jnRSl">Ціна, ${esc(curSym(d.rc))}</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label>
+        ${(typeof wlCurList==='function'&&wlCurList().length)?`<label class="jn-f"><span>Валюта</span><select id="jnRC"${gl&&typeof pzSaved==='function'&&pzSaved(gl)>0?' disabled title="У скарбничці вже є гроші"':''}>${[mainCur()].concat(wlCurList()).map(c=>`<option value="${c}"${c===d.rc?' selected':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</option>`).join('')}</select></label>`:''}
         <label class="jn-f"><span>Коли забрати</span><select id="jnRL" class="pz-sel"><option value="">уся місія</option>${d.levels.filter(m=>m.id).map(m=>`<option value="${esc(m.id)}"${String(d.rl)===String(m.id)?' selected':''}>рівень: ${esc(String(m.t).slice(0,30))}</option>`).join('')}</select></label></div>
       <div class="jn-f"><span>Папка</span><button class="jn-mini" data-jnfold>${folderTxt()}</button></div>
       <div class="jn-ed-foot">
         ${isNew?'':`<button class="jn-btn ghost" data-jngoals>Кроки й трекер</button><button class="jn-btn danger" data-jndel>Видалити</button>`}
         <button class="jn-btn" data-jnsave>Зберегти</button></div>`, ov=>{
       const q=s=>ov.querySelector(s);
+      { const rc=q('#jnRC'); if(rc) rc.onchange=()=>{ const l=q('#jnRSl'); if(l) l.textContent='Ціна, '+curSym(rc.value); }; }   // валюта призу
       // поля, які перемальовуються, спершу забирають введене
       const pull=()=>{ ov.querySelectorAll('[data-lvt]').forEach(i=>{ const m=d.levels[+i.dataset.lvt]; if(m) m.t=i.value; });
         ov.querySelectorAll('[data-lvd]').forEach(i=>{ const m=d.levels[+i.dataset.lvd]; if(m) m.due=i.value; }); };
@@ -578,6 +580,9 @@
         let pzKeep=false;
         if(!rt&&oldR&&typeof pzSaved==='function'&&pzSaved(g)>0){ pzKeep=true; }
         else g.reward=rt?Object.assign({},oldR||{},{ t:rt, sum:rs>0?Math.round(rs):0, emoji:rem?safeEmoji(rem,'🎁'):'', lv:(g.ms||[]).some(m=>m&&String(m.id)===rlv)?rlv:'' }):null;
+        // валюта призу (етап 3 валют): лише поки скарбничка порожня — інакше гроші опинились би в чужому балансі
+        if(g.reward){ const sel=q('#jnRC'); if(sel&&!sel.disabled){ const c=sel.value; if(c&&curOk(c)&&c!==mainCur()) g.reward.cur=c; else delete g.reward.cur;
+          try{ const pe=pzEnv(g); if(pe&&!(pe.ops||[]).length){ if(g.reward.cur) pe.cur=g.reward.cur; else delete pe.cur; } }catch(_){} } }
         // назва/ціна призу → його конверт у Фінансах
         try{ const e=g.reward&&typeof pzEnv==='function'?pzEnv(g):null; if(e){ e.name=String(g.reward.t).slice(0,60); e.goal=+g.reward.sum||0; e.emoji=safeEmoji(g.reward.emoji,'🎁'); saveEnvelopes(); } }catch(_){}
         g.folderKey=d.folderKey&&folders[d.folderKey]?d.folderKey:null;

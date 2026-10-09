@@ -21,9 +21,11 @@
   function pzReady(g){ return !g.reward.claimed&&pzUnlocked(g)&&pzSaved(g)>=pzPrice(g); }
   // отриманий приз, у скарбничці якого знову є гроші (напр. видалили рух «Приз забрано»), лишається видимим — щоб їх можна було повернути
   function pzActive(){ return pzGoals().filter(g=>!g.reward.claimed||pzSaved(g)>0); }
-  function pzTotal(){ return pzActive().reduce((s,g)=>s+pzSaved(g),0); }
+  function pzTotal(){ return pzActive().filter(g=>!pzCur(g)).reduce((s,g)=>s+pzSaved(g),0); }   // лише головна валюта (картка Гаманця, 🏆)
   function pzEmoji(g){ return safeEmoji(g.reward.emoji,'🎁'); }
-  function pzK(n){ return moneyK(n); }
+  // валюта призу (етап 3 валют): скарбничка вже є — її валюта; ще нема — reward.cur; без — головна ('')
+  function pzCur(g){ if(!g) return ''; const e=pzEnv(g); if(e) return envCur(e); const c=g.reward&&g.reward.cur; return c&&curOk(c)&&c!==mainCur()?c:''; }
+  function pzK(n,g){ return moneyK(n,g?pzCur(g):''); }
   function pzCond(g){ const left=pzLeftLevels(g), id=g.reward.lv;
     if(pzUnlocked(g)) return '✓ умову виконано';
     if(id){ const m=jnLevels(g).find(x=>String(x.id)===String(id)); return '🔒 рівень «'+(m?m.t:'?')+'»'; }
@@ -39,7 +41,7 @@
     const near=act.map(g=>({g, money:pzPrice(g)?pzSaved(g)/pzPrice(g):1, left:pzLeftLevels(g)})).filter(x=>x.money>=0.8||x.left<=1).sort((a,b)=>(a.left-b.left)||(b.money-a.money))[0];
     if(!near) return '';
     const g=near.g, rest=Math.max(0,pzPrice(g)-pzSaved(g)), left=near.left;
-    const parts=[rest?pzK(rest):'', left?(left+' '+pluralUk(left,'рівень','рівні','рівнів')):''].filter(Boolean);
+    const parts=[rest?pzK(rest,g):'', left?(left+' '+pluralUk(left,'рівень','рівні','рівнів')):''].filter(Boolean);
     return `<button class="pz-strip" data-pzjar="${esc(g.id)}"><span class="pz-strip-em">${pzEmoji(g)}</span><span><b>До «${esc(g.reward.t)}» — ${esc(parts.join(' і '))}</b><small>${esc(g.name||'Місія')}</small></span><i>›</i></button>`;
   }
   function pzBind(c){
@@ -49,7 +51,7 @@
 
   // ── Скарбничка: екран з баночками ──
   function pzMonthSaved(ym){
-    const ids=new Set(pzGoals().map(g=>{ const e=pzEnv(g); return e&&e.id; }).filter(Boolean).map(String));   // через pzEnv — і без envId
+    const ids=new Set(pzGoals().map(g=>{ const e=pzEnv(g); return e&&!envCur(e)&&e.id; }).filter(Boolean).map(String));   // лише головна валюта   // через pzEnv — і без envId
     return (finOps||[]).filter(o=>o&&o.envId&&ids.has(String(o.envId))&&String(o.date||'').slice(0,7)===ym)
       .reduce((s,o)=>s+(o.type==='out'&&!o.envSpend?(+o.amount||0):(o.type==='in'&&!o.pzClaim?-(+o.amount||0):0)),0);   // «Забрати» — не відміна відкладання
   }
@@ -68,7 +70,7 @@
         <div class="pz-grid">${act.map(g=>{ const sv=pzSaved(g), pr=pzPrice(g), pct=pr?Math.min(100,Math.round(sv/pr*100)):(sv?100:0), rd=pzReady(g);
           return `<button class="pz-jar${rd?' ready':''}" data-pzjar="${esc(g.id)}" style="--c:${safeColor(g.color,'#f0b429')}">
             <span class="pz-jb"><i style="height:${pct}%"></i><em>${pzEmoji(g)}</em></span>
-            <b>${esc(g.reward.t)}</b><small>${pzK(sv)} / ${pzK(pr)}</small><small class="pz-c">${rd?'✓ можна забрати':esc(pzCond(g))}</small></button>`; }).join('')}
+            <b>${esc(g.reward.t)}</b><small>${pzK(sv,g)} / ${pzK(pr,g)}</small><small class="pz-c">${rd?'✓ можна забрати':esc(pzCond(g))}</small></button>`; }).join('')}
           <button class="pz-jar add" data-pznew><span class="pz-jb"><em>＋</em></span><b>Новий приз</b><small>до будь-якої місії</small></button></div>
         ${done.length?`<div class="mo-h" style="margin-top:4px"><span>Отримані призи</span></div>${done.map(g=>`<div class="mo-fl"><span class="mo-fl-em">${pzEmoji(g)}</span><span><b>${esc(g.reward.t)}</b><small>${esc(g.name||'')} · ${jnDateTxt(g.reward.claimed)}</small></span><i>🏅</i></div>`).join('')}`:''}
       </div>`;
@@ -88,19 +90,19 @@
   // ── Баночка: відкласти / повернути / забрати ──
   function pzJarSheet(g,after){
     const sv=pzSaved(g), pr=pzPrice(g), rd=pzReady(g), items=[];
-    if(rd) items.push({ic:'target', label:'Забрати приз', sub:pzK(sv)+' повернуться на рахунок — на «'+g.reward.t+'»', primary:true, onClick:()=>pzCelebrate(g,after)});
-    items.push({ic:'plus', label:'Відкласти', sub:pr>sv?'бракує '+pzK(pr-sv):'уже зібрано', primary:!rd, onClick:()=>pzAmountSheet(g,'in',after)});
-    if(sv>0) items.push({ic:'refresh', label:'Повернути в Гаманець', sub:'зі скарбнички '+pzK(sv), onClick:()=>pzAmountSheet(g,'back',after)});
+    if(rd) items.push({ic:'target', label:'Забрати приз', sub:pzK(sv,g)+' повернуться на рахунок — на «'+g.reward.t+'»', primary:true, onClick:()=>pzCelebrate(g,after)});
+    items.push({ic:'plus', label:'Відкласти', sub:pr>sv?'бракує '+pzK(pr-sv,g):'уже зібрано', primary:!rd, onClick:()=>pzAmountSheet(g,'in',after)});
+    if(sv>0) items.push({ic:'refresh', label:'Повернути в Гаманець', sub:'зі скарбнички '+pzK(sv,g), onClick:()=>pzAmountSheet(g,'back',after)});
     items.push({ic:'edit', label:'Змінити приз', sub:'назва, ціна, умова — у редакторі місії', onClick:()=>{ const s=document.querySelector('.pz-scr'); if(s) s.remove(); jnEditor(g); }});
-    actionSheet({title:(g.reward.emoji?String(g.reward.emoji)+' ':'')+g.reward.t, sub:pzK(sv)+' з '+pzK(pr)+' · '+pzCond(g)+' · '+(g.name||'Місія'), items});
+    actionSheet({title:(g.reward.emoji?String(g.reward.emoji)+' ':'')+g.reward.t, sub:pzK(sv,g)+' з '+pzK(pr,g)+' · '+pzCond(g)+' · '+(g.name||'Місія'), items});
   }
   function pzAmountSheet(g,mode,after){
-    const sv=pzSaved(g), pr=pzPrice(g); let free=0; try{ free=walletBalance(); }catch(_){}
+    const sv=pzSaved(g), pr=pzPrice(g); let free=0; try{ free=curFree(pzCur(g)); }catch(_){}
     const max=mode==='in'?Math.max(0,free):sv, need=Math.max(0,pr-sv);
     const chips=(mode==='in'?[500,1000,2000,5000]:[500,1000,2000]).filter(v=>v<max);
     const full=mode==='in'?(need>0&&need<=max?need:0):sv;
     jnOverlay(`<div class="jn-ed-h"><b>${mode==='in'?'Відкласти на':'Повернути з'} «${esc(g.reward.t)}»</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <small class="dy-fm-sub">${pzK(sv)} з ${pzK(pr)} · ${mode==='in'?'у Гаманці вільно '+pzK(free):'повернеться на рахунок'}</small>
+      <small class="dy-fm-sub">${pzK(sv,g)} з ${pzK(pr,g)} · ${mode==='in'?'у Гаманці вільно '+pzK(free,g):'повернеться на рахунок'}</small>
       <label class="jn-f"><span>Сума, ${curSym()}</span><input id="pzAmt" type="number" inputmode="numeric" min="1" step="100" max="${max}" value="${full||''}" placeholder="0"></label>
       <div class="pz-chips">${chips.map(v=>`<button data-pzv="${v}">${v.toLocaleString('uk-UA')}</button>`).join('')}${full?`<button data-pzv="${full}">${mode==='in'?'усе, що бракує':'усе'} · ${full.toLocaleString('uk-UA')}</button>`:''}</div>
       <small class="mo-note">${mode==='in'?'У Гаманці зʼявиться запис «У конверт: '+esc(g.reward.t)+'». Повернути можна будь-коли.':'У Гаманці зʼявиться запис-переказ, у доходи він не рахується.'}</small>
@@ -110,7 +112,7 @@
       ov.querySelector('[data-pzok]').onclick=()=>{
         const a=Math.round(+inp.value||0);
         if(!(a>0)){ plToast('Вкажи суму'); return; }
-        if(a>max){ plToast(mode==='in'?'У Гаманці вільно лише '+pzK(max):'У скарбничці лише '+pzK(max)); return; }
+        if(a>max){ plToast(mode==='in'?'У Гаманці вільно лише '+pzK(max,g):'У скарбничці лише '+pzK(max,g)); return; }
         ov.remove();
         if(mode==='in') pzDeposit(g,a); else pzWithdraw(g,a,'Повернуто в Гаманець');
         try{ jnRender(); }catch(_){} if(after) after();
@@ -123,10 +125,11 @@
     if(!e){
       e={id:'env_pz_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), name:String(q.reward.t).slice(0,60), emoji:safeEmoji(q.reward.emoji,'🎁'),
         goal:pzPrice(q), color:safeColor(q.color,'#f0b429'), kind:'приз', goalId:String(q.id), ops:[]};
+      { const c=q.reward.cur; if(c&&curOk(c)&&c!==mainCur()) e.cur=c; }   // скарбничка у валюті призу
       envelopes.push(e); q.reward.envId=e.id; saveGoals();
     }
     envAddOp(e,'in',a,'Відкладено на приз');
-    plToast('🏆 '+pzK(a)+' — у скарбничку «'+q.reward.t+'»');
+    plToast('🏆 '+pzK(a,q)+' — у скарбничку «'+q.reward.t+'»');
   }
   // гроші зі скарбнички назад на рахунок: рух 'out' у конверті + переказ 'in' у Гаманці (_tr — не дохід)
   function pzWithdraw(g,a,label){
@@ -138,9 +141,11 @@
     e.ops.unshift({id:'eop_'+Date.now()+Math.random().toString(36).slice(2,5), t:'back', label:label||'Повернуто в Гаманець', amount:a, date, finOpId:finId, back:true});
     e.saved=e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0);
     let card; try{ card=mainCard().id; }catch(_){}
-    finOps.push({id:finId, type:'in', amount:a, label:'Зі скарбнички: '+e.name, date, env:e.name, envId:e.id, card, _tr:true, pzClaim:label==='Приз забрано'||undefined});
+    const wo={id:finId, type:'in', amount:a, label:'Зі скарбнички: '+e.name, date, env:e.name, envId:e.id, card, _tr:true, pzClaim:label==='Приз забрано'||undefined};
+    if(envCur(e)) wo.cur=envCur(e);   // назад у баланс валюти скарбнички
+    finOps.push(wo);
     saveEnvelopes(); saveFinOps();
-    plToast('↩ '+pzK(a)+' повернуто на рахунок');
+    plToast('↩ '+pzK(a,g)+' повернуто на рахунок');
     return true;
   }
   function pzCelebrate(g,after){
@@ -150,9 +155,9 @@
     ov.style.setProperty('--c','#f0b429');
     ov.innerHTML=`<div class="jn-cel-in"><span class="jn-conf" aria-hidden="true">${'<i></i>'.repeat(14)}</span>
       <span class="jn-cel-ok">${pzEmoji(g)}</span><b>Приз твій!</b>
-      <p>${esc(g.name||'Місія')} — умову виконано. Скарбничка «${esc(g.reward.t)}» — ${pzK(sv)}. Гроші повернуться на рахунок, щоб ти витратив їх саме на це.</p>
+      <p>${esc(g.name||'Місія')} — умову виконано. Скарбничка «${esc(g.reward.t)}» — ${pzK(sv,g)}. Гроші повернуться на рахунок, щоб ти витратив їх саме на це.</p>
       <span class="jn-cel-chips"><span>🏅 Приз отримано</span></span>
-      <button class="jn-cel-go" data-pzclaim>Забрати ${pzK(sv)}</button><button class="jn-cel-undo" data-pzlater>Не зараз</button></div>`;
+      <button class="jn-cel-go" data-pzclaim>Забрати ${pzK(sv,g)}</button><button class="jn-cel-undo" data-pzlater>Не зараз</button></div>`;
     document.body.appendChild(ov);
     ov.querySelector('[data-pzlater]').onclick=()=>ov.remove();
     ov.querySelector('[data-pzclaim]').onclick=()=>{

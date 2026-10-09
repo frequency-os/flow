@@ -1723,7 +1723,8 @@
     try{
       if(link && link.type==='fin' && link.envId && link.amount>0){
         const e=(envelopes||[]).find(x=>x.id===link.envId);
-        if(e){ envAddOp(e,'in',link.amount, b.t||'Дохід із блоку'); msg='💰 +'+money(link.amount)+' у «'+e.name+'»'; }
+        if(e&&typeof envCur==='function'&&envCur(e)) msg='✓ Виконано · «'+e.name+'» у іншій валюті — запиши суму в Гаманці';   // гривнева сума блоку не йде в €-конверт
+        else if(e){ envAddOp(e,'in',link.amount, b.t||'Дохід із блоку'); msg='💰 +'+money(link.amount)+' у «'+e.name+'»'; }
       } else if(link && (link.type==='habit'||link.type==='goalstep') && link.goalId){
         const g=(goalsData.goals||[]).find(x=>(x.id||x.name)===link.goalId);
         if(g){
@@ -1928,7 +1929,7 @@
     // ── зв'язок: тип → залежні поля
     const linkTypeSel=ov.querySelector('#pbLinkType');
     const linkExtra=ov.querySelector('#pbLinkExtra');
-    const envs=(typeof envelopes!=='undefined'&&Array.isArray(envelopes))?envelopes:[];
+    const envs=(typeof envelopes!=='undefined'&&Array.isArray(envelopes))?envelopes.filter(e=>!(typeof envCur==='function'&&envCur(e))):[];   // лише головна валюта
     function renderLinkExtra(){
       const tp=linkTypeSel.value;
       const curLink=(b&&b.link)||{};

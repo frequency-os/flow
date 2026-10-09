@@ -86,18 +86,21 @@
 
   // ── 3) «Скарбничка» і 4) «Зарплата» (дохід), 5) «Бюджет» (витрата): після запису операції в Гаманці ──
   function rlOnOp(op){
-    if(!op||!opMain(op)) return;   // правила (скарбничка, зарплата, бюджет) — лише головна валюта (етап 3 навчить інших)
+    if(!op) return;
+    // етап 3 валют: зарплата й скарбничка — у валюті доходу (конверти/приз тієї ж валюти); бюджет місії — лише головна
+    const oc=opMain(op)?'':op.cur, inCur=e=>(envCur(e)||'')===oc;
     if(op.type==='in'){
-      const sal=rlOn('salary')&&(+op.amount>=Math.max(1,+rlN('salary')||10000)||/зарплат|salary|зп\b/i.test(String(op.label||'')));
-      if(sal&&(envelopes||[]).length){ setTimeout(()=>rlSalarySheet(+op.amount),250); return; }
+      const amtMain=oc?(+op.amount||0)*(finLastRate(oc)||0):+op.amount;   // поріг правила — у головній валюті
+      const sal=rlOn('salary')&&(amtMain>=Math.max(1,+rlN('salary')||10000)||/зарплат|salary|зп\b/i.test(String(op.label||'')));
+      if(sal&&(envelopes||[]).some(e=>e&&e.id&&inCur(e))){ setTimeout(()=>rlSalarySheet(+op.amount,oc),250); return; }
       const g=op.goalId?(goalsData.goals||[]).find(x=>String(x.id)===String(op.goalId)):null;
-      if(rlOn('jar')&&g&&g.reward&&String(g.reward.t||'').trim()&&!g.reward.claimed&&typeof pzSaved==='function'){
-        const rest=Math.max(0,Math.round(+g.reward.sum||0)-pzSaved(g)); let free=0; try{ free=walletBalance(); }catch(_){}
+      if(rlOn('jar')&&g&&g.reward&&String(g.reward.t||'').trim()&&!g.reward.claimed&&typeof pzSaved==='function'&&pzCur(g)===oc){
+        const rest=Math.max(0,Math.round(+g.reward.sum||0)-pzSaved(g)); let free=0; try{ free=curFree(oc); }catch(_){}
         const amt=Math.min(rest, Math.round(+op.amount*(+rlN('jar')||10)/100), Math.floor(free));
-        if(amt>0) setTimeout(()=>rlOffer('🏆','Скарбничка', (op.label||'Дохід')+' +'+wlMoney(op.amount)+' · '+(g.name||'')+'. Відкласти '+rlN('jar')+'% ('+wlMoney(amt)+') на «'+g.reward.t+'»?',
-          'Відкласти '+wlMoney(amt),'Не зараз',()=>{ let f2=0; try{ f2=walletBalance(); }catch(_){} const a2=Math.min(amt,Math.floor(f2)); if(!(a2>0)){ plToast('Зараз вільних грошей нема'); return; } pzDeposit(g,a2); rlMark('jar',true,a2); saveGoals(); try{ renderFinance(); }catch(_){} }, ()=>{ rlMark('jar',false); saveGoals(); }),250);
+        if(amt>0) setTimeout(()=>rlOffer('🏆','Скарбничка', (op.label||'Дохід')+' +'+money(op.amount,oc)+' · '+(g.name||'')+'. Відкласти '+rlN('jar')+'% ('+money(amt,oc)+') на «'+g.reward.t+'»?',
+          'Відкласти '+money(amt,oc),'Не зараз',()=>{ let f2=0; try{ f2=curFree(oc); }catch(_){} const a2=Math.min(amt,Math.floor(f2)); if(!(a2>0)){ plToast('Зараз вільних грошей нема'); return; } pzDeposit(g,a2); rlMark('jar',true,a2); saveGoals(); try{ renderFinance(); }catch(_){} }, ()=>{ rlMark('jar',false); saveGoals(); }),250);
       }
-    } else if(op.type==='out'&&rlOn('budget')&&op.goalId){
+    } else if(op.type==='out'&&!oc&&rlOn('budget')&&op.goalId){
       const g=(goalsData.goals||[]).find(x=>String(x.id)===String(op.goalId)), bud=g&&g.budget&&+g.budget.money>0?+g.budget.money:0;
       if(bud){ const a=wlAgg(wlMonthOps(wlYm()),g.id);
         if(a.out>bud&&a.out-(+op.amount||0)<=bud){ rlMark('budget',false); saveGoals(); setTimeout(()=>{ try{ plToast('⚠️ «'+(g.name||'Місія')+'»: витрати '+wlMoney(a.out)+' — більше бюджету '+wlMoney(bud)); }catch(_){} },250); } }
@@ -105,29 +108,32 @@
   }
 
   // ── «Зарплата по конвертах»: розподіл за шаблоном hero.salarySplit=[{envId,pct}] ──
-  function rlSalarySheet(total){
-    const envs=(envelopes||[]).filter(e=>e&&e.id), h=jnHero(), tpl=Array.isArray(h.salarySplit)?h.salarySplit:[];
+  function rlSalarySheet(total,c){
+    c=c||''; const M=n=>money(n,c);
+    const envs=(envelopes||[]).filter(e=>e&&e.id&&(envCur(e)||'')===c), h=jnHero(), tpl=Array.isArray(h.salarySplit)?h.salarySplit:[];
     const pctOf=e=>{ const r=tpl.find(x=>x&&String(x.envId)===String(e.id)); return r?Math.max(0,Math.min(100,+r.pct||0)):0; };
-    jnOverlay(`<div class="jn-ed-h"><b>💼 Розподілити ${wlMoney(total)}</b><button data-jnx aria-label="Закрити">✕</button></div>
+    jnOverlay(`<div class="jn-ed-h"><b>💼 Розподілити ${M(total)}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">Відсотки по конвертах і скарбничках. Решта лишається вільною. Шаблон запамʼятається.</small>
       <div class="rl-split">${envs.map(e=>`<label class="rl-sp"><span>${safeEmoji(e.emoji,'✉️')}</span><span class="rl-sp-n">${esc(e.name)}</span>
         <input type="number" inputmode="numeric" min="0" max="100" step="5" data-rlpct="${esc(e.id)}" value="${pctOf(e)||''}" placeholder="0" aria-label="Відсоток для ${esc(e.name)}"><i>%</i><b data-rlamt="${esc(e.id)}"></b></label>`).join('')}</div>
       <div class="rl-split-tot" id="rlTot"></div>
       <div class="jn-ed-foot"><button class="jn-btn" data-rlgo>Розкласти</button></div>`, ov=>{
       const upd=()=>{ let sum=0; ov.querySelectorAll('[data-rlpct]').forEach(i=>{ const p=Math.max(0,Math.min(100,+i.value||0)); sum+=p;
-          const b=ov.querySelector('[data-rlamt="'+CSS.escape(i.dataset.rlpct)+'"]'); if(b) b.textContent=p?wlMoney(Math.round(total*p/100)):''; });
-        const t=ov.querySelector('#rlTot'); t.textContent=sum>100?'Разом '+sum+'% — більше 100%':'Розкласти '+sum+'% ('+wlMoney(Math.round(total*sum/100))+') · вільними '+wlMoney(total-Math.round(total*sum/100));
+          const b=ov.querySelector('[data-rlamt="'+CSS.escape(i.dataset.rlpct)+'"]'); if(b) b.textContent=p?M(Math.round(total*p/100)):''; });
+        const t=ov.querySelector('#rlTot'); t.textContent=sum>100?'Разом '+sum+'% — більше 100%':'Розкласти '+sum+'% ('+M(Math.round(total*sum/100))+') · вільними '+M(total-Math.round(total*sum/100));
         t.classList.toggle('bad',sum>100); return sum; };
       ov.querySelectorAll('[data-rlpct]').forEach(i=>i.oninput=upd); upd();
       ov.querySelector('[data-rlgo]').onclick=()=>{
         const sum=upd(); if(sum>100){ plToast('Разом більше 100%'); return; }
         const rows=[...ov.querySelectorAll('[data-rlpct]')].map(i=>({envId:i.dataset.rlpct, pct:Math.max(0,Math.min(100,Math.round(+i.value||0)))})).filter(r=>r.pct>0);
-        let free=0; try{ free=walletBalance(); }catch(_){}
+        let free=0; try{ free=curFree(c); }catch(_){}
         const need=rows.reduce((s,r)=>s+Math.round(total*r.pct/100),0);
-        if(need>free){ plToast('У Гаманці вільно лише '+wlMoney(free)); return; }
+        if(need>free){ plToast('У Гаманці вільно лише '+M(free)); return; }
         rows.forEach(r=>{ const e=envelopes.find(x=>String(x.id)===String(r.envId)); const a=Math.round(total*r.pct/100); if(e&&a>0) envAddOp(e,'in',a,'Розподіл зарплати'); });
-        h.salarySplit=rows; rlMark('salary',true,need); saveGoals();
-        ov.remove(); try{ renderFinance(); }catch(_){} plToast('💼 Розкладено '+wlMoney(need)+' по '+rows.length+' '+pluralUk(rows.length,'конверту','конвертах','конвертах'));
+        // шаблон — спільний для всіх валют: міняємо лише рядки конвертів цієї валюти, інші лишаються
+        const shown=new Set(envs.map(e=>String(e.id)));
+        h.salarySplit=tpl.filter(x=>x&&!shown.has(String(x.envId))).concat(rows); rlMark('salary',true,need); saveGoals();
+        ov.remove(); try{ renderFinance(); }catch(_){} plToast('💼 Розкладено '+M(need)+' по '+rows.length+' '+pluralUk(rows.length,'конверту','конвертах','конвертах'));
       };
     });
   }
@@ -237,13 +243,16 @@
     p.in=Array.isArray(p.in)?p.in.filter(r=>r&&typeof r==='object'&&!Array.isArray(r)):[]; p.out=Array.isArray(p.out)?p.out.filter(r=>r&&typeof r==='object'&&!Array.isArray(r)):[];
     return p;
   }
+  // валюта рядка Плану (етап 3 валют): r.cur — неголовна; без нього — головна ('')
+  function rlRowCur(r){ const c=r&&r.cur; return c&&curOk(c)&&c!==mainCur()?c:''; }
   function rlPlanFact(ym,id){ return (finOps||[]).filter(o=>o&&o.planId===id&&String(o.date||'').slice(0,7)===ym).reduce((s,o)=>s+(+o.amount||0),0); }
   function rlPrevYm(ym){ const y=+ym.slice(0,4), m=+ym.slice(5,7); return m===1?(y-1)+'-12':y+'-'+String(m-1).padStart(2,'0'); }
   // прогноз на кінець місяця — той самий і для вкладки «План», і для віджета Гаманця (48-widgets.js)
   function rlRecurring(){ return (typeof recurring!=='undefined'&&Array.isArray(recurring)?recurring:[]).filter(r=>r&&+r.amount>0); }
   function rlForecast(ym){
     const p=rlPlan(ym,false)||{in:[],out:[]}; let free=0; try{ free=walletBalance(); }catch(_){}
-    const left=(rows)=>rows.reduce((s,r)=>s+Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)),0);
+    // лише головна валюта: рядки в € не змішуємо з гривнями
+    const left=(rows)=>rows.filter(r=>!rlRowCur(r)).reduce((s,r)=>s+Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)),0);
     const recLeft=rlRecurring().filter(r=>r.lastYM!==ym).reduce((s,r)=>s+(+r.amount||0),0);
     return Math.round(free+left(p.in)-left(p.out)-recLeft);
   }
@@ -256,10 +265,10 @@
   function rlPlanHTML(ym){
     const p=rlPlan(ym,false)||{in:[],out:[]}, all=wlAgg(wlMonthOps(ym));
     const recs=rlRecurring();
-    const pIn=p.in.reduce((s,r)=>s+(+r.amt||0),0), pOut=p.out.reduce((s,r)=>s+(+r.amt||0),0)+recs.reduce((s,r)=>s+(+r.amount||0),0);
+    const pIn=p.in.filter(r=>!rlRowCur(r)).reduce((s,r)=>s+(+r.amt||0),0), pOut=p.out.filter(r=>!rlRowCur(r)).reduce((s,r)=>s+(+r.amt||0),0)+recs.reduce((s,r)=>s+(+r.amount||0),0);
     const fc=rlForecast(ym);
-    const row=(r,k)=>{ const f=rlPlanFact(ym,r.id), ok=f>=(+r.amt||0)&&f>0;
-      return `<button class="rl-pr${ok?' ok':''}" data-rlpr="${k}|${esc(r.id)}"><span class="rl-pr-d">${r.day?esc(String(r.day)):'—'}</span><span class="rl-pr-n"><b>${esc(r.t||'Без назви')}</b><small>${ok?'✓ записано '+wlMoney(f):f?'частково '+wlMoney(f):'тапни, коли '+(k==='in'?'прийде':'сплатиш')}</small></span><b class="${k}">${k==='in'?'+':'−'}${wlMoney(r.amt)}</b></button>`; };
+    const row=(r,k)=>{ const rc=rlRowCur(r), f=rlPlanFact(ym,r.id), ok=f>=(+r.amt||0)&&f>0;
+      return `<button class="rl-pr${ok?' ok':''}" data-rlpr="${k}|${esc(r.id)}"><span class="rl-pr-d">${r.day?esc(String(r.day)):'—'}</span><span class="rl-pr-n"><b>${esc(r.t||'Без назви')}</b><small>${ok?'✓ записано '+esc(money(f,rc)):f?'частково '+esc(money(f,rc)):'тапни, коли '+(k==='in'?'прийде':'сплатиш')}</small></span><b class="${k}">${k==='in'?'+':'−'}${esc(money(r.amt,rc))}</b></button>`; };
     const prev=rlPlan(rlPrevYm(ym),false), canCopy=!p.in.length&&!p.out.length&&prev&&(prev.in.length||prev.out.length);
     return `<div class="rl-fc"><small>Прогноз на кінець місяця</small><b class="${fc<0?'neg':''}">${fc<0?'−':''}${wlMoney(Math.abs(fc))}</b>
         <span class="wl-sp"><span>план доходу <b>${wlMoney(pIn)}</b> · є ${wlMoney(all.inc)}</span><span>план витрат <b>${wlMoney(pOut)}</b> · є ${wlMoney(all.out)}</span></span></div>
@@ -277,35 +286,42 @@
     c.querySelectorAll('[data-rlpr]').forEach(b=>b.onclick=()=>{ const [k,id]=b.dataset.rlpr.split('|'); rlPlanRowMenu(ym,k,id); });
     { const s=c.querySelector('[data-rlsal]'); if(s) s.onclick=rlSalaryTpl; }
     { const cp=c.querySelector('[data-rlcopy]'); if(cp) cp.onclick=()=>{ const prev=rlPlan(rlPrevYm(ym),false); if(!prev) return; const p=rlPlan(ym,true);
-      const cl=r=>({id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), t:String(r.t||'').slice(0,60), amt:Math.max(0,Math.round(+r.amt||0)), day:r.day||null});
+      const cl=r=>({id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), t:String(r.t||'').slice(0,60), amt:Math.max(0,Math.round(+r.amt||0)), day:r.day||null, ...(rlRowCur(r)?{cur:rlRowCur(r)}:{})});
       p.in=prev.in.map(cl); p.out=prev.out.map(cl); saveGoals(); renderFinance(); plToast('План скопійовано'); }; }
   }
   function rlPlanEdit(ym,k,id){
-    const p=rlPlan(ym,true), r=id?p[k].find(x=>x.id===id):null;
+    const p=rlPlan(ym,true), r=id?p[k].find(x=>x.id===id):null, curs=[mainCur()].concat(typeof wlCurList==='function'?wlCurList():[]);
+    let rc=(r&&rlRowCur(r))||mainCur();
+    const locked=!!(r&&rlPlanFact(ym,r.id)>0);   // уже є записи — валюту рядка не міняємо (суми змішались би)
     jnOverlay(`<div class="jn-ed-h"><b>${r?'Змінити':(k==='in'?'＋ Дохід у план':'− Витрата в план')}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <label class="jn-f"><span>Що</span><input id="rlT" maxlength="60" value="${esc(r?r.t:'')}" placeholder="${k==='in'?'Зарплата, аванс, клієнт…':'Оренда, звʼязок, курс…'}"></label>
-      <label class="jn-f"><span>Сума, ${curSym()}</span><input id="rlA" type="number" inputmode="decimal" min="0" step="1" value="${r?esc(String(r.amt)):''}" placeholder="Напр. 20000"></label>
+      ${curs.length>1&&!locked?`<div class="jn-f"><span>Валюта</span><div class="wl-chips">${curs.map(c=>`<button data-rlc="${c}"${c===rc?' class="on"':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</button>`).join('')}</div></div>`:''}
+      <label class="jn-f"><span id="rlAl">Сума, ${esc(curSym(rc))}</span><input id="rlA" type="number" inputmode="decimal" min="0" step="1" value="${r?esc(String(r.amt)):''}" placeholder="Напр. 20000"></label>
       <label class="jn-f"><span>День місяця (необовʼязково)</span><input id="rlD" type="number" inputmode="numeric" min="1" max="31" value="${r&&r.day?esc(String(r.day)):''}" placeholder="Напр. 5"></label>
       <div class="jn-ed-foot"><button class="jn-btn" data-rlok>Зберегти</button></div>`, ov=>{
+      ov.querySelectorAll('[data-rlc]').forEach(b=>b.onclick=()=>{ rc=b.dataset.rlc; ov.querySelectorAll('[data-rlc]').forEach(x=>x.classList.toggle('on',x===b)); ov.querySelector('#rlAl').textContent='Сума, '+curSym(rc); });
       ov.querySelector('[data-rlok]').onclick=()=>{
         const t=String(ov.querySelector('#rlT').value||'').trim().slice(0,60), amt=Math.round(parseFloat(String(ov.querySelector('#rlA').value||'').replace(',','.'))||0);
         const dd=parseInt(ov.querySelector('#rlD').value,10), day=dd>=1&&dd<=31?dd:null;
         if(!t){ plToast('Напиши, що це'); return; } if(!(amt>0)){ plToast('Вкажи суму'); return; }
-        if(r) Object.assign(r,{t,amt,day}); else p[k].push({id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), t, amt, day});
+        const row=r||{id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}; Object.assign(row,{t,amt,day});
+        if(rc!==mainCur()) row.cur=rc; else delete row.cur;
+        if(!r) p[k].push(row);
         saveGoals(); ov.remove(); renderFinance(); };
     });
   }
   function rlPlanRowMenu(ym,k,id){
     const p=rlPlan(ym,false); const r=p&&Array.isArray(p[k])?p[k].find(x=>x.id===id):null; if(!r) return;
-    const f=rlPlanFact(ym,id), rest=Math.max(0,(+r.amt||0)-f), items=[];
-    if(rest>0) items.push({ic:'plus', label:(k==='in'?'Прийшло':'Сплатив')+' · '+wlMoney(rest), sub:'запише '+(k==='in'?'дохід':'витрату')+' в Гаманець сьогодні', onClick:()=>{
-      inputModal({title:(k==='in'?'Скільки прийшло':'Скільки сплатив')+', '+curSym(), value:String(rest), placeholder:String(rest), onOk:v=>{
+    const f=rlPlanFact(ym,id), rest=Math.max(0,(+r.amt||0)-f), items=[], rc=rlRowCur(r);
+    if(rest>0) items.push({ic:'plus', label:(k==='in'?'Прийшло':'Сплатив')+' · '+money(rest,rc), sub:'запише '+(k==='in'?'дохід':'витрату')+' в Гаманець сьогодні', onClick:()=>{
+      inputModal({title:(k==='in'?'Скільки прийшло':'Скільки сплатив')+', '+curSym(rc), value:String(rest), placeholder:String(rest), onOk:v=>{
         const amount=Math.round(parseFloat(String(v||'').replace(',','.'))*100)/100; if(!(amount>0)) return;
         const op={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:k, amount, label:String(r.t||'').slice(0,80), date:ymdLocal(), card:mainCard().id, planId:r.id};
+        if(rc){ op.cur=rc; try{ const l=wlCurList(); if(!l.includes(rc)){ l.push(rc); wlCurSave(l); } }catch(_){} }   // у баланс валюти рядка
         finOps.push(op); saveFinOps(); renderFinance();
         try{ flowReact(k==='in'?'income':'spend',{amount}); }catch(_){}
         rlOnOp(op); }}); }});
     items.push({ic:'edit', label:'Змінити', onClick:()=>rlPlanEdit(ym,k,id)});
     items.push({ic:'trash', label:'Прибрати з плану', sub:f?'записані операції лишаться в Гаманці':'', danger:true, onClick:()=>{ const pp=rlPlan(ym,false); if(!pp) return; pp[k]=pp[k].filter(x=>x.id!==id); saveGoals(); renderFinance(); }});
-    actionSheet({title:r.t||'План', sub:(k==='in'?'+':'−')+wlMoney(r.amt)+(f?' · записано '+wlMoney(f):''), items});
+    actionSheet({title:r.t||'План', sub:(k==='in'?'+':'−')+money(r.amt,rc)+(f?' · записано '+money(f,rc):''), items});
   }

@@ -1037,6 +1037,7 @@
       const frag=String(inp.envelope||'').toLowerCase().trim();
       const e=(envelopes||[]).find(x=>String(x.name||'').toLowerCase().includes(frag)&&frag);
       if(!e) return '⚠️ конверт не знайдено. Є: '+(envelopes||[]).map(x=>x.name).join('; ');
+      if(typeof envCur==='function'&&envCur(e)) return '⚠️ конверт «'+e.name+'» у валюті '+envCur(e)+' — рухи в ньому людина записує сама в Гаманці. Нічого не змінено.';
       envAddOp(e, a==='env_deposit'?'in':'out', amt, label||undefined);
       try{ renderFinance(); }catch(_){}
       try{ plToast('🤖 конверт «'+e.name+'»: '+(a==='env_deposit'?'+':'-')+amt); }catch(_){}
