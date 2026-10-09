@@ -14,7 +14,7 @@
   function moDim(ym){ return new Date(+ym.slice(0,4), +ym.slice(5,7), 0).getDate(); }
   function moQ(ym){ return Math.floor((+ym.slice(5,7)-1)/3); }
   function moTitle(ym){ return MO_NAMES[+ym.slice(5,7)-1]+(ym.slice(0,4)!==ymdLocal().slice(0,4)?' '+ym.slice(0,4):''); }
-  function moMoney(n){ return '₴'+Math.round(+n||0).toLocaleString('uk-UA'); }
+  function moMoney(n){ return money(n); }
   // частка місяця, що минула: для риски на смужках грошей
   function moPassed(ym){ const td=ymdLocal(), cur=td.slice(0,7); if(ym<cur) return 1; if(ym>cur) return 0; return (+td.slice(8))/moDim(ym); }
   function moLate(m,ym){ if(m.done) return false; const td=ymdLocal(); if(m.due) return m.due<td; return ym<td.slice(0,7); }
@@ -91,9 +91,9 @@
     const h=jnHero(), g=(h.money&&h.money[ym])||{};
     jnOverlay(`<div class="jn-ed-h"><b>Гроші · ${esc(moTitle(ym).toLowerCase())}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">Скільки хочеш заробити і скільки готовий витратити цього місяця. Факт рахується із записів Гаманця.</small>
-      <label class="jn-f"><span>Заробити, ₴</span><input id="moEarn" type="number" inputmode="numeric" min="0" step="100" value="${+g.earn>0?+g.earn:''}" placeholder="Напр. 30000"></label>
-      <label class="jn-f"><span>Витратити не більше, ₴</span><input id="moSpend" type="number" inputmode="numeric" min="0" step="100" value="${+g.spend>0?+g.spend:''}" placeholder="Напр. 15000"></label>
-      <label class="jn-f"><span>🏆 Відкласти на призи, ₴</span><input id="moSave" type="number" inputmode="numeric" min="0" step="100" value="${+g.save>0?+g.save:''}" placeholder="Напр. 5000"></label>
+      <label class="jn-f"><span>Заробити, ${curSym()}</span><input id="moEarn" type="number" inputmode="numeric" min="0" step="100" value="${+g.earn>0?+g.earn:''}" placeholder="Напр. 30000"></label>
+      <label class="jn-f"><span>Витратити не більше, ${curSym()}</span><input id="moSpend" type="number" inputmode="numeric" min="0" step="100" value="${+g.spend>0?+g.spend:''}" placeholder="Напр. 15000"></label>
+      <label class="jn-f"><span>🏆 Відкласти на призи, ${curSym()}</span><input id="moSave" type="number" inputmode="numeric" min="0" step="100" value="${+g.save>0?+g.save:''}" placeholder="Напр. 5000"></label>
       <div class="jn-ed-foot"><button class="jn-btn" data-mosave>Зберегти</button></div>`, ov=>{
       ov.querySelector('[data-mosave]').onclick=()=>{
         const e=Math.max(0,Math.round(+ov.querySelector('#moEarn').value||0)), s=Math.max(0,Math.round(+ov.querySelector('#moSpend').value||0)), sv=Math.max(0,Math.round(+ov.querySelector('#moSave').value||0));

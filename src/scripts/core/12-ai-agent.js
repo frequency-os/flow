@@ -604,10 +604,10 @@
         parts.push('розклад: '+[1,2,3,4,5,6,0].filter(d=>sc.dows.includes(d)).map(d=>D[d]).join(' ')+' '+(+sc.min||45)+' хв'
           +(sc.start?' з '+sc.start:'')+(sc.end?' до '+sc.end:'')+(sc.plan===false?' (не в Планері)':''));
       }
-      // суми в ₴ — лише коли людина не закрила для AI розділ «Фінанси»
+      // суми в головній валюті — лише коли людина не закрила для AI розділ «Фінанси»
       const finOk=!aiSectionOff('finance');
-      if(g.budget&&(+g.budget.hWeek||(finOk&&+g.budget.money))) parts.push('бюджет: '+(+g.budget.hWeek||0)+' год/тиж'+(finOk&&+g.budget.money?' · '+(+g.budget.money)+' ₴/міс':''));
-      if(g.reward&&g.reward.t) parts.push('нагорода: '+String(g.reward.t).slice(0,60)+(finOk&&+g.reward.sum?' ('+(+g.reward.sum)+' ₴)':''));
+      if(g.budget&&(+g.budget.hWeek||(finOk&&+g.budget.money))) parts.push('бюджет: '+(+g.budget.hWeek||0)+' год/тиж'+(finOk&&+g.budget.money?' · '+money(+g.budget.money)+'/міс':''));
+      if(g.reward&&g.reward.t) parts.push('нагорода: '+String(g.reward.t).slice(0,60)+(finOk&&+g.reward.sum?' ('+money(+g.reward.sum)+')':''));
       return parts.length?'\n   місія: '+parts.join(' · '):'';
     }catch(_){ return ''; }
   }
@@ -632,7 +632,7 @@
       const extra=[];
       const en=h.energy&&typeof h.energy[ds]==='number'?h.energy[ds]:null; if(en!==null) extra.push('енергія '+en);
       if(!finOff){ try{ const ops=walletOps().filter(o=>o&&o.date===ds); const inS=ops.filter(o=>o.type==='in').reduce((a,o)=>a+(+o.amount||0),0), outS=ops.filter(o=>o.type!=='in').reduce((a,o)=>a+(+o.amount||0),0);
-        if(inS) extra.push('дохід '+Math.round(inS)+' ₴'); if(outS) extra.push('витрати '+Math.round(outS)+' ₴'); }catch(_){} }
+        if(inS) extra.push('дохід '+money(inS)); if(outS) extra.push('витрати '+money(outS)); }catch(_){} }
       if(!diaOff){ try{ if(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim()) extra.push('є запис у щоденнику'); }catch(_){} }
       if(!items.length&&!extra.length){ out.push(ds+': —'); continue; }
       out.push(ds+': '+(items.length?bl.filter(b=>b.done).length+'/'+bl.length+' — '+items.join('; '):'план порожній')+(extra.length?' | '+extra.join(', '):''));

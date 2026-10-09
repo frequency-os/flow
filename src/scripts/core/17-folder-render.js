@@ -10,7 +10,7 @@
   function debtSummary(){
     if(!debtItems.length) return '—';
     const tot=debtTotals(), curs=Object.keys(tot);
-    if(!curs.length) return '0 ₴';
+    if(!curs.length) return money(0);
     return curs.map(c=>{ const n=tot[c].owed-tot[c].owe; return (n>0?'+':'')+fmt(n)+' '+(CUR[c]||c); }).join(' · ');
   }
 

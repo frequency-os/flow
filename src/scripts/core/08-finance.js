@@ -73,46 +73,106 @@
   // сумісність зі старим API карток
   function mainCard(){ ensureCards(); return cards[0]; }
   function cardById(){ ensureCards(); return cards[0]; }      // будь-який id → гаманець
-  function cardSym(){ return '₴'; }
+  function cardSym(){ return curSym(); }
   function cardBalance(){ return walletBalance(); }
-  function incomeSummary(){ try{ return fmt(walletBalance())+' ₴'; }catch(_){ return '—'; } }
+  function incomeSummary(){ try{ return money(walletBalance()); }catch(_){ return '—'; } }
+
+  /* ==== Головна валюта акаунта (09.10.2026, етап 1 валют) ====
+     Уся програма показує гроші в головній валюті: Гаманець, віджети, Журнал, призи, План, правила.
+     Налаштування 'main_cur' (prefSet: сирий ключ + копія в хмарі) пише лише людина — у «Ще» чи на старті гри.
+     Не вибрано: якщо вже є операції — це старий гривневий акаунт (UAH), інакше — за мовою пристрою.
+     Записи без поля валюти — у головній; конвертації не робимо (міняється лише значок). */
+  const CUR_LIST={UAH:{s:'₴',n:'Гривня'}, EUR:{s:'€',n:'Євро'}, USD:{s:'$',n:'Долар'}, PLN:{s:'zł',n:'Злотий'}, GBP:{s:'£',n:'Фунт'}};
+  function curLocale(){ try{ const l=String(navigator.language||'').toLowerCase();
+    if(/^uk|^ru/.test(l)) return 'UAH'; if(/^pl/.test(l)) return 'PLN'; if(l==='en-gb') return 'GBP'; if(/^en/.test(l)) return 'USD'; }catch(_){} return 'EUR'; }
+  function mainCur(){
+    try{ const v=localStorage.getItem('main_cur'); if(v&&Object.prototype.hasOwnProperty.call(CUR_LIST,v)) return v; }catch(_){}
+    try{ if((finOps||[]).some(o=>o&&!String(o.id||'').startsWith('start_'))) return 'UAH'; }catch(_){}
+    return curLocale();
+  }
+  function curSym(c){ const k=c?finCurCode(c):mainCur(); return (CUR_LIST[k]&&CUR_LIST[k].s)||k; }
+  // «₴1 250», «€1 250», «1 250 zł» — злотий пишуть після числа
+  function money(n,c){ const v=Math.round(+n||0), k=c?finCurCode(c):mainCur(), sy=curSym(k), a=Math.abs(v).toLocaleString('uk-UA');
+    return (v<0?'−':'')+(k==='PLN'?a+' '+sy:sy+a); }
+  function moneyK(n,c){ n=Math.round(+n||0); const a=Math.abs(n); if(a<10000) return money(n,c);
+    const k=c?finCurCode(c):mainCur(), sy=curSym(k), t=(Math.round(a/100)/10).toLocaleString('uk-UA')+'k';
+    return (n<0?'−':'')+(k==='PLN'?t+' '+sy:sy+t); }
+  // Суми не перераховуються — тому головну валюту вибирають, поки в Гаманці ще нема записів (старт).
+  // Коли записи є, вони вже в цій валюті: зміна значка зробила б їх неправдивими, а Робота перерахувала б
+  // зарплату (finFx порівнює з mainCur). Інша валюта — окремим балансом (етап 2 валют).
+  // «Порожньо в памʼяті» ≠ «Гаманець порожній»: вибір лише коли fin_ops і конверти справді прочитано (хмара відповіла / гість)
+  function curLocked(){ try{
+    if(!window.__migReport) return true;   // load() ще не поклав fin_ops у памʼять (вікно на самому старті)
+    if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))) return true;
+    // гість на сайті: його вибір після входу перебив би валюту акаунта — вибирають після входу, на довірених даних
+    if(!window.FLOW_NATIVE&&!(window.sbUser&&window.sbUser())) return true;
+    return (finOps||[]).some(o=>o&&!String(o.id||'').startsWith('start_'))||(envelopes||[]).some(e=>e&&envSaved(e)>0); }catch(_){ return true; } }
+  function setMainCur(code){
+    if(!Object.prototype.hasOwnProperty.call(CUR_LIST,code)) return;
+    if(curLocked()&&code!==mainCur()){ try{ plToast('У Гаманці вже є записи в '+curSym()+' — головну валюту не міняємо'); }catch(_){} return; }
+    try{ localStorage.setItem('main_cur',code); }catch(_){}
+    try{ prefSet('main_cur',code); }catch(_){}
+    try{ renderFinance(); }catch(_){} try{ renderDashboard(); }catch(_){} try{ if(typeof jnRender==='function') jnRender(); }catch(_){}
+  }
+  function curPickSheet(after){
+    const cur=mainCur();
+    if(curLocked()){ const guest=!window.FLOW_NATIVE&&!(window.sbUser&&window.sbUser());
+      const wait=!window.__migReport||(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY)));
+      actionSheet({title:'Головна валюта · '+curSym()+' '+((CUR_LIST[cur]||{}).n||cur),
+      sub:wait?'Гаманець ще звіряється з хмарою — вибрати валюту можна, коли дані завантажаться.'
+        :guest&&!(finOps||[]).some(o=>o&&!String(o.id||'').startsWith('start_'))?'Увійди в акаунт — тоді вибереш головну валюту (щоб вибір не перебив валюту акаунта на інших пристроях). Зараз — '+curSym()+' за мовою пристрою.'
+        :'У Гаманці вже є записи в цій валюті, тому вона зафіксована: інакше старі суми стали б неправдивими. Гроші в іншій валюті скоро можна буде додати окремим балансом.', items:[]}); return; }
+    actionSheet({title:'Головна валюта', sub:'У ній показуються Гаманець, віджети, призи, План і правила. Суми не перераховуються — міняється лише значок.',
+      items:Object.keys(CUR_LIST).map(k=>({ic:k===cur?'target':'refresh', label:CUR_LIST[k].s+'  '+CUR_LIST[k].n+(k===cur?' · зараз':''), onClick:()=>{ if(k!==cur) setMainCur(k); if(after) after(k); }}))});
+  }
+  try{ prefCatchup('main_cur', v=>{ if(CUR_LIST[v]){ try{ renderFinance(); }catch(_){} try{ renderDashboard(); }catch(_){} } }); }catch(_){}
   function _projCardId(){ return WALLET_ID; }
 
-  /* ==== Чужа валюта → гривні Гаманця ====
-     Гаманець один і в гривні, а проєкт, зміна на Роботі чи борг можуть бути
-     в €/$/zł. Раніше в Гаманець ішла та сама цифра: 500 € ставали +500 ₴.
-     Тепер питаємо курс (підставляємо останній) і пишемо гривні, а слід
+  /* ==== Чужа валюта → головна валюта Гаманця ====
+     Гаманець веде головну валюту (mainCur), а проєкт, зміна на Роботі чи борг можуть бути
+     в іншій. Раніше в Гаманець ішла та сама цифра: 500 € ставали +500 ₴.
+     Тепер питаємо курс (підставляємо останній) і пишемо в головній валюті, а слід
      лишаємо в op._fx і в підписі — так само, як при міграції на гаманець. */
   const FX_SYM2CODE={'₴':'UAH','грн':'UAH','€':'EUR','$':'USD','zł':'PLN'};
   const FX_DEF={EUR:48.6,USD:41.6,PLN:11.4};
   const FX_LAST_KEY='flowapp___fx_last';   // лише підказка на цьому пристрої, не дані
-  function finCurCode(c){ c=String(c==null?'':c).trim(); if(!c) return 'UAH'; return FX_SYM2CODE[c]||c.toUpperCase(); }
-  function finLastRate(code){
+  function finCurCode(c){ c=String(c==null?'':c).trim(); if(!c) return mainCur(); return FX_SYM2CODE[c]||c.toUpperCase(); }
+  // скільки гривень за 1 одиницю (база збережених курсів — історично гривня)
+  function finUahRate(code){
+    if(code==='UAH') return 1;
     try{ const o=JSON.parse(localStorage.getItem(FX_LAST_KEY)||'{}'); if(+o[code]>0) return +o[code]; }catch(_){}
     // далі — курси людини з fx_cfg (вони синкаються), і лише потім вшиті
     try{ const r=migRates()[code]; if(+r>0) return +r; }catch(_){}
     return FX_DEF[code]||0;
   }
+  // скільки ГОЛОВНОЇ валюти за 1 одиницю code
+  function finLastRate(code){
+    const m=mainCur(); if(code===m) return 1;
+    if(m==='UAH') return finUahRate(code);
+    try{ const o=JSON.parse(localStorage.getItem(FX_LAST_KEY)||'{}'); if(+o[code+'>'+m]>0) return +o[code+'>'+m]; }catch(_){}
+    const a=finUahRate(code), b=finUahRate(m); return a>0&&b>0?Math.round(a/b*10000)/10000:0;
+  }
   function finRememberRate(code,r){
-    try{ const o=JSON.parse(localStorage.getItem(FX_LAST_KEY)||'{}'); o[code]=r; localStorage.setItem(FX_LAST_KEY,JSON.stringify(o)); }catch(_){}
+    const m=mainCur();
+    try{ const o=JSON.parse(localStorage.getItem(FX_LAST_KEY)||'{}'); o[m==='UAH'?code:code+'>'+m]=r; localStorage.setItem(FX_LAST_KEY,JSON.stringify(o)); }catch(_){}
   }
   // cb(rate): для гривні одразу 1; для іншої валюти — питаємо курс.
   // Скасував або ввів не число — cb не кличемо, нічого не записується.
   function finAskRate(cur, cb){
     const code=finCurCode(cur);
-    if(code==='UAH'){ cb(1); return; }
-    const sym=(typeof CUR!=='undefined'&&CUR[code])||code;
-    inputModal({title:'Курс: 1 '+sym+' = скільки ₴?', value:String(finLastRate(code)||''), placeholder:'Напр. 48.6', onOk:v=>{
+    if(code===mainCur()){ cb(1); return; }
+    const sym=curSym(code);
+    inputModal({title:'Курс: 1 '+sym+' = скільки '+curSym()+'?', value:String(finLastRate(code)||''), placeholder:'Напр. 48.6', onOk:v=>{
       const r=parseFloat(String(v||'').replace(',','.').replace(/[^\d.]/g,''));
       if(!(r>0)){ flowAlert('Курс має бути числом, більшим за нуль. Нічого не записано.'); return; }
       finRememberRate(code,r); cb(r);
     }});
   }
-  // сума у валюті cur → поля операції Гаманця: {amount у ₴, fx-слід, хвіст підпису}
+  // сума у валюті cur → поля операції Гаманця: {amount у головній валюті, fx-слід, хвіст підпису}
   function finFx(amount, cur, rate){
     const code=finCurCode(cur), a=+amount||0;
-    if(code==='UAH' || !(rate>0)) return {amount:a, fx:null, tail:''};
-    const sym=(typeof CUR!=='undefined'&&CUR[code])||code;
+    if(code===mainCur() || !(rate>0)) return {amount:a, fx:null, tail:''};
+    const sym=curSym(code);
     return {amount:Math.round(a*rate*100)/100, fx:{cur:code, rate, was:a}, tail:' · '+fmt(a)+' '+sym+' × '+rate};
   }
   // готова операція Гаманця з урахуванням валюти
@@ -309,8 +369,8 @@
     body.innerHTML=`
       <div class="wal-head">
         <div class="wal-lab">Гаманець</div>
-        <div class="wal-bal">${fmt(bal)} <small>₴</small></div>
-        ${(()=>{ try{ const pz=typeof pzTotal==='function'?pzTotal():0; return pz>0?`<div class="wal-split"><span>вільно <b>${fmt(bal)} ₴</b></span><span>🏆 на призи <b>${fmt(pz)} ₴</b></span></div>`:''; }catch(_){ return ''; } })()}
+        <div class="wal-bal">${fmt(bal)} <small>${curSym()}</small></div>
+        ${(()=>{ try{ const pz=typeof pzTotal==='function'?pzTotal():0; return pz>0?`<div class="wal-split"><span>вільно <b>${money(bal)}</b></span><span>🏆 на призи <b>${money(pz)}</b></span></div>`:''; }catch(_){ return ''; } })()}
         <div class="wal-sub">${finOps.length} ${finOps.length===1?'операція':(finOps.length%10>=2&&finOps.length%10<=4&&(finOps.length%100<10||finOps.length%100>=20)?'операції':'операцій')} · один рахунок</div>
       </div>
 
@@ -320,22 +380,22 @@
       </div>
 
       <div class="fdash-sec"><span>${MON_UA[mi]}</span><span class="lnk" data-wal="spend">історія ›</span></div>
-      <div class="wal-row"><span class="e">📥</span><div class="n">Дохід</div><b class="in">+${fmt(m.in)} ₴</b></div>
-      <div class="wal-row"><span class="e">📤</span><div class="n">Витрати</div><b class="out">−${fmt(m.out)} ₴</b></div>
+      <div class="wal-row"><span class="e">📥</span><div class="n">Дохід</div><b class="in">+${money(m.in)}</b></div>
+      <div class="wal-row"><span class="e">📤</span><div class="n">Витрати</div><b class="out">−${money(m.out)}</b></div>
 
-      <div class="fdash-sec"><span>Плани · ${fmt(saved)} ₴${goalSum?' / '+fmt(goalSum):''}</span><span class="lnk" data-wal="env">усі ›</span></div>
+      <div class="fdash-sec"><span>Плани · ${money(saved)}${goalSum?' / '+fmt(goalSum):''}</span><span class="lnk" data-wal="env">усі ›</span></div>
       ${envTop.length ? envTop.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
         return `<div class="wal-env" data-envopen="${esc(e.id)}" style="--ec:${safeColor(e.color,'#5b8def')}">
           <i class="fill" style="width:${pct}%"></i>
           <span class="e">${safeEmoji(e.emoji,'✉️')}</span>
-          <div class="n">${esc(e.name)}<s>${e.goal?pct+'% · ще '+fmt(Math.max(0,e.goal-sv))+' ₴':'без цілі'}</s></div>
+          <div class="n">${esc(e.name)}<s>${e.goal?pct+'% · ще '+money(Math.max(0,e.goal-sv)):'без цілі'}</s></div>
           <b>${fmt(sv)}</b></div>`;
       }).join('') : `<div class="fh-empty">Планів ще немає. Конверт — це ціль із числом і датою.</div>`}
       <button class="newbtn" data-wal="newenv">+ Новий конверт</button>
 
       <div class="fdash-sec"><span>Борги</span><span class="lnk" data-wal="debts">усі ›</span></div>
-      <div class="wal-row" data-wal="debts"><span class="e">🤝</span><div class="n">Нетто за боргами</div><b>${debts}</b></div>
+      <div class="wal-row" data-wal="debts"><span class="e">🤝</span><div class="n">Нетто за боргами</div><b>${esc(debts)}</b></div>
 
       <div class="fdash-sec"><span>Останні операції</span></div>
       ${ops.length ? ops.map(o=>`<div class="fin-op" data-finopdel="${o.id}">
@@ -380,7 +440,7 @@
     body.innerHTML=`
       <button class="back" id="envScreenBack" style="--c:var(--skl);margin-bottom:14px">‹ Фінанси</button>
       <div class="env2-tot"><div><div class="l">Накопичено у конвертах</div></div>
-        <div class="v">${fmt(tot)} <small>/ ${fmt(goalSum)} ₴</small></div></div>
+        <div class="v">${fmt(tot)} <small>/ ${money(goalSum)}</small></div></div>
       <div class="env2-grid">
       ${envelopes.map(e=>{
         const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
@@ -394,14 +454,14 @@
           <div class="e2water" style="height:0" data-e2fill="${pct}"></div>
           <div class="e2top"><span class="e2em">${safeEmoji(e.emoji,'✉️')}</span><span class="e2pct">${pct}%</span></div>
           <div class="e2nm">${esc(e.name)}</div>
-          <div class="e2amt">${fmt(sv)} / ${fmt(e.goal||0)} ₴</div>
+          <div class="e2amt">${fmt(sv)} / ${money(e.goal||0)}</div>
           <div class="e2tags">${tags.map(t=>`<span class="e2tg">${t}</span>`).join('')}</div>
         </div>`;
       }).join('')}
         <div class="env2 add" id="fhNewEnv">＋<br>Новий конверт</div>
       </div>
       <div class="fh-secl"><svg class="fin-ico"><use href="#fi-repeat"/></svg> Регулярні платежі</div>
-      ${recurring.map(r=>`<div class="fin-reg" data-regdel="${r.id}"><span><svg class="fin-ico"><use href="#fi-repeat"/></svg> ${esc(r.name)}</span><b>${fmt(r.amount)} ₴/міс</b></div>`).join('')
+      ${recurring.map(r=>`<div class="fin-reg" data-regdel="${r.id}"><span><svg class="fin-ico"><use href="#fi-repeat"/></svg> ${esc(r.name)}</span><b>${money(r.amount)}/міс</b></div>`).join('')
         || `<div class="fh-empty">Додай підписки й регулярні платежі (Netflix, оренда…).</div>`}
       <button class="newbtn" id="fhNewRec" style="border-color:#5b8def;color:#5b8def">+ Регулярний платіж</button>`;
 
@@ -438,7 +498,7 @@
   function newRecurring(){
     inputModal({title:'Регулярний платіж', placeholder:'Напр. Netflix', emoji:true, emojiVal:'🔁', onOk:(name,emojiVal)=>{
       if(!name) return;
-      inputModal({title:'Сума на місяць (₴)', placeholder:'Напр. 250', onOk:(v)=>{
+      inputModal({title:'Сума на місяць ('+curSym()+')', placeholder:'Напр. 250', onOk:(v)=>{
         const amount=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,''))||0;
         inputModal({title:'День списання (1–31)', placeholder:'Напр. 15 · порожньо = без автосписання', onOk:(dv)=>{
           const dd=parseInt((dv||'').replace(/\D/g,''),10);
@@ -454,7 +514,7 @@
   function newEnvelope(){
     inputModal({title:'Новий конверт', placeholder:'Напр. Відпустка', emoji:true, emojiVal:'✉️', onOk:(name,emojiVal)=>{
       if(!name) return;
-      inputModal({title:'Ціль конверта (сума ₴)', placeholder:'Напр. 20000', onOk:(goalStr)=>{
+      inputModal({title:'Ціль конверта (сума '+curSym()+')', placeholder:'Напр. 20000', onOk:(goalStr)=>{
         const colors=['#5b8def','#34c77b','#e8843c','#c77dff','#f0b429','#4ecdc4'];
         const goal=parseInt((goalStr||'').replace(/\D/g,''))||0;
         const e={ id:'env_'+Date.now(), name, emoji:(emojiVal!==undefined?emojiVal:'✉️'),
@@ -639,10 +699,10 @@
         <div class="e2htop"><span class="e2chip">🎯 ${esc(kind)}</span><span class="e2chip">${pct}%</span></div>
         <div class="e2htxt">
           <div class="e2nm2">${safeEmoji(e.emoji,'✉️')} ${esc(e.name)}</div>
-          <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${fmt(e.goal||0)} ₴</div>
+          <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${money(e.goal||0)}</div>
           <div class="e2prog"><i style="width:${pct}%"></i></div>
-          <div class="e2nums"><div class="n">${fmt(sv)} ₴<small>накопичено</small></div>
-            <div class="n" style="text-align:right">${fmt(left)} ₴<small>лишилось</small></div></div>
+          <div class="e2nums"><div class="n">${money(sv)}<small>накопичено</small></div>
+            <div class="n" style="text-align:right">${money(left)}<small>лишилось</small></div></div>
         </div>
       </div>
       <div class="e2body">
@@ -654,7 +714,7 @@
         ${e.ops.length? e.ops.map(o=>`<div class="e2op" data-eopdel="${o.id}">
           <div class="l"><span class="ic">${o.t==='in'?'⬆️':'⬇️'}</span>
             <div>${esc(o.label||'')}<s>${esc(o.date||'')}</s></div></div>
-          <b class="${o.t}">${o.t==='in'?'+':'−'}${fmt(o.amount)} ₴</b></div>`).join('')
+          <b class="${o.t}">${o.t==='in'?'+':'−'}${money(o.amount)}</b></div>`).join('')
           : `<div class="fh-empty">Ще немає рухів. Поповни конверт або запиши витрату.</div>`}
         <div class="e2edit">
           <button id="e2Name">✎ Назва</button>
@@ -671,7 +731,7 @@
       ask(mainCard());
     };
     s.querySelector('#e2Out').onclick=()=>inputModal({title:'Витрата на «'+e.name+'»', placeholder:'На що…', onOk:(label)=>{
-      inputModal({title:'Сума витрати (₴)', placeholder:'Напр. 500', onOk:(v)=>{
+      inputModal({title:'Сума витрати ('+curSym()+')', placeholder:'Напр. 500', onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
         envAddOp(e,'out',n,label||'Витрата'); renderEnvSheet(); renderFinance();
       }});
@@ -684,7 +744,7 @@
           .concat([{ ic:'❓', label:'Питати щоразу', onClick:()=>{ delete e.cardId; saveEnvelopes(); renderEnvSheet(); } }])
       });
     }; }
-    s.querySelector('#e2Goal').onclick=()=>inputModal({title:'Ціль конверта (₴)', value:String(e.goal||0), onOk:(v)=>{ const n=parseInt((v||'').replace(/\D/g,'')); if(!isNaN(n)){ e.goal=n; saveEnvelopes(); renderEnvSheet(); renderFinance(); } }});
+    s.querySelector('#e2Goal').onclick=()=>inputModal({title:'Ціль конверта ('+curSym()+')', value:String(e.goal||0), onOk:(v)=>{ const n=parseInt((v||'').replace(/\D/g,'')); if(!isNaN(n)){ e.goal=n; saveEnvelopes(); renderEnvSheet(); renderFinance(); } }});
     s.querySelector('#e2Del').onclick=()=>{ confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'Рухи в Розходах залишаться.', onOk:()=>{ envelopes=envelopes.filter(x=>String(x.id)!==String(e.id)); saveEnvelopes(); closeEnvSheet(); renderFinance(); }}); };
     s.querySelectorAll('[data-eopdel]').forEach(el=>el.onclick=()=>{ confirmSheet({title:'Видалити цей рух?', onOk:()=>{ envDelOp(e, el.dataset.eopdel); renderEnvSheet(); renderFinance(); }}); });
   }

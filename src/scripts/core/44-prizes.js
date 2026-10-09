@@ -23,7 +23,7 @@
   function pzActive(){ return pzGoals().filter(g=>!g.reward.claimed||pzSaved(g)>0); }
   function pzTotal(){ return pzActive().reduce((s,g)=>s+pzSaved(g),0); }
   function pzEmoji(g){ return safeEmoji(g.reward.emoji,'🎁'); }
-  function pzK(n){ n=Math.round(+n||0); return n>=10000?'₴'+(Math.round(n/100)/10).toLocaleString('uk-UA')+'к':'₴'+n.toLocaleString('uk-UA'); }
+  function pzK(n){ return moneyK(n); }
   function pzCond(g){ const left=pzLeftLevels(g), id=g.reward.lv;
     if(pzUnlocked(g)) return '✓ умову виконано';
     if(id){ const m=jnLevels(g).find(x=>String(x.id)===String(id)); return '🔒 рівень «'+(m?m.t:'?')+'»'; }
@@ -101,7 +101,7 @@
     const full=mode==='in'?(need>0&&need<=max?need:0):sv;
     jnOverlay(`<div class="jn-ed-h"><b>${mode==='in'?'Відкласти на':'Повернути з'} «${esc(g.reward.t)}»</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">${pzK(sv)} з ${pzK(pr)} · ${mode==='in'?'у Гаманці вільно '+pzK(free):'повернеться на рахунок'}</small>
-      <label class="jn-f"><span>Сума, ₴</span><input id="pzAmt" type="number" inputmode="numeric" min="1" step="100" max="${max}" value="${full||''}" placeholder="0"></label>
+      <label class="jn-f"><span>Сума, ${curSym()}</span><input id="pzAmt" type="number" inputmode="numeric" min="1" step="100" max="${max}" value="${full||''}" placeholder="0"></label>
       <div class="pz-chips">${chips.map(v=>`<button data-pzv="${v}">${v.toLocaleString('uk-UA')}</button>`).join('')}${full?`<button data-pzv="${full}">${mode==='in'?'усе, що бракує':'усе'} · ${full.toLocaleString('uk-UA')}</button>`:''}</div>
       <small class="mo-note">${mode==='in'?'У Гаманці зʼявиться запис «У конверт: '+esc(g.reward.t)+'». Повернути можна будь-коли.':'У Гаманці зʼявиться запис-переказ, у доходи він не рахується.'}</small>
       <div class="jn-ed-foot"><button class="jn-btn" data-pzok>${mode==='in'?'Відкласти':'Повернути'}</button></div>`, ov=>{

@@ -10,7 +10,7 @@
     {id:'easy',   grp:'Справи й місії', em:'🪶', t:'Легший крок',         flow:['{n} {d} без руху','15 хв сьогодні?'], on:true, n:3, unit:'днів', min:1, max:30},
     {id:'streak', grp:'Справи й місії', em:'🔥', t:'Серія',               flow:['{n} {d} поспіль','медаль +100 XP'], on:true, n:7, unit:'днів', min:2, max:60},
     {id:'jar',    grp:'Гроші',          em:'🏆', t:'Скарбничка',          flow:['дохід місії','{n}% на приз?'], on:true, n:10, unit:'%', min:1, max:100},
-    {id:'salary', grp:'Гроші',          em:'💼', t:'Зарплата по конвертах',flow:['дохід ≥ ₴{n} або «зарплата»','розподіл за шаблоном'], on:true, n:10000, unit:'₴', min:100, max:10000000},
+    {id:'salary', grp:'Гроші',          em:'💼', t:'Зарплата по конвертах',flow:['дохід ≥ {n} або «зарплата»','розподіл за шаблоном'], on:true, n:10000, unit:'cur', min:100, max:10000000},
     {id:'budget', grp:'Гроші',          em:'⚠️', t:'Бюджет місії',         flow:['витрати > бюджет','попередження'], on:true},
     {id:'quest',  grp:'Гроші',          em:'💰', t:'Квест місяця',         flow:['ціль місяця ✓','свято'], on:true},
   ];
@@ -20,7 +20,7 @@
   function rlOn(id){ return rlCfg(id).on; }
   function rlN(id){ return rlCfg(id).n; }
   function rlUnit(r,n){ return r.unit==='днів'?pluralUk(n,'день','дні','днів'):(r.unit||''); }
-  function rlFlow(r){ const n=rlN(r.id); return r.flow.map(s=>s.replace('{n}', r.unit==='₴'?Math.round(n).toLocaleString('uk-UA'):String(n)).replace('{d}',rlUnit(r,n))); }
+  function rlFlow(r){ const n=rlN(r.id); return r.flow.map(s=>s.replace('{n}', r.unit==='cur'?money(n):String(n)).replace('{d}',rlUnit(r,n))); }
   // лічильник і журнал — лише разом із дією людини (прийняла / відхилила / зробила)
   function rlMark(id,ok,sum){
     const h=jnHero();
@@ -191,14 +191,14 @@
           const stat=r.id==='budget'?(s.miss?'попереджень: '+s.miss:'бюджет не перевищено'):r.id==='jar'||r.id==='salary'?(s.sum?'відкладено '+wlMoney(s.sum):'ще не спрацювало'):(s.n?'спрацювало '+s.n+'×':'ще не спрацювало');
           return `<div class="rl-bk${on?'':' off'}"><div class="rl-bk-t"><span>${r.em}</span><b>${esc(r.t)}</b></div>
             <div class="rl-bk-f">${rlFlow(r).map(x=>`<span>${esc(x)}</span>`).join('<i>→</i>')}</div>
-            <div class="rl-bk-s"><small>${esc(stat)}</small>${r.n!==undefined?`<button class="rl-n" data-rln2="${r.id}">${r.unit==='₴'?'₴'+Math.round(rlN(r.id)).toLocaleString('uk-UA'):rlN(r.id)+(r.unit==='%'?'%':' '+esc(rlUnit(r,rlN(r.id))))}</button>`:''}
+            <div class="rl-bk-s"><small>${esc(stat)}</small>${r.n!==undefined?`<button class="rl-n" data-rln2="${r.id}">${r.unit==='cur'?money(rlN(r.id)):rlN(r.id)+(r.unit==='%'?'%':' '+esc(rlUnit(r,rlN(r.id))))}</button>`:''}
             <button class="rl-tg${on?' on':''}" data-rltg="${r.id}" role="switch" aria-checked="${on}" aria-label="${esc(r.t)}"></button></div></div>`; }).join('')}</div>`).join('')}
         <small class="mo-note">Правила, що чіпають гроші, лише пропонують — записують після твого тапу. «Трекер сам» знімає свою ✓, якщо зняти «Зроблено».</small></div>`;
       ov.querySelector('[data-rlbx]').onclick=()=>{ ov.remove(); try{ jnRender(); }catch(_){} };
       ov.querySelectorAll('[data-rltg]').forEach(b=>b.onclick=()=>{ const id=b.dataset.rltg, hh=jnHero(); if(!hh.rules||typeof hh.rules!=='object'||Array.isArray(hh.rules)) hh.rules={};
         hh.rules[id]=Object.assign({},hh.rules[id]||{},{on:!rlOn(id)}); saveGoals(); draw(); });
       ov.querySelectorAll('[data-rln2]').forEach(b=>b.onclick=()=>{ const r=rlDef(b.dataset.rln2); if(!r) return;
-        inputModal({title:r.t+' — '+(r.unit==='₴'?'сума, ₴':r.unit), value:String(rlN(r.id)), placeholder:String(r.n), onOk:v=>{
+        inputModal({title:r.t+' — '+(r.unit==='cur'?'сума, '+curSym():r.unit), value:String(rlN(r.id)), placeholder:String(r.n), onOk:v=>{
           const n=Math.round(parseFloat(String(v||'').replace(',','.'))); if(!isFinite(n)) return;
           const hh=jnHero(); if(!hh.rules||typeof hh.rules!=='object'||Array.isArray(hh.rules)) hh.rules={};
           hh.rules[r.id]=Object.assign({},hh.rules[r.id]||{},{n:Math.max(r.min||0,Math.min(r.max||1e9,n))}); saveGoals(); draw(); }}); });
@@ -284,7 +284,7 @@
     const p=rlPlan(ym,true), r=id?p[k].find(x=>x.id===id):null;
     jnOverlay(`<div class="jn-ed-h"><b>${r?'Змінити':(k==='in'?'＋ Дохід у план':'− Витрата в план')}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <label class="jn-f"><span>Що</span><input id="rlT" maxlength="60" value="${esc(r?r.t:'')}" placeholder="${k==='in'?'Зарплата, аванс, клієнт…':'Оренда, звʼязок, курс…'}"></label>
-      <label class="jn-f"><span>Сума, ₴</span><input id="rlA" type="number" inputmode="decimal" min="0" step="1" value="${r?esc(String(r.amt)):''}" placeholder="Напр. 20000"></label>
+      <label class="jn-f"><span>Сума, ${curSym()}</span><input id="rlA" type="number" inputmode="decimal" min="0" step="1" value="${r?esc(String(r.amt)):''}" placeholder="Напр. 20000"></label>
       <label class="jn-f"><span>День місяця (необовʼязково)</span><input id="rlD" type="number" inputmode="numeric" min="1" max="31" value="${r&&r.day?esc(String(r.day)):''}" placeholder="Напр. 5"></label>
       <div class="jn-ed-foot"><button class="jn-btn" data-rlok>Зберегти</button></div>`, ov=>{
       ov.querySelector('[data-rlok]').onclick=()=>{
@@ -299,7 +299,7 @@
     const p=rlPlan(ym,false); const r=p&&Array.isArray(p[k])?p[k].find(x=>x.id===id):null; if(!r) return;
     const f=rlPlanFact(ym,id), rest=Math.max(0,(+r.amt||0)-f), items=[];
     if(rest>0) items.push({ic:'plus', label:(k==='in'?'Прийшло':'Сплатив')+' · '+wlMoney(rest), sub:'запише '+(k==='in'?'дохід':'витрату')+' в Гаманець сьогодні', onClick:()=>{
-      inputModal({title:(k==='in'?'Скільки прийшло':'Скільки сплатив')+', ₴', value:String(rest), placeholder:String(rest), onOk:v=>{
+      inputModal({title:(k==='in'?'Скільки прийшло':'Скільки сплатив')+', '+curSym(), value:String(rest), placeholder:String(rest), onOk:v=>{
         const amount=Math.round(parseFloat(String(v||'').replace(',','.'))*100)/100; if(!(amount>0)) return;
         const op={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:k, amount, label:String(r.t||'').slice(0,80), date:ymdLocal(), card:mainCard().id, planId:r.id};
         finOps.push(op); saveFinOps(); renderFinance();

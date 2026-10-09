@@ -71,3 +71,5 @@
   .wl-src-k span{display:flex;flex-direction:column;gap:1px;border-left:3px solid var(--sc);padding-left:7px;}
   .wl-src-k small{font-size:11px;color:var(--muted);font-weight:700;} .wl-src-k b{font-size:14px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
   .wl-src-k em{font-style:normal;font-size:11px;font-weight:800;color:var(--sc);}
+  /* вибір головної валюти на картці (08-finance.js curPickSheet) */
+  .wl-card>.wl-cur{all:unset;cursor:pointer;position:absolute;right:12px;top:12px;z-index:1;min-width:44px;min-height:36px;padding:0 10px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.2);font-size:14px;font-weight:800;color:#fff;}

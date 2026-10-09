@@ -83,9 +83,9 @@
     let inc=0, exp=0, ops=0;
     // гроші сфери — операції Гаманця з міткою цієї папки (віджети «Доходи»/«Витрати», 48-widgets.js)
     if(proj){ try{ wlMonthOps(wlYm()).forEach(o=>{ if(String(o.folderKey||'')!==String(key)) return; if(_isRealIncome(o)) inc+=+o.amount||0; else if(_isRealExpense(o)) exp+=+o.amount||0; ops++; }); }catch(_){}
-      r.nums.push({k:'Дохід',v:fmt(inc)+' ₴',tone:'in'},{k:'Витрати',v:fmt(exp)+' ₴',tone:'out'},{k:'Прибуток',v:fmt(inc-exp)+' ₴'}); }
+      r.nums.push({k:'Дохід',v:money(inc),tone:'in'},{k:'Витрати',v:money(exp),tone:'out'},{k:'Прибуток',v:money(inc-exp)}); }
     let envPct=null, envTxt='';
-    if(proj&&+proj.goal>0){ envPct=Math.min(100,Math.round(inc/proj.goal*100)); envTxt=fmt(inc)+' з '+fmt(proj.goal)+' ₴'; r.goal={name:String(proj.label||'Доходи'),txt:envTxt,pct:envPct}; }
+    if(proj&&+proj.goal>0){ envPct=Math.min(100,Math.round(inc/proj.goal*100)); envTxt=fmt(inc)+' з '+money(proj.goal); r.goal={name:String(proj.label||'Доходи'),txt:envTxt,pct:envPct}; }
     let streak=0, week=0, marks=0;
     if(heat){ const m=heat.marks||{}; streak=sphStreak(m); week=sphWeek(m); marks=Object.keys(m).filter(k=>m[k]>0).length;
       r.nums.push({k:'Серія',v:streak+' дн.'},{k:'Цей тиждень',v:String(week)}); }
@@ -93,7 +93,7 @@
     let kdone=0, kall=0; if(kan&&Array.isArray(kan.cols)){ kan.cols.forEach((c,i)=>{ const n=(c.cards||[]).length; kall+=n; if(i===kan.cols.length-1) kdone+=n; });
       r.nums.push({k:'Ідей',v:String(kall-kdone)},{k:'Готово',v:String(kdone)}); }
     const tpl=f.sphere.tpl;
-    if(tpl==='fin'||tpl==='work'){ r.line = envTxt ? envTxt+' · ціль' : (proj ? 'прибуток '+fmt(inc-exp)+' ₴' : 'додай віджет «Доходи»'); r.pct = envPct; }
+    if(tpl==='fin'||tpl==='work'){ r.line = envTxt ? envTxt+' · ціль' : (proj ? 'прибуток '+money(inc-exp) : 'додай віджет «Доходи»'); r.pct = envPct; }
     else if(tpl==='habit'){ r.line = heat ? streak+' '+(streak%10===1&&streak%100!==11?'день':'днів')+' без зриву' : 'додай «Хітмапу»'; r.pct = heat ? Math.min(100,Math.round(streak/30*100)) : null; }
     else if(tpl==='brand'){ r.line = kan ? (kall-kdone)+' ідей · '+kdone+' готово' : 'додай «Канбан»'; r.pct = pv; }
     else { r.line = heat ? week+' за тиждень · серія '+streak : (pv!=null?pv+'%':'відкрий і додай блоки'); r.pct = heat ? Math.min(100,Math.round(week/5*100)) : pv; }   // тиждень важливіший за ручний «Прогрес»

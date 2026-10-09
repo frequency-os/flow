@@ -12,8 +12,8 @@
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
   function wgFolderMission(fk){ return fk?(goalsData.goals||[]).find(g=>g&&g.id&&String(g.folderKey||'')===String(fk)&&jnStatus(g)!=='archive')||null:null; }
   function wgMoney(n){ return wlMoney(n); }
-  function wgK(n){ n=Math.round(+n||0); const a=Math.abs(n); return (n<0?'−':'')+'₴'+(a>=10000?(Math.round(a/100)/10).toLocaleString('uk-UA')+'k':a.toLocaleString('uk-UA')); }
-  function wgDebtNet(){ let owe=0,owed=0; try{ debtItems.forEach(i=>{ if((i.cur||'UAH')==='UAH'){ const v=balance(i); if(i.kind==='owe') owe+=v; else owed+=v; } }); }catch(_){} return {owe,owed,net:owed-owe}; }
+  function wgK(n){ return moneyK(n); }
+  function wgDebtNet(){ let owe=0,owed=0; try{ debtItems.forEach(i=>{ if((i.cur||'UAH')===mainCur()){ const v=balance(i); if(i.kind==='owe') owe+=v; else owed+=v; } }); }catch(_){} return {owe,owed,net:owed-owe}; }
 
   // ── вставка з меню «/» (03-premium-pack.js → applySlash) ──
   function wgApply(k,b){
@@ -98,9 +98,9 @@
     else if(a==='in'||a==='out'){ wlOpSheet(a,'',{}); }
     else if(a==='journal'){ try{ goJournal({tab:'day'}); }catch(_){} }
     else if(a==='mission'){ try{ wlMissionSheet(el.dataset.wgg); }catch(_){} }
-    else if(a==='envs'){ try{ finView='envelopes'; goFinance(); }catch(_){} }
+    else if(a==='envs'){ try{ goEnvelopes(); }catch(_){} }
     else if(a==='plan'){ const [k,pid]=String(el.dataset.wgp||'').split('|'); try{ rlPlanRowMenu(wlYm(),k,pid); }catch(_){} }
-    else if(a==='planadd'){ try{ wlState.tab='plan'; finView='dash'; goFinance(); }catch(_){} }
+    else if(a==='planadd'){ try{ wlState.tab='plan'; goFinance(); }catch(_){} }
     else if(a==='debts'){ try{ goDebts(); }catch(_){} }
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }
@@ -141,7 +141,7 @@
       <small class="dy-fm-sub">Записи з нього підуть у Гаманець з міткою цієї папки${kind==='in'?' і типом доходу':''}.</small>
       ${kind==='in'?`<div class="jn-f"><span>Тип доходу</span><div class="wl-chips" id="wgSrc">${Object.keys(WL_SRC).map(k=>`<button data-wgsrc="${k}"${k===src?' class="on"':''}>${WL_SRC[k][0]} ${WL_SRC[k][1]}</button>`).join('')}</div></div>`:''}
       <label class="jn-f"><span>Назва</span><input id="wgLbl" maxlength="40" value="${esc(String(b.label||''))}" placeholder="${kind==='in'?'Фріланс, клієнти…':'Реклама, софт…'}"></label>
-      <label class="jn-f"><span>${kind==='in'?'Ціль':'Ліміт'} на місяць, ₴ (необовʼязково)</span><input id="wgGoal" type="number" inputmode="numeric" min="0" step="100" value="${+b.goal>0?+b.goal:''}" placeholder="Напр. 15000"></label>
+      <label class="jn-f"><span>${kind==='in'?'Ціль':'Ліміт'} на місяць, ${curSym()} (необовʼязково)</span><input id="wgGoal" type="number" inputmode="numeric" min="0" step="100" value="${+b.goal>0?+b.goal:''}" placeholder="Напр. 15000"></label>
       <div class="jn-ed-foot"><button class="jn-btn" data-wgok>Зберегти</button></div>`, ov=>{
       ov.querySelectorAll('[data-wgsrc]').forEach(x=>x.onclick=()=>{ src=x.dataset.wgsrc; ov.querySelectorAll('[data-wgsrc]').forEach(y=>y.classList.toggle('on',y===x)); });
       ov.querySelector('[data-wgok]').onclick=()=>{

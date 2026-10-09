@@ -256,10 +256,12 @@
     const code=finCurCode(workCur);
     let op=finOps.find(o=>o._autoSal===true && o._salYM===ymKey);
     const frozen=(op&&op._fx&&op._fx.cur===code&&+op._fx.rate>0)?+op._fx.rate:0;
-    const fx=finFx(amount, code, code==='UAH'?1:(frozen||finLastRate(code)));
+    const fx=finFx(amount, code, code===mainCur()?1:(frozen||finLastRate(code)));
     const label='Зарплата · '+WK_MONTHS[month-1]+' '+year+fx.tail;
     const autoSave=fn=>{ if(window.storeAuto) window.storeAuto(fn); else fn(); };
     if(op){
+      // записано при іншій головній валюті (старі — у ₴) — не перераховуємо: заморожений курс і суму не чіпаємо
+      if((op._mc||'UAH')!==mainCur()) return;
       const fxSame=JSON.stringify(op._fx||null)===JSON.stringify(fx.fx);
       if(op.amount!==fx.amount || op.date!==txDate || !fxSame){   // підпис сам по собі не чіпаємо
         op.amount=fx.amount; op.date=txDate; op.label=label;
@@ -269,7 +271,7 @@
       return;
     }
     let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
-    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc };
+    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc, _mc:mainCur() };
     if(fx.fx) op._fx=fx.fx;
     finOps.push(op); workPostedSal[ymKey]='posted'; autoSave(()=>{ saveFinOps(); saveWork(); });
     // коли зарплата прийшла — перелити заплановане у конверти
@@ -462,7 +464,7 @@
 
   // пачка змін: курс кожної чужої валюти питаємо ОДИН раз, а не на кожну зміну
   function pushWorkBatch(list){
-    const need=[...new Set(list.map(w=>finCurCode(w.cur)).filter(c=>c!=='UAH'))];
+    const need=[...new Set(list.map(w=>finCurCode(w.cur)).filter(c=>c!==mainCur()))];
     const rates={};
     const next=()=>{
       const c=need.shift();
@@ -478,13 +480,13 @@
     const w=workSessions.find(x=>String(x.id)===String(id));
     if(!w || w.pushed) return;
     const code=finCurCode(w.cur);
-    if(code!=='UAH' && !(rates&&rates[code]>0)){
+    if(code!==mainCur() && !(rates&&rates[code]>0)){
       finAskRate(code, r=>pushWorkToFin(id, batch, Object.assign({}, rates, {[code]:r})));
       return;
     }
     const opId=Date.now()+'_'+Math.random().toString(36).slice(2,6);
     const lbl='Робота · '+fmt(w.hours)+' год'+(w.note?' · '+w.note:'');
-    finOps.push(finOpFx({ id:opId, type:'in', label:lbl, date:w.date, card:WALLET_ID }, w.amount, code, code==='UAH'?1:rates[code]));
+    finOps.push(finOpFx({ id:opId, type:'in', label:lbl, date:w.date, card:WALLET_ID }, w.amount, code, code===mainCur()?1:rates[code]));
     w.pushed=true; w.opId=opId;
     saveFinOps(); saveWork();
     if(!batch){ renderWork(); try{ renderFinance(); }catch(_){} 

@@ -2,7 +2,7 @@
      Весь core — один спільний <script>, тож імена тут глобальні. Тому все
      з префіксом debt*: загальні render/save/items колись перехопила б
      будь-яка інша частина програми. esc і fmt — у 01-base.js. */
-  const CUR={UAH:"₴",USD:"$",EUR:"€",PLN:"zł"};
+  const CUR={UAH:"₴",USD:"$",EUR:"€",PLN:"zł",GBP:"£"};
   const DEBT_KEY='debts';
   let debtKind='owe', debtItems=[];
 
@@ -68,12 +68,12 @@
   function debtRender(){
     document.getElementById('cnt').textContent=debtItems.length;
     const tot=debtTotals(), curs=Object.keys(tot);
-    const sumLine=k=>curs.length?curs.map(c=>`<div class="dsum">${fmt(tot[c][k])} <small>${CUR[c]||c}</small></div>`).join(''):'0 <small>₴</small>';
+    const sumLine=k=>curs.length?curs.map(c=>`<div class="dsum">${fmt(tot[c][k])} <small>${esc(CUR[c]||c)}</small></div>`).join(''):'0 <small>'+esc(curSym())+'</small>';
     document.getElementById('sumOwe').innerHTML=sumLine('owe');
     document.getElementById('sumOwed').innerHTML=sumLine('owed');
     const ne=document.getElementById('net');
     const nets=curs.map(c=>({c,n:tot[c].owed-tot[c].owe}));
-    ne.textContent=nets.length?nets.map(x=>(x.n>0?'+':'')+fmt(x.n)+' '+(CUR[x.c]||x.c)).join(' · '):'0 ₴';
+    ne.textContent=nets.length?nets.map(x=>(x.n>0?'+':'')+fmt(x.n)+' '+(CUR[x.c]||x.c)).join(' · '):money(0);
     ne.style.color=nets.length===1?(nets[0].n>0?'var(--owed)':nets[0].n<0?'var(--owe)':'var(--text)'):'var(--text)';
 
     const list=document.getElementById('list');

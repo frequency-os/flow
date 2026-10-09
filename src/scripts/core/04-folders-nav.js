@@ -416,7 +416,7 @@
       goSpaceFor(key); return;
     }catch(e){ console.error('goFolder', key, e); flowAlert('Не вдалося відкрити папку: '+e.message); }
   }
-  function goDebts(){ debtRender(); show('scr-debts'); }
+  function goDebts(){ debtRender(); try{ const c=document.getElementById('cur'); if(c&&!c.__picked){ c.value=mainCur(); c.onchange=()=>{ c.__picked=true; }; } }catch(_){} show('scr-debts'); }   // новий борг — у головній валюті
   function goFinance(){ finView='dash'; renderFinance(); show('scr-finance'); }
   function goEnvelopes(){ finView='envelopes'; renderFinance(); show('scr-finance'); }
   function goSpend(){ renderSpend(); show('scr-spend'); }

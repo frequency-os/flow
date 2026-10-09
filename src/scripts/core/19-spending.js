@@ -78,7 +78,7 @@
   function renderSpend(){
     const list=spendOps();
     const total=spendTotal();
-    document.getElementById('spTotal').innerHTML=fmt(total)+' <small>₴</small>';
+    document.getElementById('spTotal').innerHTML=fmt(total)+' <small>'+esc(curSym())+'</small>';
     document.getElementById('spCount').textContent=list.length;
     document.getElementById('spLogCount').textContent=list.length;
 
@@ -93,7 +93,7 @@
         const C=CATS[k], v=sums[k], pct=Math.round(v/total*100);
         return `<div class="catrow" style="--cc:${C.color}">
           <div class="ct"><div class="cn"><span class="ci">${C.emoji}</span>${C.name}<span class="cp">${pct}%</span></div>
-          <div class="cv">${fmt(v)} ₴</div></div>
+          <div class="cv">${money(v)}</div></div>
           <div class="catbar"><i style="width:${pct}%"></i></div></div>`;
       }).join('');
     }
@@ -108,7 +108,7 @@
         return `<div class="splog" style="--cc:${C.color}">
           <div class="si">${C.emoji}</div>
           <div class="sm"><div class="snm">${esc(x.label)}</div><div class="smeta">${C.name} · ${d}</div></div>
-          <div class="sv">${fmt(x.amount)} ₴</div>
+          <div class="sv">${money(x.amount)}</div>
           <button class="sx" data-spdel="${esc(x.id)}">×</button></div>`;
       }).join('');
       // id витрати раніше йшов у onclick="delSpend('…')" — лапка в id ламала клік або виконувала код
@@ -126,9 +126,9 @@
   function exportSpend(){
     const total=spendTotal(), sums={};
     spendOps().forEach(x=>{ sums[x.cat]=(sums[x.cat]||0)+x.amount; });
-    let txt='Витрати, всього '+fmt(total)+' ₴:\n';
+    let txt='Витрати, всього '+money(total)+':\n';
     CAT_ORDER.filter(k=>sums[k]>0).sort((a,b)=>sums[b]-sums[a])
-      .forEach(k=>{ txt+='- '+CATS[k].name+': '+fmt(sums[k])+' ₴\n'; });
+      .forEach(k=>{ txt+='- '+CATS[k].name+': '+money(sums[k])+'\n'; });
     try{ navigator.clipboard.writeText(txt); }catch(_){}
     const btn=event.target; const old=btn.textContent; btn.textContent='✓ Скопійовано'; setTimeout(()=>btn.textContent=old,1500);
   }

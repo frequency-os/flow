@@ -1086,7 +1086,7 @@
     });
     const f=plFocusToday(); const focusMin=Math.round((f.seconds||0)/60);
     let chips='';
-    if(finSum>0) chips+=`<span class="pl-fchip fin">${plIco('income',11)} +${finSum}₴</span>`;
+    if(finSum>0) chips+=`<span class="pl-fchip fin">${plIco('income',11)} +${money(finSum)}</span>`;
     if(habitN>0) chips+=`<span class="pl-fchip hab">${plIco('done',11)} ${habitN} звичк${habitN===1?'а':'и'}</span>`;
     if(stepN>0) chips+=`<span class="pl-fchip goal">${plIco('goal',11)} +${stepN} крок${stepN===1?'':'и'}</span>`;
     if(focusMin>0) chips+=`<span class="pl-fchip foc">${plIco('focus',11)} ${focusMin} хв фокус</span>`;
@@ -1115,7 +1115,7 @@
       if(typeof recurring!=='undefined' && Array.isArray(recurring)){
         recurring.slice(0,2).forEach(r=>{
           if(!existing.includes((r.name||'').toLowerCase()))
-            sugg.push({ic:plIco('repeat',13),t:r.name||'Платіж',s:'регулярний · '+(r.amount||0)+'₴',c:'val',
+            sugg.push({ic:plIco('repeat',13),t:r.name||'Платіж',s:'регулярний · '+money(r.amount||0),c:'val',
               block:{t:r.name||'Платіж', h:12, endH:13, c:'fin', link:null}});
         });
       }
@@ -1495,10 +1495,10 @@
           <div class="pl-blk-fin">
             <div class="pl-blk-fin-h">
               <span>💰 ${esc(envName)}</span>
-              <strong class="${neg?'neg':''}">${neg?'−':'+'}${Math.abs(amt).toLocaleString()} ₴</strong>
+              <strong class="${neg?'neg':''}">${neg?'−':'+'}${money(Math.abs(amt))}</strong>
             </div>
             ${envBudget>0?`<div class="pl-blk-fin-bar"><div class="pl-blk-fin-fill" style="width:${pct}%"></div></div>
-            <div class="pl-blk-fin-meta"><span>Витрачено: ${envUsed.toLocaleString()} ₴</span><span>план ${envBudget.toLocaleString()} ₴</span></div>`:''}
+            <div class="pl-blk-fin-meta"><span>Витрачено: ${money(envUsed)}</span><span>план ${money(envBudget)}</span></div>`:''}
             ${!b.done?`<button class="pl-blk-fin-btn" data-plcomplete="${b.id}">💰 Зарахувати у конверт</button>`:''}
           </div>
         </div>`;
@@ -1670,7 +1670,7 @@
   // текст-чип зі структурованого зв'язку блоку
   function plLinkTag(link){
     if(!link||!link.type) return '';
-    if(link.type==='fin') return '💰 +'+(link.amount||0)+' ₴ → '+(link.envName||'конверт');
+    if(link.type==='fin') return '💰 +'+money(link.amount||0)+' → '+(link.envName||'конверт');
     if(link.type==='habit') return '✅ '+(link.goalName||'звичка');
     if(link.type==='goalstep') return '🎯 '+(link.goalName||'ціль');
     return '';
@@ -1723,7 +1723,7 @@
     try{
       if(link && link.type==='fin' && link.envId && link.amount>0){
         const e=(envelopes||[]).find(x=>x.id===link.envId);
-        if(e){ envAddOp(e,'in',link.amount, b.t||'Дохід із блоку'); msg='💰 +'+link.amount+' ₴ у «'+e.name+'»'; }
+        if(e){ envAddOp(e,'in',link.amount, b.t||'Дохід із блоку'); msg='💰 +'+money(link.amount)+' у «'+e.name+'»'; }
       } else if(link && (link.type==='habit'||link.type==='goalstep') && link.goalId){
         const g=(goalsData.goals||[]).find(x=>(x.id||x.name)===link.goalId);
         if(g){
@@ -1938,7 +1938,7 @@
       } else if(tp==='fin'){
         linkExtra.innerHTML=`<label class="pl-sheet-l">У який конверт</label>
           <select class="pl-sheet-in" id="pbLinkEnv">${envs.map(e=>`<option value="${esc(e.id)}" ${curLink.envId===e.id?'selected':''}>${esc(e.emoji||'✉️')} ${esc(e.name)}</option>`).join('')||'<option value="">(нема конвертів — створи в Грошах)</option>'}</select>
-          <label class="pl-sheet-l">Сума доходу, ₴</label>
+          <label class="pl-sheet-l">Сума доходу, ${curSym()}</label>
           <input class="pl-sheet-in" id="pbLinkAmt" inputmode="numeric" placeholder="напр. 1200" value="${curLink.amount||''}">`;
       } else { linkExtra.innerHTML=''; }
     }

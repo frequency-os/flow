@@ -20,7 +20,7 @@
   let jnShowArchive=false;
 
   function jnEl(id){ return document.getElementById(id); }
-  function jnMoney(n){ const v=Math.round(+n||0); return (v<0?'−':'')+'₴'+Math.abs(v).toLocaleString('uk-UA'); }
+  function jnMoney(n){ return money(n); }
   function jnHm(h){ const m=Math.round((+h||0)*60); return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
   function jnDateTxt(ds){ if(!/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) return ''; return (+ds.slice(8))+' '+JN_MON[+ds.slice(5,7)-1]; }
   function jnHero(){ if(!goalsData.hero||typeof goalsData.hero!=='object') goalsData.hero={}; return goalsData.hero; }
@@ -489,10 +489,10 @@
       ${othersKeep>0?`<div class="jn-note">У Планері вже є ${othersKeep} ${pluralUk(othersKeep,'розклад','розклади','розкладів')} цієї цілі — Журнал їх не чіпає. Якщо задаси дні тут, у ці дні може бути два блоки.</div>`:''}
       <label class="jn-check"><input type="checkbox" id="jnPlan"${d.plan?' checked':''}> Ставити в Планер у ці дні</label>
       <div class="jn-row3"><label class="jn-f"><span>Годин / тиждень</span><input type="number" id="jnHW" min="0" max="168" step="0.5" value="${esc(String(d.hWeek))}" placeholder="авто"></label>
-        <label class="jn-f"><span>₴ / місяць</span><input type="number" id="jnMoney" min="0" step="100" value="${esc(String(d.money))}" placeholder="0"></label></div>
+        <label class="jn-f"><span>${curSym()} / місяць</span><input type="number" id="jnMoney" min="0" step="100" value="${esc(String(d.money))}" placeholder="0"></label></div>
       <div class="jn-f pz-ed"><span>🎁 Приз за місію</span>
         <div class="jn-row"><input class="jn-emo" id="jnRE" maxlength="4" value="${esc(d.re)}" placeholder="🎁" aria-label="Емодзі призу"><input class="jn-name" id="jnRT" maxlength="60" value="${esc(d.rt)}" placeholder="Що отримаєш: поїздка, річ…"></div></div>
-      <div class="jn-row3"><label class="jn-f"><span>Ціна, ₴</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label>
+      <div class="jn-row3"><label class="jn-f"><span>Ціна, ${curSym()}</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label>
         <label class="jn-f"><span>Коли забрати</span><select id="jnRL" class="pz-sel"><option value="">уся місія</option>${d.levels.filter(m=>m.id).map(m=>`<option value="${esc(m.id)}"${String(d.rl)===String(m.id)?' selected':''}>рівень: ${esc(String(m.t).slice(0,30))}</option>`).join('')}</select></label></div>
       <div class="jn-f"><span>Папка</span><button class="jn-mini" data-jnfold>${folderTxt()}</button></div>
       <div class="jn-ed-foot">
@@ -521,7 +521,7 @@
           // місію з грошима в скарбничці призу не видаляємо: гроші лишились би в конверті без власника
           // перевіряємо і без c0.reward: старша збірка на іншому пристрої могла затерти приз, а конверт із грошима лишився (знаходиться за goalId)
           if(c0&&typeof pzSaved==='function'&&pzSaved(c0)>0){ const pe=pzEnv(c0), pn=(c0.reward&&c0.reward.t)||(pe&&pe.name)||'приз';
-            actionSheet({title:'Спершу поверни гроші зі скарбнички', sub:'У скарбничці «'+String(pn)+'» лежить ₴'+Math.round(pzSaved(c0)).toLocaleString('uk-UA')+'. Поверни їх у Гаманець — тоді місію можна видалити.', items:[{ic:'refresh', label:'Відкрити скарбничку', onClick:()=>{ ov.remove(); if(c0.reward&&String(c0.reward.t||'').trim()) pzJarSheet(c0); else { try{ goEnvelopes(); }catch(_){} } }}]}); return; }
+            actionSheet({title:'Спершу поверни гроші зі скарбнички', sub:'У скарбничці «'+String(pn)+'» лежить '+money(pzSaved(c0))+'. Поверни їх у Гаманець — тоді місію можна видалити.', items:[{ic:'refresh', label:'Відкрити скарбничку', onClick:()=>{ ov.remove(); if(c0.reward&&String(c0.reward.t||'').trim()) pzJarSheet(c0); else { try{ goEnvelopes(); }catch(_){} } }}]}); return; }
           confirmSheet({title:'Видалити місію «'+String(gl.name||'').slice(0,40)+'»?',
           sub:'Зникнуть її рівні, кроки й трекер, а з Планера — невиконані блоки місії від сьогодні. Виконані лишаться. Можна натомість перенести в архів.',
           okLabel:'Видалити', onOk:()=>{
@@ -604,8 +604,9 @@
       <div class="jn-f"><span>Клас</span><div class="jn-chips" id="jsCls">${JN_CLASSES.map(c=>`<button class="jn-chip${h.cls===c?' on':''}" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`;
     else if(step===3) body=`<b class="jn-q">З чим стартуєш</b>
       <p class="jn-p">Твої справжні ресурси. Нічого не підставляємо — лише те, що введеш.</p>
+      ${curLocked()||!finReady?'':`<div class="jn-f"><span>Головна валюта</span><div class="jn-chips" id="jsCur">${Object.keys(CUR_LIST).map(k=>`<button class="jn-chip${k===mainCur()?' on':''}" data-cur="${k}">${CUR_LIST[k].s} ${CUR_LIST[k].n}</button>`).join('')}</div></div>`}
       ${ops?`<div class="jn-note">У Гаманці вже є записи: зараз <b>${jnMoney(bal)}</b>. Стартовий залишок не потрібен.</div>`
-        :finReady?`<label class="jn-f"><span>Скільки зараз на рахунку, ₴</span><input type="number" id="jsBal" min="0" step="100" inputmode="decimal" placeholder="Напр. 12000"></label>`
+        :finReady?`<label class="jn-f"><span>Скільки зараз на рахунку, ${curSym()}</span><input type="number" id="jsBal" min="0" step="100" inputmode="decimal" placeholder="Напр. 12000"></label>`
         :signedIn?`<div class="jn-note">Гаманець ще звіряється з хмарою. Суму можна буде додати в Гаманці — так нічого не задвоїться.</div>`
         :`<div class="jn-note">Без входу в акаунт стартову суму краще внести в Гаманці після входу — інакше вона може задвоїтись із записами акаунта.</div>`}
       <label class="jn-f"><span>Скільки годин на тиждень маєш на місії</span><input type="number" id="jsHW" min="0" max="112" step="0.5" value="${h.hWeek?esc(String(h.hWeek)):''}" placeholder="Напр. 10"></label>
@@ -626,10 +627,13 @@
     const before=snap();
     jnOverlay(`<div class="jn-ed-h"><b>Старт гри</b><button data-jnx aria-label="Закрити">✕</button></div>
       <div class="jn-steps">${[1,2,3,4,5].map(i=>`<i class="${i<=step?'on':''}"></i>`).join('')}</div>
-      <span class="jn-k">Крок ${step} з 5</span>${body}
+      <span class="jn-k">Крок ${step}/5</span>${body}
       <div class="jn-ed-foot">${step>1?'<button class="jn-btn ghost" data-jnback>Назад</button>':''}<button class="jn-btn" data-jnnext>${step===5?'Почати гру':'Далі'}</button></div>`, ov=>{
       const q=x=>ov.querySelector(x);
       let cls=h.cls||'';
+      ov.querySelectorAll('#jsCur [data-cur]').forEach(b=>b.onclick=()=>{ setMainCur(b.dataset.cur);   // вибір людини на старті гри
+        ov.querySelectorAll('#jsCur [data-cur]').forEach(x=>x.classList.toggle('on',x===b));
+        const lb=ov.querySelector('#jsBal'); if(lb&&lb.previousElementSibling) lb.previousElementSibling.textContent='Скільки зараз на рахунку, '+curSym(); });
       ov.querySelectorAll('#jsCls [data-v]').forEach(b=>b.onclick=()=>{ cls=(cls===b.dataset.v)?'':b.dataset.v; ov.querySelectorAll('#jsCls [data-v]').forEach(x=>x.classList.toggle('on',x.dataset.v===cls)); });
       const ai=q('[data-jsai]'); if(ai) ai.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); try{ aiStartSheet(); }catch(e){ console.error('aiStart',e); } };
       const ad=q('[data-jsadd]'); if(ad) ad.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); jnEditor(null); };
