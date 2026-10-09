@@ -55,8 +55,6 @@
   let recurring=[]; // {id,name,emoji,amount,period}
   const RECKEY='fin_recurring';
   function saveRecurring(){ try{ const p=window.storage.set(RECKEY,JSON.stringify(recurring),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
-  // challenges
-// {id,name,emoji,goal,progress,unit}
 
 
   /* ============ ГАМАНЕЦЬ · єдиний рахунок ============
@@ -282,6 +280,7 @@
   function finBalance(){ return finOps.reduce((s,o)=>s+(o.type==='in'?o.amount:(o.envSpend?0:-o.amount)),0); }
 
   function renderFinance(){
+    try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджети «Гроші» в папці й на Огляді бачать ту саму зміну
     const body=document.getElementById('financeBody'); if(!body) return;
     document.getElementById('finSub').textContent='гаманець і плани';
     if(finView==='envelopes'){ renderEnvScreen(body); return; }
@@ -374,7 +373,7 @@
 
 
 
-  // ===== Envelopes sub-screen (grid + recurring + challenges entry) =====
+  // ===== Envelopes sub-screen (grid + recurring) =====
   function renderEnvScreen(body){
     const tot=envTotalSaved();
     const goalSum=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
@@ -480,173 +479,14 @@
     const d=document.getElementById('e2Dim'), s=document.getElementById('e2Sheet');
     if(d) d.classList.remove('on'); if(s) s.classList.remove('on'); envOpenId=null;
   }
-  /* ============ ПРОЄКТИ КАБІНЕТУ (fin_projects) ============
-     Проєкт живе тут, а блок «Проєкт» у папці — лише вікно в нього (b.projId),
-     як віджет «Конверт» з envId. Тому один проєкт можна показати в кількох
-     місцях, і цифри скрізь однакові.
-     Блок зберігає копію операцій (b.ops): її читає застосунок, що ще не
-     оновився, і вона ж — запас для відкату. Кожен запис іде в обидва місця.
-     Номер проєкту — 'prj_'+номер блоку: два пристрої, що перенесли той самий
-     блок одночасно, отримають ОДИН проєкт, а не два. */
+  /* ============ ПРОЄКТИ КАБІНЕТУ (fin_projects) — ПРИБРАНО 09.10.2026 ============
+     Старі віджети «Проєкт» і «Фестиваль» видалено; гроші проєктів тепер — віджети «Доходи»/«Витрати»
+     (48-widgets.js) з міткою папки в Гаманці. Сховище лишається лише для «Ще → Дані → Старі віджети»,
+     де людина сама стирає старі проєкти (wgOldCleanup). */
   let finProjects=[];
   const FINPROJKEY='fin_projects';
   function saveFinProjects(){ try{ const p=window.storage.set(FINPROJKEY,JSON.stringify(finProjects),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
-  function finProjId(b){ return 'prj_'+String(b.id); }
-  function finProjById(id){ return id ? (finProjects.find(p=>p&&p.id===id)||null) : null; }
-  // дані для блока: проєкт Кабінету, а якщо його ще нема — сам блок (старі дані)
-  function projData(b){ return (b&&finProjById(b.projId))||b; }
-  function finProjFromBlock(b){
-    return { id:finProjId(b), title:String(b.title||'Проєкт'), cur:b.cur||'€', expected:+b.expected||0,
-      deadline:b.deadline||'', unlocked:!!b.unlocked, splitPreset:b.splitPreset||null,
-      ops:(Array.isArray(b.ops)?b.ops:[]).filter(o=>o&&typeof o==='object').map((o,i)=>Object.assign({},o,o.id!=null?{}:{id:'pop_'+String(b.id)+'_'+i})), delOps:[], created:ymdLocal() };
-  }
-  // усі блоки всіх папок разом із вкладеними (сторінки, групи)
-  function finWalkBlocks(fn){
-    const walk=arr=>(Array.isArray(arr)?arr:[]).forEach(b=>{ if(!b) return; fn(b); if(Array.isArray(b.children)) walk(b.children); });
-    try{ Object.keys(boards||{}).forEach(k=>walk(boards[k])); }catch(_){}
-  }
-  // ручна дія над блоком: проєкт має існувати (створюємо при потребі — це дія людини)
-  function projEnsure(b){
-    let p=finProjById(b.projId);
-    if(!p){ p=finProjById(finProjId(b)); if(!p){ p=finProjFromBlock(b); finProjects.push(p); } b.projId=p.id; }
-    if(!Array.isArray(p.ops)) p.ops=[];
-    if(!Array.isArray(p.delOps)) p.delOps=[];
-    return p;
-  }
-  // копії в блоках-вікнах: те, що бачить застосунок, який ще не оновився
-  function projMirror(p){
-    finWalkBlocks(b=>{ if(b.type==='project' && b.projId===p.id){
-      b.ops=p.ops.map(o=>Object.assign({},o)); b.expected=p.expected; b.unlocked=p.unlocked; b.deadline=p.deadline; b.cur=p.cur;
-    }});
-  }
-  function projCommit(p){ projMirror(p); saveFinProjects(); saveBoard(); }
 
-  /* Перенесення блоків у Кабінет — реєстр MIGRATIONS_ONCE (27-canvas.js), every:true:
-     іде при кожному довіреному load() і пише лише за реальної зміни.
-       1) блок без projId → проєкт з тим самим номером, операції копіюються;
-       2) блок з projId, куди старий застосунок дописав операцію, → вона
-          доливається в проєкт (крім тих, що видалено в проєкті: delOps).
-     Блоки не видаляються й не чистяться — їхні b.ops лишаються копією. */
-  function finProjectsMigrate(){
-    let chP=false, chB=false;
-    finWalkBlocks(b=>{
-      if(b.type!=='project' || b.id==null) return;
-      let p=finProjById(b.projId);
-      if(!p){
-        p=finProjById(finProjId(b));
-        if(!p){ p=finProjFromBlock(b); finProjects.push(p); chP=true; }
-        if(b.projId!==p.id){ b.projId=p.id; chB=true; }
-        return;
-      }
-      if(!Array.isArray(p.ops)) p.ops=[];
-      // старий застосунок натиснув «Отримано» в блоці — очікувану оплату вже прийнято
-      if(+p.expected>0 && b.unlocked===true && !(+b.expected>0)){ p.expected=0; p.unlocked=true; chP=true; }
-      const have=new Set(p.ops.map(o=>String(o.id))), gone=new Set((p.delOps||[]).map(String));
-      (Array.isArray(b.ops)?b.ops:[]).forEach(o=>{
-        if(!o || o.id==null || have.has(String(o.id)) || gone.has(String(o.id))) return;
-        p.ops.push(Object.assign({},o)); have.add(String(o.id)); chP=true;
-      });
-    });
-    if(chP) saveFinProjects();
-    if(chB) saveBoard();
-    return true;
-  }
-
-  // ===== Project P&L widget =====
-  function projIncome(b){ return (projData(b).ops||[]).filter(o=>o.t==='in').reduce((s,o)=>s+o.amount,0); }
-  function projExpense(b){ return (projData(b).ops||[]).filter(o=>o.t==='out').reduce((s,o)=>s+o.amount,0); }
-  function projNet(b){ return projIncome(b)-projExpense(b); }
-  function projIsLocked(b){
-    b=projData(b);
-    if(b.unlocked) return false;
-    if(!b.deadline) return false; // без дати — не блокується
-    const today=ymdLocal();
-    return today < b.deadline; // заблоковано доки не настала дата
-  }
-  function projDaysLeft(b){
-    b=projData(b);
-    if(!b.deadline) return null;
-    const d=Math.ceil((new Date(b.deadline)-new Date())/86400000);
-    return d;
-  }
-  function projectWidgetHtml(b, sz, head){
-    const d=projData(b);   // проєкт Кабінету (або сам блок, поки не перенесено)
-    const cur=d.cur||'€';
-    const inc=projIncome(b), exp=projExpense(b), net=projNet(b);
-    const expected=+d.expected||0;
-    const locked=projIsLocked(b);
-    const dleft=projDaysLeft(b);
-    const view=b.pview||1;
-    const lockChip = d.deadline
-      ? `<span class="pj-lock ${locked?'locked':'open'}">${locked?'🔒 до '+fmtDate(d.deadline):'🔓 розблоковано'}</span>`
-      : `<span class="pj-lock open">🔓 будь-коли</span>`;
-    const switcher = `<div class="pj-views">
-      ${[['1','P&L'],['2','Журнал'],['3','Колонки'],['4','Маржа']].map(([v,l])=>
-        `<button class="pj-vbtn ${String(view)===v?'on':''}" data-pjview="${b.id}|${v}">${l}</button>`).join('')}
-    </div>`;
-    const splitBtn = (d.splitPreset && +d.splitPreset.amount>0)
-      ? `<button class="fin-btn pj-split" data-pjsplit="${b.id}" style="background:var(--hab,#34c77b);color:#08160e">💶 ${d.splitPreset.label||'Клієнт'} +${+d.splitPreset.amount}${d.splitPreset.cur||d.cur||'€'}</button>`
-      : '';
-    const actions = `<div class="fin-btns pj-acts">
-      ${splitBtn}
-      <button class="fin-btn pj-in" data-pjadd="${b.id}|in">+ Дохід</button>
-      <button class="fin-btn pj-out" data-pjadd="${b.id}|out">− Витрата</button>
-      ${(expected>0 && locked)
-        ? `<button class="fin-btn pj-got" data-pjgot="${b.id}">✅ Отримано</button>`
-        : `<button class="fin-btn pj-env" data-pjenv="${b.id}">✉️</button>`}
-    </div>`;
-
-    let bodyHtml='';
-    if(view===1){
-      const tot=inc+exp||1;
-      const expRow = expected>0 ? `<div class="pj-exp-row">${locked?'🔒':'🔓'} Очікується ще <b>${fmt(expected)} ${cur}</b>${d.deadline?` · ${locked&&dleft>=0?'через '+dleft+' дн':fmtDate(d.deadline)}`:''}</div>` : '';
-      bodyHtml=`
-        <div class="pj-pnl">
-          <div class="c" style="--pc:var(--hab)"><s>Дохід</s><b>${fmt(inc)} ${cur}</b></div>
-          <div class="c" style="--pc:var(--owe)"><s>Витрати</s><b>${fmt(exp)} ${cur}</b></div>
-          <div class="c net" style="--pc:var(--val)"><s>Прибуток</s><b style="color:${net>=0?'var(--val)':'var(--owe)'}">${fmt(net)} ${cur}</b></div>
-        </div>
-        <div class="pj-barstack"><i class="in" style="width:${inc/tot*100}%"></i><i class="ex" style="width:${exp/tot*100}%"></i></div>
-        ${expRow}`;
-    } else if(view===2){
-      const ops=(d.ops||[]).slice().reverse();
-      bodyHtml = ops.length ? ops.map(o=>`<div class="pj-led"><span class="i">${o.t==='in'?'⬆️':'⬇️'}</span>
-        <div class="m"><div class="mn">${esc(o.label||(o.t==='in'?'Дохід':'Витрата'))}</div>
-          <div class="md">${esc(o.date||'')}${o.src?' · '+esc(o.src):''}</div></div>
-        <b class="${o.t}">${o.t==='in'?'+':'−'}${fmt(o.amount)} ${cur}</b>
-        <button class="pj-del" data-pjdel="${b.id}|${o.id}">✕</button></div>`).join('')
-        : `<div class="fh-empty">Рухів ще нема. Додай дохід або витрату.</div>`;
-      bodyHtml += `<div class="pj-foot"><span class="l">Чистий прибуток</span><b class="${net<0?'neg':''}">${fmt(net)} ${cur}</b></div>`;
-    } else if(view===3){
-      const ins=(d.ops||[]).filter(o=>o.t==='in'), outs=(d.ops||[]).filter(o=>o.t==='out');
-      bodyHtml=`<div class="pj-cols">
-        <div class="pj-col inc"><div class="ch">⬆️ Доходи</div>
-          ${ins.map(o=>`<div class="row"><span>${esc(o.label||'дохід')}</span><b>${fmt(o.amount)}</b></div>`).join('')||'<div class="row"><span>—</span><b>0</b></div>'}
-          <div class="tot"><span>Разом</span><b>${fmt(inc)} ${cur}</b></div></div>
-        <div class="pj-col exp"><div class="ch">⬇️ Витрати</div>
-          ${outs.map(o=>`<div class="row"><span>${esc(o.label||'витрата')}</span><b>${fmt(o.amount)}</b></div>`).join('')||'<div class="row"><span>—</span><b>0</b></div>'}
-          <div class="tot"><span>Разом</span><b>${fmt(exp)} ${cur}</b></div></div>
-      </div>
-      <div class="pj-netrow"><span class="l">Чистий прибуток</span><b>${fmt(net)} ${cur}</b></div>`;
-    } else {
-      const margin = inc>0 ? Math.max(0,Math.round(net/inc*100)) : 0;
-      bodyHtml=`<div class="pj-gauge">
-        <div class="pj-ring" style="--p:${margin}"><div class="rin"><b>${margin}%</b><s>маржа</s></div></div>
-        <div class="pj-gstats">
-          <div class="gr"><span class="n"><i style="background:var(--hab)"></i>Дохід</span><b>${fmt(inc)} ${cur}</b></div>
-          <div class="gr"><span class="n"><i style="background:var(--owe)"></i>Витрати</span><b>−${fmt(exp)} ${cur}</b></div>
-          <div class="gr top"><span class="n"><i style="background:var(--val)"></i>Прибуток</span><b style="color:var(--val)">${fmt(net)} ${cur}</b></div>
-        </div></div>`;
-    }
-
-    return `<div class="tile ${sz} tproj" data-tileid="${b.id}" style="--tc:#34c77b">${head}
-      <div class="pj-head"><span class="pj-title" data-pjtitle="${b.id}">${esc(b.title||'Проєкт')}</span>
-        <span class="pj-lock-wrap" data-pjsetup="${b.id}">${lockChip}</span></div>
-      ${switcher}
-      <div class="pj-body">${bodyHtml}</div>
-      ${actions}</div>`;
-  }
-  function fmtDate(iso){ if(!iso) return ''; const p=iso.split('-'); return p.length===3?`${p[2]}.${p[1]}`:iso; }
 
   /* ═══════════ ПРОЄКТНІ БЛОКИ: канбан · контакти · таймлайн · подія ═══════════ */
   // ── КАНБАН: колонки й картки ──
@@ -782,214 +622,6 @@
     ]});
   }
   // ── ФЕСТИВАЛЬ · ПОДІЯ: відлік, програма, бюджет ──
-  function fstwCountdown(b){
-    if(!b.date) return {t:'дата не задана',cls:''};
-    const start=new Date(b.date+'T00:00:00'), end=new Date((b.dateEnd||b.date)+'T23:59:59'), now=new Date();
-    if(isNaN(start)) return {t:'дата не задана',cls:''};
-    if(now<start){ const n=Math.ceil((start-now)/86400000); return {t:n<=0?'сьогодні!':('через '+n+' дн.'),cls:'soon'}; }
-    if(now<=end){ const n=Math.max(0,Math.ceil((end-now)/86400000)); return {t:'триває · ще '+n+' дн.',cls:'live'}; }
-    return {t:'завершено',cls:'past'};
-  }
-  function fstwSpent(b){ return (b.ops||[]).reduce((s,o)=>s+(+o.amount||0),0); }
-  function festivalWidgetHtml(b, sz, head){
-    const cd=fstwCountdown(b);
-    const cur=b.cur||'€';
-    const spent=fstwSpent(b), bud=+b.budget||0;
-    const pct=bud?Math.min(100,Math.round(spent/bud*100)):0;
-    const prog=Array.isArray(b.program)?b.program:[];
-    const done=prog.filter(p=>p.done).length;
-    const dates=b.date?(fmtDate(b.date)+(b.dateEnd&&b.dateEnd!==b.date?('–'+fmtDate(b.dateEnd)):'')):'дата не задана';
-    const items=prog.map(p=>`<div class="fstw-ck ${p.done?'done':''}">
-      <i data-fstck="${b.id}|${p.id}"></i><span>${esc(p.text||'')}</span>
-      <button class="cdel" data-fstdel="${b.id}|${p.id}">×</button></div>`).join('');
-    return `<div class="tile ${sz} tfstw" data-tileid="${b.id}" style="--tc:#c77dff">${head}
-      <div class="fstw-hero" data-fstsetup="${b.id}">
-        <span class="fstw-em">${esc(b.emojiF||'🎪')}</span>
-        <div class="fstw-hm"><b>${esc(b.title||'Подія')}</b>
-          <span>📅 ${dates}${b.place?' · 📍 '+esc(b.place):''}</span></div>
-        <span class="fstw-cd ${cd.cls}">${cd.t}</span></div>
-      ${bud>0?`<div class="fstw-bud"><div class="r"><span>💶 Бюджет</span><b>${fmt(spent)} / ${fmt(bud)} ${cur}</b></div>
-        <div class="fstw-bar"><i style="width:${pct}%"></i></div></div>`:''}
-      <div class="fstw-pl">Програма · ${done}/${prog.length}</div>
-      ${items||'<div class="fh-empty" style="padding:4px 0 8px">Що зробити до і під час події?</div>'}
-      <div class="tadd" data-fstadd="${b.id}">+ пункт програми</div>
-      <div class="fin-btns">
-        <button class="fin-btn" data-fstspend="${b.id}">− Витрата</button>
-        <button class="fin-btn" data-fstsetup2="${b.id}">⚙ Налаштувати</button></div></div>`;
-  }
-  function fstwSpend(b){
-    const cur=b.cur||'€';
-    inputModal({title:'Витрата — на що?', placeholder:'Напр. квитки', onOk:(label)=>{
-      inputModal({title:'Сума ('+cur+')', placeholder:'Напр. 120', onOk:(v)=>{
-        const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
-        (b.ops=b.ops||[]).push({id:'fo'+Date.now(),label:(label||'Витрата').trim(),amount:n,date:ymdLocal()});
-        saveBoard(); renderBoard();
-      }});
-    }});
-  }
-  function fstwOpsSheet(b){
-    const cur=b.cur||'€';
-    const ops=(b.ops||[]).slice().reverse();
-    if(!ops.length){ flowAlert('Витрат по події ще нема.'); return; }
-    actionSheet({title:'Витрати події', sub:'Разом: '+fmt(fstwSpent(b))+' '+cur+' · тап — видалити',
-      items:ops.map(o=>({ic:'🧾', label:(o.label||'Витрата')+' · '+fmt(o.amount)+' '+cur, sub:o.date||'',
-        onClick:()=>confirmSheet({title:'Видалити витрату «'+(o.label||'')+'»?', onOk:()=>{ b.ops=(b.ops||[]).filter(x=>x!==o); saveBoard(); renderBoard(); }})}))});
-  }
-  function fstwSetup(b){
-    actionSheet({title:b.title||'Подія', sub:'Налаштування події', items:[
-      {ic:'✏️', label:'Назва', sub:b.title||'', onClick:()=>inputModal({title:'Назва події', value:b.title||'', onOk:(v)=>{ if((v||'').trim()){ b.title=v.trim(); saveBoard(); renderBoard(); } }})},
-      {ic:'🎪', label:'Емодзі', sub:b.emojiF||'🎪', onClick:()=>inputModal({title:'Емодзі події', value:b.emojiF||'🎪', onOk:(v)=>{ const e=(v||'').trim().slice(0,4); if(e){ b.emojiF=e; saveBoard(); renderBoard(); } }})},
-      {ic:'📅', label:'Дата початку', sub:b.date||'РРРР-ММ-ДД', onClick:()=>inputModal({title:'Початок (РРРР-ММ-ДД)', value:b.date||'', onOk:(v)=>{ v=(v||'').trim(); if(!v||/^\d{4}-\d{2}-\d{2}$/.test(v)){ b.date=v; saveBoard(); renderBoard(); } else flowAlert('Формат дати: РРРР-ММ-ДД'); }})},
-      {ic:'🏁', label:'Дата завершення', sub:b.dateEnd||'необов’язково', onClick:()=>inputModal({title:'Завершення (РРРР-ММ-ДД)', value:b.dateEnd||'', onOk:(v)=>{ v=(v||'').trim(); if(!v||/^\d{4}-\d{2}-\d{2}$/.test(v)){ b.dateEnd=v; saveBoard(); renderBoard(); } else flowAlert('Формат дати: РРРР-ММ-ДД'); }})},
-      {ic:'📍', label:'Місце', sub:b.place||'додати', onClick:()=>inputModal({title:'Місце події', value:b.place||'', placeholder:'Напр. Київ', onOk:(v)=>{ b.place=(v||'').trim(); saveBoard(); renderBoard(); }})},
-      {ic:'💶', label:'Бюджет', sub:(+b.budget||0)+' '+(b.cur||'€'), onClick:()=>inputModal({title:'Бюджет ('+(b.cur||'€')+')', value:String(+b.budget||''), placeholder:'Напр. 800', onOk:(v)=>{ b.budget=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,''))||0; saveBoard(); renderBoard(); }})},
-      {ic:'🧾', label:'Журнал витрат', sub:(b.ops||[]).length+' записів', onClick:()=>fstwOpsSheet(b)},
-    ]});
-  }
-
-  // додати дохід/витрату до проєкту
-  function projAddMovement(b, t){
-    const P=projEnsure(b), cur=P.cur||'€';   // пишемо в проєкт Кабінету
-    const today=ymdLocal();
-    if(t==='in'){
-      inputModal({title:'Дохід проєкту — за що?', placeholder:'Напр. аванс', onOk:(label)=>{
-        inputModal({title:'Сума доходу ('+cur+')', placeholder:'Напр. 300', onOk:(v)=>{
-          const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
-          finAskRate(cur, rate=>{
-            const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-            P.ops.push({id:'pop_'+Date.now(),t:'in',amount:n,label:label||'Дохід',date:today,src:'отримано',finOpId:finId});
-            finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,projId:P.id,card:_projCardId()}, n, cur, rate));
-            projCommit(P); saveFinOps(); renderBoard();
-          });
-        }});
-      }});
-    } else {
-      // витрата — питаємо джерело
-      actionSheet({
-        title:'Витрата на проєкт',
-        sub:'Звідки списати кошти?',
-        items:[
-          {ic:'💰', label:'З балансу', sub:'як звичайна витрата (Розходи)', onClick:()=>projAskExpense(b,'balance')},
-          {ic:'💼', label:'З доходу проєкту', sub:'зменшує прибуток, баланс не чіпає', onClick:()=>projAskExpense(b,'project')},
-        ]
-      });
-    }
-  }
-  function projAskExpense(b, src){
-    const P=projEnsure(b), cur=P.cur||'€';   // пишемо в проєкт Кабінету
-    const today=ymdLocal();
-    inputModal({title:'Витрата — на що?', placeholder:'Напр. реклама', onOk:(label)=>{
-      inputModal({title:'Сума витрати ('+cur+')', placeholder:'Напр. 180', onOk:(v)=>{
-        const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
-        const op={id:'pop_'+Date.now(),t:'out',amount:n,label:label||'Витрата',date:today,src:src==='balance'?'з балансу':'з доходу проєкту'};
-        if(src!=='balance'){ P.ops.push(op); projCommit(P); renderBoard(); return; }
-        finAskRate(cur, rate=>{
-          const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-          op.finOpId=finId;
-          finOps.push(finOpFx({id:finId,type:'out',label:'Проєкт: '+(b.title||'')+(label?' · '+label:''),date:today,proj:b.id,projId:P.id,card:_projCardId()}, n, cur, rate));
-          P.ops.push(op);
-          saveFinOps(); projCommit(P); renderBoard();
-        });
-      }});
-    }});
-  }
-  // отримати очікуваний дохід → розблокувати, додати в Дохід
-  function projReceiveExpected(b){
-    const P=projEnsure(b), cur=P.cur||'€';   // пишемо в проєкт Кабінету
-    const amt=+P.expected||0;
-    if(!(amt>0)){ P.unlocked=true; projCommit(P); renderBoard(); return; }
-    const today=ymdLocal();
-    finAskRate(cur, rate=>{
-      const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-      P.ops.push({id:'pop_'+Date.now(),t:'in',amount:amt,label:'Оплата проєкту',date:today,src:'отримано',finOpId:finId});
-      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · оплата',date:today,proj:b.id,projId:P.id,card:_projCardId()}, amt, cur, rate));
-      P.expected=0; P.unlocked=true;
-      projCommit(P); saveFinOps(); renderBoard();
-    });
-  }
-  // ⚡ АВТО-РОЗПОДІЛ: прийняти фіксовану оплату і одним тапом розкидати по конвертах за правилом.
-  // Вмикається, якщо у блока є b.splitPreset = { amount, cur, rules:[{envId, pct}] }.
-  // rules: pct у частках від суми (0.20 = 20%). Решта лишається як прибуток проєкту.
-  function projSplitPreset(b){
-    const P=projEnsure(b), ps=P.splitPreset; if(!ps||!(+ps.amount>0)){ return projAddMovement(b,'in'); }
-    const amt=+ps.amount, cur=ps.cur||P.cur||'€', today=ymdLocal();
-    const rules=Array.isArray(ps.rules)?ps.rules.filter(r=>r&&r.envId&&+r.pct>0):[];
-    finAskRate(cur, rate=>{
-      // 1) дохід у проєкт + finOps (у Гаманець — гривні за курсом)
-      const finId='fin_'+Date.now()+Math.random().toString(36).slice(2,5);
-      P.ops.push({id:'pop_'+Date.now(),t:'in',amount:amt,label:(ps.label||'Оплата клієнта'),date:today,src:'отримано',finOpId:finId});
-      finOps.push(finOpFx({id:finId,type:'in',label:'Проєкт: '+(b.title||'')+' · '+(ps.label||'оплата'),date:today,proj:b.id,projId:P.id,card:_projCardId()}, amt, cur, rate));
-      // 2) авто-переклад у кожен конверт (envAddOp сам дзеркалить у finOps як резерв).
-      //    Конверти в гривні — частку рахуємо від суми, вже переведеної в ₴.
-      const amtUAH=finFx(amt, cur, rate).amount;
-      let moved=0; const parts=[];
-      rules.forEach(r=>{
-        const e=envelopes.find(x=>String(x.id)===String(r.envId)); if(!e) return;
-        const sum=Math.round(amtUAH*(+r.pct)*100)/100; if(!(sum>0)) return;
-        envAddOp(e,'in',sum,'Авто з «'+(b.title||'проєкт')+'»',_projCardId());
-        moved+=sum; parts.push(fmt(sum)+' ₴ → '+(e.emoji||'✉️')+' '+e.name);
-      });
-      projCommit(P); saveFinOps(); renderBoard();
-      const rest=Math.round((amtUAH-moved)*100)/100;
-      const head='💶 +'+amt+' '+cur+(amtUAH!==amt?' = '+fmt(amtUAH)+' ₴':'');
-      try{ flowAlert(head+'\n'+(parts.length?parts.join('\n')+'\n':'')+'Лишилось у прибутку: '+fmt(rest)+' ₴'); }catch(_){}
-      try{ window.platform.haptic('success'); }catch(_){}
-    });
-  }
-
-  // розподілити прибуток проєкту в конверт (поповнити накопичення)
-  function projDistributeToEnvelope(b){
-    const cur=b.cur||'€';
-    const net=projNet(b);
-    const doPick=()=>{
-      actionSheet({
-        title:'Розподілити в конверт',
-        sub:'Прибуток проєкту: '+fmt(net)+' '+cur,
-        items: envelopes.map(e=>{
-          const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-          return { ic:safeEmoji(e.emoji,'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
-            onClick:()=>{
-              inputModal({title:'Скільки в «'+e.name+'» (₴)', placeholder:'Сума', onOk:(v)=>{
-                const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
-                envAddOp(e,'in',n,'З проєкту: '+(b.title||''),_projCardId()); renderBoard();
-              }});
-            }};
-        }).concat([{ ic:'＋', label:'Новий конверт', sub:'створити й поповнити', onClick:()=>createEnvelopeFor(null) }])
-      });
-    };
-    if(!envelopes.length){ createEnvelopeFor(null); return; }
-    doPick();
-  }
-
-  // створити конверт прямо з віджета на полотні й одразу привʼязати
-  function createEnvelopeFor(block){
-    inputModal({title:'Новий конверт', placeholder:'Напр. Спорт', emoji:true, emojiVal:'✉️', onOk:(name,emojiVal)=>{
-      if(!(name||'').trim()) return;
-      inputModal({title:'Ціль конверта (сума ₴)', placeholder:'Напр. 2000', onOk:(goalStr)=>{
-        const colors=['#5b8def','#34c77b','#e8843c','#c77dff','#f0b429','#4ecdc4'];
-        const goal=parseInt((goalStr||'').replace(/\D/g,''))||0;
-        const e={ id:'env_'+Date.now(), name:name.trim(), emoji:(emojiVal!==undefined?emojiVal:'✉️'),
-          color:colors[envelopes.length%colors.length], goal, saved:0, ops:[], kind:'ціль',
-          link:'main', linkLabel:'головна папка' };
-        envelopes.push(e);
-        saveEnvelopes();
-        if(block){ block.envId=e.id; saveBoard(); }
-        renderBoard();
-      }});
-    }});
-  }
-  // вибір конверта для віджета на полотні
-  function pickEnvelopeFor(block){
-    actionSheet({
-      title:'Привʼязати конверт',
-      sub:'Цей віджет показуватиме обраний конверт',
-      items: envelopes.map(e=>{
-        const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-        return { ic:safeEmoji(e.emoji,'✉️'), label:e.name, sub:`${fmt(sv)} / ${fmt(e.goal||0)} ₴ · ${pct}%`,
-          onClick:()=>{ block.envId=e.id; saveBoard(); renderBoard(); } };
-      })
-    });
-  }
   function renderEnvSheet(){
     const s=document.getElementById('e2Sheet'); if(!s) return;
     const e=envelopes.find(x=>String(x.id)===String(envOpenId)); if(!e){ closeEnvSheet(); return; }

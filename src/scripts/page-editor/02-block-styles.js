@@ -33,7 +33,7 @@
       var diff=Math.round((dl-today)/86400000);
       if(!(diff>=0 && diff<(c.deadlineN||7))) ok=false;
     }
-    if(c.metric&&(b.type==='pbar'||b.type==='kpi')){
+    if(c.metric&&b.type==='pbar'){
       any=true;
       var val = b.type==='pbar' ? (b.auto?pbarAutoValue(b):(+b.value||0))
               : ((b.points&&b.points.length)?(+b.points[b.points.length-1].v||0):0);
@@ -116,6 +116,10 @@
 
   function inner(b){
     var t=b.type,id=b.id;
+    /* віджети «Гроші» (core/48-widgets.js) — живі плитки; старі фінансові віджети прибрано 09.10.2026 */
+    if(typeof wgIs==='function'&&wgIs(t)) return '<div class="pg-content pgwg" data-wghost="'+esc(id)+'"></div>';
+    var PG_OLD_FIN={fin:'Фінанси',envelope:'Конверт',project:'Проєкт',festival:'Фестиваль',kpi:'KPI'};
+    if(PG_OLD_FIN[t]) return '<div class="pg-content"><div class="pg-oldw">🗂 Старий віджет «'+PG_OLD_FIN[t]+'» — прибирається в <b>Ще → Дані → Старі віджети</b>. Нові — у меню «/» → Гроші.</div></div>';
     /* нотатка = суцільний абзац на аркуші, без рамок */
     if(t==='note'||t==='quick')return '<div class="pg-content pg-empty" contenteditable="true" data-ph="Пишіть…" data-edit="'+id+'">'+esc(txtOf(b))+'</div>';
     if(t==='h1'){var hs1=headingStyle(b);return '<div class="pg-content pgc-h1'+hs1.cls+' pg-empty" style="'+hs1.style+'" contenteditable="true" data-ph="Заголовок 1" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
@@ -195,28 +199,6 @@
         +'<div class="pghm-top"><span class="pghm-t pg-empty" contenteditable="true" data-ph="Звичка…" data-edit="'+id+'">'+esc(b.title||'')+'</span>'
         +'<span class="pghm-st">🔥 '+hmStreak+' · '+hmTotal+'/84</span></div>'
         +'<div class="pghm-grid">'+hmCells+'</div></div></div>';
-    }
-    if(t==='kpi'){
-      var kpPts=(b.points||[]).slice(-30);
-      var kpIn;
-      if(!kpPts.length){
-        kpIn='<button class="pgpp-empty" data-pgkpiadd="'+id+'">＋ Перше значення</button>';
-      } else {
-        var kpCur=kpPts[kpPts.length-1].v, kpPrev=kpPts.length>1?kpPts[kpPts.length-2].v:kpCur;
-        var kpD=kpPrev? Math.round((kpCur-kpPrev)/Math.abs(kpPrev)*1000)/10 : 0;
-        var kpUp=kpD>=0;
-        var kpMin=Infinity,kpMax=-Infinity; kpPts.forEach(function(p){if(p.v<kpMin)kpMin=p.v;if(p.v>kpMax)kpMax=p.v;});
-        var kpR=(kpMax-kpMin)||1, kpPoly='';
-        kpPts.forEach(function(p,i){ kpPoly+=(i? ' ':'')+((i/Math.max(kpPts.length-1,1))*90)+','+(30-3-((p.v-kpMin)/kpR)*24); });
-        kpIn='<div class="pgkpi-row">'
-          +'<div class="pgkpi-l"><b class="pgkpi-v">'+esc(String(kpCur))+'</b><span class="pgkpi-u">'+esc(b.unit||'')+'</span>'
-          +'<span class="pgkpi-d '+(kpUp?'up':'dn')+'">'+(kpUp?'▲':'▼')+' '+Math.abs(kpD)+'%</span></div>'
-          +'<svg class="pgkpi-s" viewBox="0 0 90 30"><polyline points="'+kpPoly+'"/></svg>'
-          +'<button class="pgkpi-add" data-pgkpiadd="'+id+'">＋</button></div>';
-      }
-      return '<div class="pg-content"><div class="pgkpi">'
-        +'<span class="pghm-t pg-empty" contenteditable="true" data-ph="KPI…" data-edit="'+id+'">'+esc(b.title||'')+'</span>'
-        +kpIn+'</div></div>';
     }
     if(t==='chart'){
       var chPts=(b.points||[]).slice(-30), chView=b.view||'bar', chIn;
@@ -404,13 +386,11 @@
     }
     /* вже вставлені віджети/проєктні блоки показуємо чипом (у меню їх поки нема) */
     /* віджети та проєктні блоки — ЖИВІ тайли дошки прямо на сторінці */
-    var PG_TILE_TYPES={progress:1,fin:1,envelope:1,calendar:1,wpult:1,wstack:1,wpipe:1,wtline:1,wportal:1,wplanday:1,wplanmonth:1,project:1,kanban:1,contacts:1,caseline:1,festival:1};
+    var PG_TILE_TYPES={progress:1,calendar:1,wpult:1,wstack:1,wpipe:1,wtline:1,wportal:1,wplanday:1,wplanmonth:1,kanban:1,contacts:1,caseline:1};
     if(PG_TILE_TYPES[t]) return '<div class="pg-content pgwidget" data-pgwhost="'+id+'"></div>';
     /* невідомі типи — інформативний чип */
     var PGS_WCHIP={
       progress:{t:'Прогрес',d:'Шкала виконання',c:'#34c77b',ic:'progress'},
-      fin:{t:'Фінанси',d:'Зведення з модуля',c:'#f0b429',ic:'fin'},
-      envelope:{t:'Конверт',d:'Накопичення на ціль',c:'#c77dff',ic:'envelope'},
       calendar:{t:'Календар',d:'Місяць з відмітками',c:'#5b8def',ic:'calendar'},
       wpult:{t:'Пульт проєктів',d:'Наступний крок кожного проєкту',c:'#7c8cff',ic:'pult'},
       wstack:{t:'Фокус-стек',d:'Обліт проєктів по одному',c:'#ff6b9d',ic:'stack'},
@@ -418,11 +398,9 @@
       wtline:{t:'Таймлайн',d:'Дедлайни на стрічці тижнів',c:'#e8843c',ic:'tline'},
       wplanday:{t:'План на день',d:'Точки проєкту сьогодні',c:'#6a7dff',ic:'calendar'},
       wplanmonth:{t:'План на місяць',d:'Календар точок проєкту',c:'#8b5cf6',ic:'calendar'},
-      project:{t:'Проєкт',d:'Дохід − витрати = прибуток',c:'#34c77b',ic:'project'},
       kanban:{t:'Канбан',d:'Заявки → в роботі → готово',c:'#5b8def',ic:'kanban'},
       contacts:{t:'Контакти',d:'Партнери, клієнти, сервіси',c:'#4ecdc4',ic:'contacts'},
       caseline:{t:'Таймлайн справи',d:'Хронологія подій з датами',c:'#e8843c',ic:'caseline'},
-      festival:{t:'Фестиваль · Подія',d:'Відлік, програма, бюджет',c:'#c77dff',ic:'fest'},
       wportal:{t:'Портал',d:'Стрибок у будь-яку папку',c:'#c77dff',ic:'portal'}
     };
     var ci=PGS_WCHIP[t]||null;
@@ -661,6 +639,7 @@
   }
   /* живі віджети: вставляємо справжні тайли дошки і біндимо їхні обробники */
   function fillWidgetHosts(){
+    try{ if(typeof wgFillPage==='function') wgFillPage(editor); }catch(_){}   // віджети «Гроші»
     var br=bridge(); if(!br||!br.tileHTML)return;
     var hosts=editor.querySelectorAll('[data-pgwhost]');
     if(!hosts.length)return;

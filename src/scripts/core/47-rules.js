@@ -239,14 +239,25 @@
   }
   function rlPlanFact(ym,id){ return (finOps||[]).filter(o=>o&&o.planId===id&&String(o.date||'').slice(0,7)===ym).reduce((s,o)=>s+(+o.amount||0),0); }
   function rlPrevYm(ym){ const y=+ym.slice(0,4), m=+ym.slice(5,7); return m===1?(y-1)+'-12':y+'-'+String(m-1).padStart(2,'0'); }
+  // прогноз на кінець місяця — той самий і для вкладки «План», і для віджета Гаманця (48-widgets.js)
+  function rlRecurring(){ return (typeof recurring!=='undefined'&&Array.isArray(recurring)?recurring:[]).filter(r=>r&&+r.amount>0); }
+  function rlForecast(ym){
+    const p=rlPlan(ym,false)||{in:[],out:[]}; let free=0; try{ free=walletBalance(); }catch(_){}
+    const left=(rows)=>rows.reduce((s,r)=>s+Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)),0);
+    const recLeft=rlRecurring().filter(r=>r.lastYM!==ym).reduce((s,r)=>s+(+r.amount||0),0);
+    return Math.round(free+left(p.in)-left(p.out)-recLeft);
+  }
+  // ще не закриті рядки плану (дохід і витрати), від найближчого дня
+  function rlPlanOpen(ym){
+    const p=rlPlan(ym,false)||{in:[],out:[]}, out=[];
+    ['in','out'].forEach(k=>p[k].forEach(r=>{ const rest=Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)); if(rest>0) out.push({k,r,rest}); }));
+    return out.sort((a,b)=>(+a.r.day||99)-(+b.r.day||99));   // прострочені (день уже минув) — першими
+  }
   function rlPlanHTML(ym){
     const p=rlPlan(ym,false)||{in:[],out:[]}, all=wlAgg(wlMonthOps(ym));
-    let free=0; try{ free=walletBalance(); }catch(_){}
-    const recs=(typeof recurring!=='undefined'&&Array.isArray(recurring)?recurring:[]).filter(r=>r&&+r.amount>0);
-    const left=(rows)=>rows.reduce((s,r)=>s+Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)),0);
-    const recLeft=recs.filter(r=>r.lastYM!==ym).reduce((s,r)=>s+(+r.amount||0),0);
+    const recs=rlRecurring();
     const pIn=p.in.reduce((s,r)=>s+(+r.amt||0),0), pOut=p.out.reduce((s,r)=>s+(+r.amt||0),0)+recs.reduce((s,r)=>s+(+r.amount||0),0);
-    const fc=Math.round(free+left(p.in)-left(p.out)-recLeft);
+    const fc=rlForecast(ym);
     const row=(r,k)=>{ const f=rlPlanFact(ym,r.id), ok=f>=(+r.amt||0)&&f>0;
       return `<button class="rl-pr${ok?' ok':''}" data-rlpr="${k}|${esc(r.id)}"><span class="rl-pr-d">${r.day?esc(String(r.day)):'—'}</span><span class="rl-pr-n"><b>${esc(r.t||'Без назви')}</b><small>${ok?'✓ записано '+wlMoney(f):f?'частково '+wlMoney(f):'тапни, коли '+(k==='in'?'прийде':'сплатиш')}</small></span><b class="${k}">${k==='in'?'+':'−'}${wlMoney(r.amt)}</b></button>`; };
     const prev=rlPlan(rlPrevYm(ym),false), canCopy=!p.in.length&&!p.out.length&&prev&&(prev.in.length||prev.out.length);

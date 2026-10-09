@@ -230,8 +230,7 @@
     { id:'space_to_inbox',  flag:'flowapp_space_removed_v1',       run: inboxMigrateOnce },
     { id:'inbox_to_chat',   flag:'flowapp_inbox_chat_v1',          run: ()=>chatsMigrateInboxOnce() },    // 36-chats.js
     { id:'debt_ops',        every:true,                            run: ()=>migrate() },
-    // блоки «Проєкт» → проєкти Кабінету (08-finance.js); ідемпотентно, лише копіює
-    { id:'fin_projects',    every:true,                            run: ()=>finProjectsMigrate() },
+    // 'fin_projects' (блоки «Проєкт» → Кабінет) прибрано 09.10.2026 разом зі старими віджетами
   ];
   let migDeferred=false;   // останній load() відклав міграції (дані не підтверджені)
   function runMigrations(ctx){

@@ -23,7 +23,7 @@
     const g=wlGoal(o.goalId), c=g?safeColor(g.color,'#3ec7b4'):'#8c93a8', isIn=o.type==='in';
     const em=g?safeEmoji(g.emoji,'🎯'):(o.envId?'✉️':(isIn?'⬆️':'⬇️'));
     return `<button class="wl-op" data-wlop="${esc(o.id)}" style="--c:${c}"><span class="wl-op-em">${em}</span>
-      <span class="wl-op-b"><b>${esc(o.label||(isIn?'Дохід':'Витрата'))}</b><small>${jnDateTxt(String(o.date||''))}${g?` · <i class="wl-tag">${esc(g.name||'Місія')}</i>`:(o.envId||o._tr?' · переказ':'')}</small></span>
+      <span class="wl-op-b"><b>${esc(o.label||(isIn?'Дохід':'Витрата'))}</b><small>${jnDateTxt(String(o.date||''))}${g?` · <i class="wl-tag">${esc(g.name||'Місія')}</i>`:(o.envId||o._tr?' · переказ':'')}${wlFolderName(o.folderKey)?` · <i class="wl-tag fd">📁 ${esc(wlFolderName(o.folderKey))}</i>`:''}${isIn&&wlSrc(o)!=='main'?` · ${WL_SRC[wlSrc(o)][0]}`:''}</small></span>
       <b class="${isIn?'in':'out'}">${isIn?'+':'−'}${wlMoney(o.amount)}</b></button>`;
   }
 
@@ -33,9 +33,9 @@
     const sub=document.getElementById('finSub'); if(sub) sub.textContent='гаманець героя · '+MO_NAMES[+ym.slice(5,7)-1].toLowerCase();
     let h=`<div class="wl-card"><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}</span></div>
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
-      <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
+      <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="folders"${wlState.tab==='folders'?' class="on"':''}>Папки</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
     const plan=wlState.tab==='plan'&&typeof rlPlanHTML==='function';   // план місяця (47-rules.js)
-    h+=plan?rlPlanHTML(ym):wlState.tab==='missions'?wlMissionsHTML(ops):wlOverviewHTML(ops,all,ym);
+    h+=plan?rlPlanHTML(ym):wlState.tab==='missions'?wlMissionsHTML(ops):wlState.tab==='folders'?wlFoldersHTML(ops):wlOverviewHTML(ops,all,ym);
     body.innerHTML=h+'<div class="jn-pad"></div>';
     wlBind(body);
     if(plan) rlPlanBind(body,ym);
@@ -52,6 +52,11 @@
     } else {
       h+=`<div class="wl-fact"><span>Заробив <b>${wlMoney(all.inc)}</b></span><span>Витратив <b>${wlMoney(all.out)}</b></span></div><button class="mo-set" data-wlgoals>Задати цілі місяця</button>`;
     }
+    { const by={main:0,extra:0,passive:0}; ops.forEach(o=>{ if(_isRealIncome(o)) by[wlSrc(o)]+=+o.amount||0; });
+      if(by.extra||by.passive){ const tot=by.main+by.extra+by.passive||1;
+        h+=`<div class="wl-src"><div class="wl-src-h"><span>Дохід місяця</span><b>${wlMoney(tot)}</b></div>
+          <div class="wl-src-bar">${Object.keys(WL_SRC).map(k=>by[k]?`<i class="s-${k}" style="width:${by[k]/tot*100}%"></i>`:'').join('')}</div>
+          <div class="wl-src-k">${Object.keys(WL_SRC).map(k=>`<span class="s-${k}"><small>${WL_SRC[k][0]} ${WL_SRC[k][1].toLowerCase()}</small><b>${wlMoney(by[k])}</b>${by[k]&&k!=='main'?`<em>${Math.round(by[k]/tot*100)}%</em>`:''}</span>`).join('')}</div></div>`; } }
     const last=(finOps||[]).filter(o=>o&&o.id!=null&&String(o.id)!==''&&!String(o.id).startsWith('start_')).slice(-8).reverse();
     h+=`<div class="wl-sec"><span>Останні операції</span><button data-wlhist>історія ›</button></div>`;
     h+=last.length?`<div class="wl-ops">${last.map(wlOpRow).join('')}</div>`:`<div class="dy-empty"><span>Ще нема операцій. Почни з «Витрата» або «Дохід».</span></div>`;
@@ -75,6 +80,30 @@
     h+=`<button class="wl-m none" data-wlm=""><span class="wl-m-h"><span>📦</span><b>Без місії</b><span class="out">−${wlMoney(none.out)}</span></span><span class="wl-m-d"><span>побутові витрати й доходи без місії${none.inc?' · дохід '+wlMoney(none.inc):''}</span></span></button>`;
     return (ms.length?'':'<div class="dy-empty"><span>Місій ще нема — тут буде розріз грошей по місіях.</span></div>')+h;
   }
+  // ── гроші папок: операції з міткою folderKey (віджети «Доходи»/«Витрати» в папці) ──
+  function wlFoldersHTML(ops){
+    const by={}; ops.forEach(o=>{ const k=wlFolderName(o.folderKey)?String(o.folderKey):''; if(!k) return; if(!by[k]) by[k]={inc:0,out:0,n:0};
+      if(_isRealIncome(o)) by[k].inc+=+o.amount||0; else if(_isRealExpense(o)) by[k].out+=+o.amount||0; by[k].n++; });
+    const keys=Object.keys(by).sort((a,b)=>(by[b].inc-by[b].out)-(by[a].inc-by[a].out));
+    let h=keys.length?'':`<div class="dy-empty"><b>Ще нема грошей папок</b><span>Додай у папку-проєкт віджет «Доходи» чи «Витрати» (меню «/» → Гроші) — записи з нього будуть тут.</span></div>`;
+    keys.forEach(k=>{ const a=by[k], f=folders[k]||{}, pr=a.inc-a.out;
+      h+=`<button class="wl-m" data-wlfd="${esc(k)}" style="--c:${safeColor(f.color,'#c48cff')}"><span class="wl-m-h"><span>${safeEmoji(f.emoji,'📁')}</span><b>${esc(f.name||'Папка')}</b><span class="${pr>=0?'in':'out'}">${pr>=0?'+':'−'}${wlMoney(Math.abs(pr))}</span></span>
+        <span class="wl-m-d"><span>дохід <b>${wlMoney(a.inc)}</b></span><span>витрати <b>${wlMoney(a.out)}</b></span><span>${a.n} ${pluralUk(a.n,'запис','записи','записів')}</span></span></button>`; });
+    return h;
+  }
+  function wlFolderSheet(k){
+    const f=folders[k]; if(!f) return;
+    const ym=wlYm(), ops=wlMonthOps(ym).filter(o=>String(o.folderKey||'')===String(k)&&(_isRealIncome(o)||_isRealExpense(o)));
+    const inc=ops.filter(_isRealIncome).reduce((s,o)=>s+(+o.amount||0),0), out=ops.filter(_isRealExpense).reduce((s,o)=>s+(+o.amount||0),0);
+    jnOverlay(`<div class="jn-ed-h"><b>${safeEmoji(f.emoji,'📁')} ${esc(f.name||'Папка')}</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">${esc(MO_NAMES[+ym.slice(5,7)-1])}: дохід ${wlMoney(inc)} · витрати ${wlMoney(out)} · ${inc-out>=0?'прибуток':'мінус'} ${wlMoney(Math.abs(inc-out))}</small>
+      <div class="wl-ops">${ops.length?ops.slice().reverse().map(wlOpRow).join(''):'<div class="dy-empty"><span>Цього місяця записів нема.</span></div>'}</div>
+      <div class="wl-acts"><button class="pri" data-wlfgo>Відкрити папку</button><button data-wlfadd="in">＋ Дохід</button></div>`, ov=>{
+      ov.querySelector('[data-wlfgo]').onclick=()=>{ ov.remove(); try{ goFolder(k); }catch(_){} };
+      ov.querySelector('[data-wlfadd]').onclick=()=>{ ov.remove(); wlOpSheet('in','',{folderKey:k, src:'extra'}); };
+      ov.querySelectorAll('[data-wlop]').forEach(b=>b.onclick=()=>{ ov.remove(); wlOpMenu(b.dataset.wlop); });
+    });
+  }
   function wlBind(c){
     c.querySelectorAll('[data-wladd]').forEach(b=>b.onclick=()=>wlOpSheet(b.dataset.wladd,''));
     { const p=c.querySelector('[data-wlpz]'); if(p) p.onclick=()=>{ if(typeof pzScreen==='function') pzScreen(); }; }
@@ -86,20 +115,31 @@
     c.querySelectorAll('[data-envopen]').forEach(el=>el.onclick=()=>openEnvSheet(el.dataset.envopen));
     c.querySelectorAll('[data-wlop]').forEach(b=>b.onclick=()=>wlOpMenu(b.dataset.wlop));
     c.querySelectorAll('[data-wlm]').forEach(b=>b.onclick=()=>wlMissionSheet(b.dataset.wlm));
+    c.querySelectorAll('[data-wlfd]').forEach(b=>b.onclick=()=>wlFolderSheet(b.dataset.wlfd));
   }
 
   // ── нова операція: сума, на що, до місії (необовʼязково) ──
-  function wlOpSheet(type,preGid){
-    const ms=wlMissions(), t=type==='in'?'Дохід':'Витрата'; let gid=preGid||'';
+  /* тип доходу (поєднання A+C, 09.10.2026): основний / додатковий / пасивний; старі операції без src — основний */
+  const WL_SRC={main:['💼','Основний'], extra:['✨','Додатковий'], passive:['🌱','Пасивний']};
+  function wlSrc(o){ return o&&WL_SRC[o.src]?o.src:'main'; }
+  function wlFolderName(k){ try{ return k&&typeof moOwnFolder==='function'&&moOwnFolder(k)?String(folders[k].name||'Папка'):''; }catch(_){ return ''; } }
+  // opt: {folderKey, src, label} — коли шторку відкриває віджет папки (48-widgets.js)
+  function wlOpSheet(type,preGid,opt){
+    opt=opt||{};
+    const ms=wlMissions(), t=type==='in'?'Дохід':'Витрата'; let gid=preGid||'', src=WL_SRC[opt.src]?opt.src:'main';
+    const fk=wlFolderName(opt.folderKey)?String(opt.folderKey):'';
     const chips=()=>ms.map(g=>`<button data-wlg="${esc(g.id)}"${String(gid)===String(g.id)?' class="on"':''} style="--c:${safeColor(g.color,'#3ec7b4')}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'').slice(0,18))}</button>`).join('')+`<button data-wlg=""${gid?'':' class="on"'}>без місії</button>`;
     const budTxt=()=>{ const g=wlGoal(gid); if(!g||type!=='out'||!(g.budget&&+g.budget.money>0)) return ''; const a=wlAgg(wlMonthOps(wlYm()),g.id); return 'Бюджет «'+esc(g.name||'')+'» на місяць: '+wlMoney(a.out)+' з '+wlMoney(g.budget.money); };
     jnOverlay(`<div class="jn-ed-h"><b>${type==='in'?'＋':'−'} ${t}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <label class="jn-f"><span>Сума, ₴</span><input id="wlAmt" type="number" inputmode="decimal" min="0" step="1" placeholder="Напр. 500"></label>
-      <label class="jn-f"><span>На що</span><input id="wlLbl" maxlength="80" placeholder="${type==='in'?'Зарплата, оплата від клієнта…':'Їжа, таксі, підручник…'}"></label>
+      <label class="jn-f"><span>На що</span><input id="wlLbl" maxlength="80" value="${esc(String(opt.label||'').slice(0,80))}" placeholder="${type==='in'?'Зарплата, оплата від клієнта…':'Їжа, таксі, підручник…'}"></label>
+      ${type==='in'?`<div class="jn-f"><span>Тип доходу</span><div class="wl-chips" id="wlSrc">${Object.keys(WL_SRC).map(k=>`<button data-wlsrc="${k}"${k===src?' class="on"':''}>${WL_SRC[k][0]} ${WL_SRC[k][1]}</button>`).join('')}</div></div>`:''}
+      ${fk?`<small class="mo-note">📁 Запишеться з міткою папки «${esc(wlFolderName(fk))}»</small>`:''}
       ${ms.length?`<div class="jn-f"><span>До місії (необовʼязково)</span><div class="wl-chips" id="wlChips">${chips()}</div><small class="mo-note" id="wlBud">${budTxt()}</small></div>`:''}
       <div class="jn-ed-foot"><button class="jn-btn" data-wlok>Записати</button></div>`, ov=>{
       const bindChips=()=>ov.querySelectorAll('[data-wlg]').forEach(b=>b.onclick=()=>{ gid=b.dataset.wlg; ov.querySelector('#wlChips').innerHTML=chips(); const bt=ov.querySelector('#wlBud'); if(bt) bt.innerHTML=budTxt(); bindChips(); });
       bindChips();
+      ov.querySelectorAll('[data-wlsrc]').forEach(b=>b.onclick=()=>{ src=b.dataset.wlsrc; ov.querySelectorAll('[data-wlsrc]').forEach(x=>x.classList.toggle('on',x===b)); });
       setTimeout(()=>{ try{ ov.querySelector('#wlAmt').focus(); }catch(_){} },80);
       ov.querySelector('[data-wlok]').onclick=()=>{
         const amount=Math.round(parseFloat(String(ov.querySelector('#wlAmt').value||'').replace(',','.'))*100)/100;
@@ -107,7 +147,10 @@
         const label=String(ov.querySelector('#wlLbl').value||'').trim().slice(0,80)||t;
         const op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type, amount, label, date:ymdLocal(), card:mainCard().id };
         if(gid&&wlGoal(gid)) op.goalId=String(gid);
+        if(fk&&wlFolderName(fk)) op.folderKey=fk;
+        if(type==='in'&&src!=='main') op.src=src;
         finOps.push(op); saveFinOps(); ov.remove(); renderFinance();
+        try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджети в папці й на Огляді
         try{ flowReact(type==='in'?'income':'spend',{amount}); }catch(_){}
         try{ if(typeof rlOnOp==='function') rlOnOp(op); }catch(err){ console.error('rlOnOp',err); }   // правила: скарбничка / зарплата / бюджет
       };

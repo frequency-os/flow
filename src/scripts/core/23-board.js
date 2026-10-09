@@ -68,9 +68,6 @@
     table: {emoji:'🗂️', color:'#5b8def', title:'Таблиця',   desc:'Рядки та колонки'},
     head:  {emoji:'🏷️', color:'#8b93a3', title:'Заголовок', desc:'Розділювач секції'},
     quick: {emoji:'⚡', color:'#c77dff', title:'Картка',    desc:'Коротка замітка'},
-    fin:   {emoji:'💰', color:'#f0b429', title:'Фінанси',   desc:'Зведення з модуля'},
-    envelope:{emoji:'✉️', color:'#c77dff', title:'Конверт', desc:'Накопичення на ціль чи мрію'},
-    project:{emoji:'💼', color:'#34c77b', title:'Проєкт', desc:'Дохід − витрати = прибуток'},
     divider:{emoji:'➖', color:'#8b93a3', title:'Роздільник', desc:'Лінія між секціями'},
     quote: {emoji:'❝', color:'#9b8cff', title:'Цитата',    desc:'Виділена думка'},
     progress:{emoji:'📊', color:'#34c77b', title:'Прогрес', desc:'Шкала виконання'},
@@ -95,10 +92,8 @@
     kanban: {emoji:'🗂️', color:'#5b8def', title:'Канбан', desc:'Колонки й картки: заявки → в роботі → готово'},
     contacts:{emoji:'☎️', color:'#34c77b', title:'Контакти', desc:'Партнери, клієнти, сервіси — під рукою'},
     caseline:{emoji:'🕓', color:'#e8843c', title:'Таймлайн справи', desc:'Хронологія подій з датами'},
-    festival:{emoji:'🎪', color:'#c77dff', title:'Фестиваль · Подія', desc:'Відлік, програма, місце і бюджет події'},
     /* ═══ PREMIUM PACK V1 ═══ */
     heatmap:{emoji:'🟩', color:'#34c77b', title:'Хітмапа', desc:'12 тижнів звички клітинками'},
-    kpi:    {emoji:'📈', color:'#6a7dff', title:'KPI', desc:'Число + дельта + спарклайн'},
     chart:  {emoji:'📉', color:'#5b8def', title:'Графік', desc:'Твої точки даних: bar або line'},
     tabs:   {emoji:'🗃️', color:'#9b8cff', title:'Таби', desc:'Кілька вкладок в одному блоці'},
     accord: {emoji:'🪗', color:'#5b8def', title:'Акордеон', desc:'Секції, що розгортаються'},
@@ -106,12 +101,13 @@
     embed:  {emoji:'▶️', color:'#ff6b9d', title:'Відео', desc:'YouTube за посиланням'},
     audio:  {emoji:'🎧', color:'#c77dff', title:'Аудіо', desc:'Плеєр за посиланням на mp3'},
     wfocus: {emoji:'🍅', color:'#e8843c', title:'Фокус', desc:'Помодоро 25/5 із кільцем'},
+    /* віджети «Гроші» (48-widgets.js, 09.10.2026) — малює wgHTML, тут лише назви */
+    wgmoney:{emoji:'💸', color:'#34c77b', title:'Доходи / Витрати', desc:'Гроші цієї папки з міткою в Гаманці'},
+    wgwallet:{emoji:'💳', color:'#7f8cff', title:'Гаманець', desc:'Баланс, прогноз місяця'},
+    wgmission:{emoji:'🎯', color:'#34c77b', title:'Гроші місії', desc:'Дохід, бюджет і приз місії'},
+    wgenv:{emoji:'✉️', color:'#f0b429', title:'Конверти й платежі', desc:'Конверти і План місяця'},
+    wgdebt:{emoji:'🤝', color:'#ff4d6d', title:'Борги й правила', desc:'Борги, серія, дисципліна'},
   };
-  // which block types are "widgets" (shown under separate Widgets icon)
-  const WIDGET_TYPES=['fin','envelope','project','progress','calendar','countdown','wpult','wstack','wpipe','wtline','wportal','wplanday','wplanmonth','wfocus','heatmap','kpi'];
-  // проєктні блоки — окрема вкладка «Проєкти» у шторці «＋»
-  const PROJECT_BLOCKS=['project','festival','kanban','contacts','caseline','wpult','wstack','wpipe','wtline'];
-  const PROJECT_ONLY=['kanban','contacts','caseline','festival']; // не показувати серед простих блоків
 
   // modern line icons (feather-style) per block type
   const ICONS={
@@ -124,7 +120,6 @@
     table:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
     head:'<path d="M4 7h16M4 12h10M4 17h7" stroke-linecap="round"/>',
     quick:'<path d="M13 2L4 14h7l-1 8 9-12h-7z" stroke-linecap="round" stroke-linejoin="round"/>',
-    fin:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-linecap="round" stroke-linejoin="round"/>',
     divider:'<path d="M3 12h18" stroke-linecap="round"/>',
     quote:'<path d="M6 17h3l2-4V7H5v6h3zM14 17h3l2-4V7h-6v6h3z"/>',
     progress:'<rect x="3" y="9" width="18" height="6" rx="3"/><rect x="3" y="9" width="10" height="6" rx="3" fill="currentColor" stroke="none"/>',
@@ -142,9 +137,7 @@
     kanban:'<rect x="3" y="3" width="5.5" height="18" rx="1.5"/><rect x="9.5" y="3" width="5.5" height="12" rx="1.5"/><rect x="16" y="3" width="5" height="8" rx="1.5"/>',
     contacts:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/><path d="M16 4a4 4 0 0 1 0 8M18 20c0-2.4-1-4.4-2.6-5.6" stroke-linecap="round"/>',
     caseline:'<path d="M5 3v18" stroke-linecap="round"/><circle cx="5" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="5" cy="13" r="2" fill="currentColor" stroke="none"/><path d="M10 6h11M10 13h8M10 19h5" stroke-linecap="round"/>',
-    festival:'<path d="M12 3v3M4 21l2.5-9h11L20 21z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12c1 2 2.5 3 4 3s3-1 4-3M4 21h16" stroke-linecap="round"/>',
     heatmap:'<rect x="3" y="3" width="4" height="4" rx="1"/><rect x="10" y="3" width="4" height="4" rx="1"/><rect x="17" y="3" width="4" height="4" rx="1"/><rect x="3" y="10" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="10" width="4" height="4" rx="1"/><rect x="3" y="17" width="4" height="4" rx="1"/><rect x="10" y="17" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="17" width="4" height="4" rx="1"/>',
-    kpi:'<path d="M3 17l6-6 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h6v6" stroke-linecap="round" stroke-linejoin="round"/>',
     chart:'<path d="M4 20V10M10 20V4M16 20v-8M21 20H3" stroke-linecap="round"/>',
     tabs:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 11h18M8 7V4h5v3" stroke-linecap="round"/>',
     accord:'<rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="12" width="18" height="8" rx="1.5"/><path d="M17 6.5l1.5 1 1.5-1" stroke-linecap="round" stroke-linejoin="round"/>',

@@ -47,7 +47,6 @@
   // default size per type, used until user changes it
   function defaultSize(type){
     if(type==='quick') return 's';
-    if(type==='fin') return 'w';
     return 'w'; // note, check, task, photo, link, list, table — full width by default
   }
   // авто-розмір: підбираємо span за типом і обсягом контенту блока
@@ -55,7 +54,7 @@
     const t=b.type;
     if(t==='photo'||t==='table'||t==='calendar'||t==='fin'||t==='countdown') return 'w';
     if(t==='divider'||t==='head'||t==='h1'||t==='h2'||t==='h3') return 'w';
-    if(t==='heatmap'||t==='chart'||t==='tabs'||t==='accord'||t==='code'||t==='embed'||t==='kpi'||t==='audio'||t==='wfocus') return 'w';
+    if(t==='heatmap'||t==='chart'||t==='tabs'||t==='accord'||t==='code'||t==='embed'||t==='audio'||t==='wfocus') return 'w';
     if(t==='quick'){ const len=(b.text||'').length; return len>60?'w':'s'; }
     if(t==='note'){ const len=(b.text||'').length; return len>240?'l':(len>40?'w':'s'); }
     if(t==='quote'){ const len=(b.text||'').length; return len>120?'l':'w'; }
@@ -325,26 +324,6 @@
         <div class="hm-grid">${cells}</div>
         <div class="hm-foot"><span>🔥 ${streak} дн. поспіль</span><span>${total} за 12 тиж.</span></div>
         <div class="hm-hint">тап по сьогодні · довгий тап по будь-якому дню</div></div>`;
-    }
-    if(b.type==='kpi'){
-      const pts=(b.points||[]).slice(-30);
-      if(!pts.length){
-        return `<div class="tile ${sz} tkpi" data-tileid="${b.id}" style="--tc:${c}">${head}
-          <button class="pp-empty" data-kpiadd="${b.id}">＋ Додай перше значення</button></div>`;
-      }
-      const cur=pts[pts.length-1].v, prev=pts.length>1?pts[pts.length-2].v:cur;
-      const dd=prev? Math.round((cur-prev)/Math.abs(prev)*1000)/10 : 0;
-      const up=dd>=0;
-      const mn=Math.min(...pts.map(p=>p.v)), mx=Math.max(...pts.map(p=>p.v)), rng=(mx-mn)||1;
-      const W=120,H=34;
-      const poly=pts.map((p,i)=>`${(i/(Math.max(pts.length-1,1)))*W},${H-3-((p.v-mn)/rng)*(H-6)}`).join(' ');
-      return `<div class="tile ${sz} tkpi" data-tileid="${b.id}" style="--tc:${c}">${head}
-        <div class="kpi-row">
-          <div class="kpi-main"><b class="kpi-val">${esc(String(cur))}</b><span class="kpi-unit">${esc(b.unit||'')}</span>
-            <span class="kpi-delta ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(dd)}%</span></div>
-          <svg class="kpi-spark" viewBox="0 0 ${W} ${H}"><polyline points="${poly}"/></svg>
-        </div>
-        <button class="pp-ghost" data-kpiadd="${b.id}">＋ значення</button></div>`;
     }
     if(b.type==='chart'){
       const pts=(b.points||[]).slice(-30);
@@ -746,56 +725,9 @@
           </div></div>`;
       }
     }
-    if(b.type==='fin'){
-      let owe=0,owed=0; debtItems.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} });
-      const net=owed-owe, spent=spendTotal();
-      return `<div class="tile ${sz} tlink tfin" data-tileid="${b.id}" style="--tc:${c}">${head}
-        <div class="lrow"><span>🤝 Чистий баланс боргів</span><b style="color:${net<0?'var(--owe)':'var(--owed)'}">${(net>0?'+':'')+fmt(net)} ₴</b></div>
-        <div class="lrow"><span>🧾 Витрачено всього</span><b>${fmt(spent)} ₴</b></div>
-        <div class="fin-btns">
-          <button class="fin-btn" data-finopen="debts">🤝 Борги</button>
-          <button class="fin-btn" data-finopen="spend">🧾 Витрати</button>
-        </div></div>`;
-    }
-    if(b.type==='envelope'){
-      const env = b.envId ? envelopes.find(e=>String(e.id)===String(b.envId)) : null;
-      if(env){
-        const sv=envSaved(env), pct=env.goal?Math.min(100,Math.round(sv/env.goal*100)):0;
-        const col=safeColor(env.color,'#c77dff');
-        const cover=env.cover||env.wishImg||'';
-        const kind=env.kind||(env.wishId?'мрія':'ціль');
-        return `<div class="tile ${sz} tlink tenv" data-tileid="${esc(b.id)}" data-envwopen="${esc(env.id)}" style="--tc:${col}">${head}
-          <div class="tenv-card" style="--ec:${col}">
-            ${cover?`<div class="tenv-cover" style="background-image:url('${safeImg(cover)}')"></div>`:''}
-            <div class="tenv-water" style="height:${pct}%"></div>
-            <div class="tenv-top"><span class="tenv-em">${safeEmoji(env.emoji,'✉️')}</span><span class="tenv-pct">${pct}%</span></div>
-            <div class="tenv-nm">${esc(env.name)}</div>
-            <div class="tenv-amt">${fmt(sv)} / ${fmt(env.goal||0)} ₴ · 🎯 ${esc(kind)}</div>
-          </div>
-          <div class="fin-btns">
-            <button class="fin-btn" data-envwadd="${esc(env.id)}|in">+ Поповнити</button>
-            <button class="fin-btn" data-envwadd="${esc(env.id)}|out">− Витрата</button>
-          </div></div>`;
-      }
-      // не привʼязаний — зведення по всіх конвертах + вибір
-      const tot=envTotalSaved(), goalSum=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
-      const pct=goalSum?Math.round(tot/goalSum*100):0;
-      return `<div class="tile ${sz} tlink tenv" data-tileid="${b.id}" style="--tc:#c77dff">${head}
-        <div class="lrow"><span>✉️ Накопичено у конвертах</span><b>${fmt(tot)} ₴</b></div>
-        <div class="fh-env-bar" style="margin:4px 0 8px"><i style="width:${pct}%;background:#c77dff"></i></div>
-        <div class="lrow"><span>Ціль усього</span><b>${fmt(goalSum)} ₴ · ${pct}%</b></div>
-        <div class="fin-btns">
-          <button class="fin-btn" data-envwlink="${b.id}">🔗 Привʼязати</button>
-          <button class="fin-btn" data-envwnew="${b.id}">＋ Новий конверт</button>
-        </div></div>`;
-    }
-    if(b.type==='project'){
-      return projectWidgetHtml(b, sz, head);
-    }
     if(b.type==='kanban')   return kanbanWidgetHtml(b, sz, head);
     if(b.type==='contacts') return contactsWidgetHtml(b, sz, head);
     if(b.type==='caseline') return caselineWidgetHtml(b, sz, head);
-    if(b.type==='festival') return festivalWidgetHtml(b, sz, head);
     if(b.type==='bento'){
       const secs=bentoSectionsHtml(b);
       return `<div class="tile ${sz} tbento" data-tileid="${b.id}" style="--tc:${c}">${head}
@@ -854,9 +786,6 @@
       if(i<0) return;
       const copy=JSON.parse(JSON.stringify(arr[i]));
       const reid=o=>{ o.id=Date.now()+Math.random()*1e6;
-        // копія «Проєкту» — окремий проєкт: без projId (міграція чи перша дія заведе
-        // свій prj_<новий id>) і без звʼязку рухів з операціями Гаманця оригіналу
-        if(o.type==='project'){ delete o.projId; if(Array.isArray(o.ops)) o.ops.forEach(op=>{ if(op) delete op.finOpId; }); }
         if(isContainer(o)&&Array.isArray(o.children)) o.children.forEach(reid); };
       reid(copy); copy.pinned=false;
       arr.splice(i+1,0,copy); syncBlocks(); saveBoard(); renderBoard();
@@ -1210,114 +1139,6 @@
       const [bid,ri]=el.dataset.trdel.split('|'); const b=getBlock(bid);
       b.rows.splice(+ri,1); if(!b.rows.length)b.rows.push(b.cols.map(()=>'')); saveBoard(); renderBoard();
     });
-    // fin link
-    (window.__btRoot||board).querySelectorAll('[data-finopen]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      if(el.dataset.finopen==='debts') goDebts();
-      if(el.dataset.finopen==='spend') goSpend();
-      if(el.dataset.finopen==='envelopes') goEnvelopes();
-    });
-    // envelope widget: open linked envelope sheet
-    (window.__btRoot||board).querySelectorAll('[data-envwopen]').forEach(el=>el.onclick=e=>{
-      // тап по картці (не по кнопках) → відкрити аркуш конверта
-      if(e.target.closest('[data-envwadd]')) return;
-      e.stopPropagation();
-      goEnvelopes(); setTimeout(()=>{ try{ openEnvSheet(el.dataset.envwopen); }catch(_){} }, 80);
-    });
-    // envelope widget: quick top-up / spend right on canvas
-    (window.__btRoot||board).querySelectorAll('[data-envwadd]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const [id,t]=el.dataset.envwadd.split('|');
-      const env=envelopes.find(x=>String(x.id)===String(id)); if(!env) return;
-      if(t==='in'){
-        inputModal({title:'Поповнити «'+env.name+'» (₴)', placeholder:'Сума', onOk:(v)=>{
-          const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
-          envAddOp(env,'in',n,'Поповнення'); renderBoard();
-        }});
-      } else {
-        inputModal({title:'Витрата на «'+env.name+'»', placeholder:'На що…', onOk:(label)=>{
-          inputModal({title:'Сума (₴)', placeholder:'Напр. 500', onOk:(v)=>{
-            const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
-            envAddOp(env,'out',n,label||'Витрата'); renderBoard();
-          }});
-        }});
-      }
-    });
-    // envelope widget: link an envelope to this canvas widget
-    (window.__btRoot||board).querySelectorAll('[data-envwlink]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const b=getBlock(el.dataset.envwlink); if(!b) return;
-      if(!envelopes.length){ createEnvelopeFor(b); return; }
-      pickEnvelopeFor(b);
-    });
-    // envelope widget: create a new envelope right here and link it
-    (window.__btRoot||board).querySelectorAll('[data-envwnew]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const b=getBlock(el.dataset.envwnew); if(!b) return;
-      createEnvelopeFor(b);
-    });
-    // ===== project widget handlers =====
-    (window.__btRoot||board).querySelectorAll('[data-pjview]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const [id,v]=el.dataset.pjview.split('|');
-      const b=getBlock(id); if(!b) return;
-      b.pview=+v; saveBoard(); renderBoard();
-    });
-    (window.__btRoot||board).querySelectorAll('[data-pjsplit]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const b=getBlock(el.dataset.pjsplit); if(!b) return;
-      projSplitPreset(b);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-pjadd]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const [id,t]=el.dataset.pjadd.split('|');
-      const b=getBlock(id); if(!b) return;
-      projAddMovement(b,t);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-pjgot]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const b=getBlock(el.dataset.pjgot); if(!b) return;
-      projReceiveExpected(b);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-pjenv]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const b=getBlock(el.dataset.pjenv); if(!b) return;
-      projDistributeToEnvelope(b);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-pjdel]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const [id,opId]=el.dataset.pjdel.split('|');
-      const b=getBlock(id); if(!b) return;
-      confirmSheet({title:'Видалити рух?', onOk:()=>{
-        // рух живе в проєкті Кабінету; позначка в delOps — щоб копія в блоці
-        // зі старого застосунку не повернула його назад при перенесенні
-        const P=projEnsure(b);
-        const op=P.ops.find(o=>String(o.id)===String(opId));
-        if(op&&op.finOpId) finOps=finOps.filter(f=>f.id!==op.finOpId);
-        P.ops=P.ops.filter(o=>String(o.id)!==String(opId));
-        if(!P.delOps.includes(String(opId))) P.delOps.push(String(opId));
-        projCommit(P); saveFinOps(); renderBoard();
-      }});
-    });
-    (window.__btRoot||board).querySelectorAll('[data-pjtitle]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const b=getBlock(el.dataset.pjtitle); if(!b) return;
-      inputModal({title:'Назва проєкту', value:b.title||'', onOk:(v)=>{ if((v||'').trim()){ b.title=v.trim(); const P=projEnsure(b); P.title=b.title; projCommit(P); renderBoard(); } }});
-    });
-    (window.__btRoot||board).querySelectorAll('[data-pjsetup]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const b=getBlock(el.dataset.pjsetup); if(!b) return;
-      const P=projEnsure(b);
-      inputModal({title:'Очікуваний дохід ('+(P.cur||'€')+')', value:String(P.expected||0), placeholder:'Напр. 1000', onOk:(v)=>{
-        const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,''))||0;
-        P.expected=n; if(n>0) P.unlocked=false;
-        inputModal({title:'Дедлайн (РРРР-ММ-ДД, або порожньо)', value:P.deadline||'', placeholder:'2026-07-15', onOk:(d)=>{
-          d=(d||'').trim();
-          P.deadline = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : '';
-          projCommit(P); renderBoard();
-        }});
-      }});
-    });
-
     // ===== ПРОЄКТНІ БЛОКИ: канбан =====
     (window.__btRoot||board).querySelectorAll('[data-kbaddcol]').forEach(el=>el.onclick=e=>{
       e.stopPropagation(); const b=getBlock(el.dataset.kbaddcol); if(!b) return;
@@ -1359,32 +1180,6 @@
     (window.__btRoot||board).querySelectorAll('[data-clev]').forEach(el=>el.onclick=e=>{
       e.stopPropagation(); const [id,evId]=el.dataset.clev.split('|');
       const b=getBlock(id); if(b) clwMenu(b,evId);
-    });
-    // ===== ПРОЄКТНІ БЛОКИ: фестиваль · подія =====
-    (window.__btRoot||board).querySelectorAll('[data-fstsetup],[data-fstsetup2]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const b=getBlock(el.dataset.fstsetup||el.dataset.fstsetup2); if(b) fstwSetup(b);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-fstspend]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const b=getBlock(el.dataset.fstspend); if(b) fstwSpend(b);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-fstadd]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const b=getBlock(el.dataset.fstadd); if(!b) return;
-      inputModal({title:'Пункт програми', placeholder:'Напр. Забронювати житло', onOk:(v)=>{
-        if(!(v||'').trim()) return;
-        (b.program=b.program||[]).push({id:'fp'+Date.now(),text:v.trim(),done:false});
-        saveBoard(); renderBoard();
-      }});
-    });
-    (window.__btRoot||board).querySelectorAll('[data-fstck]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,pid]=el.dataset.fstck.split('|');
-      const b=getBlock(id); const p=b&&(b.program||[]).find(x=>String(x.id)===String(pid));
-      if(p){ p.done=!p.done; saveBoard(); renderBoard(); window.platform.haptic('select'); }
-    });
-    (window.__btRoot||board).querySelectorAll('[data-fstdel]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,pid]=el.dataset.fstdel.split('|');
-      const b=getBlock(id); if(!b) return;
-      b.program=(b.program||[]).filter(x=>String(x.id)!==String(pid));
-      saveBoard(); renderBoard();
     });
 
     /* ===== АПГРЕЙДИ БЛОКІВ ===== */
@@ -1514,13 +1309,7 @@
       el.onpointerup=e=>{ if(lt){ clearTimeout(lt); lt=null; if(hmDs===ymdLocal()) toggleHm(); } };
       el.onpointercancel=()=>{ if(lt){ clearTimeout(lt); lt=null; } };
     });
-    // kpi / chart: додати значення
-    PPR.querySelectorAll('[data-kpiadd]').forEach(el=>el.onclick=e=>{ e.stopPropagation();
-      ppAsk('Нове значення KPI','число, напр. 1250','',v=>{
-        const b=getBlock(el.dataset.kpiadd); if(!b) return;
-        b.points=b.points||[]; b.points.push({d:ymdLocal(),v:parseFloat(v.replace(',','.'))||0});
-        saveBoard(); renderBoard(); });
-    });
+    // графік: додати точку
     PPR.querySelectorAll('[data-chadd]').forEach(el=>el.onclick=e=>{ e.stopPropagation();
       ppAsk('Точка графіка','мітка | число  (напр. Пн | 4)','',v=>{
         const b=getBlock(el.dataset.chadd); if(!b) return;

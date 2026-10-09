@@ -309,27 +309,11 @@
     return true;
   }
 
-  /* ===== додані віджети папок (спільні дані, різні входи) ===== */
-  // каталог доступних віджетів, які можна додати в будь-яку папку
-  const WIDGET_CATALOG = {
-    worktrack: { emoji:'⏱', t:'Години та заробіток', d:'Календар змін, ставка, зарплата, конверти', open:()=>goWork() },
-    debts:     { emoji:'🤝', t:'Борги', d:'Хто кому винен · синхрон із фінансами', open:()=>goDebts() },
-    spend:     { emoji:'🧾', t:'Витрати', d:'Куди йдуть гроші', open:()=>goSpend() },
-    envelopes: { emoji:'✉️', t:'Конверти', d:'Накопичення на мрії та проєкти · впливає на баланс', open:()=>goEnvelopes() },
-    patterns:  { emoji:'🧠', t:'Патерни', d:'Перехват лазівок · заміна патернів за 4 міс', open:()=>goPatterns() },
-    planday:   { emoji:'📅', t:'План на день', d:'Точки проєкту в сьогоднішньому розкладі · синхрон із Планером', open:()=>plFolderDaySheet(currentFolderKey) },
-    planmonth: { emoji:'🗓', t:'План на місяць', d:'Календар точок проєкту + найближчі', open:()=>plFolderMonthSheet(currentFolderKey) },
-  };
-  let folderWidgets={}; // { folderKey: ['worktrack', ...] }
+  /* Старий каталог віджетів папки (WIDGET_CATALOG) прибрано 09.10.2026: його ніде не показували.
+     Сховище folder_widgets лишається — його читає завантаження і чистить видалення папки. */
+  let folderWidgets={}; // { folderKey: [...] } — лише старі дані
   const FWKEY='folder_widgets';
   function saveFolderWidgets(){ try{ const p=window.storage.set(FWKEY,JSON.stringify(folderWidgets),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
-  function addWidgetToFolder(key,id){
-    if(!WIDGET_CATALOG[id]) return;
-    if(!folderWidgets[key]) folderWidgets[key]=[];
-    if(!folderWidgets[key].includes(id) && !((folders[key]&&folders[key].widgets||[]).some(w=>w.id===id))){
-      folderWidgets[key].push(id); saveFolderWidgets();
-    }
-  }
 
   function orderedFolderKeys(){
     // pinned first, keep order otherwise

@@ -1726,14 +1726,7 @@
           emoji:safeEmoji(f.emoji, role==='project'?'🚀':'📁'), name:String(f.name).slice(0,40), pct:0, photo:'', flayout:'a',
           pinned:false, custom:true, widgets:[], parent:'', role:role, status:role==='project'?'active':'', due:due};
         order.push(key);
-        // віджети з каталогу
-        const wids=[];
-        (Array.isArray(f.widgets)?f.widgets:[]).forEach(wid=>{
-          wid=String(wid||'').trim();
-          if(typeof WIDGET_CATALOG!=='undefined'&&WIDGET_CATALOG[wid]&&typeof addWidgetToFolder==='function'){
-            try{ addWidgetToFolder(key,wid); wids.push(wid); }catch(_){}
-          }
-        });
+        // старий каталог віджетів папки (folder_widgets) прибрано 09.10.2026 — його ніде не показували
         if(typeof saveFolders==='function') saveFolders();
         try{ renderDashboard(); }catch(_){}
         undo.folders.push(key);

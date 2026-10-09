@@ -1,0 +1,59 @@
+  /* ============ ВІДЖЕТИ «ГРОШІ» (48-widgets.js): вигляд A «Плитки», як віджети iPhone ============ */
+  .wg-home{margin:4px 0 14px;}
+  .wg-home[hidden]{display:none;}
+  .wg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  @media (min-width:900px){ .wg-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;} }   /* 2+1 · 1+2 — без дірок */
+  .wg-grid .wg-host:has(.wg-t.wide){grid-column:span 2;}
+  .wg-host{min-width:0;}
+  .pgwg{padding:4px 0;}
+  .pgwg .wg-t{max-width:520px;}
+  .wg-t{position:relative;overflow:hidden;box-sizing:border-box;min-height:150px;height:100%;padding:13px 13px 12px;border-radius:24px;color:#fff;
+    display:flex;flex-direction:column;gap:5px;box-shadow:0 10px 24px rgba(0,0,0,.18);}
+  .wg-t::after{content:"";position:absolute;right:-36px;top:-36px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none;}
+  .wg-t.c-wallet{background:linear-gradient(135deg,#3a4cff,#7f8cff 50%,#c48cff);}
+  .wg-t.c-mission{background:linear-gradient(135deg,color-mix(in srgb,var(--mc,#34c77b) 78%,#000),var(--mc,#34c77b));}
+  .wg-t.c-env{background:linear-gradient(135deg,#f0b429,#ff9f43);color:#241500;}
+  .wg-t.c-debt{background:linear-gradient(135deg,#ff4d6d,#ff7a59);}
+  .wg-t.c-in{background:linear-gradient(135deg,#0f9d77,#34c77b);}
+  .wg-t.c-out{background:linear-gradient(135deg,#d9480f,#ff7a59);}
+  .wg-t.c-none{background:var(--card);color:var(--muted);border:1px solid var(--line);}
+  /* весь віджет — одна велика ціль тапу; кнопки й рядки лежать вище за неї */
+  .wg-hit{all:unset;position:absolute;inset:0;cursor:pointer;z-index:0;border-radius:inherit;}
+  .wg-hit:focus-visible{outline:3px solid #fff;outline-offset:-3px;}
+  .wg-t>*:not(.wg-hit){position:relative;z-index:1;}
+  .wg-t>span:not(.wg-acts):not(.wg-foot):not(.wg-two):not(.wg-bar),.wg-t>b,.wg-t>small{pointer-events:none;}
+  .wg-h{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:30px;}
+  .wg-big{font-size:26px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+  .wg-big.sm{font-size:17px;}
+  .wg-t small{font-size:12px;font-weight:600;opacity:.88;color:inherit;line-height:1.3;}
+  .wg-t small.wg-pz{opacity:1;font-weight:800;}
+  .wg-bar{display:block;height:7px;border-radius:9px;background:rgba(0,0,0,.2);overflow:hidden;margin-top:auto;}
+  .wg-bar i{display:block;height:100%;background:currentColor;opacity:.85;border-radius:inherit;}
+  .wg-bar i.over{background:#fff;opacity:1;box-shadow:0 0 0 2px #ff4d6d inset;}
+  .wg-foot{display:flex;align-items:flex-end;gap:8px;margin-top:auto;}
+  .wg-rings{display:flex;gap:7px;flex:1;min-width:0;}
+  .wg-r{display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;}
+  .wg-r{--sz:40px;}
+  .wg-r::before{content:"";width:var(--sz);height:var(--sz);border-radius:50%;background:conic-gradient(#fff calc(var(--p)*1%),rgba(255,255,255,.25) 0);
+    -webkit-mask:radial-gradient(circle,transparent 13px,#000 14px);mask:radial-gradient(circle,transparent 13px,#000 14px);}
+  .wg-r em{position:absolute;top:calc(var(--sz)/2 - 7px);font-style:normal;font-size:10px;font-weight:800;}
+  .wg-r{position:relative;}
+  .wg-r small{font-size:10px;opacity:.85;}
+  .wg-fact{display:flex;gap:10px;font-size:14px;font-weight:800;flex:1;pointer-events:none;}
+  .wg-acts{display:flex;gap:6px;flex:none;}
+  .wg-acts button,.wg-li,.wg-cfg,.wg-rules{all:unset;box-sizing:border-box;cursor:pointer;}
+  .wg-acts button{min-width:44px;min-height:44px;padding:0 10px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.24);font-size:18px;font-weight:800;}
+  .wg-acts.one{margin-top:auto;} .wg-acts.one button{flex:1;font-size:14px;min-height:40px;}
+  .wg-t.c-env .wg-acts button{background:rgba(0,0,0,.12);}
+  .wg-li{display:flex;justify-content:space-between;gap:6px;align-items:center;min-height:30px;padding:3px 8px;margin:0 -4px;border-radius:10px;font-size:12.5px;font-weight:700;background:rgba(0,0,0,.08);}
+  .wg-li span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .wg-li b{flex:none;font-variant-numeric:tabular-nums;}
+  .wg-li i{font-style:normal;color:#9a1b00;font-weight:800;}
+  .wg-li+.wg-li{margin-top:2px;} .wg-t.c-env .wg-big{margin-bottom:auto;}
+  .wg-t>.wg-cfg{position:absolute;right:8px;top:8px;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:rgba(0,0,0,.18);font-size:14px;z-index:2;}
+  .wg-two{display:flex;align-items:flex-end;gap:10px;margin-top:auto;}
+  .wg-two>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;pointer-events:none;}
+  .wg-rules{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;min-height:44px;justify-content:center;padding:6px 10px;border-radius:14px;background:rgba(255,255,255,.2);}
+  .wg-rules b{font-size:14px;font-weight:800;} .wg-rules small{font-size:11px;}
+  /* сторінка папки: старий фінансовий віджет — заглушка до прибирання */
+  .pg-oldw{padding:10px 12px;border-radius:12px;border:1px dashed var(--line);color:var(--muted);font-size:13px;line-height:1.45;}
+  .pg-oldw b{color:var(--text);}

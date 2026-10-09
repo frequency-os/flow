@@ -13,12 +13,13 @@
   prefCatchup('folderview', v=>{ const n=fvNorm(v); if(n){ homeFolderView=n; try{ renderDashboard(); }catch(_){} } });
   /* розмір плиток (s/m/l), порядок (вручну/за назвою), фото на всю плитку —
      одним легким налаштуванням 'folderopts' (prefSet: сирий ключ + копія в хмарі) */
-  const FOPT_DEF={size:'m', sort:'manual', covers:1};
+  const FOPT_DEF={size:'m', sort:'manual', covers:1, money:1};
   function foptParse(raw){
     let o={}; try{ o=JSON.parse(raw||'{}')||{}; }catch(_){}
     return { size:['s','m','l'].includes(o.size)?o.size:'m',
              sort:o.sort==='name'?'name':'manual',
-             covers:o.covers===0?0:1 };
+             covers:o.covers===0?0:1,
+             money:o.money===0?0:1 };   // віджети «Гроші» на Огляді (48-widgets.js)
   }
   let folderOpts=Object.assign({},FOPT_DEF);
   try{ folderOpts=foptParse(localStorage.getItem('folderopts')); }catch(_){}
@@ -270,6 +271,7 @@
   function renderDashboard(){
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
+    try{ if(typeof wgHome==='function') wgHome(); }catch(e){ console.error('wgHome',e); }   // віджети «Гроші» (48-widgets.js)
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag',
@@ -545,6 +547,7 @@
       ${seg('size','Розмір плиток',[['l','Великі'],['m','Звичайні'],['s','Дрібні']],folderOpts.size)}
       ${seg('sort','Порядок',[['manual','Вручну'],['name','За назвою']],folderOpts.sort)}
       <button type="button" class="fvs-tog" data-fotog role="switch" aria-checked="${folderOpts.covers?'true':'false'}"><span class="fvs-tt">Фото на всю плитку<small>вимкнеш — усі папки будуть кольоровими обкладинками</small></span><i class="fvs-sw" aria-hidden="true"></i></button>
+      <button type="button" class="fvs-tog" data-fomoney role="switch" aria-checked="${folderOpts.money?'true':'false'}"><span class="fvs-tt">Гроші на Огляді<small>Гаманець, місія, конверти, борги й правила — над папками</small></span><i class="fvs-sw" aria-hidden="true"></i></button>
       <div class="fvs-acts">
         ${fmRow('merge','group','Обʼєднати папки в групу','')}
         ${fmRow('newf','plus','Нова папка','')}
@@ -561,6 +564,7 @@
       });
       const tg=m.querySelector('[data-fotog]');
       tg.onclick=()=>{ setFolderOpt('covers', folderOpts.covers?0:1); tg.setAttribute('aria-checked',folderOpts.covers?'true':'false'); };
+      { const mt=m.querySelector('[data-fomoney]'); if(mt) mt.onclick=()=>{ setFolderOpt('money', folderOpts.money?0:1); mt.setAttribute('aria-checked',folderOpts.money?'true':'false'); }; }
       m.querySelector('[data-fvdone]').onclick=closeFolderMenu;
       m.querySelectorAll('.fvs-acts [data-act]').forEach(b=>b.onclick=()=>{
         const a=b.dataset.act;

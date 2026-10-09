@@ -7,6 +7,7 @@
     {id:'struct', t:'Структура', ic:'toggle'},
     {id:'media',  t:'Медіа',     ic:'photo'},
     {id:'data',   t:'Дані',      ic:'db'},
+    {id:'money',  t:'Гроші',     ic:'envelope'},
     {id:'ai',     t:'AI',        ic:'text'},
   ];
   var CATALOG=[
@@ -28,7 +29,13 @@
     {cat:'struct',k:'divider',t:'Роздільник',d:'Лінія між секціями',  c:'#8b93a3', ic:'divider'},
     {cat:'base',k:'code',   t:'Код',        d:'Моноширинний + копіювати', c:'#4ecdc4', ic:'code'},
     {cat:'data',k:'pbar',   t:'Прогрес',    d:'Смуга виконання 0–100%, або авто з задач', c:'#34c77b', ic:'pbar'},
-    {cat:'data',k:'envelope', t:'Конверт',  d:'Бюджет/накопичення під ціль — з Грошей',   c:'#c77dff', ic:'envelope'},
+    /* ═══ Гроші (48-widgets.js, 09.10.2026) — вікна в Гаманець ═══ */
+    {cat:'money', k:'wgin',     t:'Доходи',        d:'Дохід цієї папки: тип (основний/додатковий/пасивний), ціль', c:'#34c77b', ic:'envelope'},
+    {cat:'money', k:'wgout',    t:'Витрати',       d:'Витрати цієї папки з лімітом на місяць',  c:'#ff7a59', ic:'envelope'},
+    {cat:'money', k:'wgwallet', t:'Гаманець',      d:'Баланс, прогноз місяця, кільця, − / ＋',   c:'#7f8cff', ic:'envelope'},
+    {cat:'money', k:'wgmission',t:'Гроші місії',   d:'Дохід, бюджет і приз місії цієї папки',   c:'#34c77b', ic:'envelope'},
+    {cat:'money', k:'wgenv',    t:'Конверти й платежі', d:'Сума в конвертах і найближчі рядки Плану', c:'#f0b429', ic:'envelope'},
+    {cat:'money', k:'wgdebt',   t:'Борги й правила', d:'Хто кому винен, серія, дисципліна',     c:'#ff4d6d', ic:'envelope'},
     {cat:'data',k:'wplanday', t:'План на день', d:'Точки з Планера для папки-проєкту',    c:'#5b8def', ic:'countdown'},
     {cat:'data',k:'wplanmonth',t:'План на місяць', d:'Ритм проєкту за місяць з Планера',  c:'#5b8def', ic:'calendar'},
     {cat:'data',  k:'countdown',t:'Відлік',  d:'Живий таймер до дати',  c:'#e8843c', ic:'countdown'},
@@ -39,7 +46,6 @@
     /* ═══ PREMIUM PACK V1 ═══ */
     {cat:'struct',k:'tabs',   t:'Таби',      d:'Кілька вкладок в одному блоці', c:'#9b8cff', ic:'tabs'},
     {cat:'data',  k:'heatmap', t:'Хітмапа',   d:'12 тижнів звички клітинками',   c:'#34c77b', ic:'heatmap'},
-    {cat:'data',  k:'kpi',     t:'KPI',       d:'Число + дельта + спарклайн',    c:'#6a7dff', ic:'kpi'},
     {cat:'data',  k:'chart',   t:'Графік',    d:'Точки даних: bar або line',     c:'#5b8def', ic:'chartW'},
     {cat:'data',  k:'wfocus',  t:'Фокус',     d:'Помодоро 25/5 із кільцем',      c:'#e8843c', ic:'wfocus'},
   ];
@@ -66,7 +72,8 @@
     habits:['habit','звички','streak','трекер'],
     tabs:['tabs','вкладки','таби'],
     heatmap:['heatmap','хітмапа','calendar','активність'],
-    kpi:['kpi','метрика','число'],
+    wgin:['дохід','гроші','income','money','заробіток'], wgout:['витрати','гроші','expense','money'], wgwallet:['гаманець','баланс','wallet','гроші'],
+    wgmission:['місія','гроші','бюджет'], wgenv:['конверт','платежі','план'], wgdebt:['борги','правила','debt'],
     chart:['chart','графік','graph','діаграма'],
     wfocus:['focus','фокус','pomodoro','помодоро'],
     ai:['ai','ші','штучний','флоу']
@@ -83,7 +90,6 @@
     embed:'<rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/>',
     audioW:'<path d="M4 10v4M8 6v12M12 9v6M16 4v16M20 8v8" stroke-linecap="round"/>',
     heatmap:'<rect x="3" y="3" width="4" height="4" rx="1"/><rect x="10" y="3" width="4" height="4" rx="1"/><rect x="17" y="3" width="4" height="4" rx="1"/><rect x="3" y="10" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="10" width="4" height="4" rx="1"/><rect x="3" y="17" width="4" height="4" rx="1"/><rect x="10" y="17" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="17" width="4" height="4" rx="1"/>',
-    kpi:'<path d="M3 17l6-6 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h6v6" stroke-linecap="round" stroke-linejoin="round"/>',
     chartW:'<path d="M4 20V10M10 20V4M16 20v-8M21 20H3" stroke-linecap="round"/>',
     wfocus:'<circle cx="12" cy="13" r="8"/><path d="M12 13l3-3M12 3v2M9 3h6" stroke-linecap="round"/>',
     h1:'<path d="M4 6v12M12 6v12M4 12h8M17 18V9l-3 2" stroke-linecap="round" stroke-linejoin="round"/>',

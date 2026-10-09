@@ -11,11 +11,11 @@
 
   /* 09.10.2026: у нижній панелі на цьому місці тепер «Журнал героя» (41-journal.js) для всіх,
      «Мій світ» відкривається кнопкою «Карта» з Журналу. Панель і сайдбар більше не чіпаємо:
-     «Мій світ» і «Гроші» лишаються прихованими в панелі (Гаманець — чипом на Огляді). */
+     «Мій світ» лишається прихованим; «Гаманець» — у панелі після AI. */
   function worldApplyNav(){
     const nw=document.getElementById('navWorld'), nf=document.getElementById('navFinance');
     if(nw) nw.hidden=true;
-    if(nf) nf.hidden=true;
+    if(nf) nf.hidden=false;   // 09.10.2026: «Гаманець» знову в панелі — після AI
     const dw=document.querySelector('.dsb-i[data-dnav="world"]'); if(dw) dw.hidden=true;
   }
 

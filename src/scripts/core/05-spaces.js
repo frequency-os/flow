@@ -624,11 +624,11 @@
   }catch(_){}
 
   // наповнення правої панелі: конфігуроване користувачем (вибір/порядок/вимкнення)
-  const RR_DEFS={tasks:'🎯 Завдання', streak:'🔥 Streak', bal:'💰 Баланс', tip:'⚡ Підказка'};
+  const RR_DEFS={tasks:'🎯 Завдання', streak:'🔥 Streak', tip:'⚡ Підказка'};   // «💰 Баланс» прибрано 09.10.2026 — гроші тепер віджети «Гроші» на Огляді
   function rrCfg(){
     try{ const j=JSON.parse(localStorage.getItem('rrail_cfg')||''); 
       if(Array.isArray(j)&&j.length&&j.every(x=>x&&RR_DEFS[x.id])) return j; }catch(_){}
-    return [{id:'tasks',on:true},{id:'streak',on:true},{id:'bal',on:true},{id:'tip',on:true}];
+    return [{id:'tasks',on:true},{id:'streak',on:true},{id:'tip',on:true}];
   }
   function rrSave(c){ try{ localStorage.setItem('rrail_cfg',JSON.stringify(c)); }catch(_){} }
   function rrCfgSheet(){
@@ -664,18 +664,12 @@
     // streak звичок (якщо доступно) — фолбек на 0
     let streak=0;
     try{ if(typeof habitStreak==='number') streak=habitStreak; }catch(_){}
-    // фінансовий баланс
-    let bal=null;
-    try{ if(typeof debtItems!=='undefined'){ let owe=0,owed=0; debtItems.forEach(i=>{ if(i.cur==='UAH'){const v=balance(i); i.kind==='owe'?owe+=v:owed+=v;} }); bal=owed-owe; } }catch(_){}
 
     const W={
       tasks:`<div class="wgt" style="--wc:#5b8def"><div class="wh"><div class="wi">🎯</div><div><div class="wn">${taskTotal?taskTotal:'0'} завдань</div></div></div>
         <div class="wd">${taskTotal?`${taskDone} виконано · ${taskTotal-taskDone} лишилось`:'Додай завдання у папці'}</div></div>`,
       streak:`<div class="wgt" style="--wc:#34c77b"><div class="wh"><div class="wi">🔥</div><div><div class="wn">Streak ${streak} дн.</div></div></div>
         <div class="wd">${streak?'Звички тримаються':'Почни звичку сьогодні'}</div></div>`,
-      bal:(bal!==null?`<div class="wgt" style="--wc:#e8843c"><div class="wh"><div class="wi">💰</div><div><div class="wn">Баланс</div></div></div>
-        <div class="wbig" style="color:${bal<0?'var(--owe)':'var(--owed)'}">${(bal>0?'+':'')+ (typeof fmt==='function'?fmt(bal):bal)} ₴</div>
-        <div class="wd">борги · чистий</div></div>`:''),
       tip:`<div class="wgt" style="--wc:#c77dff"><div class="wh"><div class="wi">⚡</div><div><div class="wn">Швидко</div></div></div>
         <div class="wd">Відкрий папку, щоб додати блок</div></div>`
     };

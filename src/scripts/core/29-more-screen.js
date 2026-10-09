@@ -266,6 +266,11 @@
             <p class="acc-hint" data-acc-ph-count>Фото: рахую…</p>
             <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом: і з цього пристрою, і ті, що поки лежать лише в хмарі (їх бекап спершу докачає). Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
           </div>
+          <div class="acc-row" data-acc-oldw role="button" tabindex="0">
+            ${ico('backup','slate')}
+            <div class="acc-rtext"><div class="acc-rtitle">Старі віджети</div><div class="acc-rsub">прибрати старі «Фінанси», «Конверт», «Проєкт», «Фестиваль», KPI зі сторінок папок</div></div>
+            ${chev()}
+          </div>
           <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
             ${ico('disk','slate')}
             <div class="acc-rtext" style="flex:1;min-width:0">
@@ -340,6 +345,7 @@
       };
 
       const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
+      { const ow=host.querySelector('[data-acc-oldw]'); if(ow) ow.onclick=()=>{ try{ wgOldCleanup(); }catch(e){ console.error('wgOldCleanup',e); } }; }   // 48-widgets.js
 
       // ── скидання до заводських ──
       // Бекап перед стиранням не беремо на віру: якщо файл лише віддано браузеру

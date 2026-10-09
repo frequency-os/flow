@@ -155,7 +155,6 @@
     if(type==='head')  Object.assign(base,{title:'Нова секція'});
     /* PREMIUM PACK V1 */
     if(type==='heatmap') Object.assign(base,{title:'Звичка',marks:{}});
-    if(type==='kpi')     Object.assign(base,{title:'KPI',unit:'',points:[]});
     if(type==='chart')   Object.assign(base,{title:'Графік',points:[],view:'bar'});
     if(type==='tabs')    Object.assign(base,{title:'',tabs:[{name:'Нотатки',text:''}],ti:0});
     if(type==='accord')  Object.assign(base,{title:'',secs:[{name:'Секція',text:'',open:1}]});
@@ -163,9 +162,6 @@
     if(type==='embed')   Object.assign(base,{title:'Відео',url:'',play:0});
     if(type==='audio')   Object.assign(base,{title:'',url:'',name:''});
     if(type==='wfocus')  Object.assign(base,{title:'Фокус',mode:'work',end:0,done:0,doneD:''});
-    if(type==='fin')   Object.assign(base,{title:'Фінанси'});
-    if(type==='envelope') Object.assign(base,{title:'Конверт',envId:null});
-    if(type==='project') Object.assign(base,{title:'Проєкт',ops:[],expected:0,cur:'€',deadline:'',unlocked:false,pview:1});
     if(type==='divider') Object.assign(base,{title:''});
     if(type==='quote') Object.assign(base,{text:'',title:'Цитата'});
     if(type==='glass') Object.assign(base,{text:'',title:'Скло'});
@@ -190,7 +186,6 @@
       {id:'kc'+(Date.now()+2),name:'Готово',cards:[]}]});
     if(type==='contacts') Object.assign(base,{title:'Контакти',people:[]});
     if(type==='caseline') Object.assign(base,{title:'Таймлайн справи',events:[]});
-    if(type==='festival') Object.assign(base,{title:'Нова подія',emojiF:'🎪',date:'',dateEnd:'',place:'',budget:0,cur:'€',ops:[],program:[]});
     return base;
   }
 
