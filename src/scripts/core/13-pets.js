@@ -109,10 +109,12 @@
         </label>
         <button class="fx-test" id="fxTest">Показати приклад</button>
       </div>
+      ${heroOf(petCur())?'<button class="fx-test" id="heroWardBtn" style="margin-top:10px">👕 Шафа героя — одяг і свій напис</button>':''}
       <div class="ai-actions"><button class="sec" data-petclose>Готово</button></div></div>`;
     document.body.appendChild(ov);
     ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
     ov.querySelector('[data-petclose]').onclick=()=>ov.remove();
+    { const hw=ov.querySelector('#heroWardBtn'); if(hw) hw.onclick=()=>{ ov.remove(); heroWardrobe(petCur()); }; }
     /* @dev-only:start */
     // прихований вхід у dev: 5 швидких тапів по заголовку «Твій напарник»
     (function(){

@@ -15,6 +15,7 @@ const PRECACHE = [
   INDEX,
   './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   './hero-assets.js',     // кадри героїв загону (48-hero.js), ліниво після старту
+  './hero-outfits.js',    // одяг героїв (шафа 48-hero.js)
   './fonts-caveat.css',   // рукописний шрифт, вантажиться після першого кадру (01-base.js)
   './vendor/jszip.min.js', './vendor/pdf.min.js', './vendor/supabase.min.js',
 ];

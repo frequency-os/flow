@@ -1204,3 +1204,19 @@
     .ai-aurora,.ai-orb,.ai-orb::before,
     [style*="petBlink"],[style*="petGlow"]{animation:none!important;}
   }
+
+  /* ── Шафа героя (48-hero.js): одяг + свій напис ── */
+  .hw-sheet{max-height:88vh;overflow:auto;}
+  .hw-prev{height:220px;display:flex;justify-content:center;align-items:flex-end;border-radius:20px;overflow:hidden;
+    background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--pc,#8b7cff) 22%,var(--card-2)),var(--card) 72%);margin:6px 0 4px;}
+  .hw-prev svg{margin-bottom:-6px;}
+  .hw-h{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 7px;}
+  .hw-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .hw-chip{border:1.5px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:7px 12px;
+    font:700 12.5px var(--font,inherit);font-family:inherit;cursor:pointer;}
+  .hw-chip.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,var(--card));}
+  .hw-chip.hw-sw{width:30px;height:30px;padding:0;border-radius:50%;}
+  .hw-chip.hw-sw.on{outline:2px solid var(--accent);outline-offset:2px;}
+  .hw-in{width:100%;box-sizing:border-box;font:600 15px inherit;font-family:inherit;padding:11px 13px;border-radius:12px;
+    border:1px solid var(--line);background:var(--field);color:var(--text);margin-bottom:8px;}
+  .hw-note{display:none;font-size:12px;color:var(--muted);margin:-2px 0 8px;}

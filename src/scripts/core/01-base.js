@@ -144,7 +144,7 @@
     // легкі налаштування (prefSet у 02-storage.js — сирий ключ + копія тут)
     'flowtheme','flowprotheme','flowcardskin','folderview','homewidgets','hometab','homeov',
     'folderopts',                                        // розмір/порядок/фото плиток папок (16-dashboard.js, 06.10.2026)
-    'sidebarcol','spacefull','fx_mode','fx_say','ai_pet','ai_voice','pet_hidden','pet_pos','pet_sleep',
+    'sidebarcol','spacefull','fx_mode','fx_say','ai_pet','hero_look','ai_voice','pet_hidden','pet_pos','pet_sleep',
     'forcedesktop','forcemobile'                         // фічу видалено; у сховищі лишається '0'
   ];
   /* ── СИРІ КЛЮЧІ localStorage (без префікса flowapp_) — опис, не реєстр сховища ──
