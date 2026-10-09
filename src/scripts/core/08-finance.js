@@ -756,7 +756,18 @@
       });
     }; }
     s.querySelector('#e2Goal').onclick=()=>inputModal({title:'Ціль конверта ('+curSym()+')', value:String(e.goal||0), onOk:(v)=>{ const n=parseInt((v||'').replace(/\D/g,'')); if(!isNaN(n)){ e.goal=n; saveEnvelopes(); renderEnvSheet(); renderFinance(); } }});
-    s.querySelector('#e2Del').onclick=()=>{ confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'Рухи в Розходах залишаться.', onOk:()=>{ envelopes=envelopes.filter(x=>String(x.id)!==String(e.id)); saveEnvelopes(); closeEnvSheet(); renderFinance(); }}); };
+    s.querySelector('#e2Del').onclick=()=>{
+      // 10.10.2026: гроші в конверті вже списані з балансу (рух «У конверт») — без повернення вони б зникли.
+      // Повертаємо залишок у вільні переказом (_tr: не дохід), як скарбничка призу, і лише тоді видаляємо.
+      if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))){ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); return; }   // інакше стара копія ляже поверх хмари
+      const sv=Math.round(envSaved(e)*100)/100;
+      const del=()=>{ envelopes=envelopes.filter(x=>String(x.id)!==String(e.id)); saveEnvelopes(); closeEnvSheet(); renderFinance(); };
+      if(sv>0) confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'У ньому '+money(sv)+' — вони повернуться у вільні гроші. Історія витрат лишиться.', okLabel:'Повернути '+money(sv)+' і видалити', onOk:()=>{
+        let card; try{ card=mainCard().id; }catch(_){}
+        finOps.push({id:'fin_'+Date.now()+Math.random().toString(36).slice(2,6), type:'in', amount:sv, label:'З конверта: '+e.name, date:ymdLocal(), env:e.name, card, _tr:true, envBack:true});
+        saveFinOps(); del(); try{ plToast('↩ '+money(sv)+' повернуто у вільні'); }catch(_){} }});
+      else confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'Він порожній. Історія витрат лишиться.', onOk:del});
+    };
     s.querySelectorAll('[data-eopdel]').forEach(el=>el.onclick=()=>{ confirmSheet({title:'Видалити цей рух?', onOk:()=>{ envDelOp(e, el.dataset.eopdel); renderEnvSheet(); renderFinance(); }}); });
   }
 
