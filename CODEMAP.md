@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 74 |
-| Рядків JS | 31405 |
-| Файлів CSS | 39 |
-| Рядків CSS | 9671 |
-| Сутностей верхнього рівня | 2016 |
+| Файлів JS | 75 |
+| Рядків JS | 31557 |
+| Файлів CSS | 40 |
+| Рядків CSS | 9733 |
+| Сутностей верхнього рівня | 2034 |
 | Ключів сховища (FLOW_KEYS) | 75 |
 
 ## Файли JS
@@ -77,6 +77,7 @@
 | `src/scripts/core/39-spheres.js` | 232 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
 | `src/scripts/core/41-journal.js` | 652 | 56 |
+| `src/scripts/core/42-day.js` | 152 | 18 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
@@ -142,6 +143,7 @@
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
 | `src/styles/core/24-home-gallery.css` | 209 | 0 |
 | `src/styles/core/25-journal.css` | 269 | 0 |
+| `src/styles/core/26-day.css` | 62 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (75)
 
@@ -2137,6 +2139,29 @@
 | `jnDaySheet` | функція | `src/scripts/core/41-journal.js:601` |
 | `jnAskReview` | функція | `src/scripts/core/41-journal.js:637` |
 | `goJournal` | функція | `src/scripts/core/41-journal.js:647` |
+
+### `src/scripts/core/42-day.js` — 18 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `DY_DOW` | масив | `src/scripts/core/42-day.js:8` |
+| `DY_MIN_GAP` | значення | `src/scripts/core/42-day.js:9` |
+| `dyGoal` | функція | `src/scripts/core/42-day.js:11` |
+| `dyColor` | функція | `src/scripts/core/42-day.js:13` |
+| `dyAddDays` | функція | `src/scripts/core/42-day.js:14` |
+| `dyCursorStart` | функція | `src/scripts/core/42-day.js:16` |
+| `dyDayEnd` | функція | `src/scripts/core/42-day.js:22` |
+| `dyWeekHTML` | функція | `src/scripts/core/42-day.js:24` |
+| `dyRow` | функція | `src/scripts/core/42-day.js:38` |
+| `dyGap` | функція | `src/scripts/core/42-day.js:47` |
+| `dyDayHTML` | функція | `src/scripts/core/42-day.js:52` |
+| `dyBind` | функція | `src/scripts/core/42-day.js:77` |
+| `dyNewId` | функція | `src/scripts/core/42-day.js:86` |
+| `dyDropReminder` | функція | `src/scripts/core/42-day.js:87` |
+| `dyRemove` | функція | `src/scripts/core/42-day.js:90` |
+| `dyMenu` | функція | `src/scripts/core/42-day.js:99` |
+| `dyFreeSlot` | функція | `src/scripts/core/42-day.js:119` |
+| `dyFromMissions` | функція | `src/scripts/core/42-day.js:126` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

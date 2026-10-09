@@ -221,7 +221,7 @@
       'твоя система вибору хвилі':'your wave-choice system', 'ЗАГАЛЬНИЙ ПРОГРЕС':'OVERALL PROGRESS',
       'КАРТА БАЖАНЬ':'WISH MAP', 'ПАПКИ':'FOLDERS', 'активних':'active', 'Налаштування':'Settings',
       // ── Планер ──
-      'плани · горизонт · квадрати':'plans · horizon · squares', 'AI-асистент':'AI assistant',
+      'плани · горизонт · квадрати':'plans · horizon · squares', 'день · тиждень · місяць':'day · week · month', 'AI-асистент':'AI assistant',
       '📅 Плани':'📅 Plans', '🎯 Горизонт':'🎯 Horizon', 'День':'Day', 'Тиждень':'Week', 'Місяць':'Month',
       '📥 Без дня':'📥 No day', '+ задача':'+ task', '+ Нова задача':'+ New task',
       'Все має свій день ✨':'Everything has its day ✨',

@@ -1,0 +1,62 @@
+  /* ============ ПЛАНЕР · ДЕНЬ «Стрічка» (42-day.js): тиждень, справи за часом, вільні проміжки ============ */
+  .dy-wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:14px;}
+  .dy-d{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:58px;padding:7px 0 6px;
+    border-radius:14px;background:var(--card);border:1px solid var(--line);}
+  .dy-d small{font-size:10.5px;color:var(--muted);font-weight:700;}
+  .dy-d b{font-size:16px;font-weight:800;color:var(--text);}
+  .dy-d.today b{color:var(--accent);}
+  .dy-d.on{background:var(--accent);border-color:var(--accent);}
+  .dy-d.on small,.dy-d.on b{color:#fff;}
+  .dy-dots{display:flex;gap:3px;height:5px;}
+  .dy-dots i{width:5px;height:5px;border-radius:50%;}
+  .dy-d.on .dy-dots i{box-shadow:0 0 0 1px rgba(255,255,255,.8);}
+
+  .dy-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+  .dy-h>div{display:flex;flex-direction:column;min-width:0;}
+  .dy-h b{font-size:24px;font-weight:800;color:var(--text);line-height:1.15;}
+  .dy-h small{font-size:13px;color:var(--muted);font-weight:600;}
+  .dy-hb{display:flex;gap:6px;flex:none;}
+  .dy-from,.dy-today{all:unset;cursor:pointer;box-sizing:border-box;min-height:44px;display:inline-flex;align-items:center;
+    font-size:14px;font-weight:800;border-radius:999px;padding:0 15px;}
+  .dy-from{background:var(--accent);color:#fff;}
+  .dy-today{background:var(--card);border:1px solid var(--line);color:var(--text);}
+
+  .dy-empty{display:flex;flex-direction:column;gap:4px;padding:16px;margin-bottom:8px;border-radius:16px;background:var(--card);border:1px dashed var(--line);
+    font-size:13px;color:var(--muted);line-height:1.45;}
+  .dy-empty b{font-size:16px;color:var(--text);}
+
+  .dy-list{display:flex;flex-direction:column;gap:6px;}
+  .dy-t{flex:none;width:46px;font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .dy-row{display:flex;align-items:center;gap:8px;--c:var(--muted);}
+  .dy-b{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:58px;padding:8px 12px;
+    background:color-mix(in srgb,var(--c) 10%,var(--card));border:1px solid var(--line);border-left:4px solid var(--c);border-radius:16px;}
+  .dy-row.plain .dy-b{background:var(--card);}
+  .dy-ic{flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:19px;background:color-mix(in srgb,var(--c) 22%,var(--field));}
+  .dy-tx{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .dy-tx b{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dy-tx small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dy-ck{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+    border:2.5px solid var(--c);font-size:20px;font-weight:900;color:#fff;}
+  .dy-row.plain .dy-ck{border-color:var(--line);}
+  .dy-row.done .dy-ck{background:var(--c);}
+  .dy-row.plain.done .dy-ck{background:var(--accent);border-color:var(--accent);}
+  .dy-row.done .dy-tx b{text-decoration:line-through;opacity:.6;}
+  .dy-row.done .dy-b{opacity:.75;}
+
+  .dy-gap{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;font-weight:600;color:var(--muted);}
+  .dy-gap>span:nth-child(2){flex:1;border:1.5px dashed var(--line);border-radius:14px;padding:10px 12px;}
+  .dy-gap b{flex:none;width:44px;height:44px;display:grid;place-items:center;font-size:20px;color:var(--accent);}
+
+  .dy-now{display:flex;align-items:center;gap:8px;}
+  .dy-now .dy-t{color:#ff4d6d;font-weight:800;}
+  .dy-now i{flex:1;height:2px;border-radius:1px;background:#ff4d6d;position:relative;}
+  .dy-now i::before{content:'';position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:#ff4d6d;}
+  .dy-pad{height:110px;}
+
+  /* шторка «Взяти з місій» (у спільній jnOverlay) */
+  .dy-fm-sub{font-size:13px;color:var(--muted);line-height:1.4;}
+  .dy-fm{display:flex;flex-direction:column;gap:8px;}
+  .dy-fm-i{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:11px;min-height:62px;padding:10px 12px;
+    background:color-mix(in srgb,var(--c) 10%,var(--card));border:1px solid var(--line);border-left:4px solid var(--c);border-radius:16px;}
+  .dy-fm-i .dy-tx{flex:1;}
+  .dy-fm-i i{font-style:normal;flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:800;color:#fff;background:var(--c);}

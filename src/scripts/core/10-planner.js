@@ -466,7 +466,7 @@
 
     let hero;
     if(p.scope==='day'){
-      hero=`${plWeekCalHTML()}${plNowCardHTML()}${plRolloverHTML()}`;
+      hero='';   // «День» — стрічка 42-day.js (тиждень у ній самій)
     } else {
       hero=`<div class="pl-hero"><div class="pl-hero-row">${plRing(pct,'var(--accent)')}
         <div class="pl-hero-info"><h3>${titles[p.scope]}</h3><p>Прогрес періоду · ${done}/${periodTasks.length}</p>
@@ -492,7 +492,7 @@
       }
       body=`<div class="seclbl">${plIco('goal',13)} Цілі кварталу</div>${body}`;
     } else if(p.scope==='day'){
-      body=plMatrixHTML()+plDayHTML()+plQuickAddHTML()+plInboxHTML()+plDaySummaryHTML();
+      body=dyDayHTML();   // етап 5: матриця, «Вхідні», перенесення, підсумок і фокус з екрана прибрано — дані лишились
     } else {
       const lbl=p.scope==='week'?'✅ Задачі тижня':'📅 Плани місяця';
       const items=periodTasks.length?periodTasks.map((t)=>plTaskCard(t)).join('')
@@ -679,7 +679,7 @@
       };
       const rn=c.querySelector('[data-plronope]'); if(rn) rn.onclick=()=>{ p.rolloverDismissed=plTodayStr(); saveGoals(); plRerender(); };
     }
-    if(p.scope==='day') plNowTick();
+    if(p.scope==='day') dyBind(c);
   }
 
   // ===== Живий Pomodoro =====
