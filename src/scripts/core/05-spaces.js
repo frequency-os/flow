@@ -151,11 +151,12 @@
       if(bm){ bm.classList.remove('lg-play'); void bm.offsetWidth; bm.classList.add('lg-play'); } }
     if(id==='scr-finance'){ const nf=document.getElementById('navFinance'); if(nf) nf.classList.add('on'); }
     if(id==='scr-world'){ const nw=document.getElementById('navWorld'); if(nw) nw.classList.add('on'); }
+    if(id==='scr-journal'){ const nj=document.getElementById('navJournal'); if(nj) nj.classList.add('on'); }
     if(id==='scr-goals'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
     if(id==='scr-planner'){ const np=document.getElementById('navPlanner'); if(np) np.classList.add('on'); }
     if(id==='scr-more'||id==='scr-projects'||id==='scr-work'){ const nmr=document.getElementById('navMore'); if(nmr) nmr.classList.add('on'); }
     // синхронізація десктопного сайдбару
-    const dmap={'scr-home':'home','scr-goals':'planner','scr-projects':'projects',
+    const dmap={'scr-journal':'journal','scr-home':'home','scr-goals':'planner','scr-projects':'projects',
                 'scr-finance':'finance','scr-planner':'planner','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home','scr-world':'world'};
     const dkey=dmap[id]||'home';
     document.querySelectorAll('.dsb-i').forEach(b=>b.classList.toggle('on', b.dataset.dnav===dkey));

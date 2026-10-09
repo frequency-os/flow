@@ -9,12 +9,14 @@
   let worldShown=false;
   function worldOn(){ try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
 
+  /* 09.10.2026: у нижній панелі на цьому місці тепер «Журнал героя» (41-journal.js) для всіх,
+     «Мій світ» відкривається кнопкою «Карта» з Журналу. Панель і сайдбар більше не чіпаємо:
+     «Мій світ» і «Гроші» лишаються прихованими в панелі (Гаманець — чипом на Огляді). */
   function worldApplyNav(){
-    const on=worldOn();
     const nw=document.getElementById('navWorld'), nf=document.getElementById('navFinance');
-    if(nw) nw.hidden=!on;
-    if(nf) nf.hidden=on;
-    const dw=document.querySelector('.dsb-i[data-dnav="world"]'); if(dw) dw.hidden=!on;
+    if(nw) nw.hidden=true;
+    if(nf) nf.hidden=true;
+    const dw=document.querySelector('.dsb-i[data-dnav="world"]'); if(dw) dw.hidden=true;
   }
 
   // міст для гри: лише читання; open() — перехід у розділ Frequency

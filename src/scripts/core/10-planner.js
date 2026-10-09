@@ -36,6 +36,8 @@
     if(!tpl||!tpl.repeat||!tpl.repeat.type) return false;
     if(tpl.active===false) return false;
     if(ds<tpl.startDate) return false;
+    // період місії (41-journal.js): після кінцевої дати блок більше не ставиться
+    if(tpl.endDate && ds>tpl.endDate) return false;
     const dow=new Date(ds+'T12:00:00').getDay();
     if(tpl.repeat.type==='daily') return true;
     if(tpl.repeat.type==='weekdays') return dow>=1&&dow<=5;
