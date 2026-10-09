@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 79 |
-| Рядків JS | 32526 |
-| Файлів CSS | 44 |
-| Рядків CSS | 10127 |
-| Сутностей верхнього рівня | 2150 |
+| Файлів JS | 80 |
+| Рядків JS | 32837 |
+| Файлів CSS | 45 |
+| Рядків CSS | 10181 |
+| Сутностей верхнього рівня | 2175 |
 | Ключів сховища (FLOW_KEYS) | 75 |
 
 ## Файли JS
@@ -50,7 +50,7 @@
 | `src/scripts/core/12-ai-agent.js` | 1838 | 94 |
 | `src/scripts/core/13-pets.js` | 216 | 13 |
 | `src/scripts/core/14-react.js` | 335 | 43 |
-| `src/scripts/core/15-flow-spot.js` | 2064 | 97 |
+| `src/scripts/core/15-flow-spot.js` | 2066 | 97 |
 | `src/scripts/core/16-dashboard.js` | 1030 | 56 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 195 | 18 |
@@ -76,12 +76,13 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 232 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 728 | 61 |
+| `src/scripts/core/41-journal.js` | 733 | 61 |
 | `src/scripts/core/42-day.js` | 314 | 35 |
 | `src/scripts/core/43-month.js` | 244 | 32 |
 | `src/scripts/core/44-prizes.js` | 166 | 23 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
-| `src/scripts/core/46-wallet.js` | 163 | 18 |
+| `src/scripts/core/46-wallet.js` | 167 | 18 |
+| `src/scripts/core/47-rules.js` | 300 | 25 |
 | `src/scripts/page-editor/01-palette.js` | 177 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 904 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 602 | 27 |
@@ -152,6 +153,7 @@
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
 | `src/styles/core/30-wallet.css` | 61 | 0 |
+| `src/styles/core/31-rules.css` | 54 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (75)
 
@@ -1272,11 +1274,11 @@
 | `plScheduleStep` | функція | `src/scripts/core/15-flow-spot.js:1679` |
 | `plMicroBlock` | функція | `src/scripts/core/15-flow-spot.js:1696` |
 | `plCompleteBlock` | функція | `src/scripts/core/15-flow-spot.js:1709` |
-| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1764` |
-| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1780` |
-| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1788` |
-| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:2010` |
-| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:2013` |
+| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1765` |
+| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1782` |
+| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1790` |
+| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:2012` |
+| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:2015` |
 
 ### `src/scripts/core/16-dashboard.js` — 56 сутностей
 
@@ -2133,25 +2135,25 @@
 | `jnFloatRender` | функція | `src/scripts/core/41-journal.js:200` |
 | `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:214` |
 | `jnRenderToday` | функція | `src/scripts/core/41-journal.js:222` |
-| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:297` |
-| `jnDone` | функція | `src/scripts/core/41-journal.js:310` |
-| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:315` |
-| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:319` |
-| `jnStoryView` | функція | `src/scripts/core/41-journal.js:345` |
-| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:376` |
-| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:385` |
-| `jnOverlay` | функція | `src/scripts/core/41-journal.js:401` |
-| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:414` |
-| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:422` |
-| `jnTplDows` | функція | `src/scripts/core/41-journal.js:425` |
-| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:432` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:453` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:580` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:585` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:663` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:674` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:710` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:721` |
+| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:300` |
+| `jnDone` | функція | `src/scripts/core/41-journal.js:313` |
+| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:318` |
+| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:322` |
+| `jnStoryView` | функція | `src/scripts/core/41-journal.js:348` |
+| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:379` |
+| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:388` |
+| `jnOverlay` | функція | `src/scripts/core/41-journal.js:404` |
+| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:417` |
+| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:425` |
+| `jnTplDows` | функція | `src/scripts/core/41-journal.js:428` |
+| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:435` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:456` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:583` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:588` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:666` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:679` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:715` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:726` |
 
 ### `src/scripts/core/42-day.js` — 35 сутностей
 
@@ -2298,14 +2300,44 @@
 | `wlRing` | функція | `src/scripts/core/46-wallet.js:21` |
 | `wlOpRow` | функція | `src/scripts/core/46-wallet.js:22` |
 | `wlRender` | функція | `src/scripts/core/46-wallet.js:30` |
-| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:42` |
-| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:66` |
-| `wlBind` | функція | `src/scripts/core/46-wallet.js:76` |
-| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:90` |
-| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:114` |
-| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:129` |
-| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:135` |
-| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:148` |
+| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:44` |
+| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:68` |
+| `wlBind` | функція | `src/scripts/core/46-wallet.js:78` |
+| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:92` |
+| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:117` |
+| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:132` |
+| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:138` |
+| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:151` |
+
+### `src/scripts/core/47-rules.js` — 25 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `RL` | масив | `src/scripts/core/47-rules.js:8` |
+| `rlDef` | функція | `src/scripts/core/47-rules.js:17` |
+| `rlCfg` | функція | `src/scripts/core/47-rules.js:18` |
+| `rlOn` | функція | `src/scripts/core/47-rules.js:20` |
+| `rlN` | функція | `src/scripts/core/47-rules.js:21` |
+| `rlUnit` | функція | `src/scripts/core/47-rules.js:22` |
+| `rlFlow` | функція | `src/scripts/core/47-rules.js:23` |
+| `rlMark` | функція | `src/scripts/core/47-rules.js:25` |
+| `rlDiscipline` | функція | `src/scripts/core/47-rules.js:32` |
+| `rlOffer` | функція | `src/scripts/core/47-rules.js:38` |
+| `rlOnBlockDone` | функція | `src/scripts/core/47-rules.js:51` |
+| `rlOnOp` | функція | `src/scripts/core/47-rules.js:88` |
+| `rlSalarySheet` | функція | `src/scripts/core/47-rules.js:108` |
+| `rlEasyCand` | функція | `src/scripts/core/47-rules.js:136` |
+| `rlJournalHTML` | функція | `src/scripts/core/47-rules.js:154` |
+| `rlJournalBind` | функція | `src/scripts/core/47-rules.js:164` |
+| `rlBook` | функція | `src/scripts/core/47-rules.js:180` |
+| `rlSalaryTpl` | функція | `src/scripts/core/47-rules.js:210` |
+| `rlPlan` | функція | `src/scripts/core/47-rules.js:232` |
+| `rlPlanFact` | функція | `src/scripts/core/47-rules.js:240` |
+| `rlPrevYm` | функція | `src/scripts/core/47-rules.js:241` |
+| `rlPlanHTML` | функція | `src/scripts/core/47-rules.js:242` |
+| `rlPlanBind` | функція | `src/scripts/core/47-rules.js:264` |
+| `rlPlanEdit` | функція | `src/scripts/core/47-rules.js:272` |
+| `rlPlanRowMenu` | функція | `src/scripts/core/47-rules.js:287` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

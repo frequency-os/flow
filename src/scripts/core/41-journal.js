@@ -60,7 +60,7 @@
     try{ const by=plData().blocksByDay||{}; Object.keys(by).forEach(ds=>{ (by[ds]||[]).forEach(b=>{ if(b&&b.done&&jnBlockGoal(b)===(gl.id||gl.name)) xp+=15; }); }); }catch(_){}
     return xp;
   }
-  function jnHeroXP(){ return (goalsData.goals||[]).reduce((s,gl)=>s+jnXP(gl),0); }
+  function jnHeroXP(){ return (goalsData.goals||[]).reduce((s,gl)=>s+jnXP(gl),0)+Math.max(0,+(jnHero().bonusXp)||0); }   // + медалі правил (47-rules.js)
 
   function jnFreeHours(){
     try{
@@ -248,6 +248,7 @@
       ${pzStripHTML()}
       ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
       ${jnFocusCard(list)}
+      ${typeof rlJournalHTML==='function'?rlJournalHTML():''}
       <div class="jn-sec"><span>${jnFullDay?'Стрічка дня':'Далі сьогодні'}</span><button data-dyfrom>＋ З місій</button></div>
       ${jnFullDay?dyRibbonHTML(td)
         :(nextUp.length?`<div class="dy-list">${nextUp.map(dyRow).join('')}</div>`:`<div class="jn-none">${list.length?'Більше справ на сьогодні нема.':'Справ ще нема — візьми з місій або розпиши день.'}</div>`)}
@@ -261,6 +262,7 @@
       ${arch.length?`<button class="jn-arch" data-jnarch>${jnShowArchive?'Сховати архів':'Архів місій · '+arch.length}</button>${jnShowArchive?arch.map(jnMissionCard).join(''):''}`:''}
       <div class="jn-sec"><span>Розбір з Флоу</span></div>
       <div class="jn-ai"><button data-jnai="day">День</button><button data-jnai="week">Тиждень</button><button data-jnai="month">Місяць</button></div>
+      <button class="jn-arch" data-rlbook>📖 Правила гри</button>
       <button class="jn-arch" data-jnset>Налаштування гри</button>
       ${dev?`<button class="jn-map" data-jnmap>Карта · «Мій світ» (розробник)</button>`:''}
       <div class="jn-pad"></div>`;
@@ -275,6 +277,7 @@
     { const d=body.querySelector('[data-jndone]'); if(d) d.onclick=()=>{ const bl=list.find(x=>x.id===d.dataset.jndone); if(bl) jnDone(bl); }; }
     dyBind(body,td,{onDone:jnDone});   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
     pzBind(body);   // 🏆 у шапці і смужка призу (44-prizes.js)
+    if(typeof rlJournalBind==='function') rlJournalBind(body);   // картки правил і Книга правил (47-rules.js)
     body.querySelectorAll('[data-jnfull]').forEach(f=>f.onclick=()=>{ jnFullDay=!jnFullDay; jnRender(); });
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
@@ -664,6 +667,8 @@
     actionSheet({title:'Налаштування гри', sub:'Історія днів, місії, гроші й лист не скидаються ніколи — лише те, що вибереш тут.', items:[
       {ic:'refresh', label:'Пройти старт ще раз', sub:'Нічого не видаляє — лише відкриває кроки старту', onClick:()=>jnStart(1)},
       {ic:'edit', label:'Герой: імʼя і клас', onClick:jnHeroSheet},
+      {ic:'book', label:'Правила гри', sub:'Що вмикається саме: трекер, серія, скарбничка, зарплата', onClick:()=>{ if(typeof rlBook==='function') rlBook(); }},
+      {ic:'wallet', label:'Шаблон зарплати', sub:'Як розкладати дохід по конвертах', onClick:()=>{ if(typeof rlSalaryTpl==='function') rlSalaryTpl(); }},
       {ic:'trash', label:'Скинути налаштування гри', sub:'Герой і бюджет годин; місії та історія лишаються', danger:true, onClick:()=>confirmSheet({
         title:'Скинути налаштування гри?', sub:'Скинуться імʼя героя, клас, бюджет годин і позначка старту. Місії, рівні, історія днів, енергія, гроші й лист лишаються.',
         okLabel:'Скинути', onOk:()=>{ const h=jnHero(); delete h.name; delete h.cls; delete h.hWeek; delete h.started; delete h.startStep; saveGoals(); jnRender(); try{ plToast('Налаштування гри скинуто'); }catch(_){} }})}

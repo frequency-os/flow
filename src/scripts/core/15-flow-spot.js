@@ -1746,6 +1746,7 @@
         }
       }
     }catch(err){ console.error('plCompleteBlock',err); }
+    try{ if(typeof rlOnBlockDone==='function') rlOnBlockDone(b,ds,true); }catch(err){ console.error('rlOnBlockDone',err); }   // правила гри (47-rules.js)
     saveGoals(); try{ if(typeof saveEnvelopes==='function') saveEnvelopes(); }catch(_){}
     try{ window.platform.haptic('medium'); }catch(_){}
     plRerender();
@@ -1762,6 +1763,7 @@
   }
   // ефект скасування виконання блоку прибирає записані сліди
   function plUncompleteEffects(b,ds){
+    try{ if(b&&typeof rlOnBlockDone==='function') rlOnBlockDone(b,ds,false); }catch(_){}   // правила: ✓ трекера і медаль серії знімаються разом зі справою
     if(!b||!b.link) return;
     const g=(goalsData.goals||[]).find(x=>(x.id||x.name)===b.link.goalId);
     if(g){

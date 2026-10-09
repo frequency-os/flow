@@ -1,0 +1,54 @@
+  /* ============ ПРАВИЛА ГРИ (47-rules.js): пропозиції, Книга правил, розподіл зарплати, план місяця ============ */
+  .rl-offer{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:1250;max-width:460px;margin:0 auto;padding:14px 14px 12px;border-radius:20px;
+    background:var(--card);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.35);animation:rlUp .28s ease-out;}
+  @keyframes rlUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+  .rl-offer-h,.rl-card-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+  .rl-offer-h span,.rl-card-h span{font-size:18px;}
+  .rl-offer-h b{flex:1;}
+  .rl-offer-h button{all:unset;cursor:pointer;width:44px;height:36px;display:grid;place-items:center;margin:-8px -8px -8px 0;color:var(--muted);font-size:15px;}
+  .rl-offer p,.rl-card p{margin:8px 0 10px;font-size:15px;line-height:1.4;font-weight:600;color:var(--text);}
+  .rl-offer-b{display:grid;grid-template-columns:1.4fr 1fr;gap:7px;}
+  .rl-offer-b button{all:unset;cursor:pointer;box-sizing:border-box;text-align:center;min-height:44px;padding:0 8px;display:grid;place-items:center;border-radius:13px;font-size:14px;font-weight:800;
+    color:var(--text);background:var(--field,rgba(127,127,127,.12));}
+  .rl-offer-b button.y{background:var(--accent);color:#fff;}
+  .rl-card{padding:14px;border-radius:20px;margin:10px 0;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 20%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--c) 40%,var(--line));}
+  .rl-disc{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;margin:10px 0;border-radius:18px;background:var(--card);border:1px solid var(--line);}
+  .rl-disc>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:2px;}
+  .rl-disc b{font-size:15px;font-weight:800;color:var(--text);} .rl-disc small{font-size:12.5px;color:var(--muted);} .rl-disc>i{font-style:normal;color:var(--muted);font-size:20px;}
+  .rl-ring{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(#34c77b calc(var(--p)*1%),var(--field,rgba(127,127,127,.18)) 0);}
+  .rl-ring::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--card);}
+  .rl-ring em{position:relative;z-index:1;font-style:normal;font-size:12px;font-weight:800;color:var(--text);}
+  /* Книга правил */
+  .rl-grid{display:grid;grid-template-columns:1fr;gap:8px;}
+  @media (min-width:700px){ .rl-grid{grid-template-columns:1fr 1fr;} }
+  .rl-bk{padding:13px 14px 10px;border-radius:18px;background:var(--card);border:1px solid var(--line);transition:opacity .2s;}
+  .rl-bk.off{opacity:.55;}
+  .rl-bk-t{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:var(--text);} .rl-bk-t span{font-size:20px;}
+  .rl-bk-f{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:9px 0 8px;}
+  .rl-bk-f span{font-size:12.5px;font-weight:700;color:var(--text);padding:5px 9px;border-radius:999px;background:var(--field,rgba(127,127,127,.12));}
+  .rl-bk-f span:last-child{background:color-mix(in srgb,var(--accent) 22%,transparent);}
+  .rl-bk-f i{font-style:normal;color:var(--muted);font-weight:800;}
+  .rl-bk-s{display:flex;align-items:center;gap:8px;} .rl-bk-s small{flex:1;font-size:12px;color:var(--muted);}
+  .rl-n{all:unset;cursor:pointer;min-height:36px;padding:0 11px;display:grid;place-items:center;border-radius:11px;font-size:13px;font-weight:800;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);}
+  .rl-tg{all:unset;cursor:pointer;flex:none;width:50px;height:30px;border-radius:999px;position:relative;background:rgba(127,127,127,.38);transition:background .2s;margin:7px 0;}
+  .rl-tg::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s;}
+  .rl-tg.on{background:#34c77b;} .rl-tg.on::after{transform:translateX(20px);}
+  /* розподіл зарплати */
+  .rl-split{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
+  .rl-sp{display:flex;align-items:center;gap:8px;min-height:48px;padding:4px 10px;border-radius:14px;background:var(--field,rgba(127,127,127,.1));}
+  .rl-sp>span:first-child{font-size:18px;} .rl-sp-n{flex:1;min-width:0;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rl-sp input,.jn-ed .rl-sp input{flex:none;width:64px;min-height:38px;margin:0;box-sizing:border-box;text-align:right;font-size:16px;font-weight:800;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 8px;}
+  .rl-sp i{font-style:normal;color:var(--muted);font-weight:800;} .rl-sp b{min-width:70px;text-align:right;font-size:13px;font-weight:800;color:var(--hab,#34c77b);font-variant-numeric:tabular-nums;}
+  .rl-split-tot{font-size:13px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:6px;} .rl-split-tot.bad{color:#ff4d6d;}
+  /* план місяця */
+  .rl-fc{display:flex;flex-direction:column;gap:5px;padding:16px;border-radius:22px;margin-bottom:8px;color:#fff;background:linear-gradient(135deg,#0f9d77,#34c77b 60%,#7be0a8);box-shadow:0 12px 26px rgba(30,160,110,.28);}
+  .rl-fc small{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;opacity:.9;}
+  .rl-fc>b{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;} .rl-fc>b.neg{color:#ffe0e5;}
+  .rl-fc .wl-sp{flex-direction:column;gap:2px;}
+  .rl-pr{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;min-height:54px;padding:8px 12px;margin-bottom:6px;border-radius:14px;background:var(--card);border:1px solid var(--line);}
+  .rl-pr.rec{cursor:default;opacity:.85;}
+  .rl-pr-d{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:13px;font-weight:800;color:var(--muted);background:var(--field,rgba(127,127,127,.12));}
+  .rl-pr-n{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .rl-pr-n b{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .rl-pr-n small{font-size:11.5px;color:var(--muted);}
+  .rl-pr>b{flex:none;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;} .rl-pr>b.in{color:var(--hab,#34c77b);} .rl-pr>b.out{color:var(--text);}
+  .rl-pr.ok .rl-pr-d{background:color-mix(in srgb,#34c77b 25%,transparent);color:#34c77b;} .rl-pr.ok .rl-pr-n small{color:#34c77b;}

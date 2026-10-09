@@ -11,7 +11,7 @@
     font-size:14px;font-weight:800;color:var(--text);background:var(--card);border:1px solid var(--line);}
   .wl-acts button.pri{background:var(--text);color:var(--bg,#0b0f17);border-color:var(--text);}
   .jn-ed .wl-acts{grid-template-columns:1fr 1fr;margin:0;}
-  .wl-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:var(--card);border:1px solid var(--line);margin-bottom:12px;}
+  .wl-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--card);border:1px solid var(--line);margin-bottom:12px;}
   .wl-seg button{all:unset;cursor:pointer;text-align:center;min-height:38px;display:grid;place-items:center;border-radius:10px;font-size:14px;font-weight:800;color:var(--muted);}
   .wl-seg button.on{background:var(--accent);color:#fff;}
   .wl-rings{display:flex;justify-content:space-around;gap:8px;margin:4px 0 2px;}

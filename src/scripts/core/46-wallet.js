@@ -33,10 +33,12 @@
     const sub=document.getElementById('finSub'); if(sub) sub.textContent='гаманець героя · '+MO_NAMES[+ym.slice(5,7)-1].toLowerCase();
     let h=`<div class="wl-card"><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}</span></div>
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
-      <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Гроші місій</button></div>`;
-    h+=wlState.tab==='missions'?wlMissionsHTML(ops):wlOverviewHTML(ops,all,ym);
+      <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
+    const plan=wlState.tab==='plan'&&typeof rlPlanHTML==='function';   // план місяця (47-rules.js)
+    h+=plan?rlPlanHTML(ym):wlState.tab==='missions'?wlMissionsHTML(ops):wlOverviewHTML(ops,all,ym);
     body.innerHTML=h+'<div class="jn-pad"></div>';
     wlBind(body);
+    if(plan) rlPlanBind(body,ym);
     wlQuestCheck(ym,all);
   }
   function wlOverviewHTML(ops,all,ym){
@@ -107,6 +109,7 @@
         if(gid&&wlGoal(gid)) op.goalId=String(gid);
         finOps.push(op); saveFinOps(); ov.remove(); renderFinance();
         try{ flowReact(type==='in'?'income':'spend',{amount}); }catch(_){}
+        try{ if(typeof rlOnOp==='function') rlOnOp(op); }catch(err){ console.error('rlOnOp',err); }   // правила: скарбничка / зарплата / бюджет
       };
     });
   }
@@ -146,6 +149,7 @@
   }
   // ── «Квест виконано!»: ціль місяця «Заробити» чи «Відкласти» досягнуто — раз на місяць на цьому пристрої ──
   function wlQuestCheck(ym,all){
+    if(typeof rlOn==='function'&&!rlOn('quest')) return;   // правило «Квест місяця» вимкнено в Книзі правил
     const g=jnHero().money&&jnHero().money[ym]; if(!g) return;
     const svd=typeof pzMonthSaved==='function'?Math.max(0,pzMonthSaved(ym)):0;
     const q=[];
