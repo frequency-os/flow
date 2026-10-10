@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 33803 |
+| Рядків JS | 33807 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10471 |
 | Сутностей верхнього рівня | 2294 |
@@ -41,12 +41,12 @@
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 423 | 57 |
 | `src/scripts/core/05-spaces.js` | 698 | 61 |
-| `src/scripts/core/06-wishes.js` | 1460 | 111 |
+| `src/scripts/core/06-wishes.js` | 1462 | 111 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 788 | 101 |
 | `src/scripts/core/09-goals.js` | 706 | 30 |
 | `src/scripts/core/10-planner.js` | 923 | 49 |
-| `src/scripts/core/11-ai-flow.js` | 334 | 36 |
+| `src/scripts/core/11-ai-flow.js` | 336 | 36 |
 | `src/scripts/core/12-ai-agent.js` | 1845 | 98 |
 | `src/scripts/core/13-pets.js` | 230 | 13 |
 | `src/scripts/core/14-react.js` | 337 | 43 |
@@ -741,26 +741,26 @@
 | `ritPhotoCardHTML` | функція | `src/scripts/core/06-wishes.js:997` |
 | `ritPhotoTap` | функція | `src/scripts/core/06-wishes.js:1011` |
 | `ritSavePhoto` | функція | `src/scripts/core/06-wishes.js:1027` |
-| `ritPhotoMenu` | функція | `src/scripts/core/06-wishes.js:1038` |
-| `rmomTimer` | значення | `src/scripts/core/06-wishes.js:1047` |
-| `ritEnterMoment` | функція | `src/scripts/core/06-wishes.js:1050` |
-| `ritMixRecTap` | функція | `src/scripts/core/06-wishes.js:1098` |
-| `ritMixLongOrRec` | функція | `src/scripts/core/06-wishes.js:1099` |
-| `CLG_KEY` | значення | `src/scripts/core/06-wishes.js:1107` |
-| `collage` | масив | `src/scripts/core/06-wishes.js:1108` |
-| `loadCollage` | функція | `src/scripts/core/06-wishes.js:1110` |
-| `saveCollage` | функція | `src/scripts/core/06-wishes.js:1112` |
-| `goCollage` | функція | `src/scripts/core/06-wishes.js:1115` |
-| `clgPickPhotos` | функція | `src/scripts/core/06-wishes.js:1118` |
-| `clgImportWishes` | функція | `src/scripts/core/06-wishes.js:1133` |
-| `clgMenu` | функція | `src/scripts/core/06-wishes.js:1144` |
-| `renderCollage` | функція | `src/scripts/core/06-wishes.js:1157` |
-| `clgWrap` | функція | `src/scripts/core/06-wishes.js:1214` |
-| `clgWallpaper` | функція | `src/scripts/core/06-wishes.js:1220` |
-| `wdkShow` | значення | `src/scripts/core/06-wishes.js:1294` |
-| `wishDateInfo` | функція | `src/scripts/core/06-wishes.js:1295` |
-| `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1314` |
-| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1390` |
+| `ritPhotoMenu` | функція | `src/scripts/core/06-wishes.js:1040` |
+| `rmomTimer` | значення | `src/scripts/core/06-wishes.js:1049` |
+| `ritEnterMoment` | функція | `src/scripts/core/06-wishes.js:1052` |
+| `ritMixRecTap` | функція | `src/scripts/core/06-wishes.js:1100` |
+| `ritMixLongOrRec` | функція | `src/scripts/core/06-wishes.js:1101` |
+| `CLG_KEY` | значення | `src/scripts/core/06-wishes.js:1109` |
+| `collage` | масив | `src/scripts/core/06-wishes.js:1110` |
+| `loadCollage` | функція | `src/scripts/core/06-wishes.js:1112` |
+| `saveCollage` | функція | `src/scripts/core/06-wishes.js:1114` |
+| `goCollage` | функція | `src/scripts/core/06-wishes.js:1117` |
+| `clgPickPhotos` | функція | `src/scripts/core/06-wishes.js:1120` |
+| `clgImportWishes` | функція | `src/scripts/core/06-wishes.js:1135` |
+| `clgMenu` | функція | `src/scripts/core/06-wishes.js:1146` |
+| `renderCollage` | функція | `src/scripts/core/06-wishes.js:1159` |
+| `clgWrap` | функція | `src/scripts/core/06-wishes.js:1216` |
+| `clgWallpaper` | функція | `src/scripts/core/06-wishes.js:1222` |
+| `wdkShow` | значення | `src/scripts/core/06-wishes.js:1296` |
+| `wishDateInfo` | функція | `src/scripts/core/06-wishes.js:1297` |
+| `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1316` |
+| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1392` |
 
 ### `src/scripts/core/07-values.js` — 18 сутностей
 
@@ -1002,24 +1002,24 @@
 | `aiMood` | функція | `src/scripts/core/11-ai-flow.js:124` |
 | `AI_CORE_SYS` | значення | `src/scripts/core/11-ai-flow.js:135` |
 | `aiQuoteData` | функція | `src/scripts/core/11-ai-flow.js:156` |
-| `AI_PAGES_SYS` | значення | `src/scripts/core/11-ai-flow.js:161` |
-| `AI_FLOWOPS_SYS` | значення | `src/scripts/core/11-ai-flow.js:170` |
-| `AI_CHAT_SYS` | значення | `src/scripts/core/11-ai-flow.js:181` |
-| `aiHttpError` | функція | `src/scripts/core/11-ai-flow.js:186` |
-| `aiStreamError` | функція | `src/scripts/core/11-ai-flow.js:199` |
-| `aiNetDown` | функція | `src/scripts/core/11-ai-flow.js:210` |
-| `aiHumanError` | функція | `src/scripts/core/11-ai-flow.js:214` |
-| `aiLangDirective` | функція | `src/scripts/core/11-ai-flow.js:224` |
-| `AI_MAX_TOKENS` | значення | `src/scripts/core/11-ai-flow.js:234` |
-| `AI_IDLE_MS` | значення | `src/scripts/core/11-ai-flow.js:235` |
-| `AI_NOSTREAM_MS` | значення | `src/scripts/core/11-ai-flow.js:240` |
-| `AI_CUT_NOTE` | значення | `src/scripts/core/11-ai-flow.js:241` |
-| `AI_REFUSAL_NOTE` | значення | `src/scripts/core/11-ai-flow.js:242` |
-| `AI_BROKEN_NOTE` | значення | `src/scripts/core/11-ai-flow.js:243` |
-| `aiLastStop` | значення | `src/scripts/core/11-ai-flow.js:244` |
-| `aiTimeoutError` | функція | `src/scripts/core/11-ai-flow.js:245` |
-| `aiIdleGuard` | функція | `src/scripts/core/11-ai-flow.js:254` |
-| `aiCall` | функція | `src/scripts/core/11-ai-flow.js:277` |
+| `AI_PAGES_SYS` | значення | `src/scripts/core/11-ai-flow.js:163` |
+| `AI_FLOWOPS_SYS` | значення | `src/scripts/core/11-ai-flow.js:172` |
+| `AI_CHAT_SYS` | значення | `src/scripts/core/11-ai-flow.js:183` |
+| `aiHttpError` | функція | `src/scripts/core/11-ai-flow.js:188` |
+| `aiStreamError` | функція | `src/scripts/core/11-ai-flow.js:201` |
+| `aiNetDown` | функція | `src/scripts/core/11-ai-flow.js:212` |
+| `aiHumanError` | функція | `src/scripts/core/11-ai-flow.js:216` |
+| `aiLangDirective` | функція | `src/scripts/core/11-ai-flow.js:226` |
+| `AI_MAX_TOKENS` | значення | `src/scripts/core/11-ai-flow.js:236` |
+| `AI_IDLE_MS` | значення | `src/scripts/core/11-ai-flow.js:237` |
+| `AI_NOSTREAM_MS` | значення | `src/scripts/core/11-ai-flow.js:242` |
+| `AI_CUT_NOTE` | значення | `src/scripts/core/11-ai-flow.js:243` |
+| `AI_REFUSAL_NOTE` | значення | `src/scripts/core/11-ai-flow.js:244` |
+| `AI_BROKEN_NOTE` | значення | `src/scripts/core/11-ai-flow.js:245` |
+| `aiLastStop` | значення | `src/scripts/core/11-ai-flow.js:246` |
+| `aiTimeoutError` | функція | `src/scripts/core/11-ai-flow.js:247` |
+| `aiIdleGuard` | функція | `src/scripts/core/11-ai-flow.js:256` |
+| `aiCall` | функція | `src/scripts/core/11-ai-flow.js:279` |
 
 ### `src/scripts/core/12-ai-agent.js` — 98 сутностей
 

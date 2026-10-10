@@ -1026,12 +1026,14 @@
      Старі записи з адресою воркера чи data: малює safeImg як і раніше. */
   async function ritSavePhoto(dataUrl){
     const today=ritDs(0), d=ritDay(today);
-    const old=d.photo&&d.photo.url;
+    const usePdb=!!(window.PhotoDB && window.PhotoDB.available());
     let ref=dataUrl;
     try{ ref=await window.photoPut('rp_'+today+'_'+Date.now().toString(36), dataUrl); }catch(_){}
+    // PhotoDB є, а запис не вдався (памʼять повна) — не кладемо base64 у синхронізований ключ, як у мрій
+    if(usePdb && String(ref).slice(0,4)!=='idb:'){ flowAlert('Не вдалося зберегти фото — памʼять пристрою заповнена.'); return; }
     d.photo={ts:Date.now(),url:ref,local:true};
     ritSaveToday(); ritualRerender();
-    if(old && old!==ref){ try{ window.photoDel(old); }catch(_){} }   // перезняли — старий знімок прибираємо
+    // старий знімок при «Перезняти» не стираємо (як у мрій): інший пристрій зі старою копією дня ще може на нього посилатись
     try{ window.platform.haptic('medium'); }catch(_){}
     ritEnterMoment();
   }
@@ -1040,7 +1042,7 @@
     actionSheet({title:'Фото дня', items:[
       {ic:WICONS.play, label:'Зайти в момент', onClick:()=>ritEnterMoment()},
       {ic:'edit', label:'Перезняти', onClick:()=>ritPhotoTap()},
-      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ const u=d.photo&&d.photo.url; delete d.photo; ritSaveToday(); ritualRerender(); try{ window.photoDel(u); }catch(_){} }}
+      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ const u=d.photo&&d.photo.url; delete d.photo; ritSaveToday(); ritualRerender(); if(String(u||'').indexOf('idb:rp_')===0){ try{ window.photoDel(u); }catch(_){} } }}   // стираємо лише знімок фото дня, не чуже фото
     ]});
   }
   // ── Повноекранна пауза «Момент»: рандомне фото з Карти бажань, щоб пару хвилин пожити в ньому ──
