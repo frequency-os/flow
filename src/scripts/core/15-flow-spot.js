@@ -1403,7 +1403,7 @@
   }
 
   // нормалізує блок: гарантує h та endH (мігрує старий span)
-  function plBlockEnd(b){ if(typeof b.endH==='number') return b.endH; return b.h+(b.span||1); }
+  function plBlockEnd(b){ if(typeof b.endH==='number') return b.endH; return (+b.h||0)+(+b.span||1); }   // h з хмари може бути рядком: "9"+1 дало б "91"
   function plDayHTML(){
     const p=plData();
     const ds=p.selDate||plTodayStr();

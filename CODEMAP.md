@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 87 |
-| Рядків JS | 33706 |
+| Рядків JS | 33746 |
 | Файлів CSS | 47 |
-| Рядків CSS | 10505 |
-| Сутностей верхнього рівня | 2296 |
+| Рядків CSS | 10549 |
+| Сутностей верхнього рівня | 2302 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -75,8 +75,8 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 238 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 754 | 64 |
-| `src/scripts/core/42-day.js` | 314 | 35 |
+| `src/scripts/core/41-journal.js` | 749 | 64 |
+| `src/scripts/core/42-day.js` | 359 | 41 |
 | `src/scripts/core/43-month.js` | 244 | 32 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
@@ -156,7 +156,7 @@
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
 | `src/styles/core/24-home-gallery.css` | 215 | 0 |
 | `src/styles/core/25-journal.css` | 301 | 0 |
-| `src/styles/core/26-day.css` | 129 | 0 |
+| `src/styles/core/26-day.css` | 173 | 0 |
 | `src/styles/core/27-month.css` | 115 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
@@ -2112,27 +2112,27 @@
 | `jnFloatRender` | функція | `src/scripts/core/41-journal.js:210` |
 | `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:224` |
 | `jnRenderToday` | функція | `src/scripts/core/41-journal.js:232` |
-| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:312` |
-| `jnDone` | функція | `src/scripts/core/41-journal.js:325` |
-| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:330` |
-| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:334` |
-| `jnStoryView` | функція | `src/scripts/core/41-journal.js:360` |
-| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:391` |
-| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:400` |
-| `jnOverlay` | функція | `src/scripts/core/41-journal.js:416` |
-| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:429` |
-| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:437` |
-| `jnTplDows` | функція | `src/scripts/core/41-journal.js:440` |
-| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:447` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:468` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:600` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:605` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:687` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:700` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:736` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:747` |
+| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:307` |
+| `jnDone` | функція | `src/scripts/core/41-journal.js:320` |
+| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:325` |
+| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:329` |
+| `jnStoryView` | функція | `src/scripts/core/41-journal.js:355` |
+| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:386` |
+| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:395` |
+| `jnOverlay` | функція | `src/scripts/core/41-journal.js:411` |
+| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:424` |
+| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:432` |
+| `jnTplDows` | функція | `src/scripts/core/41-journal.js:435` |
+| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:442` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:463` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:595` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:600` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:682` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:695` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:731` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:742` |
 
-### `src/scripts/core/42-day.js` — 35 сутностей
+### `src/scripts/core/42-day.js` — 41 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2145,32 +2145,38 @@
 | `dyDayEnd` | функція | `src/scripts/core/42-day.js:22` |
 | `dyWeekHTML` | функція | `src/scripts/core/42-day.js:24` |
 | `dyRow` | функція | `src/scripts/core/42-day.js:38` |
-| `dyGap` | функція | `src/scripts/core/42-day.js:47` |
-| `dyRibbonHTML` | функція | `src/scripts/core/42-day.js:53` |
-| `dyDayTitle` | функція | `src/scripts/core/42-day.js:71` |
-| `dyDayHTML` | функція | `src/scripts/core/42-day.js:75` |
-| `dyBind` | функція | `src/scripts/core/42-day.js:86` |
-| `dyNewId` | функція | `src/scripts/core/42-day.js:99` |
-| `dyDropReminder` | функція | `src/scripts/core/42-day.js:100` |
-| `dyRemove` | функція | `src/scripts/core/42-day.js:103` |
-| `dyComplete` | функція | `src/scripts/core/42-day.js:115` |
-| `dyMoveTo` | функція | `src/scripts/core/42-day.js:124` |
-| `dyDayPicker` | функція | `src/scripts/core/42-day.js:138` |
-| `dyPickDay` | функція | `src/scripts/core/42-day.js:147` |
-| `dyMenu` | функція | `src/scripts/core/42-day.js:150` |
-| `dyFreeSlot` | функція | `src/scripts/core/42-day.js:166` |
-| `dyFromMissions` | функція | `src/scripts/core/42-day.js:173` |
-| `dyWk` | обʼєкт | `src/scripts/core/42-day.js:204` |
-| `dyMonday` | функція | `src/scripts/core/42-day.js:205` |
-| `dyHrs` | функція | `src/scripts/core/42-day.js:206` |
-| `dyNum` | функція | `src/scripts/core/42-day.js:207` |
-| `dyWeekRange` | функція | `src/scripts/core/42-day.js:208` |
-| `dyWeekHTMLFull` | функція | `src/scripts/core/42-day.js:212` |
-| `dyWeekBind` | функція | `src/scripts/core/42-day.js:260` |
-| `dyWeekTasks` | функція | `src/scripts/core/42-day.js:277` |
-| `dyWeekTasksHTML` | функція | `src/scripts/core/42-day.js:278` |
-| `dyTaskToDay` | функція | `src/scripts/core/42-day.js:286` |
-| `dyWeekTasksBind` | функція | `src/scripts/core/42-day.js:295` |
+| `DY_HP` | значення | `src/scripts/core/42-day.js:52` |
+| `dyRange` | функція | `src/scripts/core/42-day.js:53` |
+| `dyLanes` | функція | `src/scripts/core/42-day.js:59` |
+| `dyRibbonHTML` | функція | `src/scripts/core/42-day.js:70` |
+| `dyGridScroll` | функція | `src/scripts/core/42-day.js:90` |
+| `dyDayTitle` | функція | `src/scripts/core/42-day.js:92` |
+| `dyDayHTML` | функція | `src/scripts/core/42-day.js:96` |
+| `dyBind` | функція | `src/scripts/core/42-day.js:107` |
+| `dyNewId` | функція | `src/scripts/core/42-day.js:121` |
+| `dyDropReminder` | функція | `src/scripts/core/42-day.js:122` |
+| `dyRemove` | функція | `src/scripts/core/42-day.js:125` |
+| `dyComplete` | функція | `src/scripts/core/42-day.js:137` |
+| `dyMoveTo` | функція | `src/scripts/core/42-day.js:146` |
+| `dyDayPicker` | функція | `src/scripts/core/42-day.js:160` |
+| `dyPickDay` | функція | `src/scripts/core/42-day.js:169` |
+| `dyMenu` | функція | `src/scripts/core/42-day.js:172` |
+| `dyFreeSlot` | функція | `src/scripts/core/42-day.js:188` |
+| `dyFromMissions` | функція | `src/scripts/core/42-day.js:195` |
+| `dyWk` | обʼєкт | `src/scripts/core/42-day.js:226` |
+| `dyMonday` | функція | `src/scripts/core/42-day.js:227` |
+| `dyHrs` | функція | `src/scripts/core/42-day.js:228` |
+| `dyNum` | функція | `src/scripts/core/42-day.js:229` |
+| `dyWeekRange` | функція | `src/scripts/core/42-day.js:230` |
+| `dyWeekHTMLFull` | функція | `src/scripts/core/42-day.js:234` |
+| `dyWeekGridHTML` | функція | `src/scripts/core/42-day.js:274` |
+| `dyWeekFind` | функція | `src/scripts/core/42-day.js:288` |
+| `dyWeekGridBind` | функція | `src/scripts/core/42-day.js:292` |
+| `dyWeekBind` | функція | `src/scripts/core/42-day.js:304` |
+| `dyWeekTasks` | функція | `src/scripts/core/42-day.js:322` |
+| `dyWeekTasksHTML` | функція | `src/scripts/core/42-day.js:323` |
+| `dyTaskToDay` | функція | `src/scripts/core/42-day.js:331` |
+| `dyWeekTasksBind` | функція | `src/scripts/core/42-day.js:340` |
 
 ### `src/scripts/core/43-month.js` — 32 сутностей
 
