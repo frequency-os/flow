@@ -43,6 +43,7 @@
   }
   function flowReact(kind,opts){
     opts=opts||{};
+    try{ heroReactTo(kind); }catch(_){}   // герої загону: емоція на подію (48-hero.js), навіть коли ефекти вимкнено
     const mode=frMode();
     if(mode==='off' && !opts.force) return;               // ефекти вимкнено повністю
     const now=Date.now(); if(now-__frLast<160 && !opts.force) { /* антиспам */ } __frLast=now;
