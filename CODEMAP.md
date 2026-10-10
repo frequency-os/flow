@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 87 |
-| Рядків JS | 32323 |
+| Файлів JS | 88 |
+| Рядків JS | 32504 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10242 |
-| Сутностей верхнього рівня | 2314 |
+| Рядків CSS | 10289 |
+| Сутностей верхнього рівня | 2337 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -91,9 +91,10 @@
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
 | `src/scripts/core/54-links.js` | 223 | 25 |
-| `src/scripts/page-editor/01-palette.js` | 176 | 17 |
-| `src/scripts/page-editor/02-block-styles.js` | 766 | 49 |
-| `src/scripts/page-editor/03-premium-pack.js` | 746 | 42 |
+| `src/scripts/page-editor/01-palette.js` | 178 | 17 |
+| `src/scripts/page-editor/02-block-styles.js` | 767 | 49 |
+| `src/scripts/page-editor/03-premium-pack.js` | 747 | 42 |
+| `src/scripts/page-editor/04-table.js` | 177 | 23 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 689 | 41 |
 | `src/scripts/page-editor/09-open-page.js` | 33 | 1 |
 | `src/scripts/page-editor/10-mic.js` | 154 | 10 |
@@ -131,7 +132,7 @@
 | `src/styles/22-more-screen.css` | 181 | 0 |
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1008 | 9 |
+| `src/styles/core/02-page-editor.css` | 1055 | 9 |
 | `src/styles/core/03-folders-projects.css` | 643 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -2577,21 +2578,21 @@
 |---|---|---|
 | `PGS_CATS` | масив | `src/scripts/page-editor/01-palette.js:5` |
 | `CATALOG` | масив | `src/scripts/page-editor/01-palette.js:12` |
-| `PGS_SYN` | обʼєкт | `src/scripts/page-editor/01-palette.js:47` |
-| `PGS_ICONS` | обʼєкт | `src/scripts/page-editor/01-palette.js:75` |
-| `pgsIc` | функція | `src/scripts/page-editor/01-palette.js:129` |
-| `bridge` | функція | `src/scripts/page-editor/01-palette.js:131` |
-| `editor` | значення | `src/scripts/page-editor/01-palette.js:132` |
-| `scr` | значення | `src/scripts/page-editor/01-palette.js:133` |
-| `uid` | функція | `src/scripts/page-editor/01-palette.js:134` |
-| `esc` | функція | `src/scripts/page-editor/01-palette.js:135` |
-| `txtOf` | функція | `src/scripts/page-editor/01-palette.js:138` |
-| `setTxt` | функція | `src/scripts/page-editor/01-palette.js:139` |
-| `locate` | функція | `src/scripts/page-editor/01-palette.js:141` |
-| `save` | функція | `src/scripts/page-editor/01-palette.js:149` |
-| `moveBlock` | функція | `src/scripts/page-editor/01-palette.js:153` |
-| `snapshotArr` | функція | `src/scripts/page-editor/01-palette.js:175` |
-| `restoreArr` | функція | `src/scripts/page-editor/01-palette.js:176` |
+| `PGS_SYN` | обʼєкт | `src/scripts/page-editor/01-palette.js:48` |
+| `PGS_ICONS` | обʼєкт | `src/scripts/page-editor/01-palette.js:77` |
+| `pgsIc` | функція | `src/scripts/page-editor/01-palette.js:131` |
+| `bridge` | функція | `src/scripts/page-editor/01-palette.js:133` |
+| `editor` | значення | `src/scripts/page-editor/01-palette.js:134` |
+| `scr` | значення | `src/scripts/page-editor/01-palette.js:135` |
+| `uid` | функція | `src/scripts/page-editor/01-palette.js:136` |
+| `esc` | функція | `src/scripts/page-editor/01-palette.js:137` |
+| `txtOf` | функція | `src/scripts/page-editor/01-palette.js:140` |
+| `setTxt` | функція | `src/scripts/page-editor/01-palette.js:141` |
+| `locate` | функція | `src/scripts/page-editor/01-palette.js:143` |
+| `save` | функція | `src/scripts/page-editor/01-palette.js:151` |
+| `moveBlock` | функція | `src/scripts/page-editor/01-palette.js:155` |
+| `snapshotArr` | функція | `src/scripts/page-editor/01-palette.js:177` |
+| `restoreArr` | функція | `src/scripts/page-editor/01-palette.js:178` |
 
 ### `src/scripts/page-editor/02-block-styles.js` — 49 сутностей
 
@@ -2618,34 +2619,34 @@
 | `dbFmtNum` | функція | `src/scripts/page-editor/02-block-styles.js:115` |
 | `PG_GONE` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:119` |
 | `inner` | функція | `src/scripts/page-editor/02-block-styles.js:122` |
-| `dbEnsure` | функція | `src/scripts/page-editor/02-block-styles.js:371` |
-| `dbHTML` | функція | `src/scripts/page-editor/02-block-styles.js:388` |
-| `pgSgBusy` | значення | `src/scripts/page-editor/02-block-styles.js:438` |
-| `pgSgPlace` | функція | `src/scripts/page-editor/02-block-styles.js:439` |
-| `PGLAST` | значення | `src/scripts/page-editor/02-block-styles.js:447` |
-| `pgLastGet` | функція | `src/scripts/page-editor/02-block-styles.js:448` |
-| `pgLastSet` | функція | `src/scripts/page-editor/02-block-styles.js:449` |
-| `PGRECENT` | значення | `src/scripts/page-editor/02-block-styles.js:451` |
-| `pgRecentGet` | функція | `src/scripts/page-editor/02-block-styles.js:452` |
-| `pgRecentAdd` | функція | `src/scripts/page-editor/02-block-styles.js:453` |
-| `renderList` | функція | `src/scripts/page-editor/02-block-styles.js:454` |
-| `renderBoardBlock` | функція | `src/scripts/page-editor/02-block-styles.js:474` |
-| `renderRowBlock` | функція | `src/scripts/page-editor/02-block-styles.js:496` |
-| `renumber` | функція | `src/scripts/page-editor/02-block-styles.js:513` |
-| `pgPath` | масив | `src/scripts/page-editor/02-block-styles.js:515` |
-| `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:516` |
-| `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:526` |
-| `render` | функція | `src/scripts/page-editor/02-block-styles.js:542` |
-| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:585` |
-| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:597` |
-| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:603` |
-| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:606` |
-| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:684` |
-| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:686` |
-| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:687` |
-| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:688` |
-| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:698` |
-| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:707` |
+| `dbEnsure` | функція | `src/scripts/page-editor/02-block-styles.js:372` |
+| `dbHTML` | функція | `src/scripts/page-editor/02-block-styles.js:389` |
+| `pgSgBusy` | значення | `src/scripts/page-editor/02-block-styles.js:439` |
+| `pgSgPlace` | функція | `src/scripts/page-editor/02-block-styles.js:440` |
+| `PGLAST` | значення | `src/scripts/page-editor/02-block-styles.js:448` |
+| `pgLastGet` | функція | `src/scripts/page-editor/02-block-styles.js:449` |
+| `pgLastSet` | функція | `src/scripts/page-editor/02-block-styles.js:450` |
+| `PGRECENT` | значення | `src/scripts/page-editor/02-block-styles.js:452` |
+| `pgRecentGet` | функція | `src/scripts/page-editor/02-block-styles.js:453` |
+| `pgRecentAdd` | функція | `src/scripts/page-editor/02-block-styles.js:454` |
+| `renderList` | функція | `src/scripts/page-editor/02-block-styles.js:455` |
+| `renderBoardBlock` | функція | `src/scripts/page-editor/02-block-styles.js:475` |
+| `renderRowBlock` | функція | `src/scripts/page-editor/02-block-styles.js:497` |
+| `renumber` | функція | `src/scripts/page-editor/02-block-styles.js:514` |
+| `pgPath` | масив | `src/scripts/page-editor/02-block-styles.js:516` |
+| `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:517` |
+| `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:527` |
+| `render` | функція | `src/scripts/page-editor/02-block-styles.js:543` |
+| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:586` |
+| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:598` |
+| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:604` |
+| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:607` |
+| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:685` |
+| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:687` |
+| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:688` |
+| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:689` |
+| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:699` |
+| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:708` |
 
 ### `src/scripts/page-editor/03-premium-pack.js` — 42 сутностей
 
@@ -2668,31 +2669,59 @@
 | `dropPendingAdd` | функція | `src/scripts/page-editor/03-premium-pack.js:275` |
 | `closeSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:282` |
 | `applySlash` | функція | `src/scripts/page-editor/03-premium-pack.js:284` |
-| `pgFindWboard` | функція | `src/scripts/page-editor/03-premium-pack.js:395` |
-| `pgDataInsert` | функція | `src/scripts/page-editor/03-premium-pack.js:399` |
-| `drag` | значення | `src/scripts/page-editor/03-premium-pack.js:425` |
-| `dstart` | функція | `src/scripts/page-editor/03-premium-pack.js:428` |
-| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:438` |
-| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:447` |
-| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:448` |
-| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:449` |
-| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:450` |
-| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:472` |
-| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:484` |
-| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:579` |
-| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:580` |
-| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:617` |
-| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:664` |
-| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:665` |
-| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:668` |
-| `window.__pgThemeAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:679` |
-| `window.__pgThemeIsAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:680` |
-| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:694` |
-| `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:697` |
-| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:716` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:725` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:726` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:731` |
+| `pgFindWboard` | функція | `src/scripts/page-editor/03-premium-pack.js:396` |
+| `pgDataInsert` | функція | `src/scripts/page-editor/03-premium-pack.js:400` |
+| `drag` | значення | `src/scripts/page-editor/03-premium-pack.js:426` |
+| `dstart` | функція | `src/scripts/page-editor/03-premium-pack.js:429` |
+| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:439` |
+| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:448` |
+| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:449` |
+| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:450` |
+| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:451` |
+| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:473` |
+| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:485` |
+| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:580` |
+| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:581` |
+| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:618` |
+| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:665` |
+| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:666` |
+| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:669` |
+| `window.__pgThemeAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:680` |
+| `window.__pgThemeIsAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:681` |
+| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:695` |
+| `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:698` |
+| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:717` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:726` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:727` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:732` |
+
+### `src/scripts/page-editor/04-table.js` — 23 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `TB_TY` | обʼєкт | `src/scripts/page-editor/04-table.js:7` |
+| `TB_ST` | масив | `src/scripts/page-editor/04-table.js:8` |
+| `TB_MAXC` | значення | `src/scripts/page-editor/04-table.js:9` |
+| `tbId` | функція | `src/scripts/page-editor/04-table.js:10` |
+| `tbInit` | функція | `src/scripts/page-editor/04-table.js:11` |
+| `tbHasTy` | функція | `src/scripts/page-editor/04-table.js:16` |
+| `tbOkId` | функція | `src/scripts/page-editor/04-table.js:17` |
+| `tbCols` | функція | `src/scripts/page-editor/04-table.js:18` |
+| `tbRows` | функція | `src/scripts/page-editor/04-table.js:19` |
+| `tbYm` | функція | `src/scripts/page-editor/04-table.js:20` |
+| `tbDays` | функція | `src/scripts/page-editor/04-table.js:21` |
+| `tbFolder` | функція | `src/scripts/page-editor/04-table.js:22` |
+| `tbPlanMin` | функція | `src/scripts/page-editor/04-table.js:24` |
+| `tbRowDate` | функція | `src/scripts/page-editor/04-table.js:29` |
+| `tbNum` | функція | `src/scripts/page-editor/04-table.js:30` |
+| `tbFmt` | функція | `src/scripts/page-editor/04-table.js:31` |
+| `tbCellHTML` | функція | `src/scripts/page-editor/04-table.js:32` |
+| `tbHTML` | функція | `src/scripts/page-editor/04-table.js:40` |
+| `tbLoc` | функція | `src/scripts/page-editor/04-table.js:74` |
+| `tbCellObj` | функція | `src/scripts/page-editor/04-table.js:75` |
+| `tbSetUndo` | функція | `src/scripts/page-editor/04-table.js:77` |
+| `tbColSheet` | функція | `src/scripts/page-editor/04-table.js:127` |
+| `tbCfgSheet` | функція | `src/scripts/page-editor/04-table.js:155` |
 
 ### `src/scripts/page-editor/08-w-projects-hub.js` — 41 сутностей
 

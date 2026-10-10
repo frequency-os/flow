@@ -290,7 +290,8 @@
     if(typeof wdIs==='function'&&wdIs(k)){ pgDataInsert(k,loc); return; }   /* «Дані» — у дошку віджетів */
     var BT=(bridge()&&bridge().blockTypes())||{};
     function bTitle(t,fb){ return (BT[t]&&BT[t].title)||fb; }
-    if(k==='divider'){b.type='divider';}
+    if(k==='tbl'){tbInit(b);}
+    else if(k==='divider'){b.type='divider';}
     else if(k==='db'){b.type='db';b.dbName=b.title||'Нова база';b.view='table';b.cols=[{k:'name',t:'Назва'},{k:'status',t:'Статус'},{k:'note',t:'Нотатка'}];b.rows=[{name:'Запис 1',status:'Нова',note:''}];}
     else if(k==='callout'){b.type='callout';b.emo='💡';}
     else if(k==='toggle'){b.type='toggle';b.open=true;b.children=b.children||[{id:uid(),type:'note',text:''}];}
