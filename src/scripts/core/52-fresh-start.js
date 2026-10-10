@@ -5,12 +5,22 @@
        3 Дохід — Робота по годинах (екран Роботи) / фіксована зарплата / пропустити
        4 План місяця — складається з кроків 2–3, пишеться лише після «Готово» і лише в порожній План
      Після майстра — плашка «Сьогодні»: перший тиждень записів (7 днів з витратами чи доходами).
-     Стан майстра — лише на цьому пристрої (localStorage flow_fs). Усі записи — тапом людини
+     Стан майстра — ключ fin_fs у хмарі (до 10.10.2026 вечора — лише на пристрої, flow_fs). Усі записи — тапом людини
      і лише коли Гаманець звірено з хмарою (fsTrusted), як у «Почати фінанси з нуля». */
-  const FS_KEY='flow_fs', FS_DAYS=7;
-  function fsGet(){ try{ const v=JSON.parse(localStorage.getItem(FS_KEY)||'null'); return v&&typeof v==='object'&&!Array.isArray(v)?v:{}; }catch(_){ return {}; } }
-  function fsSet(patch){ const v=Object.assign(fsGet(),patch); try{ localStorage.setItem(FS_KEY,JSON.stringify(v)); }catch(_){} return v; }
-  function fsClear(){ try{ localStorage.removeItem(FS_KEY); }catch(_){} }
+  /* стан майстра — ключ fin_fs у хмарі (prefSet, як fin_curs; 10.10.2026): почав на телефоні — продовжуєш на Mac.
+     Раніше жив лише на пристрої (flow_fs) — його підхоплюємо читанням, але самі в хмару не переносимо:
+     перший запис — на наступний тап людини в майстрі. */
+  const FS_KEY='fin_fs', FS_OLD='flow_fs', FS_DAYS=7;
+  function fsGet(){ try{ const raw=localStorage.getItem(FS_KEY); const v=JSON.parse(raw!=null?raw:(localStorage.getItem(FS_OLD)||'null'));
+    return v&&typeof v==='object'&&!Array.isArray(v)?v:{}; }catch(_){ return {}; } }
+  function fsSet(patch){ const v=Object.assign(fsGet(),patch); try{ prefSet(FS_KEY,JSON.stringify(v)); }catch(_){} return v; }
+  // «Почати фінанси з нуля» — майстер знову з кроку 1 на всіх пристроях (порожній обʼєкт, а не видалення: інакше підхопився б старий flow_fs)
+  function fsClear(){ try{ prefSet(FS_KEY,'{}'); localStorage.removeItem(FS_OLD); }catch(_){} }
+  let fsCatchAt=0;   // flowsync приходить на кожну зміну стану синку — точковий запит не частіше ніж раз на 15 с
+  const fsCatchup=()=>{ const t=Date.now(); if(t-fsCatchAt<15000) return; fsCatchAt=t; try{ prefCatchup(FS_KEY, ()=>{ try{ renderFinance(); }catch(_){} }); }catch(_){} };
+  fsCatchup();
+  // на холодному старті сесії ще нема (prefCatchup бачить лише локальне) — доганяємо, коли вона зʼявилась і після кожної звірки з хмарою
+  try{ document.addEventListener('flowsbready',()=>{ fsCatchAt=0; fsCatchup(); }); document.addEventListener('flowsync',fsCatchup); }catch(_){}
   function fsTrusted(keys){
     if(typeof window.sbDataTrusted==='function'&&!window.sbDataTrusted()) return false;
     return !(window.storeKeyReady&&!(keys||['fin_ops']).every(k=>window.storeKeyReady(k)));

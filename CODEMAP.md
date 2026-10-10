@@ -14,11 +14,11 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 31970 |
+| Рядків JS | 31981 |
 | Файлів CSS | 46 |
 | Рядків CSS | 10097 |
-| Сутностей верхнього рівня | 2281 |
-| Ключів сховища (FLOW_KEYS) | 79 |
+| Сутностей верхнього рівня | 2283 |
+| Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
 
@@ -35,7 +35,7 @@
 | `src/scripts/43-planner.js` | 137 | 0 |
 | `src/scripts/45-month.js` | 662 | 0 |
 | `src/scripts/46-mx.js` | 220 | 0 |
-| `src/scripts/core/01-base.js` | 413 | 39 |
+| `src/scripts/core/01-base.js` | 414 | 39 |
 | `src/scripts/core/02-storage.js` | 2150 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 417 | 57 |
@@ -87,7 +87,7 @@
 | `src/scripts/core/49-finlit.js` | 132 | 17 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
 | `src/scripts/core/51-money-reset.js` | 132 | 15 |
-| `src/scripts/core/52-fresh-start.js` | 204 | 27 |
+| `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
 | `src/scripts/page-editor/01-palette.js` | 180 | 17 |
@@ -162,7 +162,7 @@
 | `src/styles/core/33-starter.css` | 63 | 0 |
 | `src/styles/core/34-intro.css` | 106 | 0 |
 
-## Ключі сховища — FLOW_KEYS (79)
+## Ключі сховища — FLOW_KEYS (80)
 
 `src/scripts/core/01-base.js`
 
@@ -172,27 +172,27 @@
 
 `collage_board` · `custom_avatar_v1` · `customboards` · `debts` · `diary_books_v1` · `diary_entries_v1`
 
-`diary_insights_v1` · `envelopes` · `fin_curs` · `fin_ops` · `fin_projects` · `fin_recurring`
+`diary_insights_v1` · `envelopes` · `fin_curs` · `fin_fs` · `fin_ops` · `fin_projects`
 
-`fin_tomb` · `flowPgCovers` · `flowcardskin` · `flowprotheme` · `flowtheme` · `folder_widgets`
+`fin_recurring` · `fin_tomb` · `flowPgCovers` · `flowcardskin` · `flowprotheme` · `flowtheme`
 
-`folderopts` · `folders_cfg` · `folders_deleted_v1` · `folders_order` · `folderview` · `forcedesktop`
+`folder_widgets` · `folderopts` · `folders_cfg` · `folders_deleted_v1` · `folders_order` · `folderview`
 
-`forcemobile` · `fx_cfg` · `fx_mode` · `fx_say` · `goals_data` · `hero_look`
+`forcedesktop` · `forcemobile` · `fx_cfg` · `fx_mode` · `fx_say` · `goals_data`
 
-`home_glass_on` · `homeov` · `hometab` · `homewidgets` · `i18n_content_cache` · `income_cards`
+`hero_look` · `home_glass_on` · `homeov` · `hometab` · `homewidgets` · `i18n_content_cache`
 
-`lang_pref` · `main_cur` · `patterns_chains` · `patterns_score` · `patterns_transform` · `pet_hidden`
+`income_cards` · `lang_pref` · `main_cur` · `patterns_chains` · `patterns_score` · `patterns_transform`
 
-`pet_pos` · `pet_sleep` · `readerCfg` · `ritual_board` · `sidebarcol` · `spacecanvas`
+`pet_hidden` · `pet_pos` · `pet_sleep` · `readerCfg` · `ritual_board` · `sidebarcol`
 
-`spacecanvaszoom` · `spacefull` · `spaces_map_v2` · `spaceview` · `spacewide` · `spend`
+`spacecanvas` · `spacecanvaszoom` · `spacefull` · `spaces_map_v2` · `spaceview` · `spacewide`
 
-`switcher_style` · `ui_mode` · `upgrade_profile_v1` · `values_state` · `vision_v1` · `wish_active_days_v1`
+`spend` · `switcher_style` · `ui_mode` · `upgrade_profile_v1` · `values_state` · `vision_v1`
 
-`wish_price` · `wishes_board` · `work_blocks` · `work_cfg` · `work_extras` · `work_sessions`
+`wish_active_days_v1` · `wish_price` · `wishes_board` · `work_blocks` · `work_cfg` · `work_extras`
 
-`world_game`
+`work_sessions` · `world_game`
 
 ## Сутності по файлах
 
@@ -290,31 +290,31 @@
 | `safeColor` | функція | `src/scripts/core/01-base.js:106` |
 | `window.safeColor` | значення | `src/scripts/core/01-base.js:111` |
 | `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:120` |
-| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:179` |
-| `getLang` | функція | `src/scripts/core/01-base.js:196` |
-| `setLang` | функція | `src/scripts/core/01-base.js:197` |
-| `window.__flowLang` | значення | `src/scripts/core/01-base.js:198` |
-| `window.flowLang` | значення | `src/scripts/core/01-base.js:199` |
-| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:200` |
-| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:205` |
-| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:259` |
-| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:287` |
-| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:302` |
-| `translateNode` | функція | `src/scripts/core/01-base.js:305` |
-| `i18nApply` | функція | `src/scripts/core/01-base.js:328` |
-| `window.i18nApply` | значення | `src/scripts/core/01-base.js:332` |
-| `i18nBlocked` | функція | `src/scripts/core/01-base.js:336` |
-| `raf` | значення | `src/scripts/core/01-base.js:346` |
-| `flush` | функція | `src/scripts/core/01-base.js:347` |
-| `mo` | функція | `src/scripts/core/01-base.js:354` |
-| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:375` |
-| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:378` |
-| `hash` | функція | `src/scripts/core/01-base.js:379` |
-| `cacheGet` | функція | `src/scripts/core/01-base.js:380` |
-| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:385` |
-| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:401` |
-| `push` | функція | `src/scripts/core/01-base.js:402` |
-| `window.flowErrors` | функція | `src/scripts/core/01-base.js:411` |
+| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:180` |
+| `getLang` | функція | `src/scripts/core/01-base.js:197` |
+| `setLang` | функція | `src/scripts/core/01-base.js:198` |
+| `window.__flowLang` | значення | `src/scripts/core/01-base.js:199` |
+| `window.flowLang` | значення | `src/scripts/core/01-base.js:200` |
+| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:201` |
+| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:206` |
+| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:260` |
+| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:288` |
+| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:303` |
+| `translateNode` | функція | `src/scripts/core/01-base.js:306` |
+| `i18nApply` | функція | `src/scripts/core/01-base.js:329` |
+| `window.i18nApply` | значення | `src/scripts/core/01-base.js:333` |
+| `i18nBlocked` | функція | `src/scripts/core/01-base.js:337` |
+| `raf` | значення | `src/scripts/core/01-base.js:347` |
+| `flush` | функція | `src/scripts/core/01-base.js:348` |
+| `mo` | функція | `src/scripts/core/01-base.js:355` |
+| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:376` |
+| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:379` |
+| `hash` | функція | `src/scripts/core/01-base.js:380` |
+| `cacheGet` | функція | `src/scripts/core/01-base.js:381` |
+| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:386` |
+| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:402` |
+| `push` | функція | `src/scripts/core/01-base.js:403` |
+| `window.flowErrors` | функція | `src/scripts/core/01-base.js:412` |
 
 ### `src/scripts/core/02-storage.js` — 177 сутностей
 
@@ -2461,37 +2461,39 @@
 | `finTombLoad` | функція | `src/scripts/core/51-money-reset.js:115` |
 | `finTombAdd` | функція | `src/scripts/core/51-money-reset.js:122` |
 
-### `src/scripts/core/52-fresh-start.js` — 27 сутностей
+### `src/scripts/core/52-fresh-start.js` — 29 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `FS_KEY` | значення | `src/scripts/core/52-fresh-start.js:10` |
-| `fsGet` | функція | `src/scripts/core/52-fresh-start.js:11` |
-| `fsSet` | функція | `src/scripts/core/52-fresh-start.js:12` |
-| `fsClear` | функція | `src/scripts/core/52-fresh-start.js:13` |
-| `fsTrusted` | функція | `src/scripts/core/52-fresh-start.js:14` |
-| `fsBusy` | функція | `src/scripts/core/52-fresh-start.js:18` |
-| `fsStartOp` | функція | `src/scripts/core/52-fresh-start.js:19` |
-| `fsWalletEmpty` | функція | `src/scripts/core/52-fresh-start.js:21` |
-| `fsActive` | функція | `src/scripts/core/52-fresh-start.js:23` |
-| `fsStep` | функція | `src/scripts/core/52-fresh-start.js:24` |
-| `FS_STEPS` | масив | `src/scripts/core/52-fresh-start.js:25` |
-| `fsNum` | функція | `src/scripts/core/52-fresh-start.js:26` |
-| `fsHead` | функція | `src/scripts/core/52-fresh-start.js:27` |
-| `fsGo` | функція | `src/scripts/core/52-fresh-start.js:29` |
-| `wlStartHTML` | функція | `src/scripts/core/52-fresh-start.js:32` |
-| `wlStartBind` | функція | `src/scripts/core/52-fresh-start.js:42` |
-| `fsStep1` | функція | `src/scripts/core/52-fresh-start.js:48` |
-| `fsMainEnvs` | функція | `src/scripts/core/52-fresh-start.js:70` |
-| `fsStep2` | функція | `src/scripts/core/52-fresh-start.js:71` |
-| `fsSplitPlan` | функція | `src/scripts/core/52-fresh-start.js:83` |
-| `fsSplit` | функція | `src/scripts/core/52-fresh-start.js:89` |
-| `fsStep3` | функція | `src/scripts/core/52-fresh-start.js:108` |
-| `fsPlanRows` | функція | `src/scripts/core/52-fresh-start.js:145` |
-| `fsStep4` | функція | `src/scripts/core/52-fresh-start.js:153` |
-| `fsDays` | функція | `src/scripts/core/52-fresh-start.js:186` |
-| `fsTodayHTML` | функція | `src/scripts/core/52-fresh-start.js:191` |
-| `fsTodayBind` | функція | `src/scripts/core/52-fresh-start.js:200` |
+| `FS_KEY` | значення | `src/scripts/core/52-fresh-start.js:13` |
+| `fsGet` | функція | `src/scripts/core/52-fresh-start.js:14` |
+| `fsSet` | функція | `src/scripts/core/52-fresh-start.js:16` |
+| `fsClear` | функція | `src/scripts/core/52-fresh-start.js:18` |
+| `fsCatchAt` | значення | `src/scripts/core/52-fresh-start.js:19` |
+| `fsCatchup` | функція | `src/scripts/core/52-fresh-start.js:20` |
+| `fsTrusted` | функція | `src/scripts/core/52-fresh-start.js:24` |
+| `fsBusy` | функція | `src/scripts/core/52-fresh-start.js:28` |
+| `fsStartOp` | функція | `src/scripts/core/52-fresh-start.js:29` |
+| `fsWalletEmpty` | функція | `src/scripts/core/52-fresh-start.js:31` |
+| `fsActive` | функція | `src/scripts/core/52-fresh-start.js:33` |
+| `fsStep` | функція | `src/scripts/core/52-fresh-start.js:34` |
+| `FS_STEPS` | масив | `src/scripts/core/52-fresh-start.js:35` |
+| `fsNum` | функція | `src/scripts/core/52-fresh-start.js:36` |
+| `fsHead` | функція | `src/scripts/core/52-fresh-start.js:37` |
+| `fsGo` | функція | `src/scripts/core/52-fresh-start.js:39` |
+| `wlStartHTML` | функція | `src/scripts/core/52-fresh-start.js:42` |
+| `wlStartBind` | функція | `src/scripts/core/52-fresh-start.js:52` |
+| `fsStep1` | функція | `src/scripts/core/52-fresh-start.js:58` |
+| `fsMainEnvs` | функція | `src/scripts/core/52-fresh-start.js:80` |
+| `fsStep2` | функція | `src/scripts/core/52-fresh-start.js:81` |
+| `fsSplitPlan` | функція | `src/scripts/core/52-fresh-start.js:93` |
+| `fsSplit` | функція | `src/scripts/core/52-fresh-start.js:99` |
+| `fsStep3` | функція | `src/scripts/core/52-fresh-start.js:118` |
+| `fsPlanRows` | функція | `src/scripts/core/52-fresh-start.js:155` |
+| `fsStep4` | функція | `src/scripts/core/52-fresh-start.js:163` |
+| `fsDays` | функція | `src/scripts/core/52-fresh-start.js:196` |
+| `fsTodayHTML` | функція | `src/scripts/core/52-fresh-start.js:201` |
+| `fsTodayBind` | функція | `src/scripts/core/52-fresh-start.js:210` |
 
 ### `src/scripts/core/53-starter.js` — 22 сутностей
 
