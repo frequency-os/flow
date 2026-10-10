@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 33737 |
+| Рядків JS | 33729 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10471 |
-| Сутностей верхнього рівня | 2287 |
+| Сутностей верхнього рівня | 2286 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -41,7 +41,7 @@
 | `src/scripts/core/03-platform.js` | 60 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 423 | 57 |
 | `src/scripts/core/05-spaces.js` | 698 | 61 |
-| `src/scripts/core/06-wishes.js` | 1468 | 112 |
+| `src/scripts/core/06-wishes.js` | 1460 | 111 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 788 | 101 |
 | `src/scripts/core/09-goals.js` | 706 | 30 |
@@ -646,7 +646,7 @@
 | `goWishes` | функція | `src/scripts/core/05-spaces.js:684` |
 | `window.goWishes` | значення | `src/scripts/core/05-spaces.js:685` |
 
-### `src/scripts/core/06-wishes.js` — 112 сутностей
+### `src/scripts/core/06-wishes.js` — 111 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -740,28 +740,27 @@
 | `RPH_ICON` | значення | `src/scripts/core/06-wishes.js:996` |
 | `ritPhotoCardHTML` | функція | `src/scripts/core/06-wishes.js:997` |
 | `ritPhotoTap` | функція | `src/scripts/core/06-wishes.js:1011` |
-| `fetchWithTimeout` | функція | `src/scripts/core/06-wishes.js:1022` |
-| `ritSavePhoto` | функція | `src/scripts/core/06-wishes.js:1028` |
-| `ritPhotoMenu` | функція | `src/scripts/core/06-wishes.js:1046` |
-| `rmomTimer` | значення | `src/scripts/core/06-wishes.js:1055` |
-| `ritEnterMoment` | функція | `src/scripts/core/06-wishes.js:1058` |
-| `ritMixRecTap` | функція | `src/scripts/core/06-wishes.js:1106` |
-| `ritMixLongOrRec` | функція | `src/scripts/core/06-wishes.js:1107` |
-| `CLG_KEY` | значення | `src/scripts/core/06-wishes.js:1115` |
-| `collage` | масив | `src/scripts/core/06-wishes.js:1116` |
-| `loadCollage` | функція | `src/scripts/core/06-wishes.js:1118` |
-| `saveCollage` | функція | `src/scripts/core/06-wishes.js:1120` |
-| `goCollage` | функція | `src/scripts/core/06-wishes.js:1123` |
-| `clgPickPhotos` | функція | `src/scripts/core/06-wishes.js:1126` |
-| `clgImportWishes` | функція | `src/scripts/core/06-wishes.js:1141` |
-| `clgMenu` | функція | `src/scripts/core/06-wishes.js:1152` |
-| `renderCollage` | функція | `src/scripts/core/06-wishes.js:1165` |
-| `clgWrap` | функція | `src/scripts/core/06-wishes.js:1222` |
-| `clgWallpaper` | функція | `src/scripts/core/06-wishes.js:1228` |
-| `wdkShow` | значення | `src/scripts/core/06-wishes.js:1302` |
-| `wishDateInfo` | функція | `src/scripts/core/06-wishes.js:1303` |
-| `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1322` |
-| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1398` |
+| `ritSavePhoto` | функція | `src/scripts/core/06-wishes.js:1027` |
+| `ritPhotoMenu` | функція | `src/scripts/core/06-wishes.js:1038` |
+| `rmomTimer` | значення | `src/scripts/core/06-wishes.js:1047` |
+| `ritEnterMoment` | функція | `src/scripts/core/06-wishes.js:1050` |
+| `ritMixRecTap` | функція | `src/scripts/core/06-wishes.js:1098` |
+| `ritMixLongOrRec` | функція | `src/scripts/core/06-wishes.js:1099` |
+| `CLG_KEY` | значення | `src/scripts/core/06-wishes.js:1107` |
+| `collage` | масив | `src/scripts/core/06-wishes.js:1108` |
+| `loadCollage` | функція | `src/scripts/core/06-wishes.js:1110` |
+| `saveCollage` | функція | `src/scripts/core/06-wishes.js:1112` |
+| `goCollage` | функція | `src/scripts/core/06-wishes.js:1115` |
+| `clgPickPhotos` | функція | `src/scripts/core/06-wishes.js:1118` |
+| `clgImportWishes` | функція | `src/scripts/core/06-wishes.js:1133` |
+| `clgMenu` | функція | `src/scripts/core/06-wishes.js:1144` |
+| `renderCollage` | функція | `src/scripts/core/06-wishes.js:1157` |
+| `clgWrap` | функція | `src/scripts/core/06-wishes.js:1214` |
+| `clgWallpaper` | функція | `src/scripts/core/06-wishes.js:1220` |
+| `wdkShow` | значення | `src/scripts/core/06-wishes.js:1294` |
+| `wishDateInfo` | функція | `src/scripts/core/06-wishes.js:1295` |
+| `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1314` |
+| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1390` |
 
 ### `src/scripts/core/07-values.js` — 18 сутностей
 

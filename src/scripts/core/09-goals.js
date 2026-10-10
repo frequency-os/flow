@@ -25,9 +25,9 @@
        фоновий запит (без згоди тихо не йде, шторки нема), uses — розділи,
        чиї дані несе запит (закритий — не йде). Без згоди на дію людини —
        шторка; «Не зараз» чи вимкнений AI — запит не виходить (помилка з
-       human/aiOff). /upload-photo — хмарне сховище фото, а не AI, його не зупиняємо. */
+       human/aiOff). Винятків нема: Фото дня більше не ходить на воркер. */
     const ai=opts.ai; if(ai){ opts=Object.assign({},opts); delete opts.ai; }
-    if(!/\/upload-photo(\?|$)/.test(String(url||''))) await aiConsentGate(ai);
+    await aiConsentGate(ai);
     /* 529 — Anthropic перевантажений, зазвичай на секунду-дві: один тихий повтор, і лише
        тоді людина бачить «AI зараз перевантажений» (GAP2-4). */
     let r=await aiFetchOnce(url,opts);
