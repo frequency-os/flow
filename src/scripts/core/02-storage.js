@@ -1872,7 +1872,9 @@
       try{
         for(const k of Object.keys(env.data)){
           if(isSvc(k)) continue;           // старі бекапи несли й службові ключі — стан чужого пристрою
-          localStorage.setItem(LP + k, env.data[k]);
+          // розмітку нотаток і журналу з файлу — крізь чистильник (SEC-6, 18-debts.js)
+          const v = (typeof sanitizeStoredRich==='function') ? sanitizeStoredRich(env.data[k]) : env.data[k];
+          localStorage.setItem(LP + k, v);
           restored++;
         }
         if(env.raw && typeof env.raw==='object') RAW_DATA.forEach(k=>{ if(typeof env.raw[k]==='string') localStorage.setItem(k, env.raw[k]); });

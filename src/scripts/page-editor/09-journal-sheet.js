@@ -26,7 +26,8 @@
   /* ── розмітка ⇄ плоский текст ─────────────────────────────────────── */
   function jeText(html){
     if(!html) return '';
-    var d=document.createElement('div'); d.innerHTML=html;
+    /* інертний документ: у живому div <img onerror> спрацював би вже тут (SEC-6) */
+    var d=new DOMParser().parseFromString('<!doctype html><body>'+jeSafe(html),'text/html').body;
     d.querySelectorAll('.je-chk').forEach(function(n){
       var on=n.classList.contains('on');
       n.textContent=(on?'[x] ':'[ ] ')+(n.querySelector('span')?n.querySelector('span').textContent:n.textContent);
@@ -37,9 +38,11 @@
     });
     return (d.textContent||'').replace(/\n{3,}/g,'\n\n').trim();
   }
+  /* розмітка запису — лише крізь спільний чистильник sanitizeRich (18-debts.js) */
+  function jeSafe(html){ return (typeof sanitizeRich==='function')?sanitizeRich(html):esc(html); }
   function jeRich(b,ymd){
     b.rich=b.rich||{};
-    if(b.rich[ymd]!=null) return b.rich[ymd];
+    if(b.rich[ymd]!=null) return jeSafe(b.rich[ymd]);
     var t=(b.entries||{})[ymd]||'';
     if(!t.trim()) return '';
     return t.split('\n').map(function(l){ return '<div>'+esc(l)+'</div>'; }).join('');
@@ -152,7 +155,7 @@
     var l=locate(jeCur.id); if(!l) return;
     var b=l.block, ymd=jeCur.ymd;
     b.rich=b.rich||{}; b.entries=b.entries||{};
-    var html=body.innerHTML;
+    var html=jeSafe(body.innerHTML);
     b.rich[ymd]=html;
     b.entries[ymd]=jeText(html);
     save();
