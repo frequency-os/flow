@@ -1004,7 +1004,7 @@
     }
     return `<div class="glass rphoto" id="ritPhotoCard">
       <div class="rph-ic">${RPH_ICON}</div>
-      <span class="tx"><b>Фото дня</b><small>сфотографуй запис із зошита чи телефону — щоб AI зміг це візуалізувати</small></span>
+      <span class="tx"><b>Фото дня</b><small>сфотографуй запис із зошита чи телефону — щоб він був під рукою</small></span>
       <span class="rph-arrow">›</span>
     </div>`;
   }
@@ -1018,28 +1018,20 @@
     };
     inp.click();
   }
-  // проста обгортка з таймаутом, щоб офлайн/повільна мережа не тримала людину в очікуванні
-  function fetchWithTimeout(url,opts,ms){
-    return Promise.race([
-      aiFetch(url,opts),   // кличеться лише для воркера (/upload-photo) — з пропуском
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms||9000))
-    ]);
-  }
+  /* Фото дня лежить так само, як решта знімків: у PhotoDB на пристрої, у дні —
+     лише посилання idb:rp_…, а в хмару його несе наявний фото-синк (рядок
+     photo:<id>, лише після входу). Раніше знімок ішов на воркер /upload-photo
+     без входу й без згоди на AI (SEC-4, PRV-4, BUGS-1). Новий id на кожен
+     знімок — як у мрій: під старим інші пристрої тримають свою копію.
+     Старі записи з адресою воркера чи data: малює safeImg як і раніше. */
   async function ritSavePhoto(dataUrl){
     const today=ritDs(0), d=ritDay(today);
-    try{ plToast('📸 Зберігаю…'); }catch(_){}
-    let saved={ts:Date.now(),url:dataUrl,local:true};
-    try{
-      const res=await fetchWithTimeout(aiEndpoint()+'/upload-photo',{
-        method:'POST', headers:{'content-type':'application/json'},
-        body:JSON.stringify({image:dataUrl, day:today})
-      },9000);
-      if(res && res.ok){
-        const data=await res.json();
-        if(data && data.url) saved={ts:Date.now(),url:data.url,local:false};
-      }
-    }catch(_){ /* нема мережі/проксі — лишаємось з локальним фото, спробуємо синхронізувати пізніше */ }
-    d.photo=saved; ritSaveToday(); ritualRerender();
+    const old=d.photo&&d.photo.url;
+    let ref=dataUrl;
+    try{ ref=await window.photoPut('rp_'+today+'_'+Date.now().toString(36), dataUrl); }catch(_){}
+    d.photo={ts:Date.now(),url:ref,local:true};
+    ritSaveToday(); ritualRerender();
+    if(old && old!==ref){ try{ window.photoDel(old); }catch(_){} }   // перезняли — старий знімок прибираємо
     try{ window.platform.haptic('medium'); }catch(_){}
     ritEnterMoment();
   }
@@ -1048,7 +1040,7 @@
     actionSheet({title:'Фото дня', items:[
       {ic:WICONS.play, label:'Зайти в момент', onClick:()=>ritEnterMoment()},
       {ic:'edit', label:'Перезняти', onClick:()=>ritPhotoTap()},
-      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ delete d.photo; ritSaveToday(); ritualRerender(); }}
+      {ic:'trash', label:'Прибрати', danger:true, onClick:()=>{ const u=d.photo&&d.photo.url; delete d.photo; ritSaveToday(); ritualRerender(); try{ window.photoDel(u); }catch(_){} }}
     ]});
   }
   // ── Повноекранна пауза «Момент»: рандомне фото з Карти бажань, щоб пару хвилин пожити в ньому ──
