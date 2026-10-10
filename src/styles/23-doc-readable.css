@@ -17,20 +17,17 @@
   #scr-page .pg-doc input::placeholder,#scr-page .pg-doc textarea::placeholder{color:var(--pg-mut);}
 
   /* ── 3. Картки блоків: видимий фон і межа ── */
-  #scr-page .pgbar,#scr-page .pghm,#scr-page .pgkpi,#scr-page .pgch,#scr-page .pgau,#scr-page .pgfc,
-  #scr-page .pgc-code,#scr-page .pgpr,#scr-page .pgfile,#scr-page .pg-bitem,#scr-page .pglk,#scr-page .pgwin,
-  #scr-page .jt-caps,#scr-page .pt-caps,#scr-page .pt-picker{
+  #scr-page .pghm,#scr-page .pgkpi,#scr-page .pgau,#scr-page .pgfc,
+  #scr-page .pgc-code,#scr-page .pgpr,#scr-page .pgfile,#scr-page .pg-bitem,#scr-page .pglk,#scr-page .pgwin{
     background:var(--pg-surface);border-color:var(--pg-edge);}
   #scr-page .pgcode-h{background:transparent;border-bottom-color:var(--pg-edge);}
-  #scr-page.pg-paper .pgbar,#scr-page.pg-paper .pghm,#scr-page.pg-paper .pgch,#scr-page.pg-paper .pgfc,
+  #scr-page.pg-paper .pghm,#scr-page.pg-paper .pgfc,
   #scr-page.pg-paper .pgc-code,#scr-page.pg-paper .pgwin,#scr-page.pg-paper .pglk{box-shadow:0 1px 2px rgba(28,26,23,.05);}
   /* доріжки прогресу й аудіо були білими на білому (1.01:1) */
-  #scr-page .pgbar-track,#scr-page .pt-pbar,#scr-page .ph-bar,#scr-page .pgau-bar{background:var(--pg-track);}
+  #scr-page .pgau-bar{background:var(--pg-track);}
 
   /* ── 4. Плейсхолдери без зайвої прозорості (була 2.2–2.9:1) ── */
-  #scr-page .pgcode-lang:empty::before,#scr-page .pgcode-pre:empty::before,#scr-page .pgsec-t:empty::before,
-  #scr-page .pgbar-t:empty::before,#scr-page .pgpr-tx:empty::before,#scr-page .pghm-t:empty::before{color:var(--pg-mut);opacity:1;}
-  #scr-page .jr-ta::placeholder{opacity:1;}
+  #scr-page .pgcode-lang:empty::before,#scr-page .pgcode-pre:empty::before,#scr-page .pgsec-t:empty::before,#scr-page .pgpr-tx:empty::before,#scr-page .pghm-t:empty::before{color:var(--pg-mut);opacity:1;}
   #scr-page .pgpp-hint{opacity:1;}
 
   /* ── 5. «＋» і «⠿» біля рядка: помітні (було 1.6–1.8:1) ── */
@@ -45,29 +42,16 @@
   /* ── 6. Світлий аркуш: темніші пари для яскравих акцентів (на білому вони мали 1.7–3.0:1) ── */
   #scr-page.pg-paper{--pgh-white:var(--pg-fg);--pgh-pink:#c2185b;--pgh-green:#1f7a4a;--pgh-amber:#8a5a00;
     --pgh-blue:#4a5ad6;--pgh-purple:#7e3bc7;--pgh-teal:#0f766e;}
-  /* фіолетово-синій #7c8cff */
-  #scr-page.pg-paper .jr-ic,#scr-page.pg-paper .jr-dmon,#scr-page.pg-paper .jt-prog,#scr-page.pg-paper .jr-done,
-  #scr-page.pg-paper .jr-exp,#scr-page.pg-paper .jr-expico,#scr-page.pg-paper .pt-secc,#scr-page.pg-paper .ph-ic{color:#4a5ad6;}
   /* зелений #34c77b */
-  #scr-page.pg-paper .pgbar-pct,#scr-page.pg-paper .pgbar-chip.on,#scr-page.pg-paper .pgkpi-d.up,#scr-page.pg-paper .jr-live,
-  #scr-page.pg-paper .jt-prog.all,#scr-page.pg-paper .hb-ic,#scr-page.pg-paper .dl-v-yes,#scr-page.pg-paper .dl-vb-yes{color:#1f7a4a;}
-  #scr-page.pg-paper .pgbar-chip.on{border-color:rgba(31,122,74,.45);background:rgba(31,122,74,.08);}
+  #scr-page.pg-paper .pgkpi-d.up{color:#1f7a4a;}
   /* бірюзовий #4ecdc4 */
-  #scr-page.pg-paper .pgcode-copy,#scr-page.pg-paper .pt-link b,#scr-page.pg-paper .pt-linkbtn,#scr-page.pg-paper .ptb-pct,
-  #scr-page.pg-paper .ph-lk,#scr-page.pg-paper .ph-unlink{color:#0f766e;}
-  #scr-page.pg-paper .pt-link svg{stroke:#0f766e;}
-  /* бурштиновий #f0b429 */
-  #scr-page.pg-paper .dl-ic,#scr-page.pg-paper .dl-dchipb.on,#scr-page.pg-paper .dl-sec-due,#scr-page.pg-paper .dl-tag-due,
-  #scr-page.pg-paper .dl-v-part,#scr-page.pg-paper .dl-vb-part{color:#8a5a00;}
-  /* рожевий #ff6b9d */
-  #scr-page.pg-paper .dl-v-no,#scr-page.pg-paper .dl-vb-no{color:#c2185b;}
+  #scr-page.pg-paper .pgcode-copy{color:#0f766e;}
   /* пурпуровий #c77dff (AI-огляд) */
   #scr-page.pg-paper .pgpr-badge,#scr-page.pg-paper .pgpr-copy{color:#7e3bc7;}
   /* помаранчевий #e8843c (Фокус) */
   #scr-page.pg-paper .pgfc-c,#scr-page.pg-paper .pgfc.run .pgfc-t{color:#a8521a;}
-  /* синій #5b8def (Графік) */
-  #scr-page.pg-paper .pgch-v.on,#scr-page.pg-paper .pgac-a{color:#2f5fc4;}
-  #scr-page.pg-paper .pgch-v.on{border-color:rgba(47,95,196,.45);}
+  /* синій #5b8def (Акордеон) */
+  #scr-page.pg-paper .pgac-a{color:#2f5fc4;}
   /* активна вкладка блока «Таби»: білий на #6a7dff був 3.5:1 */
   #scr-page .pgtb-h.on{background:#4a5ad6;}
 
@@ -110,9 +94,6 @@
   /* плитка «План на день»: кнопка на світлому акценті темної теми мала білий текст 2.8:1 */
   html:not(.t-light) #scr-page .pw-btn.go{color:#0c0e16;}
   #scr-page .pg-doc .bn-waterplus{opacity:1;}
-  #scr-page:not(.pg-paper) .pgch-v.on{color:#8fb0ff;}
-  #scr-page.pg-paper .pgbar-chip.on{color:#1a6b40;}
-  #scr-page.pg-paper .je-openb{color:#4a5ad6;}
 
   /* ── 9. Дрібниці верстки ── */
   /* кнопка «показати панель» потрібна лише на комп'ютері; на телефоні без стилів
@@ -121,15 +102,6 @@
   /* шапка документа: при прокрутці текст більше не проїжджає під прозорими пігулками */
   #scr-page .pg-top{background:color-mix(in srgb,var(--pg-bg) 84%,transparent) !important;
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
-  /* Щоденник, Лог рішень, Звички (.jr) на телефоні були на всю ширину екрана (margin −12px)
-     і без «＋/⠿», а решта блоків — з полями: край документа виходив рваним.
-     Тепер вони в одному ряду з іншими блоками й мають ту саму поверхню. */
-  @media(max-width:759px){
-    #scr-page .pgb:has(> .pg-content > .jr){margin-left:0;margin-right:0;}
-    #scr-page .pgb:has(> .pg-content > .jr) .pg-addrow,
-    #scr-page .pgb:has(> .pg-content > .jr) .pg-grip{display:flex;}
-  }
-  #scr-page .jr{background:linear-gradient(165deg,rgba(124,140,255,.1),transparent 55%),var(--pg-surface);border-color:var(--pg-edge);}
   /* короткий документ: аркуш тягнеться до низу екрана — без шва між аркушем і тлом під ним */
   #scr-page.active{display:flex;flex-direction:column;min-height:100dvh;}
   #scr-page.active > .pg-doc{flex:1 0 auto;width:100%;box-sizing:border-box;}

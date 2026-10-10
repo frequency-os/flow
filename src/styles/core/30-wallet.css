@@ -110,3 +110,41 @@
   .wl-fromlink{padding:9px 12px;border-radius:12px;font-size:13px;font-weight:700;line-height:1.4;color:var(--text);background:color-mix(in srgb,#f0b429 22%,var(--card));border:1px solid color-mix(in srgb,#f0b429 50%,var(--line));margin-bottom:8px;}
   /* .jn-f має display:flex — без цього [hidden] (місія / конверт для іншої валюти) не ховався */
   .jn-ed .jn-f[hidden]{display:none;}
+  /* «З чого почнемо?» — порожній Гаманець */
+  .wl-start{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:20px;margin-bottom:12px;background:linear-gradient(135deg,color-mix(in srgb,#7f8cff 16%,var(--card)),var(--card));border:1px solid var(--line);}
+  .wl-start>b{font-size:17px;font-weight:800;color:var(--text);} .wl-start>small{font-size:13px;color:var(--muted);margin-bottom:4px;}
+  .wl-start button{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);}
+  .wl-start button>span:first-child{font-size:22px;} .wl-start button>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:1px;}
+  .wl-start button b{font-size:14.5px;font-weight:800;color:var(--text);} .wl-start button small{font-size:12px;color:var(--muted);} .wl-start button i{font-style:normal;color:var(--muted);font-size:18px;}
+  .wl-start-ok{min-height:44px;display:flex;align-items:center;padding:0 12px;border-radius:14px;font-size:14px;font-weight:700;color:#34c77b;background:color-mix(in srgb,#34c77b 12%,transparent);}
+  /* майстер «Новий старт» і плашка «Сьогодні» (52-fresh-start.js) */
+  .fs-list{display:flex;flex-direction:column;gap:2px;margin:2px 0 6px;}
+  .fs-li{display:flex;align-items:center;gap:10px;min-height:40px;padding:4px 8px;border-radius:12px;opacity:.6;}
+  .fs-li>span:first-child{width:24px;text-align:center;font-size:18px;} .fs-li>span:last-child{display:flex;flex-direction:column;}
+  .fs-li b{font-size:14px;font-weight:800;color:var(--text);} .fs-li small{font-size:12px;color:var(--muted);}
+  .fs-li.on{opacity:1;background:var(--card);border:1px solid var(--line);} .fs-li.ok{opacity:.85;} .fs-li.ok>span:first-child{color:#34c77b;font-weight:800;}
+  .wl-start .fs-go{all:unset;cursor:pointer;box-sizing:border-box;min-height:48px;display:grid;justify-content:center;place-items:center;border-radius:14px;background:var(--accent);color:#fff;font-size:15px;font-weight:800;}
+  .fs-dots{display:flex;gap:6px;margin:-4px 0 10px;} .fs-dots i{flex:1;height:5px;border-radius:5px;background:var(--line);}
+  .fs-dots i.ok{background:#34c77b;} .fs-dots i.on{background:var(--accent);}
+  .fs-split{display:flex;flex-direction:column;gap:4px;margin:6px 0 12px;}
+  .fs-split>div{display:flex;justify-content:space-between;gap:10px;align-items:center;min-height:36px;padding:4px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:14px;color:var(--text);}
+  .fs-split>div span{min-width:0;overflow:hidden;text-overflow:ellipsis;} .fs-split>div b{flex:none;font-variant-numeric:tabular-nums;}
+  .fs-split>.fs-split-l{background:transparent;border-style:dashed;font-weight:700;}
+  .fs-opts{display:flex;flex-direction:column;gap:6px;margin:6px 0 8px;}
+  .fs-opts button{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);}
+  .fs-opts button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--card));}
+  .fs-opts button>span:first-child{font-size:22px;} .fs-opts button>span:last-child{display:flex;flex-direction:column;gap:1px;}
+  .fs-opts b{font-size:14.5px;font-weight:800;color:var(--text);} .fs-opts small{font-size:12px;color:var(--muted);}
+  .fs-fix[hidden]{display:none;}
+  .fs-today{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:20px;margin-bottom:12px;background:var(--card);border:1px solid var(--line);}
+  .fs-today-h{display:flex;justify-content:space-between;align-items:center;} .fs-today-h b{font-size:16px;font-weight:800;color:var(--text);}
+  .fs-today-h button{all:unset;cursor:pointer;width:44px;height:44px;margin:-10px -10px -10px 0;display:grid;place-items:center;color:var(--muted);}
+  .fs-today>small{font-size:13px;color:var(--muted);}
+  .fs-week{display:flex;flex-direction:column;gap:4px;} .fs-week small{font-size:11.5px;color:var(--muted);}
+  .fs-week>span{display:block;height:7px;border-radius:7px;background:var(--line);overflow:hidden;}
+  .fs-week>span::before{content:"";display:block;height:100%;width:calc(var(--p)*1%);background:#34c77b;border-radius:inherit;}
+  .fs-today-a{display:flex;gap:8px;} .fs-today-a button{all:unset;cursor:pointer;box-sizing:border-box;flex:1;min-height:44px;display:grid;place-items:center;border-radius:14px;background:var(--bg-2);border:1px solid var(--line);font-weight:800;font-size:14px;color:var(--text);}
+  .fs-today-a button.pri{background:var(--accent);border-color:transparent;color:#fff;}
+  /* борги на картці балансу */
+  .wl-card .wl-debt{all:unset;box-sizing:border-box;cursor:pointer;position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;width:100%;min-height:44px;margin-top:10px;padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.16);color:inherit;font-size:12.5px;font-weight:600;}
+  .wl-card .wl-debt span:last-child{font-size:13.5px;} .wl-card .wl-debt b{font-weight:800;font-variant-numeric:tabular-nums;}

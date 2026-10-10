@@ -133,7 +133,7 @@
   let jnFocus='';   // id блоку, який людина вибрала великою карткою (лише в памʼяті)
   /* 09.10.2026: Планер переїхав у Журнал — плаваючий перемикач День · Тиждень · Місяць · Рік (варіант C).
      Стан вкладки лише в памʼяті екрана, у сховище не пишеться. */
-  let jnTab='day', jnDayDs='', jnFullDay=false;
+  let jnTab='day', jnDayDs='';
 
   // фото місії — фото мрії з Карти бажань, привʼязаної до цієї цілі; інакше '' (фон кольору місії)
   function jnMissionPhoto(gl){
@@ -219,8 +219,8 @@
     const bl=plBlocksFor(ds), done=bl.filter(b=>b.done).length;
     const sub=jnEl('jnSub'); if(sub) sub.textContent=dyDayTitle(ds).toLowerCase()+(bl.length?' · '+done+'/'+bl.length+' зроблено':'');
     body.innerHTML=`<div class="jn-dayh"><button data-jnback>‹ Сьогодні</button><b>${esc(dyDayTitle(ds))}</b><button class="dy-from" data-dyfrom>＋ З місій</button></div>
-      ${dyRibbonHTML(ds)}<div class="jn-pad"></div>`;
-    dyBind(body,ds);
+      ${calAllDayHTML(ds)}${dyRibbonHTML(ds)}${calNoteCardHTML(ds)}<div class="jn-pad"></div>`;
+    dyBind(body,ds); calBindDay(body,ds,jnRender);   // «Весь день» і нотатка (49-calendar.js)
     const bk=body.querySelector('[data-jnback]'); if(bk) bk.onclick=()=>{ jnDayDs=''; jnRender(); jnTop(); };
   }
   function jnRenderToday(body){
@@ -233,10 +233,8 @@
     const hero=jnHero(), td=ymdLocal(), en=hero.energy&&typeof hero.energy[td]==='number'?hero.energy[td]:null;
     const free=jnFreeHours(); let bal=null; try{ bal=walletBalance(); }catch(_){}
     const now=new Date(), streak=jnStreak();
-    const list=jnTodayList(), focus=(list.filter(b=>!b.done).find(x=>x.id===jnFocus)||list.find(b=>!b.done)||{}).id;
-    const rest=list.filter(b=>b.id!==focus);
+    const list=jnTodayList();
     { const sub=jnEl('jnSub'); if(sub) sub.textContent='сьогодні · '+JN_DOW[now.getDay()].toLowerCase()+', '+now.getDate()+' '+JN_MON[now.getMonth()]+(list.length?' · '+list.filter(b=>b.done).length+'/'+list.length+' зроблено':''); }
-    const nextUp=rest.filter(b=>!b.done).slice(0,3);
     const week=jnWeek().map(ds=>{ const l=jnDayLevel(ds), d=new Date(ds+'T12:00:00');
       return `<button class="jn-d${ds===td?' today':''}${ds>td?' fut':''}" data-jnday="${ds}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></button>`; }).join('');
     const dev=!!(window.upDevOn&&window.upDevOn());
@@ -253,10 +251,8 @@
       ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
       ${jnFocusCard(list)}
       ${typeof rlJournalHTML==='function'?rlJournalHTML():''}
-      <div class="jn-sec"><span>${jnFullDay?'Стрічка дня':'Далі сьогодні'}</span><button data-dyfrom>＋ З місій</button></div>
-      ${jnFullDay?dyRibbonHTML(td)
-        :(nextUp.length?`<div class="dy-list">${nextUp.map(dyRow).join('')}</div>`:`<div class="jn-none">${list.length?'Більше справ на сьогодні нема.':'Справ ще нема — візьми з місій або розпиши день.'}</div>`)}
-      <button class="jn-more" data-jnfull>${jnFullDay?'Згорнути стрічку':'Уся стрічка дня'+(list.length?' · '+list.length+' '+pluralUk(list.length,'справа','справи','справ'):'')+' ›'}</button>
+      <div class="jn-sec"><span>День по годинах</span><button data-dyfrom>＋ З місій</button></div>
+      ${calAllDayHTML(td)}${dyRibbonHTML(td)}${calNoteCardHTML(td)}
       <div class="jn-sec"><span>Ресурси</span><button data-jnhist>Історія днів ›</button></div>
       <div class="jn-res">
         <button class="jn-r t" data-jnres="time"><small>Час</small><b>${free===null?'—':String(free).replace('.',',')+' год'}</b><small>вільно сьогодні</small></button>
@@ -279,10 +275,9 @@
       if(bl.done){ jnUndoSheet(bl); return; }
       jnFocus=bl.id; jnRender(); try{ body.querySelector('.jn-fc').scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} });
     { const d=body.querySelector('[data-jndone]'); if(d) d.onclick=()=>{ const bl=list.find(x=>x.id===d.dataset.jndone); if(bl) jnDone(bl); }; }
-    dyBind(body,td,{onDone:jnDone});   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
+    dyBind(body,td,{onDone:jnDone}); calBindDay(body,td,jnRender);   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
     pzBind(body);   // 🏆 у шапці і смужка призу (44-prizes.js)
     if(typeof rlJournalBind==='function') rlJournalBind(body);   // картки правил і Книга правил (47-rules.js)
-    body.querySelectorAll('[data-jnfull]').forEach(f=>f.onclick=()=>{ jnFullDay=!jnFullDay; jnRender(); });
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
     { const m=body.querySelector('[data-jnmate]'); if(m) m.onclick=e=>{ e.stopPropagation();
         try{ const id=petCur(); if(FLOW_PETS[id]&&FLOW_PETS[id].hero) heroWardrobe(id); else petPickerSheet(); }catch(_){} }; }

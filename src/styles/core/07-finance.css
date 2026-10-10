@@ -473,17 +473,6 @@
   .tkpi .kpi-delta.dn{ background:rgba(255,90,95,.14); color:#ff5a5f; }
   .tkpi .kpi-spark{ width:120px; height:34px; flex:none; }
   .tkpi .kpi-spark polyline{ fill:none; stroke:var(--tc); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-  /* chart */
-  .tchart .ch-bars{ display:flex; align-items:flex-end; gap:4px; height:96px; margin-top:6px; }
-  .tchart .ch-bcol{ flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; min-width:0; }
-  .tchart .ch-bcol i{ display:block; width:100%; max-width:26px; border-radius:6px 6px 2px 2px;
-    background:linear-gradient(180deg, var(--tc), color-mix(in srgb, var(--tc) 55%, var(--card)));
-    transition:height .35s var(--ease-out); }
-  .tchart .ch-bcol em{ margin-top:4px; font-weight:600; font-size:9px; font-style:normal; color:var(--muted);
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
-  .tchart .ch-line{ width:100%; height:96px; margin-top:6px; }
-  .tchart .ch-line polyline{ fill:none; stroke:var(--tc); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
-  .tchart .ch-ctrl{ display:flex; gap:6px; margin-top:8px; align-items:center; }
   /* tabs */
   .ttabs .tb-heads{ display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
   .ttabs .tb-heads::-webkit-scrollbar{ display:none; }

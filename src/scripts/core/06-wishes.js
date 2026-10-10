@@ -144,6 +144,8 @@
     const topBar=document.querySelector('#scr-home .top');
     if(!card||!slides||!ov||!dots) return;
     if(wishSlideTimer){ clearInterval(wishSlideTimer); wishSlideTimer=null; }
+    // порожній акаунт — колаж «Стартового набору» замість «0%» (53-starter.js)
+    try{ if(starterActive()){ stHero(); return; } stHeroOff(); }catch(e){ console.error('starter',e); }
 
     // у тло беремо лише те, що має картинку (фото або відео з прев'ю)
     const withImg=wishes.filter(w=> (w.type==='video') ? !!w.thumb : !!w.img );

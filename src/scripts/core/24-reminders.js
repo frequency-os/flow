@@ -155,7 +155,6 @@
     if(type==='head')  Object.assign(base,{title:'Нова секція'});
     /* PREMIUM PACK V1 */
     if(type==='heatmap') Object.assign(base,{title:'Звичка',marks:{}});
-    if(type==='chart')   Object.assign(base,{title:'Графік',points:[],view:'bar'});
     if(type==='tabs')    Object.assign(base,{title:'',tabs:[{name:'Нотатки',text:''}],ti:0});
     if(type==='accord')  Object.assign(base,{title:'',secs:[{name:'Секція',text:'',open:1}]});
     if(type==='code')    Object.assign(base,{title:'Код',text:'',lang:'js'});
@@ -165,7 +164,6 @@
     if(type==='divider') Object.assign(base,{title:''});
     if(type==='quote') Object.assign(base,{text:'',title:'Цитата'});
     if(type==='glass') Object.assign(base,{text:'',title:'Скло'});
-    if(type==='progress') Object.assign(base,{value:0,title:'Прогрес'});
     if(type==='calendar') Object.assign(base,{title:'Календар',marks:{},ym:ymLocal()});
     if(type==='countdown') Object.assign(base,{title:'Відлік',target:'',label:''});
     if(type==='toggle') Object.assign(base,{title:'Заголовок тоглу',text:'',open:false});
@@ -177,15 +175,7 @@
     if(type==='group') Object.assign(base,{title:'Нова папка',children:[],open:true});
     if(type==='page')  Object.assign(base,{title:'Нова сторінка',children:[],open:true});
     if(type==='book')  Object.assign(base,{title:'Нова книга',author:'',fmt:'',bookId:'',progress:0,loc:0,bookmarks:[],added:Date.now(),needsFile:true});
-    if(type==='wstack') Object.assign(base,{title:'Фокус-стек',idx:0});
-    if(type==='wpult'||type==='wpipe'||type==='wtline'||type==='wportal') base.title=BLOCK_TYPES[type].title;
     if(type==='wplanday'||type==='wplanmonth'){ base.title=BLOCK_TYPES[type].title; try{ const cx=curCtx(); if(cx!=='__root__') base.pfolder=cx; }catch(_){} }
-    if(type==='kanban') Object.assign(base,{title:'Канбан',cols:[
-      {id:'kc'+Date.now(),name:'Заявки',cards:[]},
-      {id:'kc'+(Date.now()+1),name:'В роботі',cards:[]},
-      {id:'kc'+(Date.now()+2),name:'Готово',cards:[]}]});
-    if(type==='contacts') Object.assign(base,{title:'Контакти',people:[]});
-    if(type==='caseline') Object.assign(base,{title:'Таймлайн справи',events:[]});
     return base;
   }
 

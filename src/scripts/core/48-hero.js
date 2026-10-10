@@ -7,9 +7,9 @@
      героя, усі кадри збігаються піксель у піксель. Файл вантажиться ліниво — лише коли
      обрано героя або відкрито шторку вибору. Поки його нема, petSVG малює запасний кружечок.
 
-     Настрій береться з даних програми (heroMood): ніч → сонний, бюджет місії перевищено →
-     тривога, серія ≥5 днів → гордий, зараз іде блок у Планері → фокус, половина дня
-     зроблена → бадьорий, інакше — спокій.
+     Настрій береться з даних програми (heroMood): ніч → вечір, бюджет місії перевищено →
+     тривога, серія ≥5 днів → гордість, зараз іде блок у Планері → фокус, половина дня
+     зроблена → усмішка, інакше — спокій. Поверх — реакції на події (heroReactTo).
 
      Шафа (крок 2, 09.10.2026): одяг — прозорий шар лише на тулуб (src/web/hero-outfits.js,
      вантажиться, коли відкрито шафу або вдягнуто не стандартне худі); свій напис на грудях
@@ -17,10 +17,17 @@
      цілком і ЛИШЕ кнопкою «Зберегти» в шафі; при старті не пишеться ніколи. */
 
   // голова в кружечку: центр і розмах кадру (у пікселях кадру 480 завширшки)
-  const HERO_CROP={ girl:{cx:240,cy:178,span:300}, guy:{cx:240,cy:152,span:290} };
+  const HERO_CROP={ girl:{cx:240,cy:178,span:300}, guy:{cx:240,cy:168,span:290}, fox:{cx:240,cy:150,span:370}, lira:{cx:236,cy:170,span:310} };
   // центр грудей і ширина місця під напис (у пікселях кадру 480 завширшки)
-  const HERO_CHEST={ girl:{x:240,y:440,w:170}, guy:{x:240,y:410,w:170} };
-  const HERO_MOOD_NAME=['спокій','бадьорий','фокус','тривога','гордий','сонний'];
+  const HERO_CHEST={ girl:{x:240,y:440,w:170}, guy:{x:240,y:428,w:170}, fox:{x:240,y:442,w:170}, lira:{x:228,y:445,w:150} };
+  // 9 кадрів на героя, очі завжди відкриті (рішення Ярослава 10.10.2026: «щоб показував емоції, не заплющував»)
+  const HERO_MOOD_NAME=['спокій','усмішка','фокус','тривога','гордість','вечір','здивування','захват','злість'];
+  /* Реакція на подію (flowReact у 14-react.js кличе heroReactTo): на ~75 с герой показує емоцію,
+     потім повертається до фонового настрою з heroMood. Звичайна витрата — без реакції,
+     щоб не сварити за кожну каву; злість лише коли після витрати пробито бюджет місії. */
+  const HERO_REACT={done:1, create:1, folder:1, goal:7, streak:7, celebrate:7, income:6, save:6};
+  const HERO_REACT_MS=75000;
+  let heroReact=null, heroReactT=null;
   const HERO_OUTFITS=[['logo','Худі з хвилею'],['plain','Фіолетове худі'],['cream','Кремове худі'],['black','Чорне худі'],['bomber','Бомбер'],['puffer','Пуховик']];
   const HERO_FONTS={
     block:{n:'Блок', f:"'Manrope',sans-serif", w:800, up:1, k:1},
@@ -63,9 +70,9 @@
     none:{n:'Без'}, heart:{n:'Серце'}, tear:{n:'Сльоза'},
     star:{n:'Зірка', need:'lvl3'}, wave:{n:'Хвиля', need:'ms'}, crown:{n:'Корона', need:'prize'}
   };
-  // нашивка — на лівому рукаві (праворуч на кадрі); тату — на шкірі біля ока (у Міи ліве сердечко вже намальоване)
-  const HERO_PATCH_AT={ girl:{x:424,y:478,s:46,r:-9}, guy:{x:424,y:470,s:46,r:-9} };
-  const HERO_TAT_AT={ girl:{x:306,y:201,s:15}, guy:{x:302,y:171,s:12} };
+  // нашивка — на лівому рукаві (праворуч на кадрі); тату — на шкірі біля ока (у Міи ліве сердечко, у Лиса ліва блискавка, у Ліри ліва зірка вже намальовані)
+  const HERO_PATCH_AT={ girl:{x:424,y:478,s:46,r:-9}, guy:{x:424,y:478,s:46,r:-9}, fox:{x:424,y:482,s:46,r:-9}, lira:{x:436,y:540,s:42,r:-9} };
+  const HERO_TAT_AT={ girl:{x:306,y:201,s:15}, guy:{x:302,y:190,s:13}, fox:{x:306,y:203,s:14}, lira:{x:302,y:206,s:14} };
   let heroLoading=false, heroOutfitsLoading=false;
 
   function heroOf(id){ const p=FLOW_PETS[id]; return p&&p.hero?p.hero:''; }
@@ -125,15 +132,30 @@
   }
 
   /* настрій 0–5 з даних програми; кожне джерело — у своєму try, щоб збій одного не валив інші */
-  function heroMood(){
-    const now=new Date(), h=now.getHours()+now.getMinutes()/60;
-    if(h>=23||h<6) return 5;
+  function heroOverBudget(){
     try{
       const ym=ymdLocal().slice(0,7), ops=wlMonthOps(ym);
-      const over=wlMissions().some(g=>{ const bud=g.budget&&+g.budget.money>0?+g.budget.money:0;
+      return wlMissions().some(g=>{ const bud=g.budget&&+g.budget.money>0?+g.budget.money:0;
         return bud>0 && wlAgg(ops,g.id).out>bud; });
-      if(over) return 3;
+    }catch(_){ return false; }
+  }
+  function heroReactTo(kind){
+    try{
+      if(!heroOf(petCur())) return;
+      let m=HERO_REACT[kind];
+      if(kind==='spend') m=heroOverBudget()?8:undefined;
+      if(m==null) return;
+      heroReact={m, until:Date.now()+HERO_REACT_MS};
+      heroRerender();
+      clearTimeout(heroReactT);
+      heroReactT=setTimeout(()=>{ heroReact=null; heroRerender(); }, HERO_REACT_MS+50);
     }catch(_){}
+  }
+  function heroMood(){
+    if(heroReact&&heroReact.until>Date.now()) return heroReact.m;
+    const now=new Date(), h=now.getHours()+now.getMinutes()/60;
+    if(h>=23||h<6) return 5;
+    if(heroOverBudget()) return 3;
     try{ if(jnStreak()>=5) return 4; }catch(_){}
     try{
       const bl=jnDayBlocks(ymdLocal());
@@ -202,7 +224,7 @@
     if(!heroReady(kind)){ heroLoad(); return null; }
     const A=window.HERO_A[kind], m=(mood==null?heroMood():mood)|0;
     const L=look?heroLookNorm(look):heroLook(id);
-    const src=A.f[Math.max(0,Math.min(5,m))]||A.f[0];
+    const src=A.f[Math.max(0,Math.min(A.f.length-1,m))]||A.f[0];
     let osrc='';
     if(L.outfit!=='logo'){
       if(window.HERO_O&&window.HERO_O[kind]&&window.HERO_O[kind][L.outfit]) osrc=window.HERO_O[kind][L.outfit];
@@ -313,4 +335,4 @@
   }catch(_){}
   // вигляд, змінений на іншому пристрої: хмара не-null і відмінна від місцевої → перемалювати
   try{ prefCatchup('hero_look', ()=>heroRerender()); }catch(_){}
-  try{ window.heroMood=heroMood; window.heroLoad=heroLoad; window.heroWardrobe=heroWardrobe; }catch(_){}
+  try{ window.heroReactTo=heroReactTo; window.heroMood=heroMood; window.heroLoad=heroLoad; window.heroWardrobe=heroWardrobe; }catch(_){}

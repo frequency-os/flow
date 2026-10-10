@@ -59,12 +59,15 @@
   function moCalHTML(ym){
     const td=ymdLocal(), first=new Date(ym+'-01T12:00:00'), lead=(first.getDay()+6)%7, dim=moDim(ym);
     const days=[]; for(let d=1;d<=dim;d++) days.push(ym+'-'+String(d).padStart(2,'0'));
-    const hrs=days.map(ds=>{ let bl=[]; try{ bl=plBlocksDisplay(ds); }catch(_){} return {ds, h:bl.reduce((s,b)=>s+dyHrs(b),0), cols:[...new Set(bl.map(b=>dyColor(b)).filter(Boolean))].slice(0,3)}; });
+    const hrs=days.map(ds=>{ let bl=[]; try{ bl=plBlocksDisplay(ds); }catch(_){}
+      // мітки календаря (49-calendar.js): кольори блоків з папками, ★ подія, • платіж Гаманця
+      let m={cols:[],ev:false,pay:false}; try{ m=calMarks(ds,''); }catch(_){}
+      return {ds, h:bl.reduce((s,b)=>s+dyHrs(b),0), cols:m.cols, ev:m.ev, pay:m.pay}; });
     const max=Math.max(1,...hrs.map(x=>x.h));
-    return `<div class="mo-card"><div class="mo-h"><span>Дні</span><span class="mo-hint">тап — відкрити день</span></div>
+    return `<div class="mo-card"><div class="mo-h"><span>Дні</span><span class="mo-hint">тап — події, блоки, нотатка</span></div>
       <div class="mo-cal">${DY_DOW.map(d=>`<b>${d}</b>`).join('')}${'<span class="e"></span>'.repeat(lead)}
       ${hrs.map(x=>{ const lvl=x.h?Math.min(3,1+Math.floor(x.h/max*2.999)):0;
-        return `<button class="mo-d${x.ds===td?' td':''}${x.ds>td?' fut':''} h${lvl}" data-moday="${x.ds}" aria-label="${+x.ds.slice(8)} ${JN_MON[+ym.slice(5,7)-1]}${x.h?', '+dyNum(x.h)+' год':''}">${+x.ds.slice(8)}<i>${x.cols.map(c=>`<u style="background:${c}"></u>`).join('')}</i></button>`; }).join('')}</div></div>`;
+        return `<button class="mo-d${x.ds===td?' td':''}${x.ds>td?' fut':''} h${lvl}" data-moday="${x.ds}" aria-label="${+x.ds.slice(8)} ${JN_MON[+ym.slice(5,7)-1]}${x.h?', '+dyNum(x.h)+' год':''}${x.ev?', є подія':''}${x.pay?', платіж':''}">${x.ev?'<em class="mo-ev">★</em>':''}${x.pay?'<em class="mo-pay"></em>':''}${+x.ds.slice(8)}<i>${x.cols.map(c=>`<u style="background:${c}"></u>`).join('')}</i></button>`; }).join('')}</div></div>`;
   }
   function moMonthHTML(){
     const ym=moYm(), ms=moMissions(), cur=ymdLocal().slice(0,7);
@@ -83,7 +86,7 @@
     { const t=c.querySelector('[data-mothis]'); if(t) t.onclick=()=>{ moState.ym=''; jnRender(); }; }
     c.querySelectorAll('[data-mom]').forEach(b=>b.onclick=()=>{ const g=(goalsData.goals||[]).find(x=>String(x.id)===b.dataset.mom); if(g) moMissionPage(g,'path'); });
     c.querySelectorAll('[data-moset]').forEach(b=>b.onclick=()=>moMoneySheet(moYm()));
-    c.querySelectorAll('[data-moday]').forEach(b=>b.onclick=()=>{ if(opt&&opt.onOpenDay) opt.onOpenDay(b.dataset.moday); });
+    c.querySelectorAll('[data-moday]').forEach(b=>b.onclick=()=>{ try{ calDaySheet(b.dataset.moday,{onOpenDay:opt&&opt.onOpenDay}); }catch(_){ if(opt&&opt.onOpenDay) opt.onOpenDay(b.dataset.moday); } });   // шторка дня (49-calendar.js)
   }
 
   // цілі грошей місяця — пишуться лише кнопкою «Зберегти»; порожні поля = ціль не задано
@@ -169,6 +172,21 @@
   function moNotes(fk){ return moBoard(fk).filter(b=>b&&b.type==='note'&&!b.vision&&String(b.text||'').trim()).sort((a,b)=>(+a.at||0)-(+b.at||0)).slice(-3).reverse(); }
   function moVision(fk){ return moBoard(fk).find(b=>b&&b.type==='note'&&b.vision)||null; }
   function moMarked(t,ds){ const v=t.marks[ds]; return t.type==='heatmap'?(+v>0):!!v; }
+  /* позначка дня в трекері місії — одна функція для сторінки місії і віджета «Звичка папки» (48-widgets.js).
+     Лише з дії людини; майбутні дні не позначаються. Повертає новий стан (true/false) або null, якщо не вийшло. */
+  function moToggleMark(fk,ds){
+    const t=fk&&moOwnFolder(fk)?moTracker(fk):null; if(!t) return null;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ds||'')||ds>ymdLocal()) return null;
+    const on=!moMarked(t,ds);
+    if(on) t.marks[ds]=t.type==='heatmap'?3:true; else delete t.marks[ds];
+    saveBoard(); return on;
+  }
+  // трекер місії (календар) у її папці — створюється лише кнопкою людини і лише якщо його ще нема
+  function moAddTracker(fk,g){
+    if(!fk||!g||!moOwnFolder(fk)||moTracker(fk)) return false;
+    if(!Array.isArray(boards[fk])) boards[fk]=[];
+    const t=buildBlock('calendar'); t.title='Трекер · '+String(g.name||'місія').slice(0,30); boards[fk].push(t); saveBoard(); return true;
+  }
   function moFolderTab(g,fk){
     // папку вже привʼязано, але її ще нема в памʼяті (не завантажилась / щойно створена на іншому пристрої) — не пропонуємо створювати нову
     if(!fk&&g.folderKey) return `<div class="dy-empty"><b>Папка місії ще завантажується</b><span>Якщо вона не зʼявиться, перевір звʼязок або привʼяжи іншу папку.</span></div><button class="mo-set" data-mplink>Привʼязати наявну папку</button>`;
@@ -220,13 +238,8 @@
     });
     // шторка вибору папки живе нижче сторінки місії (z-index) — ховаємо сторінку на час вибору й відкриваємо знову
     ov.querySelectorAll('[data-mplink]').forEach(b=>b.onclick=()=>{ ov.remove(); pickFolderForGoal(k=>{ const q=goal(); if(!q) return; if(moOwnFolder(k)){ q.folderKey=k; saveGoals(); } moMissionPage(q,'folder'); }); });
-    ov.querySelectorAll('[data-mpaddtk]').forEach(b=>b.onclick=()=>{ const k=fk(), q=goal(); if(!k||!q||moTracker(k)) return;
-      if(!Array.isArray(boards[k])) boards[k]=[];
-      const t=buildBlock('calendar'); t.title='Трекер · '+String(q.name||'місія').slice(0,30); boards[k].push(t); saveBoard(); redraw(); });
-    ov.querySelectorAll('[data-mptk]').forEach(b=>b.onclick=()=>{ const k=fk(); const t=k&&moTracker(k); if(!t) return; const ds=b.dataset.mptk;
-      if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)||ds>ymdLocal()) return;
-      if(moMarked(t,ds)) delete t.marks[ds]; else t.marks[ds]=t.type==='heatmap'?3:true;
-      saveBoard(); redraw(); });
+    ov.querySelectorAll('[data-mpaddtk]').forEach(b=>b.onclick=()=>{ if(moAddTracker(fk(),goal())) redraw(); });
+    ov.querySelectorAll('[data-mptk]').forEach(b=>b.onclick=()=>{ if(moToggleMark(fk(),b.dataset.mptk)!==null) redraw(); });
     ov.querySelectorAll('[data-mpnote]').forEach(b=>b.onclick=()=>moTextSheet('Нотатка місії','','Що хочеш запамʼятати?',v=>{ const k=fk(); if(!k||!v) return;
       if(!Array.isArray(boards[k])) boards[k]=[];
       boards[k].push({id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), type:'note', text:v, title:'', at:Date.now(), by:'me'}); saveBoard(); redraw(); }));

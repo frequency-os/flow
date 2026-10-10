@@ -31,11 +31,12 @@
     ensureCards();
     const bal=walletBalance(), pz=typeof pzTotal==='function'?pzTotal():0, ym=wlYm(), ops=wlMonthOps(ym), all=wlAgg(ops);
     const sub=document.getElementById('finSub'); if(sub) sub.textContent='гаманець героя · '+MO_NAMES[+ym.slice(5,7)-1].toLowerCase();
-    let h=`<div class="wl-card"><button class="wl-cur" data-wlcur aria-label="Головна валюта">${esc(curSym())}${curLocked()?'':' ▾'}</button><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}${wlCurList().length?`<span>разом ≈ <b>${wlMoney(wlTotalApprox()+pz)}</b></span>`:''}</span></div>
+    let h=`<div class="wl-card"><button class="wl-cur" data-wlcur aria-label="Головна валюта">${esc(curSym())}${curLocked()?'':' ▾'}</button><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}${wlCurList().length?`<span>разом ≈ <b>${wlMoney(wlTotalApprox()+pz)}</b></span>`:''}</span>${wlDebtLineHTML(bal+pz)}</div>
       ${wlCursHTML()}
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
       <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="folders"${wlState.tab==='folders'?' class="on"':''}>Папки</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
     const plan=wlState.tab==='plan'&&typeof rlPlanHTML==='function';   // план місяця (47-rules.js)
+    if(wlState.tab==='overview'&&typeof wlStartHTML==='function') h+=wlStartHTML();   // порожній Гаманець — «З чого почнемо?» першим, над плитками
     if(wlState.tab==='overview'&&typeof wgWalletHTML==='function') h+=wgWalletHTML();   // плитки Місія · Конверти · Борги (48-widgets.js)
     h+=plan?rlPlanHTML(ym):wlState.tab==='missions'?wlMissionsHTML(ops):wlState.tab==='folders'?wlFoldersHTML(ops):wlOverviewHTML(ops,all,ym);
     body.innerHTML=h+'<div class="jn-pad"></div>';
@@ -43,6 +44,19 @@
     if(plan) rlPlanBind(body,ym);
     try{ if(typeof wgHome==='function') wgHome(body); }catch(e){ console.error('wgHome',e); }
     wlQuestCheck(ym,all);
+  }
+  /* борги на картці балансу (10.10.2026): баланс — справжні гроші, а рядок нижче показує, що буде після боргів.
+     Рахуються лише НЕ проведені в Гаманець борги (проведені вже сидять у балансі операцією) і лише в головній валюті. */
+  function wlDebtTotals(){
+    let owe=0, owed=0, other=0;
+    try{ (debtItems||[]).forEach(i=>{ if(!i||i.synced) return; const v=balance(i); if(!(v>0)) return;
+      if((i.cur||'UAH')!==mainCur()){ other++; return; } if(i.kind==='owe') owe+=v; else owed+=v; }); }catch(_){}
+    return {owe:Math.round(owe*100)/100, owed:Math.round(owed*100)/100, other};
+  }
+  function wlDebtLineHTML(total){
+    const d=wlDebtTotals(); if(!d.owe&&!d.owed&&!d.other) return '';
+    const parts=[]; if(d.owe) parts.push('я винен −'+wlMoney(d.owe)); if(d.owed) parts.push('мені винні +'+wlMoney(d.owed)); if(d.other) parts.push(d.other+' в іншій валюті');
+    return `<button class="wl-debt" data-wldebt><span>🤝 ${esc(parts.join(' · '))}</span><span>після боргів ≈ <b>${esc(wlMoney(total-d.owe+d.owed))}</b> ›</span></button>`;
   }
   function wlOverviewHTML(ops,all,ym){
     const g=(jnHero().money&&jnHero().money[ym])||null, svd=typeof pzMonthSaved==='function'?Math.max(0,pzMonthSaved(ym)):0;
@@ -120,6 +134,8 @@
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
     { const st=c.querySelector('[data-wlstarter]'); if(st) st.onclick=()=>wlEnvStarter(); }
+    if(typeof wlStartBind==='function') wlStartBind(c);
+    { const db=c.querySelector('[data-wldebt]'); if(db) db.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
     { const qa=c.querySelector('[data-wlqa]'); if(qa) qa.onclick=()=>qaGuide(); }
     { const ev=c.querySelector('[data-wlenv]'); if(ev) ev.onclick=()=>{ finView='envelopes'; renderFinance(); }; }
     { const d=c.querySelector('[data-wldebts]'); if(d) d.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
@@ -361,7 +377,7 @@
   function wlSpendEnvs(){ return (envelopes||[]).filter(e=>e&&e.id&&e.kind!=='приз'); }
   // іконки конвертів для шторки витрати — лише валюти c
   function wlEnvPick(c){ return wlSpendEnvs().filter(e=>(envCur(e)||mainCur())===c).map(e=>`<button data-wlenvp="${esc(e.id)}" style="--c:${safeColor(e.color,'#5b8def')}"><span>${safeEmoji(e.emoji,'✉️')}</span><small>${esc(String(e.name||'').slice(0,12))}</small><i>${esc(moneyK(envSaved(e),envCur(e)))}</i></button>`).join(''); }
-  function wlEnvStarter(){
+  function wlEnvStarter(done){   // done(n) — для майстра «Новий старт» (52-fresh-start.js): що робити після створення
     // конверти ще не прочитано (хмара не відповіла / вхід звіряється) — інакше після злиття вийдуть дублі за назвою
     if(window.storeKeyReady&&!window.storeKeyReady(ENVKEY)){ plToast('Конверти ще завантажуються — спробуй за хвилину'); return; }
     const curs=[mainCur()].concat(wlCurList()); let ecur=mainCur();   // валюта нових конвертів (етап 3 валют)
@@ -397,7 +413,10 @@
           n++; }));
         if(!n) return;
         saveEnvelopes(); ov.remove(); renderFinance();
+        if(typeof done==='function'){ done(n); return; }
         plToast('🗂 Створено '+n+' '+pluralUk(n,'конверт','конверти','конвертів')+' — поповни їх із вільних чи правилом «Зарплата по конвертах»');
       };
     });
   }
+
+  /* «З чого почнемо?» / майстер «Новий старт» — у 52-fresh-start.js (wlStartHTML, wlStartBind) */

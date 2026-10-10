@@ -127,6 +127,7 @@
     'world_game',     // стан гри «Мій світ» (38-world.js gameLoad/gameSave; misto.html пише лише його, цілком)
     'main_cur',       // головна валюта акаунта (08-finance.js setMainCur, prefSet; 09.10.2026)
     'fin_curs',       // додаткові баланси в інших валютах — список кодів (46-wallet.js, prefSet; 09.10.2026)
+    'fin_tomb',       // «надгробки» обнулення фінансів: id стертого, щоб інший пристрій їх не повернув (51-money-reset.js; 10.10.2026)
     'income_cards','fx_cfg','spend',
     'work_sessions','work_cfg','work_extras','work_blocks',
     'board','customboards','blockusage',
@@ -179,7 +180,7 @@
     'space_purge_v1','legacy_widgets_purge_v1','theme_flat_default_v1',
     'ai_agent','ai_dev','ai_usage','ai_brief_ds','ai_week_ds','pet3d','pet3d_fx','pet_say_i','rit_auto',
     'rrail_cfg','pg_wide','fd_isl','fd_wake','fd_tts','fd_tts_voice','fd26t','flow_dev','dev_translate_content',
-    'flowPgLastBlock','flowPgRecentBlocks','flowPageThemeChoice','__flow_snapshot__','__flow_wipe_idb__','__flow_wipe_np__','__devtest','flow_yr_mx_open','flow_fl_review'];
+    'flowPgLastBlock','flowPgRecentBlocks','flowPageThemeChoice','__flow_snapshot__','__flow_wipe_idb__','__flow_wipe_np__','__devtest','flow_yr_mx_open','flow_fl_review','flow_fs'];
 
   /* ═══════════════════════════════════════════════════════════════════
      I18N: перемикач мови UI (uk/en) + переклад контенту в dev-режимі
@@ -312,7 +313,7 @@
       if(node.hasAttribute && node.hasAttribute('data-i18n-skip')) return; // явно виключені зони (контент користувача)
       // Гарантія «переклад лише показує, а не переписує»: усе, що редагується
       // (contenteditable — журнал, сторінки; поля вводу), не чіпаємо взагалі.
-      // Звідти текст читають назад і зберігають (jeFlush бере innerHTML),
+      // Звідти текст читають назад і зберігають (редактори беруть innerHTML),
       // тож «три дні» перетворилось би на «три days» назавжди.
       if(I18N_NO_TOUCH[node.tagName] || node.isContentEditable) return;
       if(node.tagName==='OPTION' && !node.hasAttribute('value')) return;

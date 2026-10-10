@@ -44,30 +44,51 @@
       <button class="dy-ck" data-dydone="${esc(b.id)}" aria-label="${b.done?'Зняти позначку':'Зроблено'}">${b.done?'✓':''}</button>
     </div>`;
   }
-  function dyGap(from,to,last){
-    const lbl=last&&to>=24?'вільно до кінця дня':(last?'вільно до '+plHM(to):'вільно '+plDurLabel(from,to));
-    return `<button class="dy-gap" data-dyadd="${from}"><span class="dy-t">${plHM(from)}</span><span>${lbl}</span><b>＋</b></button>`;
-  }
 
   // стрічка одного дня: справи за часом, лінія «зараз», проміжки «вільно ＋» (лише HTML; привʼязка — dyBind)
+  /* ── Сітка дня по годинах (10.10.2026, замість «стрічки»): блоки на своїх годинах, минулі теж,
+     тап по порожній годині — нова справа (data-dyadd), по справі — її меню (data-dyblk), ✓ (data-dydone).
+     Ті самі data-атрибути, що в стрічці, тож dyBind не змінився. Лише HTML. ── */
+  const DY_HP=52, DW_HP=40;   // висота години, px: день · тиждень
+  function dyRange(lists){
+    const p=plData(); let H0=p.dayStart>0?p.dayStart:7, H1=dyDayEnd();
+    lists.forEach(L=>L.forEach(b=>{ const h=+b.h; if(Number.isFinite(h)){ H0=Math.min(H0,Math.floor(h)); H1=Math.max(H1,Math.min(24,Math.ceil(plBlockEnd(b)))); } }));
+    H0=Math.max(0,Math.min(H0,23)); H1=Math.max(H0+1,Math.min(24,H1)); return [H0,H1];
+  }
+  // справи, що накладаються, стають поруч: доріжка (lane) і скільки доріжок у групі
+  function dyLanes(blocks){
+    const L=blocks.filter(b=>Number.isFinite(+b.h)).slice().sort((a,b)=>(+a.h)-(+b.h)), out=new Map();
+    let grp=[], grpEnd=-1;
+    const flush=()=>{ const n=Math.max(1,...grp.map(g=>g.lane+1)); grp.forEach(g=>out.set(g.b,{lane:g.lane,n})); grp=[]; };
+    L.forEach(b=>{ const st=+b.h, en=Math.max(st+0.25,Math.min(plBlockEnd(b),24));
+      if(grp.length&&st>=grpEnd){ flush(); grpEnd=-1; }
+      const used=new Set(grp.filter(g=>g.en>st).map(g=>g.lane)); let lane=0; while(used.has(lane)) lane++;
+      grp.push({b,lane,en}); grpEnd=Math.max(grpEnd,en); });
+    if(grp.length) flush();
+    return out;
+  }
   function dyRibbonHTML(ds){
     const today=plTodayStr(), isToday=ds===today;
-    const blocks=plBlocksFor(ds).slice().sort((a,b)=>(+a.h||0)-(+b.h||0));
+    const blocks=plBlocksFor(ds).filter(b=>b&&Number.isFinite(+b.h)).slice().sort((a,b)=>(+a.h||0)-(+b.h||0));
+    const [H0,H1]=dyRange([blocks]), lanes=dyLanes(blocks);
     const n=new Date(), nowDec=n.getHours()+n.getMinutes()/60;
-    let rows='', cur=dyCursorStart(ds), nowShown=!isToday;
-    const nowLine=()=>`<div class="dy-now"><span class="dy-t">${plHM(nowDec)}</span><i></i></div>`;
-    blocks.forEach(b=>{
-      if(!nowShown && b.h>nowDec){ rows+=nowLine(); nowShown=true; }
-      if(b.h-cur>=DY_MIN_GAP) rows+=dyGap(cur,b.h,false);
-      rows+=dyRow(b);
-      cur=Math.max(cur,Math.min(plBlockEnd(b),24));
-    });
-    if(!nowShown) rows+=nowLine();
-    const H1=dyDayEnd();
-    if(H1-cur>=DY_MIN_GAP) rows+=dyGap(cur,H1,true);
-    const empty=!blocks.length?`<div class="dy-empty"><b>${isToday?'День ще порожній':'Цей день порожній'}</b><span>Візьми справу з місії або тапни «＋» у вільному часі.</span></div>`:'';
-    return `${empty}<div class="dy-list">${rows}</div>`;
+    let hours='';
+    for(let h=H0;h<H1;h++) hours+=`<button class="dg-h" data-dyadd="${h}" style="top:${(h-H0)*DY_HP}px" aria-label="Нова справа о ${plHM(h)}"><span>${plHM(h)}</span></button>`;
+    const bl=blocks.map(b=>{ const g=dyGoal(b), c=dyColor(b), st=+b.h, end=Math.max(st+0.25,Math.min(plBlockEnd(b),24)), ln=lanes.get(b)||{lane:0,n:1};
+      const top=(st-H0)*DY_HP, ht=Math.max(26,(end-st)*DY_HP-3), short=ht<44;
+      return `<div class="dg-b${b.done?' done':''}${g?'':' plain'}${short?' short':''}" style="top:${top}px;height:${ht}px;--ln:${ln.lane};--lns:${ln.n};${c?'--c:'+c:''}">
+        <button class="dg-bb" data-dyblk="${esc(b.id)}"><b>${g?safeEmoji(g.emoji,'🎯')+' ':''}${esc(b.t||'Справа')}</b>${short?'':`<small>${plHM(st)}–${plHM(end)}${g?' · '+esc(g.name||'Місія'):''}${b.fromRecur?' · ↻':''}${typeof subBadge==='function'&&subBadge(b)?' · '+subBadge(b):''}</small>`}</button>
+        <button class="dg-ck" data-dydone="${esc(b.id)}" aria-label="${b.done?'Зняти позначку':'Зроблено'}">${b.done?'✓':''}</button></div>`; }).join('');
+    const now=isToday&&nowDec>=H0&&nowDec<H1?`<div class="dg-now" style="top:${(nowDec-H0)*DY_HP}px"><span>${plHM(nowDec)}</span><i></i></div>`:'';
+    const empty=!blocks.length?`<div class="dy-empty"><b>${isToday?'День ще порожній':'Цей день порожній'}</b><span>Тапни по годині, щоб додати справу, або візьми з місій.</span></div>`:'';
+    // куди прокрутити вікно сітки: сьогодні — година до «зараз», інший день — до першої справи
+    const scr=isToday?(nowDec-H0-1)*DY_HP:blocks.length?(+blocks[0].h-H0-0.5)*DY_HP:0;
+    return `${empty}<div class="dg-wrap" data-dgnow="${Math.max(0,Math.round(scr))}"><div class="dg" style="height:${(H1-H0)*DY_HP}px">${hours}${bl}${now}</div></div>`;
   }
+  // сітка в межах свого вікна: на сьогодні — одразу до поточної години (без цього довелося б гортати від 7:00)
+  // екран ще може бути прихований (рендер іде до show()) — тоді прокрутка не спрацює; ставимо її на наступні кадри
+  function dyGridScroll(c){ const go=()=>c.querySelectorAll('.dg-wrap[data-dgnow]').forEach(w=>{ if(w.dataset.dgdone) return; try{ w.scrollTop=+w.dataset.dgnow||0; if(w.clientHeight) w.dataset.dgdone='1'; }catch(_){} });
+    go(); requestAnimationFrame(go); setTimeout(go,120); setTimeout(go,400); }
   function dyDayTitle(ds){
     const today=plTodayStr(), d=new Date(ds+'T12:00:00');
     return ds===today?'Сьогодні':ds===dyAddDays(today,1)?'Завтра':ds===dyAddDays(today,-1)?'Вчора':DY_DOW[(d.getDay()+6)%7]+', '+d.getDate()+' '+JN_MON[d.getMonth()];
@@ -94,6 +115,7 @@
     // шторка нової справи бере день із selDate при відкритті — ставимо ds на мить
     c.querySelectorAll('[data-dyadd]').forEach(el=>el.onclick=()=>{ const q=plData(), old=q.selDate; q.selDate=ds; try{ plBlockSheet(null,+el.dataset.dyadd); } finally{ q.selDate=old; } });
     c.querySelectorAll('[data-dyfrom]').forEach(f=>f.onclick=()=>dyFromMissions(ds));
+    dyGridScroll(c);
   }
 
   function dyNewId(){ return 'b_'+Date.now()+'_'+Math.random().toString(36).slice(2,6); }
@@ -150,6 +172,8 @@
   function dyMenu(b,ds,opt){
     const g=dyGoal(b), items=[], week=!!(opt&&opt.week);
     items.push({ic:'target', label:b.done?'Зняти позначку «зроблено»':'Зроблено', primary:!b.done, onClick:()=>dyComplete(b.id,ds)});
+    // підпункти блоку (49-calendar.js): чекліст цього дня
+    { const sc=typeof subCount==='function'?subCount(b):{n:0,d:0}; items.push({ic:'plus', label:'Підпункти', sub:sc.n?sc.d+' з '+sc.n+' зроблено':'розбити справу на кроки', onClick:()=>subSheet(ds,b.id)}); }
     // шторка бере день один раз при відкритті — ставимо його на мить і повертаємо, щоб «День» не зсувався
     items.push({ic:'edit', label:'Змінити', sub:'назва, час, місія', onClick:()=>{ const p=plData(), old=p.selDate; p.selDate=ds; try{ plEditBlock(b.id); } finally{ p.selDate=old; } }});
     if(!b.done) items.push(week
@@ -237,25 +261,48 @@
         ${bud?(lack>0.01?`<small class="dw-lack">бракує ${dyNum(lack)} год у плані</small>`:''):`<button class="dw-set" data-dwset="${esc(g.id)}">задати бюджет</button>`}
       </div>`; }).join('');
     const heroH=+jnHero().hWeek||0;
-    const maxH=Math.max(1,...days.map(ds=>dayH[ds]));
-    const heat=days.map((ds,i)=>{ const h=dayH[ds];
-      return `<button class="dw-d${ds===sel?' on':''}${ds===today?' today':''}" data-dwday="${ds}" aria-label="${DY_DOW[i]} ${+ds.slice(8)} ${JN_MON[+ds.slice(5,7)-1]}, ${h?dyNum(h)+' год':'вільний'}"${ds===sel?' aria-pressed="true"':''}><small>${DY_DOW[i]}</small><b>${+ds.slice(8)}</b>
-        <span class="dw-col"><i style="height:${h?Math.max(12,Math.round(h/maxH*100)):0}%"></i></span><small>${h?dyNum(h)+'г':'—'}</small></button>`; }).join('');
-    const list=plBlocksDisplay(sel).slice().sort((a,b)=>(+a.h||0)-(+b.h||0));
-    const sd=new Date(sel+'T12:00:00');
-    const selTitle=(sel===today?'Сьогодні · ':'')+DY_DOW[(sd.getDay()+6)%7]+', '+sd.getDate()+' '+JN_MON[sd.getMonth()];
     return `<div class="dw-nav"><button data-dwshift="-7" aria-label="Попередній тиждень">‹</button>
         <div><b>${dyWeekRange(mon)}</b>${mon!==thisMon?`<button class="dw-now" data-dwthis>Цей тиждень</button>`:'<small>цей тиждень</small>'}</div>
         <button data-dwshift="7" aria-label="Наступний тиждень">›</button></div>
+      ${typeof wgoHTML==='function'?wgoHTML(mon):''}
       <div class="dw-sec"><span>Бюджет місій</span><span>${heroH?`усього ${dyNum(totD+totP)} з ${dyNum(heroH)} год`:`усього ${dyNum(totD+totP)} год`}</span></div>
       ${rows||`<div class="dy-empty"><b>Ще нема місій</b><span>Бюджет годин зʼявиться, коли створиш місію в Журналі.</span></div>`}
       ${ms.length?`<div class="dw-leg"><span><i class="d"></i>зроблено</span><span><i class="p"></i>заплановано</span></div>`:''}
-      <div class="dw-heat">${heat}</div>
+      ${dyWeekGridHTML(days,dayH)}
       ${dyWeekTasksHTML()}
-      <div class="dw-sec"><span>${esc(selTitle)}</span><span>${list.length?list.filter(b=>b.done).length+' з '+list.length:''}</span></div>
-      ${list.length?`<div class="dy-list">${list.map(dyRow).join('')}</div>`:`<div class="dy-empty"><span>У цей день справ нема.</span></div>`}
-      <button class="dw-open" data-dwopen>Відкрити день ›</button>
       <div class="dy-pad"></div>`;
+  }
+  /* сітка тижня: 7 колонок × години, як Календар на iPhone. Показує й «віртуальні» повторювані (plBlocksDisplay —
+     лише читання); у день справа записується, коли людина її торкнеться (dyWeekFind → plBlocksFor). */
+  function dyWeekGridHTML(days,dayH){
+    const today=plTodayStr(), lists=days.map(ds=>plBlocksDisplay(ds).filter(b=>b&&Number.isFinite(+b.h)));
+    const [H0,H1]=dyRange(lists), n=new Date(), nowDec=n.getHours()+n.getMinutes()/60;
+    const head=days.map((ds,i)=>`<button class="dwg-d${ds===today?' today':''}" data-dwgday="${ds}" aria-label="Відкрити ${DY_DOW[i]} ${+ds.slice(8)} ${JN_MON[+ds.slice(5,7)-1]}"><small>${DY_DOW[i]}</small><b>${+ds.slice(8)}</b><small>${dayH[ds]?dyNum(dayH[ds])+'г':''}</small></button>`).join('');
+    let lines=''; for(let h=H0;h<H1;h++) lines+=`<span class="dwg-l" style="top:${(h-H0)*DW_HP}px">${h}</span>`;
+    const cols=days.map((ds,i)=>{ const L=lists[i], lanes=dyLanes(L);
+      const bl=L.map(b=>{ const g=dyGoal(b), c=dyColor(b), st=+b.h, end=Math.max(st+0.25,Math.min(plBlockEnd(b),24)), ln=lanes.get(b)||{lane:0,n:1};
+        return `<button class="dwg-b${b.done?' done':''}${g?'':' plain'}" data-dwgblk="${ds}|${esc(b.id)}" style="top:${(st-H0)*DW_HP}px;height:${Math.max(18,(end-st)*DW_HP-2)}px;--ln:${ln.lane};--lns:${ln.n};${c?'--c:'+c:''}" aria-label="${esc(b.t||'Справа')}, ${plHM(st)}–${plHM(end)}">${g?safeEmoji(g.emoji,'🎯'):''}${esc(String(b.t||'Справа').slice(0,24))}</button>`; }).join('');
+      const now=ds===today&&nowDec>=H0&&nowDec<H1?`<i class="dwg-now" style="top:${(nowDec-H0)*DW_HP}px"></i>`:'';
+      return `<div class="dwg-c${ds===today?' today':''}" data-dwgcol="${ds}">${bl}${now}</div>`; }).join('');
+    return `<div class="dw-sec"><span>Тиждень по годинах</span><span>тапни по клітинці — нова справа</span></div>
+      <div class="dwg"><div class="dwg-hd"><span></span>${head}</div>
+      <div class="dg-wrap dwg-wrap" data-dgnow="${days.includes(today)?Math.max(0,(nowDec-H0-1)*DW_HP):0}"><div class="dwg-body" style="height:${(H1-H0)*DW_HP}px" data-dwgh0="${H0}">${lines}<span></span>${cols}</div></div></div>`;
+  }
+  function dyWeekFind(ds,id){
+    const v=plBlocksDisplay(ds).find(x=>String(x.id)===String(id)); if(!v) return null;
+    const list=plBlocksFor(ds); return list.find(x=>String(x.id)===String(id))||(v.fromRecur?list.find(x=>x.fromRecur===v.fromRecur):null);
+  }
+  function dyWeekGridBind(c,opt){
+    c.querySelectorAll('[data-dwgblk]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); const k=el.dataset.dwgblk, ix=k.indexOf('|'), ds=k.slice(0,ix);
+      const b=dyWeekFind(ds,k.slice(ix+1)); if(b) dyMenu(b,ds,{week:true}); });
+    c.querySelectorAll('[data-dwgcol]').forEach(col=>col.onclick=e=>{
+      const ds=col.dataset.dwgcol, H0=+(c.querySelector('[data-dwgh0]')||{dataset:{}}).dataset.dwgh0||0;
+      const r=col.getBoundingClientRect(), h=Math.min(23,Math.max(0,Math.floor(H0+(e.clientY-r.top)/DW_HP)));
+      const q=plData(), old=q.selDate; q.selDate=ds; try{ plBlockSheet(null,h); } finally{ q.selDate=old; } });
+    c.querySelectorAll('[data-dwgday]').forEach(el=>el.onclick=()=>{ const ds=el.dataset.dwgday;
+      if(opt&&opt.onOpenDay) return opt.onOpenDay(ds);
+      const p=plData(); p.selDate=ds; p.scope='day'; saveGoals(); plRerender(); try{ window.scrollTo(0,0); }catch(_){} });
+    dyGridScroll(c);
   }
   function dyWeekBind(c,opt){
     const sel=dyWk.sel;
@@ -269,6 +316,8 @@
     c.querySelectorAll('[data-dydone]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); const b=find(el.dataset.dydone); if(b) dyComplete(b.id,sel); });
     c.querySelectorAll('[data-dyblk]').forEach(el=>el.onclick=()=>{ const b=find(el.dataset.dyblk); if(b) dyMenu(b,sel,{week:true}); });
     dyWeekTasksBind(c);
+    if(typeof wgoBind==='function') wgoBind(c,dyWk.mon,plRerender);   // цілі тижня (49-calendar.js)
+    dyWeekGridBind(c,opt);
     { const o=c.querySelector('[data-dwopen]'); if(o&&opt&&opt.onOpenDay) o.onclick=()=>opt.onOpenDay(sel); else if(o) o.onclick=()=>{ const p=plData(); p.selDate=sel; p.scope='day'; saveGoals(); plRerender(); try{ window.scrollTo(0,0); }catch(_){} }; }
   }
 

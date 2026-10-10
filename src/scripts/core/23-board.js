@@ -17,7 +17,6 @@
       bindWidgets:function(rootEl){ try{ window.__btRoot=rootEl||null; bindTiles(); }catch(e){ console.error('bindWidgets',e); } finally{ window.__btRoot=null; } },
       curKey:function(){ return boardKey; },
       folderList:function(){ try{ return orderedFolderKeys().filter(function(k){ try{ return folderVisible(k); }catch(_){ return true; } }).map(function(k){ return {key:k, name:(folders[k]&&folders[k].name)||k, emoji:(folders[k]&&folders[k].emoji)||'📁'}; }); }catch(_){ return []; } },
-      folderProgress:function(k){ try{ return folderProgress(k); }catch(_){ return {done:0,total:0,pct:0}; } },
       folderName:function(k){ try{ var base=k?String(k):String(boardKey||'').split('__sp_')[0]; return (folders[base]&&folders[base].name)||''; }catch(_){ return ''; } },
       /* заголовок документа = назва папки: змінили там — змінюємо й папку (дія людини, тож звичайний saveFolders) */
       renameFolder:function(name){ try{
@@ -28,17 +27,6 @@
         try{ if(window.pgBarSync) window.pgBarSync(); }catch(_){}
         return true;
       }catch(e){ console.error('renameFolder',e); return false; } },
-      ptrackersFor:function(fkey){ /* усі проєкти (одиночні + у хабах), прив'язані до папки fkey */
-        var res=[];
-        try{ Object.keys(boards||{}).forEach(function(bk){
-          var walk=function(arr){ (arr||[]).forEach(function(b){ if(!b)return;
-            if(b.type==='ptracker'&&b.link===fkey) res.push({id:b.id,title:b.title,emoji:b.emoji,bkey:bk});
-            if(b.type==='phub'&&Array.isArray(b.projects)) b.projects.forEach(function(p){ if(p&&p.link===fkey) res.push({id:p.id,title:p.name,emoji:p.emoji,bkey:bk}); });
-            if(Array.isArray(b.children))walk(b.children); }); };
-          walk(boards[bk]);
-        }); }catch(_){}
-        return res;
-      },
       blockTypes:function(){ try{ return BLOCK_TYPES; }catch(_){ return {}; } },
       spaces:function(){ try{ const ctx=curCtx(); const a=activeSpaceFor(ctx);
         return spacesFor(ctx).map(s=>({id:s.id,name:s.name,emoji:s.emoji,color:s.color,on:s.id===a,
@@ -69,7 +57,6 @@
     quick: {emoji:'⚡', color:'#c77dff', title:'Картка',    desc:'Коротка замітка'},
     divider:{emoji:'➖', color:'#8b93a3', title:'Роздільник', desc:'Лінія між секціями'},
     quote: {emoji:'❝', color:'#9b8cff', title:'Цитата',    desc:'Виділена думка'},
-    progress:{emoji:'📊', color:'#34c77b', title:'Прогрес', desc:'Шкала виконання'},
     calendar:{emoji:'📅', color:'#5b8def', title:'Календар', desc:'Місяць з відмітками'},
     countdown:{emoji:'⏳', color:'#e8843c', title:'Відлік', desc:'Скільки днів до дати'},
     toggle:{emoji:'🔽', color:'#5b8def', title:'Тогл',     desc:'Заголовок, що розгортає текст'},
@@ -81,19 +68,10 @@
     h1:{emoji:'𝐇', color:'#f3f5f8', title:'Заголовок 1', desc:'Великий заголовок'},
     h2:{emoji:'𝐇', color:'#c7cad3', title:'Заголовок 2', desc:'Середній підзаголовок'},
     h3:{emoji:'𝐇', color:'#8b93a3', title:'Заголовок 3', desc:'Малий підзаголовок'},
-    wpult:  {emoji:'🎛️', color:'#6a7dff', title:'Пульт проєктів', desc:'Наступний крок кожного проєкту — закривай не заходячи'},
-    wstack: {emoji:'🃏', color:'#ff6b9d', title:'Фокус-стек', desc:'Обліт проєктів по одному, як картки'},
-    wpipe:  {emoji:'📊', color:'#5b8def', title:'Пайплайн', desc:'Проєкти за статусами · тап міняє статус'},
-    wtline: {emoji:'🗓️', color:'#e8843c', title:'Таймлайн', desc:'Дедлайни проєктів на стрічці тижнів'},
-    wportal:{emoji:'🌀', color:'#c77dff', title:'Портали', desc:'Швидкий стрибок у будь-яку папку'},
     wplanday:{emoji:'📅', color:'#6a7dff', title:'План на день', desc:'Точки цього проєкту сьогодні · синхрон із Планером'},
     wplanmonth:{emoji:'🗓', color:'#8b5cf6', title:'План на місяць', desc:'Календар точок проєкту + найближчі'},
-    kanban: {emoji:'🗂️', color:'#5b8def', title:'Канбан', desc:'Колонки й картки: заявки → в роботі → готово'},
-    contacts:{emoji:'☎️', color:'#34c77b', title:'Контакти', desc:'Партнери, клієнти, сервіси — під рукою'},
-    caseline:{emoji:'🕓', color:'#e8843c', title:'Таймлайн справи', desc:'Хронологія подій з датами'},
     /* ═══ PREMIUM PACK V1 ═══ */
     heatmap:{emoji:'🟩', color:'#34c77b', title:'Хітмапа', desc:'12 тижнів звички клітинками'},
-    chart:  {emoji:'📉', color:'#5b8def', title:'Графік', desc:'Твої точки даних: bar або line'},
     tabs:   {emoji:'🗃️', color:'#9b8cff', title:'Таби', desc:'Кілька вкладок в одному блоці'},
     accord: {emoji:'🪗', color:'#5b8def', title:'Акордеон', desc:'Секції, що розгортаються'},
     code:   {emoji:'⌨️', color:'#8b93a3', title:'Код', desc:'Моноширинний блок із підсвіткою'},
@@ -121,7 +99,6 @@
     quick:'<path d="M13 2L4 14h7l-1 8 9-12h-7z" stroke-linecap="round" stroke-linejoin="round"/>',
     divider:'<path d="M3 12h18" stroke-linecap="round"/>',
     quote:'<path d="M6 17h3l2-4V7H5v6h3zM14 17h3l2-4V7h-6v6h3z"/>',
-    progress:'<rect x="3" y="9" width="18" height="6" rx="3"/><rect x="3" y="9" width="10" height="6" rx="3" fill="currentColor" stroke="none"/>',
     calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke-linecap="round"/>',
     countdown:'<circle cx="12" cy="13" r="8"/><path d="M12 13V9M9 2h6M12 5V2" stroke-linecap="round"/>',
     toggle:'<path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -133,11 +110,7 @@
     h1:'<path d="M4 6v12M12 6v12M4 12h8M17 18V9l-3 2" stroke-linecap="round" stroke-linejoin="round"/>',
     h2:'<path d="M4 6v12M12 6v12M4 12h8M16 18c0-2 4-3 4-6a2 2 0 0 0-4 0" stroke-linecap="round" stroke-linejoin="round"/>',
     h3:'<path d="M4 6v12M12 6v12M4 12h8M16 10a2 2 0 1 1 3 1.5a2 2 0 1 1-3 1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-    kanban:'<rect x="3" y="3" width="5.5" height="18" rx="1.5"/><rect x="9.5" y="3" width="5.5" height="12" rx="1.5"/><rect x="16" y="3" width="5" height="8" rx="1.5"/>',
-    contacts:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round"/><path d="M16 4a4 4 0 0 1 0 8M18 20c0-2.4-1-4.4-2.6-5.6" stroke-linecap="round"/>',
-    caseline:'<path d="M5 3v18" stroke-linecap="round"/><circle cx="5" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="5" cy="13" r="2" fill="currentColor" stroke="none"/><path d="M10 6h11M10 13h8M10 19h5" stroke-linecap="round"/>',
     heatmap:'<rect x="3" y="3" width="4" height="4" rx="1"/><rect x="10" y="3" width="4" height="4" rx="1"/><rect x="17" y="3" width="4" height="4" rx="1"/><rect x="3" y="10" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="10" width="4" height="4" rx="1"/><rect x="3" y="17" width="4" height="4" rx="1"/><rect x="10" y="17" width="4" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="17" width="4" height="4" rx="1"/>',
-    chart:'<path d="M4 20V10M10 20V4M16 20v-8M21 20H3" stroke-linecap="round"/>',
     tabs:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 11h18M8 7V4h5v3" stroke-linecap="round"/>',
     accord:'<rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="12" width="18" height="8" rx="1.5"/><path d="M17 6.5l1.5 1 1.5-1" stroke-linecap="round" stroke-linejoin="round"/>',
     code:'<path d="M8 6l-5 6 5 6M16 6l5 6-5 6M13 4l-2 16" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -230,7 +203,7 @@
   /* той самий тост «Видалено · ↩ Повернути» для дрібних видалень поза дошкою
      (задача планера, крок, пункт біля чекбокса): маленький «×» стирає одразу,
      без підтвердження — тож даємо 5 с усе повернути. restore — як саме повернути. */
-  function flowUndoToast(msg, restore){
+  function flowUndoToast(msg, restore, ms){
     if(typeof restore!=='function') return;
     undoSnapshot={ restore };
     const t=document.getElementById('undoToast');
@@ -238,7 +211,7 @@
     if(m) m.textContent=msg||'Видалено';
     if(t){ t.classList.add('show'); }
     if(undoTimer) clearTimeout(undoTimer);
-    undoTimer=setTimeout(hideUndo,5000);
+    undoTimer=setTimeout(hideUndo,ms||5000);
   }
   window.flowUndoToast=flowUndoToast;
   function hideUndo(){ const t=document.getElementById('undoToast'); if(t) t.classList.remove('show'); }

@@ -1,5 +1,5 @@
 
-/* ═══════════ РЕДАКТОР СТОРІНКИ (Notion-стиль) — читає/пише реальні boards Flow ═══════════ */
+/* ═══════════ РЕДАКТОР СТОРІНКИ «Студія блоків» — читає/пише реальні boards Flow ═══════════ */
 (function(){
   /* «Студія»: категорії + преміальні лінійні іконки (feather-стиль) */
   var PGS_CATS=[
@@ -28,7 +28,6 @@
     {cat:'struct',k:'board', t:'Дошка',   d:'Сітка 12 колонок для віджетів, ресайз за кут', c:'#e8843c', ic:'db'},
     {cat:'struct',k:'divider',t:'Роздільник',d:'Лінія між секціями',  c:'#8b93a3', ic:'divider'},
     {cat:'base',k:'code',   t:'Код',        d:'Моноширинний + копіювати', c:'#4ecdc4', ic:'code'},
-    {cat:'data',k:'pbar',   t:'Прогрес',    d:'Смуга виконання 0–100%, або авто з задач', c:'#34c77b', ic:'pbar'},
     /* ═══ Гроші (48-widgets.js, 09.10.2026) — вікна в Гаманець ═══ */
     {cat:'money', k:'wgin',     t:'Доходи',        d:'Дохід цієї папки: тип (основний/додатковий/пасивний), ціль', c:'#34c77b', ic:'envelope'},
     {cat:'money', k:'wgout',    t:'Витрати',       d:'Витрати цієї папки з лімітом на місяць',  c:'#ff7a59', ic:'envelope'},
@@ -36,17 +35,16 @@
     {cat:'money', k:'wgmission',t:'Гроші місії',   d:'Дохід, бюджет і приз місії цієї папки',   c:'#34c77b', ic:'envelope'},
     {cat:'money', k:'wgenv',    t:'Конверти й платежі', d:'Сума в конвертах і найближчі рядки Плану', c:'#f0b429', ic:'envelope'},
     {cat:'money', k:'wgdebt',   t:'Борги й правила', d:'Хто кому винен, серія, дисципліна',     c:'#ff4d6d', ic:'envelope'},
-    {cat:'data',k:'wplanday', t:'План на день', d:'Точки з Планера для папки-проєкту',    c:'#5b8def', ic:'countdown'},
-    {cat:'data',k:'wplanmonth',t:'План на місяць', d:'Ритм проєкту за місяць з Планера',  c:'#5b8def', ic:'calendar'},
+    /* ═══ Дані (core/48-widgets.js, 10.10.2026) — вікна в місію, трекер і Планер; лягають у дошку віджетів S/M/L.
+       «План на день / місяць» (wplanday/wplanmonth) з меню прибрано — їх заміняє «Час папки»; старі блоки малюються як були. ═══ */
+    {cat:'data',k:'dmission', t:'Місія папки', d:'Прогрес місії, наступний крок, дедлайн',        c:'#34c77b', ic:'target'},
+    {cat:'data',k:'dhabit',   t:'Звичка папки', d:'Позначки місії за тиждень, серія, ✓ сьогодні',  c:'#e8843c', ic:'habits'},
+    {cat:'data',k:'dtime',    t:'Час папки',    d:'Блоки Планера цієї папки: день, тиждень, місяць', c:'#5b8def', ic:'calendar'},
+    {cat:'data',k:'dcal',     t:'Календар папки', d:'Місяць: блоки й події папки, тап — день у Планері', c:'#ff9a4d', ic:'calendar'},
     {cat:'data',  k:'countdown',t:'Відлік',  d:'Живий таймер до дати',  c:'#e8843c', ic:'countdown'},
-    {cat:'data',  k:'journal',  t:'Щоденник', d:'Записи на кожен день',  c:'#7c8cff', ic:'journal'},
-    {cat:'data',  k:'decision', t:'Лог рішень', d:'Рішення → очікування → перевірка', c:'#f0b429', ic:'decision'},
-    {cat:'data',  k:'phub', t:'Проєкти', d:'Хаб цілей зі звʼязком з папками', c:'#7c8cff', ic:'phub'},
-    {cat:'data',  k:'habits', t:'Трекер звичок', d:'Щоденні звички + серії', c:'#34c77b', ic:'habits'},
     /* ═══ PREMIUM PACK V1 ═══ */
     {cat:'struct',k:'tabs',   t:'Таби',      d:'Кілька вкладок в одному блоці', c:'#9b8cff', ic:'tabs'},
     {cat:'data',  k:'heatmap', t:'Хітмапа',   d:'12 тижнів звички клітинками',   c:'#34c77b', ic:'heatmap'},
-    {cat:'data',  k:'chart',   t:'Графік',    d:'Точки даних: bar або line',     c:'#5b8def', ic:'chartW'},
     {cat:'data',  k:'wfocus',  t:'Фокус',     d:'Помодоро 25/5 із кільцем',      c:'#e8843c', ic:'wfocus'},
   ];
   /* синоніми UA/EN/транслітом для пошуку в палітрі (SPECblocksv2 §3.2) */
@@ -64,23 +62,22 @@
     divider:['hr','лінія','separator','роздільник'],
     db:['database','база','таблиця','table','board','дошка'],
     code:['code','код','snippet'],
-    pbar:['progress','прогрес','бар'],
     countdown:['timer','таймер','відлік','deadline','дедлайн'],
-    journal:['diary','щоденник'],
-    decision:['decision','рішення','log'],
-    phub:['projects','проєкти','goals','цілі'],
-    habits:['habit','звички','streak','трекер'],
     tabs:['tabs','вкладки','таби'],
     heatmap:['heatmap','хітмапа','calendar','активність'],
     wgin:['дохід','гроші','income','money','заробіток'], wgout:['витрати','гроші','expense','money'], wgwallet:['гаманець','баланс','wallet','гроші'],
     wgmission:['місія','гроші','бюджет'], wgenv:['конверт','платежі','план'], wgdebt:['борги','правила','debt'],
-    chart:['chart','графік','graph','діаграма'],
     wfocus:['focus','фокус','pomodoro','помодоро'],
+    dmission:['місія','ціль','прогрес','mission','goal','progress','дедлайн','віджет','дані'],
+    dhabit:['звичка','трекер','серія','habit','streak','позначка','галочка','віджет','дані'],
+    dtime:['час','план','планер','день','тиждень','місяць','time','planner','schedule','календар','віджет','дані'],
+    dcal:['календар','місяць','дата','подія','події','дні','calendar','event','month','планер','віджет','дані'],
     ai:['ai','ші','штучний','флоу']
   };
   /* видалені з палітри Акордеон/Секція/Промт/Папку(group), і зведені в Картку/Вкладення типи —
      їхній рендер і applySlash-кейси навмисно лишені нижче незмінними: старі сторінки читаються як і раніше (SPECblocksv2 §3.1) */
   var PGS_ICONS={
+    target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',
     win:'<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 9.5h18" stroke-linecap="round"/><path d="M6.5 13h8M6.5 16h5" stroke-linecap="round" opacity=".65"/>',
     text:'<path d="M4 7V5h16v2M12 5v14M9 19h6" stroke-linecap="round"/>',
     promptB:'<rect x="2" y="3" width="20" height="18" rx="3"/><path d="M6 8l4 4-4 4M12 16h6" stroke-linecap="round" stroke-linejoin="round"/>',

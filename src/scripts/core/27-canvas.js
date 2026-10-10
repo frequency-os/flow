@@ -46,14 +46,12 @@
         b.rows=b.rows.map(r=>Array.isArray(r)?b.cols.map((_,i)=>r[i]||''):b.cols.map(()=>'')); }
       if(t==='link'){ if(typeof b.url!=='string') b.url=''; if(typeof b.label!=='string') b.label=''; }
       if(t==='group'||t==='page'){ b.children=normalizeBlocks(Array.isArray(b.children)?b.children:[]); if(typeof b.open!=='boolean') b.open=true; }
-      if(t==='progress'){ b.value=Math.max(0,Math.min(100,parseInt(b.value)||0)); }
       if(t==='calendar'){ if(!b.marks||typeof b.marks!=='object') b.marks={}; if(!b.ym) b.ym=ymLocal(); }
       if(t==='task'){ if(!b.prio) b.prio='none'; if(!Array.isArray(b.subs)) b.subs=[];
         b.subs=b.subs.map(s=>({id:s&&s.id||Date.now()+Math.random(),text:s&&s.text||'',done:!!(s&&s.done)})); }
       if(t==='callout'){ if(!b.tone) b.tone='tip'; }
       if(t==='quote'){ if(!b.qstyle) b.qstyle='line'; }
       if((t==='list') && !b.lstyle) b.lstyle='bullet';
-      if(t==='progress' && !b.pview) b.pview='bar';
       if(!b.id) b.id=Date.now()+Math.random();
       return b;
     });
@@ -283,9 +281,10 @@
         const ic=c.icon||folderIconFor(c.emoji);
         // сфера (39-spheres.js): лише два короткі рядки, усе інше відкидаємо
         const sph=(c.sphere&&typeof c.sphere.tpl==='string')?{tpl:c.sphere.tpl.slice(0,16),bld:String(c.sphere.bld||'').slice(0,16)}:undefined;
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph}); }
+        const gv=(c.gview==='folder'||c.gview==='ios')?c.gview:undefined;
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv}); }
         // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
-        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph}; }
+        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv}; }
       });
     }
   }
@@ -337,7 +336,7 @@
     const __RAW = await (async ()=>{
       const keys=[DEBT_KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',FDELKEY,
-        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,FINPROJKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
+        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,FINPROJKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY,'fin_tomb'];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
           r=>[k,(r&&typeof r.value!=='undefined')?r.value:null],
@@ -471,6 +470,8 @@
     try{ const raw=__RAW[WKEXTRAKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) workExtras=d; }catch(_){}
     try{ const raw=__RAW[WKBLKKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') wkBlocks=Object.assign(wkBlocks,d); }catch(_){}
     try{ const raw=__RAW[RECKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) recurring=d; }catch(_){}
+    // «надгробки» обнулення фінансів: стерте на цьому чи іншому пристрої не повертається зі старої копії (51-money-reset.js)
+    try{ if(typeof finTombLoad==='function') finTombLoad(__RAW['fin_tomb']); }catch(_){}
     try{ const raw=__RAW[FINPROJKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) finProjects=d.filter(p=>p&&typeof p.id==='string'); }catch(_){}
     try{ const raw=__RAW[CARDKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) cards=d; }catch(_){}
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}

@@ -213,7 +213,7 @@
     el.innerHTML=h;
     el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
       if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
-      if(isGroup){ openFolderGroup(k); return; }
+      if(isGroup){ openGroupAsChosen(k); return; }
       goFolder(k); };
     return el;
   }
@@ -232,7 +232,7 @@
       `<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню групи «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
     el.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
       if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
-      openFolderGroup(k); };
+      openGroupAsChosen(k); };
     return el;
   }
   function fc3Add(){
@@ -278,13 +278,15 @@
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag',
-      'fv2-gallery','fv2-sections','fv2-bento','fsz-s','fsz-m','fsz-l');
+      'fv2-gallery','fv2-sections','fv2-bento','fsz-s','fsz-m','fsz-l','st-on');
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
     try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
     let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project'));
+    // порожній акаунт — «Стартовий набір» замість голого «＋ Нова папка» (53-starter.js)
+    try{ if(starterActive()){ starterRender(grid); return; } stHeroOff(); }catch(e){ console.error('starter',e); }
     // «за назвою»: закріплені однаково зверху, решта — за абеткою
     if(folderOpts.sort==='name') keys=keys.slice().sort((a,b)=>
       ((folders[b].pinned?1:0)-(folders[a].pinned?1:0)) || String(folders[a].name||'').localeCompare(String(folders[b].name||''),'uk'));
@@ -345,7 +347,7 @@
       el.innerHTML=inner;
       el.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
         if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
-        if(isGroup){ openFolderGroup(k); return; }
+        if(isGroup){ openGroupAsChosen(k); return; }
         goFolder(k); };
       grid.appendChild(el);
     });
@@ -416,7 +418,9 @@
         if(par) folders[key].parent=par;
         order.push(key);
         saveFolders(); renderDashboard();
-        if(par) openFolderGroup(par);
+        if(par){ const act=document.querySelector('.screen.active');
+          if(act&&act.id==='scr-page'&&pgBarFolder()===par){ try{ renderPgLinks(); }catch(_){} }
+          else openGroupAsChosen(par); }
       }});
   }
 
@@ -468,13 +472,63 @@
       m.querySelector('[data-gnotes]').onclick=()=>go(key);
       m.querySelectorAll('[data-gkid]').forEach(b=>b.onclick=()=>{
         const ck=b.dataset.gkid;
-        if(groupKids(ck).length){ openFolderGroup(ck); return; }   // група в групі — своя шторка
+        if(groupKids(ck).length){ closeFolderMenu(); openGroupAsChosen(ck,key); return; }   // група в групі — її спосіб показу
         go(ck);
       });
       m.querySelector('[data-gnew]').onclick=()=>{ closeFolderMenu(); createFolder(key); };
       m.querySelector('[data-gadd]').onclick=()=>openFolderGroupAdd(key);
     });
     try{ window.platform.haptic('light'); }catch(_){}
+  }
+  /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
+     «Стос» — шторка зі списком (як було), «Як папка» — документ групи з підпапками зверху,
+     «Як на iPhone» — вікно з іконками підпапок поверх Огляду. Поле folders[k].gview. */
+  const GVIEW={stack:['Стос','шторка зі списком папок'],folder:['Як папка','документ, підпапки зверху'],ios:['Як на iPhone','вікно з іконками']};
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='ios')?v:'stack'; }
+  function openGroupAsChosen(key, from){
+    const v=gviewOf(key);
+    if(v==='folder'){ closeFolderMenu(); window.__fgNext=from||(folders[key]&&folders[key].parent)||''; goFolder(key); window.__fgNext=null; return; }
+    if(v==='ios'){ openFolderGroupIOS(key); return; }
+    openFolderGroup(key);
+  }
+  window.openGroupAsChosen=openGroupAsChosen;
+  function openFolderGroupIOS(key){
+    const g=folders[key]; if(!g) return;
+    closeFolderMenu();
+    const kids=groupKids(key);
+    const m=document.createElement('div'); m.className='fmenu-sheet fios-ov'; m.id='fmenuSheet';
+    m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label','Група «'+g.name+'»');
+    const tile=(ck)=>{ const f=folders[ck];
+      return `<button class="fios-t" data-iokid="${esc(ck)}"><span class="fios-ic" style="--c:${safeColor(f.c,'#6a7dff')}">${f.photo?`<img alt="" src="${esc(safeImg(window.photoSrc(f.photo)))}">`:`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}</span><span class="fios-n" data-i18n-skip="1">${esc(f.name)}</span></button>`; };
+    m.innerHTML=`<div class="fios-in">
+      <div class="fios-h"><b data-i18n-skip="1">${esc(g.name)}</b><button class="fios-more" data-iomore aria-label="Налаштування групи">⋯</button></div>
+      <div class="fios-grid">${kids.map(tile).join('')}<button class="fios-t fios-add" data-ionew><span class="fios-ic">＋</span><span class="fios-n">Нова</span></button></div>
+      <button class="fios-notes" data-ionotes>Відкрити нотатки «<span data-i18n-skip="1">${esc(g.name)}</span>»</button></div>`;
+    m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
+    document.body.appendChild(m);
+    const go=(k)=>{ closeFolderMenu(); window.__fgNext=key; goFolder(k); window.__fgNext=null; };
+    m.querySelectorAll('[data-iokid]').forEach(b=>b.onclick=()=>{ const ck=b.dataset.iokid; if(groupKids(ck).length){ openGroupAsChosen(ck,key); return; } go(ck); });
+    m.querySelector('[data-ionew]').onclick=()=>{ closeFolderMenu(); createFolder(key); };
+    m.querySelector('[data-ionotes]').onclick=()=>go(key);
+    m.querySelector('[data-iomore]').onclick=()=>openFolderMenu(key);
+    try{ window.platform.haptic('light'); }catch(_){}
+  }
+  function openGroupViewSheet(key){
+    const f=folders[key]; if(!f) return;
+    const cur=gviewOf(key);
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Як відкривати · <span data-i18n-skip="1">${esc(f.name)}</span></div>
+      ${Object.keys(GVIEW).map(v=>`<button class="fgs-row${cur===v?' on':''}" data-gv="${v}" aria-pressed="${cur===v}">
+        <span class="fgs-t"><b>${GVIEW[v][0]}</b><small>${GVIEW[v][1]}</small></span><span class="fgs-go">${cur===v?'✓':''}</span></button>`).join('')}
+      <button class="fmi" data-back>‹ Назад до меню</button>`,
+    m=>{
+      m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
+        const v=b.dataset.gv; if(v==='stack') delete f.gview; else f.gview=v;
+        saveFolders(); renderDashboard(); openGroupViewSheet(key);
+        try{ window.platform.haptic('select'); }catch(_){}
+      });
+      m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
+    });
   }
   // додати в групу папку, що вже є на головній
   function openFolderGroupAdd(key){
@@ -677,7 +731,9 @@
     const top=document.querySelector('#scr-page .pg-top'); if(!top||top.__pgb) return;
     top.__pgb=true; top.classList.add('pgb-v2');
     const up=document.getElementById('pgCrumbUp'), nm=document.getElementById('pgCrumbName'), more=document.getElementById('pgMoreBtn');
-    if(up) up.onclick=()=>{ const f=folders[pgBarFolder()]; const p=f&&f.parent; goHome(); if(p&&folders[p]) setTimeout(()=>openFolderGroup(p),60); };
+    if(up) up.onclick=()=>{ const f=folders[pgBarFolder()]; const p=f&&f.parent;
+      if(p&&folders[p]&&folders[p].gview==='folder'){ goFolder(p); return; }   // «як папка» — вгору в документ групи
+      goHome(); if(p&&folders[p]) setTimeout(()=>openGroupAsChosen(p),60); };
     if(nm) nm.onclick=pgBarSwitchSheet;
     if(more) more.onclick=pgBarMoreSheet;
     // шлях і назва оновлюються при кожному відкритті документа
@@ -856,6 +912,8 @@
       ${fmRow('due','cal',f.due?('Дедлайн: '+esc(f.due)):'Встановити дедлайн','')}
       ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
       ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
+      ${fmRow('subnew','plus','Нова підпапка','папка всередині «'+esc(f.name)+'»')}
+      ${kids.length?fmRow('gview','type','Як відкривати · '+GVIEW[gviewOf(key)][0],'стос, як папка чи як на iPhone'):''}
       ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
@@ -1010,11 +1068,16 @@
     if(act==='pin'){ f.pinned=!f.pinned; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='rename'){ closeFolderMenu(); inputModal({title:'Перейменувати папку',value:f.name,placeholder:'Назва папки',onOk:(v)=>{ if(v){f.name=v;saveFolders();renderDashboard();} }}); return; }
     if(act==='move'){ closeFolderMenu(); openFolderMovePicker(key); return; }
+    if(act==='subnew'){ closeFolderMenu(); createFolder(key); return; }
+    if(act==='gview'){ openGroupViewSheet(key); return; }
     if(act==='icon'){ openFolderIconPicker(key); return; }
     // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
     // губився б мовчки. Автоматичну — переобираємо під нове емодзі.
     if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; if(!f.iconSet) f.icon=folderIconFor(v); saveFolders(); renderDashboard(); }}); return; }
-    if(act==='delete'){ confirmSheet({title:'Видалити папку «'+f.name+'»?', onOk:()=>{ folderDelete(key); renderDashboard(); closeFolderMenu(); }}); return; }   // з документом, темами, фото й посиланнями чатів — і надгробком для інших пристроїв
+    if(act==='delete'){ const nm=f.name; confirmSheet({title:'Видалити папку «'+nm+'»?',
+      sub:'Зникнуть документ папки, її обкладинка й фото, звʼязки з чатами. Протягом 10 секунд можна повернути.',
+      onOk:()=>{ closeFolderMenu(); folderDeleteLater(key,10600);   // трохи довше за тост — «Повернути» на самому краю ще спрацює
+        try{ window.flowUndoToast('Папку «'+nm+'» видалено', ()=>folderDeleteCancel(key), 10000); }catch(_){} }}); return; }   // з документом, темами, фото й посиланнями чатів — і надгробком для інших пристроїв
   }
   function pickFolderPhoto(key){
     const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';

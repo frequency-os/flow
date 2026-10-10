@@ -113,3 +113,90 @@
   .mo-ta{box-sizing:border-box;width:100%;min-height:150px;font:inherit;font-size:16px;line-height:1.45;color:var(--text);background:var(--field);
     border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical;}
   .mo-ta:focus{outline:2px solid var(--accent);outline-offset:0;}
+
+  /* ── календар Планера (49-calendar.js): ★ подія і • платіж у клітинці, шторка дня ── */
+  .mo-d{position:relative;}
+  .mo-d .mo-ev{position:absolute;top:2px;right:4px;font-style:normal;font-size:9px;line-height:1;color:#f5b73b;}
+  .mo-d .mo-pay{position:absolute;top:5px;left:5px;width:5px;height:5px;border-radius:50%;background:#34c77b;}
+  .cal-ov .jn-ed{gap:12px;}
+  .cal-sec{display:flex;flex-direction:column;gap:6px;}
+  .cal-sh{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .cal-sh small{font-size:12px;letter-spacing:0;text-transform:none;}
+  .cal-none{font-size:13px;color:var(--muted);font-weight:600;}
+  .cal-row{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border-radius:14px;
+    background:var(--field);border:1px solid var(--line);color:var(--text);}
+  .cal-row.ro{cursor:default;}
+  .cal-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .cal-row[data-calbl]{border-left:4px solid var(--bc,var(--accent));}
+  .cal-ic{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:14px;}
+  .cal-ic.ev{background:color-mix(in srgb,#f5b73b 22%,transparent);color:#f5b73b;}
+  .cal-ic.pay{background:color-mix(in srgb,#34c77b 20%,transparent);}
+  .cal-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .cal-tx b{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cal-tx b.done{text-decoration:line-through;color:var(--muted);}
+  .cal-tx small{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cal-tm{flex:none;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted);}
+  .cal-go{flex:none;color:var(--muted);font-size:18px;}
+  .cal-ok{flex:none;color:#34c77b;font-weight:800;}
+  .cal-amt{flex:none;font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .cal-amt.in{color:#34c77b;} .cal-amt.out{color:var(--text);}
+  .cal-note{box-sizing:border-box;width:100%;min-height:76px;resize:vertical;padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+    background:var(--field);color:var(--text);font:600 15px/1.4 inherit;font-family:inherit;}
+  .cal-note:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .cal-acts{display:flex;flex-wrap:wrap;gap:8px;}
+  .cal-acts button{all:unset;box-sizing:border-box;cursor:pointer;flex:1 1 30%;min-height:46px;padding:0 12px;border-radius:14px;display:grid;place-items:center;
+    font-size:14px;font-weight:800;color:var(--text);background:var(--field);border:1px solid var(--line);text-align:center;}
+  .cal-acts button[data-calopen]{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .cal-acts button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  /* підпункти блоку — шторка */
+  .sub-list{display:flex;flex-direction:column;gap:6px;}
+  .sub-row{display:flex;align-items:center;gap:10px;min-height:48px;padding:4px 6px 4px 10px;border-radius:14px;background:var(--field);border:1px solid var(--line);}
+  .sub-row>span{flex:1;min-width:0;font-size:15px;font-weight:700;overflow-wrap:anywhere;}
+  .sub-row.on>span{color:var(--muted);text-decoration:line-through;}
+  .sub-ck{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--accent);display:grid;place-items:center;font-weight:800;color:#fff;}
+  .sub-row.on .sub-ck{background:var(--accent);}
+  .sub-rm{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:44px;height:44px;display:grid;place-items:center;color:var(--muted);font-size:14px;}
+  .sub-ck:focus-visible,.sub-rm:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .sub-add{display:flex;gap:8px;}
+  .sub-add input{flex:1;min-width:0;min-height:46px;box-sizing:border-box;padding:0 12px;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--text);font:600 15px inherit;font-family:inherit;}
+  .sub-add button{all:unset;box-sizing:border-box;cursor:pointer;width:46px;min-height:46px;border-radius:14px;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:20px;font-weight:800;}
+  .sub-add input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  /* «Весь день» над сіткою годин і нотатка під нею (Журнал → День) */
+  .cal-allday{display:flex;align-items:flex-start;gap:10px;margin:4px 0 10px;padding:8px 10px;border-radius:14px;background:var(--card);border:1px solid var(--line);}
+  .cal-ad-l{flex:none;padding-top:7px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .cal-ad-c{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;}
+  .cal-chip{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:4px;min-height:34px;padding:0 11px;border-radius:99px;
+    font-size:13px;font-weight:800;color:var(--text);border:1px solid var(--line);background:var(--field);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  button.cal-chip{cursor:pointer;}
+  .cal-chip.ev{border-color:color-mix(in srgb,#f5b73b 55%,var(--line));background:color-mix(in srgb,#f5b73b 14%,var(--field));}
+  .cal-chip.pay{border-color:color-mix(in srgb,#5b8def 50%,var(--line));background:color-mix(in srgb,#5b8def 12%,var(--field));font-variant-numeric:tabular-nums;}
+  .cal-chip.pay.in{border-color:color-mix(in srgb,#34c77b 50%,var(--line));background:color-mix(in srgb,#34c77b 12%,var(--field));}
+  .cal-chip.add{color:var(--muted);border-style:dashed;background:transparent;}
+  .cal-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .cal-notecard{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:4px;width:100%;margin-top:12px;padding:12px 14px;border-radius:16px;
+    background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .cal-notecard.empty{border-style:dashed;}
+  .cal-nc-h{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .cal-nc-t{font-size:15px;font-weight:600;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;}
+  .cal-notecard.empty .cal-nc-t{color:var(--muted);}
+  .cal-notecard:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  /* цілі тижня (Журнал → Тиждень) */
+  .wgo{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .wgo-r{display:flex;gap:8px;align-items:stretch;}
+  .wgo-m{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-width:0;display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 12px;border-radius:14px;
+    background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .wgo-t{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .wgo-t b{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wgo-t small{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wgo-v{align-self:center;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .wgo-r.ok .wgo-v{color:#34c77b;}
+  .wgo-bar{grid-column:1/-1;height:6px;border-radius:9px;background:color-mix(in srgb,var(--text) 10%,transparent);overflow:hidden;}
+  .wgo-bar i{display:block;height:100%;border-radius:inherit;background:var(--c);}
+  .wgo-r.ok .wgo-bar i{background:#34c77b;}
+  .wgo-p{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:52px;border-radius:14px;display:grid;place-items:center;font-size:15px;font-weight:800;
+    color:var(--text);background:var(--field);border:1.5px solid var(--c);}
+  .wgo-m:focus-visible,.wgo-p:focus-visible,.wgo-add:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .wgo-add{all:unset;box-sizing:border-box;cursor:pointer;min-height:32px;padding:0 10px;border-radius:10px;font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:0;text-transform:none;}
+  .wgo-n{display:flex;align-items:center;gap:16px;}
+  .wgo-n button{all:unset;box-sizing:border-box;cursor:pointer;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:20px;font-weight:800;background:var(--field);border:1px solid var(--line);color:var(--text);}
+  .wgo-n b{min-width:32px;text-align:center;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;}

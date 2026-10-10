@@ -346,10 +346,10 @@
   .tquote.qz-line .quotebody{border-left:3px solid var(--tc);padding-left:13px;font-style:italic;}
   .tquote.qz-card .quotebody{background:color-mix(in srgb,var(--tc) 13%,transparent);border-radius:12px;padding:14px;}
   .tquote.qz-big .quotebody{font-size:19px;font-weight:700;text-align:center;line-height:1.4;}
-  .qz-styles,.ls-styles,.pv-styles{display:flex;gap:6px;margin-top:10px;}
-  .qz-style,.ls-style,.pv-style{width:32px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--card);
+  .qz-styles,.ls-styles{display:flex;gap:6px;margin-top:10px;}
+  .qz-style,.ls-style{width:32px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--card);
     color:var(--muted);cursor:pointer;font-size:13px;display:grid;place-items:center;transition:.13s;}
-  .qz-style.on,.ls-style.on,.pv-style.on{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 22%,transparent);color:var(--text);}
+  .qz-style.on,.ls-style.on{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 22%,transparent);color:var(--text);}
 
   /* TASK subtasks + ring */
   .task-ring{width:38px;height:38px;flex:0 0 auto;margin-right:2px;}
@@ -372,14 +372,6 @@
   .tsort:hover{color:var(--tc);opacity:1;}
   .dtable tr.tsum td{background:color-mix(in srgb,var(--tc) 10%,transparent);font-weight:800;font-size:12px;color:var(--tc);
     border-top:2px solid color-mix(in srgb,var(--tc) 30%,transparent);}
-
-  /* PROGRESS views */
-  .prog-ring{width:54px;height:54px;margin:4px auto 2px;}
-  .prog-ring svg{width:100%;height:100%;}
-  .prog-seg{display:flex;gap:5px;align-items:center;margin:6px 0;}
-  .prog-seg span{flex:1;height:11px;border-radius:4px;background:var(--hair);transition:.2s;}
-  .prog-seg span.on{background:var(--tc);}
-  .prog-seg .prog-segval{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--tc);margin-left:4px;}
 
   /* PAGE/GROUP icon + color */
   .card-icobtn{background:none;border:none;cursor:pointer;padding:0;transition:transform .12s;}
@@ -410,11 +402,6 @@
   .tquote .quotebody{font-size:14px;font-style:italic;line-height:1.55;color:var(--text);border-left:3px solid var(--tc);
     padding:4px 0 4px 14px;outline:none;}
   .tquote .quotebody:empty:before{content:attr(data-ph);color:var(--muted);font-style:normal;}
-  .tprog .progwrap{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .tprog .progbar{flex:1;height:10px;border-radius:99px;background:var(--field);overflow:hidden;}
-  .tprog .progbar i{display:block;height:100%;background:var(--tc);border-radius:99px;transition:width .2s;}
-  .tprog .progval{font-size:14px;font-weight:800;color:var(--tc);min-width:42px;text-align:right;}
-  .tprog .progrange{width:100%;accent-color:var(--tc);}
   /* calendar widget */
   .tcal .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:13px;font-weight:800;}
   .tcal .cal-head button{background:var(--field);border:1px solid var(--line);color:var(--text);width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:14px;}

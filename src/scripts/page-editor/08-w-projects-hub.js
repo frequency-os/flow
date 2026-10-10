@@ -1,122 +1,4 @@
-  /* ═══════════ ВІДЖЕТ «ХАБ ПРОЄКТІВ» (список карток, варіант A) ═══════════ */
-  var phOpen={}, phStepAdd={}, phPick={};
-  /* «✕» біля чекбокса / звички стирає одразу, без питання — тож показуємо тост
-     «Видалено · ↩ Повернути» (core, 5 с). pick(block) → [власник, ключ] масиву;
-     на поверненні блок шукаємо наново: документ за цей час міг перемалюватись. */
-  function pgDelUndo(bid,pick,match,msg){
-    var l=locate(bid); if(!l) return;
-    var ref=pick(l.block); if(!ref) return;
-    var arr=ref[0][ref[1]]||[], i=-1;
-    for(var k=0;k<arr.length;k++){ if(match(arr[k])){ i=k; break; } }
-    if(i<0) return;
-    var gone=arr[i];
-    ref[0][ref[1]]=arr.filter(function(x){ return x!==gone; });
-    save(); render();
-    if(window.flowUndoToast) window.flowUndoToast(msg||'Видалено',function(){
-      var l2=locate(bid); if(!l2) return;
-      var r2=pick(l2.block); if(!r2) return;
-      var a=r2[0][r2[1]]||(r2[0][r2[1]]=[]);
-      a.splice(Math.min(i,a.length),0,gone); save(); render();
-    });
-  }
-  var PH_COLORS=['#7c8cff','#34c77b','#f0b429','#ff6b9d','#4ecdc4','#a78bfa'];
-  function phHTML(b){
-    var id=b.id; b.projects=b.projects||[];
-    var mode=b.pmode==='half'?'half':'full';
-    var br=bridge();
-    var active=b.projects.length;
-    var todayProg=0;
-
-    var head='<div class="jr-top"><span class="jr-ic ph-ic">'+pgsIc('phub')+'</span>'
-      +'<div class="jr-tt pg-empty" contenteditable="true" data-ph="Мої проєкти" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
-      +'<div class="jr-mode">'
-      +'<button class="'+(mode==='full'?'on':'')+'" data-phmode="'+id+'|full">Повний</button>'
-      +'<button class="'+(mode==='half'?'on':'')+'" data-phmode="'+id+'|half">Напів</button></div></div>';
-
-    if(mode==='half'){
-      var avg=active?Math.round(b.projects.reduce(function(s,p){return s+ptProgress(p).pct;},0)/active):0;
-      return '<div class="pg-content"><div class="jr ph" data-jrwrap="'+id+'">'+head
-        +'<div class="pt-half">'+active+' проєкт'+(active===1?'':active<5?'и':'ів')+' · середній прогрес '+avg+'%</div>'
-        +'<div class="jr-foot"><span class="jr-chip">'+active+' активн'+(active===1?'ий':'і')+'</span></div></div></div>';
-    }
-
-    var rows=b.projects.map(function(p,idx){
-      p.steps=p.steps||[];
-      var c=safeColor(p.color,PH_COLORS[idx%PH_COLORS.length]);   // колір із даних — у style, чистимо
-      var pr=ptProgress(p);
-      var linkName=p.link&&br&&br.folderName?br.folderName(p.link):'';
-      var opened=phOpen[id+'|'+p.id];
-      if(pr.pct>0) todayProg++;
-
-      var badge = p.link
-        ? '<span class="ph-lk"><svg viewBox="0 0 24 24"><path d="M9 15 15 9M8 12a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M16 12a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4" stroke-linecap="round"/></svg>Папка «'+esc(linkName||'?')+'»</span>'
-        : '<span class="ph-nofold">без папки</span>';
-
-      var meta = pr.total
-        ? pr.done+' з '+pr.total+' кроків'+(pr.fTot?' · '+pr.fDone+'/'+pr.fTot+' у папці':'')
-        : 'ще без кроків';
-
-      var row='<div class="ph-row" data-phrow="'+id+'|'+p.id+'">'
-        +'<span class="ph-emo" style="--pc:'+c+'" data-phemo="'+id+'|'+p.id+'">'+esc(p.emoji||'🎯')+'</span>'
-        +'<div class="ph-body"><div class="ph-name">'+esc(p.name||'Проєкт')+'  '+badge+'</div>'
-        +'<div class="ph-bar"><i style="width:'+pr.pct+'%;background:'+c+'"></i></div>'
-        +'<div class="ph-meta">'+meta+'</div></div>'
-        +'<span class="ph-pct" style="color:'+c+'">'+pr.pct+'%</span></div>';
-
-      var panel='';
-      if(opened){
-        var stepsHTML=p.steps.map(function(s){
-          return '<div class="jt-row"><button class="jt-cb'+(s.done?' on':'')+'" data-phstep="'+id+'|'+p.id+'|'+s.id+'" style="'+(s.done?'--sc:'+c:'')+'"></button>'
-            +'<span class="jt-t'+(s.done?' done':'')+'">'+esc(s.t)+'</span>'
-            +'<button class="jt-x" data-phstepdel="'+id+'|'+p.id+'|'+s.id+'">✕</button></div>';
-        }).join('');
-        var stepAdd=phStepAdd[id+'|'+p.id]
-          ? '<input class="jt-in" data-phstepinput="'+id+'|'+p.id+'" placeholder="Крок плану… (Enter)" autocomplete="off">'
-          : '<button class="jt-add" data-phstepadd="'+id+'|'+p.id+'">＋ крок</button>';
-        var linkCtl = p.link
-          ? '<button class="ph-unlink" data-phunlink="'+id+'|'+p.id+'">🔗 «'+esc(linkName)+'» — відв\u2019язати</button>'
-          : (phPick[id+'|'+p.id]
-              ? '<div class="pt-picker">'+((br&&br.folderList?br.folderList():[]).map(function(f){
-                  return '<button class="pt-pick-i" data-phlink="'+id+'|'+p.id+'|'+f.key+'"><span>'+esc(f.emoji||'📁')+'</span>'+esc(f.name)+'</button>';
-                }).join('')||'<div class="pt-none">Немає папок</div>')
-                +'<button class="pt-pick-x" data-phpickclose="'+id+'|'+p.id+'">Скасувати</button></div>'
-              : '<button class="pt-linkbtn" data-phpick="'+id+'|'+p.id+'"><svg viewBox="0 0 24 24"><path d="M9 15 15 9M8 12a3 3 0 0 1 0-4l1-1a3 3 0 0 1 4 4M16 12a3 3 0 0 1 0 4l-1 1a3 3 0 0 1-4-4" stroke-linecap="round"/></svg> Прив\u2019язати папку</button>');
-        panel='<div class="ph-panel">'
-          +'<input class="ph-rename" data-phname="'+id+'|'+p.id+'" value="'+esc(p.name||'')+'" placeholder="Назва проєкту">'
-          +linkCtl
-          +'<div class="pt-sec" style="margin-top:10px">План</div>'
-          +'<div class="pt-caps">'+stepsHTML+'<div class="jt-addwrap">'+stepAdd+'</div></div>'
-          +'<button class="ph-del" data-phdel="'+id+'|'+p.id+'">Видалити проєкт</button></div>';
-      }
-      return row+panel;
-    }).join('');
-
-    var foot='<div class="jr-foot"><span class="jr-chip">Сьогодні прогрес у '+todayProg+' проєкт'+(todayProg===1?'і':'ах')+'</span>'
-      +'<button class="jr-expico" data-phexport="'+id+'" title="Експорт для Claude">'
-      +'<svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15 7.5 10.5M4.5 19.5h15" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>';
-
-    return '<div class="pg-content"><div class="jr ph" data-jrwrap="'+id+'">'+head
-      +'<div class="ph-list">'+rows+'</div>'
-      +'<button class="ph-addp" data-phadd="'+id+'">＋ Новий проєкт</button>'+foot+'</div></div>';
-  }
-  function phExport(b){
-    var md='# '+(b.title||'Мої проєкти')+'\n\n', br=bridge();
-    (b.projects||[]).forEach(function(p){
-      var pr=ptProgress(p);
-      md+='## '+(p.emoji||'')+' '+(p.name||'Проєкт')+' — '+pr.pct+'%\n\n';
-      if(p.link&&br&&br.folderName) md+='- Папка: '+br.folderName(p.link)+' ('+pr.fDone+'/'+pr.fTot+' задач)\n';
-      (p.steps||[]).forEach(function(s){ md+='- ['+(s.done?'x':' ')+'] '+s.t+'\n'; });
-      md+='\n';
-    });
-    var name='projects-'+jrYmd()+'.md';
-    try{ var file=new File([md],name,{type:'text/markdown'});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:name}); return; } }catch(_){}
-    try{ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));
-      a.download=name; document.body.appendChild(a); a.click();
-      setTimeout(function(){ try{URL.revokeObjectURL(a.href);a.remove();}catch(_){} },1000);
-    }catch(_){ try{ prompt('Скопіюй проєкти:',md); }catch(__){} }
-  }
-
+  /* ═══════════ значки файлів, «Відлік», обробники кліків документа ═══════════ */
   function pgFileIc(name){
     var ext=(name.split('.').pop()||'').toLowerCase();
     if(/pdf/.test(ext))return '📕'; if(/docx?|pages/.test(ext))return '📘';
@@ -124,54 +6,6 @@
     if(/zip|rar|7z/.test(ext))return '🗜️'; if(/mp3|wav|m4a/.test(ext))return '🎵';
     if(/mp4|mov|avi/.test(ext))return '🎬'; if(/png|jpe?g|gif|webp|heic/.test(ext))return '🖼️';
     return '📄';
-  }
-  function currentPtKey(id){ var l=locate(id); return l?(l.block.link||''):''; }
-  function ptExport(b){
-    var pr=ptProgress(b), br=bridge();
-    var md='# Проєкт: '+(b.title||'')+'\n\n';
-    md+='- Прогрес: '+pr.pct+'% ('+pr.done+'/'+pr.total+' кроків)\n';
-    if(b.link&&br&&br.folderName) md+='- Прив\u2019язана папка: '+br.folderName(b.link)+' ('+pr.fDone+'/'+pr.fTot+' задач)\n';
-    md+='\n## План\n\n';
-    (b.steps||[]).forEach(function(s){ md+='- ['+(s.done?'x':' ')+'] '+s.t+'\n'; });
-    md+='\n## Звички\n\n';
-    (b.habits||[]).forEach(function(h){
-      var days=Object.keys(h.marks||{}).filter(function(k){return h.marks[k];}).length;
-      md+='- '+(h.emoji||'')+' '+h.name+' — серія '+ptHabStreak(h.marks||{})+' дн., всього '+days+' днів\n';
-    });
-    var name='project-'+(b.title||'flow').replace(/\s+/g,'-').toLowerCase()+'.md';
-    try{ var file=new File([md],name,{type:'text/markdown'});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:name}); return; } }catch(_){}
-    try{ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));
-      a.download=name; document.body.appendChild(a); a.click();
-      setTimeout(function(){ try{URL.revokeObjectURL(a.href);a.remove();}catch(_){} },1000);
-    }catch(_){ try{ prompt('Скопіюй проєкт:',md); }catch(__){} }
-  }
-
-  function jrExport(b){
-    var e=b.entries||{}, td=b.todos||{};
-    var days=Object.keys(e).concat(Object.keys(td)).filter(function(k,i,a){return a.indexOf(k)===i;})
-      .filter(function(k){return (e[k]||'').trim()||(td[k]||[]).length;}).sort().reverse();
-    if(!days.length){ return; }
-    var md='# '+(b.title||'Щоденник')+'\n\n';
-    days.forEach(function(ymd){
-      var d=jrParse(ymd);
-      md+='## '+String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()
-        +' ('+JR_WD[d.getDay()]+')\n\n';
-      if((e[ymd]||'').trim()) md+=e[ymd].trim()+'\n\n';
-      (td[ymd]||[]).forEach(function(t){ md+='- ['+(t.done?'x':' ')+'] '+t.t+'\n'; });
-      if((td[ymd]||[]).length) md+='\n';
-    });
-    var name='journal-'+jrYmd()+'.md';
-    try{
-      var file=new File([md],name,{type:'text/markdown'});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:name}); return; }
-    }catch(_){}
-    try{
-      var a=document.createElement('a');
-      a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));
-      a.download=name; document.body.appendChild(a); a.click();
-      setTimeout(function(){ try{URL.revokeObjectURL(a.href);a.remove();}catch(_){} },1000);
-    }catch(_){ try{ prompt('Скопіюй текст щоденника:',md); }catch(__){} }
   }
   function cdTick(){
     var els=editor.querySelectorAll('[data-pgcdwrap]');
@@ -261,39 +95,15 @@
     }
   });
   editor.addEventListener('click',function(e){
-    /* ── лог рішень ── */
-    var dm=e.target.closest&&e.target.closest('[data-dlmode]');
-    if(dm){var m0=dm.dataset.dlmode.split('|');var ld=locate(m0[0]);if(ld){ld.block.dmode=m0[1];save();render();}return;}
-    var dn=e.target.closest&&e.target.closest('[data-dlnew]');
-    if(dn){dlNew[dn.dataset.dlnew]=true;render();
-      var t0=editor.querySelector('[data-dltext="'+dn.dataset.dlnew+'"]');if(t0)t0.focus();return;}
-    var dc=e.target.closest&&e.target.closest('[data-dlcancel]');
-    if(dc){delete dlNew[dc.dataset.dlcancel];render();return;}
-    var dd=e.target.closest&&e.target.closest('[data-dldays]');
-    if(dd){var d0=dd.dataset.dldays.split('|');dlDays[d0[0]]=+d0[1];
-      var wrap=dd.closest('.dl-days');
-      wrap.querySelectorAll('.dl-dchipb').forEach(function(x){x.classList.toggle('on',x===dd);});return;}
-    var ds=e.target.closest&&e.target.closest('[data-dlsave]');
-    if(ds){var sid=ds.dataset.dlsave;var ls=locate(sid);if(!ls)return;
-      var tt=(editor.querySelector('[data-dltext="'+sid+'"]')||{}).value||'';
-      var ex=(editor.querySelector('[data-dlexp="'+sid+'"]')||{}).value||'';
-      if(!tt.trim())return;
-      ls.block.decisions=ls.block.decisions||[];
-      ls.block.decisions.push({id:'d'+Date.now(),text:tt.trim(),expect:ex.trim(),
-        created:jrYmd(),days:dlDays[sid]||30,fact:'',verdict:'',reviewed:''});
-      delete dlNew[sid];save();render();return;}
-    var dr=e.target.closest&&e.target.closest('[data-dlrow]');
-    if(dr){var k0=dr.dataset.dlrow;dlOpen[k0]=!dlOpen[k0];render();return;}
-    var dv=e.target.closest&&e.target.closest('[data-dlverd]');
-    if(dv){var v0=dv.dataset.dlverd.split('|');var lv=locate(v0[0]);if(!lv)return;
-      var dec=(lv.block.decisions||[]).find(function(x){return String(x.id)===v0[1];});if(!dec)return;
-      var fta=editor.querySelector('[data-dlfact="'+v0[0]+'|'+v0[1]+'"]');
-      if(fta)dec.fact=fta.value.trim();
-      dec.verdict=v0[2];dec.reviewed=jrYmd();save();render();return;}
-    var da=e.target.closest&&e.target.closest('[data-dlarch]');
-    if(da){dlArch[da.dataset.dlarch]=!dlArch[da.dataset.dlarch];render();return;}
-    var dx=e.target.closest&&e.target.closest('[data-dlexport]');
-    if(dx){var lx2=locate(dx.dataset.dlexport);if(lx2)dlExport(lx2.block);return;}
+    /* ── плашка старого блока (прибрані типи, 10.10.2026): «Прибрати» — видалити блок із документа ── */
+    var orm=e.target.closest&&e.target.closest('[data-pgoldrm]');
+    if(orm){var lor=locate(orm.dataset.pgoldrm);
+      if(lor){var orArr=lor.arr,orIdx=lor.idx,orBlk=lor.block;
+        orArr.splice(orIdx,1);
+        pushOp(function(){orArr.splice(Math.min(orIdx,orArr.length),0,orBlk);},
+               function(){var i=orArr.indexOf(orBlk);if(i>-1)orArr.splice(i,1);});
+        save();render();}
+      return;}
     /* ── код: копіювати ── */
     var cc=e.target.closest&&e.target.closest('[data-pgcodecopy]');
     if(cc){var lcc=locate(cc.dataset.pgcodecopy);if(lcc){var txt=txtOf(lcc.block)||'';
@@ -320,17 +130,6 @@
           for(var di=days.length-1;di>=0;di--){ if(!days[di].className.match(/lv0/)) str++; else break; }
           st.textContent='🔥 '+str+' · '+tot+'/84';}}
       return;}
-    var ca=e.target.closest&&e.target.closest('[data-pgchadd]');
-    if(ca){pgAsk('Точка графіка','мітка | число (напр. Пн | 4)','',function(v){
-      var l=locate(ca.dataset.pgchadd);if(!l)return;
-      var pr=v.split('|').map(function(s){return s.trim();});
-      var lab=pr.length>1?pr[0]:''; var num=pr.length>1?pr[1]:pr[0];
-      l.block.points=l.block.points||[];
-      l.block.points.push({l:lab,v:parseFloat(String(num).replace(',','.'))||0});
-      save();render();});return;}
-    var cv=e.target.closest&&e.target.closest('[data-pgchview]');
-    if(cv){var cv0=cv.dataset.pgchview.split('|');var lcv=locate(cv0[0]);
-      if(lcv){lcv.block.view=cv0[1];try{window.platform.haptic('select');}catch(_){ }save();render();}return;}
     var tb=e.target.closest&&e.target.closest('[data-pgtab]');
     if(tb){var tb0=tb.dataset.pgtab.split('|');var ltb=locate(tb0[0]);
       if(ltb){var blk=ltb.block, ii=parseInt(tb0[1]);
@@ -380,11 +179,6 @@
         if(fb.end&&fb.end>fnow){fb.end=0;}
         else{fb.end=fnow+(fb.mode==='rest'?5:25)*60000;try{window.platform.haptic('medium');}catch(_){ }}
         save();render();}return;}
-    /* ── прогрес-смуга: пресети + перемикач авто/ручний ── */
-    var pb=e.target.closest&&e.target.closest('[data-pgbarset]');
-    if(pb){var pb0=pb.dataset.pgbarset.split('|');var lpb=locate(pb0[0]);if(lpb){lpb.block.value=+pb0[1];save();render();}return;}
-    var pba=e.target.closest&&e.target.closest('[data-pgbarauto]');
-    if(pba){var lpba=locate(pba.dataset.pgbarauto);if(lpba){lpba.block.auto=!lpba.block.auto;save();render();}return;}
     /* ── огляд тижня: AI-підсумок сторінки, перегенеровується (SPECblocksv2 §6) ── */
     var wrg=e.target.closest&&e.target.closest('[data-pgwrgen]');
     if(wrg){
@@ -443,124 +237,6 @@
       }
       return;
     }
-    /* ── трекер звичок ── */
-    var hbm=e.target.closest&&e.target.closest('[data-hbmode]');
-    if(hbm){var hbm0=hbm.dataset.hbmode.split('|');var lhbm=locate(hbm0[0]);if(lhbm){lhbm.block.hmode=hbm0[1];save();render();}return;}
-    var hba=e.target.closest&&e.target.closest('[data-hbadd]');
-    if(hba){hbAdd[hba.dataset.hbadd]=true;render();
-      var hbi=editor.querySelector('[data-hbinput="'+hba.dataset.hbadd+'"]');if(hbi)hbi.focus();return;}
-    var hbmk=e.target.closest&&e.target.closest('[data-hbmark]');
-    if(hbmk){var hbk0=hbmk.dataset.hbmark.split('|');var lhbk=locate(hbk0[0]);
-      if(lhbk){var hh=(lhbk.block.habits||[]).find(function(x){return x.id===hbk0[1];});
-        if(hh){hh.marks=hh.marks||{};if(hh.marks[hbk0[2]])delete hh.marks[hbk0[2]];else hh.marks[hbk0[2]]=true;save();render();}}return;}
-    var hbe=e.target.closest&&e.target.closest('[data-hbemo]');
-    if(hbe){e.stopPropagation();var hbe0=hbe.dataset.hbemo.split('|');var lhbe=locate(hbe0[0]);
-      if(lhbe){var he=(lhbe.block.habits||[]).find(function(x){return x.id===hbe0[1];});
-        if(he){inputModal({title:'Емодзі звички',value:he.emoji||'✅',onOk:function(v){he.emoji=(v||'✅').trim().slice(0,2)||'✅';save();render();}});}}return;}
-    var hbd=e.target.closest&&e.target.closest('[data-hbdel]');
-    if(hbd){var hbd0=hbd.dataset.hbdel.split('|');
-      pgDelUndo(hbd0[0],function(b){return [b,'habits'];},function(x){return x.id===hbd0[1];},'Звичку видалено');return;}
-    var hbx=e.target.closest&&e.target.closest('[data-hbexport]');
-    if(hbx){var lhbx=locate(hbx.dataset.hbexport);if(lhbx)hbExport(lhbx.block);return;}
-    /* ── хаб проєктів ── */
-    var hm=e.target.closest&&e.target.closest('[data-phmode]');
-    if(hm){var hm0=hm.dataset.phmode.split('|');var lhm=locate(hm0[0]);if(lhm){lhm.block.pmode=hm0[1];save();render();}return;}
-    var hadd=e.target.closest&&e.target.closest('[data-phadd]');
-    if(hadd){var lha=locate(hadd.dataset.phadd);if(lha){lha.block.projects=lha.block.projects||[];
-      var pid='p'+Date.now();
-      lha.block.projects.push({id:pid,name:'Новий проєкт',emoji:'🎯',color:PH_COLORS[lha.block.projects.length%PH_COLORS.length],link:'',steps:[]});
-      phOpen[hadd.dataset.phadd+'|'+pid]=true;save();render();}return;}
-    var hemo=e.target.closest&&e.target.closest('[data-phemo]');
-    if(hemo){e.stopPropagation();var em0=hemo.dataset.phemo.split('|');var lem=locate(em0[0]);
-      if(lem){var pe=(lem.block.projects||[]).find(function(x){return x.id===em0[1];});
-        if(pe){inputModal({title:'Емодзі проєкту',value:pe.emoji||'🎯',onOk:function(v){pe.emoji=(v||'🎯').trim().slice(0,2)||'🎯';save();render();}});}}return;}
-    var hrow=e.target.closest&&e.target.closest('[data-phrow]');
-    if(hrow){var rk=hrow.dataset.phrow;phOpen[rk]=!phOpen[rk];render();return;}
-    var hpick=e.target.closest&&e.target.closest('[data-phpick]');
-    if(hpick){phPick[hpick.dataset.phpick]=true;render();return;}
-    var hpx=e.target.closest&&e.target.closest('[data-phpickclose]');
-    if(hpx){delete phPick[hpx.dataset.phpickclose];render();return;}
-    var hlink=e.target.closest&&e.target.closest('[data-phlink]');
-    if(hlink){var hl0=hlink.dataset.phlink.split('|');var lhl=locate(hl0[0]);
-      if(lhl){var pp2=(lhl.block.projects||[]).find(function(x){return x.id===hl0[1];});
-        if(pp2){pp2.link=hl0[2];delete phPick[hl0[0]+'|'+hl0[1]];save();render();}}return;}
-    var hunlink=e.target.closest&&e.target.closest('[data-phunlink]');
-    if(hunlink){var hu0=hunlink.dataset.phunlink.split('|');var lhu=locate(hu0[0]);
-      if(lhu){var pp3=(lhu.block.projects||[]).find(function(x){return x.id===hu0[1];});if(pp3){pp3.link='';save();render();}}return;}
-    var hsa=e.target.closest&&e.target.closest('[data-phstepadd]');
-    if(hsa){phStepAdd[hsa.dataset.phstepadd]=true;render();
-      var hsi=editor.querySelector('[data-phstepinput="'+hsa.dataset.phstepadd+'"]');if(hsi)hsi.focus();return;}
-    var hst=e.target.closest&&e.target.closest('[data-phstep]');
-    if(hst){var hs0=hst.dataset.phstep.split('|');var lhs=locate(hs0[0]);
-      if(lhs){var pp4=(lhs.block.projects||[]).find(function(x){return x.id===hs0[1];});
-        if(pp4){var st4=(pp4.steps||[]).find(function(x){return x.id===hs0[2];});if(st4){st4.done=!st4.done;save();render();}}}return;}
-    var hsd=e.target.closest&&e.target.closest('[data-phstepdel]');
-    if(hsd){var hd0=hsd.dataset.phstepdel.split('|');
-      pgDelUndo(hd0[0],function(b){var pp5=(b.projects||[]).find(function(x){return x.id===hd0[1];});return pp5?[pp5,'steps']:null;},
-        function(x){return x.id===hd0[2];},'Крок видалено');return;}
-    var hdel=e.target.closest&&e.target.closest('[data-phdel]');
-    if(hdel){var hde0=hdel.dataset.phdel.split('|');var lhde=locate(hde0[0]);
-      if(lhde){confirmSheet({title:'Видалити проєкт?',onOk:function(){
-        lhde.block.projects=(lhde.block.projects||[]).filter(function(x){return x.id!==hde0[1];});
-        delete phOpen[hde0[0]+'|'+hde0[1]];save();render();}});}return;}
-    var hex=e.target.closest&&e.target.closest('[data-phexport]');
-    if(hex){var lhex=locate(hex.dataset.phexport);if(lhex)phExport(lhex.block);return;}
-    /* ── проєкт-трекер ── */
-    var pm=e.target.closest&&e.target.closest('[data-ptmode]');
-    if(pm){var m1=pm.dataset.ptmode.split('|');var l1=locate(m1[0]);if(l1){l1.block.pmode=m1[1];save();render();}return;}
-    var pp=e.target.closest&&e.target.closest('[data-ptpick]');
-    if(pp){ptPick[pp.dataset.ptpick]=true;render();return;}
-    var ppx=e.target.closest&&e.target.closest('[data-ptpickclose]');
-    if(ppx){delete ptPick[ppx.dataset.ptpickclose];render();return;}
-    var pl=e.target.closest&&e.target.closest('[data-ptlink]');
-    if(pl){var l2p=pl.dataset.ptlink.split('|');var l2=locate(l2p[0]);if(l2){l2.block.link=l2p[1];delete ptPick[l2p[0]];save();render();}return;}
-    var pu=e.target.closest&&e.target.closest('[data-ptunlink]');
-    if(pu){var l3=locate(pu.dataset.ptunlink);if(l3){l3.block.link='';save();render();}return;}
-    var pst=e.target.closest&&e.target.closest('[data-ptstep]');
-    if(pst){var s0=pst.dataset.ptstep.split('|');var ls=locate(s0[0]);
-      if(ls){var st=(ls.block.steps||[]).find(function(x){return String(x.id)===s0[1];});if(st){st.done=!st.done;save();render();}}return;}
-    var psd=e.target.closest&&e.target.closest('[data-ptstepdel]');
-    if(psd){var sd=psd.dataset.ptstepdel.split('|');
-      pgDelUndo(sd[0],function(b){return [b,'steps'];},function(x){return String(x.id)===sd[1];},'Крок видалено');return;}
-    var psa=e.target.closest&&e.target.closest('[data-ptstepadd]');
-    if(psa){ptStepAdd[psa.dataset.ptstepadd]=true;render();
-      var si=editor.querySelector('[data-ptstepinput="'+psa.dataset.ptstepadd+'"]');if(si)si.focus();return;}
-    var ph=e.target.closest&&e.target.closest('[data-pthab]');
-    if(ph){var h0=ph.dataset.pthab.split('|');var lh=locate(h0[0]);
-      if(lh){var hb=(lh.block.habits||[]).find(function(x){return String(x.id)===h0[1];});
-        if(hb){hb.marks=hb.marks||{};if(hb.marks[h0[2]])delete hb.marks[h0[2]];else hb.marks[h0[2]]=true;save();render();}}return;}
-    var phd=e.target.closest&&e.target.closest('[data-pthabdel]');
-    if(phd){var hd=phd.dataset.pthabdel.split('|');
-      pgDelUndo(hd[0],function(b){return [b,'habits'];},function(x){return String(x.id)===hd[1];},'Звичку видалено');return;}
-    var pha=e.target.closest&&e.target.closest('[data-pthabadd]');
-    if(pha){ptHabAdd[pha.dataset.pthabadd]=true;render();
-      var hi=editor.querySelector('[data-pthabinput="'+pha.dataset.pthabadd+'"]');if(hi)hi.focus();return;}
-    var pex=e.target.closest&&e.target.closest('[data-ptexport]');
-    if(pex){var lex=locate(pex.dataset.ptexport);if(lex)ptExport(lex.block);return;}
-    /* ── щоденник: туду ── */
-    var ja=e.target.closest&&e.target.closest('[data-jtadd]');
-    if(ja){jrTdAdd[ja.dataset.jtadd]=true;render();
-      var ip=editor.querySelector('[data-jtinput="'+ja.dataset.jtadd+'"]');if(ip)ip.focus();return;}
-    var jtg=e.target.closest&&e.target.closest('[data-jttoggle]');
-    if(jtg){var g=jtg.dataset.jttoggle.split('|');var lg=locate(g[0]);
-      if(lg){var it=((lg.block.todos||{})[g[1]]||[]).find(function(x){return String(x.id)===g[2];});
-        if(it){it.done=!it.done;save();render();}}return;}
-    var jdl=e.target.closest&&e.target.closest('[data-jtdel]');
-    if(jdl){var dl0=jdl.dataset.jtdel.split('|');
-      pgDelUndo(dl0[0],function(b){return b.todos&&b.todos[dl0[1]]?[b.todos,dl0[1]]:null;},
-        function(x){return String(x.id)===dl0[2];},'Задачу видалено');return;}
-    /* ── щоденник ── */
-    var jm=e.target.closest&&e.target.closest('[data-jrmode]');
-    if(jm){var m=jm.dataset.jrmode.split('|');var l1=locate(m[0]);if(l1){l1.block.jmode=m[1];save();render();}return;}
-    var jr=e.target.closest&&e.target.closest('[data-jrrow]');
-    if(jr){var k1=jr.dataset.jrrow;jrOpen[k1]=!jrOpen[k1];if(!jrOpen[k1])delete jrEdit[k1];render();return;}
-    var je=e.target.closest&&e.target.closest('[data-jredit]');
-    if(je){jrEdit[je.dataset.jredit]=true;render();
-      var ta=editor.querySelector('[data-jrpast="'+je.dataset.jredit+'"]');if(ta){ta.focus();}return;}
-    var jd=e.target.closest&&e.target.closest('[data-jrdone]');
-    if(jd){delete jrEdit[jd.dataset.jrdone];save();render();return;}
-    var jx=e.target.closest&&e.target.closest('[data-jrexport]');
-    if(jx){var lx=locate(jx.dataset.jrexport);if(lx)jrExport(lx.block);return;}
     var _co=e.target&&e.target.closest&&e.target.closest('[data-pgcovopen]');
     if(_co){
       e.preventDefault(); e.stopPropagation();
@@ -602,6 +278,7 @@
       blc.block.children=blc.block.children||[]; blc.block.children.push(bnb);
       save(); render();
       slashCtx=bnb.id; openSlash();
+      if(blc.block.wboard){ pgsCat='data'; buildSlash(''); }   /* дошка віджетів — одразу категорія «Дані» */
       return;
     }
     var up=e.target&&e.target.closest&&e.target.closest('[data-pgup]');
@@ -770,6 +447,38 @@
       if(r&&r.value){ try{ var v=JSON.parse(r.value)||{}; covers=Object.assign({},v,covers); renderCover(); }catch(_){} }
     }).catch(function(){});
   }catch(_){}
+  /* ── В1 (10.10.2026): картинка обкладинки — у сховищі фото (PhotoDB + хмара фото), а в ключі
+     flowPgCovers лише посилання «idb:pc_…». Раніше кожна обкладинка лежала тут як data-URL
+     1200×760 у трьох копіях (localStorage, flowapp_, черга відправки) і вичерпувала памʼять iPhone.
+     Новий id на кожне фото: інший пристрій, що вже має старе фото з тим самим id, інакше не оновив би його.
+     Лише для НОВИХ обкладинок (дія людини). Автоматичного переносу старих нема: памʼять covers — тільки
+     локальна копія, і фоновий запис затер би в хмарі обкладинки, змінені на іншому пристрої. */
+  function covIsData(u){ return typeof u==='string' && u.slice(0,11)==='data:image/'; }
+  function covStore(k,dataUrl){
+    var id='pc_'+String(k).replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+Date.now().toString(36);
+    try{ return (window.photoPut?window.photoPut(id,dataUrl):Promise.resolve(dataUrl)).then(function(r){ return r||dataUrl; },function(){ return dataUrl; }); }
+    catch(_){ return Promise.resolve(dataUrl); }
+  }
+  // стерти фото, лише якщо на нього більше не посилається жодна обкладинка (перенос чат↔папка ділить посилання)
+  function covDropImg(ref){
+    try{
+      if(!ref || !window.photoIsRef || !window.photoIsRef(ref)) return;
+      for(var kk in covers){ if(covers[kk] && covers[kk].img===ref) return; }
+      if(window.photoDel) window.photoDel(ref);
+    }catch(_){}
+  }
+  // адреса для css url(): safeImg розвʼязує «idb:…» через photoSrc; поки фото вантажиться — порожньо, перемалюємо
+  var covRetryT=null, covRetryN={};
+  function covImgUrl(c){
+    var u=''; try{ u=safeImg(c&&c.img); }catch(_){ u=''; }
+    if(u){ if(c&&c.img) delete covRetryN[c.img]; return u; }
+    // фото ще вантажиться з IndexedDB/хмари — кілька повторів, далі не смикаємо мережу
+    if(c && c.img && !covRetryT && (covRetryN[c.img]||0)<5){
+      covRetryN[c.img]=(covRetryN[c.img]||0)+1;
+      covRetryT=setTimeout(function(){ covRetryT=null; try{ renderCover(); covEdSync(); }catch(_){} },500);
+    }
+    return u;
+  }
   var covSaveT=null;
   function saveCovers(){
     if(covSaveT){ clearTimeout(covSaveT); covSaveT=null; }
@@ -808,8 +517,13 @@
       grads:COV_GRADS,
       get:function(k){ return covers[k]||null; },
       keys:function(){ return Object.keys(covers); },   // видалення папки прибирає і її обкладинки (04-folders-nav.js)
-      set:function(k,c){ covers[k]=c; saveCovers(); try{ renderCover(); }catch(_){} },
-      clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} },
+      set:function(k,c){
+        var old=covers[k]&&covers[k].img;
+        var done=function(){ covers[k]=c; saveCovers(); try{ renderCover(); }catch(_){} };
+        if(c && covIsData(c.img)) return covStore(k,c.img).then(function(ref){ c.img=ref; done(); });
+        done(); return Promise.resolve();
+      },
+      clear:function(k){ var old=covers[k]&&covers[k].img; delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} covDropImg(old); },
       // лише з памʼяті, без запису: папку видалили на іншому пристрої, і він уже
       // прибрав її обкладинку в хмарі — наша копія могла б бути застарілою
       forget:function(k){ delete covers[k]; }
@@ -833,7 +547,7 @@
       covEl.className='pg-cover has';
       covEl.innerHTML='<div class="pgcov-img"></div><button class="pgcov-btn" data-covopen>Обкладинка</button>'+covMenuHTML();
       var img=covEl.querySelector('.pgcov-img');
-      if(c.img){ img.style.backgroundImage='url('+c.img+')';
+      if(c.img){ var _u=covImgUrl(c); img.style.backgroundImage=_u?"url('"+_u+"')":'none';
         img.style.backgroundPosition='50% '+(c.pos==null?50:c.pos)+'%'; }
       else{ img.style.background=COV_GRADS[c.g||0]; }
       covEl.style.setProperty('--covh',(c.h||176)+'px');
@@ -867,10 +581,12 @@
           var r=Math.min(1,maxW/w,maxH/h2); w=Math.round(w*r); h2=Math.round(h2*r);
           var cv=document.createElement('canvas'); cv.width=w; cv.height=h2;
           cv.getContext('2d').drawImage(img,0,0,w,h2);
-          var _pc=covers[k]||{};
-          covers[k]={img:cv.toDataURL('image/jpeg',0.72),
-            pos:_pc.pos==null?50:_pc.pos,dark:_pc.dark==null?30:_pc.dark,h:_pc.h||176};
-          saveCovers(); renderCover(); try{ covEdSync(); }catch(_){}
+          var data=cv.toDataURL('image/jpeg',0.72);
+          covStore(k,data).then(function(ref){
+            var _pc=covers[k]||{}, _old=_pc.img;
+            covers[k]={img:ref, pos:_pc.pos==null?50:_pc.pos,dark:_pc.dark==null?30:_pc.dark,h:_pc.h||176};
+            saveCovers(); renderCover(); try{ covEdSync(); }catch(_){}
+          });
         };
         img.src=reader.result;
       };
@@ -904,7 +620,7 @@
   function covEdSync(skipInputs){
     var b=covEdBox; if(!b)return; var c=covEdState(); if(!c)return;
     var im=b.querySelector('[data-covedimg]');
-    if(c.img){ im.style.background='#000'; im.style.backgroundImage='url('+c.img+')';
+    if(c.img){ var _cu=covImgUrl(c); im.style.background='#000'; im.style.backgroundImage=_cu?"url('"+_cu+"')":'none';
       im.style.backgroundSize='cover'; im.style.backgroundPosition='50% '+c.pos+'%'; }
     else { im.style.backgroundImage='none'; im.style.background=COV_GRADS[c.g||0]; }
     b.style.setProperty('--cd',(c.dark/100));
@@ -940,7 +656,7 @@
       var sw=e.target.closest('[data-covedg]');
       if(sw){ delete c.img; c.g=+sw.dataset.covedg; saveCovers(); renderCover(); covEdSync(); return; }
       if(e.target.closest('[data-covedphoto]')){ covPickPhoto(); return; }
-      if(e.target.closest('[data-covedclear]')){ delete covers[covKey()]; saveCovers(); renderCover(); covEdClose(); return; }
+      if(e.target.closest('[data-covedclear]')){ var _ok=covKey(), _o=covers[_ok]&&covers[_ok].img; delete covers[_ok]; saveCovers(); renderCover(); covEdClose(); covDropImg(_o); return; }
     });
     b.querySelector('[data-coveddark]').addEventListener('input',function(){
       var c=covEdState(); if(!c)return; c.dark=+this.value; saveCoversSoon(); renderCover(); covEdSync(true);

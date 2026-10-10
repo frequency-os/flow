@@ -247,6 +247,8 @@
     if(!amount||amount<=0) return;
     const ymKey=`${year}-${String(month).padStart(2,'0')}`;
     if(workPostedSal[ymKey]==='deleted') return;
+    // місяць зарплати обнулено («Почати фінанси з нуля») — навіть якщо старий пристрій повернув work_cfg без позначки
+    try{ if(typeof finTombHas==='function'&&finTombHas('sal',ymKey)) return; }catch(_){}
     const dim=new Date(year,month,0).getDate();
     const txDate=`${year}-${String(month).padStart(2,'0')}-${String(Math.min(pday,dim)).padStart(2,'0')}`;
     // Зарплата пишеться сама, без людини, — курс не питаємо. Раз записаний
@@ -272,6 +274,8 @@
     }
     let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
     op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc, _mc:mainCur() };
+    // у Плані місяця є рядок «Зарплата» — привʼязуємо, щоб він став ✓, а не висів відкритим поруч із записаною зарплатою (47-rules.js)
+    try{ const pl=typeof rlPlan==='function'?rlPlan(ymKey,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ymKey,r.id)); if(row) op.planId=row.id; }catch(_){}
     if(fx.fx) op._fx=fx.fx;
     finOps.push(op); workPostedSal[ymKey]='posted'; autoSave(()=>{ saveFinOps(); saveWork(); });
     // коли зарплата прийшла — перелити заплановане у конверти
