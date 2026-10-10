@@ -258,7 +258,7 @@
       if(sz==='s') return wdTile(b,fk,`${hit}${wdHead(b,fk)}
         ${ring?`<span class="wd-ringc">${wdRing(pct)}</span>`:`<b class="wd-big">${pct}%</b><span class="wd-bar"><i style="width:${pct}%"></i></span>`}
         <small class="wd-cap">${nm}</small>`,'mis',col);
-      return wdTile(b,fk,`${hit}${wdHead(b,fk)}
+      return wdTile(b,fk,`${hit}${wdHead(b,fk,'🔗 місія')}
         <span class="wd-row">${ring?wdRing(pct):`<b class="wd-big">${pct}%</b>`}<span class="wd-col"><b class="wd-name">${em} ${nm}</b>
           ${wdOn(b,'next')?`<small class="wd-sub"><em>Далі:</em> ${nx?esc(nx.t.slice(0,80)):'усі кроки зроблено ✓'}</small>`:''}
           ${wdOn(b,'due')&&dueTxt?`<small class="wd-sub${dl<0?' late':''}"><em>Дедлайн:</em> ${esc(dueTxt)}</small>`:''}</span></span>
@@ -283,14 +283,14 @@
       const cnt=wdOn(b,'count')&&(sz==='l'||!wdOn(b,'streak'))?`<small class="wd-sub"><em>${n} з ${past.length}</em> ${per==='month'?'цього місяця':'цього тижня'}</small>`:'';
       const dots=wdOn(b,'days')?`<span class="wd-days ${per}">${days.map(ds=>`<i class="${mk(ds)?'on':''}${ds===td?' td':''}${ds>td?' fut':''}"><u></u>${per==='week'?`<s>${DY_DOW[(new Date(ds+'T12:00:00').getDay()+6)%7]}</s>`:''}</i>`).join('')}</span>`:'';
       return wdTile(b,fk,`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" data-wgtab="folder" aria-label="Трекер місії ${esc(g.name||'')}"></button>
-        ${wdHead(b,fk)}${sz==='l'?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td):''}
+        ${wdHead(b,fk,sz==='s'?'':'🔗 трекер місії')}${sz==='l'?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td):''}
         <span class="wd-acts c"><button data-wga="wdmark" class="pill${on?' on':''}" aria-pressed="${on}">✓ Сьогодні${on?' є':''}</button></span>`,'hab',folders[gk].c);
     }
     if(t==='dcal'){
       // календар Планера, але лише ця папка: її блоки (смужки кольору) і події (★); місяць гортається в памʼяті, не пишеться
       if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">Лише в папці</b><small class="wd-sub">Показує блоки й події з міткою папки</small>`,'empty');
       const ym=wdCalYm[b.id]||td.slice(0,7);
-      return wdTile(b,fk,`${wdHead(b,fk,esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())+(ym.slice(0,4)!==td.slice(0,4)?' '+ym.slice(0,4):''))}
+      return wdTile(b,fk,`${wdHead(b,fk,'🔗 Планер · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())+(ym.slice(0,4)!==td.slice(0,4)?' '+ym.slice(0,4):''))}
         <span class="cal-nav"><button data-wga="wdcalnav" data-n="-1" aria-label="Попередній місяць">‹</button><button data-wga="wdcalnav" data-n="0">Сьогодні</button><button data-wga="wdcalnav" data-n="1" aria-label="Наступний місяць">›</button></span>
         ${calMonthGridHTML(ym,fk)}
         ${wdOn(b,'hint')?'<small class="wd-sub cal-hint">Тап по дню — події й блоки папки</small>':''}`,'calw');
@@ -319,7 +319,7 @@
           :`<small class="wd-sub">${bs.length?'на сьогодні все ✓':'Сьогодні блоків папки нема'}</small>`;
         const addB=wdOn(b,'add')?`<button data-wga="wdadd" class="pill">＋ блок</button>`:'';
         return wdTile(b,fk,`<button class="wg-hit" data-wga="wdday" aria-label="План папки на сьогодні"></button>
-          ${wdHead(b,fk,'сьогодні')}
+          ${wdHead(b,fk,sz==='s'?'сьогодні':'🔗 Планер · сьогодні')}
           <b class="wd-big">${bs.length} <span>${pluralUk(bs.length,'блок','блоки','блоків')}${wdOn(b,'hours')&&bs.length?' · '+wdHm(h)+' год':''}${dn?' · '+dn+' ✓':''}</span></b>
           ${sz!=='s'?tl:''}
           ${sz==='l'?wdWeekBars(mine,hrs,td):''}
@@ -333,7 +333,7 @@
       if(sz==='l'){ const u=[]; by.forEach(x=>{ if(x.ds>=td) x.bs.forEach(y=>{ if(!y.done&&u.length<3) u.push({ds:x.ds,b:y}); }); });
         up=u.length?`<span class="wd-list">${u.map(x=>`<span><em>${x.ds===td?'сьогодні':esc(jnDateTxt(x.ds))} ${plHM(+x.b.h||0)}</em>${esc(String(x.b.t||'Блок').slice(0,34))}</span>`).join('')}</span>`:''; }
       return wdTile(b,fk,`<button class="wg-hit" data-wga="wdmonth" aria-label="Календар папки"></button>
-        ${wdHead(b,fk,per==='month'?esc(MO_NAMES[+td.slice(5,7)-1].toLowerCase()):'тиждень')}
+        ${wdHead(b,fk,(sz==='s'?'':'🔗 Планер · ')+(per==='month'?esc(MO_NAMES[+td.slice(5,7)-1].toLowerCase()):'тиждень'))}
         <b class="wd-big">${n} <span>${pluralUk(n,'блок','блоки','блоків')}${wdOn(b,'hours')?' · '+wdHm(h)+' год':''}</span></b>
         ${bars}${up}${add}`);
     }

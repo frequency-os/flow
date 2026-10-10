@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 31981 |
+| Рядків JS | 31977 |
 | Файлів CSS | 46 |
 | Рядків CSS | 10097 |
 | Сутностей верхнього рівня | 2283 |
@@ -90,7 +90,7 @@
 | `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
-| `src/scripts/page-editor/01-palette.js` | 180 | 17 |
+| `src/scripts/page-editor/01-palette.js` | 176 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 764 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 657 | 36 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 689 | 41 |
@@ -2545,22 +2545,22 @@
 | Імʼя | Вид | Де |
 |---|---|---|
 | `PGS_CATS` | масив | `src/scripts/page-editor/01-palette.js:5` |
-| `CATALOG` | масив | `src/scripts/page-editor/01-palette.js:13` |
-| `PGS_SYN` | обʼєкт | `src/scripts/page-editor/01-palette.js:51` |
-| `PGS_ICONS` | обʼєкт | `src/scripts/page-editor/01-palette.js:79` |
-| `pgsIc` | функція | `src/scripts/page-editor/01-palette.js:133` |
-| `bridge` | функція | `src/scripts/page-editor/01-palette.js:135` |
-| `editor` | значення | `src/scripts/page-editor/01-palette.js:136` |
-| `scr` | значення | `src/scripts/page-editor/01-palette.js:137` |
-| `uid` | функція | `src/scripts/page-editor/01-palette.js:138` |
-| `esc` | функція | `src/scripts/page-editor/01-palette.js:139` |
-| `txtOf` | функція | `src/scripts/page-editor/01-palette.js:142` |
-| `setTxt` | функція | `src/scripts/page-editor/01-palette.js:143` |
-| `locate` | функція | `src/scripts/page-editor/01-palette.js:145` |
-| `save` | функція | `src/scripts/page-editor/01-palette.js:153` |
-| `moveBlock` | функція | `src/scripts/page-editor/01-palette.js:157` |
-| `snapshotArr` | функція | `src/scripts/page-editor/01-palette.js:179` |
-| `restoreArr` | функція | `src/scripts/page-editor/01-palette.js:180` |
+| `CATALOG` | масив | `src/scripts/page-editor/01-palette.js:12` |
+| `PGS_SYN` | обʼєкт | `src/scripts/page-editor/01-palette.js:47` |
+| `PGS_ICONS` | обʼєкт | `src/scripts/page-editor/01-palette.js:75` |
+| `pgsIc` | функція | `src/scripts/page-editor/01-palette.js:129` |
+| `bridge` | функція | `src/scripts/page-editor/01-palette.js:131` |
+| `editor` | значення | `src/scripts/page-editor/01-palette.js:132` |
+| `scr` | значення | `src/scripts/page-editor/01-palette.js:133` |
+| `uid` | функція | `src/scripts/page-editor/01-palette.js:134` |
+| `esc` | функція | `src/scripts/page-editor/01-palette.js:135` |
+| `txtOf` | функція | `src/scripts/page-editor/01-palette.js:138` |
+| `setTxt` | функція | `src/scripts/page-editor/01-palette.js:139` |
+| `locate` | функція | `src/scripts/page-editor/01-palette.js:141` |
+| `save` | функція | `src/scripts/page-editor/01-palette.js:149` |
+| `moveBlock` | функція | `src/scripts/page-editor/01-palette.js:153` |
+| `snapshotArr` | функція | `src/scripts/page-editor/01-palette.js:175` |
+| `restoreArr` | функція | `src/scripts/page-editor/01-palette.js:176` |
 
 ### `src/scripts/page-editor/02-block-styles.js` — 49 сутностей
 

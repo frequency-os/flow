@@ -277,7 +277,7 @@
       var bnb={id:uid(),type:'note',text:'',gw:4,gh:2};
       blc.block.children=blc.block.children||[]; blc.block.children.push(bnb);
       save(); render();
-      slashCtx=bnb.id; openSlash();
+      slashCtx=bnb.id; openSlash(); pgAddPending=bnb.id;   /* закрив меню без вибору — порожня плитка прибирається (dropPendingAdd) */
       if(blc.block.wboard){ pgsCat='data'; buildSlash(''); }   /* дошка віджетів — одразу категорія «Дані» */
       return;
     }
