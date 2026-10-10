@@ -76,3 +76,16 @@
     background:transparent;color:var(--muted);font:inherit;font-size:20px;font-weight:800;line-height:1;cursor:pointer;display:grid;place-items:center;}
   .chl-more:active,.sph-more:active{background:var(--hair);}
   .chl-pin{font-size:11px;margin-right:5px;vertical-align:1px;}
+  /* ── Д3 (10.10.2026): хаб звʼязків під назвою документа — Гроші · Час · Місія · Чати ── */
+  .pg-hub{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:2px 0 12px;}
+  .pgh-c{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;padding:10px 10px 9px;border-radius:14px;cursor:pointer;
+    border:1px solid var(--pg-edge,var(--line));background:var(--pg-surface,var(--card));color:var(--pg-fg,var(--text));font:inherit;text-align:left;}
+  .pgh-c:active{transform:scale(.97);}
+  .pgh-ic{color:var(--pg-acc,var(--accent));line-height:0;margin-bottom:2px;}
+  .pgh-ic svg{width:17px;height:17px;}
+  .pgh-c small{font-size:11px;font-weight:700;color:var(--pg-mut,var(--muted));}
+  .pgh-c b{font-size:14.5px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .pgh-c.dim b{color:var(--pg-mut,var(--muted));font-weight:700;}
+  /* блок під назвою тепер = хаб + (за потреби) коробка «Чати папки» */
+  .pg-links{background:none;border:0;overflow:visible;}
+  .pgl-box{display:flex;flex-direction:column;border-radius:18px;background:var(--pg-field,var(--card));border:1px solid var(--pg-line,var(--line));overflow:hidden;}
