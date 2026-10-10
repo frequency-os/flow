@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 33392 |
+| Рядків JS | 33469 |
 | Файлів CSS | 46 |
 | Рядків CSS | 10344 |
-| Сутностей верхнього рівня | 2257 |
+| Сутностей верхнього рівня | 2262 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -107,7 +107,7 @@
 | `tools/make-icon.js` | 40 | 5 |
 | `tools/scriptcheck.js` | 98 | 12 |
 | `tools/smoke.js` | 61 | 5 |
-| `tools/test-migrations.js` | 297 | 29 |
+| `tools/test-migrations.js` | 374 | 34 |
 | `worker/flow-ai-worker.js` | 581 | 20 |
 | `worker/test-worker.mjs` | 151 | 11 |
 
@@ -2754,39 +2754,44 @@
 | `NOISE` | значення | `tools/smoke.js:14` |
 | `errors` | масив | `tools/smoke.js:15` |
 
-### `tools/test-migrations.js` — 29 сутностей
+### `tools/test-migrations.js` — 34 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `fs` | значення | `tools/test-migrations.js:15` |
-| `os` | значення | `tools/test-migrations.js:16` |
-| `path` | значення | `tools/test-migrations.js:17` |
-| `target` | функція | `tools/test-migrations.js:20` |
-| `SB_TOKEN_KEY` | значення | `tools/test-migrations.js:23` |
-| `FLAGS` | масив | `tools/test-migrations.js:25` |
-| `WAIT` | значення | `tools/test-migrations.js:28` |
-| `T0` | значення | `tools/test-migrations.js:30` |
-| `PNG` | значення | `tools/test-migrations.js:31` |
-| `W` | функція | `tools/test-migrations.js:33` |
-| `LEGACY` | обʼєкт | `tools/test-migrations.js:35` |
-| `POSTMIG` | значення | `tools/test-migrations.js:72` |
-| `fakeSession` | функція | `tools/test-migrations.js:88` |
-| `problems` | масив | `tools/test-migrations.js:96` |
-| `bad` | функція | `tools/test-migrations.js:97` |
-| `sleep` | функція | `tools/test-migrations.js:98` |
-| `errors` | масив | `tools/test-migrations.js:99` |
-| `blank` | значення | `tools/test-migrations.js:107` |
-| `makeWin` | функція | `tools/test-migrations.js:110` |
-| `seed` | функція | `tools/test-migrations.js:123` |
-| `start` | функція | `tools/test-migrations.js:127` |
-| `snap` | функція | `tools/test-migrations.js:128` |
-| `js` | функція | `tools/test-migrations.js:130` |
-| `diff` | функція | `tools/test-migrations.js:131` |
-| `isStore` | функція | `tools/test-migrations.js:141` |
-| `dataOf` | функція | `tools/test-migrations.js:142` |
-| `scenarioA` | функція | `tools/test-migrations.js:144` |
-| `scenarioP` | функція | `tools/test-migrations.js:207` |
-| `scenarioSilent` | функція | `tools/test-migrations.js:243` |
+| `fs` | значення | `tools/test-migrations.js:22` |
+| `os` | значення | `tools/test-migrations.js:23` |
+| `path` | значення | `tools/test-migrations.js:24` |
+| `target` | функція | `tools/test-migrations.js:27` |
+| `SB_TOKEN_KEY` | значення | `tools/test-migrations.js:30` |
+| `FLAGS` | масив | `tools/test-migrations.js:32` |
+| `WAIT` | значення | `tools/test-migrations.js:35` |
+| `T0` | значення | `tools/test-migrations.js:37` |
+| `PNG` | значення | `tools/test-migrations.js:38` |
+| `W` | функція | `tools/test-migrations.js:40` |
+| `LEGACY` | обʼєкт | `tools/test-migrations.js:42` |
+| `POSTMIG` | значення | `tools/test-migrations.js:78` |
+| `fakeSession` | функція | `tools/test-migrations.js:94` |
+| `problems` | масив | `tools/test-migrations.js:102` |
+| `bad` | функція | `tools/test-migrations.js:103` |
+| `sleep` | функція | `tools/test-migrations.js:104` |
+| `errors` | масив | `tools/test-migrations.js:105` |
+| `blank` | значення | `tools/test-migrations.js:113` |
+| `makeWin` | функція | `tools/test-migrations.js:116` |
+| `seed` | функція | `tools/test-migrations.js:129` |
+| `start` | функція | `tools/test-migrations.js:133` |
+| `snap` | функція | `tools/test-migrations.js:134` |
+| `js` | функція | `tools/test-migrations.js:136` |
+| `diff` | функція | `tools/test-migrations.js:137` |
+| `isStore` | функція | `tools/test-migrations.js:147` |
+| `dataOf` | функція | `tools/test-migrations.js:148` |
+| `scenarioA` | функція | `tools/test-migrations.js:150` |
+| `scenarioP` | функція | `tools/test-migrations.js:216` |
+| `NP` | обʼєкт | `tools/test-migrations.js:257` |
+| `nativePreload` | значення | `tools/test-migrations.js:266` |
+| `call` | функція | `tools/test-migrations.js:268` |
+| `MARK` | значення | `tools/test-migrations.js:272` |
+| `scenarioN` | функція | `tools/test-migrations.js:274` |
+| `scenarioSilent` | функція | `tools/test-migrations.js:318` |
 
 ### `worker/flow-ai-worker.js` — 20 сутностей
 

@@ -28,6 +28,7 @@
    ```bash
    npm run check          # «Все гаразд.», повний вивід у чат
    npm run smoke          # димовий тест (скрипт із гілки night/check-gate)
+   npm run test:migrations  # міграції + «Стерти все» на iPhone (npm run deploy теж його ганяє)
    ```
 6. **Міграція в релізі?** Спершу Ярослав робить Ще → Бекап даних на телефоні,
    ти — `./tools/snapshot.sh`. Дивись [`mihratsiia-danykh.md`](mihratsiia-danykh.md).
