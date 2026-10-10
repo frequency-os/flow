@@ -67,6 +67,7 @@
     // призи місій: прив'язку до видаленої скарбнички знімаємо (сам приз і ціна лишаються)
     try{ (goalsData.goals||[]).forEach(g=>{ if(g&&g.reward&&typeof g.reward==='object') delete g.reward.envId; }); saveGoals(); }catch(_){}   // «отримано» — досягнення, лишається
     try{ wlCurSave([]); }catch(_){}
+    try{ if(typeof fsClear==='function') fsClear(); }catch(_){}   // майстер «Новий старт» (52-fresh-start.js) — знову з кроку 1
     // борги: самі борги лишаються, а позначка «записано в Гаманець» знімається — операцій уже нема, можна провести знову
     try{ let ch=false; (debtItems||[]).forEach(i=>{ if(i&&(i.synced||i.finOpId)){ i.synced=false; i.finOpId=null; ch=true; } }); if(ch) debtSave(); }catch(_){}
     // години Роботи (work_sessions) не переписуємо — лише налаштування з позначками зарплат (work_cfg)

@@ -255,7 +255,11 @@
   }
   // валюта рядка Плану (етап 3 валют): r.cur — неголовна; без нього — головна ('')
   function rlRowCur(r){ const c=r&&r.cur; return c&&curOk(c)&&c!==mainCur()?c:''; }
-  function rlPlanFact(ym,id){ return (finOps||[]).filter(o=>o&&o.planId===id&&String(o.date||'').slice(0,7)===ym).reduce((s,o)=>s+(+o.amount||0),0); }
+  function rlPlanFact(ym,id){
+    // рядок-конверт (r.envId, майстер «Новий старт», 52-fresh-start.js) закривається ПОПОВНЕННЯМ конверта цього місяця:
+    // витрати з конверта planId не мають, і без цього рядок висів би відкритим, а прогноз віднімав би його вічно
+    let env=''; try{ const p=rlPlan(ym,false); const r=p&&p.out.find(x=>x.id===id); env=r&&r.envId?String(r.envId):''; }catch(_){}
+    return (finOps||[]).filter(o=>o&&String(o.date||'').slice(0,7)===ym&&(o.planId===id||(env&&String(o.envId||'')===env&&o.type==='out'&&!o.envSpend))).reduce((s,o)=>s+(+o.amount||0),0); }
   function rlPrevYm(ym){ const y=+ym.slice(0,4), m=+ym.slice(5,7); return m===1?(y-1)+'-12':y+'-'+String(m-1).padStart(2,'0'); }
   // прогноз на кінець місяця — той самий і для вкладки «План», і для віджета Гаманця (48-widgets.js)
   function rlRecurring(){ return (typeof recurring!=='undefined'&&Array.isArray(recurring)?recurring:[]).filter(r=>r&&+r.amount>0); }
@@ -326,7 +330,14 @@
   function rlPlanRowMenu(ym,k,id){
     const p=rlPlan(ym,false); const r=p&&Array.isArray(p[k])?p[k].find(x=>x.id===id):null; if(!r) return;
     const f=rlPlanFact(ym,id), rest=Math.max(0,(+r.amt||0)-f), items=[], rc=rlRowCur(r);
-    if(rest>0) items.push({ic:'plus', label:(k==='in'?'Прийшло':'Сплатив')+' · '+money(rest,rc), sub:'запише '+(k==='in'?'дохід':'витрату')+' в Гаманець сьогодні', onClick:()=>{
+    const re=r.envId?(envelopes||[]).find(e=>e&&e.id===r.envId):null;
+    if(rest>0&&re) items.push({ic:'plus', label:'Покласти в конверт · '+money(rest,rc), sub:'з вільних грошей у «'+String(re.name||'конверт')+'»', onClick:()=>{
+      inputModal({title:'Скільки покласти, '+curSym(rc), value:String(rest), placeholder:String(rest), onOk:v=>{
+        const amount=Math.round(parseFloat(String(v||'').replace(',','.'))*100)/100; if(!(amount>0&&amount<1e9)) return;
+        if(typeof fsTrusted==='function'&&!fsTrusted(['fin_ops',ENVKEY])){ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); return; }
+        if(amount>curFree(envCur(re))){ plToast('Вільних грошей менше — є '+money(curFree(envCur(re)),envCur(re))); return; }
+        envAddOp(re,'in',amount,'План місяця'); renderFinance(); }}); }});
+    else if(rest>0) items.push({ic:'plus', label:(k==='in'?'Прийшло':'Сплатив')+' · '+money(rest,rc), sub:'запише '+(k==='in'?'дохід':'витрату')+' в Гаманець сьогодні', onClick:()=>{
       inputModal({title:(k==='in'?'Скільки прийшло':'Скільки сплатив')+', '+curSym(rc), value:String(rest), placeholder:String(rest), onOk:v=>{
         const amount=Math.round(parseFloat(String(v||'').replace(',','.'))*100)/100; if(!(amount>0)) return;
         const op={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:k, amount, label:String(r.t||'').slice(0,80), date:ymdLocal(), card:mainCard().id, planId:r.id};
