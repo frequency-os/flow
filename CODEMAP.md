@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 87 |
-| Рядків JS | 33685 |
+| Рядків JS | 33706 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10505 |
 | Сутностей верхнього рівня | 2296 |
@@ -48,7 +48,7 @@
 | `src/scripts/core/10-planner.js` | 923 | 49 |
 | `src/scripts/core/11-ai-flow.js` | 258 | 26 |
 | `src/scripts/core/12-ai-agent.js` | 1832 | 94 |
-| `src/scripts/core/13-pets.js` | 237 | 14 |
+| `src/scripts/core/13-pets.js` | 240 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 2067 | 97 |
 | `src/scripts/core/16-dashboard.js` | 1049 | 55 |
@@ -101,8 +101,8 @@
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
 | `src/vendor/pdf.min.js` _(мініфікований вендор)_ | 22 | — |
 | `src/vendor/supabase.min.js` _(мініфікований вендор)_ | 11 | — |
-| `src/web/hero-assets.js` _(мініфікований вендор)_ | 40 | — |
-| `src/web/hero-outfits.js` _(мініфікований вендор)_ | 27 | — |
+| `src/web/hero-assets.js` _(мініфікований вендор)_ | 51 | — |
+| `src/web/hero-outfits.js` _(мініфікований вендор)_ | 34 | — |
 | `src/web/misto-assets.js` _(мініфікований вендор)_ | 43 | — |
 | `src/web/sw.js` | 109 | 9 |
 | `tools/make-icon.js` | 40 | 5 |
@@ -1108,19 +1108,19 @@
 | Імʼя | Вид | Де |
 |---|---|---|
 | `FLOW_PETS` | обʼєкт | `src/scripts/core/13-pets.js:2` |
-| `PETS_LEGACY_HIDDEN` | значення | `src/scripts/core/13-pets.js:48` |
-| `petCur` | функція | `src/scripts/core/13-pets.js:49` |
-| `petPersona` | функція | `src/scripts/core/13-pets.js:52` |
-| `petSVG` | функція | `src/scripts/core/13-pets.js:53` |
-| `petPickerSheet` | функція | `src/scripts/core/13-pets.js:95` |
-| `petSleeping` | функція | `src/scripts/core/13-pets.js:177` |
-| `petSleepSet` | функція | `src/scripts/core/13-pets.js:178` |
-| `window.petWake` | функція | `src/scripts/core/13-pets.js:179` |
-| `fcPos` | функція | `src/scripts/core/13-pets.js:180` |
-| `fcClamp` | функція | `src/scripts/core/13-pets.js:181` |
-| `fcApplyPos` | функція | `src/scripts/core/13-pets.js:186` |
-| `fcBindDrag` | функція | `src/scripts/core/13-pets.js:192` |
-| `fcBurst` | функція | `src/scripts/core/13-pets.js:230` |
+| `PETS_LEGACY_HIDDEN` | значення | `src/scripts/core/13-pets.js:51` |
+| `petCur` | функція | `src/scripts/core/13-pets.js:52` |
+| `petPersona` | функція | `src/scripts/core/13-pets.js:55` |
+| `petSVG` | функція | `src/scripts/core/13-pets.js:56` |
+| `petPickerSheet` | функція | `src/scripts/core/13-pets.js:98` |
+| `petSleeping` | функція | `src/scripts/core/13-pets.js:180` |
+| `petSleepSet` | функція | `src/scripts/core/13-pets.js:181` |
+| `window.petWake` | функція | `src/scripts/core/13-pets.js:182` |
+| `fcPos` | функція | `src/scripts/core/13-pets.js:183` |
+| `fcClamp` | функція | `src/scripts/core/13-pets.js:184` |
+| `fcApplyPos` | функція | `src/scripts/core/13-pets.js:189` |
+| `fcBindDrag` | функція | `src/scripts/core/13-pets.js:195` |
+| `fcBurst` | функція | `src/scripts/core/13-pets.js:233` |
 
 ### `src/scripts/core/14-react.js` — 43 сутностей
 
