@@ -24,30 +24,63 @@
 
   .in-ph{display:block;border-radius:12px;background:color-mix(in srgb,var(--accent) 22%,var(--card));
     background-size:cover;background-position:center;}
-  /* 1 — міні-Огляд */
+  /* 8:00 — колаж Карти бажань */
   .in-v1{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
   .in-col{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:64px 64px;gap:5px;
     grid-template-areas:"sea run home home" "sea run study travel";}
   .in-sea{grid-area:sea}.in-run{grid-area:run}.in-home{grid-area:home}.in-study{grid-area:study}.in-travel{grid-area:travel}
-  .in-tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-  .in-tile{position:relative;height:64px;border-radius:12px;overflow:hidden;background:color-mix(in srgb,var(--c) 35%,var(--card));}
-  .in-tile .in-ph{position:absolute;inset:0;border-radius:0;}
-  .in-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),rgba(0,0,0,0) 70%);}
-  .in-tile b{position:absolute;left:8px;bottom:6px;z-index:1;color:#fff;font-size:12px;font-weight:800;}
-  /* 2 — ланцюжок мрія → ціль → сьогодні */
-  .in-v2{display:flex;flex-direction:column;align-items:stretch;}
-  .in-step{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
-  .in-step > span:not(.in-ic):not(.in-ok){flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;}
-  .in-step small{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
-  .in-step b{font-size:15px;font-weight:800;}
-  .in-wish .in-ph{width:52px;height:52px;flex:none;}
-  .in-ic{width:52px;height:52px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:22px;
+  .in-ic{width:44px;height:44px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:20px;
     background:color-mix(in srgb,var(--accent) 16%,var(--card));}
-  .in-bar{display:block;height:6px;border-radius:3px;background:var(--line);margin-top:4px;overflow:hidden;}
-  .in-bar i{display:block;height:100%;background:var(--accent);border-radius:3px;}
-  .in-today{border-color:color-mix(in srgb,var(--accent) 60%,var(--line));}
-  .in-ok{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:#34c77b;}
-  .in-arr{align-self:center;width:2px;height:18px;background:linear-gradient(var(--line),var(--accent));}
+  /* мітка часу картки — «День із життя» */
+  .in-time{align-self:flex-start;font-size:13px;font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:999px;
+    color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);}
+  /* 7:00 — ранковий ритуал */
+  .in-v-rit{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
+  .in-rit-h{display:flex;justify-content:space-between;align-items:baseline;}
+  .in-rit-h b{font-size:16px;font-weight:800;}
+  .in-rit-h span{font-size:13px;font-weight:700;color:#ff9f43;}
+  .in-rit-cal{display:flex;justify-content:space-between;margin:2px 0 4px;}
+  .in-rit-cal span{display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .in-rit-cal em{font-style:normal;font-size:11px;font-weight:600;color:var(--muted);}
+  .in-rit-cal i{width:24px;height:24px;border-radius:8px;background:var(--line);}
+  .in-rit-cal .ok i{background:color-mix(in srgb,#ff9f43 75%,var(--card));}
+  .in-rit-cal .now i{outline:2px solid var(--accent);outline-offset:2px;}
+  .in-rit-step{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:color-mix(in srgb,var(--line) 45%,transparent);}
+  .in-rit-step b{font-size:14px;font-weight:700;}
+  .in-rit-step.ok b{color:var(--muted);text-decoration:line-through;}
+  .in-chk{width:22px;height:22px;flex:none;border-radius:7px;display:grid;place-items:center;font-size:13px;font-weight:800;
+    border:2px solid var(--line);color:#fff;}
+  .in-rit-step.ok .in-chk{background:#34c77b;border-color:#34c77b;}
+  .in-rit-done{margin-top:2px;text-align:center;padding:10px;border-radius:12px;font-size:14px;font-weight:800;color:#fff;
+    background:linear-gradient(90deg,#ff7a45,#ff9f43);}
+  /* 8:00 — Карта бажань: підпис і «ціна мрії» */
+  .in-wcap{display:flex;align-items:center;gap:10px;padding:2px 2px 0;}
+  .in-wthumb{width:40px;height:40px;flex:none;border-radius:10px;}
+  .in-wcap span{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .in-wcap b{font-size:15px;font-weight:800;}
+  .in-wcap small{font-size:12px;color:var(--muted);}
+  /* 9:00 — план дня по годинах */
+  .in-v-plan{display:flex;flex-direction:column;padding:10px 14px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
+  .in-hr{display:flex;align-items:stretch;gap:12px;min-height:54px;border-top:1px solid var(--line);padding:6px 0;}
+  .in-hr:first-child{border-top:0;}
+  .in-hr em{font-style:normal;width:42px;flex:none;font-size:12px;font-weight:700;color:var(--muted);padding-top:4px;}
+  .in-blk{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:6px 10px;border-radius:10px;
+    background:color-mix(in srgb,var(--accent) 10%,var(--card));border-left:3px solid color-mix(in srgb,var(--accent) 45%,var(--line));}
+  .in-blk b{font-size:14px;font-weight:700;}
+  .in-blk small{font-size:12px;font-weight:700;color:var(--accent);}
+  .in-hr.on .in-blk{background:color-mix(in srgb,var(--accent) 22%,var(--card));border-left-color:var(--accent);}
+  /* 21:00 — щоденник і Журнал героя */
+  .in-v-eve{display:flex;flex-direction:column;gap:10px;}
+  .in-diary{padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);}
+  .in-diary small{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .in-diary p{margin:6px 0 0;font-family:'Caveat',cursive;font-size:22px;line-height:1.25;}
+  .in-jr{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);}
+  .in-jr > span:not(.in-ic){flex:1;display:flex;flex-direction:column;gap:2px;}
+  .in-jr b{font-size:15px;font-weight:800;}
+  .in-jr small{font-size:12px;color:var(--muted);}
+  .in-ring{width:40px;height:40px;flex:none;border-radius:50%;
+    background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0);
+    -webkit-mask:radial-gradient(farthest-side,transparent 70%,#000 71%);mask:radial-gradient(farthest-side,transparent 70%,#000 71%);}
   /* 3 — ріст: тиждень і досягнута ціль */
   .in-v3{display:flex;flex-direction:column;gap:10px;}
   .in-wk{padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;}
@@ -68,6 +101,6 @@
   .in-done-t b{font-size:17px;font-weight:800;}
   /* низькі екрани (iPhone SE): картинки менші, щоб текст і кнопка лишились видно */
   @media (max-height:700px){
-    .in-col{grid-template-rows:48px 48px;} .in-tile{height:48px;} .in-done{height:110px;}
+    .in-col{grid-template-rows:48px 48px;} .in-done{height:110px;} .in-hr{min-height:44px;} .in-rit-step{padding:6px 10px;}
     .in-slide h2{font-size:23px;} .in-vis{margin-bottom:10px;}
   }

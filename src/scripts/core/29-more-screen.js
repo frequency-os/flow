@@ -293,7 +293,7 @@
         <div class="mr-grp" data-sec="about">
           <div class="acc-row" data-acc-intro>
             ${ico('compass','violet')}
-            <div class="acc-rtext"><div class="acc-rtitle">Що таке Frequency</div><div class="acc-rsub">три картки: навіщо це і як допомагає рости</div></div>
+            <div class="acc-rtext"><div class="acc-rtitle">Що таке Frequency</div><div class="acc-rsub">коротка екскурсія: навіщо це і як допомагає рости</div></div>
             ${chev()}
           </div>
           <div class="acc-row" data-acc-ver style="cursor:default">
