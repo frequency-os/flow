@@ -1,5 +1,5 @@
 // Тест разових міграцій Frequency (реєстр MIGRATIONS_ONCE у 27-canvas.js).
-// Відкриває зібраний dist/index.html у невидимому Electron і проганяє три сценарії:
+// Відкриває зібраний dist/index.html у невидимому Electron і проганяє сценарії:
 //   A) «старий пристрій, без входу»: засіваємо localStorage даними до всіх
 //      міграцій → старт → ще один load() у тій самій сторінці → перезапуск.
 //      Міграції мусять спрацювати РАЗ: після першого старту дані перенесені,
@@ -10,12 +10,19 @@
 //   C) «старий пристрій з даними, хмара мовчить»: те саме, але локально лежать
 //      дані до міграцій. Міграції чекають: дані й прапорці не змінюються.
 //      Потім «хмара ожила» — відкладені міграції доїжджають самі, без перезапуску.
+//   P) «старі проєкти»: блоки «Проєкт» і Кабінет (fin_projects) з 09.10.2026 при старті
+//      НЕ переносяться і НЕ стираються — лежать як були; прибирає їх лише людина
+//      («Ще → Дані → Старі віджети»), і ця кнопка мусить їх бачити.
+//   N) «iPhone: Стерти все → перезапуск»: заглушка Capacitor + Preferences (сховище — у
+//      головному процесі, як UserDefaults поза WebView). Звичайний старт після чистки
+//      localStorage піднімає дані з Preferences (страховка жива), а після скидання —
+//      порожньо і в localStorage, і в Preferences.
 // Запуск з кореня: npm run test:migrations  (спершу npm run build)
 // Код виходу: 0 — усе гаразд, 1 — є порушення, 2 — тайм-аут.
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, session, ipcMain } = require('electron');
 
 const target = process.argv.slice(2).find(a => /\.html$/.test(a))
   || path.join(__dirname, '..', 'dist', 'index.html');
@@ -63,12 +70,11 @@ const LEGACY = {
   flowapp_spend: W([{ id: 111, amount: 20, label: 'кава', date: '2026-08-10', cat: 'food' }]),
   flowapp_wishes_board: W([{ id: 'w1', img: PNG, cap: 'мрія' }]),
 };
-// Пристрій, де старі разові міграції вже пройшли. Перевіряємо перенесення в Кабінет (fin_projects):
-//   · prj_8  — звичайний блок, переїжджає вперше;
-//   · prj_10 — у вкладеній сторінці;
-//   · prj_20 — уже перенесений; «старий телефон» дописав у копію блоку pop_new
-//     (має долитись) і досі тримає pop_del, який у Кабінеті видалено (не має повернутись);
-//     ще й прийняв там очікувану оплату (expected 0, unlocked) — проєкт має це побачити.
+// Пристрій, де старі разові міграції вже пройшли, зі старими проєктами (сценарій P):
+//   · блок 8  — звичайний «Проєкт», ніколи не переносився;
+//   · блок 10 — «Проєкт» у вкладеній сторінці;
+//   · блок 20 — колись перенесений у Кабінет (prj_20), копія в блоці розійшлась з Кабінетом.
+// Перенесення в Кабінет прибрано 09.10.2026: при старті все це має лишитись байт у байт.
 const POSTMIG = Object.assign({ flowtheme: 'dark', theme_flat_default_v1: '1' },
   Object.fromEntries(FLAGS.map(f => [f, '1'])), {
   flowapp_folders_cfg: W({ f_fin: { custom: true, name: 'Фінанси', emoji: '💰', c: '#22c55e' } }),
@@ -107,13 +113,13 @@ app.on('window-all-closed', () => {});
 const blank = path.join(os.tmpdir(), 'flow-mig-blank-' + process.pid + '.html');
 fs.writeFileSync(blank, '<!doctype html><title>seed</title>');
 
-async function makeWin(name, offline) {
+async function makeWin(name, offline, preload) {
   const part = 'mig-' + name + '-' + process.pid;   // без persist: — лише в памʼяті
   const ses = session.fromPartition(part);
   // «хмара мовчить»: будь-який запит у мережу обривається (file:// ходить як завжди)
   if (offline) ses.webRequest.onBeforeRequest({ urls: ['http://*/*', 'https://*/*'] }, (_d, cb) => cb({ cancel: true }));
   const win = new BrowserWindow({ show: false, width: 375, height: 812,
-    webPreferences: { partition: part, contextIsolation: true } });
+    webPreferences: Object.assign({ partition: part, contextIsolation: true }, preload ? { preload } : {}) });
   win.webContents.on('console-message', (e) => {
     if (e.level === 'error' && !/Failed to load resource|net::ERR_|fetch|NetworkError|supabase|ServiceWorker|sw\.js/i.test(e.message))
       errors.push(name + ': ' + e.message.slice(0, 200));
@@ -158,10 +164,13 @@ async function scenarioA() {
   if (inbox.length !== 2) bad(S, 'у чаті «Вхідні» ' + inbox.length + ' записів замість 2');
   // legacy_widgets вимкнено 03.10.2026: живі блоки (kanban, project…) на новому пристрої не вирізаються
   if (!(board.f_proj || []).some(b => b.type === 'kanban')) bad(S, 'живий блок kanban вирізано з дошки');
+  // перенесення «Проєкт» → Кабінет (fin_projects) прибрано 09.10.2026: блок лишається як був,
+  // а fin_projects при старті не зʼявляється — старе прибирає лише людина («Ще → Старі віджети»)
   const lp = (board.f_proj || []).find(b => b.type === 'project');
+  const lp0 = dataOf(LEGACY, 'board').f_proj.find(b => b.type === 'project');
   if (!lp) bad(S, 'блок «Проєкт» вирізано з дошки на новому пристрої');
-  else if (lp.projId !== 'prj_' + lp.id) bad(S, 'блок «Проєкт» не отримав projId');
-  if (!(dataOf(s1, 'fin_projects') || []).some(x => x.id === 'prj_12')) bad(S, 'проєкт не переїхав у fin_projects на новому пристрої');
+  else if (JSON.stringify(lp) !== JSON.stringify(lp0)) bad(S, 'блок «Проєкт» змінено при старті: ' + JSON.stringify(lp));
+  if ('flowapp_fin_projects' in s1) bad(S, 'при старті створено fin_projects — перенесення в Кабінет прибрано 09.10');
   ['f_agsk_seed', 'pat', 'f_space_1', 'f_inbox', 'f_inbox__sp_t1'].forEach(k => { if (board[k]) bad(S, 'дошка ' + k + ' лишилась'); });
   const chats = dataOf(s1, 'chats_v1') || [];
   if (!chats.some(c => c.id === 'inbox')) bad(S, 'нема чату «Вхідні»');
@@ -205,27 +214,29 @@ async function scenarioA() {
 }
 
 async function scenarioP() {
-  const S = 'P (проєкти → Кабінет)';
+  const S = 'P (старі проєкти на місці)';
   const win = await makeWin('p', false);
   await seed(win, POSTMIG);
   await start(win);
   const s1 = await snap(win);
-  const fp = dataOf(s1, 'fin_projects') || [];
-  const byId = id => fp.find(x => x.id === id);
-  const p8 = byId('prj_8'), p20 = byId('prj_20');
-  if (!p8) bad(S, 'блок не переїхав у fin_projects');
-  else if (!p8.ops || p8.ops.length !== 1 || p8.ops[0].amount !== 300 || p8.cur !== '€') bad(S, 'проєкт перенесено з втратами: ' + JSON.stringify(p8));
-  if (!byId('prj_10')) bad(S, 'вкладений проєкт не переїхав');
-  if (fp.length !== 3) bad(S, 'у fin_projects ' + fp.length + ' проєктів замість 3');
-  const ids20 = ((p20 && p20.ops) || []).map(o => o.id).sort().join(',');
-  if (ids20 !== 'pop_a,pop_new') bad(S, 'prj_20: очікував pop_a,pop_new, маю ' + ids20);
-  if (!p20 || p20.expected !== 0 || !p20.unlocked) bad(S, 'prj_20: оплату, прийняту старим застосунком, не перенесено');
+  // при старті нічого не переноситься і не стирається: обидва ключі — байт у байт як були
+  if (s1.flowapp_fin_projects !== POSTMIG.flowapp_fin_projects) bad(S, 'fin_projects змінено при старті: ' + String(s1.flowapp_fin_projects).slice(0, 200));
+  if (s1.flowapp_board !== POSTMIG.flowapp_board) bad(S, 'дошку зі старими блоками «Проєкт» переписано при старті');
   const board = (dataOf(s1, 'board') || {}).f_fin || [];
-  const b8 = board.find(x => x.id === 8);
-  if (!b8 || b8.projId !== 'prj_8') bad(S, 'блок не отримав projId');
-  else if (!b8.ops || b8.ops.length !== 1) bad(S, 'копію рухів у блоці втрачено');
+  const b8 = board.find(x => x.id === 8), b20 = board.find(x => x.id === 20);
   const b10 = ((board.find(x => x.id === 9) || {}).children || [])[0];
-  if (!b10 || b10.projId !== 'prj_10') bad(S, 'вкладений блок не отримав projId');
+  if (!b8 || !b10 || !b20) bad(S, 'блок «Проєкт» зник з дошки');
+  else {
+    if ('projId' in b8 || 'projId' in b10) bad(S, 'блок «Проєкт» отримав projId — перенесення в Кабінет прибрано 09.10');
+    const ids20 = (b20.ops || []).map(o => o.id).join(',');
+    if (ids20 !== 'pop_a,pop_del,pop_new') bad(S, 'рухи старого блоку змінено: ' + ids20);
+  }
+  const fp = dataOf(s1, 'fin_projects') || [];
+  if (fp.length !== 1 || !fp[0] || fp[0].id !== 'prj_20' || fp[0].expected !== 500) bad(S, 'Кабінет змінено: ' + JSON.stringify(fp).slice(0, 200));
+  // прибирає лише людина: кнопка «Ще → Дані → Старі віджети» (48-widgets.js) мусить усе це бачити
+  const old = await js(win, '(typeof wgOldScan==="function") ? wgOldScan() : null');
+  if (!old) bad(S, 'немає wgOldScan — нічим прибрати старі віджети');
+  else if ((old.by || {}).project !== 3 || old.pj !== 1) bad(S, '«Старі віджети» бачать не все: ' + JSON.stringify(old));
   // повторний load() і перезапуск нічого не переписують
   await js(win, '(async()=>{ if(typeof window.__load==="function") await window.__load(); })()');
   await sleep(1500);
@@ -236,7 +247,71 @@ async function scenarioP() {
   const s3 = await snap(win);
   const d13 = diff(s1, s3).filter(isStore);
   if (d13.length) bad(S, 'перезапуск переписав: ' + d13.join(', '));
-  console.log(S + ': проєктів ' + fp.length + ' · змін при повторі: ' + d12.length + ' · при перезапуску: ' + d13.length);
+  console.log(S + ': проєктів у Кабінеті ' + fp.length + ' · старих блоків ' + ((old && old.by && old.by.project) || 0) + ' · змін при повторі: ' + d12.length + ' · при перезапуску: ' + d13.length);
+  win.destroy();
+}
+
+// ── iPhone: заглушка Capacitor + Preferences ──
+// Preferences живе тут, у головному процесі (як UserDefaults поза WebView): переживає
+// перезапуск сторінки і не чиститься разом із localStorage — саме так, як на телефоні.
+const NP = new Map();
+ipcMain.handle('mig-np', (_e, op, o) => {
+  if (op === 'get') return { value: NP.has(o.key) ? NP.get(o.key) : null };
+  if (op === 'set') { NP.set(o.key, String(o.value)); return null; }
+  if (op === 'remove') { NP.delete(o.key); return null; }
+  if (op === 'keys') return { keys: [...NP.keys()] };
+  if (op === 'clear') { NP.clear(); return null; }
+  return null;
+});
+const nativePreload = path.join(os.tmpdir(), 'flow-mig-native-' + process.pid + '.js');
+fs.writeFileSync(nativePreload, `const { contextBridge, ipcRenderer } = require('electron');
+const call = (op, o) => ipcRenderer.invoke('mig-np', op, o || {});
+contextBridge.exposeInMainWorld('Capacitor', { isNative: true, isNativePlatform: () => true, getPlatform: () => 'ios',
+  Plugins: { Preferences: { get: o => call('get', o), set: o => call('set', o), remove: o => call('remove', o),
+    keys: () => call('keys'), clear: () => call('clear') } } });`);
+const MARK = 'WIPE_TEST_MARKER';
+
+async function scenarioN() {
+  const S = 'N (iPhone: Стерти все → перезапуск)';
+  const win = await makeWin('n', true, nativePreload);
+  const own = () => [...NP.keys()].filter(k => k.indexOf('flowapp_') === 0);
+  const inPrefs = () => [...NP.values()].some(v => v.indexOf(MARK) >= 0);
+  const inLocal = s => Object.keys(s).some(k => String(s[k]).indexOf(MARK) >= 0);
+  await seed(win, POSTMIG);
+  await start(win);   // nativeBoot засіває Preferences тим, що лежить локально
+  // запис людини: місія в цілях (через сам застосунок → localStorage + Preferences)
+  await js(win, '(async()=>{ goalsData.mission=' + JSON.stringify(MARK) + '; saveGoals(); await new Promise(r=>setTimeout(r,1200)); return 1; })()');
+  const native = await js(win, '!!window.FLOW_NATIVE');
+  if (!native || !inPrefs()) { bad(S, 'сценарій не відтворено: FLOW_NATIVE=' + native + ', маркер у Preferences=' + inPrefs()); win.destroy(); return; }
+  // 1) страховка жива: iOS вичистив localStorage — звичайний старт піднімає все з Preferences
+  await seed(win, {});
+  await start(win);
+  const s1 = await snap(win);
+  if (!inLocal(s1)) bad(S, 'страховку зламано: після чистки localStorage дані не повернулись з Preferences');
+  if (!(dataOf(s1, 'folders_cfg') || {}).f_fin) bad(S, 'страховку зламано: папка f_fin не повернулась з Preferences');
+  // 2) «Стерти все» (бекап уже «збережено») → застосунок сам перезапускається
+  let atReload = null;
+  const reloaded = new Promise(r => {
+    win.webContents.once('did-start-loading', () => { atReload = own(); });
+    win.webContents.once('did-finish-load', () => r(true));
+    setTimeout(() => r(false), 15000);
+  });
+  const ret = await js(win, 'window.flowFactoryReset({wipeCloud:false, backupConfirmed:true})');
+  if (!ret || !ret.ok) bad(S, 'скидання не пройшло: ' + JSON.stringify(ret));
+  if (!(await reloaded)) bad(S, 'після скидання застосунок не перезапустився');
+  if (atReload && atReload.length) bad(S, 'перезапуск почався, а в Preferences ще лежить: ' + atReload.join(', '));
+  await sleep(WAIT);
+  const s2 = await snap(win);
+  if (inLocal(s2)) bad(S, 'після скидання маркер повернувся в localStorage');
+  if (inPrefs()) bad(S, 'після скидання маркер лишився в Preferences');
+  if ((dataOf(s2, 'folders_cfg') || {}).f_fin || s2.flowapp_fin_projects || NP.has('flowapp_fin_projects')) bad(S, 'після скидання повернулись старі дані (f_fin / fin_projects)');
+  if (s2.__flow_wipe_np__) bad(S, 'мітку скидання не знято на першому старті');
+  // 3) ще один звичайний перезапуск: стерте не воскресає і далі
+  await start(win);
+  const s3 = await snap(win);
+  if (inLocal(s3) || inPrefs()) bad(S, 'другий перезапуск повернув стерте');
+  console.log(S + ': до скидання в Preferences маркер є · на момент перезапуску flowapp_ у Preferences: ' + (atReload ? atReload.length : '?') +
+    ' · після: маркер у localStorage=' + inLocal(s2) + ', у Preferences=' + inPrefs() + ' · ключів Preferences після: ' + own().length);
   win.destroy();
 }
 
@@ -282,6 +357,7 @@ app.whenReady().then(async () => {
   await Promise.all([
     guard('A', scenarioA()),
     guard('P', scenarioP()),
+    guard('N', scenarioN()),
     guard('D', scenarioSilent('d', 'D (проєкти, хмара мовчить)', Object.assign({ [SB_TOKEN_KEY]: fakeSession() }, POSTMIG))),
     guard('B', scenarioSilent('b', 'B (новий пристрій, хмара мовчить)', { [SB_TOKEN_KEY]: fakeSession() })),
     // «старий» пристрій уже пройшов перехід теми 01.09 — вона поза реєстром (див. 05-spaces.js)
@@ -290,6 +366,7 @@ app.whenReady().then(async () => {
   ]);
   clearTimeout(timer);
   try { fs.unlinkSync(blank); } catch (_) {}
+  try { fs.unlinkSync(nativePreload); } catch (_) {}
   errors.slice(0, 15).forEach(m => console.log('   ⚠ консоль: ' + m));
   problems.forEach(p => console.log('   ✗ ' + p));
   console.log(problems.length ? '\n❌ Міграції: проблем ' + problems.length : '\n✅ Міграції: чисто');

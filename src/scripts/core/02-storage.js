@@ -220,12 +220,50 @@
       clearTimeout(npTimers[key]);
       try{ P.remove({ key: LP+key }); }catch(_){}
     }
+    /* ── Скидання до заводських на native (знахідка APP-2, 10.10.2026) ──
+       wipeLocal у flowFactoryReset чистить лише localStorage, а npHydrate на
+       наступному старті піднімав з Preferences усе стерте назад: «Стерти все»
+       на iPhone нічого не стирало. Тому скидання стирає й нативну копію — усі
+       flowapp_*, разом зі службовими ___seeded / ___owner — і чекає відповіді.
+       NP_WIPED — одноразова мітка «щойно було скидання» для npHydrate. Це сирий
+       ключ localStorage без префікса flowapp_: у Preferences (а отже й у хмару,
+       й у бекап) він не потрапляє, тож воскреснути звідти не може. Ставимо її
+       ДО стирання: обірветься воно посередині — наступний старт дотре. */
+    const NP_WIPED = '__flow_wipe_np__';
+    async function npWipeAll(){
+      const P = npReady();
+      if(!P) return { native:false, removed:0, left:0 };
+      try{ localStorage.setItem(NP_WIPED, '1'); }catch(_){}
+      // відкладені записи дзеркала (дебаунс 400 мс) інакше доїхали б ПІСЛЯ стирання
+      Object.keys(npTimers).forEach(function(k){ clearTimeout(npTimers[k]); delete npTimers[k]; });
+      const own = function(all){ return (all && all.keys ? all.keys : []).filter(function(k){ return k.indexOf(LP)===0; }); };
+      let removed = 0, left = -1;   // -1 — Preferences навіть не відповів, скільки лишилось
+      try{
+        const keys = own(await P.keys());
+        await Promise.all(keys.map(function(k){
+          return Promise.resolve().then(function(){ return P.remove({ key:k }); }).then(function(){ removed++; }, function(){});
+        }));
+        left = own(await P.keys()).length;
+      }catch(_){}
+      return { native:true, removed, left };
+    }
     /* Підйом при старті: Preferences → localStorage. Перезаписуємо лише коли
        локального значення немає або воно старіше — щоб не відкотити зміни,
        зроблені за цей запуск. */
     async function npHydrate(){
       const NP = npReady();
       if(!NP) return { restored:0, checked:0 };
+      /* Перший старт після скидання: нічого не піднімаємо, а що лишилось у
+         Preferences (скидання не дочекалось, iOS відмовив) — дотираємо. Мітку
+         знімаємо, лише коли там справді порожньо, інакше наступний старт
+         повторить. Далі npSeed засіє Preferences уже новим, порожнім станом. */
+      let wiped = false;
+      try{ wiped = localStorage.getItem(NP_WIPED)==='1'; }catch(_){}
+      if(wiped){
+        const w = await npWipeAll();
+        if(w.left===0){ try{ localStorage.removeItem(NP_WIPED); }catch(_){} }
+        return { restored:0, checked:0, wiped:w.removed };
+      }
       let restored = 0, checked = 0;
       try{
         const all = await NP.keys();
@@ -273,8 +311,11 @@
       async nativeBoot(){
         const h = await npHydrate();
         const s = await npSeed();
-        return { restored:h.restored, checked:h.checked, seeded:s, native: !!npReady() };
+        return { restored:h.restored, checked:h.checked, seeded:s, wiped:h.wiped||0, native: !!npReady() };
       },
+      /* Скидання до заводських (flowFactoryReset): стерти нативну копію й
+         поставити мітку для наступного старту. На web/Mac — нічого (native:false). */
+      nativeWipe(){ return npWipeAll(); },
       /* обробити значення на виході: мігрувати якщо треба, віддати модулю чисті дані.
          Приймає рядок ЯК ЛЕЖИТЬ у сховищі (з __sv). Читання більше НІЧОГО НЕ ПИШЕ.
          Раніше сюди приходив уже розгорнутий рядок без __sv — версія завжди
@@ -1911,7 +1952,8 @@
      Книжки читалки (BookDB) в бекап не входять — екран чесно попереджає.
      IndexedDB тут лише позначається прапорцем: бази видаляє ранній хук
      на наступному старті (див. верх файлу), бо відкриті зʼєднання
-     блокують deleteDatabase. ============ */
+     блокують deleteDatabase. На iPhone стирається й копія в Preferences
+     (storage.nativeWipe → npWipeAll), інакше старт повернув би все назад. ============ */
   window.flowFactoryReset = async function(opts){
     const o=opts||{};
     // 1) страховка: бекап у файл. Не вдався чи скасовано — зупиняємось.
@@ -1970,8 +2012,17 @@
        Тут, а не до кроку хмари: якщо хмару стерти не вдалось, кошик лишається живим.
        Самі правки є у файлі бекапу, зробленому вище. */
     try{ if(window.sbDropQueue) window.sbDropQueue(); }catch(_){}
+    /* 5) iPhone: нативна копія в Preferences. Без цього npHydrate на старті
+       підняв би все стерте назад (APP-2). Стираємо після кожного wipeLocal
+       (він прибирає й мітку NP_WIPED, nativeWipe ставить її знову) і ЧЕКАЄМО
+       відповіді до перезапуску; завис міст — не довше 5 с, решту дотре
+       наступний старт за міткою. На web/Mac nativeWipe нічого не робить. */
+    const npWipe = ()=>Promise.race([
+      Promise.resolve().then(()=>window.storage.nativeWipe ? window.storage.nativeWipe() : null).catch(()=>null),
+      new Promise(r=>setTimeout(r, 5000)) ]);
     wipeLocal();
-    setTimeout(()=>{ wipeLocal(); try{ location.reload(); }catch(_){} }, 600);
+    await npWipe();
+    setTimeout(async ()=>{ wipeLocal(); await npWipe(); try{ location.reload(); }catch(_){} }, 600);
     return { ok:true };
   };
 
