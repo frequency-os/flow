@@ -194,6 +194,7 @@
     if(!slashCtx){closeSlash();return;}
     var loc=locate(slashCtx);if(!loc){closeSlash();return;}
     var b=loc.block;
+    if(typeof wdIs==='function'&&wdIs(k)){ pgDataInsert(k,loc); return; }   /* «Дані» — у дошку віджетів */
     var BT=(bridge()&&bridge().blockTypes())||{};
     function bTitle(t,fb){ return (BT[t]&&BT[t].title)||fb; }
     if(k==='divider'){b.type='divider';}
@@ -293,6 +294,36 @@
       try{rb.scrollIntoView({block:'center',behavior:'smooth'});}catch(_){try{rb.scrollIntoView();}catch(__){}}
       rb.classList.add('pg-born');
       setTimeout(function(){try{rb.classList.remove('pg-born');}catch(_){}},900);
+    }
+  }
+  /* «Дані» (core/48-widgets.js → wdInit): віджет лягає в дошку віджетів — ту, в якій стоїть рядок;
+     інакше в уже наявну дошку віджетів сторінки (wboard:true); інакше рядок стає новою дошкою.
+     Блок несе лише налаштування (sz/goalId/period/show) — дані модулів не копіюються. */
+  function pgFindWboard(arr){
+    for(var i=0;i<(arr||[]).length;i++){ var x=arr[i]; if(x&&x.type==='board'&&x.wboard&&Array.isArray(x.children)) return x; }
+    return null;
+  }
+  function pgDataInsert(k,loc){
+    var b=loc.block, par=loc.parent, w, board=null;
+    var blank=b.type==='note'&&!String(b.text||'').trim()&&!(b.children&&b.children.length);
+    if(turnSnap&&turnSnap.id===b.id) turnSnap=null;
+    if(par&&par.type==='board'){                                                  /* рядок у дошці: порожній стає віджетом, з текстом — віджет лягає поруч */
+      if(blank) w=wdInit(b,k);
+      else{ w=wdInit({id:uid()},k); par.children.splice(loc.idx+1,0,w); }
+      board=par;
+    }
+    else{
+      w=wdInit({id:uid()},k);
+      board=pgFindWboard(pgResolve().arr);
+      if(board){ board.children.push(w); if(blank) loc.arr.splice(loc.idx,1); }  /* порожній рядок вставки більше не потрібен */
+      else if(blank){ var keep=b.id; Object.keys(b).forEach(function(kk){delete b[kk];}); b.id=keep; b.type='board'; b.wboard=true; b.children=[w]; board=b; }
+      else{ board={id:uid(),type:'board',wboard:true,children:[w]}; loc.arr.splice(loc.idx+1,0,board); }
+    }
+    closeSlash(); save(); render();
+    var el=null; editor.querySelectorAll('[data-wghost]').forEach(function(x){ if(x.dataset.wghost===String(w.id)) el=x; }); var cell=el&&el.closest('.pg-bitem');
+    if(cell){
+      try{cell.scrollIntoView({block:'center',behavior:'smooth'});}catch(_){}
+      cell.classList.add('pg-born'); setTimeout(function(){try{cell.classList.remove('pg-born');}catch(_){}},900);
     }
   }
   backdrop.onclick=function(){closeSlash();closeBmenu();};
@@ -414,6 +445,10 @@
           colW:boardEl.getBoundingClientRect().width/12,
           startX:(e.touches?e.touches[0].clientX:e.clientX),startY:(e.touches?e.touches[0].clientY:e.clientY),
           w0:loc.block.gw||4,h0:loc.block.gh||2};
+      if(typeof wdIs==='function'&&wdIs(loc.block.type)){
+        var sz0=wdSz(loc.block); bz.wd=true; bz.h0=WD_SZ[sz0].gh;
+        bz.w0eff=window.innerWidth>=760?WD_SZ[sz0].gw/2:WD_SZ[sz0].gw;
+      }
       document.addEventListener('touchmove',bzMove,{passive:false});document.addEventListener('mousemove',bzMove);
       document.addEventListener('touchend',bzEnd);document.addEventListener('mouseup',bzEnd);
     }
@@ -421,6 +456,16 @@
       if(!bz)return; e.preventDefault();
       var x=e.touches?e.touches[0].clientX:e.clientX,y=e.touches?e.touches[0].clientY:e.clientY;
       var dW=Math.round((x-bz.startX)/Math.max(1,bz.colW)), dH=Math.round((y-bz.startY)/ROWH);
+      if(bz.wd){
+        /* віджет «Дані»: лише S / M / L. На ширині ≥760 S=3, M=L=6 колонок (CSS), тож рахуємо в частках ширини M */
+        var full=window.innerWidth>=760?6:12, ew=(bz.w0eff+dW)/full, eh=bz.h0+dH;
+        var sz=eh>=3?'l':(ew>=.75?'m':'s');
+        if(sz!==bz.block.sz){
+          bz.block.sz=sz; bz.block.gw=WD_SZ[sz].gw; bz.block.gh=WD_SZ[sz].gh; bz.cell.dataset.sz=sz;
+          bz.cell.style.setProperty('--gw',bz.block.gw); bz.cell.style.setProperty('--gh',bz.block.gh); bz.changed=true;
+        }
+        return;
+      }
       bz.block.gw=Math.max(2,Math.min(12,bz.w0+dW));
       bz.block.gh=Math.max(1,Math.min(8,bz.h0+dH));
       bz.cell.style.setProperty('--gw',bz.block.gw); bz.cell.style.setProperty('--gh',bz.block.gh);
@@ -429,7 +474,9 @@
       if(!bz)return;
       document.removeEventListener('touchmove',bzMove);document.removeEventListener('mousemove',bzMove);
       document.removeEventListener('touchend',bzEnd);document.removeEventListener('mouseup',bzEnd);
+      var redraw=bz.wd&&bz.changed;
       save(); bz=null;
+      if(redraw) render();   /* S/M/L показують різний вміст — перемалювати віджет */
     }
     editor.addEventListener('touchstart',bzStart,{passive:false});
     editor.addEventListener('mousedown',bzStart);
@@ -482,7 +529,7 @@
              function(){var i=dArr.indexOf(dBlk);if(i>-1)dArr.splice(i,1);});
     }
     else if(act==='dup'){
-      var cp=JSON.parse(JSON.stringify(loc.block));cp.id=uid();
+      var cp=JSON.parse(JSON.stringify(loc.block));(function reid(x){x.id=uid();(x.children||[]).forEach(function(c){if(c&&typeof c==='object')reid(c);});})(cp);   /* нові id і вкладеним — інакше ⚙ копії міг змінити оригінал */
       var uArr=loc.arr,origBlk=loc.block;
       uArr.splice(loc.idx+1,0,cp);
       pushOp(function(){var i=uArr.indexOf(cp);if(i>-1)uArr.splice(i,1);},

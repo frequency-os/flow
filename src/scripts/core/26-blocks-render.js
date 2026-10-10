@@ -1,9 +1,11 @@
-  // рекурсивний пошук блока (враховує вкладені у папки)
+  // рекурсивний пошук блока (враховує вкладені у папки, дошки, картки)
   function isContainer(b){ return b && (b.type==='group'||b.type==='page'); }
   function findBlockDeep(arr,id){
     for(const b of arr){
+      if(!b) continue;
       if(String(b.id)===String(id)) return b;
-      if(isContainer(b)&&Array.isArray(b.children)){
+      // будь-які вкладені блоки (папка, сторінка, дошка віджетів, картка, тогл): id унікальні, тож пошук лише глибший
+      if(Array.isArray(b.children)){
         const f=findBlockDeep(b.children,id); if(f) return f;
       }
     }
@@ -12,8 +14,9 @@
   // знайти масив-контейнер, у якому лежить блок (для переміщення/видалення)
   function findParentArr(arr,id){
     for(const b of arr){
+      if(!b) continue;
       if(String(b.id)===String(id)) return arr;
-      if(isContainer(b)&&Array.isArray(b.children)){
+      if(Array.isArray(b.children)){
         const f=findParentArr(b.children,id); if(f) return f;
       }
     }

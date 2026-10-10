@@ -1202,6 +1202,12 @@
     if(r.type==='custom') return (r.dows||[]).slice().sort((a,b)=>((a+6)%7)-((b+6)%7)).map(d=>DOW_UA[d]).join('·');
     return '';
   }
+  // «＋ точка» папки: шторка нового блоку Планера на сьогодні з міткою папки (шторка «План на день» і віджет «Час папки»)
+  function plFolderAddBlock(key){
+    if(!key||!folders[key]) return;
+    const p=plData(); p.selDate=plTodayStr(); saveGoals();
+    plBlockSheet(null, null, {folder:key});
+  }
   // ── шторка «План на день» у папці ──
   function plFolderDaySheet(key){
     const f=folders[key]; if(!f) return;
@@ -1252,10 +1258,7 @@
           saveGoals(); paint();
         }});
       });
-      { const ad=ov.querySelector('[data-fpsadd]'); if(ad) ad.onclick=()=>{
-        p.selDate=plTodayStr(); saveGoals(); close();
-        plBlockSheet(null, null, {folder:key});
-      }; }
+      { const ad=ov.querySelector('[data-fpsadd]'); if(ad) ad.onclick=()=>{ close(); plFolderAddBlock(key); }; }
     }
     paint();
   }
@@ -1316,10 +1319,7 @@
       ov.querySelectorAll('[data-fpmgo]').forEach(b=>b.onclick=()=>{
         p.selDate=b.dataset.fpmgo; p.scope='day'; saveGoals(); close(); goPlanner(true);
       });
-      { const ad=ov.querySelector('[data-fpsadd]'); if(ad) ad.onclick=()=>{
-        p.selDate=plTodayStr(); saveGoals(); close();
-        plBlockSheet(null, null, {folder:key});
-      }; }
+      { const ad=ov.querySelector('[data-fpsadd]'); if(ad) ad.onclick=()=>{ close(); plFolderAddBlock(key); }; }
     }
     paint();
   }

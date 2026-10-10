@@ -35,8 +35,11 @@
     {cat:'money', k:'wgmission',t:'Гроші місії',   d:'Дохід, бюджет і приз місії цієї папки',   c:'#34c77b', ic:'envelope'},
     {cat:'money', k:'wgenv',    t:'Конверти й платежі', d:'Сума в конвертах і найближчі рядки Плану', c:'#f0b429', ic:'envelope'},
     {cat:'money', k:'wgdebt',   t:'Борги й правила', d:'Хто кому винен, серія, дисципліна',     c:'#ff4d6d', ic:'envelope'},
-    {cat:'data',k:'wplanday', t:'План на день', d:'Точки з Планера для папки-проєкту',    c:'#5b8def', ic:'countdown'},
-    {cat:'data',k:'wplanmonth',t:'План на місяць', d:'Ритм проєкту за місяць з Планера',  c:'#5b8def', ic:'calendar'},
+    /* ═══ Дані (core/48-widgets.js, 10.10.2026) — вікна в місію, трекер і Планер; лягають у дошку віджетів S/M/L.
+       «План на день / місяць» (wplanday/wplanmonth) з меню прибрано — їх заміняє «Час папки»; старі блоки малюються як були. ═══ */
+    {cat:'data',k:'dmission', t:'Місія папки', d:'Прогрес місії, наступний крок, дедлайн',        c:'#34c77b', ic:'target'},
+    {cat:'data',k:'dhabit',   t:'Звичка папки', d:'Позначки місії за тиждень, серія, ✓ сьогодні',  c:'#e8843c', ic:'habits'},
+    {cat:'data',k:'dtime',    t:'Час папки',    d:'Блоки Планера цієї папки: день, тиждень, місяць', c:'#5b8def', ic:'calendar'},
     {cat:'data',  k:'countdown',t:'Відлік',  d:'Живий таймер до дати',  c:'#e8843c', ic:'countdown'},
     /* ═══ PREMIUM PACK V1 ═══ */
     {cat:'struct',k:'tabs',   t:'Таби',      d:'Кілька вкладок в одному блоці', c:'#9b8cff', ic:'tabs'},
@@ -64,11 +67,15 @@
     wgin:['дохід','гроші','income','money','заробіток'], wgout:['витрати','гроші','expense','money'], wgwallet:['гаманець','баланс','wallet','гроші'],
     wgmission:['місія','гроші','бюджет'], wgenv:['конверт','платежі','план'], wgdebt:['борги','правила','debt'],
     wfocus:['focus','фокус','pomodoro','помодоро'],
+    dmission:['місія','ціль','прогрес','mission','goal','progress','дедлайн','віджет','дані'],
+    dhabit:['звичка','трекер','серія','habit','streak','позначка','галочка','віджет','дані'],
+    dtime:['час','план','планер','день','тиждень','місяць','time','planner','schedule','календар','віджет','дані'],
     ai:['ai','ші','штучний','флоу']
   };
   /* видалені з палітри Акордеон/Секція/Промт/Папку(group), і зведені в Картку/Вкладення типи —
      їхній рендер і applySlash-кейси навмисно лишені нижче незмінними: старі сторінки читаються як і раніше (SPECblocksv2 §3.1) */
   var PGS_ICONS={
+    target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',
     win:'<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 9.5h18" stroke-linecap="round"/><path d="M6.5 13h8M6.5 16h5" stroke-linecap="round" opacity=".65"/>',
     text:'<path d="M4 7V5h16v2M12 5v14M9 19h6" stroke-linecap="round"/>',
     promptB:'<rect x="2" y="3" width="20" height="18" rx="3"/><path d="M6 8l4 4-4 4M12 16h6" stroke-linecap="round" stroke-linejoin="round"/>',

@@ -20,30 +20,31 @@
   };
   function sphIcon(name){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(SPH_ICONS[name]||SPH_ICONS.star)+'</svg>'; }
 
-  /* Шаблони: блоки — ті самі, що в палітрі документа (дефолти як у 03-premium-pack). */
+  /* Шаблони: блоки — ті самі, що в палітрі документа (дефолти як у 03-premium-pack).
+     «План» = віджет «Час папки» (dtime, 48-widgets.js) — замість старого wplanday (10.10.2026). */
   const SPH_TPL={
     fin:{n:'Кабінет фінансів', d:'Дохід, витрати, ціль місяця', ic:'wallet', c:'#22c55e', bld:'bank', em:'💰',
       chips:['Доходи','Витрати','Гаманець'],
       blocks:()=>[{type:'wgmoney',kind:'in',src:'extra',label:'Доходи',goal:0},{type:'wgmoney',kind:'out',label:'Витрати',goal:0},{type:'wgwallet'}]},
     sport:{n:'Спорт', d:'Тренування, звичка, план', ic:'dumbbell', c:'#f97316', bld:'gym', em:'🏋️',
       chips:['Хітмапа','План'],
-      blocks:()=>[{type:'heatmap',title:'Тренування',marks:{}},{type:'wplanday',title:'План на день'}]},
+      blocks:()=>[{type:'heatmap',title:'Тренування',marks:{}},{type:'dtime',sz:'m',gw:12,gh:2,period:'day'}]},
     learn:{n:'Навчання', d:'Серія днів, уроки', ic:'book', c:'#eab308', bld:'school', em:'📚',
       chips:['Серія','План'],
-      blocks:()=>[{type:'heatmap',title:'Заняття',marks:{}},{type:'wplanday',title:'План на день'}]},
+      blocks:()=>[{type:'heatmap',title:'Заняття',marks:{}},{type:'dtime',sz:'m',gw:12,gh:2,period:'day'}]},
     work:{n:'Робота', d:'Заробіток, зміни, план', ic:'server', c:'#3b82f6', bld:'dc', em:'⚡',
       chips:['Заробіток','Хітмапа','План'],
       blocks:()=>[{type:'wgmoney',kind:'in',src:'main',label:'Заробіток',goal:0},
-                  {type:'heatmap',title:'Зміни',marks:{}},{type:'wplanday',title:'План на день'}]},
+                  {type:'heatmap',title:'Зміни',marks:{}},{type:'dtime',sz:'m',gw:12,gh:2,period:'day'}]},
     brand:{n:'Бренд / контент', d:'Публікації, план', ic:'video', c:'#a855f7', bld:'media', em:'🎬',
       chips:['Хітмапа','План'],
-      blocks:()=>[{type:'heatmap',title:'Публікації',marks:{}},{type:'wplanday',title:'План на день'}]},
+      blocks:()=>[{type:'heatmap',title:'Публікації',marks:{}},{type:'dtime',sz:'m',gw:12,gh:2,period:'day'}]},
     habit:{n:'Звичка', d:'Дні без зриву, економія', ic:'nosmoke', c:'#14b8a6', bld:'park', em:'🌿',
       chips:['Хітмапа','Відлік'],
       blocks:()=>[{type:'heatmap',title:'Дні без зриву',marks:{}},{type:'countdown',title:'Мета',target:'',label:''}]},
     home:{n:'Дім', d:'Побут, сон, свої справи', ic:'home', c:'#6366f1', bld:'home', em:'🏠',
       chips:['Хітмапа','План'],
-      blocks:()=>[{type:'heatmap',title:'Сон вчасно',marks:{}},{type:'wplanday',title:'План на день'}]}
+      blocks:()=>[{type:'heatmap',title:'Сон вчасно',marks:{}},{type:'dtime',sz:'m',gw:12,gh:2,period:'day'}]}
   };
   const SPH_ORDER=['fin','sport','learn','work','brand','habit','home'];
 

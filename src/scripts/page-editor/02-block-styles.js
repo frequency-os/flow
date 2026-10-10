@@ -119,13 +119,13 @@
     pbar:'Прогрес',chart:'Графік',progress:'Прогрес',kanban:'Канбан',contacts:'Контакти',caseline:'Таймлайн справи',
     wpult:'Пульт проєктів',wstack:'Фокус-стек',wpipe:'Пайплайн',wtline:'Таймлайн',wportal:'Портал'};
   function inner(b){
-    var t=b.type,id=b.id;
+    var t=b.type,id=esc(b.id);   // id з даних іде в атрибути data-*=" " — екрануємо (звичайні id від uid() не змінюються)
     /* віджети «Гроші» (core/48-widgets.js) — живі плитки; старі фінансові віджети прибрано 09.10.2026 */
-    if(typeof wgIs==='function'&&wgIs(t)) return '<div class="pg-content pgwg" data-wghost="'+esc(id)+'"></div>';
+    if(typeof wgIs==='function'&&wgIs(t)) return '<div class="pg-content pgwg" data-wghost="'+id+'"></div>';
     var PG_OLD_FIN={fin:'Фінанси',envelope:'Конверт',project:'Проєкт',festival:'Фестиваль',kpi:'KPI'};
     if(PG_OLD_FIN[t]) return '<div class="pg-content"><div class="pg-oldw">🗂 Старий віджет «'+PG_OLD_FIN[t]+'» — прибирається в <b>Ще → Дані → Старі віджети</b>. Нові — у меню «/» → Гроші.</div></div>';
     /* прибрані 10.10.2026 ізольовані блоки — у старих документах лишається плашка з «Прибрати» */
-    if(Object.prototype.hasOwnProperty.call(PG_GONE,t)) return '<div class="pg-content"><div class="pg-oldw">Старий блок «'+PG_GONE[t]+'» — більше не підтримується. <button type="button" class="pg-oldw-rm" data-pgoldrm="'+esc(id)+'">Прибрати</button></div></div>';
+    if(Object.prototype.hasOwnProperty.call(PG_GONE,t)) return '<div class="pg-content"><div class="pg-oldw">Старий блок «'+PG_GONE[t]+'» — більше не підтримується. <button type="button" class="pg-oldw-rm" data-pgoldrm="'+id+'">Прибрати</button></div></div>';
     /* нотатка = суцільний абзац на аркуші, без рамок */
     if(t==='note'||t==='quick')return '<div class="pg-content pg-empty" contenteditable="true" data-ph="Пишіть…" data-edit="'+id+'">'+esc(txtOf(b))+'</div>';
     if(t==='h1'){var hs1=headingStyle(b);return '<div class="pg-content pgc-h1'+hs1.cls+' pg-empty" style="'+hs1.style+'" contenteditable="true" data-ph="Заголовок 1" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
@@ -470,12 +470,15 @@
   }
   /* ── дошка: сітка 12 колонок, авто-укладання нативним CSS Grid (SPECblocksv2 §4.3) ── */
   function renderBoardBlock(rb,host){
-    var wrap=document.createElement('div'); wrap.className='pg-board'; wrap.dataset.id=rb.id;
+    /* wboard — дошка віджетів «Дані»: на телефоні 2 колонки, як віджети iPhone (CSS 32-widgets.css) */
+    var wrap=document.createElement('div'); wrap.className='pg-board'+(rb.wboard?' wboard':''); wrap.dataset.id=rb.id;
     var items=Array.isArray(rb.children)?rb.children:[];
     items.forEach(function(it){
       if(!condMet(it)&&!pgShowHidden) return;
       var cell=document.createElement('div'); cell.className='pg-bitem'+(!condMet(it)?' pg-condhidden':'');
       cell.style.setProperty('--gw',it.gw||4); cell.style.setProperty('--gh',it.gh||2);
+      /* віджети «Дані» мають розміри S/M/L — ширину на телефоні й ноуті задає CSS за data-sz */
+      if(typeof wdIs==='function'&&wdIs(it.type)) cell.dataset.sz=wdSz(it);
       renderList([it],cell);
       var rz=document.createElement('span'); rz.className='pg-brz'; rz.dataset.pgboardrz=it.id; rz.textContent='◢';
       cell.appendChild(rz);
@@ -483,8 +486,8 @@
     });
     host.appendChild(wrap);
     var foot=document.createElement('div'); foot.className='pg-bfoot';
-    foot.innerHTML='<button class="pg-badd" data-pgboardadd="'+rb.id+'">＋ Віджет у дошку</button>'
-      +'<button class="pg-rowdel" data-pgrowdel="'+rb.id+'" title="Видалити дошку">✕</button>';
+    foot.innerHTML='<button class="pg-badd" data-pgboardadd="'+esc(rb.id)+'">'+(rb.wboard?'＋ Віджет':'＋ Віджет у дошку')+'</button>'
+      +'<button class="pg-rowdel" data-pgrowdel="'+esc(rb.id)+'" title="Видалити дошку">✕</button>';
     host.appendChild(foot);
   }
   /* ── ряд колонок: горизонтальний контейнер, кожна колонка — своя вертикальна renderList (SPECblocksv2 §4.1) ── */

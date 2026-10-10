@@ -278,6 +278,7 @@
       blc.block.children=blc.block.children||[]; blc.block.children.push(bnb);
       save(); render();
       slashCtx=bnb.id; openSlash();
+      if(blc.block.wboard){ pgsCat='data'; buildSlash(''); }   /* дошка віджетів — одразу категорія «Дані» */
       return;
     }
     var up=e.target&&e.target.closest&&e.target.closest('[data-pgup]');
