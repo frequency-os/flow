@@ -1719,7 +1719,10 @@
       try{ localStorage.setItem('__flow_snapshot__', makeEnvelope()); return true; }catch(_){ return false; }
     }
     function restoreSnapshot(){
-      try{ const s = localStorage.getItem('__flow_snapshot__'); if(!s) return false; return applyEnvelope(s, {makeSafetyCopy:false}); }catch(_){ return false; }
+      try{ const s = localStorage.getItem('__flow_snapshot__'); if(!s) return false; const r = applyEnvelope(s, {makeSafetyCopy:false});
+        // як і в pushRestored: надгробки фінансів «з майбутнього» не мають сховати щойно відновлене
+        try{ if(r && r.ok!==false && typeof window.finTombReset==='function'){ const q = window.finTombReset(); if(q && q.catch) q.catch(()=>{}); } }catch(_){}
+        return r; }catch(_){ return false; }
     }
 
     // значення у форматі localStorage ({_v,d} чи сирий рядок) → рядок даних
@@ -1856,6 +1859,9 @@
         const v = window.storage.getLocal(k); if(v==null) continue;
         try{ await window.storage.set(k, v, false); n++; }catch(_){}
       }
+      // «надгробки» обнулення фінансів (fin_tomb, 51-money-reset.js) — теж «з майбутнього»: бекап, зроблений ДО обнулення,
+      // інакше відновився б і одразу сховався (а перше ж збереження стерло б відновлене назавжди). І з входом, і без.
+      try{ if(typeof window.finTombReset==='function') await window.finTombReset(); }catch(_){}
       if(!(window.sbUser && window.sbUser())) return { cloud:false, keys:n };
       // відновлення — крок назад у часі: «надгробки» папок, які інші пристрої
       // ще тримають у памʼяті, більше не діють (інакше вони знову стерли б

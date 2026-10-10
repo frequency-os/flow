@@ -335,7 +335,7 @@
     const __RAW = await (async ()=>{
       const keys=[DEBT_KEY,SKEY,PAT_CKEY,PAT_SKEY,PAT_TKEY,BKEY,RDR_CFG_KEY,
         FKEY,FOKEY,FWKEY,GKEY,VZKEY,CUSTOM_AV_KEY,ENVKEY,FINOPKEY,'chats_v1',FDELKEY,
-        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,FINPROJKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY];   // fx_cfg лишився тільки як джерело курсу для міграції
+        WORKKEY,WORKCFGKEY,WKEXTRAKEY,WKBLKKEY,RECKEY,CARDKEY,FINPROJKEY,'fx_cfg',DIARY_KEY,DIAINS_KEY,DIABOOKS_KEY,'fin_tomb'];   // fx_cfg лишився тільки як джерело курсу для міграції
       const pairs=await Promise.all(keys.map(k=>
         window.storage.get(k,false).then(
           r=>[k,(r&&typeof r.value!=='undefined')?r.value:null],
@@ -469,6 +469,8 @@
     try{ const raw=__RAW[WKEXTRAKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) workExtras=d; }catch(_){}
     try{ const raw=__RAW[WKBLKKEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') wkBlocks=Object.assign(wkBlocks,d); }catch(_){}
     try{ const raw=__RAW[RECKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) recurring=d; }catch(_){}
+    // «надгробки» обнулення фінансів: стерте на цьому чи іншому пристрої не повертається зі старої копії (51-money-reset.js)
+    try{ if(typeof finTombLoad==='function') finTombLoad(__RAW['fin_tomb']); }catch(_){}
     try{ const raw=__RAW[FINPROJKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) finProjects=d.filter(p=>p&&typeof p.id==='string'); }catch(_){}
     try{ const raw=__RAW[CARDKEY]; const d=raw?JSON.parse(raw):null; if(Array.isArray(d)) cards=d; }catch(_){}
     try{ const raw=__RAW[DIARY_KEY]; const d=raw?JSON.parse(raw):null; if(d&&typeof d==='object') diaryEntries=d; }catch(_){}

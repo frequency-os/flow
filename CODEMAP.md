@@ -14,11 +14,11 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 84 |
-| Рядків JS | 32478 |
+| Рядків JS | 32544 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10289 |
-| Сутностей верхнього рівня | 2271 |
-| Ключів сховища (FLOW_KEYS) | 78 |
+| Сутностей верхнього рівня | 2279 |
+| Ключів сховища (FLOW_KEYS) | 79 |
 
 ## Файли JS
 
@@ -36,8 +36,8 @@
 | `src/scripts/44-week.js` | 325 | 0 |
 | `src/scripts/45-month.js` | 662 | 0 |
 | `src/scripts/46-mx.js` | 220 | 0 |
-| `src/scripts/core/01-base.js` | 410 | 39 |
-| `src/scripts/core/02-storage.js` | 2091 | 175 |
+| `src/scripts/core/01-base.js` | 411 | 39 |
+| `src/scripts/core/02-storage.js` | 2097 | 175 |
 | `src/scripts/core/03-platform.js` | 60 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 404 | 55 |
 | `src/scripts/core/05-spaces.js` | 690 | 61 |
@@ -55,14 +55,14 @@
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 199 | 18 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
-| `src/scripts/core/20-work.js` | 523 | 51 |
+| `src/scripts/core/20-work.js` | 525 | 51 |
 | `src/scripts/core/21-patterns.js` | 191 | 21 |
 | `src/scripts/core/22-diary.js` | 531 | 54 |
 | `src/scripts/core/23-board.js` | 295 | 29 |
 | `src/scripts/core/24-reminders.js` | 181 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
 | `src/scripts/core/26-blocks-render.js` | 1203 | 16 |
-| `src/scripts/core/27-canvas.js` | 591 | 27 |
+| `src/scripts/core/27-canvas.js` | 593 | 27 |
 | `src/scripts/core/28-vision.js` | 528 | 42 |
 | `src/scripts/core/29-more-screen.js` | 588 | 32 |
 | `src/scripts/core/30-upgrade.js` | 296 | 30 |
@@ -87,7 +87,7 @@
 | `src/scripts/core/49-calendar.js` | 148 | 17 |
 | `src/scripts/core/49-finlit.js` | 132 | 17 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
-| `src/scripts/core/51-money-reset.js` | 77 | 7 |
+| `src/scripts/core/51-money-reset.js` | 132 | 15 |
 | `src/scripts/core/52-fresh-start.js` | 204 | 27 |
 | `src/scripts/page-editor/01-palette.js` | 180 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 764 | 49 |
@@ -161,7 +161,7 @@
 | `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 278 | 0 |
 
-## Ключі сховища — FLOW_KEYS (78)
+## Ключі сховища — FLOW_KEYS (79)
 
 `src/scripts/core/01-base.js`
 
@@ -173,23 +173,25 @@
 
 `diary_insights_v1` · `envelopes` · `fin_curs` · `fin_ops` · `fin_projects` · `fin_recurring`
 
-`flowPgCovers` · `flowcardskin` · `flowprotheme` · `flowtheme` · `folder_widgets` · `folderopts`
+`fin_tomb` · `flowPgCovers` · `flowcardskin` · `flowprotheme` · `flowtheme` · `folder_widgets`
 
-`folders_cfg` · `folders_deleted_v1` · `folders_order` · `folderview` · `forcedesktop` · `forcemobile`
+`folderopts` · `folders_cfg` · `folders_deleted_v1` · `folders_order` · `folderview` · `forcedesktop`
 
-`fx_cfg` · `fx_mode` · `fx_say` · `goals_data` · `hero_look` · `home_glass_on`
+`forcemobile` · `fx_cfg` · `fx_mode` · `fx_say` · `goals_data` · `hero_look`
 
-`homeov` · `hometab` · `homewidgets` · `i18n_content_cache` · `income_cards` · `lang_pref`
+`home_glass_on` · `homeov` · `hometab` · `homewidgets` · `i18n_content_cache` · `income_cards`
 
-`main_cur` · `patterns_chains` · `patterns_score` · `patterns_transform` · `pet_hidden` · `pet_pos`
+`lang_pref` · `main_cur` · `patterns_chains` · `patterns_score` · `patterns_transform` · `pet_hidden`
 
-`pet_sleep` · `readerCfg` · `ritual_board` · `sidebarcol` · `spacecanvas` · `spacecanvaszoom`
+`pet_pos` · `pet_sleep` · `readerCfg` · `ritual_board` · `sidebarcol` · `spacecanvas`
 
-`spacefull` · `spaces_map_v2` · `spaceview` · `spacewide` · `spend` · `switcher_style`
+`spacecanvaszoom` · `spacefull` · `spaces_map_v2` · `spaceview` · `spacewide` · `spend`
 
-`ui_mode` · `upgrade_profile_v1` · `values_state` · `vision_v1` · `wish_active_days_v1` · `wish_price`
+`switcher_style` · `ui_mode` · `upgrade_profile_v1` · `values_state` · `vision_v1` · `wish_active_days_v1`
 
-`wishes_board` · `work_blocks` · `work_cfg` · `work_extras` · `work_sessions` · `world_game`
+`wish_price` · `wishes_board` · `work_blocks` · `work_cfg` · `work_extras` · `work_sessions`
+
+`world_game`
 
 ## Сутності по файлах
 
@@ -285,31 +287,31 @@
 | `safeColor` | функція | `src/scripts/core/01-base.js:106` |
 | `window.safeColor` | значення | `src/scripts/core/01-base.js:111` |
 | `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:120` |
-| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:178` |
-| `getLang` | функція | `src/scripts/core/01-base.js:195` |
-| `setLang` | функція | `src/scripts/core/01-base.js:196` |
-| `window.__flowLang` | значення | `src/scripts/core/01-base.js:197` |
-| `window.flowLang` | значення | `src/scripts/core/01-base.js:198` |
-| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:199` |
-| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:204` |
-| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:256` |
-| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:284` |
-| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:299` |
-| `translateNode` | функція | `src/scripts/core/01-base.js:302` |
-| `i18nApply` | функція | `src/scripts/core/01-base.js:325` |
-| `window.i18nApply` | значення | `src/scripts/core/01-base.js:329` |
-| `i18nBlocked` | функція | `src/scripts/core/01-base.js:333` |
-| `raf` | значення | `src/scripts/core/01-base.js:343` |
-| `flush` | функція | `src/scripts/core/01-base.js:344` |
-| `mo` | функція | `src/scripts/core/01-base.js:351` |
-| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:372` |
-| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:375` |
-| `hash` | функція | `src/scripts/core/01-base.js:376` |
-| `cacheGet` | функція | `src/scripts/core/01-base.js:377` |
-| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:382` |
-| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:398` |
-| `push` | функція | `src/scripts/core/01-base.js:399` |
-| `window.flowErrors` | функція | `src/scripts/core/01-base.js:408` |
+| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:179` |
+| `getLang` | функція | `src/scripts/core/01-base.js:196` |
+| `setLang` | функція | `src/scripts/core/01-base.js:197` |
+| `window.__flowLang` | значення | `src/scripts/core/01-base.js:198` |
+| `window.flowLang` | значення | `src/scripts/core/01-base.js:199` |
+| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:200` |
+| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:205` |
+| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:257` |
+| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:285` |
+| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:300` |
+| `translateNode` | функція | `src/scripts/core/01-base.js:303` |
+| `i18nApply` | функція | `src/scripts/core/01-base.js:326` |
+| `window.i18nApply` | значення | `src/scripts/core/01-base.js:330` |
+| `i18nBlocked` | функція | `src/scripts/core/01-base.js:334` |
+| `raf` | значення | `src/scripts/core/01-base.js:344` |
+| `flush` | функція | `src/scripts/core/01-base.js:345` |
+| `mo` | функція | `src/scripts/core/01-base.js:352` |
+| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:373` |
+| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:376` |
+| `hash` | функція | `src/scripts/core/01-base.js:377` |
+| `cacheGet` | функція | `src/scripts/core/01-base.js:378` |
+| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:383` |
+| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:399` |
+| `push` | функція | `src/scripts/core/01-base.js:400` |
+| `window.flowErrors` | функція | `src/scripts/core/01-base.js:409` |
 
 ### `src/scripts/core/02-storage.js` — 175 сутностей
 
@@ -468,28 +470,28 @@
 | `exportToFile` | функція | `src/scripts/core/02-storage.js:1703` |
 | `snapshot` | функція | `src/scripts/core/02-storage.js:1718` |
 | `restoreSnapshot` | функція | `src/scripts/core/02-storage.js:1721` |
-| `unwrapVal` | функція | `src/scripts/core/02-storage.js:1726` |
-| `valOf` | функція | `src/scripts/core/02-storage.js:1731` |
-| `checkEnvelope` | функція | `src/scripts/core/02-storage.js:1740` |
-| `plural` | функція | `src/scripts/core/02-storage.js:1758` |
-| `summarize` | функція | `src/scripts/core/02-storage.js:1763` |
-| `readFile` | функція | `src/scripts/core/02-storage.js:1786` |
-| `inspectFile` | функція | `src/scripts/core/02-storage.js:1796` |
-| `applyEnvelope` | функція | `src/scripts/core/02-storage.js:1825` |
-| `pushRestored` | функція | `src/scripts/core/02-storage.js:1849` |
-| `applyInspected` | функція | `src/scripts/core/02-storage.js:1875` |
-| `importFromFile` | функція | `src/scripts/core/02-storage.js:1893` |
-| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1899` |
-| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1915` |
-| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:1988` |
-| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:2026` |
-| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:2032` |
-| `__photoPoke` | функція | `src/scripts/core/02-storage.js:2033` |
-| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:2041` |
-| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:2065` |
-| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:2066` |
-| `window.photoPut` | функція | `src/scripts/core/02-storage.js:2072` |
-| `window.photoDel` | функція | `src/scripts/core/02-storage.js:2081` |
+| `unwrapVal` | функція | `src/scripts/core/02-storage.js:1729` |
+| `valOf` | функція | `src/scripts/core/02-storage.js:1734` |
+| `checkEnvelope` | функція | `src/scripts/core/02-storage.js:1743` |
+| `plural` | функція | `src/scripts/core/02-storage.js:1761` |
+| `summarize` | функція | `src/scripts/core/02-storage.js:1766` |
+| `readFile` | функція | `src/scripts/core/02-storage.js:1789` |
+| `inspectFile` | функція | `src/scripts/core/02-storage.js:1799` |
+| `applyEnvelope` | функція | `src/scripts/core/02-storage.js:1828` |
+| `pushRestored` | функція | `src/scripts/core/02-storage.js:1852` |
+| `applyInspected` | функція | `src/scripts/core/02-storage.js:1881` |
+| `importFromFile` | функція | `src/scripts/core/02-storage.js:1899` |
+| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1905` |
+| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1921` |
+| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:1994` |
+| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:2032` |
+| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:2038` |
+| `__photoPoke` | функція | `src/scripts/core/02-storage.js:2039` |
+| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:2047` |
+| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:2071` |
+| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:2072` |
+| `window.photoPut` | функція | `src/scripts/core/02-storage.js:2078` |
+| `window.photoDel` | функція | `src/scripts/core/02-storage.js:2087` |
 
 ### `src/scripts/core/03-platform.js` — 14 сутностей
 
@@ -1406,17 +1408,17 @@
 | `delExtra` | функція | `src/scripts/core/20-work.js:226` |
 | `renderExtras` | функція | `src/scripts/core/20-work.js:227` |
 | `syncSalaryToFin` | функція | `src/scripts/core/20-work.js:246` |
-| `transferPlannedToEnvelopes` | функція | `src/scripts/core/20-work.js:285` |
-| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:303` |
-| `openAllocModal` | функція | `src/scripts/core/20-work.js:307` |
-| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:330` |
-| `allocSave` | функція | `src/scripts/core/20-work.js:341` |
-| `renderWork` | функція | `src/scripts/core/20-work.js:358` |
-| `workShiftMonth` | функція | `src/scripts/core/20-work.js:461` |
-| `pushWorkBatch` | функція | `src/scripts/core/20-work.js:469` |
-| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:482` |
-| `delWork` | функція | `src/scripts/core/20-work.js:500` |
-| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:510` |
+| `transferPlannedToEnvelopes` | функція | `src/scripts/core/20-work.js:287` |
+| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:305` |
+| `openAllocModal` | функція | `src/scripts/core/20-work.js:309` |
+| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:332` |
+| `allocSave` | функція | `src/scripts/core/20-work.js:343` |
+| `renderWork` | функція | `src/scripts/core/20-work.js:360` |
+| `workShiftMonth` | функція | `src/scripts/core/20-work.js:463` |
+| `pushWorkBatch` | функція | `src/scripts/core/20-work.js:471` |
+| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:484` |
+| `delWork` | функція | `src/scripts/core/20-work.js:502` |
+| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:512` |
 
 ### `src/scripts/core/21-patterns.js` — 21 сутностей
 
@@ -1646,15 +1648,15 @@
 | `loadInFlight` | значення | `src/scripts/core/27-canvas.js:300` |
 | `load` | функція | `src/scripts/core/27-canvas.js:301` |
 | `loadOnce` | функція | `src/scripts/core/27-canvas.js:306` |
-| `vv` | значення | `src/scripts/core/27-canvas.js:504` |
-| `FIELD` | значення | `src/scripts/core/27-canvas.js:505` |
-| `isField` | функція | `src/scripts/core/27-canvas.js:507` |
-| `kbHeight` | функція | `src/scripts/core/27-canvas.js:510` |
-| `syncKb` | функція | `src/scripts/core/27-canvas.js:514` |
-| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:521` |
-| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:557` |
-| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:564` |
-| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:582` |
+| `vv` | значення | `src/scripts/core/27-canvas.js:506` |
+| `FIELD` | значення | `src/scripts/core/27-canvas.js:507` |
+| `isField` | функція | `src/scripts/core/27-canvas.js:509` |
+| `kbHeight` | функція | `src/scripts/core/27-canvas.js:512` |
+| `syncKb` | функція | `src/scripts/core/27-canvas.js:516` |
+| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:523` |
+| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:559` |
+| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:566` |
+| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:584` |
 
 ### `src/scripts/core/28-vision.js` — 42 сутностей
 
@@ -2479,7 +2481,7 @@
 | `qaRun` | функція | `src/scripts/core/50-quickadd.js:30` |
 | `qaGuide` | функція | `src/scripts/core/50-quickadd.js:50` |
 
-### `src/scripts/core/51-money-reset.js` — 7 сутностей
+### `src/scripts/core/51-money-reset.js` — 15 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2490,6 +2492,14 @@
 | `finResetScan` | функція | `src/scripts/core/51-money-reset.js:43` |
 | `finResetReady` | функція | `src/scripts/core/51-money-reset.js:50` |
 | `finResetAll` | функція | `src/scripts/core/51-money-reset.js:55` |
+| `FIN_TOMB_KINDS` | масив | `src/scripts/core/51-money-reset.js:90` |
+| `window.finTombReset` | функція | `src/scripts/core/51-money-reset.js:92` |
+| `finTombNorm` | функція | `src/scripts/core/51-money-reset.js:94` |
+| `finTombGet` | функція | `src/scripts/core/51-money-reset.js:99` |
+| `finTombHas` | функція | `src/scripts/core/51-money-reset.js:100` |
+| `finTombApply` | функція | `src/scripts/core/51-money-reset.js:105` |
+| `finTombLoad` | функція | `src/scripts/core/51-money-reset.js:115` |
+| `finTombAdd` | функція | `src/scripts/core/51-money-reset.js:122` |
 
 ### `src/scripts/core/52-fresh-start.js` — 27 сутностей
 
