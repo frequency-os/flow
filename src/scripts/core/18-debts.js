@@ -16,26 +16,76 @@
     try{ const p=window.storage.set(DEBT_KEY,JSON.stringify(debtItems),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){}
   }
   function initials(n){ return (n.trim()[0]||'?').toUpperCase(); }
-  // дозволяємо лише прості теги форматування у rich-нотатці
+  /* Єдиний чистильник розмітки з нотаток і журналу (SEC-6, 10.10.2026).
+     Розбираємо в ІНЕРТНОМУ документі (DOMParser): там нічого не вантажиться
+     і не запускається — на відміну від div.innerHTML у живій сторінці, де
+     <img onerror> спрацьовував уже під час «чистки». Лишаємо білий список
+     тегів форматування; невідомі теги розгортаємо (текст лишається), а
+     script/style/iframe… викидаємо разом із вмістом. Атрибути — усі геть,
+     крім: маркера (background-color у span/font/mark), клас je-chk/on
+     (пункт-галочка журналу) і href у посиланнях (лише http(s) і mailto). */
   function sanitizeRich(html){
     try{
-      const tmp=document.createElement('div'); tmp.innerHTML=String(html||'');
-      const allow={B:1,I:1,U:1,S:1,STRIKE:1,MARK:1,BR:1,DIV:1,SPAN:1,FONT:1,P:1};
+      const RICH_TAGS={B:1,STRONG:1,I:1,EM:1,U:1,S:1,STRIKE:1,DEL:1,MARK:1,BR:1,DIV:1,SPAN:1,FONT:1,P:1,
+        H1:1,H2:1,H3:1,H4:1,UL:1,OL:1,LI:1,BLOCKQUOTE:1,PRE:1,CODE:1,SUB:1,SUP:1,HR:1,A:1};
+      const RICH_DROP={SCRIPT:1,STYLE:1,TEMPLATE:1,IFRAME:1,FRAME:1,FRAMESET:1,OBJECT:1,EMBED:1,APPLET:1,
+        NOSCRIPT:1,TITLE:1,HEAD:1,META:1,LINK:1,BASE:1,SVG:1,MATH:1,FORM:1,TEXTAREA:1,SELECT:1};
+      const doc=new DOMParser().parseFromString('<!doctype html><body>'+String(html||''),'text/html');
       const walk=node=>{
         [...node.childNodes].forEach(n=>{
-          if(n.nodeType===1){
-            if(!allow[n.tagName]){ const txt=document.createTextNode(n.textContent); n.replaceWith(txt); return; }
-            // прибрати всі атрибути крім підсвітки
-            const bg=n.style && (n.style.backgroundColor||'');
-            [...n.attributes].forEach(a=>n.removeAttribute(a.name));
-            if((n.tagName==='SPAN'||n.tagName==='FONT'||n.tagName==='MARK') && bg){ n.style.backgroundColor=bg; }
-            walk(n);
-          }
+          if(n.nodeType===3) return;
+          if(n.nodeType!==1){ n.remove(); return; }          // коментарі та інше — геть
+          const tag=String(n.tagName||'').toUpperCase();
+          if(RICH_DROP[tag]){ n.remove(); return; }
+          walk(n);
+          if(!RICH_TAGS[tag]){ n.replaceWith(...n.childNodes); return; }
+          // прибрати всі атрибути, крім підсвітки, галочки журналу й безпечного href
+          const bg=String(n.style&&n.style.backgroundColor||'');
+          const cls=String(n.getAttribute('class')||'').split(/\s+/).filter(c=>c==='je-chk'||c==='on').join(' ');
+          const href=tag==='A'?safeHref(n.getAttribute('href')):'';
+          [...n.attributes].forEach(a=>n.removeAttribute(a.name));
+          if((tag==='SPAN'||tag==='FONT'||tag==='MARK') && /^(#[0-9a-f]{3,8}|rgba?\([\d.,\s%]+\)|[a-z]+)$/i.test(bg)) n.style.backgroundColor=bg;
+          if(tag==='DIV' && cls) n.setAttribute('class',cls);
+          if(href){ n.setAttribute('href',href); n.setAttribute('target','_blank'); n.setAttribute('rel','noopener noreferrer'); }
         });
       };
-      walk(tmp);
-      return tmp.innerHTML;
+      walk(doc.body);
+      return doc.body.innerHTML;
     }catch(_){ return esc(html); }
+  }
+  /* Адреса для посилання: лише http(s) і mailto. Без схеми («site.com») —
+     вважаємо https. javascript:, data:, file: та інше — порожньо. */
+  function safeHref(u){
+    const raw=String(u==null?'':u).trim();
+    if(!raw || /[\s\u0000-\u001f\u007f-\u009f]/.test(raw)) return '';   // «java\tscript:» теж сюди
+    if(/^(https?:\/\/|mailto:)/i.test(raw)) return raw;
+    if(/^[a-z][a-z0-9+.\-]*:/i.test(raw)||/^[\/\\]/.test(raw)) return '';
+    return /^[^.]+\.[^.]/.test(raw)?'https://'+raw:'';
+  }
+  /* Імпорт бекапу: розмітка з чужого файлу йде крізь той самий чистильник
+     ще до запису у сховище. Ходимо по JSON будь-якого ключа і чистимо
+     html нотаток (type note/quick) і rich[день] журналу. Повертає рядок;
+     якщо чистити нічого — той самий рядок без змін. */
+  function sanitizeStoredRich(str){
+    if(typeof str!=='string' || (str.indexOf('html')<0 && str.indexOf('rich')<0)) return str;
+    let o; try{ o=JSON.parse(str); }catch(_){ return str; }
+    let changed=false;
+    const fix=h=>{ const c=sanitizeRich(h); if(c!==h) changed=true; return c; };
+    const walk=(x,depth)=>{
+      if(!x || typeof x!=='object' || depth>40) return;
+      if(Array.isArray(x)){ x.forEach(y=>walk(y,depth+1)); return; }
+      if(typeof x.html==='string' && (x.type==='note'||x.type==='quick')) x.html=fix(x.html);
+      if(x.rich && typeof x.rich==='object' && !Array.isArray(x.rich))
+        Object.keys(x.rich).forEach(k=>{ if(typeof x.rich[k]==='string') x.rich[k]=fix(x.rich[k]); });
+      Object.keys(x).forEach(k=>{
+        const v=x[k];
+        // обгортка сховища {_v,d}: d — сам JSON рядком
+        if(typeof v==='string' && /^\s*[\[{]/.test(v)){ const c=sanitizeStoredRich(v); if(c!==v){ x[k]=c; changed=true; } }
+        else if(k!=='rich') walk(v,depth+1);
+      });
+    };
+    walk(o,0);
+    return changed?JSON.stringify(o):str;
   }
   // безпечне джерело зображення: лише data:image/* або http(s); інакше порожньо (захист від XSS у src/url())
   function safeImg(u){

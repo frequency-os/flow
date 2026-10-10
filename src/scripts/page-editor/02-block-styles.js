@@ -354,7 +354,7 @@
         +'<div class="pglk-b"><div class="pglk-t pg-empty" contenteditable="true" data-ph="Назва…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
         +'<input class="pglk-u" type="url" inputmode="url" placeholder="Встав посилання (YouTube / mp3 / будь-що)…" value="'+esc(_au)+'" data-pglink="'+id+'"></div>'
         +'<button class="pgf-x" data-pgattfile="'+id+'" title="Або прикріпити файл">📎</button>'
-        +(_au?'<a class="pglk-go" href="'+esc(_au)+'" target="_blank" rel="noopener">↗</a>':'')
+        +(safeHref(_au)?'<a class="pglk-go" href="'+esc(safeHref(_au))+'" target="_blank" rel="noopener">↗</a>':'')   /* лише http(s)/mailto (SEC-6) */
         +'</div></div>';
     }
     if(t==='db'||t==='table')return dbHTML(b);
@@ -391,7 +391,7 @@
         +'<span class="pglk-ic">'+pgsIc('link')+'</span>'
         +'<div class="pglk-b"><div class="pglk-t pg-empty" contenteditable="true" data-ph="Назва посилання…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
         +'<input class="pglk-u" type="url" inputmode="url" placeholder="https://…" value="'+esc(u)+'" data-pglink="'+id+'"></div>'
-        +(u?'<a class="pglk-go" href="'+esc(u)+'" target="_blank" rel="noopener">↗</a>':'')
+        +(safeHref(u)?'<a class="pglk-go" href="'+esc(safeHref(u))+'" target="_blank" rel="noopener">↗</a>':'')   /* лише http(s)/mailto (SEC-6) */
         +'</div></div>';
     }
     /* вже вставлені віджети/проєктні блоки показуємо чипом (у меню їх поки нема) */

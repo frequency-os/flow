@@ -503,7 +503,7 @@
       </div>` : '';
       return `<div class="tile ${sz}" data-tileid="${b.id}" style="--tc:${c}">${head}
         <div class="note-rich-wrap">${bar}
-        <div class="tnote rich" contenteditable="true" data-id="${b.id}" data-f="html" data-ph="Почни писати…">${b.html||esc(b.text||'')}</div></div></div>`;
+        <div class="tnote rich" contenteditable="true" data-id="${b.id}" data-f="html" data-ph="Почни писати…">${b.html?sanitizeRich(b.html):esc(b.text||'')}</div></div></div>`;
     }
     if(b.type==='check'){
       const total=b.items.filter(i=>i.text.trim()).length;
@@ -554,7 +554,7 @@
       const fav=host?`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`:'';
       const editing=b.editing||!raw;
       const card = raw ? `<div class="link-view">
-          <a class="linkcard" href="${escAttr(raw)}" target="_blank" rel="noopener" data-linkopen="${b.id}">
+          <a class="linkcard" href="${escAttr(safeHref(raw))}" target="_blank" rel="noopener" data-linkopen="${b.id}">
             <span class="lc-fav">${fav?`<img src="${safeImg(fav)}" alt="" onerror="this.parentNode.innerHTML='<span class=&quot;lc-let&quot;>${esc((host[0]||'L').toUpperCase())}</span>'">`:`<span class="lc-let">${esc((host[0]||'L').toUpperCase())}</span>`}</span>
             <span class="lc-body"><span class="lc-title">${esc(title)}</span><span class="lc-host">${esc(host)}</span></span>
             <span class="lc-arrow">→</span>

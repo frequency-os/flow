@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 33737 |
+| Рядків JS | 33793 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10471 |
-| Сутностей верхнього рівня | 2287 |
+| Сутностей верхнього рівня | 2290 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -37,8 +37,8 @@
 | `src/scripts/45-month.js` | 662 | 0 |
 | `src/scripts/46-mx.js` | 220 | 0 |
 | `src/scripts/core/01-base.js` | 410 | 39 |
-| `src/scripts/core/02-storage.js` | 2142 | 177 |
-| `src/scripts/core/03-platform.js` | 60 | 14 |
+| `src/scripts/core/02-storage.js` | 2144 | 177 |
+| `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 423 | 57 |
 | `src/scripts/core/05-spaces.js` | 698 | 61 |
 | `src/scripts/core/06-wishes.js` | 1468 | 112 |
@@ -53,7 +53,7 @@
 | `src/scripts/core/15-flow-spot.js` | 2066 | 97 |
 | `src/scripts/core/16-dashboard.js` | 1049 | 55 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
-| `src/scripts/core/18-debts.js` | 199 | 18 |
+| `src/scripts/core/18-debts.js` | 249 | 20 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
 | `src/scripts/core/20-work.js` | 521 | 51 |
 | `src/scripts/core/21-patterns.js` | 191 | 21 |
@@ -95,7 +95,7 @@
 | `src/scripts/page-editor/06-w-project.js` | 100 | 6 |
 | `src/scripts/page-editor/07-w-habits.js` | 69 | 4 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 973 | 44 |
-| `src/scripts/page-editor/09-journal-sheet.js` | 488 | 37 |
+| `src/scripts/page-editor/09-journal-sheet.js` | 491 | 38 |
 | `src/scripts/page-editor/10-mic.js` | 155 | 10 |
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
 | `src/vendor/pdf.min.js` _(мініфікований вендор)_ | 22 | — |
@@ -484,20 +484,20 @@
 | `readFile` | функція | `src/scripts/core/02-storage.js:1827` |
 | `inspectFile` | функція | `src/scripts/core/02-storage.js:1837` |
 | `applyEnvelope` | функція | `src/scripts/core/02-storage.js:1866` |
-| `pushRestored` | функція | `src/scripts/core/02-storage.js:1890` |
-| `applyInspected` | функція | `src/scripts/core/02-storage.js:1916` |
-| `importFromFile` | функція | `src/scripts/core/02-storage.js:1934` |
-| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1940` |
-| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1957` |
-| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:2039` |
-| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:2077` |
-| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:2083` |
-| `__photoPoke` | функція | `src/scripts/core/02-storage.js:2084` |
-| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:2092` |
-| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:2116` |
-| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:2117` |
-| `window.photoPut` | функція | `src/scripts/core/02-storage.js:2123` |
-| `window.photoDel` | функція | `src/scripts/core/02-storage.js:2132` |
+| `pushRestored` | функція | `src/scripts/core/02-storage.js:1892` |
+| `applyInspected` | функція | `src/scripts/core/02-storage.js:1918` |
+| `importFromFile` | функція | `src/scripts/core/02-storage.js:1936` |
+| `window.flowBackup` | обʼєкт | `src/scripts/core/02-storage.js:1942` |
+| `window.flowFactoryReset` | функція | `src/scripts/core/02-storage.js:1959` |
+| `window.PhotoDB` | значення | `src/scripts/core/02-storage.js:2041` |
+| `window.__photoCache` | значення | `src/scripts/core/02-storage.js:2079` |
+| `__phPending` | обʼєкт | `src/scripts/core/02-storage.js:2085` |
+| `__photoPoke` | функція | `src/scripts/core/02-storage.js:2086` |
+| `window.photoSrc` | функція | `src/scripts/core/02-storage.js:2094` |
+| `window.photoIsRef` | функція | `src/scripts/core/02-storage.js:2118` |
+| `window.photoWarm` | функція | `src/scripts/core/02-storage.js:2119` |
+| `window.photoPut` | функція | `src/scripts/core/02-storage.js:2125` |
+| `window.photoDel` | функція | `src/scripts/core/02-storage.js:2134` |
 
 ### `src/scripts/core/03-platform.js` — 14 сутностей
 
@@ -511,12 +511,12 @@
 | `user` | функція | `src/scripts/core/03-platform.js:23` |
 | `setBgColor` | функція | `src/scripts/core/03-platform.js:26` |
 | `openLink` | функція | `src/scripts/core/03-platform.js:29` |
-| `diag` | функція | `src/scripts/core/03-platform.js:35` |
-| `lockSwipe` | функція | `src/scripts/core/03-platform.js:39` |
-| `expand` | функція | `src/scripts/core/03-platform.js:40` |
-| `popup` | функція | `src/scripts/core/03-platform.js:43` |
-| `window.platform` | обʼєкт | `src/scripts/core/03-platform.js:47` |
-| `window.micDenyMsg` | функція | `src/scripts/core/03-platform.js:53` |
+| `diag` | функція | `src/scripts/core/03-platform.js:36` |
+| `lockSwipe` | функція | `src/scripts/core/03-platform.js:40` |
+| `expand` | функція | `src/scripts/core/03-platform.js:41` |
+| `popup` | функція | `src/scripts/core/03-platform.js:44` |
+| `window.platform` | обʼєкт | `src/scripts/core/03-platform.js:48` |
+| `window.micDenyMsg` | функція | `src/scripts/core/03-platform.js:54` |
 
 ### `src/scripts/core/04-folders-nav.js` — 57 сутностей
 
@@ -1355,7 +1355,7 @@
 | `debtTotals` | функція | `src/scripts/core/17-folder-render.js:5` |
 | `debtSummary` | функція | `src/scripts/core/17-folder-render.js:10` |
 
-### `src/scripts/core/18-debts.js` — 18 сутностей
+### `src/scripts/core/18-debts.js` — 20 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1364,19 +1364,21 @@
 | `debtKind` | значення | `src/scripts/core/18-debts.js:7` |
 | `debtSave` | функція | `src/scripts/core/18-debts.js:15` |
 | `initials` | функція | `src/scripts/core/18-debts.js:18` |
-| `sanitizeRich` | функція | `src/scripts/core/18-debts.js:20` |
-| `safeImg` | функція | `src/scripts/core/18-debts.js:41` |
-| `balance` | функція | `src/scripts/core/18-debts.js:57` |
-| `debtDel` | функція | `src/scripts/core/18-debts.js:70` |
-| `debtRender` | функція | `src/scripts/core/18-debts.js:72` |
-| `toggleDebtSync` | функція | `src/scripts/core/18-debts.js:111` |
-| `curId` | значення | `src/scripts/core/18-debts.js:141` |
-| `openModal` | функція | `src/scripts/core/18-debts.js:142` |
-| `closeModal` | функція | `src/scripts/core/18-debts.js:145` |
-| `renderModal` | функція | `src/scripts/core/18-debts.js:148` |
-| `askOp` | функція | `src/scripts/core/18-debts.js:177` |
-| `commitOp` | функція | `src/scripts/core/18-debts.js:186` |
-| `delOp` | функція | `src/scripts/core/18-debts.js:195` |
+| `sanitizeRich` | функція | `src/scripts/core/18-debts.js:27` |
+| `safeHref` | функція | `src/scripts/core/18-debts.js:58` |
+| `sanitizeStoredRich` | функція | `src/scripts/core/18-debts.js:69` |
+| `safeImg` | функція | `src/scripts/core/18-debts.js:91` |
+| `balance` | функція | `src/scripts/core/18-debts.js:107` |
+| `debtDel` | функція | `src/scripts/core/18-debts.js:120` |
+| `debtRender` | функція | `src/scripts/core/18-debts.js:122` |
+| `toggleDebtSync` | функція | `src/scripts/core/18-debts.js:161` |
+| `curId` | значення | `src/scripts/core/18-debts.js:191` |
+| `openModal` | функція | `src/scripts/core/18-debts.js:192` |
+| `closeModal` | функція | `src/scripts/core/18-debts.js:195` |
+| `renderModal` | функція | `src/scripts/core/18-debts.js:198` |
+| `askOp` | функція | `src/scripts/core/18-debts.js:227` |
+| `commitOp` | функція | `src/scripts/core/18-debts.js:236` |
+| `delOp` | функція | `src/scripts/core/18-debts.js:245` |
 
 ### `src/scripts/core/19-spending.js` — 14 сутностей
 
@@ -2672,7 +2674,7 @@
 | `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:971` |
 | `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:972` |
 
-### `src/scripts/page-editor/09-journal-sheet.js` — 37 сутностей
+### `src/scripts/page-editor/09-journal-sheet.js` — 38 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2681,38 +2683,39 @@
 | `JE_TAGS` | масив | `src/scripts/page-editor/09-journal-sheet.js:21` |
 | `JE_MONN` | масив | `src/scripts/page-editor/09-journal-sheet.js:23` |
 | `jeText` | функція | `src/scripts/page-editor/09-journal-sheet.js:27` |
-| `jeRich` | функція | `src/scripts/page-editor/09-journal-sheet.js:40` |
-| `jeWords` | функція | `src/scripts/page-editor/09-journal-sheet.js:47` |
-| `jeIsoWeek` | функція | `src/scripts/page-editor/09-journal-sheet.js:48` |
-| `jeCur` | значення | `src/scripts/page-editor/09-journal-sheet.js:56` |
-| `jeSaveT` | значення | `src/scripts/page-editor/09-journal-sheet.js:57` |
-| `jeOpen` | функція | `src/scripts/page-editor/09-journal-sheet.js:59` |
-| `jeClose` | функція | `src/scripts/page-editor/09-journal-sheet.js:75` |
-| `jeShell` | функція | `src/scripts/page-editor/09-journal-sheet.js:82` |
-| `jeViewport` | функція | `src/scripts/page-editor/09-journal-sheet.js:138` |
-| `jeFlush` | функція | `src/scripts/page-editor/09-journal-sheet.js:148` |
-| `jeQueue` | функція | `src/scripts/page-editor/09-journal-sheet.js:160` |
-| `jeWrap` | функція | `src/scripts/page-editor/09-journal-sheet.js:163` |
-| `jeCheck` | функція | `src/scripts/page-editor/09-journal-sheet.js:172` |
-| `jeMonthHTML` | функція | `src/scripts/page-editor/09-journal-sheet.js:181` |
-| `jeMon` | функція | `src/scripts/page-editor/09-journal-sheet.js:208` |
-| `jeWkKey` | функція | `src/scripts/page-editor/09-journal-sheet.js:209` |
-| `jeMoKey` | функція | `src/scripts/page-editor/09-journal-sheet.js:210` |
-| `jeEntries` | функція | `src/scripts/page-editor/09-journal-sheet.js:211` |
-| `jeG` | функція | `src/scripts/page-editor/09-journal-sheet.js:224` |
-| `jeAiOff` | функція | `src/scripts/page-editor/09-journal-sheet.js:226` |
-| `jeFacts` | функція | `src/scripts/page-editor/09-journal-sheet.js:227` |
-| `jePending` | функція | `src/scripts/page-editor/09-journal-sheet.js:245` |
-| `JE_SYS_W` | значення | `src/scripts/page-editor/09-journal-sheet.js:264` |
-| `JE_SYS_M` | значення | `src/scripts/page-editor/09-journal-sheet.js:270` |
-| `jeBusy` | значення | `src/scripts/page-editor/09-journal-sheet.js:275` |
-| `jeGen` | функція | `src/scripts/page-editor/09-journal-sheet.js:279` |
-| `jeAuto` | функція | `src/scripts/page-editor/09-journal-sheet.js:322` |
-| `jeMd` | функція | `src/scripts/page-editor/09-journal-sheet.js:331` |
-| `jeAiHTML` | функція | `src/scripts/page-editor/09-journal-sheet.js:337` |
-| `jeRec` | значення | `src/scripts/page-editor/09-journal-sheet.js:422` |
-| `jeMic` | функція | `src/scripts/page-editor/09-journal-sheet.js:423` |
-| `window.openFlowPage` | функція | `src/scripts/page-editor/09-journal-sheet.js:461` |
+| `jeSafe` | функція | `src/scripts/page-editor/09-journal-sheet.js:42` |
+| `jeRich` | функція | `src/scripts/page-editor/09-journal-sheet.js:43` |
+| `jeWords` | функція | `src/scripts/page-editor/09-journal-sheet.js:50` |
+| `jeIsoWeek` | функція | `src/scripts/page-editor/09-journal-sheet.js:51` |
+| `jeCur` | значення | `src/scripts/page-editor/09-journal-sheet.js:59` |
+| `jeSaveT` | значення | `src/scripts/page-editor/09-journal-sheet.js:60` |
+| `jeOpen` | функція | `src/scripts/page-editor/09-journal-sheet.js:62` |
+| `jeClose` | функція | `src/scripts/page-editor/09-journal-sheet.js:78` |
+| `jeShell` | функція | `src/scripts/page-editor/09-journal-sheet.js:85` |
+| `jeViewport` | функція | `src/scripts/page-editor/09-journal-sheet.js:141` |
+| `jeFlush` | функція | `src/scripts/page-editor/09-journal-sheet.js:151` |
+| `jeQueue` | функція | `src/scripts/page-editor/09-journal-sheet.js:163` |
+| `jeWrap` | функція | `src/scripts/page-editor/09-journal-sheet.js:166` |
+| `jeCheck` | функція | `src/scripts/page-editor/09-journal-sheet.js:175` |
+| `jeMonthHTML` | функція | `src/scripts/page-editor/09-journal-sheet.js:184` |
+| `jeMon` | функція | `src/scripts/page-editor/09-journal-sheet.js:211` |
+| `jeWkKey` | функція | `src/scripts/page-editor/09-journal-sheet.js:212` |
+| `jeMoKey` | функція | `src/scripts/page-editor/09-journal-sheet.js:213` |
+| `jeEntries` | функція | `src/scripts/page-editor/09-journal-sheet.js:214` |
+| `jeG` | функція | `src/scripts/page-editor/09-journal-sheet.js:227` |
+| `jeAiOff` | функція | `src/scripts/page-editor/09-journal-sheet.js:229` |
+| `jeFacts` | функція | `src/scripts/page-editor/09-journal-sheet.js:230` |
+| `jePending` | функція | `src/scripts/page-editor/09-journal-sheet.js:248` |
+| `JE_SYS_W` | значення | `src/scripts/page-editor/09-journal-sheet.js:267` |
+| `JE_SYS_M` | значення | `src/scripts/page-editor/09-journal-sheet.js:273` |
+| `jeBusy` | значення | `src/scripts/page-editor/09-journal-sheet.js:278` |
+| `jeGen` | функція | `src/scripts/page-editor/09-journal-sheet.js:282` |
+| `jeAuto` | функція | `src/scripts/page-editor/09-journal-sheet.js:325` |
+| `jeMd` | функція | `src/scripts/page-editor/09-journal-sheet.js:334` |
+| `jeAiHTML` | функція | `src/scripts/page-editor/09-journal-sheet.js:340` |
+| `jeRec` | значення | `src/scripts/page-editor/09-journal-sheet.js:425` |
+| `jeMic` | функція | `src/scripts/page-editor/09-journal-sheet.js:426` |
+| `window.openFlowPage` | функція | `src/scripts/page-editor/09-journal-sheet.js:464` |
 
 ### `src/scripts/page-editor/10-mic.js` — 10 сутностей
 

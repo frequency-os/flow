@@ -27,7 +27,8 @@
 
     // Відкрити зовнішнє посилання — звичайна вкладка
     function openLink(url){
-      if(!url) return;
+      // лише http(s) і mailto (safeHref, 18-debts.js): javascript:/data: з даних не відкриваємо
+      url=(typeof safeHref==='function')?safeHref(url):''; if(!url) return;
       try{ window.open(url, '_blank', 'noopener'); }catch(_){}
     }
 
