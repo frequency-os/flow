@@ -151,10 +151,15 @@
     },1000,{now:true});
   }
 
-  /* якір: ставимо меню одразу ПІД блоком, який додаємо (всі екрани) */
-  function positionSlash(){
+  /* зняти якір. Кличемо і при закритті: інакше inline top/left лишались, схована
+     панель (z-index 230) лягала поверх нижньої панелі (200) і глушила її тапи */
+  function unanchorSlash(){
     slash.classList.remove('anch');
     slash.style.left='';slash.style.top='';slash.style.width='';slash.style.maxHeight='';
+  }
+  /* якір: ставимо меню одразу ПІД блоком, який додаємо (всі екрани) */
+  function positionSlash(){
+    unanchorSlash();
     if(!slashCtx)return;
     var row=null;
     try{row=editor.querySelector('.pgb[data-id="'+String(slashCtx).replace(/"/g,'\\"')+'"]');}catch(_){}
@@ -181,7 +186,7 @@
     /* автофокус лише на десктопі: на iOS клавіатура зсуває viewport і тапи по fixed-меню промахуються */
     if(window.innerWidth>=760) setTimeout(function(){ssearch.focus();},60);
   }
-  function closeSlash(){slash.classList.remove('show');slash.classList.remove('anch');backdrop.classList.remove('show');slashCtx=null;}
+  function closeSlash(){slash.classList.remove('show');unanchorSlash();backdrop.classList.remove('show');slashCtx=null;}
   ssearch.addEventListener('input',function(){buildSlash(ssearch.value);});
   function applySlash(k){
     try{ if(k&&k!=='note'){ pgLastSet(k); pgRecentAdd(k); } }catch(_){}
@@ -451,6 +456,9 @@
   // ── block menu ──
   var bmenu=document.getElementById('pgBmenu'),bmId=null;
   function openBmenu(id){bmId=id;bmenu.classList.add('show');backdrop.classList.add('show');}
+  /* «⋮» на живих тайлах у документі (bindTiles, 26-blocks-render.js) відкриває це ж меню.
+     false — такого блока на сторінці нема, тайл лишається зі своєю старою поведінкою */
+  try{ window.__pgBlockMenu=function(id){ if(!locate(id))return false; openBmenu(id); return true; }; }catch(_){}
   /* ── довге натискання на блок → меню (видалити / закріпити / дублювати) ── */
   (function(){
     var lp=null;

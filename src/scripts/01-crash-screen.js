@@ -70,13 +70,42 @@
       body.textContent=msg+(cnt>1?'\n(помилок поспіль: '+cnt+')':'')+'\nУсі — в «Ще → Журнал помилок».';
     }catch(_){}
   }
+
+  /* ── червоний банер — лише власнику в dev-режимі, людині — тихий тост ──
+     Банер з англійським текстом рушія лякав і виглядав як «застосунок зламався»
+     (App Store, 2.1). Запис у журнал (add) від цього не залежить. */
+  function devOn(){
+    try{ if(localStorage.getItem('flow_dev')==='1') return true; }catch(_){}
+    // ворота власника з 30-upgrade.js. Поки ядро не завантажилось або хеш акаунта
+    // ще рахується, upDevOn нема чи каже «ні» — тоді тихий варіант
+    try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; }
+  }
+  var QUIET='Щось пішло не так — ми записали це в журнал помилок', quietAt=0, qel=null;
+  function quiet(){
+    var now=Date.now();
+    if(now-quietAt<6000) return;   // помилка в циклі — тост раз на 6 с, а не «прилиплий»
+    quietAt=now;
+    try{ if(typeof window.__flowToast==='function'){ window.__flowToast(QUIET); return; } }catch(_){}
+    // на старті тосту застосунку ще нема — свій, такий самий тихий
+    try{
+      if(!qel || !qel.isConnected){
+        qel=document.createElement('div'); qel.id='flowErrToast'; qel.setAttribute('role','status');
+        qel.style.cssText='position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:999999;max-width:88vw;padding:11px 16px;border-radius:12px;background:#1d2029;color:#e8eaf1;border:1px solid rgba(255,255,255,.14);font:600 12.5px/1.4 -apple-system,sans-serif;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.45);pointer-events:none;transition:opacity .3s;';
+        (document.body||document.documentElement).appendChild(qel);
+      }
+      qel.textContent=QUIET; qel.style.opacity='1';
+      clearTimeout(qel._t); qel._t=setTimeout(function(){ try{ qel.style.opacity='0'; }catch(_){} },3000);
+    }catch(_){}
+  }
+  function report(msg){ if(devOn()) show(msg); else quiet(); }
+
   window.addEventListener('error',function(e){
     add('error', e.message||'Script error', e.filename, e.lineno);
-    show((e.message||'Script error')+(e.lineno?('\nрядок '+e.lineno+(e.colno?':'+e.colno:'')):''));
+    report((e.message||'Script error')+(e.lineno?('\nрядок '+e.lineno+(e.colno?':'+e.colno:'')):''));
   });
   window.addEventListener('unhandledrejection',function(e){
     var r=e&&e.reason, m=(r&&(r.message||r))||'невідома помилка';
     add('promise', m);
-    show('Promise: '+m);
+    report('Promise: '+m);
   });
 })();

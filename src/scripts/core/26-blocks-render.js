@@ -760,8 +760,12 @@
     (window.__btRoot||board).querySelectorAll('[data-menu]').forEach(el=>el.onclick=e=>{
       e.stopPropagation();
       const tile=el.closest('.tile');
-      if(tile && tile.dataset.tileid){ openRadialMenu(tile); return; }
-      // запасний шлях (нетипові картки без tileid) — стара поведінка
+      // у документі папки — звичайне меню блока сторінки, те саме, що довгий тап.
+      // Раніше тут кликалось радіальне меню дошки, а його видалили разом з дошкою (caac0d4):
+      // тап по «⋮» на «План на день/місяць» давав ReferenceError і червоний банер.
+      if(tile && tile.dataset.tileid && typeof window.__pgBlockMenu==='function' && window.__pgBlockMenu(tile.dataset.tileid)) return;
+      if(!tile) return;
+      // запасний шлях (картки без tileid чи поза сторінкою) — стара поведінка
       const wasOpen=tile.classList.contains('menu-open');
       (window.__btRoot||board).querySelectorAll('.tile.menu-open').forEach(t=>t.classList.remove('menu-open'));
       if(!wasOpen) tile.classList.add('menu-open');

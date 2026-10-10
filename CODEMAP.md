@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 83 |
-| Рядків JS | 32996 |
+| Рядків JS | 33007 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10314 |
+| Рядків CSS | 10315 |
 | Сутностей верхнього рівня | 2226 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
@@ -26,7 +26,7 @@
 |---|---|---|
 | `desktop/main.js` | 232 | 13 |
 | `desktop/preload.js` | 21 | 0 |
-| `src/scripts/01-crash-screen.js` | 82 | 10 |
+| `src/scripts/01-crash-screen.js` | 111 | 14 |
 | `src/scripts/03-quota-banner.js` | 14 | 2 |
 | `src/scripts/21-newyear-countdown.js` | 127 | 11 |
 | `src/scripts/40-pets-3d.js` | 297 | 0 |
@@ -49,7 +49,7 @@
 | `src/scripts/core/11-ai-flow.js` | 258 | 26 |
 | `src/scripts/core/12-ai-agent.js` | 1831 | 94 |
 | `src/scripts/core/13-pets.js` | 227 | 13 |
-| `src/scripts/core/14-react.js` | 338 | 43 |
+| `src/scripts/core/14-react.js` | 337 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 2066 | 97 |
 | `src/scripts/core/16-dashboard.js` | 1030 | 56 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
@@ -61,7 +61,7 @@
 | `src/scripts/core/23-board.js` | 323 | 29 |
 | `src/scripts/core/24-reminders.js` | 191 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
-| `src/scripts/core/26-blocks-render.js` | 1449 | 16 |
+| `src/scripts/core/26-blocks-render.js` | 1453 | 16 |
 | `src/scripts/core/27-canvas.js` | 593 | 27 |
 | `src/scripts/core/28-vision.js` | 528 | 42 |
 | `src/scripts/core/29-more-screen.js` | 571 | 32 |
@@ -82,11 +82,11 @@
 | `src/scripts/core/45-year.js` | 145 | 21 |
 | `src/scripts/core/46-wallet.js` | 382 | 35 |
 | `src/scripts/core/47-rules.js` | 311 | 28 |
-| `src/scripts/core/48-hero.js` | 338 | 41 |
+| `src/scripts/core/48-hero.js` | 316 | 36 |
 | `src/scripts/core/48-widgets.js` | 191 | 20 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 883 | 47 |
-| `src/scripts/page-editor/03-premium-pack.js` | 595 | 27 |
+| `src/scripts/page-editor/03-premium-pack.js` | 603 | 28 |
 | `src/scripts/page-editor/04-w-journal.js` | 107 | 9 |
 | `src/scripts/page-editor/05-w-decisions.js` | 112 | 4 |
 | `src/scripts/page-editor/06-w-project.js` | 100 | 6 |
@@ -97,7 +97,7 @@
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
 | `src/vendor/pdf.min.js` _(мініфікований вендор)_ | 22 | — |
 | `src/vendor/supabase.min.js` _(мініфікований вендор)_ | 11 | — |
-| `src/web/hero-assets.js` _(мініфікований вендор)_ | 29 | — |
+| `src/web/hero-assets.js` _(мініфікований вендор)_ | 22 | — |
 | `src/web/hero-outfits.js` _(мініфікований вендор)_ | 20 | — |
 | `src/web/misto-assets.js` _(мініфікований вендор)_ | 43 | — |
 | `src/web/sw.js` | 109 | 9 |
@@ -128,7 +128,7 @@
 | `src/styles/21-hero-week.css` | 133 | 2 |
 | `src/styles/22-more-screen.css` | 181 | 0 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1253 | 10 |
+| `src/styles/core/02-page-editor.css` | 1254 | 10 |
 | `src/styles/core/03-folders-projects.css` | 695 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 186 | 0 |
@@ -213,7 +213,7 @@
 
 ### `desktop/preload.js` — порожньо на верхньому рівні
 
-### `src/scripts/01-crash-screen.js` — 10 сутностей
+### `src/scripts/01-crash-screen.js` — 14 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -227,6 +227,10 @@
 | `window.flowErrLog` | обʼєкт | `src/scripts/01-crash-screen.js:43` |
 | `box` | значення | `src/scripts/01-crash-screen.js:48` |
 | `show` | функція | `src/scripts/01-crash-screen.js:49` |
+| `devOn` | функція | `src/scripts/01-crash-screen.js:77` |
+| `QUIET` | значення | `src/scripts/01-crash-screen.js:83` |
+| `quiet` | функція | `src/scripts/01-crash-screen.js:84` |
+| `report` | функція | `src/scripts/01-crash-screen.js:100` |
 
 ### `src/scripts/03-quota-banner.js` — 2 сутностей
 
@@ -1130,41 +1134,41 @@
 | `__frLast` | значення | `src/scripts/core/14-react.js:18` |
 | `flowReactAt` | функція | `src/scripts/core/14-react.js:19` |
 | `flowReact` | функція | `src/scripts/core/14-react.js:44` |
-| `__frSayT` | значення | `src/scripts/core/14-react.js:80` |
-| `flowSay` | функція | `src/scripts/core/14-react.js:81` |
-| `window.flowReact` | значення | `src/scripts/core/14-react.js:91` |
-| `FC_EMO` | обʼєкт | `src/scripts/core/14-react.js:92` |
-| `fcEmote` | функція | `src/scripts/core/14-react.js:93` |
-| `fcLifeTimer` | значення | `src/scripts/core/14-react.js:104` |
-| `fcLifeStart` | функція | `src/scripts/core/14-react.js:105` |
-| `petSVGSleep` | функція | `src/scripts/core/14-react.js:116` |
-| `AI_HAM_ACTS` | масив | `src/scripts/core/14-react.js:125` |
-| `aiHamAct` | функція | `src/scripts/core/14-react.js:133` |
-| `aiHamNextAct` | функція | `src/scripts/core/14-react.js:137` |
-| `aiHamCoreHTML` | функція | `src/scripts/core/14-react.js:143` |
-| `aiHamSceneHTML` | функція | `src/scripts/core/14-react.js:155` |
-| `aiHamRotT` | значення | `src/scripts/core/14-react.js:164` |
-| `aiHamRotStart` | функція | `src/scripts/core/14-react.js:165` |
-| `aiHamWakeFrom` | функція | `src/scripts/core/14-react.js:175` |
-| `aiHamBind` | функція | `src/scripts/core/14-react.js:182` |
-| `aiWakeInChat` | функція | `src/scripts/core/14-react.js:188` |
-| `petSleepNow` | функція | `src/scripts/core/14-react.js:202` |
-| `window.petSleepNow` | значення | `src/scripts/core/14-react.js:214` |
-| `fcWakeNow` | функція | `src/scripts/core/14-react.js:215` |
-| `window.petWake` | значення | `src/scripts/core/14-react.js:225` |
-| `FC_SAY` | обʼєкт | `src/scripts/core/14-react.js:227` |
-| `fcSayPick` | функція | `src/scripts/core/14-react.js:245` |
-| `fcSayTimer` | значення | `src/scripts/core/14-react.js:258` |
-| `fcSayHide` | функція | `src/scripts/core/14-react.js:259` |
-| `fcSayShow` | функція | `src/scripts/core/14-react.js:260` |
-| `fcSayStart` | функція | `src/scripts/core/14-react.js:292` |
-| `flowCapRender` | функція | `src/scripts/core/14-react.js:297` |
-| `fcCheckOverlap` | функція | `src/scripts/core/14-react.js:328` |
-| `window.fcCheckOverlap` | значення | `src/scripts/core/14-react.js:329` |
-| `petHidden` | функція | `src/scripts/core/14-react.js:331` |
-| `petHiddenSet` | функція | `src/scripts/core/14-react.js:332` |
-| `t` | значення | `src/scripts/core/14-react.js:335` |
-| `sched` | функція | `src/scripts/core/14-react.js:336` |
+| `__frSayT` | значення | `src/scripts/core/14-react.js:79` |
+| `flowSay` | функція | `src/scripts/core/14-react.js:80` |
+| `window.flowReact` | значення | `src/scripts/core/14-react.js:90` |
+| `FC_EMO` | обʼєкт | `src/scripts/core/14-react.js:91` |
+| `fcEmote` | функція | `src/scripts/core/14-react.js:92` |
+| `fcLifeTimer` | значення | `src/scripts/core/14-react.js:103` |
+| `fcLifeStart` | функція | `src/scripts/core/14-react.js:104` |
+| `petSVGSleep` | функція | `src/scripts/core/14-react.js:115` |
+| `AI_HAM_ACTS` | масив | `src/scripts/core/14-react.js:124` |
+| `aiHamAct` | функція | `src/scripts/core/14-react.js:132` |
+| `aiHamNextAct` | функція | `src/scripts/core/14-react.js:136` |
+| `aiHamCoreHTML` | функція | `src/scripts/core/14-react.js:142` |
+| `aiHamSceneHTML` | функція | `src/scripts/core/14-react.js:154` |
+| `aiHamRotT` | значення | `src/scripts/core/14-react.js:163` |
+| `aiHamRotStart` | функція | `src/scripts/core/14-react.js:164` |
+| `aiHamWakeFrom` | функція | `src/scripts/core/14-react.js:174` |
+| `aiHamBind` | функція | `src/scripts/core/14-react.js:181` |
+| `aiWakeInChat` | функція | `src/scripts/core/14-react.js:187` |
+| `petSleepNow` | функція | `src/scripts/core/14-react.js:201` |
+| `window.petSleepNow` | значення | `src/scripts/core/14-react.js:213` |
+| `fcWakeNow` | функція | `src/scripts/core/14-react.js:214` |
+| `window.petWake` | значення | `src/scripts/core/14-react.js:224` |
+| `FC_SAY` | обʼєкт | `src/scripts/core/14-react.js:226` |
+| `fcSayPick` | функція | `src/scripts/core/14-react.js:244` |
+| `fcSayTimer` | значення | `src/scripts/core/14-react.js:257` |
+| `fcSayHide` | функція | `src/scripts/core/14-react.js:258` |
+| `fcSayShow` | функція | `src/scripts/core/14-react.js:259` |
+| `fcSayStart` | функція | `src/scripts/core/14-react.js:291` |
+| `flowCapRender` | функція | `src/scripts/core/14-react.js:296` |
+| `fcCheckOverlap` | функція | `src/scripts/core/14-react.js:327` |
+| `window.fcCheckOverlap` | значення | `src/scripts/core/14-react.js:328` |
+| `petHidden` | функція | `src/scripts/core/14-react.js:330` |
+| `petHiddenSet` | функція | `src/scripts/core/14-react.js:331` |
+| `t` | значення | `src/scripts/core/14-react.js:334` |
+| `sched` | функція | `src/scripts/core/14-react.js:335` |
 
 ### `src/scripts/core/15-flow-spot.js` — 97 сутностей
 
@@ -2328,51 +2332,46 @@
 | `rlPlanEdit` | функція | `src/scripts/core/47-rules.js:283` |
 | `rlPlanRowMenu` | функція | `src/scripts/core/47-rules.js:298` |
 
-### `src/scripts/core/48-hero.js` — 41 сутностей
+### `src/scripts/core/48-hero.js` — 36 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
 | `HERO_CROP` | обʼєкт | `src/scripts/core/48-hero.js:20` |
 | `HERO_CHEST` | обʼєкт | `src/scripts/core/48-hero.js:22` |
-| `HERO_MOOD_NAME` | масив | `src/scripts/core/48-hero.js:24` |
-| `HERO_REACT` | обʼєкт | `src/scripts/core/48-hero.js:28` |
-| `HERO_REACT_MS` | значення | `src/scripts/core/48-hero.js:29` |
-| `heroReact` | значення | `src/scripts/core/48-hero.js:30` |
-| `HERO_OUTFITS` | масив | `src/scripts/core/48-hero.js:31` |
-| `HERO_FONTS` | обʼєкт | `src/scripts/core/48-hero.js:32` |
-| `HERO_COLORS` | масив | `src/scripts/core/48-hero.js:38` |
-| `HERO_TECH` | обʼєкт | `src/scripts/core/48-hero.js:39` |
-| `HERO_LOOK_DEF` | обʼєкт | `src/scripts/core/48-hero.js:40` |
-| `HERO_ICON` | обʼєкт | `src/scripts/core/48-hero.js:44` |
-| `HERO_NEED` | обʼєкт | `src/scripts/core/48-hero.js:54` |
-| `HERO_PATCHES` | обʼєкт | `src/scripts/core/48-hero.js:59` |
-| `HERO_TATS` | обʼєкт | `src/scripts/core/48-hero.js:69` |
-| `HERO_PATCH_AT` | обʼєкт | `src/scripts/core/48-hero.js:74` |
-| `HERO_TAT_AT` | обʼєкт | `src/scripts/core/48-hero.js:75` |
-| `heroLoading` | значення | `src/scripts/core/48-hero.js:76` |
-| `heroOf` | функція | `src/scripts/core/48-hero.js:78` |
-| `heroReady` | функція | `src/scripts/core/48-hero.js:79` |
-| `heroLookAll` | функція | `src/scripts/core/48-hero.js:83` |
-| `heroLookNorm` | функція | `src/scripts/core/48-hero.js:86` |
-| `heroLook` | функція | `src/scripts/core/48-hero.js:98` |
-| `heroRerender` | функція | `src/scripts/core/48-hero.js:100` |
-| `heroLoad` | функція | `src/scripts/core/48-hero.js:107` |
-| `heroOutfitsLoad` | функція | `src/scripts/core/48-hero.js:124` |
-| `heroOverBudget` | функція | `src/scripts/core/48-hero.js:135` |
-| `heroReactTo` | функція | `src/scripts/core/48-hero.js:142` |
-| `heroMood` | функція | `src/scripts/core/48-hero.js:154` |
-| `heroChestLines` | функція | `src/scripts/core/48-hero.js:170` |
-| `heroChestText` | функція | `src/scripts/core/48-hero.js:177` |
-| `heroUnlocks` | функція | `src/scripts/core/48-hero.js:196` |
-| `heroItemOpen` | функція | `src/scripts/core/48-hero.js:204` |
-| `heroPatchSVG` | функція | `src/scripts/core/48-hero.js:205` |
-| `heroTatSVG` | функція | `src/scripts/core/48-hero.js:213` |
-| `heroSVG` | функція | `src/scripts/core/48-hero.js:222` |
-| `heroWard` | значення | `src/scripts/core/48-hero.js:258` |
-| `heroWardRedraw` | функція | `src/scripts/core/48-hero.js:259` |
-| `heroWardSave` | функція | `src/scripts/core/48-hero.js:270` |
-| `heroWardItem` | функція | `src/scripts/core/48-hero.js:282` |
-| `heroWardrobe` | функція | `src/scripts/core/48-hero.js:290` |
+| `HERO_MOOD_NAME` | масив | `src/scripts/core/48-hero.js:23` |
+| `HERO_OUTFITS` | масив | `src/scripts/core/48-hero.js:24` |
+| `HERO_FONTS` | обʼєкт | `src/scripts/core/48-hero.js:25` |
+| `HERO_COLORS` | масив | `src/scripts/core/48-hero.js:31` |
+| `HERO_TECH` | обʼєкт | `src/scripts/core/48-hero.js:32` |
+| `HERO_LOOK_DEF` | обʼєкт | `src/scripts/core/48-hero.js:33` |
+| `HERO_ICON` | обʼєкт | `src/scripts/core/48-hero.js:37` |
+| `HERO_NEED` | обʼєкт | `src/scripts/core/48-hero.js:47` |
+| `HERO_PATCHES` | обʼєкт | `src/scripts/core/48-hero.js:52` |
+| `HERO_TATS` | обʼєкт | `src/scripts/core/48-hero.js:62` |
+| `HERO_PATCH_AT` | обʼєкт | `src/scripts/core/48-hero.js:67` |
+| `HERO_TAT_AT` | обʼєкт | `src/scripts/core/48-hero.js:68` |
+| `heroLoading` | значення | `src/scripts/core/48-hero.js:69` |
+| `heroOf` | функція | `src/scripts/core/48-hero.js:71` |
+| `heroReady` | функція | `src/scripts/core/48-hero.js:72` |
+| `heroLookAll` | функція | `src/scripts/core/48-hero.js:76` |
+| `heroLookNorm` | функція | `src/scripts/core/48-hero.js:79` |
+| `heroLook` | функція | `src/scripts/core/48-hero.js:91` |
+| `heroRerender` | функція | `src/scripts/core/48-hero.js:93` |
+| `heroLoad` | функція | `src/scripts/core/48-hero.js:100` |
+| `heroOutfitsLoad` | функція | `src/scripts/core/48-hero.js:117` |
+| `heroMood` | функція | `src/scripts/core/48-hero.js:128` |
+| `heroChestLines` | функція | `src/scripts/core/48-hero.js:148` |
+| `heroChestText` | функція | `src/scripts/core/48-hero.js:155` |
+| `heroUnlocks` | функція | `src/scripts/core/48-hero.js:174` |
+| `heroItemOpen` | функція | `src/scripts/core/48-hero.js:182` |
+| `heroPatchSVG` | функція | `src/scripts/core/48-hero.js:183` |
+| `heroTatSVG` | функція | `src/scripts/core/48-hero.js:191` |
+| `heroSVG` | функція | `src/scripts/core/48-hero.js:200` |
+| `heroWard` | значення | `src/scripts/core/48-hero.js:236` |
+| `heroWardRedraw` | функція | `src/scripts/core/48-hero.js:237` |
+| `heroWardSave` | функція | `src/scripts/core/48-hero.js:248` |
+| `heroWardItem` | функція | `src/scripts/core/48-hero.js:260` |
+| `heroWardrobe` | функція | `src/scripts/core/48-hero.js:268` |
 
 ### `src/scripts/core/48-widgets.js` — 20 сутностей
 
@@ -2473,37 +2472,38 @@
 | `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:769` |
 | `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:778` |
 
-### `src/scripts/page-editor/03-premium-pack.js` — 27 сутностей
+### `src/scripts/page-editor/03-premium-pack.js` — 28 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
 | `pgAsk` | функція | `src/scripts/page-editor/03-premium-pack.js:15` |
 | `openCondSheet` | функція | `src/scripts/page-editor/03-premium-pack.js:30` |
 | `openHeadingStyleSheet` | функція | `src/scripts/page-editor/03-premium-pack.js:83` |
-| `positionSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:155` |
-| `openSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:178` |
-| `closeSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:184` |
-| `applySlash` | функція | `src/scripts/page-editor/03-premium-pack.js:186` |
-| `drag` | значення | `src/scripts/page-editor/03-premium-pack.js:314` |
-| `dstart` | функція | `src/scripts/page-editor/03-premium-pack.js:317` |
-| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:327` |
-| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:336` |
-| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:337` |
-| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:338` |
-| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:339` |
-| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:361` |
-| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:373` |
-| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:452` |
-| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:453` |
-| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:487` |
-| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:533` |
-| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:534` |
-| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:537` |
-| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:555` |
-| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:565` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:574` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:575` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:580` |
+| `unanchorSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:156` |
+| `positionSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:161` |
+| `openSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:183` |
+| `closeSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:189` |
+| `applySlash` | функція | `src/scripts/page-editor/03-premium-pack.js:191` |
+| `drag` | значення | `src/scripts/page-editor/03-premium-pack.js:319` |
+| `dstart` | функція | `src/scripts/page-editor/03-premium-pack.js:322` |
+| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:332` |
+| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:341` |
+| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:342` |
+| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:343` |
+| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:344` |
+| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:366` |
+| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:378` |
+| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:457` |
+| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:458` |
+| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:495` |
+| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:541` |
+| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:542` |
+| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:545` |
+| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:563` |
+| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:573` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:582` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:583` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:588` |
 
 ### `src/scripts/page-editor/04-w-journal.js` — 9 сутностей
 
