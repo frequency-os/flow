@@ -48,7 +48,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-10-1644-7348995';
+  var BUILD='2026-10-10-1651-b8dc6e2';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -7207,6 +7207,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     font-size:14px;font-weight:800;color:var(--text);background:var(--field);border:1px solid var(--line);text-align:center;}
   .cal-acts button[data-calopen]{background:var(--accent);border-color:var(--accent);color:#fff;}
   .cal-acts button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  /* підпункти блоку — шторка */
+  .sub-list{display:flex;flex-direction:column;gap:6px;}
+  .sub-row{display:flex;align-items:center;gap:10px;min-height:48px;padding:4px 6px 4px 10px;border-radius:14px;background:var(--field);border:1px solid var(--line);}
+  .sub-row>span{flex:1;min-width:0;font-size:15px;font-weight:700;overflow-wrap:anywhere;}
+  .sub-row.on>span{color:var(--muted);text-decoration:line-through;}
+  .sub-ck{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--accent);display:grid;place-items:center;font-weight:800;color:#fff;}
+  .sub-row.on .sub-ck{background:var(--accent);}
+  .sub-rm{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:44px;height:44px;display:grid;place-items:center;color:var(--muted);font-size:14px;}
+  .sub-ck:focus-visible,.sub-rm:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .sub-add{display:flex;gap:8px;}
+  .sub-add input{flex:1;min-width:0;min-height:46px;box-sizing:border-box;padding:0 12px;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--text);font:600 15px inherit;font-family:inherit;}
+  .sub-add button{all:unset;box-sizing:border-box;cursor:pointer;width:46px;min-height:46px;border-radius:14px;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:20px;font-weight:800;}
+  .sub-add input:focus{outline:2px solid var(--accent);outline-offset:1px;}
   /* ============ ПРИЗИ І СКАРБНИЧКА (44-prizes.js): значок у Журналі, смужка, баночки, суми ============ */
   .jn-top-r{display:flex;align-items:center;gap:6px;flex:none;}
   .pz-pill{all:unset;cursor:pointer;flex:none;font-size:13px;font-weight:800;color:#2a1c00;border-radius:999px;padding:7px 11px;min-height:20px;
@@ -7835,6 +7848,20 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .wg-t.wd small.cal-hint{-webkit-line-clamp:1;}
   /* загальне правило плиток вимикає кліки для span усередині .wg-t — дням календаря повертаємо */
   .wg-t.wd .cal-grid .cal-d{pointer-events:auto;}
+  /* рядки блоків у «Час папки» — кнопки (тап — підпункти); чекліст найближчого блоку в L */
+  .wd-list>.wd-row-b{all:unset;box-sizing:border-box;pointer-events:auto;cursor:pointer;display:flex;gap:8px;align-items:baseline;min-width:0;min-height:30px;
+    font-size:14px;font-weight:700;color:var(--pg-fg,var(--text));}
+  .wd-row-b>span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wd-row-b em{flex:none;font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;color:var(--pg-mut,var(--muted));}
+  .wd-row-b.done>span{color:var(--pg-mut,var(--muted));text-decoration:line-through;}
+  .wd-row-b:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;border-radius:6px;}
+  .wd-sb{flex:none;font-style:normal;font-size:12px;font-weight:800;color:var(--fc);}
+  .wd-subs{display:flex;flex-direction:column;gap:2px;padding-left:48px;}
+  .wd-subs button{all:unset;box-sizing:border-box;pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:32px;font-size:13.5px;font-weight:600;color:var(--pg-fg,var(--text));}
+  .wd-subs button i{flex:none;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--fc);display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;color:#fff;}
+  .wd-subs button.on i{background:var(--fc);}
+  .wd-subs button.on{color:var(--pg-mut,var(--muted));text-decoration:line-through;}
+  .wd-subs button:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:1px;border-radius:6px;}
 </style>
 <style id="patterns-css">
 /* ===== PATTERNS MODULE (перехват + трансформація) ===== */
@@ -31312,7 +31339,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const bl=blocks.map(b=>{ const g=dyGoal(b), c=dyColor(b), st=+b.h, end=Math.max(st+0.25,Math.min(plBlockEnd(b),24)), ln=lanes.get(b)||{lane:0,n:1};
       const top=(st-H0)*DY_HP, ht=Math.max(26,(end-st)*DY_HP-3), short=ht<44;
       return `<div class="dg-b${b.done?' done':''}${g?'':' plain'}${short?' short':''}" style="top:${top}px;height:${ht}px;--ln:${ln.lane};--lns:${ln.n};${c?'--c:'+c:''}">
-        <button class="dg-bb" data-dyblk="${esc(b.id)}"><b>${g?safeEmoji(g.emoji,'🎯')+' ':''}${esc(b.t||'Справа')}</b>${short?'':`<small>${plHM(st)}–${plHM(end)}${g?' · '+esc(g.name||'Місія'):''}${b.fromRecur?' · ↻':''}</small>`}</button>
+        <button class="dg-bb" data-dyblk="${esc(b.id)}"><b>${g?safeEmoji(g.emoji,'🎯')+' ':''}${esc(b.t||'Справа')}</b>${short?'':`<small>${plHM(st)}–${plHM(end)}${g?' · '+esc(g.name||'Місія'):''}${b.fromRecur?' · ↻':''}${typeof subBadge==='function'&&subBadge(b)?' · '+subBadge(b):''}</small>`}</button>
         <button class="dg-ck" data-dydone="${esc(b.id)}" aria-label="${b.done?'Зняти позначку':'Зроблено'}">${b.done?'✓':''}</button></div>`; }).join('');
     const now=isToday&&nowDec>=H0&&nowDec<H1?`<div class="dg-now" style="top:${(nowDec-H0)*DY_HP}px"><span>${plHM(nowDec)}</span><i></i></div>`:'';
     const empty=!blocks.length?`<div class="dy-empty"><b>${isToday?'День ще порожній':'Цей день порожній'}</b><span>Тапни по годині, щоб додати справу, або візьми з місій.</span></div>`:'';
@@ -31407,6 +31434,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function dyMenu(b,ds,opt){
     const g=dyGoal(b), items=[], week=!!(opt&&opt.week);
     items.push({ic:'target', label:b.done?'Зняти позначку «зроблено»':'Зроблено', primary:!b.done, onClick:()=>dyComplete(b.id,ds)});
+    // підпункти блоку (49-calendar.js): чекліст цього дня
+    { const sc=typeof subCount==='function'?subCount(b):{n:0,d:0}; items.push({ic:'plus', label:'Підпункти', sub:sc.n?sc.d+' з '+sc.n+' зроблено':'розбити справу на кроки', onClick:()=>subSheet(ds,b.id)}); }
     // шторка бере день один раз при відкритті — ставимо його на мить і повертаємо, щоб «День» не зсувався
     items.push({ic:'edit', label:'Змінити', sub:'назва, час, місія', onClick:()=>{ const p=plData(), old=p.selDate; p.selDate=ds; try{ plEditBlock(b.id); } finally{ p.selDate=old; } }});
     if(!b.done) items.push(week
@@ -33575,7 +33604,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const nowM=nowH>=d0&&nowH<=d1?`<b style="left:${((nowH-d0)/span*100).toFixed(1)}%"></b>`:'';
         const tl=`<span class="wd-tl"><em>${plHM(d0)}</em><span class="wd-tlb">${seg}${nowM}</span><em>${plHM(d1)}</em></span>`;
         const list=sz==='l'?bs.slice(0,6):bs.filter(x=>!x.done&&plBlockEnd(x)>nowH).slice(0,1);   // S/M — найближчий блок, L — увесь день
-        const rows=list.length?`<span class="wd-list">${list.map(x=>`<span class="${x.done?'done':''}"><em>${plHM(+x.h||0)}</em>${esc(String(x.t||'Блок').slice(0,40))}</span>`).join('')}</span>`
+        // рядок блоку: тап — підпункти (49-calendar.js); у L найближчий блок розгорнуто чеклістом
+        const sb=x=>{ const c=subCount(x); return c.n?`<i class="wd-sb">☑ ${c.d}/${c.n}</i>`:''; };
+        const subs=x=>{ const L=subList(x).slice(0,5); return L.length?`<span class="wd-subs">${L.map(q=>`<button data-wga="wdsubck" data-ds="${td}" data-bid="${esc(x.id)}" data-sid="${esc(q.id)}" class="${q.done?'on':''}" role="checkbox" aria-checked="${!!q.done}"><i>${q.done?'✓':''}</i>${esc(q.t.slice(0,40))}</button>`).join('')}</span>`:''; };
+        const firstOpen=list.find(x=>!x.done);
+        const rows=list.length?`<span class="wd-list">${list.map(x=>`<button data-wga="wdsub" data-ds="${td}" data-bid="${esc(x.id)}" class="wd-row-b${x.done?' done':''}"><em>${plHM(+x.h||0)}</em><span>${esc(String(x.t||'Блок').slice(0,40))}</span>${sb(x)}</button>${sz==='l'&&x===firstOpen?subs(x):''}`).join('')}</span>`
           :`<small class="wd-sub">${bs.length?'на сьогодні все ✓':'Сьогодні блоків папки нема'}</small>`;
         const addB=wdOn(b,'add')?`<button data-wga="wdadd" class="pill">＋ блок</button>`:'';
         return wdTile(b,fk,`<button class="wg-hit" data-wga="wdday" aria-label="План папки на сьогодні"></button>
@@ -33618,6 +33651,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     else if(a==='wdadd'){ if(fk) plFolderAddBlock(fk); }
     else if(a==='wdday'){ if(fk) plFolderDaySheet(fk); }
     else if(a==='wdmonth'){ if(fk) plFolderMonthSheet(fk); }
+    // день — з плитки (коли її намалювали), а не з моменту тапу: після півночі не шукаємо блок у новому дні
+    else if(a==='wdsub'){ const bid=el.dataset.bid, ds=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(); if(bid) subSheet(ds,bid); }
+    else if(a==='wdsubck'){ const bid=el.dataset.bid, sid=el.dataset.sid, ds=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(); if(bid&&sid){ const r=subToggle(ds,bid,sid); if(r!==null) try{ window.platform.haptic('light'); }catch(_){} } }
     else if(a==='wdcalnav'){ const n=+el.dataset.n||0, cur=wdCalYm[b.id]||ymdLocal().slice(0,7); wdCalYm[b.id]=n?moShift(cur,n):ymdLocal().slice(0,7); wgRefresh(); }
     else if(a==='wdcalday'){ const ds=el.dataset.ds; if(fk&&/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) calDaySheet(ds,{folder:fk,onOpenDay:d=>{ try{ goJournal({tab:'day',ds:d}); }catch(_){} }}); }
   }
@@ -33779,7 +33815,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const ev=calEventsOn(ds,fk), pay=fk?[]:calPayOn(ds), bl=calBlocks(ds,fk), note=calNote(ds);
       const evRow=e=>`<button class="cal-row" data-calev="${esc(e.id)}"><span class="cal-ic ev">★</span><span class="cal-tx"><b>${esc(String(e.t||'Подія').slice(0,80))}</b><small>${esc(CAL_REP[calRep(e)])}${calFolderName(e.folder)&&!fk?' · 📁 '+esc(calFolderName(e.folder).slice(0,24)):''}</small></span><span class="cal-go">›</span></button>`;
       const payRow=x=>`<div class="cal-row ro"><span class="cal-ic pay">${x.k==='in'?'＋':'💳'}</span><span class="cal-tx"><b>${esc(x.t.slice(0,60))}</b><small>${x.rec?'регулярний · ':''}з Гаманця</small></span><b class="cal-amt ${x.k}">${x.k==='in'?'+':'−'}${esc(money(x.amt,x.cur||undefined))}</b></div>`;
-      const blRow=b=>`<button class="cal-row" data-calbl style="--bc:${calBlockColor(b)}"><span class="cal-tm">${plHM(+b.h||0)}–${plHM(Math.min(plBlockEnd(b),24))}</span><span class="cal-tx"><b class="${b.done?'done':''}">${esc(String(b.t||'Блок').slice(0,60))}</b>${calFolderName(b.folder)&&!fk?`<small>📁 ${esc(calFolderName(b.folder).slice(0,24))}</small>`:''}</span>${b.done?'<span class="cal-ok">✓</span>':''}</button>`;
+      const blRow=b=>`<button class="cal-row" data-calbl style="--bc:${calBlockColor(b)}"><span class="cal-tm">${plHM(+b.h||0)}–${plHM(Math.min(plBlockEnd(b),24))}</span><span class="cal-tx"><b class="${b.done?'done':''}">${esc(String(b.t||'Блок').slice(0,60))}</b>${(calFolderName(b.folder)&&!fk)||subBadge(b)?`<small>${calFolderName(b.folder)&&!fk?'📁 '+esc(calFolderName(b.folder).slice(0,24)):''}${calFolderName(b.folder)&&!fk&&subBadge(b)?' · ':''}${subBadge(b)}</small>`:''}</span>${b.done?'<span class="cal-ok">✓</span>':''}</button>`;
       return `<div class="jn-ed-h"><b>${esc(dyDayTitle(ds))}${fk?' · '+esc(calFolderName(fk).slice(0,20)):''}</b><button data-jnx aria-label="Закрити">✕</button></div>
         <div class="cal-sec"><div class="cal-sh"><span>Події</span></div>
           ${ev.length||pay.length?ev.map(evRow).join('')+pay.map(payRow).join(''):'<small class="cal-none">Подій нема — день народження, дедлайн, платіж</small>'}</div>
@@ -33865,6 +33901,78 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     for(let d=1;d<=dim;d++){ const ds=ym+'-'+String(d).padStart(2,'0'), m=calMarks(ds,fk);
       h+=`<button class="cal-d${ds===td?' td':''}${ds>td?' fut':''}" data-wga="wdcalday" data-ds="${ds}" aria-label="${d} ${JN_MON[+ym.slice(5,7)-1]}${m.n?', блоків: '+m.n:''}${m.ev?', є подія':''}">${d}${m.ev?'<em>★</em>':''}<i>${m.cols.map(c=>`<u style="background:${c}"></u>`).join('')}</i></button>`; }
     return `<span class="cal-grid">${h}</span>`;
+  }
+
+  /* ════════ Підпункти блоку (етап 2, 10.10.2026) ════════
+     Блок Планера несе свій чекліст: b.sub=[{id, t, done}] — усередині blocksByDay[ds], той самий ключ goals_data.
+     Повторюваний блок отримує підпункти на конкретний день (материалізований блок цього дня) — відмітки не переходять.
+     Коли людина відмітила останній підпункт, блок стає виконаним (той самий dyComplete, що й ✓), з «Скасувати».
+     Пишеться лише з дій людини. Видно: Журнал → День (2/3, меню справи), шторка дня календаря, віджет «Час папки». */
+  function subList(b){ return b&&Array.isArray(b.sub)?b.sub.filter(x=>x&&typeof x==='object'&&!Array.isArray(x)&&typeof x.t==='string'):[]; }
+  function subCount(b){ const L=subList(b); return {n:L.length, d:L.filter(x=>x.done).length}; }
+  function subBadge(b){ const c=subCount(b); return c.n?`☑ ${c.d}/${c.n}`:''; }
+  // блок дня за id (віртуальні v_/disp_ повторюваних — за шаблоном; plBlocksFor створює блок дня в памʼяті)
+  function subFind(ds,id){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) return null;
+    const L=plBlocksFor(ds); let b=L.find(x=>x&&String(x.id)===String(id));
+    if(!b){ const m=String(id||'').match(/^(?:v_|disp_)(.+)$/); if(m) b=L.find(x=>x&&x.fromRecur===m[1]); }
+    return b||null;
+  }
+  function subAfter(){ try{ if(typeof window.__subRedraw==='function') window.__subRedraw(); }catch(_){} try{ plRerender(); }catch(_){} try{ const s=document.getElementById('scr-journal'); if(s&&s.classList.contains('active')) jnRender(); }catch(_){} try{ wgRefresh(); }catch(_){} }
+  // відмітити підпункт; останній → блок виконано (з «Скасувати»). Повертає новий стан або null
+  function subToggle(ds,id,sid){
+    const b=subFind(ds,id); if(!b) return null;
+    const s=subList(b).find(x=>String(x.id)===String(sid)); if(!s) return null;
+    s.done=!s.done; saveGoals();
+    const c=subCount(b);
+    if(s.done&&c.n&&c.d===c.n&&!b.done){
+      // блок із грошима (дохід у конверт) чи з матриці сам не закриваємо: зняття позначки не відкочує гроші,
+      // тож «Повернути» було б неправдою — людина ставить ✓ сама
+      if((b.link&&b.link.type==='fin')||b.fromMx){ try{ plToast('Усі підпункти ✓ — познач блок «Зроблено», коли готовий'); }catch(_){} }
+      else{
+        const bid=b.id, sid2=s.id; dyComplete(bid,ds);
+        try{ flowUndoToast('Усі підпункти ✓ — блок виконано',()=>{ const q=subFind(ds,bid); if(q&&q.done) dyComplete(bid,ds);
+          // повертаємо і останню відмітку — бейдж знову «2/3», а не «3/3» на невиконаному блоці
+          const qs=q?subList(q).find(z=>String(z.id)===String(sid2)):null; if(qs&&qs.done){ qs.done=false; saveGoals(); }
+          subAfter(); }); }catch(_){}
+      }
+    }
+    subAfter(); return s.done;
+  }
+  function subSheet(ds,id){
+    const draw=()=>{
+      const b=subFind(ds,id); if(!b) return '';
+      const L=subList(b), c=subCount(b);
+      return `<div class="jn-ed-h"><b>${esc(String(b.t||'Справа').slice(0,50))}</b><button data-jnx aria-label="Закрити">✕</button></div>
+        <small class="dy-fm-sub">${esc(dyDayTitle(ds))} · ${plHM(+b.h||0)}–${plHM(Math.min(plBlockEnd(b),24))}${c.n?' · '+c.d+' з '+c.n:''}${b.done?' · виконано ✓':''}</small>
+        <div class="sub-list">${L.map(x=>`<div class="sub-row${x.done?' on':''}"><button class="sub-ck" data-subck="${esc(x.id)}" role="checkbox" aria-checked="${!!x.done}" aria-label="${esc(x.t)}">${x.done?'✓':''}</button><span>${esc(x.t)}</span><button class="sub-rm" data-subrm="${esc(x.id)}" aria-label="Прибрати «${esc(x.t)}»">✕</button></div>`).join('')||'<small class="cal-none">Розбий справу на кроки — їх видно і в Планері, і в папці</small>'}</div>
+        <form class="sub-add" data-subadd><input id="subT" maxlength="80" placeholder="Новий підпункт, напр. «Граматика 20 хв»" autocomplete="off"><button type="submit">＋</button></form>`;
+    };
+    const bind=ov=>{
+      ov.classList.add('cal-ov');
+      const redraw=()=>{ if(!ov.isConnected){ window.__subRedraw=null; return; } const h=draw(); if(!h){ ov.remove(); return; } ov.querySelector('.jn-ed').innerHTML=h; bind2(); };
+      window.__subRedraw=redraw;   // «Повернути» з тосту перемальовує відкриту шторку
+      const bind2=()=>{
+        const x=ov.querySelector('[data-jnx]'); if(x) x.onclick=()=>{ ov.remove(); subAfter(); };
+        ov.querySelectorAll('[data-subck]').forEach(el=>el.onclick=()=>{ subToggle(ds,id,el.dataset.subck); redraw(); });
+        ov.querySelectorAll('[data-subrm]').forEach(el=>el.onclick=()=>{
+          const b=subFind(ds,id); if(!b||!Array.isArray(b.sub)) return;
+          const i=b.sub.findIndex(q=>q&&String(q.id)===String(el.dataset.subrm)); if(i<0) return;
+          const was=b.sub.splice(i,1)[0]; if(!b.sub.length) delete b.sub; saveGoals(); redraw();
+          try{ flowUndoToast('Підпункт прибрано',()=>{ const q=subFind(ds,id); if(!q) return; if(!Array.isArray(q.sub)) q.sub=[];
+            if(!q.sub.some(z=>z&&String(z.id)===String(was.id))){ q.sub.splice(Math.min(i,q.sub.length),0,was); saveGoals(); subAfter(); } }); }catch(_){}
+        });
+        const f=ov.querySelector('[data-subadd]'), inp=ov.querySelector('#subT');
+        if(f) f.onsubmit=e=>{ e.preventDefault(); const t=String(inp.value||'').trim().slice(0,80); if(!t) return;
+          const b=subFind(ds,id); if(!b) return; if(!Array.isArray(b.sub)) b.sub=[];
+          if(b.sub.length>=30){ plToast('Максимум 30 підпунктів'); return; }
+          b.sub.push({id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), t, done:false}); saveGoals(); redraw();
+          const n=ov.querySelector('#subT'); if(n) n.focus(); };
+      };
+      ov.onclick=e=>{ if(e.target===ov){ ov.remove(); subAfter(); } };
+      bind2();
+    };
+    const h=draw(); if(!h) return; jnOverlay(h,bind);
   }
   /* ════════ Фінансові звички і «Школа грошей» (49-finlit.js, 10.10.2026) ════════
      Додає в Книгу правил (47-rules.js, масив RL) групу «Фінансові звички». Як і решта правил — лише пропонують,
