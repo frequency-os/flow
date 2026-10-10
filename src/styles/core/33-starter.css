@@ -1,0 +1,63 @@
+  /* ════════ «Стартовий набір» — порожній Огляд нової людини (53-starter.js, 10.10.2026) ════════
+     Банер Карти бажань → колаж мрій; сітка папок → 4 приклади + Журнал + «Зробити своїм».
+     Кольори лише з токенів теми; текст на фото — білий під затемненням знизу. */
+
+  /* банер: власний вміст замість «0%» — решту дітей ховаємо, нічого не видаляючи.
+     Рукописна назва (.wishlink) лишається: вона ж тримає відступ від шапки, що лежить поверх банера */
+  #summaryCard.is-starter > :not(.st-hero):not(.wishlink){display:none !important;}
+  .st-hero{position:relative;order:1;margin-top:14px;display:flex;flex-direction:column;gap:12px;}
+  .st-col{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:84px 84px;gap:6px;
+    grid-template-areas:"sea run home home" "sea run study travel";}
+  .st-ph{display:block;border-radius:12px;background:color-mix(in srgb,var(--accent) 22%,var(--card));
+    background-size:cover;background-position:center;}
+  .st-sea{grid-area:sea}.st-run{grid-area:run}.st-home{grid-area:home}.st-study{grid-area:study}.st-travel{grid-area:travel}
+  .st-tag{position:absolute;top:8px;right:8px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;
+    background:rgba(20,16,4,.62);color:#ffc965;border:1px solid rgba(255,201,101,.45);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+  .st-hstat{display:flex;align-items:baseline;gap:10px;}
+  .st-hstat > b{font-size:40px;font-weight:800;line-height:1;color:var(--text);}
+  .st-hstat > b small{font-size:20px;color:var(--muted);margin-left:1px;}
+  .st-hstat span{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .st-hstat span b{color:var(--text);}
+  .st-week{display:flex;gap:14px;}
+  .st-week span{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .st-week em{font-style:normal;font-size:12px;font-weight:600;color:var(--muted);}
+  .st-week i{width:12px;height:12px;border-radius:50%;background:var(--line);}
+  .st-week .on i{background:var(--accent);box-shadow:0 0 10px color-mix(in srgb,var(--accent) 60%,transparent);}
+
+  /* сітка: блок на всю ширину, незалежно від вигляду папок (fv2-*) */
+  #folderGrid.st-on{display:block !important;}
+  .st-wrap{display:flex;flex-direction:column;gap:10px;padding-bottom:16px;}
+  .st-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .st-tile{all:unset;box-sizing:border-box;position:relative;overflow:hidden;cursor:pointer;height:132px;border-radius:18px;
+    padding:12px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;
+    background:color-mix(in srgb,var(--c) 35%,var(--card));border:1px solid var(--line);}
+  .st-tbg{position:absolute;inset:0;background-size:cover;background-position:center;}
+  .st-veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,.08) 62%);}
+  .st-em{position:absolute;top:10px;left:10px;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:17px;
+    background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+  .st-tile b,.st-tile small{position:relative;color:#fff;}
+  .st-tile b{font-size:15px;font-weight:800;}
+  .st-tile small{font-size:12px;opacity:.85;}
+  .st-tile:active,.st-jr:active,.st-go:active{transform:scale(.98);}
+
+  .st-jr{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;
+    background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .st-jr-ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:17px;
+    background:color-mix(in srgb,var(--accent) 16%,var(--card));}
+  .st-jr-t{flex:1;display:flex;flex-direction:column;}
+  .st-jr-t b{font-size:15px;font-weight:800;}
+  .st-jr-t small{font-size:12px;color:var(--muted);}
+  .st-jr svg{width:40px;height:16px;color:var(--accent);}
+
+  .st-go{all:unset;box-sizing:border-box;cursor:pointer;text-align:center;min-height:52px;line-height:52px;margin-top:4px;border-radius:16px;
+    font-size:16px;font-weight:800;color:#fff;background:var(--accent);
+    box-shadow:0 8px 24px -8px color-mix(in srgb,var(--accent) 70%,transparent);}
+  .st-clean{all:unset;cursor:pointer;align-self:center;padding:10px 14px;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;}
+
+  /* шторка вибору */
+  .st-pick-h{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+  .st-pick{display:flex;align-items:center;gap:12px;padding:6px 0;cursor:pointer;color:var(--text);font-size:15px;}
+  .st-pick input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin:0;}
+  .st-pth{width:44px;height:44px;border-radius:10px;flex:none;background:color-mix(in srgb,var(--accent) 22%,var(--card));
+    background-size:cover;background-position:center;}
