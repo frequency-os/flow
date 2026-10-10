@@ -278,13 +278,15 @@
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag',
-      'fv2-gallery','fv2-sections','fv2-bento','fsz-s','fsz-m','fsz-l');
+      'fv2-gallery','fv2-sections','fv2-bento','fsz-s','fsz-m','fsz-l','st-on');
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
     try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
     let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project'));
+    // порожній акаунт — «Стартовий набір» замість голого «＋ Нова папка» (53-starter.js)
+    try{ if(starterActive()){ starterRender(grid); return; } stHeroOff(); }catch(e){ console.error('starter',e); }
     // «за назвою»: закріплені однаково зверху, решта — за абеткою
     if(folderOpts.sort==='name') keys=keys.slice().sort((a,b)=>
       ((folders[b].pinned?1:0)-(folders[a].pinned?1:0)) || String(folders[a].name||'').localeCompare(String(folders[b].name||''),'uk'));
