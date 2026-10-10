@@ -2,13 +2,23 @@
 
   /* ── стиль заголовка: колір / шрифт / контур / виділення, як в Instagram-текстах ── */
   var PGH_FONTS={serif:"'Lora',Georgia,serif",mono:"ui-monospace,'SF Mono',Menlo,monospace",script:"'Caveat',cursive"};
+  /* Колір заголовка зберігається як hex з палітри (03-premium-pack.js). На світлому аркуші
+     світлі відтінки зникали (білий — 1.1:1), тому малюємо через змінну: у темному документі
+     діє сам hex, у світлому — темніша пара з 23-doc-readable.css. Дані не змінюються. */
+  var PGH_CLR_VAR={'#f3f5f8':'white','#ff6b9d':'pink','#34c77b':'green','#f0b429':'amber','#6a7dff':'blue','#c77dff':'purple','#4ecdc4':'teal'};
+  function headingClr(c){
+    c=String(c||'').toLowerCase();
+    if(!/^#[0-9a-f]{3,8}$/.test(c)) return '';
+    return PGH_CLR_VAR[c] ? 'var(--pgh-'+PGH_CLR_VAR[c]+','+c+')' : c;
+  }
   function headingStyle(b){
     var st='';
-    if(PGH_FONTS[b.hfont]) st+='font-family:'+PGH_FONTS[b.hfont]+';';
+    if(Object.prototype.hasOwnProperty.call(PGH_FONTS,b.hfont)) st+='font-family:'+PGH_FONTS[b.hfont]+';';
+    var hc=headingClr(b.hclr);
     if(b.hout){
-      var oc=b.hclr||'currentColor';
+      var oc=hc||'currentColor';
       st+='-webkit-text-stroke:1.3px '+oc+';-webkit-text-fill-color:transparent;paint-order:stroke fill;';
-    } else if(b.hclr){ st+='color:'+b.hclr+';'; }
+    } else if(hc){ st+='color:'+hc+';'; }
     return {style:st,cls:(b.hhl?' pgh-hl':'')};
   }
 

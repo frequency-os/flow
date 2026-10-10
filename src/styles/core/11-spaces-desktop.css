@@ -36,7 +36,10 @@
     background:var(--line);border:1px solid rgba(255,255,255,.1);flex-shrink:0;}
   .gico svg{fill:none;stroke:#fff;stroke-width:2;opacity:.92;}
   /* ── iOS WebView не зумить сторінку при фокусі, якщо шрифт поля ≥16px ── */
-  input,textarea,select,[contenteditable="true"]{font-size:16px !important;}
+  /* Заголовки документа й назва сторінки (18–32px) і так ≥16px — їх не чіпаємо,
+     інакше H1/H2/H3 і назва папки ставали розміром зі звичайний текст (10.10.2026). */
+  input:not(.pg-pagetitle),textarea,select,
+  [contenteditable="true"]:not(.pgc-h1):not(.pgc-h2):not(.pgc-h3){font-size:16px !important;}
 
   /* =======================================================================
      ТЕМА «PRO» — Quiet Luxe база + aurora-сяйво за хедером + bento hero-блок

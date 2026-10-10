@@ -175,7 +175,11 @@
     slash.style.left=left+'px';slash.style.top=top+'px';
     slash.style.width=W+'px';slash.style.maxHeight=Math.round(H)+'px';
   }
+  /* меню й календар живуть поза #scr-page, тож тему документа їм передаємо класом:
+     інакше на світлому аркуші вони лишались темним склом без контрасту (10.10.2026) */
+  function pgMenuTheme(el){ if(el) el.classList.toggle('pg-paper', scr.classList.contains('pg-paper')); }
   function openSlash(){
+    pgMenuTheme(slash);
     pgsCat='base';buildSlash('');ssearch.value='';positionSlash();
     slash.classList.add('show');backdrop.classList.add('show');
     /* автофокус лише на десктопі: на iOS клавіатура зсуває viewport і тапи по fixed-меню промахуються */
@@ -450,7 +454,7 @@
 
   // ── block menu ──
   var bmenu=document.getElementById('pgBmenu'),bmId=null;
-  function openBmenu(id){bmId=id;bmenu.classList.add('show');backdrop.classList.add('show');}
+  function openBmenu(id){bmId=id;pgMenuTheme(bmenu);bmenu.classList.add('show');backdrop.classList.add('show');}
   /* ── довге натискання на блок → меню (видалити / закріпити / дублювати) ── */
   (function(){
     var lp=null;

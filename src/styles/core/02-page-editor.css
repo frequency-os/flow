@@ -54,11 +54,7 @@
   #scr-page.pg-wide .pg-widebtn{color:var(--pg-fg);border-color:var(--pg-fg2);}
   .pg-widebtn:disabled{opacity:.28;pointer-events:none;}
   .pg-widebtn.on{color:var(--pg-acc)!important;border-color:color-mix(in srgb,var(--pg-acc) 50%,transparent)!important;}
-  /* slash/block-меню завжди темні й контрастні — навіть на світлій темі сторінки */
-  #scr-page.pg-paper .pg-slash,#scr-page.pg-paper .pg-bmenu{
-    --pg-sheet:#14161f;--pg-line:#2b3040;--pg-field:#1c2030;
-    --pg-fg:#eef0f6;--pg-fg2:#dfe3ee;--pg-mut:#9aa2ba;--pg-mut2:#7c849c;
-    color:var(--pg-fg);}
+  /* slash/block-меню лежать поза #scr-page — їхня тема в 23-doc-readable.css (клас .pg-paper з JS) */
   /* шестерня панелі «Сьогодні» + рядки конфігуратора */
   .rrcfg-btn{border:none;background:none;color:var(--muted);cursor:pointer;font-size:13px;float:right;padding:0 2px;}
   .rrcfg-btn:hover{color:var(--text);}

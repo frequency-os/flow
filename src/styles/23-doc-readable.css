@@ -1,0 +1,138 @@
+  /* ══════════ ДОКУМЕНТ ПАПКИ · ЧИТАБЕЛЬНІСТЬ У ТЕМАХ (пакет А, 10.10.2026) ══════════
+     Скарга: «додаю блоки, а на білому фоні вони погано відрізняються, і в темній теж».
+     Корінь: у документа свої кольори (--pg-*), а меню, плитки, віджети й поля брали
+     кольори застосунку; картки блоків мали фон як у сторінки і межу 1.2:1.
+     Файл підключено останнім, тож правила тут перекривають старі без !important,
+     де вистачає специфічності (#scr-page …). Контраст звірено розрахунком WCAG. */
+
+  /* ── 1. Поверхня й межа блока — власні токени документа ── */
+  #scr-page{--pg-surface:#22262d;--pg-edge:#40464f;--pg-track:rgba(255,255,255,.13);}
+  #scr-page.pg-paper{--pg-surface:#f6f4ef;--pg-edge:#c9c2b5;--pg-track:rgba(28,26,23,.11);}
+
+  /* ── 2. Усередині документа кольори застосунку = кольори документа.
+     Плитки «План на день / місяць», віджет «Гроші» без даних, старі віджети й поля
+     беруть --card/--text/--muted/--line — тепер вони йдуть за темою аркуша. ── */
+  #scr-page .pg-doc{--card:var(--pg-surface);--card-2:var(--pg-card2);--text:var(--pg-fg);--muted:var(--pg-mut);
+    --line:var(--pg-edge);--field:var(--pg-field);--hair:var(--pg-hair);--hair-2:var(--pg-edge);}
+  #scr-page .pg-doc input::placeholder,#scr-page .pg-doc textarea::placeholder{color:var(--pg-mut);}
+
+  /* ── 3. Картки блоків: видимий фон і межа ── */
+  #scr-page .pgbar,#scr-page .pghm,#scr-page .pgkpi,#scr-page .pgch,#scr-page .pgau,#scr-page .pgfc,
+  #scr-page .pgc-code,#scr-page .pgpr,#scr-page .pgfile,#scr-page .pg-bitem,#scr-page .pglk,#scr-page .pgwin,
+  #scr-page .jt-caps,#scr-page .pt-caps,#scr-page .pt-picker{
+    background:var(--pg-surface);border-color:var(--pg-edge);}
+  #scr-page .pgcode-h{background:transparent;border-bottom-color:var(--pg-edge);}
+  #scr-page.pg-paper .pgbar,#scr-page.pg-paper .pghm,#scr-page.pg-paper .pgch,#scr-page.pg-paper .pgfc,
+  #scr-page.pg-paper .pgc-code,#scr-page.pg-paper .pgwin,#scr-page.pg-paper .pglk{box-shadow:0 1px 2px rgba(28,26,23,.05);}
+  /* доріжки прогресу й аудіо були білими на білому (1.01:1) */
+  #scr-page .pgbar-track,#scr-page .pt-pbar,#scr-page .ph-bar,#scr-page .pgau-bar{background:var(--pg-track);}
+
+  /* ── 4. Плейсхолдери без зайвої прозорості (була 2.2–2.9:1) ── */
+  #scr-page .pgcode-lang:empty::before,#scr-page .pgcode-pre:empty::before,#scr-page .pgsec-t:empty::before,
+  #scr-page .pgbar-t:empty::before,#scr-page .pgpr-tx:empty::before,#scr-page .pghm-t:empty::before{color:var(--pg-mut);opacity:1;}
+  #scr-page .jr-ta::placeholder{opacity:1;}
+  #scr-page .pgpp-hint{opacity:1;}
+
+  /* ── 5. «＋» і «⠿» біля рядка: помітні (було 1.6–1.8:1) ── */
+  #scr-page .pgb .pg-grip{opacity:.7;}
+  #scr-page .pgb .pg-addrow{opacity:.75;}
+  @media (hover:hover){
+    #scr-page .pgb .pg-addrow{opacity:0;}
+    #scr-page .pgb:hover .pg-addrow{opacity:.8;}
+    #scr-page .pgb .pg-addrow:hover{opacity:1;}
+  }
+
+  /* ── 6. Світлий аркуш: темніші пари для яскравих акцентів (на білому вони мали 1.7–3.0:1) ── */
+  #scr-page.pg-paper{--pgh-white:var(--pg-fg);--pgh-pink:#c2185b;--pgh-green:#1f7a4a;--pgh-amber:#8a5a00;
+    --pgh-blue:#4a5ad6;--pgh-purple:#7e3bc7;--pgh-teal:#0f766e;}
+  /* фіолетово-синій #7c8cff */
+  #scr-page.pg-paper .jr-ic,#scr-page.pg-paper .jr-dmon,#scr-page.pg-paper .jt-prog,#scr-page.pg-paper .jr-done,
+  #scr-page.pg-paper .jr-exp,#scr-page.pg-paper .jr-expico,#scr-page.pg-paper .pt-secc,#scr-page.pg-paper .ph-ic{color:#4a5ad6;}
+  /* зелений #34c77b */
+  #scr-page.pg-paper .pgbar-pct,#scr-page.pg-paper .pgbar-chip.on,#scr-page.pg-paper .pgkpi-d.up,#scr-page.pg-paper .jr-live,
+  #scr-page.pg-paper .jt-prog.all,#scr-page.pg-paper .hb-ic,#scr-page.pg-paper .dl-v-yes,#scr-page.pg-paper .dl-vb-yes{color:#1f7a4a;}
+  #scr-page.pg-paper .pgbar-chip.on{border-color:rgba(31,122,74,.45);background:rgba(31,122,74,.08);}
+  /* бірюзовий #4ecdc4 */
+  #scr-page.pg-paper .pgcode-copy,#scr-page.pg-paper .pt-link b,#scr-page.pg-paper .pt-linkbtn,#scr-page.pg-paper .ptb-pct,
+  #scr-page.pg-paper .ph-lk,#scr-page.pg-paper .ph-unlink{color:#0f766e;}
+  #scr-page.pg-paper .pt-link svg{stroke:#0f766e;}
+  /* бурштиновий #f0b429 */
+  #scr-page.pg-paper .dl-ic,#scr-page.pg-paper .dl-dchipb.on,#scr-page.pg-paper .dl-sec-due,#scr-page.pg-paper .dl-tag-due,
+  #scr-page.pg-paper .dl-v-part,#scr-page.pg-paper .dl-vb-part{color:#8a5a00;}
+  /* рожевий #ff6b9d */
+  #scr-page.pg-paper .dl-v-no,#scr-page.pg-paper .dl-vb-no{color:#c2185b;}
+  /* пурпуровий #c77dff (AI-огляд) */
+  #scr-page.pg-paper .pgpr-badge,#scr-page.pg-paper .pgpr-copy{color:#7e3bc7;}
+  /* помаранчевий #e8843c (Фокус) */
+  #scr-page.pg-paper .pgfc-c,#scr-page.pg-paper .pgfc.run .pgfc-t{color:#a8521a;}
+  /* синій #5b8def (Графік) */
+  #scr-page.pg-paper .pgch-v.on,#scr-page.pg-paper .pgac-a{color:#2f5fc4;}
+  #scr-page.pg-paper .pgch-v.on{border-color:rgba(47,95,196,.45);}
+  /* активна вкладка блока «Таби»: білий на #6a7dff був 3.5:1 */
+  #scr-page .pgtb-h.on{background:#4a5ad6;}
+
+  /* ── 7. Меню «＋ Додати блок» і меню блока: щільні, у темі документа.
+     Було: темне скло на 26 % — на білому аркуші сіре, текст 1.4–1.7:1. ── */
+  .pg-slash,.pg-bmenu{
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0) 45%),rgba(20,23,32,.94);}
+  .pg-slash.pg-paper,.pg-bmenu.pg-paper{
+    --pg-bg:#ffffff;--pg-fg:#1c1a17;--pg-fg2:#33302b;--pg-mut:#615d57;--pg-mut2:#6b6861;
+    --pg-line:#e2ddd4;--pg-field:#f2f0eb;--pg-acc:#4a5ad6;--pg-acc-solid:#4a5ad6;--pg-danger:#c62828;--pg-sheet:#ffffff;
+    color:var(--pg-fg);
+    background:rgba(255,255,255,.97);border:1px solid rgba(28,26,23,.12);
+    box-shadow:0 1px 0 #fff inset,0 22px 54px -18px rgba(28,26,23,.35);}
+  .pg-slash.pg-paper .pg-ssearch{background:var(--pg-field);border-color:var(--pg-line);color:var(--pg-fg);}
+  .pg-slash.pg-paper .pg-ssearch::placeholder{color:var(--pg-mut);}
+  .pg-slash.pg-paper .pgst-ins{background:var(--pg-acc-solid);color:#fff;}
+  /* значки типів: на білому світлі відтінки (заголовки #f3f5f8, бірюза) зникали */
+  .pg-slash.pg-paper .pg-sitem .sic{color:color-mix(in srgb,var(--sc) 72%,#000);}
+  .pg-slash.pg-paper .pg-sitem[data-k="h1"] .sic,.pg-slash.pg-paper .pg-sitem[data-k="h2"] .sic,
+  .pg-slash.pg-paper .pg-sitem[data-k="h3"] .sic,.pg-slash.pg-paper .pg-sitem[data-k="divider"] .sic{
+    color:var(--pg-fg2);background:var(--pg-field);}
+  /* поле пошуку виходило за правий край меню на 14 px */
+  .pg-slash .pg-ssearch{box-sizing:border-box;width:auto;max-width:calc(100% - 28px);align-self:stretch;}
+
+  /* календар дати блока — теж поза аркушем: щільне скло замість 50 % */
+  .pgcal{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0) 40%),rgba(19,23,34,.95);}
+  .pgcal-wd{color:#9aa2b5;}
+
+  /* ── 8. Віджети «Гроші»: білий текст на світлих кінцях градієнтів мав 2.2–3.0:1.
+     Відтінки ті самі, на крок темніші; кожен кінець ≥ 4.7:1 під білим текстом. ── */
+  .wg-t.c-wallet{background:linear-gradient(135deg,#3343f0,#4f58e8 50%,#7f45d8);}
+  .wg-t.c-mission{background:linear-gradient(135deg,color-mix(in srgb,var(--mc,#34c77b) 52%,#000),color-mix(in srgb,var(--mc,#34c77b) 66%,#000));}
+  .wg-t.c-debt{background:linear-gradient(135deg,#b81d3e,#d1284b);}
+  .wg-t.c-in{background:linear-gradient(135deg,#0a6a47,#0e8455);}
+  .wg-t.c-out{background:linear-gradient(135deg,#a8340a,#c2410c);}
+  /* кнопки й «Книга правил» — темна підкладка: біле скло на кольорі знову з'їдало контраст */
+  .wg-acts button,.wg-rules{background:rgba(0,0,0,.2);}
+  .wg-t.c-env .wg-acts button{background:rgba(0,0,0,.12);}
+
+  /* плитка «План на день»: кнопка на світлому акценті темної теми мала білий текст 2.8:1 */
+  html:not(.t-light) #scr-page .pw-btn.go{color:#0c0e16;}
+  #scr-page .pg-doc .bn-waterplus{opacity:1;}
+  #scr-page:not(.pg-paper) .pgch-v.on{color:#8fb0ff;}
+  #scr-page.pg-paper .pgbar-chip.on{color:#1a6b40;}
+  #scr-page.pg-paper .je-openb{color:#4a5ad6;}
+
+  /* ── 9. Дрібниці верстки ── */
+  /* кнопка «показати панель» потрібна лише на комп'ютері; на телефоні без стилів
+     вона малювала сіру смужку зліва зверху і зсувала весь екран на 22 px */
+  #sidebarReveal{display:none;}
+  /* шапка документа: при прокрутці текст більше не проїжджає під прозорими пігулками */
+  #scr-page .pg-top{background:color-mix(in srgb,var(--pg-bg) 84%,transparent) !important;
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
+  /* Щоденник, Лог рішень, Звички (.jr) на телефоні були на всю ширину екрана (margin −12px)
+     і без «＋/⠿», а решта блоків — з полями: край документа виходив рваним.
+     Тепер вони в одному ряду з іншими блоками й мають ту саму поверхню. */
+  @media(max-width:759px){
+    #scr-page .pgb:has(> .pg-content > .jr){margin-left:0;margin-right:0;}
+    #scr-page .pgb:has(> .pg-content > .jr) .pg-addrow,
+    #scr-page .pgb:has(> .pg-content > .jr) .pg-grip{display:flex;}
+  }
+  #scr-page .jr{background:linear-gradient(165deg,rgba(124,140,255,.1),transparent 55%),var(--pg-surface);border-color:var(--pg-edge);}
+  /* короткий документ: аркуш тягнеться до низу екрана — без шва між аркушем і тлом під ним */
+  #scr-page.active{display:flex;flex-direction:column;min-height:100dvh;}
+  #scr-page.active > .pg-doc{flex:1 0 auto;width:100%;box-sizing:border-box;}
+  /* під аркушем лишався нижній відступ оболонки (124 px під панель) кольором тла — це і був шов;
+     у самого аркуша вже є 200 px знизу, тож панель нічого не перекриває */
+  body:has(#scr-page.active) .phone{padding-bottom:0 !important;}
