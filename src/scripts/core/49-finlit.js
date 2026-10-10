@@ -108,7 +108,7 @@
   ];
   function flCushionHTML(){
     if(!rlOn('cushion')) return '';
-    const avg=flAvgSpend(), n=Math.max(1,+rlN('cushion')||3), target=avg*n, e=flCushionEnv(), sv=e?envSaved(e):0, pct=target?Math.min(100,Math.round(sv/target*100)):0;
+    const avg=flAvgSpend(), n=Math.max(1,+rlN('cushion')||3), target=Math.round(avg*n/100)*100, e=flCushionEnv(), sv=e?envSaved(e):0, pct=target?Math.min(100,Math.round(sv/target*100)):0;
     return `<div class="fl-cush"><div class="fl-cush-h"><span>🛟</span><b>Подушка безпеки</b><small>${n} ${pluralUk(n,'місяць','місяці','місяців')} витрат</small></div>
       ${avg?`<div class="fl-cush-n"><b>${esc(money(sv))}</b><small>з ${esc(money(target))} · середні витрати ${esc(money(avg))}/міс</small></div><div class="fl-rev-bar"><i style="width:${pct}%"></i></div>`
         :`<small class="fl-cush-e">Ще мало даних про витрати — ціль зʼявиться після першого повного місяця.</small>`}
@@ -124,7 +124,7 @@
       hh.rules[id]=Object.assign({},hh.rules[id]||{},{on:true}); saveGoals(); redraw(); });
     { const c=ov.querySelector('[data-flcush]'); if(c) c.onclick=()=>{
       if(window.storeKeyReady&&!window.storeKeyReady(ENVKEY)){ plToast('Конверти ще завантажуються'); return; }
-      const target=flAvgSpend()*Math.max(1,+rlN('cushion')||3); if(!(target>0)) return;
+      const target=Math.round(flAvgSpend()*Math.max(1,+rlN('cushion')||3)/100)*100; if(!(target>0)) return;   // кругла ціль
       let e=flCushionEnv();
       if(!e){ e={id:'env_cushion_'+Date.now().toString(36), name:'Подушка', emoji:'🛟', color:'#3ec7b4', goal:target, saved:0, ops:[], kind:'витрати', link:'main', linkLabel:'головна папка'}; envelopes.push(e); }
       else e.goal=target;
