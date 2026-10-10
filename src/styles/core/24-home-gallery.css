@@ -213,3 +213,21 @@
 #scr-home .sec-htabs .htab-add:active{transform:scale(.94);}
 /* шапка шторки чату: великий емодзі замість водяного знака папки */
 .fmc-em{position:absolute;right:18px;top:14px;z-index:0;font-size:58px;line-height:1;opacity:.92;}
+
+/* ── «Рядки» (нічний макет №4, 10.10.2026): компактний список папок ── */
+.fvs-prev i.n{grid-column:span 2;height:7px;border-radius:3px;}
+#folderGrid.fv2-rows{display:flex!important;flex-direction:column;gap:8px;}
+.fr{position:relative;display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 6px 10px 12px;border-radius:16px;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);color:var(--text);box-sizing:border-box;}
+.fr:active{transform:scale(.99);}
+.fr-ic{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;
+  background:var(--c,#6a7dff);box-shadow:0 2px 8px color-mix(in srgb,var(--c,#6a7dff) 35%,transparent);}
+.fr-ic .ico{width:22px;height:22px;}
+.fr-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.fr-b b{font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fr-b small{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fr-bar{display:block;height:4px;border-radius:9px;background:color-mix(in srgb,var(--text) 10%,transparent);overflow:hidden;margin-top:2px;}
+.fr-bar i{display:block;height:100%;border-radius:inherit;background:var(--c,#6a7dff);}
+.fr .fmenu{position:static;flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer;opacity:1;}
+.fr .fmenu:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.fr.fr-add{justify-content:flex-start;gap:10px;min-height:52px;border-style:dashed;background:transparent;color:var(--accent);font-weight:800;font-size:14.5px;}

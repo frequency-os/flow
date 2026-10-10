@@ -4,8 +4,8 @@
      Вибір — у шторці ⚙ (openFolderViewSheet). Старе 'grid' (і ще давніші
      cover/compact/deck) читаємо як «Галерею» лише в памʼяті: при старті нічого
      не переписуємо, ключ зміниться, коли людина сама вибере вигляд. */
-  const FV_ORDER=['gallery','sections','bento','list','mag'];
-  const FV_NAME={gallery:'Галерея', sections:'Секції', bento:'Бенто', list:'Список', mag:'Журнал'};
+  const FV_ORDER=['gallery','sections','bento','rows','list','mag'];
+  const FV_NAME={gallery:'Галерея', sections:'Секції', bento:'Бенто', rows:'Рядки', list:'Список', mag:'Журнал'};   // rows — нічний макет №4 (10.10.2026)
   const FV_COVER=['gallery','sections','bento'];
   function fvNorm(v){ return FV_ORDER.includes(v) ? v : (v==='grid'||v==='cover'||v==='compact'||v==='deck') ? 'gallery' : null; }
   let homeFolderView='gallery';
@@ -278,7 +278,7 @@
     const grid = document.getElementById('folderGrid');
     grid.innerHTML='';
     grid.classList.remove('fv-list','fv-grid','fv-cover','fv-compact','fv2-list','fv2-grid','fv2-deck','fv2-mag',
-      'fv2-gallery','fv2-sections','fv2-bento','fsz-s','fsz-m','fsz-l','st-on');
+      'fv2-gallery','fv2-sections','fv2-bento','fv2-rows','fsz-s','fsz-m','fsz-l','st-on');
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
@@ -319,6 +319,19 @@
       } else {
         metaHtml=f.pct?`<div class="fstat">${f.pct}%</div>`:'';
       }
+      // ── «Рядки» (макет №4): компактний рядок — кольорова іконка, назва, підпис, тонкий прогрес, одна ⋯ ──
+      if(homeFolderView==='rows'){
+        const pr=folderProgress(k), sub=isGroup?(kids.length+' '+pluralUk(kids.length,'папка','папки','папок')+' · група'):fgSub(k);
+        const r=document.createElement('div'); r.className='fcard fr'+(isGroup?' fr-group':''); r.dataset.fkey=k;
+        r.style.setProperty('--c',safeColor(f.c,'#6a7dff'));
+        r.innerHTML=`<span class="fr-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>
+          <span class="fr-b"><b data-i18n-skip="1">${esc(f.name)}</b><small>${f.pinned?'📌 ':''}${esc(sub)}</small>${!isGroup&&pr.total?`<span class="fr-bar"><i style="width:${Math.max(0,Math.min(100,+pr.pct||0))}%"></i></span>`:''}</span>
+          <button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування" aria-label="Налаштування папки «${esc(String(f.name||'').slice(0,30))}»">⋯</button>`;
+        r.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
+          if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
+          if(isGroup){ openGroupAsChosen(k); return; } goFolder(k); };
+        grid.appendChild(r); return;
+      }
       // ── v2 (Список · Журнал): єдина розмітка, режим вирішує лише клас-обгортку ──
       const modeClass = homeFolderView==='mag' ? 'fc2-mag' : 'fc2-row';
       const el=document.createElement('div');
@@ -353,8 +366,8 @@
     });
     // add-folder card — під поточний режим
     const add=document.createElement('div');
-    add.className='fc2 fc2-add '+(homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
-    add.innerHTML=`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
+    add.className=homeFolderView==='rows'?'fr fr-add':'fc2 fc2-add '+(homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
+    add.innerHTML=homeFolderView==='rows'?`<span class="fr-ic" style="background:transparent;box-shadow:none;color:var(--accent);font-size:22px">＋</span><span>Нова папка</span>`:`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
     add.onclick=createFolder;
     grid.appendChild(add);
     }
@@ -592,6 +605,7 @@
     gallery:'<i></i><i></i><i></i><i></i>',
     sections:'<i class="w"></i><i class="r"></i><i></i><i></i>',
     bento:'<i class="w"></i><i class="t"></i><i></i><i></i>',
+    rows:'<i class="n"></i><i class="n"></i><i class="n"></i><i class="n"></i>',
     list:'<i class="r"></i><i class="r"></i><i class="r"></i>',
     mag:'<i class="m"></i><i class="m"></i>'
   };
