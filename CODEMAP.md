@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 84 |
-| Рядків JS | 32625 |
+| Рядків JS | 32647 |
 | Файлів CSS | 47 |
-| Рядків CSS | 10316 |
-| Сутностей верхнього рівня | 2286 |
+| Рядків CSS | 10335 |
+| Сутностей верхнього рівня | 2289 |
 | Ключів сховища (FLOW_KEYS) | 79 |
 
 ## Файли JS
@@ -84,7 +84,7 @@
 | `src/scripts/core/47-rules.js` | 351 | 29 |
 | `src/scripts/core/48-hero.js` | 338 | 41 |
 | `src/scripts/core/48-widgets.js` | 463 | 46 |
-| `src/scripts/core/49-calendar.js` | 220 | 24 |
+| `src/scripts/core/49-calendar.js` | 242 | 27 |
 | `src/scripts/core/49-finlit.js` | 132 | 17 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
 | `src/scripts/core/51-money-reset.js` | 132 | 15 |
@@ -154,7 +154,7 @@
 | `src/styles/core/24-home-gallery.css` | 215 | 0 |
 | `src/styles/core/25-journal.css` | 301 | 0 |
 | `src/styles/core/26-day.css` | 173 | 0 |
-| `src/styles/core/27-month.css` | 163 | 0 |
+| `src/styles/core/27-month.css` | 182 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
 | `src/styles/core/30-wallet.css` | 147 | 0 |
@@ -2427,7 +2427,7 @@
 | `wgOldScan` | функція | `src/scripts/core/48-widgets.js:435` |
 | `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:442` |
 
-### `src/scripts/core/49-calendar.js` — 24 сутностей
+### `src/scripts/core/49-calendar.js` — 27 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2455,6 +2455,9 @@
 | `subAfter` | функція | `src/scripts/core/49-calendar.js:165` |
 | `subToggle` | функція | `src/scripts/core/49-calendar.js:167` |
 | `subSheet` | функція | `src/scripts/core/49-calendar.js:186` |
+| `calAllDayHTML` | функція | `src/scripts/core/49-calendar.js:225` |
+| `calNoteCardHTML` | функція | `src/scripts/core/49-calendar.js:232` |
+| `calBindDay` | функція | `src/scripts/core/49-calendar.js:237` |
 
 ### `src/scripts/core/49-finlit.js` — 17 сутностей
 

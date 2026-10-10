@@ -218,3 +218,25 @@
     };
     const h=draw(); if(!h) return; jnOverlay(h,bind);
   }
+
+  /* ════════ Етап 3: «Весь день» і нотатка в Журнал → День (10.10.2026) ════════
+     Над сіткою годин — події дня (★) і платежі Гаманця (💳) чипами, «＋ подія»; під сіткою — нотатка дня.
+     Лише показ тих самих даних (planner.events / dayNotes / План Гаманця); запис — через ті самі шторки. */
+  function calAllDayHTML(ds){
+    const ev=calEventsOn(ds,''), pay=calPayOn(ds);
+    return `<div class="cal-allday" aria-label="Весь день"><span class="cal-ad-l">Весь день</span><span class="cal-ad-c">
+      ${ev.map(e=>`<button class="cal-chip ev" data-caladev="${esc(e.id)}">★ ${esc(String(e.t||'Подія').slice(0,40))}</button>`).join('')}
+      ${pay.map(x=>`<span class="cal-chip pay ${x.k}">${x.k==='in'?'＋':'💳'} ${esc(x.t.slice(0,30))} ${esc(money(x.amt,x.cur||undefined))}</span>`).join('')}
+      <button class="cal-chip add" data-caladnew aria-label="Нова подія цього дня">＋ подія</button></span></div>`;
+  }
+  function calNoteCardHTML(ds){
+    const n=calNote(ds);
+    return `<button class="cal-notecard${n?'':' empty'}" data-calnote><span class="cal-nc-h">📝 Нотатка дня</span>${n?`<span class="cal-nc-t">${esc(n.slice(0,400))}</span>`:'<span class="cal-nc-t">＋ Що важливо цього дня</span>'}</button>`;
+  }
+  // rerender — як перемалювати екран після змін у шторках
+  function calBindDay(c,ds,rerender){
+    const back=()=>{ try{ rerender(); }catch(_){} };
+    c.querySelectorAll('[data-caladev]').forEach(b=>b.onclick=()=>calEventSheet(ds,b.dataset.caladev,back));
+    c.querySelectorAll('[data-caladnew]').forEach(b=>b.onclick=()=>calEventSheet(ds,'',back));
+    c.querySelectorAll('[data-calnote]').forEach(b=>b.onclick=()=>calDaySheet(ds,{}));
+  }

@@ -225,8 +225,8 @@
     const bl=plBlocksFor(ds), done=bl.filter(b=>b.done).length;
     const sub=jnEl('jnSub'); if(sub) sub.textContent=dyDayTitle(ds).toLowerCase()+(bl.length?' · '+done+'/'+bl.length+' зроблено':'');
     body.innerHTML=`<div class="jn-dayh"><button data-jnback>‹ Сьогодні</button><b>${esc(dyDayTitle(ds))}</b><button class="dy-from" data-dyfrom>＋ З місій</button></div>
-      ${dyRibbonHTML(ds)}<div class="jn-pad"></div>`;
-    dyBind(body,ds);
+      ${calAllDayHTML(ds)}${dyRibbonHTML(ds)}${calNoteCardHTML(ds)}<div class="jn-pad"></div>`;
+    dyBind(body,ds); calBindDay(body,ds,jnRender);   // «Весь день» і нотатка (49-calendar.js)
     const bk=body.querySelector('[data-jnback]'); if(bk) bk.onclick=()=>{ jnDayDs=''; jnRender(); jnTop(); };
   }
   function jnRenderToday(body){
@@ -258,7 +258,7 @@
       ${jnFocusCard(list)}
       ${typeof rlJournalHTML==='function'?rlJournalHTML():''}
       <div class="jn-sec"><span>День по годинах</span><button data-dyfrom>＋ З місій</button></div>
-      ${dyRibbonHTML(td)}
+      ${calAllDayHTML(td)}${dyRibbonHTML(td)}${calNoteCardHTML(td)}
       <div class="jn-sec"><span>Ресурси</span><button data-jnhist>Історія днів ›</button></div>
       <div class="jn-res">
         <button class="jn-r t" data-jnres="time"><small>Час</small><b>${free===null?'—':String(free).replace('.',',')+' год'}</b><small>вільно сьогодні</small></button>
@@ -281,7 +281,7 @@
       if(bl.done){ jnUndoSheet(bl); return; }
       jnFocus=bl.id; jnRender(); try{ body.querySelector('.jn-fc').scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} });
     { const d=body.querySelector('[data-jndone]'); if(d) d.onclick=()=>{ const bl=list.find(x=>x.id===d.dataset.jndone); if(bl) jnDone(bl); }; }
-    dyBind(body,td,{onDone:jnDone});   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
+    dyBind(body,td,{onDone:jnDone}); calBindDay(body,td,jnRender);   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
     pzBind(body);   // 🏆 у шапці і смужка призу (44-prizes.js)
     if(typeof rlJournalBind==='function') rlJournalBind(body);   // картки правил і Книга правил (47-rules.js)
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
