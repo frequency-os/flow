@@ -78,6 +78,10 @@ else
   echo "$utc" | sed 's/^/      /'; bad=$((bad+1))
 fi
 
+echo "8) Збірка для iOS (dist-ios/ без dev-коду і без 'unsafe-eval'):"
+# Сам dist-ios не збирає: python3 tools/build.py --ios. Нема теки — крок пропускається.
+./tools/check-ios.sh || bad=$((bad+1))
+
 rm -rf "$TMP"
 # Код виходу важливий: за ним deploy.sh вирішує, чи можна публікувати.
 [ "$bad" = 0 ] && { echo "\nВсе гаразд."; exit 0; }

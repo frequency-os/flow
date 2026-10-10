@@ -38,7 +38,8 @@
   FLOW_PETS.dev={name:'Нокс',kind:'чорний лис',vibe:'dev-режим',glow:'#5ce0a8',c:['#2a2e3d','#12141f'],male:true,
     line:'root@flow:~#',
     persona:''};
-  function petCur(){ try{ if(localStorage.getItem('ai_dev')==='1') return 'dev'; const p=localStorage.getItem('ai_pet'); return FLOW_PETS[p]&&p!=='dev'?p:'spark'; }catch(_){ return 'spark'; } }
+  function petCur(){ try{ if(aiDevOn()) return 'dev';   // Нокс — лише у dev-режимі власника, не за голим прапорцем
+     const p=localStorage.getItem('ai_pet'); return FLOW_PETS[p]&&p!=='dev'?p:'spark'; }catch(_){ return 'spark'; } }
   function petPersona(){ return FLOW_PETS[petCur()].persona+' Ти залишаєшся Флоу-асистентом системи: усі правила і формат відповіді незмінні, характер впливає лише на тон.'; }
   function petSVG(id,size){
     try{ const h=heroSVG(id,size); if(h) return h; }catch(_){ }   // герої загону — кадри з 48-hero.js
@@ -116,8 +117,10 @@
     ov.querySelector('[data-petclose]').onclick=()=>ov.remove();
     { const hw=ov.querySelector('#heroWardBtn'); if(hw) hw.onclick=()=>{ ov.remove(); heroWardrobe(petCur()); }; }
     /* @dev-only:start */
-    // прихований вхід у dev: 5 швидких тапів по заголовку «Твій напарник»
+    // прихований вхід у dev: 5 швидких тапів по заголовку «Твій напарник» —
+    // лише власнику у веб-версії (aiDevOwner, 12-ai-agent.js); на iPhone жесту нема (APP-5)
     (function(){
+      if(!aiDevOwner()) return;
       const t=ov.querySelector('h3'); if(!t) return;
       let n=0, t0=0;
       t.style.cssText+=';-webkit-user-select:none;user-select:none;cursor:pointer';
