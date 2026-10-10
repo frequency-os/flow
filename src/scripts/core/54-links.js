@@ -191,3 +191,33 @@
   function lkSegBind(root,fk){
     root.querySelectorAll('[data-lkview]').forEach(b=>b.onclick=()=>{ lkView[fk]=b.dataset.lkview; try{ renderPgLinks(); }catch(_){} });
   }
+
+  /* ════════ Дерево папок у бічному меню ноутбука (нічний макет №8) ════════
+     Під пунктом «Папки»: папки верхнього рівня, групи розгортаються (Фінанси → YouTube…), відкрита папка підсвічена.
+     Лише читає folders/order; тап — та сама навігація, що й на Огляді. Розгорнуті групи — у памʼяті. */
+  const dsbOpen=Object.create(null);   // без прототипу: ключ папки «constructor» не вдаватиме розгорнуту групу
+  function dsbTreeHTML(){
+    let cur=''; try{ const s=document.getElementById('scr-page'); if(s&&s.classList.contains('active')) cur=pgFolderKey()||''; }catch(_){}
+    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project';
+    let tops=[]; try{ tops=topFolderKeys().filter(vis); }catch(_){ return ''; }
+    if(!tops.length) return '';
+    const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
+      return `<div class="dsbt-r${k===cur?' on':''}" style="--lvl:${lvl}">
+        ${kids.length?`<button class="dsbt-tw${open?' open':''}" data-dsbtw="${esc(k)}" aria-label="${open?'Згорнути':'Розгорнути'} «${esc(String(f.name||'Папка').slice(0,30))}»" aria-expanded="${open}">›</button>`:'<span class="dsbt-tw sp"></span>'}
+        <button class="dsbt-b" data-dsbt="${esc(k)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`
+        +(kids.length&&open&&lvl<2?kids.map(ck=>row(ck,lvl+1)).join(''):''); };
+    return tops.slice(0,40).map(k=>row(k,0)).join('');
+  }
+  function dsbTreeSync(){
+    if(window.innerWidth<1024) return;
+    const nav=document.querySelector('#desktopSidebar .dsb-nav'), fb=nav&&nav.querySelector('.dsb-i[data-dnav="folders"]'); if(!fb) return;
+    let t=document.getElementById('dsbTree');
+    if(!t){ t=document.createElement('div'); t.id='dsbTree'; t.className='dsb-tree'; t.setAttribute('aria-label','Папки'); fb.insertAdjacentElement('afterend',t); }
+    t.innerHTML=dsbTreeHTML();
+    t.querySelectorAll('[data-dsbtw]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.dsbtw; dsbOpen[k]=!(b.classList.contains('open')); dsbTreeSync(); });
+    t.querySelectorAll('[data-dsbt]').forEach(b=>b.onclick=()=>{ const k=b.dataset.dsbt; if(!folders[k]) return;
+      try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ dsbOpen[k]=true; openGroupAsChosen(k); dsbTreeSync(); return; } }catch(_){}
+      try{ goFolder(k); }catch(_){} });
+  }
+  try{ window.addEventListener('resize',()=>{ clearTimeout(window.__dsbRz); window.__dsbRz=setTimeout(dsbTreeSync,200); }); }catch(_){}
+  try{ document.addEventListener('flowsync',()=>{ try{ dsbTreeSync(); }catch(_){} }); }catch(_){}

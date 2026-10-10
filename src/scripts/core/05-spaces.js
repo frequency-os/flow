@@ -91,6 +91,7 @@
                 'scr-finance':'finance','scr-planner':'journal','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-world':'world'};
     const dkey=dmap[id]||'home';
     document.querySelectorAll('.dsb-i').forEach(b=>b.classList.toggle('on', b.dataset.dnav===dkey));
+    try{ if(typeof dsbTreeSync==='function') setTimeout(dsbTreeSync,0); }catch(_){}   // дерево папок у бічному меню (54-links.js)
     document.body.classList.toggle('in-home', id==='scr-home');
     document.body.classList.toggle('in-reader', id==='scr-reader');
     // Канал папки: ховає нижню панель і котика (18-channel.css)
