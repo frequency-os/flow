@@ -883,7 +883,6 @@
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
         const a=b.dataset.act;
-        if(a==='color'){ cycleFolderColor(key); saveFolders(); renderDashboard(); openFolderLook(key); return; }
         folderAction(key,a);
       });
       m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
@@ -1011,18 +1010,11 @@
     if(act==='pin'){ f.pinned=!f.pinned; saveFolders(); renderDashboard(); closeFolderMenu(); return; }
     if(act==='rename'){ closeFolderMenu(); inputModal({title:'Перейменувати папку',value:f.name,placeholder:'Назва папки',onOk:(v)=>{ if(v){f.name=v;saveFolders();renderDashboard();} }}); return; }
     if(act==='move'){ closeFolderMenu(); openFolderMovePicker(key); return; }
-    if(act==='color'){ cycleFolderColor(key); saveFolders(); renderDashboard(); openFolderMenu(key); return; }
     if(act==='icon'){ openFolderIconPicker(key); return; }
     // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
     // губився б мовчки. Автоматичну — переобираємо під нове емодзі.
     if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; if(!f.iconSet) f.icon=folderIconFor(v); saveFolders(); renderDashboard(); }}); return; }
     if(act==='delete'){ confirmSheet({title:'Видалити папку «'+f.name+'»?', onOk:()=>{ folderDelete(key); renderDashboard(); closeFolderMenu(); }}); return; }   // з документом, темами, фото й посиланнями чатів — і надгробком для інших пристроїв
-  }
-  function cycleFolderColor(key){
-    const f=folders[key];
-    const raw=f.c.startsWith('var(')? ({'var(--fin)':'#e8843c','var(--hab)':'#34c77b','var(--val)':'#5b8def','var(--skl)':'#c77dff'}[f.c]||'#6a7dff') : f.c;
-    let i=FOLDER_COLORS.indexOf(raw); i=(i+1)%FOLDER_COLORS.length;
-    f.c=FOLDER_COLORS[i];
   }
   function pickFolderPhoto(key){
     const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';

@@ -43,17 +43,7 @@
       spaces:function(){ try{ const ctx=curCtx(); const a=activeSpaceFor(ctx);
         return spacesFor(ctx).map(s=>({id:s.id,name:s.name,emoji:s.emoji,color:s.color,on:s.id===a,
           n:(function(){ try{ return (boards[keyForSpaceIn(ctx,s.id)]||[]).length; }catch(_){ return 0; } })()})); }catch(_){ return []; } },
-      switchSpace:function(id){ try{ switchSpace(id); }catch(_){} },
-      addSpace:function(){ try{
-        const ctx=curCtx(); const list=spacesFor(ctx);
-        const palette=['#ff6b9d','#34c77b','#f0b429','#c77dff','#4ecdc4','#e8843c','#9b8cff','#5b8def'];
-        const emojis=['🎬','💼','💡','🚀','📚','🏆','🎨','⚡','❤️','🎯','📸','🧠'];
-        const id='s'+Date.now().toString(36); const n=list.length;
-        list.push({id,name:'Простір '+(n+1),emoji:emojis[n%emojis.length],color:palette[n%palette.length]});
-        boards[keyForSpaceIn(ctx,id)]=[]; activeSpaceMap[ctx]=id; saveSpacesMeta(); saveBoard();
-        boardKey=keyForSpaceIn(ctx,id); folderPath=[]; syncBlocks();
-        return id;
-      }catch(_){ return null; } }
+      switchSpace:function(id){ try{ switchSpace(id); }catch(_){} }
     };
   }catch(_){}
   function resortPinned(){

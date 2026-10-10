@@ -630,10 +630,6 @@
       if(bridge().switchSpace)bridge().switchSpace(sw.dataset.pgspace);
       pgPath=[]; render(); renderCover(); cdTick(); return;
     }
-    if(e.target&&e.target.closest&&e.target.closest('[data-pgspadd]')){
-      if(bridge().addSpace)bridge().addSpace();
-      pgPath=[]; render(); renderCover(); cdTick(); return;
-    }
     var c=e.target&&e.target.closest&&e.target.closest('[data-pgcdcal]');
     if(c){ e.preventDefault(); openCal(c.dataset.pgcdcal); return; }
     var m=e.target&&e.target.closest&&e.target.closest('[data-pgcdmore]');

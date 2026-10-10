@@ -46,8 +46,12 @@
        photoSrc повертає незмінними. */
     try{ if(window.photoSrc) u=window.photoSrc(u); }catch(_){}
     u=String(u==null?'':u).trim();
-    if(/^data:image\/(png|jpe?g|gif|webp|svg\+xml);/i.test(u)) return u.replace(/'/g,'%27').replace(/"/g,'%22');
-    if(/^https?:\/\//i.test(u)) return u.replace(/'/g,'%27').replace(/"/g,'%22');
+    /* переноси рядка, керівні символи й «\» дають змогу вийти з url('…') у сусідні CSS-властивості
+       (шар на весь екран, картинка з чужого сервера) — таку адресу не пропускаємо; дужки кодуємо (10.10.2026) */
+    if(/[\u0000-\u001f\u007f\\]/.test(u)) return '';
+    const enc=s=>s.replace(/'/g,'%27').replace(/"/g,'%22').replace(/\(/g,'%28').replace(/\)/g,'%29');
+    if(/^data:image\/(png|jpe?g|gif|webp|svg\+xml);/i.test(u)) return enc(u.replace(/ /g,'%20'));
+    if(/^https?:\/\//i.test(u)) return /\s/.test(u)?'':enc(u);
     return '';
   }
   function balance(i){ return i.ops.reduce((s,o)=>s+(o.type==='borrow'?o.amount:-o.amount),0); }

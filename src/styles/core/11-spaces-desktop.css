@@ -1,36 +1,3 @@
-  /* ===== налаштування просторів ===== */
-  .spcfg-ov{position:fixed;inset:0;z-index:500;background:rgba(8,10,16,.55);backdrop-filter:blur(4px);
-    display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s;}
-  .spcfg-ov.open{opacity:1;}
-  .spcfg-in{width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--line);border-radius:22px 22px 0 0;
-    padding:8px 18px max(22px,env(safe-area-inset-bottom)) 18px;transform:translateY(100%);transition:transform .24s cubic-bezier(.2,.9,.3,1);max-height:88vh;overflow-y:auto;}
-  .spcfg-ov.open .spcfg-in{transform:none;}
-  .spcfg-grip{width:40px;height:5px;border-radius:99px;background:rgba(255,255,255,.22);margin:6px auto 14px;}
-  .spcfg-h{font-size:19px;font-weight:800;margin-bottom:6px;}
-  .spcfg-sec{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:18px 0 10px;}
-  .spcfg-styles{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
-  .spcfg-style{aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:var(--card);cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:.14s;padding:6px 2px;font-family:inherit;color:var(--text);}
-  .spcfg-style .ss-p{font-size:15px;}
-  .spcfg-style .ss-n{font-size:9.5px;font-weight:700;color:var(--muted);text-align:center;line-height:1.1;}
-  .spcfg-style.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent);}
-  .spcfg-style.on .ss-n{color:var(--text);}
-  .spcfg-list{display:flex;flex-direction:column;gap:8px;}
-  .spcfg-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:9px 11px;
-    border-left:3px solid var(--sc);}
-  .spcfg-row.flash{animation:rowflash 1s ease;}
-  @keyframes rowflash{0%,100%{background:var(--card);}30%{background:color-mix(in srgb,var(--sc) 22%,var(--card));}}
-  .spcfg-emoji{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-size:19px;cursor:pointer;flex:0 0 auto;}
-  .spcfg-name{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);font-size:14.5px;font-weight:700;font-family:inherit;padding:4px;border-radius:7px;}
-  .spcfg-name:focus{background:var(--hair);}
-  .spcfg-cnt{font-size:11px;color:var(--muted);flex:0 0 auto;}
-  .spcfg-lock{font-size:14px;opacity:.6;flex:0 0 auto;}
-  .spcfg-del{background:none;border:none;font-size:15px;cursor:pointer;opacity:.6;flex:0 0 auto;}
-  .spcfg-del:active{opacity:1;}
-  .spcfg-add{width:100%;margin-top:12px;padding:13px;border-radius:13px;border:1.5px dashed var(--line);background:none;
-    color:var(--accent);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;}
-  .spcfg-close{width:100%;margin-top:10px;padding:14px;border-radius:13px;border:none;cursor:pointer;
-    background:linear-gradient(135deg,var(--accent),var(--skl));color:#fff;font-size:14px;font-weight:800;font-family:inherit;}
   /* glass-circle icon (variant B) */
   .gico{display:inline-grid;place-items:center;border-radius:50%;
     background:var(--line);border:1px solid rgba(255,255,255,.1);flex-shrink:0;}

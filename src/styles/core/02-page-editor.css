@@ -1189,15 +1189,6 @@
 
   /* ── рейка швидкого доступу до проєктів, зліва від сітки папок ── */
   .foh-row{display:flex;gap:10px;align-items:flex-start;}
-  .proj-rail{display:none;flex-direction:column;gap:8px;flex-shrink:0;}
-  .proj-rail-i{width:42px;height:42px;border-radius:13px;background:var(--card);border:1px solid var(--line);
-    display:grid;place-items:center;font-size:18px;cursor:pointer;position:relative;transition:border-color .15s,background .15s;}
-  .proj-rail-i:active{transform:scale(.94);}
-  .proj-rail-i::before{content:"";position:absolute;left:-9px;top:50%;transform:translateY(-50%);
-    width:3px;height:0;border-radius:3px;background:var(--pc,var(--accent));transition:height .15s;}
-  .proj-rail-i:hover::before{height:18px;}
-  .proj-rail-add{width:42px;height:42px;border-radius:13px;border:1.5px dashed var(--line);color:var(--muted);
-    display:grid;place-items:center;font-size:18px;cursor:pointer;}
 
   /* ── глобальні режими вигляду папок (перемикач біля заголовка «Папки») ── */
   /* fv-list: одна колонка, повноширокі картки (за замовч.) */
