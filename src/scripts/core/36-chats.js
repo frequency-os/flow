@@ -339,11 +339,11 @@
   function renderPgLinks(){
     const host=document.getElementById('pgLinks'), add=document.getElementById('pgAddLink'); if(!host) return;
     const fk=pgFolderKey();
-    if(!fk){ host.innerHTML=''; host.hidden=true; if(add) add.hidden=true; try{ lkAsideSync(); }catch(_){} return; }
+    if(!fk){ host.innerHTML=''; host.hidden=true; if(add) add.hidden=true; try{ lkAsideSync(); lkViewApply(''); }catch(_){} return; }
     if(add) add.hidden=false;
     const list=chatsForFolder(fk).map(c=>({c,last:chatLast(c)})).sort((a,b)=>(b.last?b.last.at:b.c.at)-(a.last?a.last.at:a.c.at));
     host.hidden=false;
-    host.innerHTML=pgSubHTML(fk)+pgHubHTML(fk,list.length)+(!list.length?'':`<div class="pgl-box"><div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
+    host.innerHTML=lkSegHTML(fk)+pgSubHTML(fk)+pgHubHTML(fk,list.length)+(!list.length?'':`<div class="pgl-box"><div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
       `<button class="pgl-row" data-pgchat="${esc(c.id)}" style="--cc:${safeColor(c.c,'var(--accent)')}">
         <span class="pgl-av">${esc(c.emoji||'💬')}</span>
         <span class="pgl-body"><b data-i18n-skip="1">${esc(c.name)}</b><small data-i18n-skip="1">${esc(chatPreview(last&&last.b))}</small></span>
@@ -356,6 +356,7 @@
     const sn=host.querySelector('[data-pgsubnew]'); if(sn) sn.onclick=()=>createFolder(fk);
     { const lb=host.querySelector('[data-pglinks]'); if(lb) lb.onclick=()=>lkSheet(fk); }   // «Звʼязки папки» (54-links.js)
     try{ lkAsideSync(); }catch(_){}   // ноутбук: та сама панель праворуч
+    try{ lkSegBind(host,fk); lkViewApply(fk); }catch(_){}   // «Документ · Стрічка» (54-links.js)
   }
   /* ── Хаб звʼязків під назвою документа (Д3, 10.10.2026): Гроші · Час · Місія · Чати.
      Лише читає те, що вже позначено папкою (op.folderKey, блок Планера folder, goal.folderKey,

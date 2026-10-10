@@ -143,3 +143,51 @@
       ${card('cal','📅','Календар',cal,'★ Подія')}
       ${card('chats','💬','Чати',ch,chs.length?'':'＋ Привʼязати')}</div>`;
   }
+
+  /* ════════ «Стрічка папки» (нічний макет №3, 10.10.2026): перемикач «Документ · Стрічка» над документом.
+     Стрічка — усе, що сталось у папці за 30 днів, по днях: записи Гаманця, виконані блоки Планера, позначки звички,
+     події календаря, повідомлення привʼязаних чатів, нові записи документа. Лише читання; режим — у памʼяті. ── */
+  const lkView={};   // fk → 'doc' | 'feed' (не зберігається)
+  function lkFeedItems(fk){
+    const out=[], td=ymdLocal(), from=(()=>{ const d=new Date(); d.setDate(d.getDate()-30); return ymdLocal(d); })();
+    const add=(ds,t,ic,title,sub,cls)=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(ds||'')&&ds>=from&&ds<=td) out.push({ds,t:+t||0,ic,title,sub:sub||'',cls:cls||''}); };
+    const dsOf=ms=>{ const d=new Date(ms); return isNaN(d)?'':ymdLocal(d); };
+    try{ (finOps||[]).forEach(o=>{ if(!o||String(o.folderKey||'')!==String(fk)) return; const inc=o.type==='in';
+      add(String(o.date||''),0,inc?'＋':'−',(inc?'+':'−')+money(+o.amount||0,o.cur||undefined),o.label||(inc?'Дохід':'Витрата'),inc?'in':'out'); }); }catch(_){}
+    try{ for(let i=0;i<=30;i++){ const d=new Date(); d.setDate(d.getDate()-i); const ds=ymdLocal(d);
+      plBlocksDisplay(ds).forEach(b=>{ if(b&&b.done&&b.folder===fk){ const h=Math.max(0,Math.min(plBlockEnd(b),24)-(+b.h||0));
+        add(ds,(+b.h||0)*3600e3,'⏱','Блок виконано · '+String(b.t||'Блок'),plHM(+b.h||0)+' · '+String(Math.round(h*10)/10).replace('.',',')+' год','done'); } });
+      calEventsOn(ds,fk).forEach(e=>add(ds,1,'★',String(e.t||'Подія'),'подія календаря','ev')); } }catch(_){}
+    try{ const g=wgFolderMission(fk), tr=g&&moOwnFolder(g.folderKey)?moTracker(g.folderKey):null;
+      if(tr) Object.keys(tr.marks||{}).forEach(ds=>{ if(moMarked(tr,ds)) add(ds,2,'🔥','Звичку відмічено',String(g.name||'Місія'),'hab'); }); }catch(_){}
+    try{ chatsForFolder(fk).forEach(c=>{ (boards[chatBk(c.id)]||[]).forEach(b=>{ if(!b||b.type==='divider') return; const t=chTimeOf(b); if(!t) return;
+      add(dsOf(t),t,'💬',String(c.name||'Чат'),chatPreview(b),'chat'); }); }); }catch(_){}
+    try{ (Array.isArray(boards[fk])?boards[fk]:[]).forEach(b=>{ if(!b||!/^(note|task|h1|h2|h3|bullet|num)$/.test(b.type)) return; const t=chTimeOf(b), tx=String(txtPlain(b)).trim(); if(!t||!tx) return;
+      add(dsOf(t),t,b.type==='task'?(b.done?'☑':'☐'):'📝',b.type==='task'?(b.done?'Завдання виконано':'Нове завдання'):'Запис у документі',tx,'doc'); }); }catch(_){}
+    return out.sort((a,b)=>a.ds<b.ds?1:a.ds>b.ds?-1:b.t-a.t).slice(0,80);
+  }
+  function txtPlain(b){ try{ return chTxt(b); }catch(_){ return String(b.text||b.title||''); } }
+  function lkFeedHTML(fk){
+    const items=lkFeedItems(fk), td=ymdLocal();
+    if(!items.length) return `<div class="lkf"><div class="dy-empty"><b>Стрічка поки порожня</b><span>Тут зʼявиться все, що відбувається з папкою: блоки Планера, гроші, звичка, події, чати й нові записи.</span></div></div>`;
+    let h='<div class="lkf">', cur='';
+    items.forEach(x=>{ if(x.ds!==cur){ cur=x.ds; h+=`<div class="lkf-day">${x.ds===td?'Сьогодні':esc(dyDayTitle(x.ds))}</div>`; }
+      h+=`<div class="lkf-it ${x.cls}"><span class="lkf-ic">${esc(x.ic)}</span><span class="lkf-tx"><b data-i18n-skip="1">${esc(String(x.title).slice(0,80))}</b>${x.sub?`<small data-i18n-skip="1">${esc(String(x.sub).slice(0,120))}</small>`:''}</span></div>`; });
+    return h+'</div>';
+  }
+  function lkSegHTML(fk){ const v=lkView[fk]==='feed'?'feed':'doc';
+    return `<div class="lkv-seg" role="tablist" aria-label="Вигляд папки"><button role="tab" data-lkview="doc" aria-selected="${v==='doc'}" class="${v==='doc'?'on':''}">Документ</button><button role="tab" data-lkview="feed" aria-selected="${v==='feed'}" class="${v==='feed'?'on':''}">Стрічка</button></div>`; }
+  // показати / сховати документ і стрічку; викликається з renderPgLinks
+  function lkViewApply(fk){
+    const scr=document.getElementById('scr-page'); if(!scr) return;
+    const ed=document.getElementById('pgEditor'), host=document.getElementById('pgLinks');
+    let feed=document.getElementById('lkFeed');
+    const on=!!fk&&lkView[fk]==='feed';
+    scr.classList.toggle('lk-feedmode',on);
+    if(!on){ if(feed) feed.remove(); if(ed) ed.hidden=false; return; }
+    if(!feed){ feed=document.createElement('div'); feed.id='lkFeed'; if(host&&host.parentNode) host.parentNode.insertBefore(feed,host.nextSibling); else scr.appendChild(feed); }
+    feed.innerHTML=lkFeedHTML(fk); if(ed) ed.hidden=true;
+  }
+  function lkSegBind(root,fk){
+    root.querySelectorAll('[data-lkview]').forEach(b=>b.onclick=()=>{ lkView[fk]=b.dataset.lkview; try{ renderPgLinks(); }catch(_){} });
+  }

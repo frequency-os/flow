@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 87 |
-| Рядків JS | 32217 |
+| Рядків JS | 32266 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10182 |
-| Сутностей верхнього рівня | 2304 |
+| Рядків CSS | 10197 |
+| Сутностей верхнього рівня | 2311 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -69,7 +69,7 @@
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
 | `src/scripts/core/35-channel.js` | 691 | 65 |
-| `src/scripts/core/36-chats.js` | 439 | 46 |
+| `src/scripts/core/36-chats.js` | 440 | 46 |
 | `src/scripts/core/37-ai-privacy.js` | 202 | 20 |
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
@@ -90,7 +90,7 @@
 | `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
-| `src/scripts/core/54-links.js` | 145 | 15 |
+| `src/scripts/core/54-links.js` | 193 | 22 |
 | `src/scripts/page-editor/01-palette.js` | 176 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 766 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 746 | 42 |
@@ -146,7 +146,7 @@
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
 | `src/styles/core/18-channel.css` | 178 | 0 |
-| `src/styles/core/19-chats.css` | 187 | 0 |
+| `src/styles/core/19-chats.css` | 202 | 0 |
 | `src/styles/core/20-world.css` | 20 | 0 |
 | `src/styles/core/21-spheres.css` | 82 | 0 |
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
@@ -1884,13 +1884,13 @@
 | `window.openChatSettings` | значення | `src/scripts/core/36-chats.js:335` |
 | `pgFolderKey` | функція | `src/scripts/core/36-chats.js:338` |
 | `renderPgLinks` | функція | `src/scripts/core/36-chats.js:339` |
-| `pgSubHTML` | функція | `src/scripts/core/36-chats.js:365` |
-| `pgHubData` | функція | `src/scripts/core/36-chats.js:373` |
-| `pgHubHTML` | функція | `src/scripts/core/36-chats.js:382` |
-| `pgHubOpen` | функція | `src/scripts/core/36-chats.js:393` |
-| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:402` |
-| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:417` |
-| `chatsInit` | функція | `src/scripts/core/36-chats.js:427` |
+| `pgSubHTML` | функція | `src/scripts/core/36-chats.js:366` |
+| `pgHubData` | функція | `src/scripts/core/36-chats.js:374` |
+| `pgHubHTML` | функція | `src/scripts/core/36-chats.js:383` |
+| `pgHubOpen` | функція | `src/scripts/core/36-chats.js:394` |
+| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:403` |
+| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:418` |
+| `chatsInit` | функція | `src/scripts/core/36-chats.js:428` |
 
 ### `src/scripts/core/37-ai-privacy.js` — 20 сутностей
 
@@ -2541,7 +2541,7 @@
 | `introRefresh` | функція | `src/scripts/core/54-intro.js:121` |
 | `window.introOpen` | функція | `src/scripts/core/54-intro.js:130` |
 
-### `src/scripts/core/54-links.js` — 15 сутностей
+### `src/scripts/core/54-links.js` — 22 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2560,6 +2560,13 @@
 | `lkSheet` | функція | `src/scripts/core/54-links.js:93` |
 | `lkAsideSync` | функція | `src/scripts/core/54-links.js:103` |
 | `lkPanelHTML` | функція | `src/scripts/core/54-links.js:118` |
+| `lkView` | обʼєкт | `src/scripts/core/54-links.js:150` |
+| `lkFeedItems` | функція | `src/scripts/core/54-links.js:151` |
+| `txtPlain` | функція | `src/scripts/core/54-links.js:169` |
+| `lkFeedHTML` | функція | `src/scripts/core/54-links.js:170` |
+| `lkSegHTML` | функція | `src/scripts/core/54-links.js:178` |
+| `lkViewApply` | функція | `src/scripts/core/54-links.js:181` |
+| `lkSegBind` | функція | `src/scripts/core/54-links.js:191` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
