@@ -89,3 +89,32 @@
   /* блок під назвою тепер = хаб + (за потреби) коробка «Чати папки» */
   .pg-links{background:none;border:0;overflow:visible;}
   .pgl-box{display:flex;flex-direction:column;border-radius:18px;background:var(--pg-field,var(--card));border:1px solid var(--pg-line,var(--line));overflow:hidden;}
+
+  /* ── Підпапки в документі (10.10.2026): рядок плиток над хабом звʼязків ── */
+  .pg-subs{margin:0 0 12px;}
+  .pgs-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pg-mut,var(--muted));}
+  .pgs-new{border:0;background:none;color:var(--pg-acc,var(--accent));font:inherit;font-size:12px;font-weight:800;letter-spacing:0;text-transform:none;cursor:pointer;padding:6px 4px;}
+  .pgs-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+  .pgs-row::-webkit-scrollbar{display:none;}
+  .pgs-t{flex:0 0 118px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px;border-radius:14px;cursor:pointer;text-align:left;font:inherit;
+    border:1px solid var(--pg-edge,var(--line));background:var(--pg-surface,var(--card));color:var(--pg-fg,var(--text));}
+  .pgs-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;margin-bottom:4px;color:#fff;background:var(--c);}
+  .pgs-ic .pgb-ic{color:#fff;}
+  .pgs-t b{font-size:13.5px;font-weight:800;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgs-t small{font-size:11px;color:var(--pg-mut,var(--muted));max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* ── Група «як на iPhone»: вікно з іконками поверх Огляду ── */
+  .fios-ov{display:grid;place-items:center;align-items:center;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);}
+  .fios-in{width:min(340px,calc(100vw - 40px));padding:18px 16px 16px;border-radius:30px;background:color-mix(in srgb,var(--card) 88%,transparent);
+    border:1px solid var(--line);box-shadow:0 30px 70px -20px rgba(0,0,0,.6);}
+  .fios-h{display:flex;align-items:center;gap:8px;margin:0 4px 14px;}
+  .fios-h b{flex:1;font-size:22px;font-weight:800;letter-spacing:-.01em;}
+  .fios-more{width:40px;height:40px;border-radius:12px;border:0;background:var(--hair);color:var(--text);font-size:18px;cursor:pointer;}
+  .fios-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px;}
+  .fios-t{display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;color:var(--text);font:inherit;cursor:pointer;min-width:0;}
+  .fios-ic{width:62px;height:62px;border-radius:17px;display:grid;place-items:center;color:#fff;background:var(--c,var(--hair));overflow:hidden;font-size:26px;}
+  .fios-ic svg{width:28px;height:28px;}
+  .fios-ic img{width:100%;height:100%;object-fit:cover;}
+  .fios-add .fios-ic{background:transparent;border:1.5px dashed var(--hair-2);color:var(--muted);}
+  .fios-n{font-size:12px;font-weight:700;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fios-notes{width:100%;margin-top:16px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--hair);color:var(--text);font:inherit;font-weight:800;cursor:pointer;}
+  .pgs-ic svg{width:17px;height:17px;}

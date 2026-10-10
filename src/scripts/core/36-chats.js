@@ -343,17 +343,31 @@
     if(add) add.hidden=false;
     const list=chatsForFolder(fk).map(c=>({c,last:chatLast(c)})).sort((a,b)=>(b.last?b.last.at:b.c.at)-(a.last?a.last.at:a.c.at));
     host.hidden=false;
-    host.innerHTML=pgHubHTML(fk,list.length)+(!list.length?'':`<div class="pgl-box"><div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
+    host.innerHTML=pgSubHTML(fk)+pgHubHTML(fk,list.length)+(!list.length?'':`<div class="pgl-box"><div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
       `<button class="pgl-row" data-pgchat="${esc(c.id)}" style="--cc:${safeColor(c.c,'var(--accent)')}">
         <span class="pgl-av">${esc(c.emoji||'💬')}</span>
         <span class="pgl-body"><b data-i18n-skip="1">${esc(c.name)}</b><small data-i18n-skip="1">${esc(chatPreview(last&&last.b))}</small></span>
         <small class="pgl-time">${chatTimeLabel(last?last.at:0)}</small></button>`).join('')+`</div>`);
     host.querySelectorAll('[data-pgchat]').forEach(b=>b.onclick=()=>goChat(b.dataset.pgchat,{from:'page',key:fk}));
     host.querySelectorAll('[data-pghub]').forEach(b=>b.onclick=()=>pgHubOpen(fk,b.dataset.pghub));
+    host.querySelectorAll('[data-pgsub]').forEach(b=>b.onclick=()=>{ const ck=b.dataset.pgsub;
+      if(typeof groupKids==='function' && groupKids(ck).length && typeof openGroupAsChosen==='function'){ openGroupAsChosen(ck,fk); return; }
+      window.__fgNext=fk; goFolder(ck); window.__fgNext=null; });
+    const sn=host.querySelector('[data-pgsubnew]'); if(sn) sn.onclick=()=>createFolder(fk);
   }
   /* ── Хаб звʼязків під назвою документа (Д3, 10.10.2026): Гроші · Час · Місія · Чати.
      Лише читає те, що вже позначено папкою (op.folderKey, блок Планера folder, goal.folderKey,
      chat.folders) — формат даних не змінюється. Тап — та шторка, де цим керують. */
+  /* ── підпапки папки рядом плиток над хабом (10.10.2026): видно, лише коли вони є,
+     або коли групу відкривають «як папку». Тап — підпапка, «＋» — нова всередині. */
+  function pgSubHTML(fk){
+    let kids=[]; try{ kids=typeof groupKids==='function'?groupKids(fk):[]; }catch(_){}
+    const f=folders[fk]; if(!kids.length && !(f&&f.gview==='folder')) return '';
+    const t=ck=>{ const k=folders[ck];
+      return `<button class="pgs-t" data-pgsub="${esc(ck)}" style="--c:${safeColor(k.c,'#6a7dff')}"><span class="pgs-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(k))}"/></svg></span><b data-i18n-skip="1">${esc(k.name)}</b><small>${esc(typeof fgSub==='function'?fgSub(ck):'')}</small></button>`; };
+    return `<div class="pg-subs"><div class="pgs-head"><span>Підпапки · ${kids.length}</span><button class="pgs-new" data-pgsubnew>＋ Підпапка</button></div>
+      <div class="pgs-row">${kids.map(t).join('')}</div></div>`;
+  }
   function pgHubData(fk){
     const d={money:null, time:0, mission:null, chats:0};
     try{ const ops=wlMonthOps(wlYm()).filter(o=>String(o.folderKey||'')===String(fk)).filter(opMain);

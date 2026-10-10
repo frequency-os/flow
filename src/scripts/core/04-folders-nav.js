@@ -133,6 +133,8 @@
         cfg[k]={c:f.c,emoji:f.emoji,icon:f.icon||folderIconFor(f.emoji),iconSet:f.iconSet?1:0,name:f.name,photo:f.photo||'',photoPos:f.photoPos||null,flayout:f.flayout||'a',pinned:!!f.pinned,custom:!!f.custom,pct:f.pct||0,parent:f.parent||'',role:f.role||'area',status:f.status||'',due:f.due||''};
         // сфера (39-spheres.js): шаблон і будівля в «Моєму світі»; поле пишемо лише в сфер
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
+        // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
+        if(f.gview==='folder'||f.gview==='ios') cfg[k].gview=f.gview;
       });
       const put=()=>{
         const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
