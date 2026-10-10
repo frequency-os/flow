@@ -12,7 +12,7 @@
      Тап по запису — шторка дій (редагувати, завдання, скопіювати в папку,
      видалити). Прикріплені папки відкриваються документом і повертають сюди. */
   let chKey=null;          // id відкритого чату
-  let chTopic='all';       // 'all' | 'media' (лише фото чату)
+  let chTopic='all';       // 'all' | 'media' (лише фото чату) | 'tasks' (лише завдання — лічильник «Завдання»)
   let chFeedTail=null;     // хвіст намальованої стрічки: куди і з якою датою дописувати (chAppendFeed)
   let chOrigin=null;       // звідки прийшли: {scr:'home'} | {scr:'page', key:папка}
   let chMode='note';       // що створить рядок вводу: 'note' | 'task'
@@ -149,7 +149,7 @@
   }
   function renderChannel(){
     const c=chChat(); if(!c) return;
-    if(chTopic!=='all'&&chTopic!=='media') chTopic='all';
+    if(chTopic!=='all'&&chTopic!=='media'&&chTopic!=='tasks') chTopic='all';
     const scr=document.getElementById('scr-channel');
     scr.style.setProperty('--fc', safeColor(c.c,'var(--accent)'));
     renderChCover(); renderChChips(); renderChFeed();
@@ -165,7 +165,7 @@
       nf?(nf+' '+pluralUk(nf,'папка','папки','папок')):'', nr?(nr+' '+pluralUk(nr,'запис','записи','записів')):''].filter(Boolean).join(' · ');
   }
   // оновити лише підпис — без перемальовування обкладинки (фото не блимає)
-  function chSyncSub(){ const el=document.querySelector('#chCover .ch-sub'); if(el) el.textContent=chSubText(); }
+  function chSyncSub(){ const el=document.querySelector('#chCover .ch-sub'); if(el) el.textContent=chSubText(); try{ renderChChips(); }catch(_){} }   // + лічильники
   function renderChCover(){
     const c=chChat(), el=document.getElementById('chCover'); if(!c||!el) return;
     const api=chCoverApi(); const cov=api?api.get(chBoardKey()):null;
@@ -215,7 +215,15 @@
     const host=document.getElementById('chChips'); if(!host) return;
     const fl=chFolders();
     let h='';
-    if(chTopic==='media') h+=`<button class="ch-chip on" data-chall>${chI('back')}Усі записи</button>`;
+    // лічильники під обкладинкою (нічний макет №10): тап — показати лише це
+    { const its=chItems(), tk=its.filter(it=>it.b.type==='task'||it.b.type==='check'), td=tk.filter(it=>it.b.type==='check'?((it.b.items||[]).length&&(it.b.items||[]).every(x=>x&&x.done)):it.b.done).length, nph=chPhotos().length;
+      const st=(k,n,l,on)=>`<button class="ch-stat${on?' on':''}" data-chstat="${k}" aria-pressed="${!!on}"><b>${n}</b><small>${l}</small></button>`;
+      let sh=document.getElementById('chStats'); if(!sh){ sh=document.createElement('div'); sh.id='chStats'; sh.className='ch-stats'; host.parentNode.insertBefore(sh,host); }
+      sh.innerHTML=st('folders',fl.length,'Папки',false)+st('tasks',tk.length?(tk.length-td)+'/'+tk.length:'0','Завдання',chTopic==='tasks')+st('media',nph,'Медіа',chTopic==='media')+st('all',its.length,'Записи',chTopic==='all');
+      sh.querySelectorAll('[data-chstat]').forEach(b=>b.onclick=()=>{ const k=b.dataset.chstat;
+        if(k==='folders'){ chatAddSheet(chKey); return; }
+        chTopic=k; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); }); }
+    if(chTopic!=='all') h+=`<button class="ch-chip on" data-chall>${chI('back')}Усі записи</button>`;
     h+=`<span class="ch-lbl">Папки</span>`;
     fl.forEach(f=>{ h+=`<button class="ch-chip fold" data-chfold="${esc(f.key)}" data-i18n-skip="1"><span class="e">${esc(f.emoji||'📁')}</span>${esc(f.name)}</button>`; });
     h+=`<button class="ch-chip add" data-chadd aria-label="Додати папку">${chI('plus')}</button>`;
@@ -260,11 +268,15 @@
     if(chTopic==='media'){
       const ph=chPhotos();
       host.innerHTML = ph.length
-        ? `<div class="ch-media">${ph.map(p=>`<button class="ch-mi" data-chopen="${p.bk}|${p.b.id}"><img src="${p.b.data}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`
+        ? `<div class="ch-media">${ph.map(p=>`<button class="ch-mi" data-chopen="${esc(p.bk)}|${esc(p.b.id)}"><img src="${esc(p.b.data)}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`
         : `<div class="ch-empty"><b>Фото ще немає</b><span>Додай через «+» → Фото — і всі знімки чату збиратимуться тут.</span></div>`;
       chBindFeed(host); return;
     }
-    const items=chItems();
+    let items=chItems();
+    if(chTopic==='tasks'){
+      items=items.filter(it=>it.b.type==='task'||it.b.type==='check');
+      if(!items.length){ host.innerHTML=`<div class="ch-empty"><b>Завдань ще немає</b><span>Додай через «+» → Завдання — і всі завдання чату збиратимуться тут.</span></div>`; return; }
+    }
     if(!items.length){
       host.innerHTML=`<div class="ch-empty"><b>Поки порожньо</b><span>Напиши перше повідомлення внизу — воно стане першим записом чату.</span></div>`;
       return;
@@ -326,10 +338,10 @@
       body=`<div class="ch-text ch-quote">${esc(chTxt(b))}</div>`;
     } else if(t==='task'){
       const s=chTxt(b);
-      body=`<div class="ch-task ${b.done?'done':''}"><button class="ch-box" data-chtodo="${it.bk}|${b.id}" aria-label="Виконано">${b.done?chI('check'):''}</button><div class="ch-text">${s?esc(s):'<i class="ch-mut">Завдання…</i>'}</div></div>`;
+      body=`<div class="ch-task ${b.done?'done':''}"><button class="ch-box" data-chtodo="${esc(it.bk)}|${esc(b.id)}" aria-label="Виконано">${b.done?chI('check'):''}</button><div class="ch-text">${s?esc(s):'<i class="ch-mut">Завдання…</i>'}</div></div>`;
     } else if(t==='check'){
       const items=(b.items||[]).filter(x=>x&&(x.text||'').trim());
-      body=`<div class="ch-card">${b.title?`<div class="ch-card-t">${esc(b.title)}</div>`:''}${items.length?items.map(x=>`<div class="ch-task ${x.done?'done':''}"><button class="ch-box" data-chtodo="${it.bk}|${b.id}|${x.id}" aria-label="Виконано">${x.done?chI('check'):''}</button><div class="ch-text">${esc(chPlain(x.text))}</div></div>`).join(''):'<i class="ch-mut">Порожній чекліст</i>'}</div>`;
+      body=`<div class="ch-card">${b.title?`<div class="ch-card-t">${esc(b.title)}</div>`:''}${items.length?items.map(x=>`<div class="ch-task ${x.done?'done':''}"><button class="ch-box" data-chtodo="${esc(it.bk)}|${esc(b.id)}|${esc(x.id)}" aria-label="Виконано">${x.done?chI('check'):''}</button><div class="ch-text">${esc(chPlain(x.text))}</div></div>`).join(''):'<i class="ch-mut">Порожній чекліст</i>'}</div>`;
     } else if(t==='list'||t==='numlist'){
       const items=(b.items||[]).filter(x=>x&&(x.text||'').trim());
       body=`<div class="ch-card">${b.title&&b.title!=='Список'?`<div class="ch-card-t">${esc(b.title)}</div>`:''}${items.map((x,i)=>`<div class="ch-li"><span>${t==='numlist'?(i+1)+'.':'•'}</span><div class="ch-text">${esc(chPlain(x.text))}</div></div>`).join('')}</div>`;
@@ -338,7 +350,7 @@
       // decoding="async" — розкодування фото не блокує прокрутку; lazy — лише
       // для старих (див. chEagerPhotos), останні вантажимо одразу
       body = b.data
-        ? `<div class="ch-photo"><img src="${b.data}" alt="" decoding="async"${eager?'':' loading="lazy"'}${b.h?` style="height:${Math.min(340,Math.max(80,+b.h||0))}px"`:''}></div>${b.title?`<div class="ch-text ch-cap">${esc(b.title)}</div>`:''}`
+        ? `<div class="ch-photo"><img src="${esc(b.data)}" alt="" decoding="async"${eager?'':' loading="lazy"'}${b.h?` style="height:${Math.min(340,Math.max(80,+b.h||0))}px"`:''}></div>${b.title?`<div class="ch-text ch-cap">${esc(b.title)}</div>`:''}`
         : `<div class="ch-link-card"><span class="ch-lc-ic">🖼️</span><div><b>Фото</b><small>без зображення</small></div>${chI('chev')}</div>`;
     } else if(t==='flink'){
       // картка «прикріплено папку» — момент, коли це сталось; тап відкриває документ папки
@@ -354,7 +366,7 @@
     } else {
       body=`<div class="ch-link-card"><span class="ch-lc-ic">${esc(meta.emoji||'🧩')}</span><div><b>${esc(b.title||meta.title||t)}</b><small>${esc(meta.title||t)}</small></div>${chI('chev')}</div>`;
     }
-    return `<div class="ch-msg${cls}${b.ai?' ai':''}" data-chopen="${it.bk}|${b.id}">${tag}${body}${time}</div>`;
+    return `<div class="ch-msg${cls}${b.ai?' ai':''}" data-chopen="${esc(it.bk)}|${esc(b.id)}">${tag}${body}${time}</div>`;
   }
   /* ── AI-чип «Підсумувати тиждень»: той самий aiCall, що аналізує тиждень у щоденнику ── */
   function chAiSync(){
@@ -453,7 +465,7 @@
       if(iid){ const it=(b.items||[]).find(x=>x&&String(x.id)===iid); if(!it) return; it.done=!it.done; }
       else b.done=!b.done;
       saveBoard(); chHaptic('light');
-      const top=document.body.scrollTop; renderChFeed(); document.body.scrollTop=top;
+      const top=document.body.scrollTop; renderChFeed(); document.body.scrollTop=top; try{ renderChChips(); }catch(_){}
     });
     all('[data-chopen]').forEach(el=>el.onclick=(e)=>{
       if(e.target.closest('[data-chtodo]')) return;
@@ -610,7 +622,7 @@
     const bk=chTargetBk(); if(!boards[bk]) boards[bk]=[];
     boards[bk].push(b); saveBoard();
     if(boardKey===bk) syncBlocks();
-    if(chTopic==='media'&&b.type!=='photo'){ chTopic='all'; renderChChips(); }
+    if((chTopic==='media'&&b.type!=='photo')||(chTopic==='tasks'&&b.type!=='task'&&b.type!=='check')){ chTopic='all'; renderChChips(); }
     chAppendFeed(b); chScrollBottom(true); chHaptic('light'); chSyncSub();
   }
   function chSend(){

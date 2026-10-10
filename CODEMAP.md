@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 87 |
-| Рядків JS | 32311 |
+| Рядків JS | 32323 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10233 |
+| Рядків CSS | 10242 |
 | Сутностей верхнього рівня | 2314 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -68,7 +68,7 @@
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
-| `src/scripts/core/35-channel.js` | 691 | 65 |
+| `src/scripts/core/35-channel.js` | 703 | 65 |
 | `src/scripts/core/36-chats.js` | 440 | 46 |
 | `src/scripts/core/37-ai-privacy.js` | 202 | 20 |
 | `src/scripts/core/38-world.js` | 107 | 5 |
@@ -145,7 +145,7 @@
 | `src/styles/core/13-search-capture.css` | 84 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
-| `src/styles/core/18-channel.css` | 178 | 0 |
+| `src/styles/core/18-channel.css` | 187 | 0 |
 | `src/styles/core/19-chats.css` | 202 | 0 |
 | `src/styles/core/20-world.css` | 20 | 0 |
 | `src/styles/core/21-spheres.css` | 82 | 0 |
@@ -1812,34 +1812,34 @@
 | `chCoverSheet` | функція | `src/scripts/core/35-channel.js:192` |
 | `chMoreSheet` | функція | `src/scripts/core/35-channel.js:208` |
 | `renderChChips` | функція | `src/scripts/core/35-channel.js:214` |
-| `chOpenFolder` | функція | `src/scripts/core/35-channel.js:231` |
-| `chFolderChipSheet` | функція | `src/scripts/core/35-channel.js:237` |
-| `chAttachLongPress` | функція | `src/scripts/core/35-channel.js:247` |
-| `renderChFeed` | функція | `src/scripts/core/35-channel.js:257` |
-| `chAppendFeed` | функція | `src/scripts/core/35-channel.js:290` |
-| `chEagerPhotos` | функція | `src/scripts/core/35-channel.js:308` |
-| `chBubble` | функція | `src/scripts/core/35-channel.js:313` |
-| `chAiSync` | функція | `src/scripts/core/35-channel.js:360` |
-| `chAiCollect` | функція | `src/scripts/core/35-channel.js:377` |
-| `chAiSummarize` | функція | `src/scripts/core/35-channel.js:403` |
-| `chBindFeed` | функція | `src/scripts/core/35-channel.js:446` |
-| `chJumpTo` | функція | `src/scripts/core/35-channel.js:468` |
-| `chRecordSheet` | функція | `src/scripts/core/35-channel.js:480` |
-| `chEditRecord` | функція | `src/scripts/core/35-channel.js:499` |
-| `chCopyToFolder` | функція | `src/scripts/core/35-channel.js:520` |
-| `chPickCopyTarget` | функція | `src/scripts/core/35-channel.js:527` |
-| `chDeleteRecord` | функція | `src/scripts/core/35-channel.js:536` |
-| `chInitComposer` | функція | `src/scripts/core/35-channel.js:545` |
-| `chAutoGrow` | функція | `src/scripts/core/35-channel.js:590` |
-| `chSyncSend` | функція | `src/scripts/core/35-channel.js:591` |
-| `chSetMode` | функція | `src/scripts/core/35-channel.js:597` |
-| `chToggleTray` | функція | `src/scripts/core/35-channel.js:603` |
-| `chPushBlock` | функція | `src/scripts/core/35-channel.js:609` |
-| `chSend` | функція | `src/scripts/core/35-channel.js:616` |
-| `chPickFile` | функція | `src/scripts/core/35-channel.js:629` |
-| `chShrink` | функція | `src/scripts/core/35-channel.js:635` |
-| `chVoice` | функція | `src/scripts/core/35-channel.js:646` |
-| `chSheet` | функція | `src/scripts/core/35-channel.js:677` |
+| `chOpenFolder` | функція | `src/scripts/core/35-channel.js:239` |
+| `chFolderChipSheet` | функція | `src/scripts/core/35-channel.js:245` |
+| `chAttachLongPress` | функція | `src/scripts/core/35-channel.js:255` |
+| `renderChFeed` | функція | `src/scripts/core/35-channel.js:265` |
+| `chAppendFeed` | функція | `src/scripts/core/35-channel.js:302` |
+| `chEagerPhotos` | функція | `src/scripts/core/35-channel.js:320` |
+| `chBubble` | функція | `src/scripts/core/35-channel.js:325` |
+| `chAiSync` | функція | `src/scripts/core/35-channel.js:372` |
+| `chAiCollect` | функція | `src/scripts/core/35-channel.js:389` |
+| `chAiSummarize` | функція | `src/scripts/core/35-channel.js:415` |
+| `chBindFeed` | функція | `src/scripts/core/35-channel.js:458` |
+| `chJumpTo` | функція | `src/scripts/core/35-channel.js:480` |
+| `chRecordSheet` | функція | `src/scripts/core/35-channel.js:492` |
+| `chEditRecord` | функція | `src/scripts/core/35-channel.js:511` |
+| `chCopyToFolder` | функція | `src/scripts/core/35-channel.js:532` |
+| `chPickCopyTarget` | функція | `src/scripts/core/35-channel.js:539` |
+| `chDeleteRecord` | функція | `src/scripts/core/35-channel.js:548` |
+| `chInitComposer` | функція | `src/scripts/core/35-channel.js:557` |
+| `chAutoGrow` | функція | `src/scripts/core/35-channel.js:602` |
+| `chSyncSend` | функція | `src/scripts/core/35-channel.js:603` |
+| `chSetMode` | функція | `src/scripts/core/35-channel.js:609` |
+| `chToggleTray` | функція | `src/scripts/core/35-channel.js:615` |
+| `chPushBlock` | функція | `src/scripts/core/35-channel.js:621` |
+| `chSend` | функція | `src/scripts/core/35-channel.js:628` |
+| `chPickFile` | функція | `src/scripts/core/35-channel.js:641` |
+| `chShrink` | функція | `src/scripts/core/35-channel.js:647` |
+| `chVoice` | функція | `src/scripts/core/35-channel.js:658` |
+| `chSheet` | функція | `src/scripts/core/35-channel.js:689` |
 
 ### `src/scripts/core/36-chats.js` — 46 сутностей
 

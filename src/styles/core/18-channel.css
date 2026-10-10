@@ -176,3 +176,12 @@
     .ch-cover{border-radius:22px;}
   }
   @media (min-width:1380px){ #scr-channel{margin-left:-72px;margin-right:-72px;} }
+
+  /* лічильники чату під обкладинкою (нічний макет №10): Папки · Завдання · Медіа · Записи, тап — фільтр */
+  .ch-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px 12px 0;}
+  .ch-stat{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:56px;padding:8px 10px;border-radius:14px;
+    background:color-mix(in srgb,var(--text) 6%,transparent);border:1px solid var(--line);color:var(--text);}
+  .ch-stat b{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .ch-stat small{font-size:11.5px;font-weight:700;color:var(--muted);}
+  .ch-stat.on{border-color:var(--fc,var(--accent));background:color-mix(in srgb,var(--fc,var(--accent)) 18%,transparent);}
+  .ch-stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
