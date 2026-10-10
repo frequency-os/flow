@@ -82,7 +82,27 @@
   try{ window.folderIconFor=folderIconFor; }catch(_){}
 
   // видимість папки: Vault (сховані папки за PIN) вирізано 04.09.2026 — усі папки видимі
-  function folderVisible(k){ return !!folders[k]; }
+  /* «Скасувати» після видалення (В3, 10.10.2026): справжнє видалення (надгробок, прибирання,
+     запис) відкладається на 10 с; до того папка лише схована з екрана. Закрили застосунок раніше —
+     папка лишається: помилка в бік збереження, синк нічого не встигає побачити. */
+  const folderDelPending={};
+  function folderVisible(k){ return !!folders[k] && !folderDelPending[k]; }
+  function folderDeleteLater(key, ms){
+    if(!folders[key] || !folders[key].custom) return false;
+    if(folderDelPending[key]) clearTimeout(folderDelPending[key]);
+    folderDelPending[key]=setTimeout(()=>{ delete folderDelPending[key]; folderDelete(key); try{ renderDashboard(); }catch(_){} }, ms||10000);
+    // документ цієї папки відкритий — на Огляд
+    try{ const act=document.querySelector('.screen.active'); const base=String(boardKey||'').split('__sp_')[0];
+      if(act && act.id==='scr-page' && base===key) goHome(); }catch(_){}
+    try{ renderDashboard(); }catch(_){}
+    return true;
+  }
+  function folderDeleteCancel(key){
+    if(!folderDelPending[key]) return false;
+    clearTimeout(folderDelPending[key]); delete folderDelPending[key];
+    try{ renderDashboard(); }catch(_){}
+    return true;
+  }
 
   /* ═══════ ЗАПОБІЖНИК ВІД ВТРАТИ ПАПОК ═══════
      Історія бага: якщо локальної копії не було (iOS вичистив кеш, інший

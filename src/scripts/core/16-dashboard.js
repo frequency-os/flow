@@ -1072,7 +1072,10 @@
     // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
     // губився б мовчки. Автоматичну — переобираємо під нове емодзі.
     if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; if(!f.iconSet) f.icon=folderIconFor(v); saveFolders(); renderDashboard(); }}); return; }
-    if(act==='delete'){ confirmSheet({title:'Видалити папку «'+f.name+'»?', onOk:()=>{ folderDelete(key); renderDashboard(); closeFolderMenu(); }}); return; }   // з документом, темами, фото й посиланнями чатів — і надгробком для інших пристроїв
+    if(act==='delete'){ const nm=f.name; confirmSheet({title:'Видалити папку «'+nm+'»?',
+      sub:'Зникнуть документ папки, її обкладинка й фото, звʼязки з чатами. Протягом 10 секунд можна повернути.',
+      onOk:()=>{ closeFolderMenu(); folderDeleteLater(key,10600);   // трохи довше за тост — «Повернути» на самому краю ще спрацює
+        try{ window.flowUndoToast('Папку «'+nm+'» видалено', ()=>folderDeleteCancel(key), 10000); }catch(_){} }}); return; }   // з документом, темами, фото й посиланнями чатів — і надгробком для інших пристроїв
   }
   function pickFolderPhoto(key){
     const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';

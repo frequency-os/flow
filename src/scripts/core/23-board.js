@@ -203,7 +203,7 @@
   /* той самий тост «Видалено · ↩ Повернути» для дрібних видалень поза дошкою
      (задача планера, крок, пункт біля чекбокса): маленький «×» стирає одразу,
      без підтвердження — тож даємо 5 с усе повернути. restore — як саме повернути. */
-  function flowUndoToast(msg, restore){
+  function flowUndoToast(msg, restore, ms){
     if(typeof restore!=='function') return;
     undoSnapshot={ restore };
     const t=document.getElementById('undoToast');
@@ -211,7 +211,7 @@
     if(m) m.textContent=msg||'Видалено';
     if(t){ t.classList.add('show'); }
     if(undoTimer) clearTimeout(undoTimer);
-    undoTimer=setTimeout(hideUndo,5000);
+    undoTimer=setTimeout(hideUndo,ms||5000);
   }
   window.flowUndoToast=flowUndoToast;
   function hideUndo(){ const t=document.getElementById('undoToast'); if(t) t.classList.remove('show'); }
