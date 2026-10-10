@@ -48,7 +48,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-10-0118-5e59d1a';
+  var BUILD='2026-10-10-1003-a13fd65';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -7726,6 +7726,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .wl-envpick button span{font-size:22px;} .wl-envpick button small{font-size:11px;font-weight:700;color:var(--text);max-width:68px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .wl-envpick button i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;}
   .wl-envpick button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 28%,var(--card));}
+  /* Apple Pay через Команди (50-quickadd.js) */
+  .qa-steps{margin:10px 0;padding-left:20px;display:flex;flex-direction:column;gap:7px;font-size:14px;line-height:1.45;color:var(--text);}
+  .qa-steps code{font-size:12.5px;background:var(--field,rgba(127,127,127,.15));padding:1px 5px;border-radius:6px;}
+  .qa-url{font:600 12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;padding:10px 12px;border-radius:12px;background:var(--card);border:1px dashed var(--line);color:var(--text);margin-bottom:10px;}
+  .wl-fromlink{padding:9px 12px;border-radius:12px;font-size:13px;font-weight:700;line-height:1.4;color:var(--text);background:color-mix(in srgb,#f0b429 22%,var(--card));border:1px solid color-mix(in srgb,#f0b429 50%,var(--line));margin-bottom:8px;}
+  /* .jn-f має display:flex — без цього [hidden] (місія / конверт для іншої валюти) не ховався */
+  .jn-ed .jn-f[hidden]{display:none;}
   /* ============ ПРАВИЛА ГРИ (47-rules.js): пропозиції, Книга правил, розподіл зарплати, план місяця ============ */
   .rl-offer{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:1250;max-width:460px;margin:0 auto;padding:14px 14px 12px;border-radius:20px;
     background:var(--card);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.35);animation:rlUp .28s ease-out;}
@@ -7780,6 +7787,28 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .rl-pr-n b{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .rl-pr-n small{font-size:11.5px;color:var(--muted);}
   .rl-pr>b{flex:none;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;} .rl-pr>b.in{color:var(--hab,#34c77b);} .rl-pr>b.out{color:var(--text);}
   .rl-pr.ok .rl-pr-d{background:color-mix(in srgb,#34c77b 25%,transparent);color:#34c77b;} .rl-pr.ok .rl-pr-n small{color:#34c77b;}
+  /* фінансові звички і «Школа грошей» (49-finlit.js) */
+  .fl-rev{padding:14px;border-radius:20px;margin:10px 0;background:linear-gradient(135deg,color-mix(in srgb,#7f8cff 18%,var(--card)),var(--card));border:1px solid var(--line);}
+  .fl-rev.good{background:linear-gradient(135deg,color-mix(in srgb,#34c77b 20%,var(--card)),var(--card));}
+  .fl-rev-h{display:flex;align-items:center;gap:8px;} .fl-rev-h span{font-size:18px;} .fl-rev-h b{flex:1;font-size:15px;font-weight:800;color:var(--text);}
+  .fl-rev-h button{all:unset;cursor:pointer;width:44px;height:36px;display:grid;place-items:center;margin:-8px -8px -8px 0;color:var(--muted);}
+  .fl-rev-k{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;}
+  .fl-rev-k span{display:flex;flex-direction:column;gap:1px;} .fl-rev-k small{font-size:11px;color:var(--muted);font-weight:700;} .fl-rev-k b{font-size:15px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;}
+  .fl-rev-bar{position:relative;height:8px;border-radius:9px;background:var(--field,rgba(127,127,127,.18));overflow:visible;}
+  .fl-rev-bar i{display:block;height:100%;border-radius:inherit;background:#34c77b;}
+  .fl-rev-bar u{position:absolute;top:-3px;width:2px;height:14px;background:var(--text);opacity:.5;}
+  .fl-rev p{margin:8px 0 0;font-size:13.5px;line-height:1.45;color:var(--text);}
+  .fl-cush{padding:13px 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);margin-bottom:8px;display:flex;flex-direction:column;gap:7px;}
+  .fl-cush-h{display:flex;align-items:center;gap:8px;} .fl-cush-h span{font-size:20px;} .fl-cush-h b{flex:1;font-size:15px;font-weight:800;color:var(--text);} .fl-cush-h small{font-size:12px;color:var(--muted);}
+  .fl-cush-n{display:flex;flex-direction:column;gap:1px;} .fl-cush-n b{font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;} .fl-cush-n small,.fl-cush-e{font-size:12.5px;color:var(--muted);}
+  .fl-school{display:flex;flex-direction:column;gap:6px;}
+  .fl-l{border-radius:16px;background:var(--card);border:1px solid var(--line);padding:0 14px;}
+  .fl-l summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:52px;}
+  .fl-l summary::-webkit-details-marker{display:none;}
+  .fl-l summary span{font-size:20px;} .fl-l summary b{flex:1;font-size:15px;font-weight:800;color:var(--text);} .fl-l summary i{font-style:normal;color:var(--muted);transition:transform .2s;}
+  .fl-l[open] summary i{transform:rotate(90deg);}
+  .fl-l p{margin:0 0 10px;font-size:14px;line-height:1.5;color:var(--text);}
+  .fl-l .mo-set{margin-bottom:12px;} .fl-on{display:block;font-size:12.5px;color:#34c77b;font-weight:700;margin-bottom:12px;}
   /* ============ ВІДЖЕТИ «ГРОШІ» (48-widgets.js): вигляд A «Плитки», як віджети iPhone ============ */
   .wg-home{margin:4px 0 14px;}
   .wg-home[hidden]{display:none;}
@@ -7798,6 +7827,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .wg-t.c-debt{background:linear-gradient(135deg,#ff4d6d,#ff7a59);}
   .wg-t.c-in{background:linear-gradient(135deg,#0f9d77,#34c77b);}
   .wg-t.c-out{background:linear-gradient(135deg,#d9480f,#ff7a59);}
+  .wg-t.c-work{background:linear-gradient(135deg,#3a7bd5,#4ecdc4);}
   .wg-t.c-none{background:var(--card);color:var(--muted);border:1px solid var(--line);}
   /* весь віджет — одна велика ціль тапу; кнопки й рядки лежать вище за неї */
   .wg-hit{all:unset;position:absolute;inset:0;cursor:pointer;z-index:0;border-radius:inherit;}
@@ -9082,7 +9112,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     'space_purge_v1','legacy_widgets_purge_v1','theme_flat_default_v1',
     'ai_agent','ai_dev','ai_usage','ai_brief_ds','ai_week_ds','pet3d','pet3d_fx','pet_say_i','rit_auto',
     'rrail_cfg','pg_wide','fd_isl','fd_wake','fd_tts','fd_tts_voice','fd26t','flow_dev','dev_translate_content',
-    'flowPgLastBlock','flowPgRecentBlocks','flowPageThemeChoice','__flow_snapshot__','__flow_wipe_idb__','__devtest','flow_yr_mx_open'];
+    'flowPgLastBlock','flowPgRecentBlocks','flowPageThemeChoice','__flow_snapshot__','__flow_wipe_idb__','__devtest','flow_yr_mx_open','flow_fl_review'];
 
   /* ═══════════════════════════════════════════════════════════════════
      I18N: перемикач мови UI (uk/en) + переклад контенту в dev-режимі
@@ -14334,8 +14364,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     return e;
   }
   function envSaved(e){ envMigrate(e); const v=e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0); e.saved=v; return v; }
-  function envTotalSaved(){ return envelopes.reduce((s,e)=>s+envSaved(e),0); }
+  function envTotalSaved(){ return envelopes.reduce((s,e)=>s+(envCur(e)?0:envSaved(e)),0); }   // лише головна валюта
 
+  /* Валюта конверта (етап 3 валют, 10.10.2026): e.cur — код неголовної валюти; без нього (усі старі) — головна.
+     Рух конверта йде в баланс ТІЄЇ Ж валюти: op.cur на віддзеркаленні у finOps. */
+  function envCur(e){ const c=e&&e.cur; return c&&curOk(c)&&c!==mainCur()?c:''; }
+  // вільні гроші у валюті c ('' — головна)
+  function curFree(c){ try{ return c?curBalance(c):walletBalance(); }catch(_){ return 0; } }
   // додати рух у конверт + віддзеркалити у finOps (вплив на Дохід/Розхід/Баланс)
   function envAddOp(e, t, amount, label, cardId){
     envMigrate(e);
@@ -14350,6 +14385,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const fo={ id:finId, type:'out', amount, label:finLabel, date, env:e.name, envId:e.id };
     if(t==='in'){ try{ fo.card = cardId || e.cardId || (cards.length?mainCard().id:undefined); }catch(_){} }
     else { fo.envSpend=true; }
+    { const ec=envCur(e); if(ec) fo.cur=ec; }   // €-конверт — у €-балансі
     finOps.push(fo);
     saveEnvelopes(); saveFinOps();
     try{ flowReact(t==='in'?'save':'spend',{amount:amount}); }catch(_){}
@@ -14688,7 +14724,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const ym=ymLocal(), m=monthAgg(ym);
     const mi=parseInt(ym.slice(5,7),10)-1;
     const saved=envTotalSaved();
-    const goalSum=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
+    const goalSum=envelopes.reduce((s,e)=>s+(envCur(e)?0:(+e.goal||0)),0);
     const ops=finOps.slice().reverse().slice(0,8);
     let debts='—'; try{ debts=debtSummary(); }catch(_){}
     const envTop=envelopes.slice(0,4);
@@ -14763,7 +14799,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // ===== Envelopes sub-screen (grid + recurring) =====
   function renderEnvScreen(body){
     const tot=envTotalSaved();
-    const goalSum=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
+    const goalSum=envelopes.reduce((s,e)=>s+(envCur(e)?0:(+e.goal||0)),0);
     body.innerHTML=`
       <button class="back" id="envScreenBack" style="--c:var(--skl);margin-bottom:14px">‹ Фінанси</button>
       <div class="env2-tot"><div><div class="l">Накопичено у конвертах</div></div>
@@ -14774,14 +14810,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const col=safeColor(e.color,'#5b8def');
         const outs=(e.ops||[]).filter(o=>o.t==='out'&&!o.back).length;
         const kind=e.kind||(e.wishId?'мрія':'ціль');
-        const tags=[`🎯 ${esc(kind)}`]; if(outs) tags.push(`${outs} витрат`);
+        const tags=[`🎯 ${esc(kind)}`]; if(outs) tags.push(`${outs} витрат`); if(envCur(e)) tags.unshift(esc(curSym(envCur(e))));
         const cover=e.cover||e.wishImg||'';
         return `<div class="env2 ${(e.wishId||cover)?'wishlinked':''}" style="--ec:${col}" data-envopen="${esc(e.id)}">
           ${cover?`<div class="e2cover" style="background-image:url('${safeImg(cover)}')"></div>`:''}
           <div class="e2water" style="height:0" data-e2fill="${pct}"></div>
           <div class="e2top"><span class="e2em">${safeEmoji(e.emoji,'✉️')}</span><span class="e2pct">${pct}%</span></div>
           <div class="e2nm">${esc(e.name)}</div>
-          <div class="e2amt">${fmt(sv)} / ${money(e.goal||0)}</div>
+          <div class="e2amt">${fmt(sv)} / ${esc(money(e.goal||0,envCur(e)))}</div>
           <div class="e2tags">${tags.map(t=>`<span class="e2tg">${t}</span>`).join('')}</div>
         </div>`;
       }).join('')}
@@ -15016,7 +15052,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const e=envelopes.find(x=>String(x.id)===String(envOpenId)); if(!e){ closeEnvSheet(); return; }
     envMigrate(e);
     const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-    const left=Math.max(0,(e.goal||0)-sv);
+    const left=Math.max(0,(e.goal||0)-sv), ec=envCur(e);
     const col=safeColor(e.color,'#5b8def');
     const kind=e.kind||(e.wishId?'мрія':'ціль');
     const cover=e.cover||e.wishImg||'';
@@ -15028,10 +15064,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <div class="e2htop"><span class="e2chip">🎯 ${esc(kind)}</span><span class="e2chip">${pct}%</span></div>
         <div class="e2htxt">
           <div class="e2nm2">${safeEmoji(e.emoji,'✉️')} ${esc(e.name)}</div>
-          <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${money(e.goal||0)}</div>
+          <div class="e2sub">${e.wishId?'звʼязано з Картою мрій · ':''}ціль ${esc(money(e.goal||0,ec))}</div>
           <div class="e2prog"><i style="width:${pct}%"></i></div>
-          <div class="e2nums"><div class="n">${money(sv)}<small>накопичено</small></div>
-            <div class="n" style="text-align:right">${money(left)}<small>лишилось</small></div></div>
+          <div class="e2nums"><div class="n">${esc(money(sv,ec))}<small>накопичено</small></div>
+            <div class="n" style="text-align:right">${esc(money(left,ec))}<small>лишилось</small></div></div>
         </div>
       </div>
       <div class="e2body">
@@ -15040,32 +15076,39 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           <button class="out" id="e2Out">− Витрата на ціль<small>піде в Розходи</small></button>
         </div>
         <div class="e2secl"><span>Рухи (${e.ops.length})</span><span>усе по конверту</span></div>
-        ${e.ops.length? e.ops.map(o=>`<div class="e2op" data-eopdel="${o.id}">
+        ${e.ops.length? e.ops.map(o=>`<div class="e2op" data-eopdel="${esc(o.id)}">
           <div class="l"><span class="ic">${o.t==='in'?'⬆️':'⬇️'}</span>
             <div>${esc(o.label||'')}<s>${esc(o.date||'')}</s></div></div>
-          <b class="${o.t}">${o.t==='in'?'+':'−'}${money(o.amount)}</b></div>`).join('')
+          <b class="${o.t==='in'?'in':'out'}">${o.t==='in'?'+':'−'}${esc(money(o.amount,ec))}</b></div>`).join('')
           : `<div class="fh-empty">Ще немає рухів. Поповни конверт або запиши витрату.</div>`}
         <div class="e2edit">
           <button id="e2Name">✎ Назва</button>
           <button id="e2Goal">🎯 Ціль</button>
-          <button id="e2Card">💳 Картка</button>
+          ${(typeof wlCurList==='function'&&wlCurList().length)||ec?`<button id="e2Cur">💱 ${esc(curSym(ec))}</button>`:`<button id="e2Card">💳 Картка</button>`}
           <button id="e2Del" class="e2del">Видалити</button>
         </div>
       </div>`;
     s.querySelector('#e2In').onclick=()=>{
-      const ask=(c)=>inputModal({title:'Поповнити «'+e.name+'» ('+cardSym(c)+')', placeholder:'Сума', onOk:(v)=>{
+      const ask=(c)=>inputModal({title:'Поповнити «'+e.name+'» ('+curSym(ec)+')', placeholder:'Сума · вільно '+money(curFree(ec),ec), onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
+        if(n>curFree(ec)+1e-9){ flowAlert('Вільно лише '+money(curFree(ec),ec)+'. Нічого не записано.'); return; }   // конверт — гроші з вільних, не в борг
         envAddOp(e,'in',n,'З картки: '+c.name,c.id); renderEnvSheet(); renderFinance();
       }});
       ask(mainCard());
     };
     s.querySelector('#e2Out').onclick=()=>inputModal({title:'Витрата на «'+e.name+'»', placeholder:'На що…', onOk:(label)=>{
-      inputModal({title:'Сума витрати ('+curSym()+')', placeholder:'Напр. 500', onOk:(v)=>{
+      inputModal({title:'Сума витрати ('+curSym(ec)+')', placeholder:'Напр. 500', onOk:(v)=>{
         const n=parseFloat((v||'').replace(',','.').replace(/[^\d.]/g,'')); if(!(n>0)) return;
         envAddOp(e,'out',n,label||'Витрата'); renderEnvSheet(); renderFinance();
       }});
     }});
     s.querySelector('#e2Name').onclick=()=>inputModal({title:'Назва конверта', value:e.name, onOk:(v)=>{ if((v||'').trim()){ e.name=v.trim(); saveEnvelopes(); renderEnvSheet(); renderFinance(); } }});
+    { const cu=s.querySelector('#e2Cur'); if(cu) cu.onclick=()=>{
+      // валюту міняємо лише порожньому конверту: інакше старі рухи опинились би в чужому балансі
+      if(e.ops.length){ flowAlert('Валюту можна змінити лише в новому конверті без рухів. Створи окремий конверт у потрібній валюті.'); return; }
+      const opts=[mainCur()].concat(typeof wlCurList==='function'?wlCurList():[]);
+      actionSheet({title:'Валюта конверта', sub:'Поповнення й витрати йдуть з балансу цієї валюти.', items:opts.map(c=>({ic:c===(ec||mainCur())?'target':'refresh', label:curSym(c)+'  '+((CUR_LIST[c]||{}).n||c)+(c===mainCur()?' · головна':''), onClick:()=>{ if(c===mainCur()) delete e.cur; else e.cur=c; saveEnvelopes(); renderEnvSheet(); renderFinance(); }}))});
+    }; }
     { const cb=s.querySelector('#e2Card'); if(cb) cb.onclick=()=>{
       ensureCards();
       actionSheet({ title:'Картка для поповнень', sub:e.cardId?('Зараз: '+((cardById(e.cardId)||{}).name||'—')):'Зараз: питати щоразу',
@@ -15074,7 +15117,20 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       });
     }; }
     s.querySelector('#e2Goal').onclick=()=>inputModal({title:'Ціль конверта ('+curSym()+')', value:String(e.goal||0), onOk:(v)=>{ const n=parseInt((v||'').replace(/\D/g,'')); if(!isNaN(n)){ e.goal=n; saveEnvelopes(); renderEnvSheet(); renderFinance(); } }});
-    s.querySelector('#e2Del').onclick=()=>{ confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'Рухи в Розходах залишаться.', onOk:()=>{ envelopes=envelopes.filter(x=>String(x.id)!==String(e.id)); saveEnvelopes(); closeEnvSheet(); renderFinance(); }}); };
+    s.querySelector('#e2Del').onclick=()=>{
+      // 10.10.2026: гроші в конверті вже списані з балансу (рух «У конверт») — без повернення вони б зникли.
+      // Повертаємо залишок у вільні переказом (_tr: не дохід), як скарбничка призу, і лише тоді видаляємо.
+      if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))){ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); return; }   // інакше стара копія ляже поверх хмари
+      const sv=Math.round(envSaved(e)*100)/100;
+      const del=()=>{ envelopes=envelopes.filter(x=>String(x.id)!==String(e.id)); saveEnvelopes(); closeEnvSheet(); renderFinance(); };
+      if(sv>0) confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'У ньому '+money(sv,envCur(e))+' — вони повернуться у вільні гроші. Історія витрат лишиться.', okLabel:'Повернути '+money(sv,envCur(e))+' і видалити', onOk:()=>{
+        let card; try{ card=mainCard().id; }catch(_){}
+        const bo={id:'fin_'+Date.now()+Math.random().toString(36).slice(2,6), type:'in', amount:sv, label:'З конверта: '+e.name, date:ymdLocal(), env:e.name, card, _tr:true, envBack:true};
+        if(envCur(e)) bo.cur=envCur(e);   // повертаємо в баланс валюти конверта
+        finOps.push(bo);
+        saveFinOps(); del(); try{ plToast('↩ '+money(sv,envCur(e))+' повернуто у вільні'); }catch(_){} }});
+      else confirmSheet({title:'Видалити конверт «'+e.name+'»?', sub:'Він порожній. Історія витрат лишиться.', onOk:del});
+    };
     s.querySelectorAll('[data-eopdel]').forEach(el=>el.onclick=()=>{ confirmSheet({title:'Видалити цей рух?', onOk:()=>{ envDelOp(e, el.dataset.eopdel); renderEnvSheet(); renderFinance(); }}); });
   }
 
@@ -17988,6 +18044,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const frag=String(inp.envelope||'').toLowerCase().trim();
       const e=(envelopes||[]).find(x=>String(x.name||'').toLowerCase().includes(frag)&&frag);
       if(!e) return '⚠️ конверт не знайдено. Є: '+(envelopes||[]).map(x=>x.name).join('; ');
+      if(typeof envCur==='function'&&envCur(e)) return '⚠️ конверт «'+e.name+'» у валюті '+envCur(e)+' — рухи в ньому людина записує сама в Гаманці. Нічого не змінено.';
       envAddOp(e, a==='env_deposit'?'in':'out', amt, label||undefined);
       try{ renderFinance(); }catch(_){}
       try{ plToast('🤖 конверт «'+e.name+'»: '+(a==='env_deposit'?'+':'-')+amt); }catch(_){}
@@ -21069,7 +21126,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     try{
       if(link && link.type==='fin' && link.envId && link.amount>0){
         const e=(envelopes||[]).find(x=>x.id===link.envId);
-        if(e){ envAddOp(e,'in',link.amount, b.t||'Дохід із блоку'); msg='💰 +'+money(link.amount)+' у «'+e.name+'»'; }
+        if(e&&typeof envCur==='function'&&envCur(e)) msg='✓ Виконано · «'+e.name+'» у іншій валюті — запиши суму в Гаманці';   // гривнева сума блоку не йде в €-конверт
+        else if(e){ envAddOp(e,'in',link.amount, b.t||'Дохід із блоку'); msg='💰 +'+money(link.amount)+' у «'+e.name+'»'; }
       } else if(link && (link.type==='habit'||link.type==='goalstep') && link.goalId){
         const g=(goalsData.goals||[]).find(x=>(x.id||x.name)===link.goalId);
         if(g){
@@ -21274,7 +21332,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // ── зв'язок: тип → залежні поля
     const linkTypeSel=ov.querySelector('#pbLinkType');
     const linkExtra=ov.querySelector('#pbLinkExtra');
-    const envs=(typeof envelopes!=='undefined'&&Array.isArray(envelopes))?envelopes:[];
+    const envs=(typeof envelopes!=='undefined'&&Array.isArray(envelopes))?envelopes.filter(e=>!(typeof envCur==='function'&&envCur(e))):[];   // лише головна валюта
     function renderLinkExtra(){
       const tp=linkTypeSel.value;
       const curLink=(b&&b.link)||{};
@@ -23075,6 +23133,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(workPostedSal['planDone:'+ymKey]==='1') return;
     let moved=false;
     envelopes.forEach(e=>{
+      if(typeof envCur==='function'&&envCur(e)) return;   // €-конверт: заплановане в гривнях не переносимо сам (етап 3 валют)
       const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
       if(p>0){
         if(typeof envAddOp==='function'){ let _wc2; try{ ensureCards(); _wc2=workCard().id; }catch(_){} envAddOp(e,'in',p,'Із зарплати ('+ymKey+')',_wc2); }
@@ -23100,7 +23159,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       flowAlert('Спершу створи конверти у Фінансах → ✉️ Конверти (напр. «Подушка», «Оренда»).'); return;
     }
     const list=document.getElementById('allocList');
-    list.innerHTML=envelopes.map(e=>{
+    list.innerHTML=envelopes.filter(e=>!(typeof envCur==='function'&&envCur(e))).map(e=>{   // лише головна валюта
       const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
       const goalTxt=e.goal?`ціль ${fmt(e.goal)} · є ${fmt(e.saved||0)}`:`є ${fmt(e.saved||0)}`;
       return `<div class="alloc-env">
@@ -27189,7 +27248,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* ── живі значення зі звʼязаних модулів (нічого не копіюємо — читаємо напряму) ── */
   function vzFin(){ try{
     const base=(fx&&fx.base)||'UAH'; const sym=(typeof CUR==='object'&&CUR[base])||'₴';
-    const tot=envTotalSaved(); const goal=envelopes.reduce((s,e)=>s+(+e.goal||0),0);
+    const tot=envTotalSaved(); const goal=envelopes.reduce((s,e)=>s+(typeof envCur==='function'&&envCur(e)?0:(+e.goal||0)),0);
     return { bal:fmt(finBalance())+' '+sym, envPct:goal?Math.min(100,Math.round(tot/goal*100)):null };
   }catch(_){ return {bal:'—', envPct:null}; } }
   function vzDay(){ try{ const l=plBlocksFor(plTodayStr());
@@ -27952,6 +28011,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
             <div class="acc-rtext"><div class="acc-rtitle">Головна валюта</div><div class="acc-rsub">${escA(curSym()+' '+((CUR_LIST[mainCur()]||{}).n||mainCur()))} ${curLocked()?' · зафіксована':' · у ній Гаманець, віджети, призи, План'}</div></div>
             ${chev()}
           </div>
+          <div class="acc-row" data-acc-finreset role="button" tabindex="0">
+            ${ico('reset','red')}
+            <div class="acc-rtext"><div class="acc-rtitle">Почати фінанси з нуля</div><div class="acc-rsub">стерти операції, конверти, План і цілі місяця — місії, Журнал, папки, борги й години Роботи лишаються</div></div>
+            ${chev()}
+          </div>
           <div class="acc-row" data-acc-oldw role="button" tabindex="0">
             ${ico('backup','slate')}
             <div class="acc-rtext"><div class="acc-rtitle">Старі віджети</div><div class="acc-rsub">прибрати старі «Фінанси», «Конверт», «Проєкт», «Фестиваль», KPI зі сторінок папок</div></div>
@@ -28032,6 +28096,18 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
       const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
       { const cr=host.querySelector('[data-acc-cur]'); if(cr) cr.onclick=()=>curPickSheet(()=>{ try{ renderAccount(); }catch(_){} }); }   // 08-finance.js
+      { const fr=host.querySelector('[data-acc-finreset]'); if(fr) fr.onclick=()=>{   // 51-money-reset.js
+        if(typeof finResetScan!=='function') return;
+        if(!finResetReady()){ try{ plToast('Дані ще звіряються з хмарою — спробуй за хвилину'); }catch(_){} return; }
+        const r=finResetScan(), parts=[r.ops+' операцій', r.envs+' конвертів і скарбничок'];
+        if(r.recs) parts.push(r.recs+' регулярних платежів'); if(r.plans||r.goals) parts.push('План і цілі місяця'); if(r.curs) parts.push(r.curs+' інших валют');
+        actionSheet({title:'Почати фінанси з нуля?', sub:'Зникне: '+parts.join(', ')+'. Місії, Журнал, папки, борги й години Роботи лишаються. Скасувати не можна — спершу збережи бекап. На інших пристроях спершу онови Frequency й нічого там не записуй, доки вони не підтягнуть зміни — інакше старі записи можуть повернутися.',
+          items:[
+            {ic:'down', label:'Спершу бекап у файл', sub:'збереже всі дані, потім натисни ще раз', onClick:()=>{ try{ Promise.resolve(exportRun(false)).catch(e=>{ console.error('export',e); try{ plToast('Бекап не вдався — не стирай, спробуй ще раз'); }catch(_){} }); }catch(e){ console.error('export',e); try{ plToast('Бекап не вдався — не стирай'); }catch(_){} } }},
+            {ic:'trash', label:'Стерти гроші й почати з нуля', danger:true, onClick:()=>confirmSheet({title:'Точно стерти всі гроші?', sub:'Гаманець стане ₴0, конверти зникнуть. Це остаточно.', okLabel:'Стерти назавжди', onOk:()=>{
+              Promise.resolve(finResetAll()).then(ok=>{ if(ok){ try{ plToast('🧹 Фінанси з нуля — додай стартовий залишок у Гаманці'); }catch(_){} try{ renderAccount(); }catch(_){} } }); }})}
+          ]});
+      }; }
       { const ow=host.querySelector('[data-acc-oldw]'); if(ow) ow.onclick=()=>{ try{ wgOldCleanup(); }catch(e){ console.error('wgOldCleanup',e); } }; }   // 48-widgets.js
 
       // ── скидання до заводських ──
@@ -31320,7 +31396,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       dows:Array.isArray(sc.dows)?sc.dows.slice():[], min:+sc.min||45, h:typeof sc.h==='number'?sc.h:18,
       start:sc.start||ymdLocal(), end:sc.end||'', plan:sc.plan!==false,
       hWeek:(gl&&gl.budget&&+gl.budget.hWeek)||'', money:(gl&&gl.budget&&+gl.budget.money)||'',
-      rt:(gl&&gl.reward&&gl.reward.t)||'', rs:(gl&&gl.reward&&+gl.reward.sum)||'', re:(gl&&gl.reward&&gl.reward.emoji)||'', rl:(gl&&gl.reward&&gl.reward.lv)||'', folderKey:gl?gl.folderKey||null:null };
+      rt:(gl&&gl.reward&&gl.reward.t)||'', rs:(gl&&gl.reward&&+gl.reward.sum)||'', rc:(gl&&gl.reward&&typeof pzCur==='function'?pzCur(gl):'')||mainCur(), re:(gl&&gl.reward&&gl.reward.emoji)||'', rl:(gl&&gl.reward&&gl.reward.lv)||'', folderKey:gl?gl.folderKey||null:null };
     const seg=(name,opts,val)=>`<div class="jn-seg" data-seg="${name}">${opts.map(([v,l])=>`<button class="${val===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div>`;
     const lvRow=(m,i)=>`<div class="jn-lv${m.done?' done':''}" data-i="${i}"><button class="jn-lv-ck" data-lvck="${i}" aria-label="Досягнуто">${m.done?'✓':''}</button>
       <input value="${esc(m.t)}" data-lvt="${i}" maxlength="80" placeholder="Рівень, напр. B1"><input type="date" value="${esc(m.due)}" data-lvd="${i}">
@@ -31345,13 +31421,15 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <label class="jn-f"><span>${curSym()} / місяць</span><input type="number" id="jnMoney" min="0" step="100" value="${esc(String(d.money))}" placeholder="0"></label></div>
       <div class="jn-f pz-ed"><span>🎁 Приз за місію</span>
         <div class="jn-row"><input class="jn-emo" id="jnRE" maxlength="4" value="${esc(d.re)}" placeholder="🎁" aria-label="Емодзі призу"><input class="jn-name" id="jnRT" maxlength="60" value="${esc(d.rt)}" placeholder="Що отримаєш: поїздка, річ…"></div></div>
-      <div class="jn-row3"><label class="jn-f"><span>Ціна, ${curSym()}</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label>
+      <div class="jn-row3"><label class="jn-f"><span id="jnRSl">Ціна, ${esc(curSym(d.rc))}</span><input type="number" id="jnRS" min="0" step="100" value="${esc(String(d.rs))}" placeholder="0"></label>
+        ${(typeof wlCurList==='function'&&wlCurList().length)?`<label class="jn-f"><span>Валюта</span><select id="jnRC"${gl&&typeof pzSaved==='function'&&pzSaved(gl)>0?' disabled title="У скарбничці вже є гроші"':''}>${[mainCur()].concat(wlCurList()).map(c=>`<option value="${c}"${c===d.rc?' selected':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</option>`).join('')}</select></label>`:''}
         <label class="jn-f"><span>Коли забрати</span><select id="jnRL" class="pz-sel"><option value="">уся місія</option>${d.levels.filter(m=>m.id).map(m=>`<option value="${esc(m.id)}"${String(d.rl)===String(m.id)?' selected':''}>рівень: ${esc(String(m.t).slice(0,30))}</option>`).join('')}</select></label></div>
       <div class="jn-f"><span>Папка</span><button class="jn-mini" data-jnfold>${folderTxt()}</button></div>
       <div class="jn-ed-foot">
         ${isNew?'':`<button class="jn-btn ghost" data-jngoals>Кроки й трекер</button><button class="jn-btn danger" data-jndel>Видалити</button>`}
         <button class="jn-btn" data-jnsave>Зберегти</button></div>`, ov=>{
       const q=s=>ov.querySelector(s);
+      { const rc=q('#jnRC'); if(rc) rc.onchange=()=>{ const l=q('#jnRSl'); if(l) l.textContent='Ціна, '+curSym(rc.value); }; }   // валюта призу
       // поля, які перемальовуються, спершу забирають введене
       const pull=()=>{ ov.querySelectorAll('[data-lvt]').forEach(i=>{ const m=d.levels[+i.dataset.lvt]; if(m) m.t=i.value; });
         ov.querySelectorAll('[data-lvd]').forEach(i=>{ const m=d.levels[+i.dataset.lvd]; if(m) m.due=i.value; }); };
@@ -31419,6 +31497,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         let pzKeep=false;
         if(!rt&&oldR&&typeof pzSaved==='function'&&pzSaved(g)>0){ pzKeep=true; }
         else g.reward=rt?Object.assign({},oldR||{},{ t:rt, sum:rs>0?Math.round(rs):0, emoji:rem?safeEmoji(rem,'🎁'):'', lv:(g.ms||[]).some(m=>m&&String(m.id)===rlv)?rlv:'' }):null;
+        // валюта призу (етап 3 валют): лише поки скарбничка порожня — інакше гроші опинились би в чужому балансі
+        if(g.reward){ const sel=q('#jnRC'); if(sel&&!sel.disabled){ const c=sel.value; if(c&&curOk(c)&&c!==mainCur()) g.reward.cur=c; else delete g.reward.cur;
+          try{ const pe=pzEnv(g); if(pe&&!(pe.ops||[]).length){ if(g.reward.cur) pe.cur=g.reward.cur; else delete pe.cur; } }catch(_){} } }
         // назва/ціна призу → його конверт у Фінансах
         try{ const e=g.reward&&typeof pzEnv==='function'?pzEnv(g):null; if(e){ e.name=String(g.reward.t).slice(0,60); e.goal=+g.reward.sum||0; e.emoji=safeEmoji(g.reward.emoji,'🎁'); saveEnvelopes(); } }catch(_){}
         g.folderKey=d.folderKey&&folders[d.folderKey]?d.folderKey:null;
@@ -32169,9 +32250,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function pzReady(g){ return !g.reward.claimed&&pzUnlocked(g)&&pzSaved(g)>=pzPrice(g); }
   // отриманий приз, у скарбничці якого знову є гроші (напр. видалили рух «Приз забрано»), лишається видимим — щоб їх можна було повернути
   function pzActive(){ return pzGoals().filter(g=>!g.reward.claimed||pzSaved(g)>0); }
-  function pzTotal(){ return pzActive().reduce((s,g)=>s+pzSaved(g),0); }
+  function pzTotal(){ return pzActive().filter(g=>!pzCur(g)).reduce((s,g)=>s+pzSaved(g),0); }   // лише головна валюта (картка Гаманця, 🏆)
   function pzEmoji(g){ return safeEmoji(g.reward.emoji,'🎁'); }
-  function pzK(n){ return moneyK(n); }
+  // валюта призу (етап 3 валют): скарбничка вже є — її валюта; ще нема — reward.cur; без — головна ('')
+  function pzCur(g){ if(!g) return ''; const e=pzEnv(g); if(e) return envCur(e); const c=g.reward&&g.reward.cur; return c&&curOk(c)&&c!==mainCur()?c:''; }
+  function pzK(n,g){ return moneyK(n,g?pzCur(g):''); }
   function pzCond(g){ const left=pzLeftLevels(g), id=g.reward.lv;
     if(pzUnlocked(g)) return '✓ умову виконано';
     if(id){ const m=jnLevels(g).find(x=>String(x.id)===String(id)); return '🔒 рівень «'+(m?m.t:'?')+'»'; }
@@ -32187,7 +32270,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const near=act.map(g=>({g, money:pzPrice(g)?pzSaved(g)/pzPrice(g):1, left:pzLeftLevels(g)})).filter(x=>x.money>=0.8||x.left<=1).sort((a,b)=>(a.left-b.left)||(b.money-a.money))[0];
     if(!near) return '';
     const g=near.g, rest=Math.max(0,pzPrice(g)-pzSaved(g)), left=near.left;
-    const parts=[rest?pzK(rest):'', left?(left+' '+pluralUk(left,'рівень','рівні','рівнів')):''].filter(Boolean);
+    const parts=[rest?pzK(rest,g):'', left?(left+' '+pluralUk(left,'рівень','рівні','рівнів')):''].filter(Boolean);
     return `<button class="pz-strip" data-pzjar="${esc(g.id)}"><span class="pz-strip-em">${pzEmoji(g)}</span><span><b>До «${esc(g.reward.t)}» — ${esc(parts.join(' і '))}</b><small>${esc(g.name||'Місія')}</small></span><i>›</i></button>`;
   }
   function pzBind(c){
@@ -32197,7 +32280,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
   // ── Скарбничка: екран з баночками ──
   function pzMonthSaved(ym){
-    const ids=new Set(pzGoals().map(g=>{ const e=pzEnv(g); return e&&e.id; }).filter(Boolean).map(String));   // через pzEnv — і без envId
+    const ids=new Set(pzGoals().map(g=>{ const e=pzEnv(g); return e&&!envCur(e)&&e.id; }).filter(Boolean).map(String));   // лише головна валюта   // через pzEnv — і без envId
     return (finOps||[]).filter(o=>o&&o.envId&&ids.has(String(o.envId))&&String(o.date||'').slice(0,7)===ym)
       .reduce((s,o)=>s+(o.type==='out'&&!o.envSpend?(+o.amount||0):(o.type==='in'&&!o.pzClaim?-(+o.amount||0):0)),0);   // «Забрати» — не відміна відкладання
   }
@@ -32216,7 +32299,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <div class="pz-grid">${act.map(g=>{ const sv=pzSaved(g), pr=pzPrice(g), pct=pr?Math.min(100,Math.round(sv/pr*100)):(sv?100:0), rd=pzReady(g);
           return `<button class="pz-jar${rd?' ready':''}" data-pzjar="${esc(g.id)}" style="--c:${safeColor(g.color,'#f0b429')}">
             <span class="pz-jb"><i style="height:${pct}%"></i><em>${pzEmoji(g)}</em></span>
-            <b>${esc(g.reward.t)}</b><small>${pzK(sv)} / ${pzK(pr)}</small><small class="pz-c">${rd?'✓ можна забрати':esc(pzCond(g))}</small></button>`; }).join('')}
+            <b>${esc(g.reward.t)}</b><small>${pzK(sv,g)} / ${pzK(pr,g)}</small><small class="pz-c">${rd?'✓ можна забрати':esc(pzCond(g))}</small></button>`; }).join('')}
           <button class="pz-jar add" data-pznew><span class="pz-jb"><em>＋</em></span><b>Новий приз</b><small>до будь-якої місії</small></button></div>
         ${done.length?`<div class="mo-h" style="margin-top:4px"><span>Отримані призи</span></div>${done.map(g=>`<div class="mo-fl"><span class="mo-fl-em">${pzEmoji(g)}</span><span><b>${esc(g.reward.t)}</b><small>${esc(g.name||'')} · ${jnDateTxt(g.reward.claimed)}</small></span><i>🏅</i></div>`).join('')}`:''}
       </div>`;
@@ -32236,19 +32319,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // ── Баночка: відкласти / повернути / забрати ──
   function pzJarSheet(g,after){
     const sv=pzSaved(g), pr=pzPrice(g), rd=pzReady(g), items=[];
-    if(rd) items.push({ic:'target', label:'Забрати приз', sub:pzK(sv)+' повернуться на рахунок — на «'+g.reward.t+'»', primary:true, onClick:()=>pzCelebrate(g,after)});
-    items.push({ic:'plus', label:'Відкласти', sub:pr>sv?'бракує '+pzK(pr-sv):'уже зібрано', primary:!rd, onClick:()=>pzAmountSheet(g,'in',after)});
-    if(sv>0) items.push({ic:'refresh', label:'Повернути в Гаманець', sub:'зі скарбнички '+pzK(sv), onClick:()=>pzAmountSheet(g,'back',after)});
+    if(rd) items.push({ic:'target', label:'Забрати приз', sub:pzK(sv,g)+' повернуться на рахунок — на «'+g.reward.t+'»', primary:true, onClick:()=>pzCelebrate(g,after)});
+    items.push({ic:'plus', label:'Відкласти', sub:pr>sv?'бракує '+pzK(pr-sv,g):'уже зібрано', primary:!rd, onClick:()=>pzAmountSheet(g,'in',after)});
+    if(sv>0) items.push({ic:'refresh', label:'Повернути в Гаманець', sub:'зі скарбнички '+pzK(sv,g), onClick:()=>pzAmountSheet(g,'back',after)});
     items.push({ic:'edit', label:'Змінити приз', sub:'назва, ціна, умова — у редакторі місії', onClick:()=>{ const s=document.querySelector('.pz-scr'); if(s) s.remove(); jnEditor(g); }});
-    actionSheet({title:(g.reward.emoji?String(g.reward.emoji)+' ':'')+g.reward.t, sub:pzK(sv)+' з '+pzK(pr)+' · '+pzCond(g)+' · '+(g.name||'Місія'), items});
+    actionSheet({title:(g.reward.emoji?String(g.reward.emoji)+' ':'')+g.reward.t, sub:pzK(sv,g)+' з '+pzK(pr,g)+' · '+pzCond(g)+' · '+(g.name||'Місія'), items});
   }
   function pzAmountSheet(g,mode,after){
-    const sv=pzSaved(g), pr=pzPrice(g); let free=0; try{ free=walletBalance(); }catch(_){}
+    const sv=pzSaved(g), pr=pzPrice(g); let free=0; try{ free=curFree(pzCur(g)); }catch(_){}
     const max=mode==='in'?Math.max(0,free):sv, need=Math.max(0,pr-sv);
     const chips=(mode==='in'?[500,1000,2000,5000]:[500,1000,2000]).filter(v=>v<max);
     const full=mode==='in'?(need>0&&need<=max?need:0):sv;
     jnOverlay(`<div class="jn-ed-h"><b>${mode==='in'?'Відкласти на':'Повернути з'} «${esc(g.reward.t)}»</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <small class="dy-fm-sub">${pzK(sv)} з ${pzK(pr)} · ${mode==='in'?'у Гаманці вільно '+pzK(free):'повернеться на рахунок'}</small>
+      <small class="dy-fm-sub">${pzK(sv,g)} з ${pzK(pr,g)} · ${mode==='in'?'у Гаманці вільно '+pzK(free,g):'повернеться на рахунок'}</small>
       <label class="jn-f"><span>Сума, ${curSym()}</span><input id="pzAmt" type="number" inputmode="numeric" min="1" step="100" max="${max}" value="${full||''}" placeholder="0"></label>
       <div class="pz-chips">${chips.map(v=>`<button data-pzv="${v}">${v.toLocaleString('uk-UA')}</button>`).join('')}${full?`<button data-pzv="${full}">${mode==='in'?'усе, що бракує':'усе'} · ${full.toLocaleString('uk-UA')}</button>`:''}</div>
       <small class="mo-note">${mode==='in'?'У Гаманці зʼявиться запис «У конверт: '+esc(g.reward.t)+'». Повернути можна будь-коли.':'У Гаманці зʼявиться запис-переказ, у доходи він не рахується.'}</small>
@@ -32258,7 +32341,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ov.querySelector('[data-pzok]').onclick=()=>{
         const a=Math.round(+inp.value||0);
         if(!(a>0)){ plToast('Вкажи суму'); return; }
-        if(a>max){ plToast(mode==='in'?'У Гаманці вільно лише '+pzK(max):'У скарбничці лише '+pzK(max)); return; }
+        if(a>max){ plToast(mode==='in'?'У Гаманці вільно лише '+pzK(max,g):'У скарбничці лише '+pzK(max,g)); return; }
         ov.remove();
         if(mode==='in') pzDeposit(g,a); else pzWithdraw(g,a,'Повернуто в Гаманець');
         try{ jnRender(); }catch(_){} if(after) after();
@@ -32271,10 +32354,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(!e){
       e={id:'env_pz_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), name:String(q.reward.t).slice(0,60), emoji:safeEmoji(q.reward.emoji,'🎁'),
         goal:pzPrice(q), color:safeColor(q.color,'#f0b429'), kind:'приз', goalId:String(q.id), ops:[]};
+      { const c=q.reward.cur; if(c&&curOk(c)&&c!==mainCur()) e.cur=c; }   // скарбничка у валюті призу
       envelopes.push(e); q.reward.envId=e.id; saveGoals();
     }
     envAddOp(e,'in',a,'Відкладено на приз');
-    plToast('🏆 '+pzK(a)+' — у скарбничку «'+q.reward.t+'»');
+    plToast('🏆 '+pzK(a,q)+' — у скарбничку «'+q.reward.t+'»');
   }
   // гроші зі скарбнички назад на рахунок: рух 'out' у конверті + переказ 'in' у Гаманці (_tr — не дохід)
   function pzWithdraw(g,a,label){
@@ -32286,9 +32370,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     e.ops.unshift({id:'eop_'+Date.now()+Math.random().toString(36).slice(2,5), t:'back', label:label||'Повернуто в Гаманець', amount:a, date, finOpId:finId, back:true});
     e.saved=e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0);
     let card; try{ card=mainCard().id; }catch(_){}
-    finOps.push({id:finId, type:'in', amount:a, label:'Зі скарбнички: '+e.name, date, env:e.name, envId:e.id, card, _tr:true, pzClaim:label==='Приз забрано'||undefined});
+    const wo={id:finId, type:'in', amount:a, label:'Зі скарбнички: '+e.name, date, env:e.name, envId:e.id, card, _tr:true, pzClaim:label==='Приз забрано'||undefined};
+    if(envCur(e)) wo.cur=envCur(e);   // назад у баланс валюти скарбнички
+    finOps.push(wo);
     saveEnvelopes(); saveFinOps();
-    plToast('↩ '+pzK(a)+' повернуто на рахунок');
+    plToast('↩ '+pzK(a,g)+' повернуто на рахунок');
     return true;
   }
   function pzCelebrate(g,after){
@@ -32298,9 +32384,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     ov.style.setProperty('--c','#f0b429');
     ov.innerHTML=`<div class="jn-cel-in"><span class="jn-conf" aria-hidden="true">${'<i></i>'.repeat(14)}</span>
       <span class="jn-cel-ok">${pzEmoji(g)}</span><b>Приз твій!</b>
-      <p>${esc(g.name||'Місія')} — умову виконано. Скарбничка «${esc(g.reward.t)}» — ${pzK(sv)}. Гроші повернуться на рахунок, щоб ти витратив їх саме на це.</p>
+      <p>${esc(g.name||'Місія')} — умову виконано. Скарбничка «${esc(g.reward.t)}» — ${pzK(sv,g)}. Гроші повернуться на рахунок, щоб ти витратив їх саме на це.</p>
       <span class="jn-cel-chips"><span>🏅 Приз отримано</span></span>
-      <button class="jn-cel-go" data-pzclaim>Забрати ${pzK(sv)}</button><button class="jn-cel-undo" data-pzlater>Не зараз</button></div>`;
+      <button class="jn-cel-go" data-pzclaim>Забрати ${pzK(sv,g)}</button><button class="jn-cel-undo" data-pzlater>Не зараз</button></div>`;
     document.body.appendChild(ov);
     ov.querySelector('[data-pzlater]').onclick=()=>ov.remove();
     ov.querySelector('[data-pzclaim]').onclick=()=>{
@@ -32526,10 +32612,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const envTop=(envelopes||[]).slice(0,4);
     h+=`<div class="wl-sec"><span>Конверти й скарбнички</span><button data-wlenv>усі ›</button></div>`;
     h+=envTop.length?envTop.map(e=>{ const sv=envSaved(e), pct=e.goal?Math.min(100,Math.round(sv/e.goal*100)):0;
-      return `<button class="wl-env" data-envopen="${esc(e.id)}" style="--c:${safeColor(e.color,'#5b8def')}"><i style="width:${pct}%"></i><span>${safeEmoji(e.emoji,'✉️')}</span><span><b>${esc(e.name)}</b><small>${e.goal?pct+'% · ще '+wlMoney(Math.max(0,e.goal-sv)):'без цілі'}</small></span><b>${wlMoney(sv)}</b></button>`; }).join('')
+      return `<button class="wl-env" data-envopen="${esc(e.id)}" style="--c:${safeColor(e.color,'#5b8def')}"><i style="width:${pct}%"></i><span>${safeEmoji(e.emoji,'✉️')}</span><span><b>${esc(e.name)}</b><small>${e.goal?pct+'% · ще '+esc(money(Math.max(0,e.goal-sv),envCur(e))):'без цілі'}</small></span><b>${esc(money(sv,envCur(e)))}</b></button>`; }).join('')
       :`<button class="wl-starter" data-wlstarter><span>🗂</span><span><b>Розклади гроші по конвертах</b><small>Продукти, кафе, транспорт, житло… — вибери стандартні або створи свої</small></span><i>›</i></button>`;
     let debts='—'; try{ debts=debtSummary(); }catch(_){}
     h+=`<button class="wl-env" data-wldebts><span>🤝</span><span><b>Борги</b><small>нетто</small></span><b>${esc(String(debts))}</b></button>`;
+    if(typeof qaGuide==='function') h+=`<button class="wl-link" data-wlqa>💳 Записувати покупки з Apple Pay автоматично ›</button>`;   // 50-quickadd.js
     return h;
   }
   function wlMissionsHTML(ops){
@@ -32578,6 +32665,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
     { const st=c.querySelector('[data-wlstarter]'); if(st) st.onclick=()=>wlEnvStarter(); }
+    { const qa=c.querySelector('[data-wlqa]'); if(qa) qa.onclick=()=>qaGuide(); }
     { const ev=c.querySelector('[data-wlenv]'); if(ev) ev.onclick=()=>{ finView='envelopes'; renderFinance(); }; }
     { const d=c.querySelector('[data-wldebts]'); if(d) d.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
     c.querySelectorAll('[data-envopen]').forEach(el=>el.onclick=()=>openEnvSheet(el.dataset.envopen));
@@ -32603,9 +32691,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const budTxt=()=>{ const g=wlGoal(gid); if(!g||type!=='out'||!(g.budget&&+g.budget.money>0)) return ''; const a=wlAgg(wlMonthOps(wlYm()),g.id); return 'Бюджет «'+esc(g.name||'')+'» на місяць: '+wlMoney(a.out)+' з '+wlMoney(g.budget.money); };
     jnOverlay(`<div class="jn-ed-h"><b>${type==='in'?'＋':'−'} ${t}</b><button data-jnx aria-label="Закрити">✕</button></div>
       ${curs.length?`<div class="jn-f"><span>Баланс</span><div class="wl-chips" id="wlCurC">${[mainCur()].concat(curs).map(c=>`<button data-wlc="${c}"${c===cur?' class="on"':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</button>`).join('')}</div></div>`:''}
-      <label class="jn-f"><span id="wlAmtL">Сума, ${esc(curSym(cur))}</span><input id="wlAmt" type="number" inputmode="decimal" min="0" step="1" placeholder="Напр. 500"></label>
+      ${opt.fromLink?`<div class="wl-fromlink">🔗 Відкрито з посилання — перевір суму й назву, перш ніж записати</div>`:''}
+      <label class="jn-f"><span id="wlAmtL">Сума, ${esc(curSym(cur))}</span><input id="wlAmt" type="number" inputmode="decimal" min="0" step="1" placeholder="Напр. 500" value="${+opt.amount>0?esc(String(Math.round(+opt.amount*100)/100)):''}"></label>
       <label class="jn-f"><span>На що</span><input id="wlLbl" maxlength="80" value="${esc(String(opt.label||'').slice(0,80))}" placeholder="${type==='in'?'Зарплата, оплата від клієнта…':'Їжа, таксі, підручник…'}"></label>
-      ${type==='out'&&wlSpendEnvs().length?`<div class="jn-f" id="wlEnvF"${cur!==mainCur()?' hidden':''}><span>З конверта (необовʼязково)</span><div class="wl-envpick" id="wlEnvP">${wlSpendEnvs().map(e=>`<button data-wlenvp="${esc(e.id)}" style="--c:${safeColor(e.color,'#5b8def')}"><span>${safeEmoji(e.emoji,'✉️')}</span><small>${esc(String(e.name||'').slice(0,12))}</small><i>${esc(moneyK(envSaved(e)))}</i></button>`).join('')}</div></div>`:''}
+      ${type==='out'&&wlSpendEnvs().length?`<div class="jn-f" id="wlEnvF"${wlEnvPick(cur)?'':' hidden'}><span>З конверта (необовʼязково)</span><div class="wl-envpick" id="wlEnvP">${wlEnvPick(cur)}</div></div>`:''}
       ${type==='in'?`<div class="jn-f"><span>Тип доходу</span><div class="wl-chips" id="wlSrc">${Object.keys(WL_SRC).map(k=>`<button data-wlsrc="${k}"${k===src?' class="on"':''}>${WL_SRC[k][0]} ${WL_SRC[k][1]}</button>`).join('')}</div></div>`:''}
       ${fk?`<small class="mo-note">📁 Запишеться з міткою папки «${esc(wlFolderName(fk))}»</small>`:''}
       ${ms.length?`<div class="jn-f" id="wlMisF"${cur!==mainCur()?' hidden':''}><span>До місії (необовʼязково)</span><div class="wl-chips" id="wlChips">${chips()}</div><small class="mo-note" id="wlBud">${budTxt()}</small></div>`:''}
@@ -32615,16 +32704,20 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ov.querySelectorAll('[data-wlc]').forEach(b=>b.onclick=()=>{ cur=b.dataset.wlc; ov.querySelectorAll('[data-wlc]').forEach(x=>x.classList.toggle('on',x===b));
         const l=ov.querySelector('#wlAmtL'); if(l) l.textContent='Сума, '+curSym(cur);
         const mf=ov.querySelector('#wlMisF'); if(mf) mf.hidden=cur!==mainCur();
-        const ef=ov.querySelector('#wlEnvF'); if(ef){ ef.hidden=cur!==mainCur(); if(ef.hidden){ envId=''; ov.querySelectorAll('[data-wlenvp]').forEach(x=>x.classList.remove('on')); } } });   // місії рахують лише головну валюту
+        // конверти — лише тієї валюти, з якої витрата (етап 3 валют)
+        const ef=ov.querySelector('#wlEnvF'); if(ef){ envId=''; const h2=wlEnvPick(cur); ov.querySelector('#wlEnvP').innerHTML=h2; ef.hidden=!h2; bindEnvP(); } });   // місії рахують лише головну валюту
       let envId='';
-      ov.querySelectorAll('[data-wlenvp]').forEach(b=>b.onclick=()=>{ envId=envId===b.dataset.wlenvp?'':b.dataset.wlenvp; ov.querySelectorAll('[data-wlenvp]').forEach(x=>x.classList.toggle('on',x.dataset.wlenvp===envId));
+      const bindEnvP=()=>ov.querySelectorAll('[data-wlenvp]').forEach(b=>b.onclick=()=>{ envId=envId===b.dataset.wlenvp?'':b.dataset.wlenvp; ov.querySelectorAll('[data-wlenvp]').forEach(x=>x.classList.toggle('on',x.dataset.wlenvp===envId));
         const lb=ov.querySelector('#wlLbl'), e=(envelopes||[]).find(x=>String(x.id)===envId); if(e&&lb&&!lb.value.trim()) lb.placeholder=e.name; });
+      bindEnvP();
       ov.querySelectorAll('[data-wlsrc]').forEach(b=>b.onclick=()=>{ src=b.dataset.wlsrc; ov.querySelectorAll('[data-wlsrc]').forEach(x=>x.classList.toggle('on',x===b)); });
       setTimeout(()=>{ try{ ov.querySelector('#wlAmt').focus(); }catch(_){} },80);
       ov.querySelector('[data-wlok]').onclick=()=>{
         const amount=Math.round(parseFloat(String(ov.querySelector('#wlAmt').value||'').replace(',','.'))*100)/100;
         if(!(amount>0)){ plToast('Вкажи суму'); return; }
-        const env=envId&&cur===mainCur()?(envelopes||[]).find(x=>String(x.id)===envId):null;
+        const env=envId?(envelopes||[]).find(x=>String(x.id)===envId&&(envCur(x)||mainCur())===cur)||null:null;
+        // «Правило 24 годин» (49-finlit.js): велика витрата з вільних у головній валюті — спершу пропозиція почекати
+        if(type==='out'&&!env&&cur===mainCur()&&!ov.__h24ok&&typeof flH24==='function'&&flH24(amount,String(ov.querySelector('#wlLbl').value||'').trim()||t,()=>{ ov.__h24ok=true; const b=ov.querySelector('[data-wlok]'); if(b) b.click(); },()=>ov.remove())) return;
         const typed=String(ov.querySelector('#wlLbl').value||'').trim().slice(0,80), label=typed||(env?env.name:t);
         // з конверта: гроші вже відкладені — витрата йде з конверта (envAddOp 'out' = envSpend, баланс удруге не списує).
         // Якщо в конверті менше — пишемо звичайну витрату з вільних і кажемо про це (з мінусом у конверт не йдемо).
@@ -32635,10 +32728,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
             const fo=finOps[finOps.length-1]; if(fo&&fo.envId===env.id){ if(gid&&wlGoal(gid)) fo.goalId=String(gid); if(fk&&wlFolderName(fk)) fo.folderKey=fk; saveFinOps();
               try{ if(typeof rlOnOp==='function') rlOnOp(fo); }catch(err){ console.error('rlOnOp',err); } }   // правила (бюджет місії) — як для звичайної витрати
             ov.remove(); renderFinance(); try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}
-            plToast((env.emoji?safeEmoji(env.emoji,'✉️')+' ':'')+'−'+money(amount)+' з «'+env.name+'» · лишилось '+money(envSaved(env)));
+            plToast((env.emoji?safeEmoji(env.emoji,'✉️')+' ':'')+'−'+money(amount,cur)+' з «'+env.name+'» · лишилось '+money(envSaved(env),cur));
             return;
           }
-          plToast('У «'+env.name+'» лише '+money(sv)+' — витрату записано з вільних грошей');
+          plToast('У «'+env.name+'» лише '+money(sv,cur)+' — витрату записано з вільних грошей');
         }
         const op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type, amount, label, date:ymdLocal(), card:mainCard().id };
         if(cur!==mainCur()) op.cur=cur;
@@ -32811,13 +32904,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   const WL_ENV_COLORS=['#34c77b','#ff9f43','#5b8def','#4ecdc4','#c48cff','#f0b429','#7f8cff','#ff6b9d','#e8843c','#ff4d6d','#3ec7b4','#8b93a3'];
   // конверти, з яких можна платити: без скарбничок призів
   function wlSpendEnvs(){ return (envelopes||[]).filter(e=>e&&e.id&&e.kind!=='приз'); }
+  // іконки конвертів для шторки витрати — лише валюти c
+  function wlEnvPick(c){ return wlSpendEnvs().filter(e=>(envCur(e)||mainCur())===c).map(e=>`<button data-wlenvp="${esc(e.id)}" style="--c:${safeColor(e.color,'#5b8def')}"><span>${safeEmoji(e.emoji,'✉️')}</span><small>${esc(String(e.name||'').slice(0,12))}</small><i>${esc(moneyK(envSaved(e),envCur(e)))}</i></button>`).join(''); }
   function wlEnvStarter(){
     // конверти ще не прочитано (хмара не відповіла / вхід звіряється) — інакше після злиття вийдуть дублі за назвою
     if(window.storeKeyReady&&!window.storeKeyReady(ENVKEY)){ plToast('Конверти ще завантажуються — спробуй за хвилину'); return; }
-    const have=new Set((envelopes||[]).map(e=>String(e&&e.name||'').trim().toLowerCase()));
+    const curs=[mainCur()].concat(wlCurList()); let ecur=mainCur();   // валюта нових конвертів (етап 3 валют)
+    let have=new Set();
+    const haveFor=c=>new Set((envelopes||[]).filter(e=>e&&(envCur(e)||mainCur())===c).map(e=>String(e.name||'').trim().toLowerCase()));
+    have=haveFor(ecur);
     const sel={}; WL_ENV_TPL.forEach(gr=>gr.items.forEach(([k,,n,on])=>{ if(on&&!have.has(n.toLowerCase())) sel[k]=true; }));
     jnOverlay(`<div class="jn-ed-h"><b>🗂 Конверти витрат</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">Відміть, на що зазвичай ідуть гроші. Ліміт на місяць — необовʼязково. Потім можна перейменувати, видалити чи додати свої.</small>
+      ${curs.length>1?`<div class="jn-f"><span>Валюта конвертів</span><div class="wl-chips" id="tplCur">${curs.map(c=>`<button data-tplc="${c}"${c===ecur?' class="on"':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</button>`).join('')}</div></div>`:''}
       ${WL_ENV_TPL.map(gr=>`<div class="wl-tpl-g">${esc(gr.g)}</div><div class="wl-tpl">${gr.items.map(([k,em,n])=>{ const ex=have.has(n.toLowerCase());
         return `<div class="wl-tpl-r${ex?' ex':''}" data-tplr="${k}"><button class="wl-tpl-t${sel[k]?' on':''}" data-tpl="${k}"${ex?' disabled':''} aria-pressed="${!!sel[k]}"><span>${em}</span><b>${esc(n)}</b>${ex?'<small>вже є</small>':''}</button>
           <input type="number" inputmode="numeric" min="0" step="100" data-tpll="${k}" placeholder="ліміт, ${esc(curSym())}" aria-label="Ліміт для ${esc(n)}"${sel[k]?'':' hidden'}></div>`; }).join('')}</div>`).join('')}
@@ -32826,12 +32925,20 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ov.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{ const k=b.dataset.tpl; sel[k]=!sel[k]; b.classList.toggle('on',!!sel[k]); b.setAttribute('aria-pressed',String(!!sel[k]));
         const i=ov.querySelector('[data-tpll="'+k+'"]'); if(i) i.hidden=!sel[k]; cnt(); });
       cnt();
+      ov.querySelectorAll('[data-tplc]').forEach(b=>b.onclick=()=>{ ecur=b.dataset.tplc; ov.querySelectorAll('[data-tplc]').forEach(x=>x.classList.toggle('on',x===b));
+        have=haveFor(ecur);
+        ov.querySelectorAll('[data-tplr]').forEach(r=>{ const k=r.dataset.tplr, it=WL_ENV_TPL.flatMap(g=>g.items).find(x=>x[0]===k), ex=have.has(String(it[2]).toLowerCase());
+          r.classList.toggle('ex',ex); const t=r.querySelector('[data-tpl]'); t.disabled=ex; if(ex){ sel[k]=false; t.classList.remove('on'); }
+          const i=r.querySelector('[data-tpll]'); if(i){ i.placeholder='ліміт, '+curSym(ecur); i.hidden=!sel[k]; } });
+        cnt(); });
       ov.querySelector('[data-tplown]').onclick=()=>{ ov.remove(); try{ newEnvelope(); }catch(_){} };
       ov.querySelector('[data-tplok]').onclick=()=>{
         let n=0, ci=(envelopes||[]).length;
         WL_ENV_TPL.forEach(gr=>gr.items.forEach(([k,em,nm])=>{ if(!sel[k]||have.has(nm.toLowerCase())) return;
           const li=ov.querySelector('[data-tpll="'+k+'"]'), goal=Math.max(0,Math.round(parseFloat(String(li&&li.value||'').replace(',','.'))||0));
-          envelopes.push({id:'env_'+k+'_'+Date.now().toString(36)+n, name:nm, emoji:em, color:WL_ENV_COLORS[(ci++)%WL_ENV_COLORS.length], goal, saved:0, ops:[], kind:'витрати', link:'main', linkLabel:'головна папка'});
+          const ne={id:'env_'+k+'_'+Date.now().toString(36)+n, name:nm, emoji:em, color:WL_ENV_COLORS[(ci++)%WL_ENV_COLORS.length], goal, saved:0, ops:[], kind:'витрати', link:'main', linkLabel:'головна папка'};
+          if(ecur!==mainCur()) ne.cur=ecur;
+          envelopes.push(ne);
           n++; }));
         if(!n) return;
         saveEnvelopes(); ov.remove(); renderFinance();
@@ -32927,18 +33034,24 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
   // ── 3) «Скарбничка» і 4) «Зарплата» (дохід), 5) «Бюджет» (витрата): після запису операції в Гаманці ──
   function rlOnOp(op){
-    if(!op||!opMain(op)) return;   // правила (скарбничка, зарплата, бюджет) — лише головна валюта (етап 3 навчить інших)
+    if(!op) return;
+    // етап 3 валют: зарплата й скарбничка — у валюті доходу (конверти/приз тієї ж валюти); бюджет місії — лише головна
+    const oc=opMain(op)?'':op.cur, inCur=e=>(envCur(e)||'')===oc;
     if(op.type==='in'){
-      const sal=rlOn('salary')&&(+op.amount>=Math.max(1,+rlN('salary')||10000)||/зарплат|salary|зп\b/i.test(String(op.label||'')));
-      if(sal&&(envelopes||[]).length){ setTimeout(()=>rlSalarySheet(+op.amount),250); return; }
+      const amtMain=oc?(+op.amount||0)*(finLastRate(oc)||0):+op.amount;   // поріг правила — у головній валюті
+      const sal=rlOn('salary')&&(amtMain>=Math.max(1,+rlN('salary')||10000)||/зарплат|salary|зп\b/i.test(String(op.label||'')));
+      if(sal&&(envelopes||[]).some(e=>e&&e.id&&inCur(e))){ setTimeout(()=>rlSalarySheet(+op.amount,oc),250); return; }
       const g=op.goalId?(goalsData.goals||[]).find(x=>String(x.id)===String(op.goalId)):null;
-      if(rlOn('jar')&&g&&g.reward&&String(g.reward.t||'').trim()&&!g.reward.claimed&&typeof pzSaved==='function'){
-        const rest=Math.max(0,Math.round(+g.reward.sum||0)-pzSaved(g)); let free=0; try{ free=walletBalance(); }catch(_){}
+      let jarOffered=false;
+      if(rlOn('jar')&&g&&g.reward&&String(g.reward.t||'').trim()&&!g.reward.claimed&&typeof pzSaved==='function'&&pzCur(g)===oc){
+        const rest=Math.max(0,Math.round(+g.reward.sum||0)-pzSaved(g)); let free=0; try{ free=curFree(oc); }catch(_){}
         const amt=Math.min(rest, Math.round(+op.amount*(+rlN('jar')||10)/100), Math.floor(free));
-        if(amt>0) setTimeout(()=>rlOffer('🏆','Скарбничка', (op.label||'Дохід')+' +'+wlMoney(op.amount)+' · '+(g.name||'')+'. Відкласти '+rlN('jar')+'% ('+wlMoney(amt)+') на «'+g.reward.t+'»?',
-          'Відкласти '+wlMoney(amt),'Не зараз',()=>{ let f2=0; try{ f2=walletBalance(); }catch(_){} const a2=Math.min(amt,Math.floor(f2)); if(!(a2>0)){ plToast('Зараз вільних грошей нема'); return; } pzDeposit(g,a2); rlMark('jar',true,a2); saveGoals(); try{ renderFinance(); }catch(_){} }, ()=>{ rlMark('jar',false); saveGoals(); }),250);
+        if(amt>0) jarOffered=true;
+        if(amt>0) setTimeout(()=>rlOffer('🏆','Скарбничка', (op.label||'Дохід')+' +'+money(op.amount,oc)+' · '+(g.name||'')+'. Відкласти '+rlN('jar')+'% ('+money(amt,oc)+') на «'+g.reward.t+'»?',
+          'Відкласти '+money(amt,oc),'Не зараз',()=>{ let f2=0; try{ f2=curFree(oc); }catch(_){} const a2=Math.min(amt,Math.floor(f2)); if(!(a2>0)){ plToast('Зараз вільних грошей нема'); return; } pzDeposit(g,a2); rlMark('jar',true,a2); saveGoals(); try{ renderFinance(); }catch(_){} }, ()=>{ rlMark('jar',false); saveGoals(); }),250);
       }
-    } else if(op.type==='out'&&rlOn('budget')&&op.goalId){
+      if(!jarOffered&&typeof flOnIncome==='function') flOnIncome(op);   // «Спершу собі» (49-finlit.js)
+    } else if(op.type==='out'&&!oc&&rlOn('budget')&&op.goalId){
       const g=(goalsData.goals||[]).find(x=>String(x.id)===String(op.goalId)), bud=g&&g.budget&&+g.budget.money>0?+g.budget.money:0;
       if(bud){ const a=wlAgg(wlMonthOps(wlYm()),g.id);
         if(a.out>bud&&a.out-(+op.amount||0)<=bud){ rlMark('budget',false); saveGoals(); setTimeout(()=>{ try{ plToast('⚠️ «'+(g.name||'Місія')+'»: витрати '+wlMoney(a.out)+' — більше бюджету '+wlMoney(bud)); }catch(_){} },250); } }
@@ -32946,29 +33059,34 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
 
   // ── «Зарплата по конвертах»: розподіл за шаблоном hero.salarySplit=[{envId,pct}] ──
-  function rlSalarySheet(total){
-    const envs=(envelopes||[]).filter(e=>e&&e.id), h=jnHero(), tpl=Array.isArray(h.salarySplit)?h.salarySplit:[];
+  function rlSalarySheet(total,c){
+    c=c||''; const M=n=>money(n,c);
+    const envs=(envelopes||[]).filter(e=>e&&e.id&&(envCur(e)||'')===c), h=jnHero(), tpl=Array.isArray(h.salarySplit)?h.salarySplit:[];
     const pctOf=e=>{ const r=tpl.find(x=>x&&String(x.envId)===String(e.id)); return r?Math.max(0,Math.min(100,+r.pct||0)):0; };
-    jnOverlay(`<div class="jn-ed-h"><b>💼 Розподілити ${wlMoney(total)}</b><button data-jnx aria-label="Закрити">✕</button></div>
+    jnOverlay(`<div class="jn-ed-h"><b>💼 Розподілити ${M(total)}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">Відсотки по конвертах і скарбничках. Решта лишається вільною. Шаблон запамʼятається.</small>
       <div class="rl-split">${envs.map(e=>`<label class="rl-sp"><span>${safeEmoji(e.emoji,'✉️')}</span><span class="rl-sp-n">${esc(e.name)}</span>
         <input type="number" inputmode="numeric" min="0" max="100" step="5" data-rlpct="${esc(e.id)}" value="${pctOf(e)||''}" placeholder="0" aria-label="Відсоток для ${esc(e.name)}"><i>%</i><b data-rlamt="${esc(e.id)}"></b></label>`).join('')}</div>
       <div class="rl-split-tot" id="rlTot"></div>
+      ${typeof fl503020==='function'&&envs.length?`<button class="mo-set" data-rl532>🥧 Заповнити за 50/30/20</button>`:''}
       <div class="jn-ed-foot"><button class="jn-btn" data-rlgo>Розкласти</button></div>`, ov=>{
+      { const b=ov.querySelector('[data-rl532]'); if(b) b.onclick=()=>flApply503020(ov,envs); }
       const upd=()=>{ let sum=0; ov.querySelectorAll('[data-rlpct]').forEach(i=>{ const p=Math.max(0,Math.min(100,+i.value||0)); sum+=p;
-          const b=ov.querySelector('[data-rlamt="'+CSS.escape(i.dataset.rlpct)+'"]'); if(b) b.textContent=p?wlMoney(Math.round(total*p/100)):''; });
-        const t=ov.querySelector('#rlTot'); t.textContent=sum>100?'Разом '+sum+'% — більше 100%':'Розкласти '+sum+'% ('+wlMoney(Math.round(total*sum/100))+') · вільними '+wlMoney(total-Math.round(total*sum/100));
+          const b=ov.querySelector('[data-rlamt="'+CSS.escape(i.dataset.rlpct)+'"]'); if(b) b.textContent=p?M(Math.round(total*p/100)):''; });
+        const t=ov.querySelector('#rlTot'); t.textContent=sum>100?'Разом '+sum+'% — більше 100%':'Розкласти '+sum+'% ('+M(Math.round(total*sum/100))+') · вільними '+M(total-Math.round(total*sum/100));
         t.classList.toggle('bad',sum>100); return sum; };
       ov.querySelectorAll('[data-rlpct]').forEach(i=>i.oninput=upd); upd();
       ov.querySelector('[data-rlgo]').onclick=()=>{
         const sum=upd(); if(sum>100){ plToast('Разом більше 100%'); return; }
         const rows=[...ov.querySelectorAll('[data-rlpct]')].map(i=>({envId:i.dataset.rlpct, pct:Math.max(0,Math.min(100,Math.round(+i.value||0)))})).filter(r=>r.pct>0);
-        let free=0; try{ free=walletBalance(); }catch(_){}
+        let free=0; try{ free=curFree(c); }catch(_){}
         const need=rows.reduce((s,r)=>s+Math.round(total*r.pct/100),0);
-        if(need>free){ plToast('У Гаманці вільно лише '+wlMoney(free)); return; }
+        if(need>free){ plToast('У Гаманці вільно лише '+M(free)); return; }
         rows.forEach(r=>{ const e=envelopes.find(x=>String(x.id)===String(r.envId)); const a=Math.round(total*r.pct/100); if(e&&a>0) envAddOp(e,'in',a,'Розподіл зарплати'); });
-        h.salarySplit=rows; rlMark('salary',true,need); saveGoals();
-        ov.remove(); try{ renderFinance(); }catch(_){} plToast('💼 Розкладено '+wlMoney(need)+' по '+rows.length+' '+pluralUk(rows.length,'конверту','конвертах','конвертах'));
+        // шаблон — спільний для всіх валют: міняємо лише рядки конвертів цієї валюти, інші лишаються
+        const shown=new Set(envs.map(e=>String(e.id)));
+        h.salarySplit=tpl.filter(x=>x&&!shown.has(String(x.envId))).concat(rows); rlMark('salary',true,need); saveGoals();
+        ov.remove(); try{ renderFinance(); }catch(_){} plToast('💼 Розкладено '+M(need)+' по '+rows.length+' '+pluralUk(rows.length,'конверту','конвертах','конвертах'));
       };
     });
   }
@@ -32993,7 +33111,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     return null;
   }
   function rlJournalHTML(){
-    let h='';
+    let h=typeof flReviewHTML==='function'?flReviewHTML():'';   // «Огляд місяця» (49-finlit.js)
     const d=rlDiscipline();
     if(d.all>=3) h+=`<button class="rl-disc" data-rlbook><span class="rl-ring" style="--p:${Math.round(d.ok/d.all*100)}"><em>${Math.round(d.ok/d.all*100)}%</em></span><span><b>Дисципліна тижня</b><small>правила дотримано ${d.ok} з ${d.all} ${pluralUk(d.all,'разу','разів','разів')}</small></span><i>›</i></button>`;
     const c=rlEasyCand();
@@ -33004,6 +33122,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   function rlJournalBind(c){
     c.querySelectorAll('[data-rlbook]').forEach(b=>b.onclick=()=>rlBook());
+    try{ if(typeof flReviewBind==='function') flReviewBind(c); }catch(_){}
     c.querySelectorAll('[data-rleasy]').forEach(b=>b.onclick=()=>{
       const g=(goalsData.goals||[]).find(x=>String(x.id)===b.dataset.rleasy); if(!g) return;
       const td=ymdLocal(); let ds=td, h=dyFreeSlot(td,0.25);
@@ -33034,8 +33153,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
             <div class="rl-bk-f">${rlFlow(r).map(x=>`<span>${esc(x)}</span>`).join('<i>→</i>')}</div>
             <div class="rl-bk-s"><small>${esc(stat)}</small>${r.n!==undefined?`<button class="rl-n" data-rln2="${r.id}">${r.unit==='cur'?money(rlN(r.id)):rlN(r.id)+(r.unit==='%'?'%':' '+esc(rlUnit(r,rlN(r.id))))}</button>`:''}
             <button class="rl-tg${on?' on':''}" data-rltg="${r.id}" role="switch" aria-checked="${on}" aria-label="${esc(r.t)}"></button></div></div>`; }).join('')}</div>`).join('')}
+        ${typeof flSchoolHTML==='function'?flSchoolHTML():''}
         <small class="mo-note">Правила, що чіпають гроші, лише пропонують — записують після твого тапу. «Трекер сам» знімає свою ✓, якщо зняти «Зроблено».</small></div>`;
       ov.querySelector('[data-rlbx]').onclick=()=>{ ov.remove(); try{ jnRender(); }catch(_){} };
+      try{ if(typeof flSchoolBind==='function') flSchoolBind(ov,draw); }catch(_){}
       ov.querySelectorAll('[data-rltg]').forEach(b=>b.onclick=()=>{ const id=b.dataset.rltg, hh=jnHero(); if(!hh.rules||typeof hh.rules!=='object'||Array.isArray(hh.rules)) hh.rules={};
         hh.rules[id]=Object.assign({},hh.rules[id]||{},{on:!rlOn(id)}); saveGoals(); draw(); });
       ov.querySelectorAll('[data-rln2]').forEach(b=>b.onclick=()=>{ const r=rlDef(b.dataset.rln2); if(!r) return;
@@ -33057,7 +33178,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <div class="rl-split">${envs.map(e=>`<label class="rl-sp"><span>${safeEmoji(e.emoji,'✉️')}</span><span class="rl-sp-n">${esc(e.name)}</span>
         <input type="number" inputmode="numeric" min="0" max="100" step="5" data-rlpct="${esc(e.id)}" value="${pctOf(e)||''}" placeholder="0" aria-label="Відсоток для ${esc(e.name)}"><i>%</i></label>`).join('')}</div>
       <div class="rl-split-tot" id="rlTot"></div>
+      ${typeof fl503020==='function'&&envs.length?`<button class="mo-set" data-rl532>🥧 Заповнити за 50/30/20</button>`:''}
       <div class="jn-ed-foot"><button class="jn-btn" data-rlsave>Зберегти шаблон</button></div>`, ov=>{
+      { const b=ov.querySelector('[data-rl532]'); if(b) b.onclick=()=>flApply503020(ov,envs); }
       const upd=()=>{ let s=0; ov.querySelectorAll('[data-rlpct]').forEach(i=>s+=Math.max(0,Math.min(100,+i.value||0)));
         const t=ov.querySelector('#rlTot'); t.textContent=s>100?'Разом '+s+'% — більше 100%':'Разом '+s+'% · вільними лишиться '+(100-s)+'%'; t.classList.toggle('bad',s>100); return s; };
       ov.querySelectorAll('[data-rlpct]').forEach(i=>i.oninput=upd); upd();
@@ -33078,15 +33201,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     p.in=Array.isArray(p.in)?p.in.filter(r=>r&&typeof r==='object'&&!Array.isArray(r)):[]; p.out=Array.isArray(p.out)?p.out.filter(r=>r&&typeof r==='object'&&!Array.isArray(r)):[];
     return p;
   }
+  // валюта рядка Плану (етап 3 валют): r.cur — неголовна; без нього — головна ('')
+  function rlRowCur(r){ const c=r&&r.cur; return c&&curOk(c)&&c!==mainCur()?c:''; }
   function rlPlanFact(ym,id){ return (finOps||[]).filter(o=>o&&o.planId===id&&String(o.date||'').slice(0,7)===ym).reduce((s,o)=>s+(+o.amount||0),0); }
   function rlPrevYm(ym){ const y=+ym.slice(0,4), m=+ym.slice(5,7); return m===1?(y-1)+'-12':y+'-'+String(m-1).padStart(2,'0'); }
   // прогноз на кінець місяця — той самий і для вкладки «План», і для віджета Гаманця (48-widgets.js)
   function rlRecurring(){ return (typeof recurring!=='undefined'&&Array.isArray(recurring)?recurring:[]).filter(r=>r&&+r.amount>0); }
   function rlForecast(ym){
     const p=rlPlan(ym,false)||{in:[],out:[]}; let free=0; try{ free=walletBalance(); }catch(_){}
-    const left=(rows)=>rows.reduce((s,r)=>s+Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)),0);
+    // лише головна валюта: рядки в € не змішуємо з гривнями
+    const left=(rows)=>rows.filter(r=>!rlRowCur(r)).reduce((s,r)=>s+Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)),0);
     const recLeft=rlRecurring().filter(r=>r.lastYM!==ym).reduce((s,r)=>s+(+r.amount||0),0);
-    return Math.round(free+left(p.in)-left(p.out)-recLeft);
+    let wk=0; try{ if(typeof wkExpectedMain==='function') wk=wkExpectedMain(ym); }catch(_){}   // очікувана зарплата з Роботи (51-money-reset.js)
+    return Math.round(free+left(p.in)+wk-left(p.out)-recLeft);
   }
   // ще не закриті рядки плану (дохід і витрати), від найближчого дня
   function rlPlanOpen(ym){
@@ -33097,15 +33224,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function rlPlanHTML(ym){
     const p=rlPlan(ym,false)||{in:[],out:[]}, all=wlAgg(wlMonthOps(ym));
     const recs=rlRecurring();
-    const pIn=p.in.reduce((s,r)=>s+(+r.amt||0),0), pOut=p.out.reduce((s,r)=>s+(+r.amt||0),0)+recs.reduce((s,r)=>s+(+r.amount||0),0);
+    const pIn=p.in.filter(r=>!rlRowCur(r)).reduce((s,r)=>s+(+r.amt||0),0), pOut=p.out.filter(r=>!rlRowCur(r)).reduce((s,r)=>s+(+r.amt||0),0)+recs.reduce((s,r)=>s+(+r.amount||0),0);
     const fc=rlForecast(ym);
-    const row=(r,k)=>{ const f=rlPlanFact(ym,r.id), ok=f>=(+r.amt||0)&&f>0;
-      return `<button class="rl-pr${ok?' ok':''}" data-rlpr="${k}|${esc(r.id)}"><span class="rl-pr-d">${r.day?esc(String(r.day)):'—'}</span><span class="rl-pr-n"><b>${esc(r.t||'Без назви')}</b><small>${ok?'✓ записано '+wlMoney(f):f?'частково '+wlMoney(f):'тапни, коли '+(k==='in'?'прийде':'сплатиш')}</small></span><b class="${k}">${k==='in'?'+':'−'}${wlMoney(r.amt)}</b></button>`; };
+    const row=(r,k)=>{ const rc=rlRowCur(r), f=rlPlanFact(ym,r.id), ok=f>=(+r.amt||0)&&f>0;
+      return `<button class="rl-pr${ok?' ok':''}" data-rlpr="${k}|${esc(r.id)}"><span class="rl-pr-d">${r.day?esc(String(r.day)):'—'}</span><span class="rl-pr-n"><b>${esc(r.t||'Без назви')}</b><small>${ok?'✓ записано '+esc(money(f,rc)):f?'частково '+esc(money(f,rc)):'тапни, коли '+(k==='in'?'прийде':'сплатиш')}</small></span><b class="${k}">${k==='in'?'+':'−'}${esc(money(r.amt,rc))}</b></button>`; };
     const prev=rlPlan(rlPrevYm(ym),false), canCopy=!p.in.length&&!p.out.length&&prev&&(prev.in.length||prev.out.length);
     return `<div class="rl-fc"><small>Прогноз на кінець місяця</small><b class="${fc<0?'neg':''}">${fc<0?'−':''}${wlMoney(Math.abs(fc))}</b>
         <span class="wl-sp"><span>план доходу <b>${wlMoney(pIn)}</b> · є ${wlMoney(all.inc)}</span><span>план витрат <b>${wlMoney(pOut)}</b> · є ${wlMoney(all.out)}</span></span></div>
       ${canCopy?`<button class="mo-set" data-rlcopy>Взяти план з минулого місяця</button>`:''}
       <div class="wl-sec"><span>Доходи</span><button data-rladd="in">＋ дохід</button></div>
+      ${typeof wkPlanRowHTML==='function'?wkPlanRowHTML(ym):''}
       ${p.in.length?p.in.slice().sort((a,b)=>(+a.day||99)-(+b.day||99)).map(r=>row(r,'in')).join(''):'<div class="dy-empty"><span>Зарплата, оплата від клієнта — що чекаєш цього місяця.</span></div>'}
       <div class="wl-sec"><span>Витрати</span><button data-rladd="out">＋ витрата</button></div>
       ${p.out.slice().sort((a,b)=>(+a.day||99)-(+b.day||99)).map(r=>row(r,'out')).join('')}
@@ -33115,40 +33243,48 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   function rlPlanBind(c,ym){
     c.querySelectorAll('[data-rladd]').forEach(b=>b.onclick=()=>rlPlanEdit(ym,b.dataset.rladd,null));
+    try{ if(typeof wkPlanBind==='function') wkPlanBind(c); }catch(_){}
     c.querySelectorAll('[data-rlpr]').forEach(b=>b.onclick=()=>{ const [k,id]=b.dataset.rlpr.split('|'); rlPlanRowMenu(ym,k,id); });
     { const s=c.querySelector('[data-rlsal]'); if(s) s.onclick=rlSalaryTpl; }
     { const cp=c.querySelector('[data-rlcopy]'); if(cp) cp.onclick=()=>{ const prev=rlPlan(rlPrevYm(ym),false); if(!prev) return; const p=rlPlan(ym,true);
-      const cl=r=>({id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), t:String(r.t||'').slice(0,60), amt:Math.max(0,Math.round(+r.amt||0)), day:r.day||null});
+      const cl=r=>({id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), t:String(r.t||'').slice(0,60), amt:Math.max(0,Math.round(+r.amt||0)), day:r.day||null, ...(rlRowCur(r)?{cur:rlRowCur(r)}:{})});
       p.in=prev.in.map(cl); p.out=prev.out.map(cl); saveGoals(); renderFinance(); plToast('План скопійовано'); }; }
   }
   function rlPlanEdit(ym,k,id){
-    const p=rlPlan(ym,true), r=id?p[k].find(x=>x.id===id):null;
+    const p=rlPlan(ym,true), r=id?p[k].find(x=>x.id===id):null, curs=[mainCur()].concat(typeof wlCurList==='function'?wlCurList():[]);
+    let rc=(r&&rlRowCur(r))||mainCur();
+    const locked=!!(r&&rlPlanFact(ym,r.id)>0);   // уже є записи — валюту рядка не міняємо (суми змішались би)
     jnOverlay(`<div class="jn-ed-h"><b>${r?'Змінити':(k==='in'?'＋ Дохід у план':'− Витрата в план')}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <label class="jn-f"><span>Що</span><input id="rlT" maxlength="60" value="${esc(r?r.t:'')}" placeholder="${k==='in'?'Зарплата, аванс, клієнт…':'Оренда, звʼязок, курс…'}"></label>
-      <label class="jn-f"><span>Сума, ${curSym()}</span><input id="rlA" type="number" inputmode="decimal" min="0" step="1" value="${r?esc(String(r.amt)):''}" placeholder="Напр. 20000"></label>
+      ${curs.length>1&&!locked?`<div class="jn-f"><span>Валюта</span><div class="wl-chips">${curs.map(c=>`<button data-rlc="${c}"${c===rc?' class="on"':''}>${esc(curSym(c))} ${esc((CUR_LIST[c]||{}).n||c)}</button>`).join('')}</div></div>`:''}
+      <label class="jn-f"><span id="rlAl">Сума, ${esc(curSym(rc))}</span><input id="rlA" type="number" inputmode="decimal" min="0" step="1" value="${r?esc(String(r.amt)):''}" placeholder="Напр. 20000"></label>
       <label class="jn-f"><span>День місяця (необовʼязково)</span><input id="rlD" type="number" inputmode="numeric" min="1" max="31" value="${r&&r.day?esc(String(r.day)):''}" placeholder="Напр. 5"></label>
       <div class="jn-ed-foot"><button class="jn-btn" data-rlok>Зберегти</button></div>`, ov=>{
+      ov.querySelectorAll('[data-rlc]').forEach(b=>b.onclick=()=>{ rc=b.dataset.rlc; ov.querySelectorAll('[data-rlc]').forEach(x=>x.classList.toggle('on',x===b)); ov.querySelector('#rlAl').textContent='Сума, '+curSym(rc); });
       ov.querySelector('[data-rlok]').onclick=()=>{
         const t=String(ov.querySelector('#rlT').value||'').trim().slice(0,60), amt=Math.round(parseFloat(String(ov.querySelector('#rlA').value||'').replace(',','.'))||0);
         const dd=parseInt(ov.querySelector('#rlD').value,10), day=dd>=1&&dd<=31?dd:null;
         if(!t){ plToast('Напиши, що це'); return; } if(!(amt>0)){ plToast('Вкажи суму'); return; }
-        if(r) Object.assign(r,{t,amt,day}); else p[k].push({id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), t, amt, day});
+        const row=r||{id:'pl'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}; Object.assign(row,{t,amt,day});
+        if(rc!==mainCur()) row.cur=rc; else delete row.cur;
+        if(!r) p[k].push(row);
         saveGoals(); ov.remove(); renderFinance(); };
     });
   }
   function rlPlanRowMenu(ym,k,id){
     const p=rlPlan(ym,false); const r=p&&Array.isArray(p[k])?p[k].find(x=>x.id===id):null; if(!r) return;
-    const f=rlPlanFact(ym,id), rest=Math.max(0,(+r.amt||0)-f), items=[];
-    if(rest>0) items.push({ic:'plus', label:(k==='in'?'Прийшло':'Сплатив')+' · '+wlMoney(rest), sub:'запише '+(k==='in'?'дохід':'витрату')+' в Гаманець сьогодні', onClick:()=>{
-      inputModal({title:(k==='in'?'Скільки прийшло':'Скільки сплатив')+', '+curSym(), value:String(rest), placeholder:String(rest), onOk:v=>{
+    const f=rlPlanFact(ym,id), rest=Math.max(0,(+r.amt||0)-f), items=[], rc=rlRowCur(r);
+    if(rest>0) items.push({ic:'plus', label:(k==='in'?'Прийшло':'Сплатив')+' · '+money(rest,rc), sub:'запише '+(k==='in'?'дохід':'витрату')+' в Гаманець сьогодні', onClick:()=>{
+      inputModal({title:(k==='in'?'Скільки прийшло':'Скільки сплатив')+', '+curSym(rc), value:String(rest), placeholder:String(rest), onOk:v=>{
         const amount=Math.round(parseFloat(String(v||'').replace(',','.'))*100)/100; if(!(amount>0)) return;
         const op={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:k, amount, label:String(r.t||'').slice(0,80), date:ymdLocal(), card:mainCard().id, planId:r.id};
+        if(rc){ op.cur=rc; try{ const l=wlCurList(); if(!l.includes(rc)){ l.push(rc); wlCurSave(l); } }catch(_){} }   // у баланс валюти рядка
         finOps.push(op); saveFinOps(); renderFinance();
         try{ flowReact(k==='in'?'income':'spend',{amount}); }catch(_){}
         rlOnOp(op); }}); }});
     items.push({ic:'edit', label:'Змінити', onClick:()=>rlPlanEdit(ym,k,id)});
     items.push({ic:'trash', label:'Прибрати з плану', sub:f?'записані операції лишаться в Гаманці':'', danger:true, onClick:()=>{ const pp=rlPlan(ym,false); if(!pp) return; pp[k]=pp[k].filter(x=>x.id!==id); saveGoals(); renderFinance(); }});
-    actionSheet({title:r.t||'План', sub:(k==='in'?'+':'−')+wlMoney(r.amt)+(f?' · записано '+wlMoney(f):''), items});
+    actionSheet({title:r.t||'План', sub:(k==='in'?'+':'−')+money(r.amt,rc)+(f?' · записано '+money(f,rc):''), items});
   }
   /* ════════ Герої-напарники (48-hero.js): дівчина й хлопець у балаклавах, худі Frequency ════════
      Рішення Ярослава 09.10.2026: поруч зі звірками (FLOW_PETS) — два нові герої у стилі
@@ -33474,7 +33610,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1};
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1};
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -33526,12 +33662,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         ${rw?`<small class="wg-pz">${safeEmoji(rw.emoji,'🎁')} ${rp}% на «${esc(String(rw.t).slice(0,18))}»</small>`:''}`,` style="--mc:${safeColor(g.color,'#34c77b')}"`);
     }
     if(t==='wgenv'){
-      const envs=(envelopes||[]).filter(e=>e&&e.id); let tot=0; envs.forEach(e=>{ try{ tot+=envSaved(e); }catch(_){} });
+      const envs=(envelopes||[]).filter(e=>e&&e.id&&!envCur(e)); let tot=0; envs.forEach(e=>{ try{ tot+=envSaved(e); }catch(_){} });   // сума — лише головна валюта
       let rows=[]; try{ rows=rlPlanOpen(ym).slice(0,2); }catch(_){}
       const td=+ymdLocal().slice(8,10);
       return wgTile('c-env',`<button class="wg-hit" data-wga="envs" aria-label="Конверти"></button>
         <span class="wg-h">✉️ Конверти</span><b class="wg-big">${wgK(tot)}</b>
-        ${rows.length?rows.map(x=>`<button class="wg-li" data-wga="plan" data-wgp="${x.k}|${esc(x.r.id)}"><span>${esc(String(x.r.t||'').slice(0,14))}${x.r.day?` · ${+x.r.day<td?'<i>прострочено</i>':esc(String(x.r.day))+'-го'}`:''}</span><b>${x.k==='in'?'+':'−'}${wgK(x.rest)}</b></button>`).join('')
+        ${rows.length?rows.map(x=>`<button class="wg-li" data-wga="plan" data-wgp="${x.k}|${esc(x.r.id)}"><span>${esc(String(x.r.t||'').slice(0,14))}${x.r.day?` · ${+x.r.day<td?'<i>прострочено</i>':esc(String(x.r.day))+'-го'}`:''}</span><b>${x.k==='in'?'+':'−'}${esc(moneyK(x.rest,rlRowCur(x.r)))}</b></button>`).join('')
           :`<button class="wg-li" data-wga="planadd"><span>План місяця порожній</span><b>＋</b></button>`}`);
     }
     if(t==='wgdebt'){
@@ -33540,6 +33676,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <span class="wg-h">🤝 Борги · 📖 Правила</span>
         <span class="wg-two"><span><b class="wg-big">${d.net>0?'+':''}${wgK(d.net)}</b><small>${d.owed||d.owe?'мені винні '+wgK(d.owed)+' · я винен '+wgK(d.owe):'боргів нема'}</small></span>
         <button class="wg-rules" data-wga="rules"><b>🔥 ${s} ${pluralUk(s,'день','дні','днів')}</b><small>${dc.all?'дисципліна '+Math.round(dc.ok/dc.all*100)+'%':'Книга правил ›'}</small></button></span>`);
+    }
+    if(t==='wgwork'){
+      const i=typeof wkMoneyInfo==='function'?wkMoneyInfo(ym):null;
+      if(!i) return '';
+      return wgTile('wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
+        <span class="wg-h">⏱ Робота · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
+        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>`);
     }
     if(t==='wgmoney'){
       const kind=b.kind==='out'?'out':'in', src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&b.cur!==mainCur()&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:'';
@@ -33572,6 +33715,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     else if(a==='plan'){ const [k,pid]=String(el.dataset.wgp||'').split('|'); try{ rlPlanRowMenu(wlYm(),k,pid); }catch(_){} }
     else if(a==='planadd'){ try{ wlState.tab='plan'; goFinance(); }catch(_){} }
     else if(a==='debts'){ try{ goDebts(); }catch(_){} }
+    else if(a==='work'){ try{ goWork(); }catch(_){} }
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }
     else if(a==='cfg'){ if(id) wgMoneyCfg(id,false); }
@@ -33590,7 +33734,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     (root||document).querySelectorAll('[data-wghost]').forEach(h=>{ let b=null; try{ b=getBlock(h.dataset.wghost); }catch(_){} if(b) wgFill(h,b,fk); });
   }
   // плитки в Гаманці (вкладка «Огляд», під кнопками): картка балансу вже зверху, тож без «Гаманця»
-  function wgWalletHTML(){ return '<div class="wg-home wl-wg"><div class="wg-grid">'+['wgmission','wgenv','wgdebt'].map(t=>`<div class="wg-host" data-wghome="${t}"></div>`).join('')+'</div></div>'; }
+  function wgWalletHTML(){ let w=false; try{ w=typeof wkMoneyInfo==='function'&&!!(wkMoneyInfo()||{}).has; }catch(_){}   // «⏱ Робота» — коли в календарі є години цього місяця
+    return '<div class="wg-home wl-wg"><div class="wg-grid">'+(w?['wgmission','wgenv','wgwork','wgdebt']:['wgmission','wgenv','wgdebt']).map(t=>`<div class="wg-host" data-wghome="${t}"></div>`).join('')+'</div></div>'; }
   function wgHome(root){ (root||document).querySelectorAll('[data-wghome]').forEach(h=>wgFill(h,{type:h.dataset.wghome},'')); }
   // після будь-якого запису грошей — перемалювати всі видимі віджети
   function wgRefresh(){ try{ wgFillPage(document); }catch(_){} try{ wgHome(); }catch(_){} }
@@ -33656,6 +33801,277 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         plToast('🧹 Прибрано: '+(r.n?r.n+' '+pluralUk(r.n,'блок','блоки','блоків'):'')+(r.n&&r.pj?' · ':'')+(r.pj?r.pj+' '+pluralUk(r.pj,'проєкт','проєкти','проєктів'):''));
         try{ renderBoard(); }catch(_){}
       }});
+  }
+  /* ════════ Фінансові звички і «Школа грошей» (49-finlit.js, 10.10.2026) ════════
+     Додає в Книгу правил (47-rules.js, масив RL) групу «Фінансові звички». Як і решта правил — лише пропонують,
+     записує людина; кожне вимикається. Усе в головній валюті.
+       first  «Спершу собі»       — дохід → «Відкласти N% у Подушку?» (конверт «Подушка»; нема — створюється після «так»)
+       h24    «Правило 24 годин»  — витрата ≥ N → «Почекати добу?» → нагадування в планері на завтра, витрату не пишемо
+       cushion «Подушка безпеки»  — ціль: N місяців середніх витрат; видно прогрес і кнопку «Поставити ціль»
+       review «Огляд місяця»      — перші 7 днів місяця: картка в Журналі з підсумком минулого місяця
+     Плюс кнопка «50/30/20» у розподілі зарплати і 6 карток-уроків «Школа грошей». */
+
+  RL.push(
+    {id:'first',  grp:'Фінансові звички', em:'🐷', t:'Спершу собі',       flow:['дохід','{n}% у Подушку?'], on:true, n:10, unit:'%', min:1, max:50},
+    {id:'h24',    grp:'Фінансові звички', em:'⏳', t:'Правило 24 годин',  flow:['витрата ≥ {n}','почекати добу?'], on:false, n:5000, unit:'cur', min:100, max:10000000},
+    {id:'cushion',grp:'Фінансові звички', em:'🛟', t:'Подушка безпеки',   flow:['{n} міс. витрат','ціль Подушки'], on:true, n:3, unit:'міс.', min:1, max:12},
+    {id:'review', grp:'Фінансові звички', em:'📊', t:'Огляд місяця',      flow:['початок місяця','підсумок і норма 20%'], on:true}
+  );
+
+  // ── спільне ──
+  function flCushionEnv(){ return (envelopes||[]).find(e=>e&&!envCur(e)&&e.kind!=='приз'&&/подушк/i.test(String(e.name||'')))||null; }
+  function flMonthAgg(ym){ return wlAgg(wlMonthOps(ym)); }
+  function flPrevYm(ym){ const y=+ym.slice(0,4), m=+ym.slice(5,7); return m===1?(y-1)+'-12':y+'-'+String(m-1).padStart(2,'0'); }
+  // відкладено за місяць: поповнення конвертів і скарбничок головної валюти (рух «У конверт» = out з envId без envSpend)
+  function flSavedIn(ym){ return (finOps||[]).filter(o=>o&&opMain(o)&&o.type==='out'&&o.envId&&!o.envSpend&&String(o.date||'').slice(0,7)===ym).reduce((s,o)=>s+(+o.amount||0),0)
+    -(finOps||[]).filter(o=>o&&opMain(o)&&o.type==='in'&&o._tr&&(o.envBack||o.envId)&&String(o.date||'').slice(0,7)===ym).reduce((s,o)=>s+(+o.amount||0),0); }
+  // середні витрати за 3 повні минулі місяці (є дані — рахуємо лише їх)
+  function flAvgSpend(){ let ym=wlYm(), s=0, n=0; for(let i=0;i<3;i++){ ym=flPrevYm(ym); const a=flMonthAgg(ym); if(a.out>0){ s+=a.out; n++; } } return n?Math.round(s/n):0; }
+
+  // ── «Спершу собі»: після доходу (47-rules.js rlOnOp кличе, якщо не спрацювали зарплата й скарбничка) ──
+  function flOnIncome(op){
+    if(!op||!opMain(op)||op.type!=='in'||op._tr||!rlOn('first')) return false;
+    if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))) return false;   // конверти ще не прочитано — не створюємо «Подушку» поверх справжніх
+    if(+op.amount<1000) return false;   // дрібні надходження не чіпаємо
+    const pct=Math.max(1,Math.min(50,+rlN('first')||10)), amt=Math.round(+op.amount*pct/100);
+    let free=0; try{ free=walletBalance(); }catch(_){}
+    if(!(amt>0)||amt>free) return false;
+    const e=flCushionEnv();
+    setTimeout(()=>rlOffer('🐷','Спершу собі', (op.label||'Дохід')+' +'+money(op.amount)+'. Відкласти '+pct+'% ('+money(amt)+') у '+(e?'«'+e.name+'»':'нову «Подушку»')+'? Спершу собі — потім витрати.',
+      'Відкласти '+money(amt),'Не зараз',()=>{
+        if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))){ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); return; }
+        let f2=0; try{ f2=walletBalance(); }catch(_){} if(amt>f2){ plToast('Вільно лише '+money(f2)); return; }
+        let env=flCushionEnv();
+        if(!env){ env={id:'env_cushion_'+Date.now().toString(36), name:'Подушка', emoji:'🛟', color:'#3ec7b4', goal:0, saved:0, ops:[], kind:'витрати', link:'main', linkLabel:'головна папка'}; envelopes.push(env); }
+        envAddOp(env,'in',amt,'Спершу собі'); rlMark('first',true,amt); saveGoals(); try{ renderFinance(); }catch(_){}
+        plToast('🐷 '+money(amt)+' у «'+env.name+'»'); },
+      ()=>{ rlMark('first',false); saveGoals(); }),300);
+    return true;
+  }
+
+  // ── «Правило 24 годин»: перед записом великої витрати (46-wallet.js wlOpSheet). true — запис зупинено, чекаємо рішення ──
+  function flH24(amount,label,proceed,defer){
+    if(!rlOn('h24')) return false;
+    const lim=Math.max(100,+rlN('h24')||5000); if(!(+amount>=lim)) return false;
+    actionSheet({title:'⏳ Велика покупка · '+money(amount), sub:'Правило 24 годин: почекай добу — якщо завтра все ще потрібно, купуй спокійно. Якщо вже купив — тисни «Записати зараз».',
+      items:[
+        {ic:'calendar', label:'Подумати до завтра', sub:'нагадування в планері, витрату не записую', onClick:()=>{
+          const ds=dyAddDays(ymdLocal(),1); let h=null; try{ h=dyFreeSlot(ds,0.25); }catch(_){}
+          if(h===null) h=12;
+          try{ plBlocksFor(ds).push({id:dyNewId(), h, endH:h+0.25, t:'🤔 Купити «'+String(label||'покупку').slice(0,40)+'» за '+money(amount)+'?', c:'val', link:null, tag:'', folder:'', done:false}); saveGoals(); }catch(_){}
+          rlMark('h24',true,amount); saveGoals();
+          if(defer) try{ defer(); }catch(_){}
+          plToast('⏳ Нагадаю завтра о '+(typeof plHM==='function'?plHM(h):h+':00')); }},
+        {ic:'plus', label:'Записати зараз', sub:'покупка обдумана', onClick:()=>{ rlMark('h24',false); saveGoals(); proceed(); }}
+      ]});
+    return true;
+  }
+
+  // ── «Огляд місяця»: картка в Журналі перші 7 днів місяця (закривається на цей місяць — лише цей пристрій) ──
+  function flReviewHTML(){
+    if(!rlOn('review')) return '';
+    const td=ymdLocal(); if(+td.slice(8,10)>7) return '';
+    const pym=flPrevYm(td.slice(0,7)); let seen=false; try{ seen=localStorage.getItem('flow_fl_review')===pym; }catch(_){} if(seen) return '';
+    const a=flMonthAgg(pym); if(!(a.inc>0||a.out>0)) return '';
+    const sv=Math.max(0,flSavedIn(pym)), rate=a.inc>0?Math.round(sv/a.inc*100):0, good=rate>=20;
+    const mn=MO_NAMES[+pym.slice(5,7)-1];
+    return `<div class="fl-rev${good?' good':''}"><div class="fl-rev-h"><span>📊</span><b>${esc(mn)}: підсумок</b><button data-flrevx aria-label="Закрити">✕</button></div>
+      <div class="fl-rev-k"><span><small>заробив</small><b>${esc(money(a.inc))}</b></span><span><small>витратив</small><b>${esc(money(a.out))}</b></span><span><small>відклав</small><b>${esc(money(sv))}</b></span></div>
+      <div class="fl-rev-bar"><i style="width:${Math.min(100,rate)}%"></i><u style="left:20%"></u></div>
+      <p>${good?'Відклав '+rate+'% доходу — це норма фінансово здорової людини (20%+). Так тримати!':'Відкладено '+rate+'% доходу. Орієнтир — 20%: спробуй «Спершу собі» в Книзі правил.'}</p></div>`;
+  }
+  function flReviewBind(c){
+    c.querySelectorAll('[data-flrevx]').forEach(b=>b.onclick=()=>{ try{ localStorage.setItem('flow_fl_review', flPrevYm(ymdLocal().slice(0,7))); }catch(_){} rlMark('review',true); saveGoals(); try{ jnRender(); }catch(_){} });
+  }
+
+  // ── 50/30/20: розкласти відсотки по конвертах за типом (потреби / бажання / заощадження) ──
+  const FL_NEEDS=/продукт|житл|оренд|комунал|звʼязок|зв'язок|інтернет|транспорт|побут|здоров|ліки|кредит/i;
+  const FL_SAVE=/подушк|заощадж|резерв|інвест|запас|відпуст|мрі/i;
+  function fl503020(envs){
+    const g={n:[],w:[],s:[]};
+    envs.forEach(e=>{ const nm=String(e.name||''), k=String(e.id||'');
+      if(e.kind==='приз'||FL_SAVE.test(nm)||/^env_cushion/.test(k)) g.s.push(e); else if(FL_NEEDS.test(nm)||/^env_(food|trans|home|rent|util|net|health)_/.test(k)) g.n.push(e); else g.w.push(e); });
+    const out={}; const put=(arr,share)=>{ if(!arr.length) return; const each=Math.floor(share/arr.length); arr.forEach((e,i)=>{ out[e.id]=each+(i<share-each*arr.length?1:0); }); };
+    put(g.n,50); put(g.w,30); put(g.s,20);
+    return out;
+  }
+  // кнопку додає 47-rules.js у шторки розподілу; тут — заповнення полів
+  function flApply503020(ov,envs){
+    const m=fl503020(envs); ov.querySelectorAll('[data-rlpct]').forEach(i=>{ i.value=m[i.dataset.rlpct]?String(m[i.dataset.rlpct]):''; i.dispatchEvent(new Event('input')); });
+    plToast('50% потреби · 30% бажання · 20% заощадження');
+  }
+
+  // ── «Подушка безпеки» і «Школа грошей» — у Книзі правил ──
+  const FL_LESSONS=[
+    {id:'l503020', em:'🥧', t:'50/30/20', rule:'salary', p:'Половина доходу — на потреби (житло, їжа, транспорт), 30% — на бажання, 20% — на заощадження. Простий каркас, з якого легко почати. У розподілі зарплати є кнопка «50/30/20».'},
+    {id:'lfirst',  em:'🐷', t:'Спершу собі', rule:'first', p:'Відкладай одразу, коли прийшли гроші, а не те, що лишилось у кінці місяця — бо лишається зазвичай нуль. Навіть 10% щомісяця за рік дають більше місячного доходу.'},
+    {id:'lcushion',em:'🛟', t:'Подушка безпеки', rule:'cushion', p:'3–6 місяців звичайних витрат на окремому рахунку — і втрата роботи чи хвороба вже не катастрофа. Спершу подушка, потім інвестиції.'},
+    {id:'lh24',    em:'⏳', t:'Правило 24 годин', rule:'h24', p:'Велику незаплановану покупку відклади на добу. Якщо завтра вона все ще потрібна — купуй спокійно. Більшість імпульсних бажань до ранку зникає.'},
+    {id:'lenv',    em:'✉️', t:'Конверти', rule:'salary', p:'Розклади гроші по конвертах одразу після зарплати: Продукти, Житло, Кафе… Коли конверт порожній — категорія на цей місяць закрита. Видно, куди йдуть гроші, ще до того, як вони пішли.'},
+    {id:'ldebt',   em:'🧊', t:'Борги: лавина і сніжка', rule:'', p:'Лавина — гасиш спершу борг з найбільшим відсотком (вигідніше). Сніжка — спершу найменший (швидша перемога, більше мотивації). Обидва працюють, якщо платити більше мінімуму.'},
+  ];
+  function flCushionHTML(){
+    if(!rlOn('cushion')) return '';
+    const avg=flAvgSpend(), n=Math.max(1,+rlN('cushion')||3), target=Math.round(avg*n/100)*100, e=flCushionEnv(), sv=e?envSaved(e):0, pct=target?Math.min(100,Math.round(sv/target*100)):0;
+    return `<div class="fl-cush"><div class="fl-cush-h"><span>🛟</span><b>Подушка безпеки</b><small>${n} ${pluralUk(n,'місяць','місяці','місяців')} витрат</small></div>
+      ${avg?`<div class="fl-cush-n"><b>${esc(money(sv))}</b><small>з ${esc(money(target))} · середні витрати ${esc(money(avg))}/міс</small></div><div class="fl-rev-bar"><i style="width:${pct}%"></i></div>`
+        :`<small class="fl-cush-e">Ще мало даних про витрати — ціль зʼявиться після першого повного місяця.</small>`}
+      ${avg&&(!e||+e.goal!==target)?`<button class="mo-set" data-flcush>${e?'Поставити ціль «'+esc(e.name)+'» — '+esc(money(target)):'Створити конверт «Подушка» з ціллю '+esc(money(target))}</button>`:''}</div>`;
+  }
+  function flSchoolHTML(){
+    return `<div class="mo-h" style="margin-top:14px"><span>Школа грошей</span></div>${flCushionHTML()}
+      <div class="fl-school">${FL_LESSONS.map(l=>`<details class="fl-l"><summary><span>${l.em}</span><b>${esc(l.t)}</b><i>›</i></summary><p>${esc(l.p)}</p>
+        ${l.rule&&rlDef(l.rule)?(rlOn(l.rule)?`<small class="fl-on">✓ правило «${esc(rlDef(l.rule).t)}» увімкнене</small>`:`<button class="mo-set" data-flon="${l.rule}">Увімкнути «${esc(rlDef(l.rule).t)}»</button>`):''}</details>`).join('')}</div>`;
+  }
+  function flSchoolBind(ov,redraw){
+    ov.querySelectorAll('[data-flon]').forEach(b=>b.onclick=()=>{ const id=b.dataset.flon, hh=jnHero(); if(!hh.rules||typeof hh.rules!=='object'||Array.isArray(hh.rules)) hh.rules={};
+      hh.rules[id]=Object.assign({},hh.rules[id]||{},{on:true}); saveGoals(); redraw(); });
+    { const c=ov.querySelector('[data-flcush]'); if(c) c.onclick=()=>{
+      if(window.storeKeyReady&&!window.storeKeyReady(ENVKEY)){ plToast('Конверти ще завантажуються'); return; }
+      const target=Math.round(flAvgSpend()*Math.max(1,+rlN('cushion')||3)/100)*100; if(!(target>0)) return;   // кругла ціль
+      let e=flCushionEnv();
+      if(!e){ e={id:'env_cushion_'+Date.now().toString(36), name:'Подушка', emoji:'🛟', color:'#3ec7b4', goal:target, saved:0, ops:[], kind:'витрати', link:'main', linkLabel:'головна папка'}; envelopes.push(e); }
+      else e.goal=target;
+      saveEnvelopes(); plToast('🛟 Ціль Подушки — '+money(target)); redraw(); }; }
+  }
+  /* ════════ Швидкий запис з посилання (50-quickadd.js, 10.10.2026) ════════
+     Для Apple Pay через Команди iPhone (автоматизація «Транзакція») і будь-яких ярликів:
+       …/flow/?add=out&amount=230&label=Сільпо          — витрата
+       …/flow/?add=in&amount=5000&label=Клієнт&cur=EUR  — дохід у балансі €
+     Посилання НІЧОГО не пише саме: лише відкриває шторку Гаманця з уже вписаною сумою й назвою,
+     запис — після тапу «Записати» людиною. Дані з адреси — недовірені: сума лише число > 0, назва ≤ 80
+     символів (у поле через esc), валюта — лише код із CUR_LIST і лише якщо такий баланс уже є.
+     Після прочитання параметри прибираються з адреси (history.replaceState), щоб оновлення сторінки не відкривало шторку знову. */
+
+  // «230», «230,5», «1 230,50», «1,230.50» (англ. iPhone), «1.230,50» — останній роздільник = дробовий, решта — тисячі
+  function qaNum(v){
+    let t=String(v||'').replace(/[^\d.,]/g,''); if(!t) return 0;
+    const li=Math.max(t.lastIndexOf('.'),t.lastIndexOf(','));
+    if(li>=0){ const tail=t.slice(li+1); t=(tail.length===3&&(t.match(/[.,]/g)||[]).length===1&&t.indexOf(',')===li)?t.replace(/[.,]/g,'')   // «1,230» — тисячі
+      :t.slice(0,li).replace(/[.,]/g,'')+'.'+tail; }
+    const n=Math.round(parseFloat(t)*100)/100; return n>0&&n<1e9?n:0;
+  }
+  function qaParse(){
+    let sp; try{ sp=new URLSearchParams(location.search); }catch(_){ return null; }
+    const add=sp.get('add'); if(add!=='in'&&add!=='out') return null;
+    const amount=qaNum(sp.get('amount'));
+    const label=String(sp.get('label')||sp.get('merchant')||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,80);
+    const cur=String(sp.get('cur')||'').toUpperCase().slice(0,3);
+    return {type:add, amount, label, cur};
+  }
+  function qaClearUrl(){
+    try{ const u=new URL(location.href); ['add','amount','label','merchant','cur'].forEach(k=>u.searchParams.delete(k)); history.replaceState(history.state,'',u.pathname+(u.search||'')+u.hash); }catch(_){}
+  }
+  // чекаємо, поки load() прочитав Гаманець (інакше шторка відкриється над порожніми даними), максимум ~15 с
+  function qaRun(){
+    const q=qaParse(); if(!q) return;
+    try{ if(window.top!==window.self){ qaClearUrl(); return; } }catch(_){ return; }   // у чужій рамці — нічого не відкриваємо (прихований клік)
+    let tries=0;
+    const go=()=>{
+      tries++;
+      const ready=!!window.__migReport&&!(window.storeKeyReady&&!window.storeKeyReady('fin_ops'));
+      if(!ready&&tries<30){ setTimeout(go,500); return; }
+      qaClearUrl();
+      if(!ready){ try{ plToast('Гаманець ще не завантажився — запиши вручну'); }catch(_){} return; }
+      try{ goFinance(); }catch(_){}
+      let cur='';
+      try{ if(q.cur&&curOk(q.cur)&&q.cur!==mainCur()&&wlCurList().includes(q.cur)) cur=q.cur; }catch(_){}
+      setTimeout(()=>{ try{ wlOpSheet(q.type,'',{label:q.label, amount:q.amount, cur:cur||undefined, fromLink:true}); }catch(err){ console.error('quickadd',err); } },200);
+    };
+    setTimeout(go,300);
+  }
+  try{ qaRun(); }catch(_){}
+
+  // ── інструкція: як підключити Apple Pay через Команди ──
+  function qaGuide(){
+    const base=location.origin+location.pathname;
+    jnOverlay(`<div class="jn-ed-h"><b>💳 Apple Pay → Frequency</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">Після кожної оплати карткою з Гаманця Apple iPhone сам відкриє Frequency із сумою й магазином — лишиться тапнути «Записати».</small>
+      <ol class="qa-steps">
+        <li>Відкрий <b>Команди</b> → <b>Автоматизація</b> → <b>＋</b> → <b>Транзакція</b>.</li>
+        <li>Вибери свої картки, познач <b>«Запускати одразу»</b>.</li>
+        <li>Дія: <b>Відкрити URL</b>. Встав адресу нижче, а замість <code>СУМА</code> і <code>МАГАЗИН</code> підстав змінні <b>Сума</b> і <b>Продавець</b> з транзакції.</li>
+      </ol>
+      <div class="qa-url" id="qaUrl">${esc(base)}?add=out&amp;amount=СУМА&amp;label=МАГАЗИН</div>
+      <div class="jn-ed-foot"><button class="jn-btn ghost" data-qacopy>Скопіювати адресу</button><button class="jn-btn" data-qatry>Спробувати</button></div>
+      <small class="mo-note">Посилання відкривається в Safari, тож увійди там у той самий акаунт — запис синхронізується з застосунком. Сам застосунок нічого не записує без твого тапу.</small>`, ov=>{
+      ov.querySelector('[data-qacopy]').onclick=()=>{ const t=base+'?add=out&amount=СУМА&label=МАГАЗИН'; try{ navigator.clipboard.writeText(t).then(()=>plToast('Скопійовано'),()=>plToast('Не вдалося скопіювати')); }catch(_){ plToast('Не вдалося скопіювати'); } };
+      ov.querySelector('[data-qatry]').onclick=()=>{ ov.remove(); try{ wlOpSheet('out','',{label:'Перевірка Apple Pay — не записуй'}); }catch(_){} plToast('Так виглядатиме шторка після оплати. Закрий її — це лише перевірка'); };   // без суми: випадковий тап нічого не запише
+    });
+  }
+  /* ════════ Робота ↔ Гаманець і «Почати фінанси з нуля» (51-money-reset.js, 10.10.2026) ════════
+     1) wkMoneyInfo(ym) — лише ЧИТАННЯ календаря Роботи (20-work.js): години, зароблено (зміни + аванси/премії),
+        день виплати, чи зарплату вже записано (op._autoSal з _salYM). Записує зарплату, як і раніше, сама Робота
+        (syncSalaryToFin) — тут нічого не пишеться.
+        Використання: плитка «⏱ Робота» в Гаманці (48-widgets.js), рядок «Очікується з Роботи» у Плані й прогнозі (47-rules.js).
+     2) finResetScan / finResetAll — «Ще → Дані → Почати фінанси з нуля»: лише за тапом людини, після підтвердження
+        й лише коли fin_ops / конверти / goals_data звірені з хмарою. Стирає ГРОШІ: операції Гаманця, конверти й
+        скарбнички, регулярні платежі, План і цілі місяця, шаблон зарплати, додаткові валюти. Лишає: місії, Журнал,
+        папки, борги, години Роботи. Зарплати минулих місяців Робота після цього не записує знову (workPostedSal='deleted'). */
+
+  function wkMoneyInfo(ym){
+    ym=ym||wlYm();
+    let ss=[]; try{ ss=workSessionsIn(ym); }catch(_){ return null; }
+    let net=0; try{ net=extrasNet(ym); }catch(_){}
+    const hours=ss.reduce((s,w)=>s+(+w.hours||0),0), earned=ss.reduce((s,w)=>s+(+w.amount||0),0)+net;
+    const pushed=ss.filter(w=>w.pushed).reduce((s,w)=>s+(+w.amount||0),0);   // зміни, вже записані в Гаманець окремо
+    const y=+ym.slice(0,4), m=+ym.slice(5,7), dim=new Date(y,m,0).getDate();
+    const pday=Math.min(Math.max(parseInt(workPayday)||dim,1),dim);
+    const sal=(finOps||[]).find(o=>o&&o._autoSal===true&&o._salYM===ym)||null;
+    let cur=''; try{ const c=finCurCode(workCur); cur=c&&curOk(c)&&c!==mainCur()?c:''; }catch(_){}
+    const left=sal?0:Math.max(0,Math.round((earned-pushed)*100)/100);
+    const td=ymdLocal(), due=ym<td.slice(0,7)||(ym===td.slice(0,7)&&+td.slice(8,10)>=pday);   // день виплати вже настав
+    // зарплату цього місяця видалено руками чи обнулено фінанси — Робота її не запише, тож і не «очікуємо»
+    let skip=false; try{ skip=!sal&&workPostedSal&&workPostedSal[ym]==='deleted'; }catch(_){}
+    return {ym, hours, earned, pday, paid:!!sal, salOp:sal, cur, left:skip?0:left, due, skip, has:!skip&&(ss.length>0||Math.abs(net)>0)};
+  }
+  // очікувана зарплата в головній валюті (для прогнозу Плану): Робота в €, зарплата пишеться в ₴ за курсом — так само рахуємо
+  function wkExpectedMain(ym){
+    const i=wkMoneyInfo(ym); if(!i||!i.left) return 0;
+    try{ const p=rlPlan(ym,false); if(p&&p.in.some(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||'')))) return 0; }catch(_){}   // уже є в Плані — не двічі
+    if(!i.cur) return i.left;
+    const r=finLastRate(i.cur); return r>0?Math.round(i.left*r):0;
+  }
+  // рядок у вкладці «План» → Доходи (лише показ; тап — у календар Роботи)
+  function wkPlanRowHTML(ym){
+    const i=wkMoneyInfo(ym); if(!i||!i.has) return '';
+    const mn=MO_NAMES[+ym.slice(5,7)-1].toLowerCase();
+    return `<button class="rl-pr${i.paid?' ok':''}" data-wkgo><span class="rl-pr-d">${esc(String(i.pday))}</span><span class="rl-pr-n"><b>⏱ Зарплата за ${esc(mn)}</b><small>${i.paid?'✓ записано в Гаманець':esc(String(Math.round(i.hours*10)/10).replace('.',','))+' год · '+(i.due?'день виплати минув — тапни, Робота запише':'очікується '+esc(String(i.pday))+'-го')}</small></span><b class="in">+${esc(money(i.paid?(+i.salOp.amount||0):i.left, i.paid?'':i.cur))}</b></button>`;
+  }
+  function wkPlanBind(c){ c.querySelectorAll('[data-wkgo]').forEach(b=>b.onclick=()=>{ try{ goWork(); }catch(_){} }); }
+
+  // ── «Почати фінанси з нуля» ──
+  function finResetScan(){
+    const ops=(finOps||[]).length, envs=(envelopes||[]).length, recs=(typeof recurring!=='undefined'&&Array.isArray(recurring))?recurring.length:0;
+    const h=jnHero(); const plans=h.plan&&typeof h.plan==='object'?Object.keys(h.plan).length:0, goals=h.money&&typeof h.money==='object'?Object.keys(h.money).length:0;
+    let curs=0; try{ curs=wlCurList().length; }catch(_){}
+    return {ops, envs, recs, plans, goals, curs};
+  }
+  // довіра: хмара реально відповіла (sbDataTrusted) і ключі прочитано — інакше стара локальна копія (офлайн) затерла б чужі правки
+  function finResetReady(){
+    if(window.sbDataTrusted&&!window.sbDataTrusted()) return false;
+    return !(window.storeKeyReady&&!['fin_ops',ENVKEY,'goals_data','work_cfg'].every(k=>window.storeKeyReady(k)));
+  }
+  // перед стиранням — свіжі дані з хмари в памʼять (з входом); гість — лише локальні дані, звіряти нема з чим
+  async function finResetAll(){
+    try{ if(window.sbUser&&window.sbUser()&&typeof window.sbPullAndLoad==='function'){ const ok=await window.sbPullAndLoad(); if(!ok){ plToast('Хмара не відповіла — нічого не змінено. Перевір звʼязок.'); return false; } } }catch(_){ plToast('Хмара не відповіла — нічого не змінено.'); return false; }
+    if(!finResetReady()){ plToast('Дані ще звіряються з хмарою — спробуй за хвилину. Нічого не змінено.'); return false; }
+    // Робота: зарплати, вже записані, і всі минулі місяці — «не записувати знову» (інакше відкриття календаря повернуло б стару історію)
+    try{ const cur=wlYm(); if(!workPostedSal||typeof workPostedSal!=='object') workPostedSal={};
+      (finOps||[]).forEach(o=>{ if(o&&o._autoSal===true&&o._salYM) workPostedSal[o._salYM]='deleted'; });
+      (workSessions||[]).forEach(w=>{ const ym=String(w&&w.date||'').slice(0,7); if(/^\d{4}-\d{2}$/.test(ym)&&ym<cur) workPostedSal[ym]='deleted'; });
+      (typeof workExtras!=='undefined'&&Array.isArray(workExtras)?workExtras:[]).forEach(x=>{ const ym=String(x&&x.ym||''); if(/^\d{4}-\d{2}$/.test(ym)&&ym<cur) workPostedSal[ym]='deleted'; }); }catch(_){}
+    finOps=[]; saveFinOps();
+    envelopes=[]; saveEnvelopes();
+    try{ recurring=[]; saveRecurring(); }catch(_){}
+    const h=jnHero(); delete h.plan; delete h.money; delete h.salarySplit; saveGoals();
+    // призи місій: прив'язку до видаленої скарбнички знімаємо (сам приз і ціна лишаються)
+    try{ (goalsData.goals||[]).forEach(g=>{ if(g&&g.reward&&typeof g.reward==='object') delete g.reward.envId; }); saveGoals(); }catch(_){}   // «отримано» — досягнення, лишається
+    try{ wlCurSave([]); }catch(_){}
+    // години Роботи (work_sessions) не переписуємо — лише налаштування з позначками зарплат (work_cfg)
+    try{ const q=window.storage.set(WORKCFGKEY,JSON.stringify({rate:workRate,cur:workCur,payday:workPayday,postedSal:workPostedSal,cardId:workCardId}),false); if(q&&q.catch)q.catch(()=>{}); }catch(_){}
+    try{ renderFinance(); }catch(_){} try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}
+    return true;
   }
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
