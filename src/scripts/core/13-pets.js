@@ -31,14 +31,24 @@
     mia:{name:'Міа',kind:'героїня загону',vibe:'тепло',glow:'#ff8ab0',c:['#ff9cc0','#c2508a'],hero:'girl',
       line:'Я поруч. Робимо крок — і святкуємо.',
       persona:'ХАРАКТЕР: ти Міа — дівчина в рожевій балаклаві із загону Frequency. Тон: теплий, жвавий, на «ти», з легкою іронією. Підбадьорюєш, помічаєш дрібні перемоги, нагадуєш дбати про себе, але тримаєш курс на ціль.'},
+    // 10.10.2026: Рей — новий вигляд (чорна балаклава без кепки, добрий погляд); кепка стане вибором у шафі
     rey:{name:'Рей',kind:'герой загону',vibe:'впевненість',glow:'#8b7cff',c:['#5b4a9e','#2a2342'],hero:'guy',male:1,
       line:'Без шуму. Наступний крок — і вперед.',
-      persona:'ХАРАКТЕР: ти Рей — хлопець у кепці й балаклаві із загону Frequency. Тон: спокійний, впевнений, коротко й по ділу, трохи вуличного сленгу без грубощів. Тримаєш фокус і темп, прямо кажеш, що робити далі.'},
+      persona:'ХАРАКТЕР: ти Рей — хлопець у чорній балаклаві із загону Frequency. Тон: спокійний, впевнений, доброзичливий, коротко й по ділу, трохи вуличного сленгу без грубощів. Тримаєш фокус і темп, прямо кажеш, що робити далі.'},
+    lis:{name:'Лис',kind:'герой загону',vibe:'кмітливість',glow:'#7d94c4',c:['#8a9cc4','#3c4660'],hero:'fox',male:1,
+      line:'Є хитрий спосіб зробити це швидше.',
+      persona:'ХАРАКТЕР: ти Лис — хлопець у сірій балаклаві з лисячими вушками із загону Frequency. Тон: кмітливий, з легким гумором, на «ти». Знаходиш короткі шляхи й лайфхаки, ділиш справу на хитрі маленькі кроки, але не халтуриш.'},
   };
   FLOW_PETS.dev={name:'Нокс',kind:'чорний лис',vibe:'dev-режим',glow:'#5ce0a8',c:['#2a2e3d','#12141f'],male:true,
     line:'root@flow:~#',
     persona:''};
-  function petCur(){ try{ if(localStorage.getItem('ai_dev')==='1') return 'dev'; const p=localStorage.getItem('ai_pet'); return FLOW_PETS[p]&&p!=='dev'?p:'spark'; }catch(_){ return 'spark'; } }
+  /* Звірки сховані (рішення Ярослава 10.10.2026): у шторці лишаються лише герої загону (48-hero.js).
+     Код і записи звірків не видаляються — хто обрав звірка, бачить Міу, а ai_pet не переписується;
+     щоб повернути звірків, досить PETS_LEGACY_HIDDEN=false. Далі вирішимо: видалити чи окремим блоком. */
+  const PETS_LEGACY_HIDDEN=true;
+  function petCur(){ try{ if(localStorage.getItem('ai_dev')==='1') return 'dev'; const p=localStorage.getItem('ai_pet');
+    if(FLOW_PETS[p]&&p!=='dev'&&(!PETS_LEGACY_HIDDEN||FLOW_PETS[p].hero)) return p;
+    return PETS_LEGACY_HIDDEN?'mia':'spark'; }catch(_){ return PETS_LEGACY_HIDDEN?'mia':'spark'; } }
   function petPersona(){ return FLOW_PETS[petCur()].persona+' Ти залишаєшся Флоу-асистентом системи: усі правила і формат відповіді незмінні, характер впливає лише на тон.'; }
   function petSVG(id,size){
     try{ const h=heroSVG(id,size); if(h) return h; }catch(_){ }   // герої загону — кадри з 48-hero.js
@@ -85,7 +95,7 @@
   function petPickerSheet(){
     try{ heroLoad(); }catch(_){}   // кадри героїв загону — щоб у сітці були справжні портрети
     const ov=document.createElement('div'); ov.className='ai-ov'; ov.id='petOv';
-    const cards=Object.keys(FLOW_PETS).filter(id=>id!=='dev').map(id=>{ const q=FLOW_PETS[id];
+    const cards=Object.keys(FLOW_PETS).filter(id=>id!=='dev'&&(!PETS_LEGACY_HIDDEN||FLOW_PETS[id].hero)).map(id=>{ const q=FLOW_PETS[id];
       return `<div class="pet-card${id===petCur()?' on':''}" data-pet="${id}" style="--pc:${q.glow};border-color:${id===petCur()?q.glow:'var(--line)'}">
         <div style="display:flex;justify-content:center">${petSVG(id,56)}</div>
         <b>${q.name}</b><small>${q.kind}</small><span class="pv" style="color:${q.glow}">${q.vibe}</span></div>`; }).join('');
@@ -100,7 +110,7 @@
           <button data-fx="off">○ Вимк.</button>
         </div>
         <label class="fx-row" id="fxSayRow">
-          <div><b>Фрази Спарка</b><small>короткі репліки на дії</small></div>
+          <div><b>Фрази напарника</b><small>короткі репліки на дії</small></div>
           <span class="fx-toggle" id="fxSay"></span>
         </label>
         <label class="fx-row" id="fxShowRow">
