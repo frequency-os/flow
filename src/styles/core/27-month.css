@@ -180,3 +180,23 @@
   .cal-nc-t{font-size:15px;font-weight:600;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;}
   .cal-notecard.empty .cal-nc-t{color:var(--muted);}
   .cal-notecard:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  /* цілі тижня (Журнал → Тиждень) */
+  .wgo{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .wgo-r{display:flex;gap:8px;align-items:stretch;}
+  .wgo-m{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-width:0;display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 12px;border-radius:14px;
+    background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .wgo-t{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .wgo-t b{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wgo-t small{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wgo-v{align-self:center;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .wgo-r.ok .wgo-v{color:#34c77b;}
+  .wgo-bar{grid-column:1/-1;height:6px;border-radius:9px;background:color-mix(in srgb,var(--text) 10%,transparent);overflow:hidden;}
+  .wgo-bar i{display:block;height:100%;border-radius:inherit;background:var(--c);}
+  .wgo-r.ok .wgo-bar i{background:#34c77b;}
+  .wgo-p{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:52px;border-radius:14px;display:grid;place-items:center;font-size:15px;font-weight:800;
+    color:var(--text);background:var(--field);border:1.5px solid var(--c);}
+  .wgo-m:focus-visible,.wgo-p:focus-visible,.wgo-add:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .wgo-add{all:unset;box-sizing:border-box;cursor:pointer;min-height:32px;padding:0 10px;border-radius:10px;font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:0;text-transform:none;}
+  .wgo-n{display:flex;align-items:center;gap:16px;}
+  .wgo-n button{all:unset;box-sizing:border-box;cursor:pointer;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:20px;font-weight:800;background:var(--field);border:1px solid var(--line);color:var(--text);}
+  .wgo-n b{min-width:32px;text-align:center;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;}

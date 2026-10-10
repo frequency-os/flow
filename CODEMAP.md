@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 32918 |
+| Рядків JS | 32988 |
 | Файлів CSS | 48 |
-| Рядків CSS | 10427 |
-| Сутностей верхнього рівня | 2317 |
+| Рядків CSS | 10447 |
+| Сутностей верхнього рівня | 2326 |
 | Ключів сховища (FLOW_KEYS) | 79 |
 
 ## Файли JS
@@ -76,7 +76,7 @@
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
 | `src/scripts/core/41-journal.js` | 749 | 64 |
-| `src/scripts/core/42-day.js` | 361 | 41 |
+| `src/scripts/core/42-day.js` | 363 | 41 |
 | `src/scripts/core/43-month.js` | 257 | 34 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
@@ -84,7 +84,7 @@
 | `src/scripts/core/47-rules.js` | 351 | 29 |
 | `src/scripts/core/48-hero.js` | 338 | 41 |
 | `src/scripts/core/48-widgets.js` | 463 | 46 |
-| `src/scripts/core/49-calendar.js` | 242 | 27 |
+| `src/scripts/core/49-calendar.js` | 310 | 36 |
 | `src/scripts/core/49-finlit.js` | 132 | 17 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
 | `src/scripts/core/51-money-reset.js` | 132 | 15 |
@@ -156,7 +156,7 @@
 | `src/styles/core/24-home-gallery.css` | 215 | 0 |
 | `src/styles/core/25-journal.css` | 301 | 0 |
 | `src/styles/core/26-day.css` | 173 | 0 |
-| `src/styles/core/27-month.css` | 182 | 0 |
+| `src/styles/core/27-month.css` | 202 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
 | `src/styles/core/30-wallet.css` | 147 | 0 |
@@ -2165,14 +2165,14 @@
 | `dyNum` | функція | `src/scripts/core/42-day.js:231` |
 | `dyWeekRange` | функція | `src/scripts/core/42-day.js:232` |
 | `dyWeekHTMLFull` | функція | `src/scripts/core/42-day.js:236` |
-| `dyWeekGridHTML` | функція | `src/scripts/core/42-day.js:276` |
-| `dyWeekFind` | функція | `src/scripts/core/42-day.js:290` |
-| `dyWeekGridBind` | функція | `src/scripts/core/42-day.js:294` |
-| `dyWeekBind` | функція | `src/scripts/core/42-day.js:306` |
-| `dyWeekTasks` | функція | `src/scripts/core/42-day.js:324` |
-| `dyWeekTasksHTML` | функція | `src/scripts/core/42-day.js:325` |
-| `dyTaskToDay` | функція | `src/scripts/core/42-day.js:333` |
-| `dyWeekTasksBind` | функція | `src/scripts/core/42-day.js:342` |
+| `dyWeekGridHTML` | функція | `src/scripts/core/42-day.js:277` |
+| `dyWeekFind` | функція | `src/scripts/core/42-day.js:291` |
+| `dyWeekGridBind` | функція | `src/scripts/core/42-day.js:295` |
+| `dyWeekBind` | функція | `src/scripts/core/42-day.js:307` |
+| `dyWeekTasks` | функція | `src/scripts/core/42-day.js:326` |
+| `dyWeekTasksHTML` | функція | `src/scripts/core/42-day.js:327` |
+| `dyTaskToDay` | функція | `src/scripts/core/42-day.js:335` |
+| `dyWeekTasksBind` | функція | `src/scripts/core/42-day.js:344` |
 
 ### `src/scripts/core/43-month.js` — 34 сутностей
 
@@ -2440,7 +2440,7 @@
 | `wgOldScan` | функція | `src/scripts/core/48-widgets.js:435` |
 | `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:442` |
 
-### `src/scripts/core/49-calendar.js` — 27 сутностей
+### `src/scripts/core/49-calendar.js` — 36 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2471,6 +2471,15 @@
 | `calAllDayHTML` | функція | `src/scripts/core/49-calendar.js:225` |
 | `calNoteCardHTML` | функція | `src/scripts/core/49-calendar.js:232` |
 | `calBindDay` | функція | `src/scripts/core/49-calendar.js:237` |
+| `wgoAll` | функція | `src/scripts/core/49-calendar.js:248` |
+| `wgoList` | функція | `src/scripts/core/49-calendar.js:249` |
+| `wgoN` | функція | `src/scripts/core/49-calendar.js:250` |
+| `wgoMan` | функція | `src/scripts/core/49-calendar.js:251` |
+| `wgoAuto` | функція | `src/scripts/core/49-calendar.js:252` |
+| `wgoHTML` | функція | `src/scripts/core/49-calendar.js:257` |
+| `wgoSave` | функція | `src/scripts/core/49-calendar.js:267` |
+| `wgoBind` | функція | `src/scripts/core/49-calendar.js:270` |
+| `wgoSheet` | функція | `src/scripts/core/49-calendar.js:290` |
 
 ### `src/scripts/core/49-finlit.js` — 17 сутностей
 

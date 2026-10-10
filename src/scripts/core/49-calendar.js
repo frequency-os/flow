@@ -240,3 +240,71 @@
     c.querySelectorAll('[data-caladnew]').forEach(b=>b.onclick=()=>calEventSheet(ds,'',back));
     c.querySelectorAll('[data-calnote]').forEach(b=>b.onclick=()=>calDaySheet(ds,{}));
   }
+
+  /* ════════ Етап 4: Цілі тижня (10.10.2026) ════════
+     planner.weekGoals = {'YYYY-MM-DD' (понеділок): [{id, t, n (скільки разів), folder?, man (ручні +1)}]} — той самий goals_data.
+     Прогрес = виконані блоки папки цього тижня (автоматично, якщо ціль привʼязана до папки) + ручні «+1».
+     «→ на день» створює блок цієї папки у вільному часі вибраного дня. Пишеться лише з дій людини. */
+  function wgoAll(){ let p=null; try{ p=plData(); }catch(_){ return {}; } return p.weekGoals&&typeof p.weekGoals==='object'&&!Array.isArray(p.weekGoals)?p.weekGoals:{}; }
+  function wgoList(mon){ const L=wgoAll()[mon]; return Array.isArray(L)?L.filter(g=>g&&typeof g==='object'&&!Array.isArray(g)&&g.id&&typeof g.t==='string'):[]; }
+  function wgoN(g){ const n=parseInt(g.n,10); return n>=1&&n<=50?n:1; }
+  function wgoMan(g){ const m=parseInt(g.man,10); return m>0&&m<=999?m:0; }
+  function wgoAuto(g,mon){
+    if(!g.folder||!moOwnFolder(g.folder)) return 0;
+    let n=0; for(let i=0;i<7;i++){ let bl=[]; try{ bl=plBlocksDisplay(dyAddDays(mon,i)); }catch(_){} n+=bl.filter(b=>b&&b.done&&b.folder===g.folder).length; }
+    return n;
+  }
+  function wgoHTML(mon){
+    const L=wgoList(mon);
+    const row=g=>{ const n=wgoN(g), a=wgoAuto(g,mon), m=wgoMan(g), d=a+m, pct=Math.min(100,Math.round(d/n*100)), f=g.folder&&moOwnFolder(g.folder)?folders[g.folder]:null;
+      return `<div class="wgo-r${d>=n?' ok':''}" style="--c:${safeColor(f&&f.c,'#ff9a4d')}">
+        <button class="wgo-m" data-wgo="${esc(g.id)}"><span class="wgo-t"><b>${esc(g.t.slice(0,60))}</b><small>${f?'📁 '+esc(String(f.name||'Папка').slice(0,20))+(a?' · '+a+' з блоків':''):'вручну'}${m?' · +'+m:''}</small></span>
+          <span class="wgo-v">${d}/${n}${d>=n?' ✓':''}</span><span class="wgo-bar"><i style="width:${pct}%"></i></span></button>
+        <button class="wgo-p" data-wgoplus="${esc(g.id)}" aria-label="Плюс один до «${esc(g.t.slice(0,40))}»">+1</button></div>`; };
+    return `<div class="dw-sec"><span>Цілі тижня</span><button class="wgo-add" data-wgoadd>＋ Ціль</button></div>
+      <div class="wgo">${L.length?L.map(row).join(''):'<small class="cal-none">Що хочеш встигнути за тиждень? Напр. «3 заняття англійською» — рахується з блоків папки само.</small>'}</div>`;
+  }
+  function wgoSave(mon,fn){ const p=plData(); if(!p.weekGoals||typeof p.weekGoals!=='object'||Array.isArray(p.weekGoals)) p.weekGoals={}; if(!Array.isArray(p.weekGoals[mon])) p.weekGoals[mon]=[];
+    p.weekGoals[mon]=p.weekGoals[mon].filter(g=>g&&typeof g==='object'&&!Array.isArray(g));   // сміття з хмари не валить кнопки
+    fn(p.weekGoals[mon]); if(!p.weekGoals[mon].length) delete p.weekGoals[mon]; saveGoals(); }
+  function wgoBind(c,mon,rerender){
+    const re=()=>{ try{ rerender(); }catch(_){} };
+    c.querySelectorAll('[data-wgoadd]').forEach(b=>b.onclick=()=>wgoSheet(mon,'',re));
+    c.querySelectorAll('[data-wgoplus]').forEach(b=>b.onclick=()=>{ const id=b.dataset.wgoplus;
+      wgoSave(mon,L=>{ const g=L.find(x=>x&&String(x.id)===String(id)); if(g) g.man=Math.min(999,wgoMan(g)+1); }); try{ window.platform.haptic('light'); }catch(_){} re(); });
+    c.querySelectorAll('[data-wgo]').forEach(b=>b.onclick=()=>{ const id=b.dataset.wgo, g=wgoList(mon).find(x=>String(x.id)===String(id)); if(!g) return;
+      const items=[];
+      items.push({ic:'calendar', label:'→ На день', sub:g.folder&&moOwnFolder(g.folder)?'блок цієї папки у вільний час':'блок у вільний час', primary:true, onClick:()=>{
+        dyDayPicker('На який день?','«'+g.t+'» — година у першому вільному проміжку.',mon,'',ds=>{
+          const slot=dyFreeSlot(ds,1); if(slot===null){ plToast('У цей день нема вільної години'); return; }
+          const nb={id:dyNewId(), h:slot, endH:slot+1, t:g.t.slice(0,60), c:'orange', done:false}; if(g.folder&&moOwnFolder(g.folder)) nb.folder=g.folder;
+          plBlocksFor(ds).push(nb); saveGoals(); plToast('Додано на '+dyDayTitle(ds).toLowerCase()+' о '+plHM(slot)); re(); }); }});
+      if(wgoMan(g)) items.push({ic:'down', label:'−1', sub:'забрати ручну позначку', onClick:()=>{ wgoSave(mon,L=>{ const q=L.find(x=>String(x.id)===String(id)); if(q) q.man=Math.max(0,wgoMan(q)-1); }); re(); }});
+      items.push({ic:'edit', label:'Змінити', onClick:()=>wgoSheet(mon,id,re)});
+      items.push({ic:'trash', label:'Видалити', danger:true, onClick:()=>{ let was=null,i=-1;
+        wgoSave(mon,L=>{ i=L.findIndex(x=>String(x.id)===String(id)); if(i>=0) was=L.splice(i,1)[0]; }); re();
+        if(was) try{ flowUndoToast('Ціль тижня видалено',()=>{ wgoSave(mon,L=>{ if(!L.some(x=>String(x.id)===String(was.id))) L.splice(Math.min(i,L.length),0,was); }); re(); }); }catch(_){} }});
+      actionSheet({title:g.t, sub:(wgoAuto(g,mon)+wgoMan(g))+' з '+wgoN(g)+' цього тижня', items});
+    });
+  }
+  function wgoSheet(mon,id,back){
+    const g=id?wgoList(mon).find(x=>String(x.id)===String(id)):null;
+    let fk=g&&g.folder&&moOwnFolder(g.folder)?g.folder:'', n=g?wgoN(g):3;
+    const fks=Object.keys(folders||{}).filter(k=>moOwnFolder(k)&&(typeof folderVisible!=='function'||folderVisible(k))).slice(0,30);
+    jnOverlay(`<div class="jn-ed-h"><b>${g?'Ціль тижня':'Нова ціль тижня'}</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">${esc(dyWeekRange(mon))}</small>
+      <label class="jn-f"><span>Що</span><input id="wgoT" maxlength="60" value="${g?esc(g.t):''}" placeholder="Заняття англійською, тренування…"></label>
+      <div class="jn-f"><span>Скільки разів за тиждень</span><div class="wgo-n"><button data-wgon="-1" aria-label="Менше">−</button><b id="wgoN">${n}</b><button data-wgon="1" aria-label="Більше">＋</button></div></div>
+      <div class="jn-f"><span>Папка — рахувати її виконані блоки (необовʼязково)</span><div class="wl-chips"><button data-wgofk="" class="${fk?'':'on'}">Лише вручну</button>${fks.map(k=>`<button data-wgofk="${esc(k)}" class="${k===fk?'on':''}">${esc(String(folders[k].name||'Папка').slice(0,22))}</button>`).join('')}</div></div>
+      <div class="jn-ed-foot"><button class="jn-btn" data-wgook>Зберегти</button></div>`, ov=>{
+      ov.querySelectorAll('[data-wgon]').forEach(b=>b.onclick=()=>{ n=Math.max(1,Math.min(50,n+(+b.dataset.wgon))); ov.querySelector('#wgoN').textContent=n; });
+      ov.querySelectorAll('[data-wgofk]').forEach(b=>b.onclick=()=>{ fk=b.dataset.wgofk; ov.querySelectorAll('[data-wgofk]').forEach(y=>y.classList.toggle('on',y===b)); });
+      ov.querySelector('[data-wgook]').onclick=()=>{
+        const t=String(ov.querySelector('#wgoT').value||'').trim().slice(0,60); if(!t){ ov.querySelector('#wgoT').focus(); return; }
+        wgoSave(mon,L=>{ const row=g?L.find(x=>String(x.id)===String(g.id)):null;
+          if(row){ row.t=t; row.n=n; if(fk&&moOwnFolder(fk)) row.folder=fk; else delete row.folder; }
+          else{ const v={id:'wg'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), t, n}; if(fk&&moOwnFolder(fk)) v.folder=fk; L.push(v); } });
+        ov.remove(); if(back) back();
+      };
+    });
+  }

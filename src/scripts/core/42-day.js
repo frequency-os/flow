@@ -264,6 +264,7 @@
     return `<div class="dw-nav"><button data-dwshift="-7" aria-label="Попередній тиждень">‹</button>
         <div><b>${dyWeekRange(mon)}</b>${mon!==thisMon?`<button class="dw-now" data-dwthis>Цей тиждень</button>`:'<small>цей тиждень</small>'}</div>
         <button data-dwshift="7" aria-label="Наступний тиждень">›</button></div>
+      ${typeof wgoHTML==='function'?wgoHTML(mon):''}
       <div class="dw-sec"><span>Бюджет місій</span><span>${heroH?`усього ${dyNum(totD+totP)} з ${dyNum(heroH)} год`:`усього ${dyNum(totD+totP)} год`}</span></div>
       ${rows||`<div class="dy-empty"><b>Ще нема місій</b><span>Бюджет годин зʼявиться, коли створиш місію в Журналі.</span></div>`}
       ${ms.length?`<div class="dw-leg"><span><i class="d"></i>зроблено</span><span><i class="p"></i>заплановано</span></div>`:''}
@@ -315,6 +316,7 @@
     c.querySelectorAll('[data-dydone]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); const b=find(el.dataset.dydone); if(b) dyComplete(b.id,sel); });
     c.querySelectorAll('[data-dyblk]').forEach(el=>el.onclick=()=>{ const b=find(el.dataset.dyblk); if(b) dyMenu(b,sel,{week:true}); });
     dyWeekTasksBind(c);
+    if(typeof wgoBind==='function') wgoBind(c,dyWk.mon,plRerender);   // цілі тижня (49-calendar.js)
     dyWeekGridBind(c,opt);
     { const o=c.querySelector('[data-dwopen]'); if(o&&opt&&opt.onOpenDay) o.onclick=()=>opt.onOpenDay(sel); else if(o) o.onclick=()=>{ const p=plData(); p.selDate=sel; p.scope='day'; saveGoals(); plRerender(); try{ window.scrollTo(0,0); }catch(_){} }; }
   }
