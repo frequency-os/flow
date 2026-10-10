@@ -238,6 +238,12 @@
   function renderSettingsCard(){
     const host=document.getElementById('settingsCard'); if(!host) return;
     const lang=(window.flowLang&&window.flowLang())||'uk';
+    /* Англійська поки чорнова: словник (01-base.js) міняє лише частину слів, і
+       виходить мішанина — «ЦЬОГО WEEK», «Історія days». Для App Store це
+       «незавершений застосунок» (APP-8, BUGS-3, 10.10.2026). Тому рядок «Мова»
+       бачить лише той, у кого EN уже стоїть, — щоб міг повернутись на українську.
+       Сховище не чіпаємо, код перекладу лишається: повний переклад — поверне рядок. */
+    const langRow=lang==='en';
     const devOn=(typeof aiDevOn==='function')&&aiDevOn();
     const ctOn=(function(){ try{ return localStorage.getItem('dev_translate_content')==='1'; }catch(_){ return false; } })();
     const set=themeSetOf(theme), dark=themeIsDark(theme);
@@ -265,11 +271,11 @@
         <div class="mr-row">${stgIco('palette','pink')}
           <span class="mr-tx"><b>Стиль</b><small>${THEME_SETS[set].name}</small></span>
           <span class="mr-sws" id="stgThemeSetSeg">${swatches}</span></div>
-        <div class="mr-row">${stgIco('globe','teal')}
+        ${langRow?`<div class="mr-row">${stgIco('globe','teal')}
           <span class="mr-tx"><b>Мова</b><small>Interface language</small></span>
           <span class="mr-seg" id="stgLangSeg">
             <button data-l="uk" class="${lang==='uk'?'on':''}">UA</button>
-            <button data-l="en" class="${lang==='en'?'on':''}">EN</button></span></div>
+            <button data-l="en" class="${lang==='en'?'on':''}">EN</button></span></div>`:''}
         <div class="mr-row">${stgIco('mode','slate')}
           <span class="mr-tx"><b>Режим</b><small>${um==='lite'?'Lite: внизу лише Планер і Гроші':'Pro: увесь Frequency з Оглядом'}</small></span>
           ${seg('uimode',[['lite','Lite'],['pro','Pro']],um)}</div>
@@ -296,6 +302,8 @@
     host.querySelectorAll('#stgLangSeg button').forEach(b=>b.onclick=()=>{
       const l=b.dataset.l;
       if(l!==lang && window.flowSetLang) window.flowSetLang(l);
+      // уже перекладені підписи назад не вертаються, а рядок «Мова» зараз зникне — кажемо чесно
+      if(l==='uk' && lang==='en'){ try{ plToast('Мову змінено на українську — решта підписів оновиться після перезапуску'); }catch(_){} }
       renderSettingsCard();
     });
     host.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>{
