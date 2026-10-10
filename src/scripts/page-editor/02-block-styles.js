@@ -96,8 +96,9 @@
     if(undoStack.length>UNDO_MAX)undoStack.shift();
     redoStack.length=0; syncUndoBtn();
   }
-  function doUndo(){ var op=undoStack.pop(); if(!op)return; op.undo(); redoStack.push(op); save(); render(); syncUndoBtn(); }
-  function doRedo(){ var op=redoStack.pop(); if(!op)return; op.redo(); undoStack.push(op); save(); render(); syncUndoBtn(); }
+  /* дія може відмовитись (повернути false), щоб не загубити текст — тоді запис лишається на місці і нічого не пишемо */
+  function doUndo(){ var op=undoStack.pop(); if(!op)return; if(op.undo()===false){ undoStack.push(op); syncUndoBtn(); return; } redoStack.push(op); save(); render(); syncUndoBtn(); }
+  function doRedo(){ var op=redoStack.pop(); if(!op)return; if(op.redo()===false){ redoStack.push(op); syncUndoBtn(); return; } undoStack.push(op); save(); render(); syncUndoBtn(); }
   function syncUndoBtn(){ var b=document.getElementById('pgUndoBtn'); if(b) b.disabled=!undoStack.length; }
   document.addEventListener('keydown',function(e){
     if(!scr||!scr.classList.contains('active'))return;
@@ -457,6 +458,7 @@
       if(b.type==='row'){ renderRowBlock(b,host); return; }
       if(b.type==='board'){ renderBoardBlock(b,host); return; }
       var row=document.createElement('div');row.className='pgb'+(b.pinned?' pinned':'')+(!met?' pg-condhidden':'');row.dataset.id=b.id;
+      if(b.bw===33||b.bw===50||b.bw===67){ row.dataset.bw=b.bw; if(b.al==='c'||b.al==='r') row.dataset.al=b.al; }   /* «Розташування й колонки» */
       row.innerHTML='<button class="pg-addrow" data-pgaddafter="'+b.id+'" title="Додати блок нижче">＋</button>'
         +inner(b)
         +'<span class="pg-grip" data-pggrip="'+b.id+'">⠿</span>'

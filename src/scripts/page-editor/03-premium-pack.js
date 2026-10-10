@@ -71,6 +71,94 @@
     };
   }
   /* ── редактор стилю заголовка: шрифт / колір / контур / виділення ── */
+  /* ── «Розташування й колонки» (10.10.2026, макет «Шторка блоку»): ліворуч / по центру / праворуч / вся ширина,
+     ширина 1/3 · 1/2 · 2/3 · вся, колонки 1 · 2 · 3 («поставити поруч» — той самий ряд колонок, що й перетягування вбік).
+     Блок зберігає лише b.al ('c'|'r') і b.bw (33|50|67) — за замовчуванням полів нема. Усе відкочується «Скасувати». ── */
+  var PG_BW={33:'1/3',50:'1/2',67:'2/3',100:'Вся'};
+  function pgEmptyBlock(x){ return x&&x.type==='note'&&!String(txtOf(x)||'').trim()&&!(x.children&&x.children.length); }
+  function pgRowOf(id){
+    var loc=locate(id); if(!loc||!loc.parent||loc.parent.type!=='col') return null;
+    var colLoc=locate(loc.parent.id); if(!colLoc||!colLoc.parent||colLoc.parent.type!=='row') return null;
+    return {loc:loc, col:loc.parent, row:colLoc.parent};
+  }
+  function pgSetCols(id,n){
+    var loc=locate(id); if(!loc) return; var b=loc.block, r=pgRowOf(id);
+    var emptyCol=function(){ return {id:uid(),type:'col',width:1,children:[{id:uid(),type:'note',text:''}]}; };
+    if(!r){
+      if(n<=1) return;
+      var cols=[{id:uid(),type:'col',width:1,children:[b]}]; for(var i=1;i<n;i++) cols.push(emptyCol());
+      equalizeWidths(cols); loc.arr.splice(loc.idx,1,{id:uid(),type:'row',children:cols}); return;
+    }
+    var row=r.row, cur=row.children.length, isEmptyCol=function(c){ return !(c.children||[]).some(function(x){ return !pgEmptyBlock(x); }); };
+    if(n>cur){ for(var j=cur;j<n;j++) row.children.push(emptyCol()); equalizeWidths(row.children); return; }
+    if(n===cur) return;
+    if(n<=1){
+      /* винести блок з ряду перед ним; порожні колонки прибрати; лишилась одна — ряд розгорнути */
+      r.col.children.splice(r.loc.idx,1);
+      var rowLoc=locate(row.id); if(!rowLoc) return;
+      rowLoc.arr.splice(rowLoc.idx,0,b);
+      for(var q=row.children.length-1;q>=0;q--){ if(isEmptyCol(row.children[q])) row.children.splice(q,1); }   /* на місці — масив той самий (відкат тримає посилання) */
+      var rl=locate(row.id); if(!rl) return;
+      if(!row.children.length) rl.arr.splice(rl.idx,1);
+      else if(row.children.length===1){ var kids=row.children[0].children||[]; rl.arr.splice.apply(rl.arr,[rl.idx,1].concat(kids)); }
+      else equalizeWidths(row.children);
+      return;
+    }
+    /* менше колонок: прибираємо з кінця лише порожні (з текстом не чіпаємо) */
+    for(var k=row.children.length-1;k>=0&&row.children.length>n;k--){ if(row.children[k]!==r.col&&isEmptyCol(row.children[k])) row.children.splice(k,1); }
+    equalizeWidths(row.children);
+    if(row.children.length>n) plToastSafe('Колонки з текстом лишились — прибери їх вручну');
+  }
+  function plToastSafe(m){ try{ if(typeof window.__flowToast==='function') window.__flowToast(m); }catch(_){} }
+  function openLayoutSheet(blockId){
+    var loc=locate(blockId); if(!loc) return; var b=loc.block, r=pgRowOf(blockId);
+    var al=b.al==='c'||b.al==='r'?b.al:'l', bw=PG_BW[b.bw]?+b.bw:100, cols=r?r.row.children.length:1;
+    var pos=[['l','Ліворуч','▮▯▯'],['c','По центру','▯▮▯'],['r','Праворуч','▯▯▮'],['full','Вся ширина','▮▮▮']];
+    var ov=document.createElement('div'); ov.className='pgask-ov';
+    var draw=function(){
+      var fullOn=bw===100;
+      ov.innerHTML='<div class="pgask cond-card pglay">'
+        +'<div class="pgask-t">Розташування й колонки</div>'
+        +'<div class="cond-lbl">Розташування</div><div class="pglay-g4">'+pos.map(function(p){ var on=p[0]==='full'?fullOn:(!fullOn&&al===p[0]); return '<button data-lay="'+p[0]+'" class="'+(on?'on':'')+'"><i>'+p[2]+'</i><span>'+p[1]+'</span></button>'; }).join('')+'</div>'
+        +'<div class="cond-lbl">Ширина</div><div class="pglay-g4">'+[33,50,67,100].map(function(w){ return '<button data-bw="'+w+'" class="'+(bw===w?'on':'')+'"><b>'+PG_BW[w]+'</b></button>'; }).join('')+'</div>'
+        +'<div class="cond-lbl">Колонки — поставити поруч</div><div class="pglay-g3">'+[1,2,3].map(function(n){ return '<button data-cols="'+n+'" class="'+(cols===n?'on':'')+'"><i>'+new Array(n+1).join('▮')+'</i><span>'+n+'</span></button>'; }).join('')+'</div>'
+        +'<small class="pglay-hint">'+(cols>1?'Блок стоїть у ряді з '+cols+' колонок. Порожні колонки — для нових блоків.':'Більше колонок — поруч зʼявляться порожні місця для блоків.')+'</small>'
+        +'<div class="pgask-b"><button class="c">Скасувати</button><button class="ok">Зберегти</button></div></div>';
+      ov.querySelectorAll('[data-lay]').forEach(function(x){ x.onclick=function(){ var v=x.dataset.lay; if(v==='full'){ bw=100; al='l'; } else { al=v; if(bw===100) bw=50; } draw(); }; });
+      ov.querySelectorAll('[data-bw]').forEach(function(x){ x.onclick=function(){ bw=+x.dataset.bw; draw(); }; });
+      ov.querySelectorAll('[data-cols]').forEach(function(x){ x.onclick=function(){ cols=+x.dataset.cols; draw(); }; });
+      ov.querySelector('.c').onclick=function(){ ov.remove(); };
+      ov.querySelector('.ok').onclick=function(){
+        var q=locate(blockId); if(!q){ ov.remove(); return; }
+        /* відкат тримає ПОСИЛАННЯ на ті самі масиви й блоки (не JSON-копії): текст, набраний після, не зникає,
+           а старші записи «Скасувати» бачать ті самі обʼєкти */
+        var blk=q.block, r2=pgRowOf(blockId), arrs=[q.arr];
+        if(r2){ arrs.push(r2.row.children, r2.col.children); var rl0=locate(r2.row.id); if(rl0) arrs.push(rl0.arr); }
+        var shot=function(){ return {lists:arrs.map(function(a){ return a.slice(); }), widths:r2?r2.row.children.map(function(c){ return [c,c.width]; }):[], al:blk.al, bw:blk.bw}; };
+        var apply=function(st){ arrs.forEach(function(a,i){ a.length=0; Array.prototype.push.apply(a,st.lists[i]); }); st.widths.forEach(function(w){ w[0].width=w[1]; });
+          if(st.bw===undefined) delete blk.bw; else blk.bw=st.bw; if(st.al===undefined) delete blk.al; else blk.al=st.al; };
+        var before=shot();
+        if(bw<100){ blk.bw=bw; if(al==='l') delete blk.al; else blk.al=al; } else { delete blk.bw; delete blk.al; }
+        var curCols=r2?r2.row.children.length:1;
+        if(cols!==curCols) pgSetCols(blockId,cols);
+        var after=shot();
+        /* якщо в колонках, які створила ця дія, людина вже щось написала — відкат їх не прибирає (текст не губимо) */
+        var reach=function(st){ var out=[]; var walk=function(x){ if(!x||out.indexOf(x)>=0) return; out.push(x); (x.children||[]).forEach(walk); }; st.lists.forEach(function(l){ l.forEach(walk); }); return out; };
+        var had=reach(before);
+        pushOp(function(){
+          var lost=reach(shot()).filter(function(x){ return had.indexOf(x)<0&&x.type!=='row'&&x.type!=='col'&&!pgEmptyBlock(x); });
+          if(lost.length){ plToastSafe('Після цієї зміни тут уже є новий текст — лишаю як є, прибери вручну'); return false; }
+          apply(before); },function(){
+          /* повтор так само: не прибираємо блоки з текстом, яких не було в стані «після» */
+          var had2=reach(after), lost2=reach(shot()).filter(function(x){ return had2.indexOf(x)<0&&x.type!=='row'&&x.type!=='col'&&!pgEmptyBlock(x); });
+          if(lost2.length){ plToastSafe('Тут уже є новий текст — повтор пропускаю'); return false; }
+          apply(after); });
+        ov.remove(); save(); render();
+      };
+    };
+    ov.onclick=function(e){ if(e.target===ov) ov.remove(); };
+    draw(); document.body.appendChild(ov);
+  }
   function openHeadingStyleSheet(blockId){
     var loc=locate(blockId); if(!loc)return;
     var b=loc.block;
@@ -561,9 +649,10 @@
         if(rO)pushOp(function(){undoMove(rO);},function(){redoMove(rO);});
       }
     }
-    else if(act==='turn'){turnSnap={id:bmId,before:JSON.parse(JSON.stringify(loc.block))};closeBmenu();slashCtx=bmId;openSlash();return;}
-    else if(act==='cond'){closeBmenu();openCondSheet(bmId);return;}
-    else if(act==='hstyle'){closeBmenu();openHeadingStyleSheet(bmId);return;}
+    else if(act==='turn'){var tid=bmId;turnSnap={id:tid,before:JSON.parse(JSON.stringify(loc.block))};closeBmenu();slashCtx=tid;openSlash();return;}
+    else if(act==='cond'){var cid=bmId;closeBmenu();openCondSheet(cid);return;}   /* id беремо ДО closeBmenu — той обнуляє bmId */
+    else if(act==='hstyle'){var hid=bmId;closeBmenu();openHeadingStyleSheet(hid);return;}
+    else if(act==='layout'){var lid=bmId;closeBmenu();openLayoutSheet(lid);return;}
     save();closeBmenu();render();
   });
 

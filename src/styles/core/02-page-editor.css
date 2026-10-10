@@ -988,3 +988,21 @@
   .fbanner .femoji{display:grid;place-items:center;}
   .fbanner .name{font-size:15px;font-weight:800;line-height:1.15;word-break:break-word;color:var(--text);}
   .fbanner .fstat{font-size:11px;color:var(--muted);margin-top:4px;} .fbanner .fstat b{color:var(--c);font-weight:800;}
+
+  /* ── «Розташування й колонки» (03-premium-pack.js → openLayoutSheet) ── */
+  #scr-page .pgb[data-bw="33"]{max-width:max(33.33%,180px);}
+  #scr-page .pgb[data-bw="50"]{max-width:max(50%,180px);}
+  #scr-page .pgb[data-bw="67"]{max-width:66.67%;}
+  #scr-page .pgb[data-bw][data-al="c"]{margin-left:auto;margin-right:auto;}
+  #scr-page .pgb[data-bw][data-al="r"]{margin-left:auto;margin-right:0;}
+  .pglay .pglay-g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px;}
+  .pglay .pglay-g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:8px;}
+  .pglay button[data-lay],.pglay button[data-bw],.pglay button[data-cols]{all:unset;box-sizing:border-box;cursor:pointer;min-height:64px;padding:8px 4px;border-radius:14px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;
+    background:var(--pg-field,var(--field));border:1.5px solid var(--pg-edge,var(--line));color:var(--pg-fg,var(--text));}
+  .pglay button.on{border-color:var(--pg-acc,var(--accent));background:color-mix(in srgb,var(--pg-acc,var(--accent)) 16%,var(--pg-field,var(--field)));}
+  .pglay button i{font-style:normal;letter-spacing:1px;font-size:14px;color:var(--pg-acc,var(--accent));}
+  .pglay button span{font-size:12px;font-weight:700;}
+  .pglay button b{font-size:15px;font-weight:800;}
+  .pglay button:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .pglay-hint{display:block;font-size:12px;color:var(--pg-mut,var(--muted));margin:2px 0 10px;line-height:1.35;}
