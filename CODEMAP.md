@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 31893 |
+| Рядків JS | 31970 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10064 |
-| Сутностей верхнього рівня | 2273 |
+| Рядків CSS | 10097 |
+| Сутностей верхнього рівня | 2281 |
 | Ключів сховища (FLOW_KEYS) | 79 |
 
 ## Файли JS
@@ -35,7 +35,7 @@
 | `src/scripts/43-planner.js` | 137 | 0 |
 | `src/scripts/45-month.js` | 662 | 0 |
 | `src/scripts/46-mx.js` | 220 | 0 |
-| `src/scripts/core/01-base.js` | 411 | 39 |
+| `src/scripts/core/01-base.js` | 413 | 39 |
 | `src/scripts/core/02-storage.js` | 2150 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 417 | 57 |
@@ -88,8 +88,8 @@
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
 | `src/scripts/core/51-money-reset.js` | 132 | 15 |
 | `src/scripts/core/52-fresh-start.js` | 204 | 27 |
-| `src/scripts/core/53-starter.js` | 155 | 18 |
-| `src/scripts/core/54-intro.js` | 79 | 9 |
+| `src/scripts/core/53-starter.js` | 178 | 22 |
+| `src/scripts/core/54-intro.js` | 131 | 13 |
 | `src/scripts/page-editor/01-palette.js` | 180 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 764 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 657 | 36 |
@@ -160,7 +160,7 @@
 | `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 292 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
-| `src/styles/core/34-intro.css` | 73 | 0 |
+| `src/styles/core/34-intro.css` | 106 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (79)
 
@@ -297,24 +297,24 @@
 | `window.flowLang` | значення | `src/scripts/core/01-base.js:199` |
 | `window.flowSetLang` | значення | `src/scripts/core/01-base.js:200` |
 | `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:205` |
-| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:257` |
-| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:285` |
-| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:300` |
-| `translateNode` | функція | `src/scripts/core/01-base.js:303` |
-| `i18nApply` | функція | `src/scripts/core/01-base.js:326` |
-| `window.i18nApply` | значення | `src/scripts/core/01-base.js:330` |
-| `i18nBlocked` | функція | `src/scripts/core/01-base.js:334` |
-| `raf` | значення | `src/scripts/core/01-base.js:344` |
-| `flush` | функція | `src/scripts/core/01-base.js:345` |
-| `mo` | функція | `src/scripts/core/01-base.js:352` |
-| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:373` |
-| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:376` |
-| `hash` | функція | `src/scripts/core/01-base.js:377` |
-| `cacheGet` | функція | `src/scripts/core/01-base.js:378` |
-| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:383` |
-| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:399` |
-| `push` | функція | `src/scripts/core/01-base.js:400` |
-| `window.flowErrors` | функція | `src/scripts/core/01-base.js:409` |
+| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:259` |
+| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:287` |
+| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:302` |
+| `translateNode` | функція | `src/scripts/core/01-base.js:305` |
+| `i18nApply` | функція | `src/scripts/core/01-base.js:328` |
+| `window.i18nApply` | значення | `src/scripts/core/01-base.js:332` |
+| `i18nBlocked` | функція | `src/scripts/core/01-base.js:336` |
+| `raf` | значення | `src/scripts/core/01-base.js:346` |
+| `flush` | функція | `src/scripts/core/01-base.js:347` |
+| `mo` | функція | `src/scripts/core/01-base.js:354` |
+| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:375` |
+| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:378` |
+| `hash` | функція | `src/scripts/core/01-base.js:379` |
+| `cacheGet` | функція | `src/scripts/core/01-base.js:380` |
+| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:385` |
+| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:401` |
+| `push` | функція | `src/scripts/core/01-base.js:402` |
+| `window.flowErrors` | функція | `src/scripts/core/01-base.js:411` |
 
 ### `src/scripts/core/02-storage.js` — 177 сутностей
 
@@ -2493,42 +2493,50 @@
 | `fsTodayHTML` | функція | `src/scripts/core/52-fresh-start.js:191` |
 | `fsTodayBind` | функція | `src/scripts/core/52-fresh-start.js:200` |
 
-### `src/scripts/core/53-starter.js` — 18 сутностей
+### `src/scripts/core/53-starter.js` — 22 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
 | `ST_KEY` | значення | `src/scripts/core/53-starter.js:14` |
-| `ST_WISHES` | масив | `src/scripts/core/53-starter.js:15` |
-| `ST_FOLDERS` | масив | `src/scripts/core/53-starter.js:23` |
-| `stLoading` | значення | `src/scripts/core/53-starter.js:29` |
-| `stOff` | функція | `src/scripts/core/53-starter.js:30` |
-| `stTrusted` | функція | `src/scripts/core/53-starter.js:31` |
-| `stEmpty` | функція | `src/scripts/core/53-starter.js:37` |
-| `starterActive` | функція | `src/scripts/core/53-starter.js:41` |
-| `stImg` | функція | `src/scripts/core/53-starter.js:42` |
-| `stLoad` | функція | `src/scripts/core/53-starter.js:43` |
-| `stBg` | функція | `src/scripts/core/53-starter.js:52` |
-| `stHeroOff` | функція | `src/scripts/core/53-starter.js:55` |
-| `stHero` | функція | `src/scripts/core/53-starter.js:60` |
-| `starterRender` | функція | `src/scripts/core/53-starter.js:77` |
-| `stRefresh` | функція | `src/scripts/core/53-starter.js:99` |
-| `stPick` | функція | `src/scripts/core/53-starter.js:105` |
-| `stPut` | функція | `src/scripts/core/53-starter.js:129` |
-| `stMakeOwn` | функція | `src/scripts/core/53-starter.js:133` |
+| `stLang` | функція | `src/scripts/core/53-starter.js:19` |
+| `stL` | функція | `src/scripts/core/53-starter.js:20` |
+| `ST_T` | обʼєкт | `src/scripts/core/53-starter.js:21` |
+| `stT` | функція | `src/scripts/core/53-starter.js:35` |
+| `ST_WISHES` | масив | `src/scripts/core/53-starter.js:36` |
+| `ST_FOLDERS` | масив | `src/scripts/core/53-starter.js:44` |
+| `stLoading` | значення | `src/scripts/core/53-starter.js:50` |
+| `stOff` | функція | `src/scripts/core/53-starter.js:51` |
+| `stTrusted` | функція | `src/scripts/core/53-starter.js:52` |
+| `stEmpty` | функція | `src/scripts/core/53-starter.js:58` |
+| `starterActive` | функція | `src/scripts/core/53-starter.js:62` |
+| `stImg` | функція | `src/scripts/core/53-starter.js:63` |
+| `stLoad` | функція | `src/scripts/core/53-starter.js:64` |
+| `stBg` | функція | `src/scripts/core/53-starter.js:73` |
+| `stHeroOff` | функція | `src/scripts/core/53-starter.js:76` |
+| `stHero` | функція | `src/scripts/core/53-starter.js:81` |
+| `starterRender` | функція | `src/scripts/core/53-starter.js:98` |
+| `stRefresh` | функція | `src/scripts/core/53-starter.js:120` |
+| `stPick` | функція | `src/scripts/core/53-starter.js:128` |
+| `stPut` | функція | `src/scripts/core/53-starter.js:152` |
+| `stMakeOwn` | функція | `src/scripts/core/53-starter.js:156` |
 
-### `src/scripts/core/54-intro.js` — 9 сутностей
+### `src/scripts/core/54-intro.js` — 13 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `IN_KEY` | значення | `src/scripts/core/54-intro.js:10` |
-| `inShownNow` | значення | `src/scripts/core/54-intro.js:11` |
-| `inSeen` | функція | `src/scripts/core/54-intro.js:12` |
-| `inMark` | функція | `src/scripts/core/54-intro.js:13` |
-| `introMaybe` | функція | `src/scripts/core/54-intro.js:15` |
-| `inPh` | функція | `src/scripts/core/54-intro.js:20` |
-| `inSlides` | функція | `src/scripts/core/54-intro.js:21` |
-| `introOpen` | функція | `src/scripts/core/54-intro.js:44` |
-| `introRefresh` | функція | `src/scripts/core/54-intro.js:74` |
+| `IN_KEY` | значення | `src/scripts/core/54-intro.js:12` |
+| `inShownNow` | значення | `src/scripts/core/54-intro.js:13` |
+| `inSeen` | функція | `src/scripts/core/54-intro.js:14` |
+| `inMark` | функція | `src/scripts/core/54-intro.js:15` |
+| `introMaybe` | функція | `src/scripts/core/54-intro.js:17` |
+| `IN_T` | обʼєкт | `src/scripts/core/54-intro.js:22` |
+| `inT` | функція | `src/scripts/core/54-intro.js:54` |
+| `inPh` | функція | `src/scripts/core/54-intro.js:55` |
+| `inTime` | масив | `src/scripts/core/54-intro.js:56` |
+| `inSlides` | функція | `src/scripts/core/54-intro.js:57` |
+| `inOpen` | функція | `src/scripts/core/54-intro.js:86` |
+| `introRefresh` | функція | `src/scripts/core/54-intro.js:121` |
+| `window.introOpen` | функція | `src/scripts/core/54-intro.js:130` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
