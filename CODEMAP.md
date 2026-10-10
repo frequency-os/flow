@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 85 |
-| Рядків JS | 33031 |
-| Файлів CSS | 46 |
-| Рядків CSS | 10314 |
-| Сутностей верхнього рівня | 2269 |
+| Рядків JS | 32194 |
+| Файлів CSS | 44 |
+| Рядків CSS | 10011 |
+| Сутностей верхнього рівня | 2200 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -38,10 +38,10 @@
 | `src/scripts/core/01-base.js` | 410 | 39 |
 | `src/scripts/core/02-storage.js` | 2144 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
-| `src/scripts/core/04-folders-nav.js` | 417 | 56 |
-| `src/scripts/core/05-spaces.js` | 689 | 58 |
+| `src/scripts/core/04-folders-nav.js` | 414 | 56 |
+| `src/scripts/core/05-spaces.js` | 687 | 57 |
 | `src/scripts/core/06-wishes.js` | 1459 | 109 |
-| `src/scripts/core/07-values.js` | 202 | 18 |
+| `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 786 | 99 |
 | `src/scripts/core/09-goals.js` | 706 | 30 |
 | `src/scripts/core/10-planner.js` | 880 | 43 |
@@ -49,20 +49,20 @@
 | `src/scripts/core/12-ai-agent.js` | 1845 | 98 |
 | `src/scripts/core/13-pets.js` | 213 | 13 |
 | `src/scripts/core/14-react.js` | 337 | 43 |
-| `src/scripts/core/15-flow-spot.js` | 1697 | 88 |
+| `src/scripts/core/15-flow-spot.js` | 1695 | 88 |
 | `src/scripts/core/16-dashboard.js` | 1049 | 55 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
 | `src/scripts/core/20-work.js` | 521 | 51 |
-| `src/scripts/core/21-patterns.js` | 191 | 21 |
+| `src/scripts/core/21-patterns.js` | 34 | 6 |
 | `src/scripts/core/22-diary.js` | 536 | 54 |
 | `src/scripts/core/23-board.js` | 322 | 29 |
 | `src/scripts/core/24-reminders.js` | 191 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
 | `src/scripts/core/26-blocks-render.js` | 1453 | 16 |
 | `src/scripts/core/27-canvas.js` | 593 | 27 |
-| `src/scripts/core/28-vision.js` | 528 | 42 |
+| `src/scripts/core/28-vision.js` | 36 | 3 |
 | `src/scripts/core/29-more-screen.js` | 589 | 32 |
 | `src/scripts/core/30-upgrade.js` | 303 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
@@ -115,7 +115,6 @@
 | Файл | Рядків | Селекторів |
 |---|---|---|
 | `src/styles/00-fonts.css` | 68 | 0 |
-| `src/styles/03-patterns.css` | 71 | 0 |
 | `src/styles/04-diary.css` | 110 | 0 |
 | `src/styles/10-fd26.css` | 29 | 0 |
 | `src/styles/12-theme-nightfire.css` | 419 | 6 |
@@ -133,7 +132,7 @@
 | `src/styles/core/02-page-editor.css` | 1241 | 9 |
 | `src/styles/core/03-folders-projects.css` | 695 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
-| `src/styles/core/05-values-wishes.css` | 186 | 0 |
+| `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 228 | 0 |
 | `src/styles/core/07-finance.css` | 597 | 0 |
 | `src/styles/core/08-work.css` | 202 | 0 |
@@ -142,7 +141,6 @@
 | `src/styles/core/11-spaces-desktop.css` | 181 | 0 |
 | `src/styles/core/12-pets-more-planner.css` | 1228 | 0 |
 | `src/styles/core/13-search-capture.css` | 84 | 0 |
-| `src/styles/core/15-vision.css` | 172 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
 | `src/styles/core/18-channel.css` | 178 | 0 |
@@ -568,14 +566,14 @@
 | `moveFolderTo` | функція | `src/scripts/core/04-folders-nav.js:385` |
 | `goHome` | функція | `src/scripts/core/04-folders-nav.js:395` |
 | `goFolder` | функція | `src/scripts/core/04-folders-nav.js:396` |
-| `goDebts` | функція | `src/scripts/core/04-folders-nav.js:411` |
-| `goFinance` | функція | `src/scripts/core/04-folders-nav.js:412` |
-| `goEnvelopes` | функція | `src/scripts/core/04-folders-nav.js:413` |
-| `goSpend` | функція | `src/scripts/core/04-folders-nav.js:414` |
-| `workOrigin` | значення | `src/scripts/core/04-folders-nav.js:415` |
-| `goWork` | функція | `src/scripts/core/04-folders-nav.js:416` |
+| `goDebts` | функція | `src/scripts/core/04-folders-nav.js:408` |
+| `goFinance` | функція | `src/scripts/core/04-folders-nav.js:409` |
+| `goEnvelopes` | функція | `src/scripts/core/04-folders-nav.js:410` |
+| `goSpend` | функція | `src/scripts/core/04-folders-nav.js:411` |
+| `workOrigin` | значення | `src/scripts/core/04-folders-nav.js:412` |
+| `goWork` | функція | `src/scripts/core/04-folders-nav.js:413` |
 
-### `src/scripts/core/05-spaces.js` — 58 сутностей
+### `src/scripts/core/05-spaces.js` — 57 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -634,9 +632,8 @@
 | `renderProjects` | функція | `src/scripts/core/05-spaces.js:630` |
 | `goProjects` | функція | `src/scripts/core/05-spaces.js:663` |
 | `goPlanner` | функція | `src/scripts/core/05-spaces.js:668` |
-| `goValues` | функція | `src/scripts/core/05-spaces.js:673` |
-| `goWishes` | функція | `src/scripts/core/05-spaces.js:675` |
-| `window.goWishes` | значення | `src/scripts/core/05-spaces.js:676` |
+| `goWishes` | функція | `src/scripts/core/05-spaces.js:673` |
+| `window.goWishes` | значення | `src/scripts/core/05-spaces.js:674` |
 
 ### `src/scripts/core/06-wishes.js` — 109 сутностей
 
@@ -752,28 +749,14 @@
 | `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1313` |
 | `renderWishes` | функція | `src/scripts/core/06-wishes.js:1389` |
 
-### `src/scripts/core/07-values.js` — 18 сутностей
+### `src/scripts/core/07-values.js` — 4 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `VAL_KEY` | значення | `src/scripts/core/07-values.js:2` |
-| `VALUES_LIBRARY` | масив | `src/scripts/core/07-values.js:3` |
-| `valState` | обʼєкт | `src/scripts/core/07-values.js:13` |
-| `valTab` | значення | `src/scripts/core/07-values.js:24` |
-| `loadValues` | функція | `src/scripts/core/07-values.js:26` |
-| `saveValues` | функція | `src/scripts/core/07-values.js:29` |
-| `todayStr` | функція | `src/scripts/core/07-values.js:30` |
-| `dmy` | функція | `src/scripts/core/07-values.js:31` |
-| `VISION_Q` | масив | `src/scripts/core/07-values.js:33` |
-| `ANTI_Q` | масив | `src/scripts/core/07-values.js:40` |
-| `DAILY_AM` | масив | `src/scripts/core/07-values.js:45` |
-| `DAILY_PM` | масив | `src/scripts/core/07-values.js:49` |
-| `renderValues` | функція | `src/scripts/core/07-values.js:54` |
-| `renderCompass` | функція | `src/scripts/core/07-values.js:73` |
-| `renderEditCards` | функція | `src/scripts/core/07-values.js:122` |
-| `renderValVision` | функція | `src/scripts/core/07-values.js:141` |
-| `renderAnti` | функція | `src/scripts/core/07-values.js:145` |
-| `renderDaily` | функція | `src/scripts/core/07-values.js:150` |
+| `VAL_KEY` | значення | `src/scripts/core/07-values.js:5` |
+| `valState` | обʼєкт | `src/scripts/core/07-values.js:6` |
+| `loadValues` | функція | `src/scripts/core/07-values.js:18` |
+| `todayStr` | функція | `src/scripts/core/07-values.js:21` |
 
 ### `src/scripts/core/08-finance.js` — 99 сутностей
 
@@ -1178,92 +1161,92 @@
 |---|---|---|
 | `spotMsgs` | масив | `src/scripts/core/15-flow-spot.js:2` |
 | `spotCtx` | функція | `src/scripts/core/15-flow-spot.js:3` |
-| `spotChips` | функція | `src/scripts/core/15-flow-spot.js:17` |
-| `spotAddon` | функція | `src/scripts/core/15-flow-spot.js:26` |
-| `aiParsePage` | функція | `src/scripts/core/15-flow-spot.js:38` |
-| `applyPageBlocks` | функція | `src/scripts/core/15-flow-spot.js:45` |
-| `flowSpotEl` | функція | `src/scripts/core/15-flow-spot.js:72` |
-| `flowSpotToggle` | функція | `src/scripts/core/15-flow-spot.js:94` |
-| `flowSpotOpen` | функція | `src/scripts/core/15-flow-spot.js:95` |
-| `flowSpotClose` | функція | `src/scripts/core/15-flow-spot.js:109` |
-| `flowSpotSend` | функція | `src/scripts/core/15-flow-spot.js:110` |
-| `spotMicToggle` | функція | `src/scripts/core/15-flow-spot.js:159` |
-| `window.flowCapRender` | значення | `src/scripts/core/15-flow-spot.js:188` |
-| `window.flowSpotOpen` | значення | `src/scripts/core/15-flow-spot.js:189` |
-| `aiChatSheet` | функція | `src/scripts/core/15-flow-spot.js:192` |
-| `aiClose` | функція | `src/scripts/core/15-flow-spot.js:225` |
-| `aiDayPct` | функція | `src/scripts/core/15-flow-spot.js:232` |
-| `aiVoiceOn` | значення | `src/scripts/core/15-flow-spot.js:239` |
-| `aiSpeakStop` | функція | `src/scripts/core/15-flow-spot.js:241` |
-| `aiSpeak` | функція | `src/scripts/core/15-flow-spot.js:242` |
-| `aiVoiceToggle` | функція | `src/scripts/core/15-flow-spot.js:282` |
-| `aiRenderHead` | функція | `src/scripts/core/15-flow-spot.js:289` |
-| `aiMemSheet` | функція | `src/scripts/core/15-flow-spot.js:336` |
-| `aiRenderViews` | функція | `src/scripts/core/15-flow-spot.js:358` |
-| `aiLogHTML` | функція | `src/scripts/core/15-flow-spot.js:363` |
-| `aiTlHTML` | функція | `src/scripts/core/15-flow-spot.js:370` |
-| `aiActsHTML` | функція | `src/scripts/core/15-flow-spot.js:393` |
-| `aiTraceLiveHTML` | функція | `src/scripts/core/15-flow-spot.js:433` |
-| `aiTraceRowHTML` | функція | `src/scripts/core/15-flow-spot.js:439` |
-| `AI_SHELF_GO` | обʼєкт | `src/scripts/core/15-flow-spot.js:444` |
-| `aiShelfHTML` | функція | `src/scripts/core/15-flow-spot.js:445` |
-| `aiTraceKpisHTML` | функція | `src/scripts/core/15-flow-spot.js:455` |
-| `aiWireBody` | функція | `src/scripts/core/15-flow-spot.js:470` |
-| `aiChipsHTML` | функція | `src/scripts/core/15-flow-spot.js:490` |
-| `AI_SVG` | обʼєкт | `src/scripts/core/15-flow-spot.js:496` |
-| `AI_ICO` | обʼєкт | `src/scripts/core/15-flow-spot.js:504` |
-| `aiIco` | функція | `src/scripts/core/15-flow-spot.js:527` |
-| `aiMD` | функція | `src/scripts/core/15-flow-spot.js:532` |
-| `aiBusyHTML` | функція | `src/scripts/core/15-flow-spot.js:538` |
-| `aiSlashHide` | функція | `src/scripts/core/15-flow-spot.js:546` |
-| `aiSlashShow` | функція | `src/scripts/core/15-flow-spot.js:547` |
-| `aiAttachRender` | функція | `src/scripts/core/15-flow-spot.js:562` |
-| `aiImgShrink` | функція | `src/scripts/core/15-flow-spot.js:574` |
-| `aiFileB64` | функція | `src/scripts/core/15-flow-spot.js:591` |
-| `aiPickFile` | функція | `src/scripts/core/15-flow-spot.js:599` |
-| `aiPlusSheet` | функція | `src/scripts/core/15-flow-spot.js:625` |
-| `aiPromptsSheet` | функція | `src/scripts/core/15-flow-spot.js:645` |
-| `aiPromptEdit` | функція | `src/scripts/core/15-flow-spot.js:664` |
-| `aiEnvKpi` | функція | `src/scripts/core/15-flow-spot.js:681` |
-| `aiPlanCardHTML` | функція | `src/scripts/core/15-flow-spot.js:689` |
-| `aiRenderBody` | функція | `src/scripts/core/15-flow-spot.js:715` |
-| `AI_SKILLS` | обʼєкт | `src/scripts/core/15-flow-spot.js:765` |
-| `aiSkillFor` | функція | `src/scripts/core/15-flow-spot.js:777` |
-| `aiSumBusy` | значення | `src/scripts/core/15-flow-spot.js:784` |
-| `aiMaybeSummarize` | функція | `src/scripts/core/15-flow-spot.js:785` |
-| `aiChatSend` | функція | `src/scripts/core/15-flow-spot.js:798` |
-| `aiRec` | значення | `src/scripts/core/15-flow-spot.js:918` |
-| `aiMicUI` | функція | `src/scripts/core/15-flow-spot.js:919` |
-| `aiMicToggle` | функція | `src/scripts/core/15-flow-spot.js:920` |
-| `aiTranscribeBlob` | функція | `src/scripts/core/15-flow-spot.js:958` |
-| `aiTranscribe` | функція | `src/scripts/core/15-flow-spot.js:981` |
-| `window.aiChatSheet` | значення | `src/scripts/core/15-flow-spot.js:985` |
-| `plStreak` | функція | `src/scripts/core/15-flow-spot.js:987` |
-| `heroWeekDays` | функція | `src/scripts/core/15-flow-spot.js:1006` |
-| `heroMonthDays` | функція | `src/scripts/core/15-flow-spot.js:1024` |
-| `heroDayWord` | функція | `src/scripts/core/15-flow-spot.js:1035` |
-| `renderHeroStreak` | функція | `src/scripts/core/15-flow-spot.js:1041` |
-| `plBlocksDisplay` | функція | `src/scripts/core/15-flow-spot.js:1066` |
-| `plFolderComplete` | функція | `src/scripts/core/15-flow-spot.js:1080` |
-| `DOW_UA` | масив | `src/scripts/core/15-flow-spot.js:1085` |
-| `plRuleDowsLabel` | функція | `src/scripts/core/15-flow-spot.js:1086` |
-| `plFolderDaySheet` | функція | `src/scripts/core/15-flow-spot.js:1095` |
-| `plFolderMonthSheet` | функція | `src/scripts/core/15-flow-spot.js:1152` |
-| `plMxSchedule` | функція | `src/scripts/core/15-flow-spot.js:1217` |
-| `plSlotTask` | функція | `src/scripts/core/15-flow-spot.js:1231` |
-| `plBlockEnd` | функція | `src/scripts/core/15-flow-spot.js:1245` |
-| `plTaskCard` | функція | `src/scripts/core/15-flow-spot.js:1246` |
-| `plAdd` | функція | `src/scripts/core/15-flow-spot.js:1269` |
-| `plAddBlockAt` | функція | `src/scripts/core/15-flow-spot.js:1296` |
-| `plLinkTag` | функція | `src/scripts/core/15-flow-spot.js:1301` |
-| `plScheduleStep` | функція | `src/scripts/core/15-flow-spot.js:1309` |
-| `plMicroBlock` | функція | `src/scripts/core/15-flow-spot.js:1326` |
-| `plCompleteBlock` | функція | `src/scripts/core/15-flow-spot.js:1339` |
-| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1396` |
-| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1413` |
-| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1421` |
-| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1643` |
-| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1646` |
+| `spotChips` | функція | `src/scripts/core/15-flow-spot.js:16` |
+| `spotAddon` | функція | `src/scripts/core/15-flow-spot.js:24` |
+| `aiParsePage` | функція | `src/scripts/core/15-flow-spot.js:36` |
+| `applyPageBlocks` | функція | `src/scripts/core/15-flow-spot.js:43` |
+| `flowSpotEl` | функція | `src/scripts/core/15-flow-spot.js:70` |
+| `flowSpotToggle` | функція | `src/scripts/core/15-flow-spot.js:92` |
+| `flowSpotOpen` | функція | `src/scripts/core/15-flow-spot.js:93` |
+| `flowSpotClose` | функція | `src/scripts/core/15-flow-spot.js:107` |
+| `flowSpotSend` | функція | `src/scripts/core/15-flow-spot.js:108` |
+| `spotMicToggle` | функція | `src/scripts/core/15-flow-spot.js:157` |
+| `window.flowCapRender` | значення | `src/scripts/core/15-flow-spot.js:186` |
+| `window.flowSpotOpen` | значення | `src/scripts/core/15-flow-spot.js:187` |
+| `aiChatSheet` | функція | `src/scripts/core/15-flow-spot.js:190` |
+| `aiClose` | функція | `src/scripts/core/15-flow-spot.js:223` |
+| `aiDayPct` | функція | `src/scripts/core/15-flow-spot.js:230` |
+| `aiVoiceOn` | значення | `src/scripts/core/15-flow-spot.js:237` |
+| `aiSpeakStop` | функція | `src/scripts/core/15-flow-spot.js:239` |
+| `aiSpeak` | функція | `src/scripts/core/15-flow-spot.js:240` |
+| `aiVoiceToggle` | функція | `src/scripts/core/15-flow-spot.js:280` |
+| `aiRenderHead` | функція | `src/scripts/core/15-flow-spot.js:287` |
+| `aiMemSheet` | функція | `src/scripts/core/15-flow-spot.js:334` |
+| `aiRenderViews` | функція | `src/scripts/core/15-flow-spot.js:356` |
+| `aiLogHTML` | функція | `src/scripts/core/15-flow-spot.js:361` |
+| `aiTlHTML` | функція | `src/scripts/core/15-flow-spot.js:368` |
+| `aiActsHTML` | функція | `src/scripts/core/15-flow-spot.js:391` |
+| `aiTraceLiveHTML` | функція | `src/scripts/core/15-flow-spot.js:431` |
+| `aiTraceRowHTML` | функція | `src/scripts/core/15-flow-spot.js:437` |
+| `AI_SHELF_GO` | обʼєкт | `src/scripts/core/15-flow-spot.js:442` |
+| `aiShelfHTML` | функція | `src/scripts/core/15-flow-spot.js:443` |
+| `aiTraceKpisHTML` | функція | `src/scripts/core/15-flow-spot.js:453` |
+| `aiWireBody` | функція | `src/scripts/core/15-flow-spot.js:468` |
+| `aiChipsHTML` | функція | `src/scripts/core/15-flow-spot.js:488` |
+| `AI_SVG` | обʼєкт | `src/scripts/core/15-flow-spot.js:494` |
+| `AI_ICO` | обʼєкт | `src/scripts/core/15-flow-spot.js:502` |
+| `aiIco` | функція | `src/scripts/core/15-flow-spot.js:525` |
+| `aiMD` | функція | `src/scripts/core/15-flow-spot.js:530` |
+| `aiBusyHTML` | функція | `src/scripts/core/15-flow-spot.js:536` |
+| `aiSlashHide` | функція | `src/scripts/core/15-flow-spot.js:544` |
+| `aiSlashShow` | функція | `src/scripts/core/15-flow-spot.js:545` |
+| `aiAttachRender` | функція | `src/scripts/core/15-flow-spot.js:560` |
+| `aiImgShrink` | функція | `src/scripts/core/15-flow-spot.js:572` |
+| `aiFileB64` | функція | `src/scripts/core/15-flow-spot.js:589` |
+| `aiPickFile` | функція | `src/scripts/core/15-flow-spot.js:597` |
+| `aiPlusSheet` | функція | `src/scripts/core/15-flow-spot.js:623` |
+| `aiPromptsSheet` | функція | `src/scripts/core/15-flow-spot.js:643` |
+| `aiPromptEdit` | функція | `src/scripts/core/15-flow-spot.js:662` |
+| `aiEnvKpi` | функція | `src/scripts/core/15-flow-spot.js:679` |
+| `aiPlanCardHTML` | функція | `src/scripts/core/15-flow-spot.js:687` |
+| `aiRenderBody` | функція | `src/scripts/core/15-flow-spot.js:713` |
+| `AI_SKILLS` | обʼєкт | `src/scripts/core/15-flow-spot.js:763` |
+| `aiSkillFor` | функція | `src/scripts/core/15-flow-spot.js:775` |
+| `aiSumBusy` | значення | `src/scripts/core/15-flow-spot.js:782` |
+| `aiMaybeSummarize` | функція | `src/scripts/core/15-flow-spot.js:783` |
+| `aiChatSend` | функція | `src/scripts/core/15-flow-spot.js:796` |
+| `aiRec` | значення | `src/scripts/core/15-flow-spot.js:916` |
+| `aiMicUI` | функція | `src/scripts/core/15-flow-spot.js:917` |
+| `aiMicToggle` | функція | `src/scripts/core/15-flow-spot.js:918` |
+| `aiTranscribeBlob` | функція | `src/scripts/core/15-flow-spot.js:956` |
+| `aiTranscribe` | функція | `src/scripts/core/15-flow-spot.js:979` |
+| `window.aiChatSheet` | значення | `src/scripts/core/15-flow-spot.js:983` |
+| `plStreak` | функція | `src/scripts/core/15-flow-spot.js:985` |
+| `heroWeekDays` | функція | `src/scripts/core/15-flow-spot.js:1004` |
+| `heroMonthDays` | функція | `src/scripts/core/15-flow-spot.js:1022` |
+| `heroDayWord` | функція | `src/scripts/core/15-flow-spot.js:1033` |
+| `renderHeroStreak` | функція | `src/scripts/core/15-flow-spot.js:1039` |
+| `plBlocksDisplay` | функція | `src/scripts/core/15-flow-spot.js:1064` |
+| `plFolderComplete` | функція | `src/scripts/core/15-flow-spot.js:1078` |
+| `DOW_UA` | масив | `src/scripts/core/15-flow-spot.js:1083` |
+| `plRuleDowsLabel` | функція | `src/scripts/core/15-flow-spot.js:1084` |
+| `plFolderDaySheet` | функція | `src/scripts/core/15-flow-spot.js:1093` |
+| `plFolderMonthSheet` | функція | `src/scripts/core/15-flow-spot.js:1150` |
+| `plMxSchedule` | функція | `src/scripts/core/15-flow-spot.js:1215` |
+| `plSlotTask` | функція | `src/scripts/core/15-flow-spot.js:1229` |
+| `plBlockEnd` | функція | `src/scripts/core/15-flow-spot.js:1243` |
+| `plTaskCard` | функція | `src/scripts/core/15-flow-spot.js:1244` |
+| `plAdd` | функція | `src/scripts/core/15-flow-spot.js:1267` |
+| `plAddBlockAt` | функція | `src/scripts/core/15-flow-spot.js:1294` |
+| `plLinkTag` | функція | `src/scripts/core/15-flow-spot.js:1299` |
+| `plScheduleStep` | функція | `src/scripts/core/15-flow-spot.js:1307` |
+| `plMicroBlock` | функція | `src/scripts/core/15-flow-spot.js:1324` |
+| `plCompleteBlock` | функція | `src/scripts/core/15-flow-spot.js:1337` |
+| `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1394` |
+| `plToast` | функція | `src/scripts/core/15-flow-spot.js:1411` |
+| `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1419` |
+| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1641` |
+| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1644` |
 
 ### `src/scripts/core/16-dashboard.js` — 55 сутностей
 
@@ -1431,31 +1414,16 @@
 | `delWork` | функція | `src/scripts/core/20-work.js:498` |
 | `clearWorkMonth` | функція | `src/scripts/core/20-work.js:508` |
 
-### `src/scripts/core/21-patterns.js` — 21 сутностей
+### `src/scripts/core/21-patterns.js` — 6 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `PAT_CKEY` | значення | `src/scripts/core/21-patterns.js:4` |
-| `patChains` | масив | `src/scripts/core/21-patterns.js:5` |
-| `PAT_PHASES` | масив | `src/scripts/core/21-patterns.js:6` |
-| `patSaveChains` | функція | `src/scripts/core/21-patterns.js:12` |
-| `patSaveScore` | функція | `src/scripts/core/21-patterns.js:13` |
-| `patSaveTrans` | функція | `src/scripts/core/21-patterns.js:14` |
-| `patEsc` | функція | `src/scripts/core/21-patterns.js:15` |
-| `patFmt` | функція | `src/scripts/core/21-patterns.js:16` |
-| `goPatterns` | функція | `src/scripts/core/21-patterns.js:18` |
-| `patSetView` | функція | `src/scripts/core/21-patterns.js:23` |
-| `patInterceptData` | функція | `src/scripts/core/21-patterns.js:34` |
-| `patOpenIntercept` | функція | `src/scripts/core/21-patterns.js:42` |
-| `patDecide` | функція | `src/scripts/core/21-patterns.js:57` |
-| `patAddChain` | функція | `src/scripts/core/21-patterns.js:69` |
-| `patDelChain` | функція | `src/scripts/core/21-patterns.js:80` |
-| `patDaysFrom` | функція | `src/scripts/core/21-patterns.js:88` |
-| `patAddTrans` | функція | `src/scripts/core/21-patterns.js:95` |
-| `patDelTrans` | функція | `src/scripts/core/21-patterns.js:113` |
-| `patTCheck` | функція | `src/scripts/core/21-patterns.js:118` |
-| `patLast7` | функція | `src/scripts/core/21-patterns.js:126` |
-| `renderPatterns` | функція | `src/scripts/core/21-patterns.js:134` |
+| `PAT_CKEY` | значення | `src/scripts/core/21-patterns.js:8` |
+| `patChains` | масив | `src/scripts/core/21-patterns.js:9` |
+| `patSaveTrans` | функція | `src/scripts/core/21-patterns.js:10` |
+| `patDaysFrom` | функція | `src/scripts/core/21-patterns.js:13` |
+| `patTCheck` | функція | `src/scripts/core/21-patterns.js:21` |
+| `patLast7` | функція | `src/scripts/core/21-patterns.js:29` |
 
 ### `src/scripts/core/22-diary.js` — 54 сутностей
 
@@ -1669,52 +1637,13 @@
 | `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:566` |
 | `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:584` |
 
-### `src/scripts/core/28-vision.js` — 42 сутностей
+### `src/scripts/core/28-vision.js` — 3 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `VZKEY` | значення | `src/scripts/core/28-vision.js:2` |
-| `vzData` | обʼєкт | `src/scripts/core/28-vision.js:3` |
-| `vzNorm` | функція | `src/scripts/core/28-vision.js:5` |
-| `vzSave` | функція | `src/scripts/core/28-vision.js:34` |
-| `vzFin` | функція | `src/scripts/core/28-vision.js:37` |
-| `vzDay` | функція | `src/scripts/core/28-vision.js:42` |
-| `vzGoalsInfo` | функція | `src/scripts/core/28-vision.js:45` |
-| `vzStreak` | функція | `src/scripts/core/28-vision.js:49` |
-| `vzFocusCalc` | функція | `src/scripts/core/28-vision.js:57` |
-| `vzCoachMsg` | функція | `src/scripts/core/28-vision.js:67` |
-| `vzEditStatement` | функція | `src/scripts/core/28-vision.js:80` |
-| `vzEditTags` | функція | `src/scripts/core/28-vision.js:83` |
-| `vzEditFocus` | функція | `src/scripts/core/28-vision.js:86` |
-| `vzAddStep` | функція | `src/scripts/core/28-vision.js:101` |
-| `vzStepMenu` | функція | `src/scripts/core/28-vision.js:111` |
-| `vzPickFolder` | функція | `src/scripts/core/28-vision.js:129` |
-| `VZ_GOAL_COLORS` | масив | `src/scripts/core/28-vision.js:137` |
-| `vzAfterGoalCreated` | функція | `src/scripts/core/28-vision.js:138` |
-| `vzStepToGoal` | функція | `src/scripts/core/28-vision.js:143` |
-| `vzPlanToGoal` | функція | `src/scripts/core/28-vision.js:150` |
-| `VZ_TERMS` | масив | `src/scripts/core/28-vision.js:160` |
-| `VZ_TERM_LABEL` | обʼєкт | `src/scripts/core/28-vision.js:161` |
-| `vzAddPlan` | функція | `src/scripts/core/28-vision.js:162` |
-| `vzPlanAddItem` | функція | `src/scripts/core/28-vision.js:169` |
-| `vzPlanMenu` | функція | `src/scripts/core/28-vision.js:176` |
-| `vzAddFolderLink` | функція | `src/scripts/core/28-vision.js:193` |
-| `vzFolderChipMenu` | функція | `src/scripts/core/28-vision.js:201` |
-| `vzRzToday` | функція | `src/scripts/core/28-vision.js:210` |
-| `vzRzDayFull` | функція | `src/scripts/core/28-vision.js:211` |
-| `vzRzToggle` | функція | `src/scripts/core/28-vision.js:213` |
-| `vzRzMenu` | функція | `src/scripts/core/28-vision.js:219` |
-| `vzKtStats` | функція | `src/scripts/core/28-vision.js:238` |
-| `vzKtAnswer` | функція | `src/scripts/core/28-vision.js:245` |
-| `vzKtMenu` | функція | `src/scripts/core/28-vision.js:249` |
-| `vzFocus` | обʼєкт | `src/scripts/core/28-vision.js:268` |
-| `vzQueue` | функція | `src/scripts/core/28-vision.js:269` |
-| `vzFocusStop` | функція | `src/scripts/core/28-vision.js:279` |
-| `vzFocusDone` | функція | `src/scripts/core/28-vision.js:280` |
-| `renderVisionFocus` | функція | `src/scripts/core/28-vision.js:290` |
-| `renderVision` | функція | `src/scripts/core/28-vision.js:330` |
-| `goVision` | функція | `src/scripts/core/28-vision.js:525` |
-| `window.goVision` | значення | `src/scripts/core/28-vision.js:526` |
+| `VZKEY` | значення | `src/scripts/core/28-vision.js:5` |
+| `vzData` | обʼєкт | `src/scripts/core/28-vision.js:6` |
+| `vzNorm` | функція | `src/scripts/core/28-vision.js:8` |
 
 ### `src/scripts/core/29-more-screen.js` — 32 сутностей
 

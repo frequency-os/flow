@@ -87,7 +87,7 @@
     if(id==='scr-more'||id==='scr-projects'||id==='scr-work'){ const nmr=document.getElementById('navMore'); if(nmr) nmr.classList.add('on'); }
     // синхронізація десктопного сайдбару
     const dmap={'scr-journal':'journal','scr-home':'home','scr-goals':'journal','scr-projects':'projects',
-                'scr-finance':'finance','scr-planner':'journal','scr-values':'finance','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-patterns':'home','scr-vision':'home','scr-world':'world'};
+                'scr-finance':'finance','scr-planner':'journal','scr-debts':'finance','scr-spend':'finance','scr-work':'projects','scr-wishes':'home','scr-more':'more','scr-nyc':'more','scr-page':'home','scr-world':'world'};
     const dkey=dmap[id]||'home';
     document.querySelectorAll('.dsb-i').forEach(b=>b.classList.toggle('on', b.dataset.dnav===dkey));
     document.body.classList.toggle('in-home', id==='scr-home');
@@ -670,8 +670,6 @@
     if(!keepDay){ const pp=plData(); const td=plTodayStr();
       if(pp.selDate!==td){ pp.selDate=td; pp.calMonth=td.slice(0,7); saveGoals(); } }
     const c=document.getElementById('plannerBody'); if(c) renderPlanner(c); show('scr-planner'); const sb=document.getElementById('plSettingsBtn'); if(sb) sb.onclick=()=>plRangeSheet(); const ab=document.getElementById('plAiBtn'); if(ab) ab.onclick=()=>aiChatSheet(); }catch(e){ console.error('goPlanner',e); } }
-  function goValues(){ try{ renderValues(); show('scr-values'); }catch(e){ console.error('goValues',e); } }
-  document.getElementById('valBack').onclick = () => { currentFolderKey=null; goHome(); };
   function goWishes(){ try{ renderWishes(); show('scr-wishes'); }catch(e){ console.error('goWishes',e); } }
   window.goWishes=goWishes;
   document.getElementById('wishBack').onclick = goHome;

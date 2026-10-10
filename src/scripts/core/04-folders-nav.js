@@ -399,10 +399,7 @@
       // роль «Сторінка»: одразу відкриваємо аркуш цієї папки
       if(folders[key] && folders[key].role==='page'){ goSpaceFor(key); return; }
       if(key==='fin'){ finView='dash'; renderFinance(); show('scr-finance'); return; }
-      if(key==='val'){ renderValues(); show('scr-values'); return; }
       if(key==='work'){ goWork(); return; }
-      if(key==='pat'){ goPatterns(); return; }
-      if(key===VISION_FKEY){ goVision(); return; }
       // ЗВИЧАЙНА ПАПКА: одразу документ. Стрічка «як у месенджері» — це окрема
       // сутність Чат (36-chats.js); папки нею більше не відкриваються (21.09.2026)
       goSpaceFor(key); return;

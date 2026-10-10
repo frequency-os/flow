@@ -1,68 +1,8 @@
-  /* ===== VALUES / Create-yourself screen ===== */
-  .v-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin-bottom:16px;-ms-overflow-style:none;scrollbar-width:none;}
-  .v-chips::-webkit-scrollbar{display:none;}
-  .v-chip{flex:0 0 auto;border:1px solid var(--line);background:var(--bg-2);color:var(--muted);
-    border-radius:12px;padding:9px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s;}
-  .v-chip.on{background:color-mix(in srgb,var(--val) 18%,transparent);color:var(--val);border-color:color-mix(in srgb,var(--val) 45%,transparent);}
-  .v-hero{background:linear-gradient(135deg,rgba(91,141,239,.16),rgba(91,141,239,.04));border:1px solid color-mix(in srgb,var(--val) 22%,transparent);
-    border-radius:18px;padding:18px;margin-bottom:16px;}
-  .v-hero .hl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--val);font-weight:800;}
-  .v-hero .hv{font-size:18px;font-weight:800;margin-top:6px;line-height:1.35;}
-  .v-hero .hs{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.5;}
-  .v-sec{font-size:13px;font-weight:800;color:var(--text);margin:18px 0 10px;display:flex;align-items:center;gap:8px;}
-  .v-sec .n{font-size:11px;color:var(--muted);font-weight:600;}
-  .v-note{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:12px;}
-  /* value picker grid */
-  .v-grid{display:flex;flex-wrap:wrap;gap:8px;}
-  .v-tag{border:1px solid var(--line);background:var(--bg-2);color:var(--text);border-radius:11px;
-    padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;user-select:none;}
-  .v-tag.sel{background:color-mix(in srgb,var(--val) 20%,transparent);border-color:var(--val);color:#dbe7ff;}
-  .v-tag.sel::before{content:'✓ ';font-weight:800;}
-  /* ranked top list */
-  .v-rank{display:flex;flex-direction:column;gap:10px;}
-  .v-rankitem{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:13px 14px;}
-  .v-rankitem .num{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:14px;
-    background:color-mix(in srgb,var(--val) 22%,transparent);color:var(--val);flex:0 0 auto;}
-  .v-rankitem .body{flex:1;min-width:0;}
-  .v-rankitem .body .t{font-weight:700;font-size:15px;}
-  .v-rankitem .body .why{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45;}
-  .v-rankitem .arrows{display:flex;flex-direction:column;gap:3px;}
-  .v-rankitem .arrows button{width:26px;height:22px;border-radius:7px;border:1px solid var(--line);background:var(--bg-2);
-    color:var(--muted);cursor:pointer;font-size:12px;line-height:1;}
-  .v-empty{text-align:center;color:var(--muted);font-size:13px;padding:24px 12px;line-height:1.5;
-    border:1px dashed var(--line);border-radius:14px;}
-  /* editable cards (vision / anti-vision / prompts) */
-  .v-card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:11px;}
-  .v-card .q{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
-  .v-card .q .em{font-size:17px;}
-  .v-card .hint{font-size:12px;color:var(--muted);margin-bottom:9px;line-height:1.45;}
-  .v-card textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:11px;
-    color:var(--text);font-family:inherit;font-size:14px;line-height:1.55;padding:11px 12px;resize:vertical;min-height:66px;}
-  .v-card textarea:focus{outline:none;border-color:color-mix(in srgb,var(--val) 50%,transparent);}
+  /* ===== Кнопка .v-btn (лишилась від екрана «Цінності», прибраного 10.10.2026; нею користується Карта бажань) ===== */
   .v-btn{width:100%;border:none;border-radius:13px;padding:14px;font-family:inherit;font-size:14px;font-weight:800;
     cursor:pointer;background:var(--val);color:#fff;margin-top:6px;transition:filter .15s;}
   .v-btn:hover{filter:brightness(1.08);}
   .v-btn.ghost{background:var(--bg-2);color:var(--text);border:1px solid var(--line);}
-  /* daily */
-  .v-streak{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
-    border-radius:15px;padding:15px 16px;margin-bottom:16px;}
-  .v-streak .big{font-size:30px;font-weight:800;color:var(--val);line-height:1;}
-  .v-streak .lab{font-size:12px;color:var(--muted);margin-top:3px;}
-  .v-focus{background:linear-gradient(135deg,rgba(91,141,239,.14),transparent);border:1px solid color-mix(in srgb,var(--val) 25%,transparent);
-    border-radius:15px;padding:16px;margin-bottom:14px;}
-  .v-focus .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--val);font-weight:800;}
-  .v-focus .nm{font-size:20px;font-weight:800;margin-top:6px;}
-  .v-focus .ds{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
-  .v-done{display:inline-flex;align-items:center;gap:7px;background:color-mix(in srgb,var(--hab) 16%,transparent);
-    color:var(--hab);border:1px solid color-mix(in srgb,var(--hab) 40%,transparent);border-radius:10px;
-    padding:8px 13px;font-size:13px;font-weight:700;margin-top:10px;}
-  .v-jentry{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin-bottom:9px;}
-  .v-jentry .d{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px;}
-  .v-jentry .tx{font-size:13.5px;line-height:1.5;white-space:pre-wrap;}
-  .v-dots{display:flex;justify-content:center;gap:7px;margin-top:14px;}
-  .v-dots i{width:6px;height:6px;border-radius:50%;background:var(--line);transition:all .2s;}
-  .v-dots i.on{background:var(--val);width:18px;border-radius:4px;}
 
   /* ===== WISHES / Карта бажань (Сузір'я) ===== */
   #scr-wishes{background:

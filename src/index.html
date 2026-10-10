@@ -47,7 +47,6 @@
 <!-- шрифти вбудовані в код (див. tools/build-fonts.py) — інтернет не потрібен -->
 <style>@@INC:styles/00-fonts.css@@</style>
 <style>@@INCDIR:styles/core@@</style>
-<style id="patterns-css">@@INC:styles/03-patterns.css@@</style>
 <style id="diary-css">@@INC:styles/04-diary.css@@</style>
 </head>
 <body>
@@ -252,74 +251,6 @@
 
     <div class="lsec"><h3>Записи</h3><div class="cnt" id="cnt">0</div></div>
     <div id="list"></div>
-  </section>
-
-  <!-- ===== SCREEN: PATTERNS · перехват лазівок + трансформація ===== -->
-  <section class="screen" id="scr-patterns">
-    <button class="back" id="patternsBack" style="--c:var(--owe)">‹ Огляд</button>
-    <div class="ph" style="--c:var(--owe)">
-      <div class="ey">Дисципліна · <b>Патерни</b></div>
-      <h2><span class="em" style="background:color-mix(in srgb,var(--owe) 16%,transparent)">🧠</span>Мозок vs Я</h2>
-    </div>
-
-    <div class="pat-seg">
-      <button class="on" id="patTabI">🛑 Перехват</button>
-      <button id="patTabT">🔄 4 місяці</button>
-    </div>
-
-    <!-- ВИД 1: ПЕРЕХВАТ -->
-    <div id="patViewI">
-      <div class="balance">
-        <div class="bcard" style="--bc:var(--owed)"><div class="t"><i></i>Я перехопив</div><div class="v" id="patWin">0</div></div>
-        <div class="bcard" style="--bc:var(--owe)"><div class="t"><i></i>Мозок виграв</div><div class="v" id="patLose">0</div></div>
-      </div>
-      <div class="netbar"><div class="t">Рахунок</div><div class="v" id="patNet">0 : 0</div></div>
-
-      <button class="pat-panic" id="patPanicBtn">Мозок торгується зараз<small>натисни в момент спокуси</small></button>
-      <div class="pat-panel" id="patPanel">
-        <div class="pat-sub"><div class="pat-qh">Мозок уже казав це — і ось чим закінчилось:</div><div id="patLies"></div></div>
-        <div class="pat-sub"><div class="pat-qh">Твої готові розриви:</div><div id="patBreaks"></div></div>
-        <div class="pat-decide">
-          <button class="pat-dwin" id="patDWin">✓ Перехопив</button>
-          <button class="pat-dlose" id="patDLose">✕ Розібрати зрив</button>
-        </div>
-      </div>
-
-      <div class="form">
-        <div class="lab">⛓️ Розбір зриву</div>
-        <input class="mb" id="patTrigger" placeholder="1 · Тригер — що сталось ззовні" maxlength="80">
-        <input class="mb" id="patThought" placeholder="2 · Лазівка — фраза мозку дослівно" maxlength="80">
-        <input class="mb" id="patAction" placeholder="3 · Дія — що зробив" maxlength="80">
-        <input class="mb" id="patConseq" placeholder="4 · Наслідок — як почувався" maxlength="80">
-        <input class="mb" id="patBreak" placeholder="⚡ Розрив — де можна було зупинити" maxlength="120" style="border-color:var(--owed)">
-        <button class="add" id="patAdd">Зберегти ланцюг</button>
-      </div>
-
-      <div class="lsec"><h3>Ланцюги</h3><div class="cnt" id="patCnt">0</div></div>
-      <div id="patList"></div>
-    </div>
-
-    <!-- ВИД 2: ТРАНСФОРМАЦІЯ 4 МІСЯЦІ -->
-    <div id="patViewT" style="display:none">
-      <div class="pat-phases">
-        <div class="pat-pi" style="--pc:#e0b64a"><b><i>1</i>Виявлення</b><span>30 дн: фіксуй тригери й причини. Без тиску.</span></div>
-        <div class="pat-pi" style="--pc:#6a7dff"><b><i>2</i>Заміна</b><span>30 дн: у момент тригера — новий патерн.</span></div>
-        <div class="pat-pi" style="--pc:#9b7dff"><b><i>3</i>Закріплення</b><span>30 дн: новий = типова відповідь.</span></div>
-        <div class="pat-pi" style="--pc:#34c77b"><b><i>4</i>Автоматизм</b><span>30 дн: працює без зусиль. Новий рівень.</span></div>
-      </div>
-      <div class="form">
-        <div class="lab">+ Патерн на заміну</div>
-        <button class="pat-seed" id="patSeed">✨ приклад: емоційні покупки → конверти</button>
-        <input class="mb" id="patTOld" placeholder="Старий патерн — що робиш зараз" maxlength="100">
-        <input class="mb" id="patTCause" placeholder="Причина — який страх/потреба за цим" maxlength="120">
-        <input class="mb" id="patTNew" placeholder="Новий патерн — на що заміняєш" maxlength="100" style="border-color:var(--owed)">
-        <input class="mb" id="patTTools" placeholder="Інструменти — конкретні правила" maxlength="160">
-        <input class="mb" id="patTStart" type="date">
-        <button class="add" id="patTAdd">Почати 4-місячний цикл</button>
-      </div>
-      <div class="lsec"><h3>Активні заміни</h3><div class="cnt" id="patTCnt">0</div></div>
-      <div id="patTList"></div>
-    </div>
   </section>
 
 
@@ -628,14 +559,6 @@
   <div class="e2dim" id="e2Dim"></div>
   <div class="e2sheet" id="e2Sheet"></div>
 
-  <section class="screen" id="scr-values">
-    <button class="back" id="valBack" style="--c:var(--val)">‹ Папки</button>
-    <div class="top">
-      <div class="brand"><div class="logo" style="background:linear-gradient(135deg,#5b8def,#3d6fd1)">🧭</div><div><h1>Створи себе</h1><span id="valSub">компас особистості</span></div></div>
-    </div>
-    <div id="valuesBody"></div>
-  </section>
-
   <section class="screen" id="scr-wishes">
     <button class="back" id="wishBack">‹ Огляд</button>
     <div id="wishesBody"></div>
@@ -808,16 +731,6 @@
     <div class="ch-chips" id="chChips"></div>
     <div class="ch-feed" id="chFeed"></div>
     <div class="ch-composer" id="chComposer"></div>
-  </section>
-
-  <!-- ===== SCREEN: MORE (Ще) ===== -->
-  <section class="screen" id="scr-vision">
-    <button class="back" id="vzBack" style="--c:#f0b429">‹ Огляд</button>
-    <div class="ph" style="--c:#f0b429">
-      <div class="ey">Навігатор · <b>Точка А → Точка Б</b></div>
-      <h2><span class="em" style="background:rgba(240,180,41,.16)">🧭</span>Візія</h2>
-    </div>
-    <div id="visionBody"></div>
   </section>
 
   <!-- «Мій світ»: гра «Місто дня» всередині Frequency (38-world.js, 20-world.css) -->

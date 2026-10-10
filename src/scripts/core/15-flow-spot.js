@@ -7,9 +7,8 @@
       let nm=''; try{ nm=br&&br.folderName()||''; }catch(_){}
       return {key:'page',label:'📁 '+(nm||'Простір'),canWrite:!!br};
     }
-    if(/^scr-(finance|values|debts|spend|work)$/.test(scr)) return {key:'fin',label:'💰 Гроші'};
+    if(/^scr-(finance|debts|spend|work)$/.test(scr)) return {key:'fin',label:'💰 Гроші'};
     if(scr==='scr-planner') return {key:'plan',label:'📅 Планер'};
-    if(scr==='scr-vision') return {key:'vision',label:'🧭 Візія'};
     if(scr==='scr-goals') return {key:'goals',label:'🎯 Цілі'};
     if(scr==='scr-projects') return {key:'projects',label:'🚀 Проєкти'};
     return {key:'home',label:'🏠 Огляд'};
@@ -18,7 +17,6 @@
     if(key==='page') return ['Додай план на тиждень','Зроби таблицю витрат','Додай чекліст на завтра'];
     if(key==='fin') return ['Куди пішли гроші?','Скільки можу відкласти?','Постав блок на бюджет'];
     if(key==='plan') return ['Заповни мій день','Встав перерву 30 хв','Що встигну сьогодні?'];
-    if(key==='vision') return ['Що просідає у моїй візії?','Додай у планер блок до Точки Б','Оціни мій фокус кварталу'];
     if(key==='goals') return ['Розбий ціль на кроки','Що головне цього тижня?'];
     if(key==='projects') return ['Який проєкт зараз просідає?','Наступний крок по проєкту','Розбий проєкт на кроки'];
     return ['Що зараз головне?','План на сьогодні','Додай блок у планер'];
