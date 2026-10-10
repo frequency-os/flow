@@ -77,7 +77,7 @@
     const bl=blocks.map(b=>{ const g=dyGoal(b), c=dyColor(b), st=+b.h, end=Math.max(st+0.25,Math.min(plBlockEnd(b),24)), ln=lanes.get(b)||{lane:0,n:1};
       const top=(st-H0)*DY_HP, ht=Math.max(26,(end-st)*DY_HP-3), short=ht<44;
       return `<div class="dg-b${b.done?' done':''}${g?'':' plain'}${short?' short':''}" style="top:${top}px;height:${ht}px;--ln:${ln.lane};--lns:${ln.n};${c?'--c:'+c:''}">
-        <button class="dg-bb" data-dyblk="${esc(b.id)}"><b>${g?safeEmoji(g.emoji,'🎯')+' ':''}${esc(b.t||'Справа')}</b>${short?'':`<small>${plHM(st)}–${plHM(end)}${g?' · '+esc(g.name||'Місія'):''}${b.fromRecur?' · ↻':''}</small>`}</button>
+        <button class="dg-bb" data-dyblk="${esc(b.id)}"><b>${g?safeEmoji(g.emoji,'🎯')+' ':''}${esc(b.t||'Справа')}</b>${short?'':`<small>${plHM(st)}–${plHM(end)}${g?' · '+esc(g.name||'Місія'):''}${b.fromRecur?' · ↻':''}${typeof subBadge==='function'&&subBadge(b)?' · '+subBadge(b):''}</small>`}</button>
         <button class="dg-ck" data-dydone="${esc(b.id)}" aria-label="${b.done?'Зняти позначку':'Зроблено'}">${b.done?'✓':''}</button></div>`; }).join('');
     const now=isToday&&nowDec>=H0&&nowDec<H1?`<div class="dg-now" style="top:${(nowDec-H0)*DY_HP}px"><span>${plHM(nowDec)}</span><i></i></div>`:'';
     const empty=!blocks.length?`<div class="dy-empty"><b>${isToday?'День ще порожній':'Цей день порожній'}</b><span>Тапни по годині, щоб додати справу, або візьми з місій.</span></div>`:'';
@@ -172,6 +172,8 @@
   function dyMenu(b,ds,opt){
     const g=dyGoal(b), items=[], week=!!(opt&&opt.week);
     items.push({ic:'target', label:b.done?'Зняти позначку «зроблено»':'Зроблено', primary:!b.done, onClick:()=>dyComplete(b.id,ds)});
+    // підпункти блоку (49-calendar.js): чекліст цього дня
+    { const sc=typeof subCount==='function'?subCount(b):{n:0,d:0}; items.push({ic:'plus', label:'Підпункти', sub:sc.n?sc.d+' з '+sc.n+' зроблено':'розбити справу на кроки', onClick:()=>subSheet(ds,b.id)}); }
     // шторка бере день один раз при відкритті — ставимо його на мить і повертаємо, щоб «День» не зсувався
     items.push({ic:'edit', label:'Змінити', sub:'назва, час, місія', onClick:()=>{ const p=plData(), old=p.selDate; p.selDate=ds; try{ plEditBlock(b.id); } finally{ p.selDate=old; } }});
     if(!b.done) items.push(week

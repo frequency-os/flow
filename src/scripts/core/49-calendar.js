@@ -59,7 +59,7 @@
       const ev=calEventsOn(ds,fk), pay=fk?[]:calPayOn(ds), bl=calBlocks(ds,fk), note=calNote(ds);
       const evRow=e=>`<button class="cal-row" data-calev="${esc(e.id)}"><span class="cal-ic ev">★</span><span class="cal-tx"><b>${esc(String(e.t||'Подія').slice(0,80))}</b><small>${esc(CAL_REP[calRep(e)])}${calFolderName(e.folder)&&!fk?' · 📁 '+esc(calFolderName(e.folder).slice(0,24)):''}</small></span><span class="cal-go">›</span></button>`;
       const payRow=x=>`<div class="cal-row ro"><span class="cal-ic pay">${x.k==='in'?'＋':'💳'}</span><span class="cal-tx"><b>${esc(x.t.slice(0,60))}</b><small>${x.rec?'регулярний · ':''}з Гаманця</small></span><b class="cal-amt ${x.k}">${x.k==='in'?'+':'−'}${esc(money(x.amt,x.cur||undefined))}</b></div>`;
-      const blRow=b=>`<button class="cal-row" data-calbl style="--bc:${calBlockColor(b)}"><span class="cal-tm">${plHM(+b.h||0)}–${plHM(Math.min(plBlockEnd(b),24))}</span><span class="cal-tx"><b class="${b.done?'done':''}">${esc(String(b.t||'Блок').slice(0,60))}</b>${calFolderName(b.folder)&&!fk?`<small>📁 ${esc(calFolderName(b.folder).slice(0,24))}</small>`:''}</span>${b.done?'<span class="cal-ok">✓</span>':''}</button>`;
+      const blRow=b=>`<button class="cal-row" data-calbl style="--bc:${calBlockColor(b)}"><span class="cal-tm">${plHM(+b.h||0)}–${plHM(Math.min(plBlockEnd(b),24))}</span><span class="cal-tx"><b class="${b.done?'done':''}">${esc(String(b.t||'Блок').slice(0,60))}</b>${(calFolderName(b.folder)&&!fk)||subBadge(b)?`<small>${calFolderName(b.folder)&&!fk?'📁 '+esc(calFolderName(b.folder).slice(0,24)):''}${calFolderName(b.folder)&&!fk&&subBadge(b)?' · ':''}${subBadge(b)}</small>`:''}</span>${b.done?'<span class="cal-ok">✓</span>':''}</button>`;
       return `<div class="jn-ed-h"><b>${esc(dyDayTitle(ds))}${fk?' · '+esc(calFolderName(fk).slice(0,20)):''}</b><button data-jnx aria-label="Закрити">✕</button></div>
         <div class="cal-sec"><div class="cal-sh"><span>Події</span></div>
           ${ev.length||pay.length?ev.map(evRow).join('')+pay.map(payRow).join(''):'<small class="cal-none">Подій нема — день народження, дедлайн, платіж</small>'}</div>
@@ -145,4 +145,76 @@
     for(let d=1;d<=dim;d++){ const ds=ym+'-'+String(d).padStart(2,'0'), m=calMarks(ds,fk);
       h+=`<button class="cal-d${ds===td?' td':''}${ds>td?' fut':''}" data-wga="wdcalday" data-ds="${ds}" aria-label="${d} ${JN_MON[+ym.slice(5,7)-1]}${m.n?', блоків: '+m.n:''}${m.ev?', є подія':''}">${d}${m.ev?'<em>★</em>':''}<i>${m.cols.map(c=>`<u style="background:${c}"></u>`).join('')}</i></button>`; }
     return `<span class="cal-grid">${h}</span>`;
+  }
+
+  /* ════════ Підпункти блоку (етап 2, 10.10.2026) ════════
+     Блок Планера несе свій чекліст: b.sub=[{id, t, done}] — усередині blocksByDay[ds], той самий ключ goals_data.
+     Повторюваний блок отримує підпункти на конкретний день (материалізований блок цього дня) — відмітки не переходять.
+     Коли людина відмітила останній підпункт, блок стає виконаним (той самий dyComplete, що й ✓), з «Скасувати».
+     Пишеться лише з дій людини. Видно: Журнал → День (2/3, меню справи), шторка дня календаря, віджет «Час папки». */
+  function subList(b){ return b&&Array.isArray(b.sub)?b.sub.filter(x=>x&&typeof x==='object'&&!Array.isArray(x)&&typeof x.t==='string'):[]; }
+  function subCount(b){ const L=subList(b); return {n:L.length, d:L.filter(x=>x.done).length}; }
+  function subBadge(b){ const c=subCount(b); return c.n?`☑ ${c.d}/${c.n}`:''; }
+  // блок дня за id (віртуальні v_/disp_ повторюваних — за шаблоном; plBlocksFor створює блок дня в памʼяті)
+  function subFind(ds,id){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) return null;
+    const L=plBlocksFor(ds); let b=L.find(x=>x&&String(x.id)===String(id));
+    if(!b){ const m=String(id||'').match(/^(?:v_|disp_)(.+)$/); if(m) b=L.find(x=>x&&x.fromRecur===m[1]); }
+    return b||null;
+  }
+  function subAfter(){ try{ if(typeof window.__subRedraw==='function') window.__subRedraw(); }catch(_){} try{ plRerender(); }catch(_){} try{ const s=document.getElementById('scr-journal'); if(s&&s.classList.contains('active')) jnRender(); }catch(_){} try{ wgRefresh(); }catch(_){} }
+  // відмітити підпункт; останній → блок виконано (з «Скасувати»). Повертає новий стан або null
+  function subToggle(ds,id,sid){
+    const b=subFind(ds,id); if(!b) return null;
+    const s=subList(b).find(x=>String(x.id)===String(sid)); if(!s) return null;
+    s.done=!s.done; saveGoals();
+    const c=subCount(b);
+    if(s.done&&c.n&&c.d===c.n&&!b.done){
+      // блок із грошима (дохід у конверт) чи з матриці сам не закриваємо: зняття позначки не відкочує гроші,
+      // тож «Повернути» було б неправдою — людина ставить ✓ сама
+      if((b.link&&b.link.type==='fin')||b.fromMx){ try{ plToast('Усі підпункти ✓ — познач блок «Зроблено», коли готовий'); }catch(_){} }
+      else{
+        const bid=b.id, sid2=s.id; dyComplete(bid,ds);
+        try{ flowUndoToast('Усі підпункти ✓ — блок виконано',()=>{ const q=subFind(ds,bid); if(q&&q.done) dyComplete(bid,ds);
+          // повертаємо і останню відмітку — бейдж знову «2/3», а не «3/3» на невиконаному блоці
+          const qs=q?subList(q).find(z=>String(z.id)===String(sid2)):null; if(qs&&qs.done){ qs.done=false; saveGoals(); }
+          subAfter(); }); }catch(_){}
+      }
+    }
+    subAfter(); return s.done;
+  }
+  function subSheet(ds,id){
+    const draw=()=>{
+      const b=subFind(ds,id); if(!b) return '';
+      const L=subList(b), c=subCount(b);
+      return `<div class="jn-ed-h"><b>${esc(String(b.t||'Справа').slice(0,50))}</b><button data-jnx aria-label="Закрити">✕</button></div>
+        <small class="dy-fm-sub">${esc(dyDayTitle(ds))} · ${plHM(+b.h||0)}–${plHM(Math.min(plBlockEnd(b),24))}${c.n?' · '+c.d+' з '+c.n:''}${b.done?' · виконано ✓':''}</small>
+        <div class="sub-list">${L.map(x=>`<div class="sub-row${x.done?' on':''}"><button class="sub-ck" data-subck="${esc(x.id)}" role="checkbox" aria-checked="${!!x.done}" aria-label="${esc(x.t)}">${x.done?'✓':''}</button><span>${esc(x.t)}</span><button class="sub-rm" data-subrm="${esc(x.id)}" aria-label="Прибрати «${esc(x.t)}»">✕</button></div>`).join('')||'<small class="cal-none">Розбий справу на кроки — їх видно і в Планері, і в папці</small>'}</div>
+        <form class="sub-add" data-subadd><input id="subT" maxlength="80" placeholder="Новий підпункт, напр. «Граматика 20 хв»" autocomplete="off"><button type="submit">＋</button></form>`;
+    };
+    const bind=ov=>{
+      ov.classList.add('cal-ov');
+      const redraw=()=>{ if(!ov.isConnected){ window.__subRedraw=null; return; } const h=draw(); if(!h){ ov.remove(); return; } ov.querySelector('.jn-ed').innerHTML=h; bind2(); };
+      window.__subRedraw=redraw;   // «Повернути» з тосту перемальовує відкриту шторку
+      const bind2=()=>{
+        const x=ov.querySelector('[data-jnx]'); if(x) x.onclick=()=>{ ov.remove(); subAfter(); };
+        ov.querySelectorAll('[data-subck]').forEach(el=>el.onclick=()=>{ subToggle(ds,id,el.dataset.subck); redraw(); });
+        ov.querySelectorAll('[data-subrm]').forEach(el=>el.onclick=()=>{
+          const b=subFind(ds,id); if(!b||!Array.isArray(b.sub)) return;
+          const i=b.sub.findIndex(q=>q&&String(q.id)===String(el.dataset.subrm)); if(i<0) return;
+          const was=b.sub.splice(i,1)[0]; if(!b.sub.length) delete b.sub; saveGoals(); redraw();
+          try{ flowUndoToast('Підпункт прибрано',()=>{ const q=subFind(ds,id); if(!q) return; if(!Array.isArray(q.sub)) q.sub=[];
+            if(!q.sub.some(z=>z&&String(z.id)===String(was.id))){ q.sub.splice(Math.min(i,q.sub.length),0,was); saveGoals(); subAfter(); } }); }catch(_){}
+        });
+        const f=ov.querySelector('[data-subadd]'), inp=ov.querySelector('#subT');
+        if(f) f.onsubmit=e=>{ e.preventDefault(); const t=String(inp.value||'').trim().slice(0,80); if(!t) return;
+          const b=subFind(ds,id); if(!b) return; if(!Array.isArray(b.sub)) b.sub=[];
+          if(b.sub.length>=30){ plToast('Максимум 30 підпунктів'); return; }
+          b.sub.push({id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), t, done:false}); saveGoals(); redraw();
+          const n=ov.querySelector('#subT'); if(n) n.focus(); };
+      };
+      ov.onclick=e=>{ if(e.target===ov){ ov.remove(); subAfter(); } };
+      bind2();
+    };
+    const h=draw(); if(!h) return; jnOverlay(h,bind);
   }

@@ -311,7 +311,11 @@
         const nowM=nowH>=d0&&nowH<=d1?`<b style="left:${((nowH-d0)/span*100).toFixed(1)}%"></b>`:'';
         const tl=`<span class="wd-tl"><em>${plHM(d0)}</em><span class="wd-tlb">${seg}${nowM}</span><em>${plHM(d1)}</em></span>`;
         const list=sz==='l'?bs.slice(0,6):bs.filter(x=>!x.done&&plBlockEnd(x)>nowH).slice(0,1);   // S/M — найближчий блок, L — увесь день
-        const rows=list.length?`<span class="wd-list">${list.map(x=>`<span class="${x.done?'done':''}"><em>${plHM(+x.h||0)}</em>${esc(String(x.t||'Блок').slice(0,40))}</span>`).join('')}</span>`
+        // рядок блоку: тап — підпункти (49-calendar.js); у L найближчий блок розгорнуто чеклістом
+        const sb=x=>{ const c=subCount(x); return c.n?`<i class="wd-sb">☑ ${c.d}/${c.n}</i>`:''; };
+        const subs=x=>{ const L=subList(x).slice(0,5); return L.length?`<span class="wd-subs">${L.map(q=>`<button data-wga="wdsubck" data-ds="${td}" data-bid="${esc(x.id)}" data-sid="${esc(q.id)}" class="${q.done?'on':''}" role="checkbox" aria-checked="${!!q.done}"><i>${q.done?'✓':''}</i>${esc(q.t.slice(0,40))}</button>`).join('')}</span>`:''; };
+        const firstOpen=list.find(x=>!x.done);
+        const rows=list.length?`<span class="wd-list">${list.map(x=>`<button data-wga="wdsub" data-ds="${td}" data-bid="${esc(x.id)}" class="wd-row-b${x.done?' done':''}"><em>${plHM(+x.h||0)}</em><span>${esc(String(x.t||'Блок').slice(0,40))}</span>${sb(x)}</button>${sz==='l'&&x===firstOpen?subs(x):''}`).join('')}</span>`
           :`<small class="wd-sub">${bs.length?'на сьогодні все ✓':'Сьогодні блоків папки нема'}</small>`;
         const addB=wdOn(b,'add')?`<button data-wga="wdadd" class="pill">＋ блок</button>`:'';
         return wdTile(b,fk,`<button class="wg-hit" data-wga="wdday" aria-label="План папки на сьогодні"></button>
@@ -354,6 +358,9 @@
     else if(a==='wdadd'){ if(fk) plFolderAddBlock(fk); }
     else if(a==='wdday'){ if(fk) plFolderDaySheet(fk); }
     else if(a==='wdmonth'){ if(fk) plFolderMonthSheet(fk); }
+    // день — з плитки (коли її намалювали), а не з моменту тапу: після півночі не шукаємо блок у новому дні
+    else if(a==='wdsub'){ const bid=el.dataset.bid, ds=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(); if(bid) subSheet(ds,bid); }
+    else if(a==='wdsubck'){ const bid=el.dataset.bid, sid=el.dataset.sid, ds=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(); if(bid&&sid){ const r=subToggle(ds,bid,sid); if(r!==null) try{ window.platform.haptic('light'); }catch(_){} } }
     else if(a==='wdcalnav'){ const n=+el.dataset.n||0, cur=wdCalYm[b.id]||ymdLocal().slice(0,7); wdCalYm[b.id]=n?moShift(cur,n):ymdLocal().slice(0,7); wgRefresh(); }
     else if(a==='wdcalday'){ const ds=el.dataset.ds; if(fk&&/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) calDaySheet(ds,{folder:fk,onOpenDay:d=>{ try{ goJournal({tab:'day',ds:d}); }catch(_){} }}); }
   }

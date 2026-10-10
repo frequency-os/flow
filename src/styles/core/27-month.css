@@ -148,3 +148,16 @@
     font-size:14px;font-weight:800;color:var(--text);background:var(--field);border:1px solid var(--line);text-align:center;}
   .cal-acts button[data-calopen]{background:var(--accent);border-color:var(--accent);color:#fff;}
   .cal-acts button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  /* підпункти блоку — шторка */
+  .sub-list{display:flex;flex-direction:column;gap:6px;}
+  .sub-row{display:flex;align-items:center;gap:10px;min-height:48px;padding:4px 6px 4px 10px;border-radius:14px;background:var(--field);border:1px solid var(--line);}
+  .sub-row>span{flex:1;min-width:0;font-size:15px;font-weight:700;overflow-wrap:anywhere;}
+  .sub-row.on>span{color:var(--muted);text-decoration:line-through;}
+  .sub-ck{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--accent);display:grid;place-items:center;font-weight:800;color:#fff;}
+  .sub-row.on .sub-ck{background:var(--accent);}
+  .sub-rm{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:44px;height:44px;display:grid;place-items:center;color:var(--muted);font-size:14px;}
+  .sub-ck:focus-visible,.sub-rm:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .sub-add{display:flex;gap:8px;}
+  .sub-add input{flex:1;min-width:0;min-height:46px;box-sizing:border-box;padding:0 12px;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--text);font:600 15px inherit;font-family:inherit;}
+  .sub-add button{all:unset;box-sizing:border-box;cursor:pointer;width:46px;min-height:46px;border-radius:14px;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:20px;font-weight:800;}
+  .sub-add input:focus{outline:2px solid var(--accent);outline-offset:1px;}
