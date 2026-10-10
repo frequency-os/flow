@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 87 |
-| Рядків JS | 33077 |
+| Рядків JS | 33091 |
 | Файлів CSS | 49 |
-| Рядків CSS | 10520 |
-| Сутностей верхнього рівня | 2335 |
+| Рядків CSS | 10523 |
+| Сутностей верхнього рівня | 2337 |
 | Ключів сховища (FLOW_KEYS) | 79 |
 
 ## Файли JS
@@ -80,7 +80,7 @@
 | `src/scripts/core/43-month.js` | 257 | 34 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
-| `src/scripts/core/46-wallet.js` | 408 | 36 |
+| `src/scripts/core/46-wallet.js` | 422 | 38 |
 | `src/scripts/core/47-rules.js` | 351 | 29 |
 | `src/scripts/core/48-hero.js` | 338 | 41 |
 | `src/scripts/core/48-widgets.js` | 463 | 46 |
@@ -160,7 +160,7 @@
 | `src/styles/core/27-month.css` | 202 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
-| `src/styles/core/30-wallet.css` | 147 | 0 |
+| `src/styles/core/30-wallet.css` | 150 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 292 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
@@ -2270,7 +2270,7 @@
 | `yrAddLevel` | функція | `src/scripts/core/45-year.js:105` |
 | `yrBind` | функція | `src/scripts/core/45-year.js:116` |
 
-### `src/scripts/core/46-wallet.js` — 36 сутностей
+### `src/scripts/core/46-wallet.js` — 38 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2284,32 +2284,34 @@
 | `wlRing` | функція | `src/scripts/core/46-wallet.js:21` |
 | `wlOpRow` | функція | `src/scripts/core/46-wallet.js:22` |
 | `wlRender` | функція | `src/scripts/core/46-wallet.js:30` |
-| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:48` |
-| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:78` |
-| `wlFoldersHTML` | функція | `src/scripts/core/46-wallet.js:89` |
-| `wlFolderSheet` | функція | `src/scripts/core/46-wallet.js:100` |
-| `wlBind` | функція | `src/scripts/core/46-wallet.js:113` |
-| `WL_SRC` | обʼєкт | `src/scripts/core/46-wallet.js:136` |
-| `wlSrc` | функція | `src/scripts/core/46-wallet.js:137` |
-| `wlFolderName` | функція | `src/scripts/core/46-wallet.js:138` |
-| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:140` |
-| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:206` |
-| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:226` |
-| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:232` |
-| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:245` |
-| `wlCurList` | функція | `src/scripts/core/46-wallet.js:267` |
-| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:272` |
-| `curBalance` | функція | `src/scripts/core/46-wallet.js:273` |
-| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:274` |
-| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:276` |
-| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:281` |
-| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:292` |
-| `wlExchange` | функція | `src/scripts/core/46-wallet.js:309` |
-| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:355` |
-| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:361` |
-| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:363` |
-| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:365` |
-| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:366` |
+| `wlDebtTotals` | функція | `src/scripts/core/46-wallet.js:50` |
+| `wlDebtLineHTML` | функція | `src/scripts/core/46-wallet.js:56` |
+| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:61` |
+| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:91` |
+| `wlFoldersHTML` | функція | `src/scripts/core/46-wallet.js:102` |
+| `wlFolderSheet` | функція | `src/scripts/core/46-wallet.js:113` |
+| `wlBind` | функція | `src/scripts/core/46-wallet.js:126` |
+| `WL_SRC` | обʼєкт | `src/scripts/core/46-wallet.js:150` |
+| `wlSrc` | функція | `src/scripts/core/46-wallet.js:151` |
+| `wlFolderName` | функція | `src/scripts/core/46-wallet.js:152` |
+| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:154` |
+| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:220` |
+| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:240` |
+| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:246` |
+| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:259` |
+| `wlCurList` | функція | `src/scripts/core/46-wallet.js:281` |
+| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:286` |
+| `curBalance` | функція | `src/scripts/core/46-wallet.js:287` |
+| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:288` |
+| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:290` |
+| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:295` |
+| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:306` |
+| `wlExchange` | функція | `src/scripts/core/46-wallet.js:323` |
+| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:369` |
+| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:375` |
+| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:377` |
+| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:379` |
+| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:380` |
 
 ### `src/scripts/core/47-rules.js` — 29 сутностей
 

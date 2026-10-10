@@ -145,3 +145,6 @@
   .fs-week>span::before{content:"";display:block;height:100%;width:calc(var(--p)*1%);background:#34c77b;border-radius:inherit;}
   .fs-today-a{display:flex;gap:8px;} .fs-today-a button{all:unset;cursor:pointer;box-sizing:border-box;flex:1;min-height:44px;display:grid;place-items:center;border-radius:14px;background:var(--bg-2);border:1px solid var(--line);font-weight:800;font-size:14px;color:var(--text);}
   .fs-today-a button.pri{background:var(--accent);border-color:transparent;color:#fff;}
+  /* борги на картці балансу */
+  .wl-card .wl-debt{all:unset;box-sizing:border-box;cursor:pointer;position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;width:100%;min-height:44px;margin-top:10px;padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.16);color:inherit;font-size:12.5px;font-weight:600;}
+  .wl-card .wl-debt span:last-child{font-size:13.5px;} .wl-card .wl-debt b{font-weight:800;font-variant-numeric:tabular-nums;}

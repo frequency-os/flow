@@ -31,7 +31,7 @@
     ensureCards();
     const bal=walletBalance(), pz=typeof pzTotal==='function'?pzTotal():0, ym=wlYm(), ops=wlMonthOps(ym), all=wlAgg(ops);
     const sub=document.getElementById('finSub'); if(sub) sub.textContent='гаманець героя · '+MO_NAMES[+ym.slice(5,7)-1].toLowerCase();
-    let h=`<div class="wl-card"><button class="wl-cur" data-wlcur aria-label="Головна валюта">${esc(curSym())}${curLocked()?'':' ▾'}</button><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}${wlCurList().length?`<span>разом ≈ <b>${wlMoney(wlTotalApprox()+pz)}</b></span>`:''}</span></div>
+    let h=`<div class="wl-card"><button class="wl-cur" data-wlcur aria-label="Головна валюта">${esc(curSym())}${curLocked()?'':' ▾'}</button><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}${wlCurList().length?`<span>разом ≈ <b>${wlMoney(wlTotalApprox()+pz)}</b></span>`:''}</span>${wlDebtLineHTML(bal+pz)}</div>
       ${wlCursHTML()}
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
       <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="folders"${wlState.tab==='folders'?' class="on"':''}>Папки</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
@@ -44,6 +44,19 @@
     if(plan) rlPlanBind(body,ym);
     try{ if(typeof wgHome==='function') wgHome(body); }catch(e){ console.error('wgHome',e); }
     wlQuestCheck(ym,all);
+  }
+  /* борги на картці балансу (10.10.2026): баланс — справжні гроші, а рядок нижче показує, що буде після боргів.
+     Рахуються лише НЕ проведені в Гаманець борги (проведені вже сидять у балансі операцією) і лише в головній валюті. */
+  function wlDebtTotals(){
+    let owe=0, owed=0, other=0;
+    try{ (debtItems||[]).forEach(i=>{ if(!i||i.synced) return; const v=balance(i); if(!(v>0)) return;
+      if((i.cur||'UAH')!==mainCur()){ other++; return; } if(i.kind==='owe') owe+=v; else owed+=v; }); }catch(_){}
+    return {owe:Math.round(owe*100)/100, owed:Math.round(owed*100)/100, other};
+  }
+  function wlDebtLineHTML(total){
+    const d=wlDebtTotals(); if(!d.owe&&!d.owed&&!d.other) return '';
+    const parts=[]; if(d.owe) parts.push('я винен −'+wlMoney(d.owe)); if(d.owed) parts.push('мені винні +'+wlMoney(d.owed)); if(d.other) parts.push(d.other+' в іншій валюті');
+    return `<button class="wl-debt" data-wldebt><span>🤝 ${esc(parts.join(' · '))}</span><span>після боргів ≈ <b>${esc(wlMoney(total-d.owe+d.owed))}</b> ›</span></button>`;
   }
   function wlOverviewHTML(ops,all,ym){
     const g=(jnHero().money&&jnHero().money[ym])||null, svd=typeof pzMonthSaved==='function'?Math.max(0,pzMonthSaved(ym)):0;
@@ -122,6 +135,7 @@
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
     { const st=c.querySelector('[data-wlstarter]'); if(st) st.onclick=()=>wlEnvStarter(); }
     if(typeof wlStartBind==='function') wlStartBind(c);
+    { const db=c.querySelector('[data-wldebt]'); if(db) db.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
     { const qa=c.querySelector('[data-wlqa]'); if(qa) qa.onclick=()=>qaGuide(); }
     { const ev=c.querySelector('[data-wlenv]'); if(ev) ev.onclick=()=>{ finView='envelopes'; renderFinance(); }; }
     { const d=c.querySelector('[data-wldebts]'); if(d) d.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
