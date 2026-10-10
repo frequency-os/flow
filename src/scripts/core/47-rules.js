@@ -264,7 +264,8 @@
     // лише головна валюта: рядки в € не змішуємо з гривнями
     const left=(rows)=>rows.filter(r=>!rlRowCur(r)).reduce((s,r)=>s+Math.max(0,(+r.amt||0)-rlPlanFact(ym,r.id)),0);
     const recLeft=rlRecurring().filter(r=>r.lastYM!==ym).reduce((s,r)=>s+(+r.amount||0),0);
-    return Math.round(free+left(p.in)-left(p.out)-recLeft);
+    let wk=0; try{ if(typeof wkExpectedMain==='function') wk=wkExpectedMain(ym); }catch(_){}   // очікувана зарплата з Роботи (51-money-reset.js)
+    return Math.round(free+left(p.in)+wk-left(p.out)-recLeft);
   }
   // ще не закриті рядки плану (дохід і витрати), від найближчого дня
   function rlPlanOpen(ym){
@@ -284,6 +285,7 @@
         <span class="wl-sp"><span>план доходу <b>${wlMoney(pIn)}</b> · є ${wlMoney(all.inc)}</span><span>план витрат <b>${wlMoney(pOut)}</b> · є ${wlMoney(all.out)}</span></span></div>
       ${canCopy?`<button class="mo-set" data-rlcopy>Взяти план з минулого місяця</button>`:''}
       <div class="wl-sec"><span>Доходи</span><button data-rladd="in">＋ дохід</button></div>
+      ${typeof wkPlanRowHTML==='function'?wkPlanRowHTML(ym):''}
       ${p.in.length?p.in.slice().sort((a,b)=>(+a.day||99)-(+b.day||99)).map(r=>row(r,'in')).join(''):'<div class="dy-empty"><span>Зарплата, оплата від клієнта — що чекаєш цього місяця.</span></div>'}
       <div class="wl-sec"><span>Витрати</span><button data-rladd="out">＋ витрата</button></div>
       ${p.out.slice().sort((a,b)=>(+a.day||99)-(+b.day||99)).map(r=>row(r,'out')).join('')}
@@ -293,6 +295,7 @@
   }
   function rlPlanBind(c,ym){
     c.querySelectorAll('[data-rladd]').forEach(b=>b.onclick=()=>rlPlanEdit(ym,b.dataset.rladd,null));
+    try{ if(typeof wkPlanBind==='function') wkPlanBind(c); }catch(_){}
     c.querySelectorAll('[data-rlpr]').forEach(b=>b.onclick=()=>{ const [k,id]=b.dataset.rlpr.split('|'); rlPlanRowMenu(ym,k,id); });
     { const s=c.querySelector('[data-rlsal]'); if(s) s.onclick=rlSalaryTpl; }
     { const cp=c.querySelector('[data-rlcopy]'); if(cp) cp.onclick=()=>{ const prev=rlPlan(rlPrevYm(ym),false); if(!prev) return; const p=rlPlan(ym,true);

@@ -16,6 +16,7 @@
   .wg-t.c-debt{background:linear-gradient(135deg,#ff4d6d,#ff7a59);}
   .wg-t.c-in{background:linear-gradient(135deg,#0f9d77,#34c77b);}
   .wg-t.c-out{background:linear-gradient(135deg,#d9480f,#ff7a59);}
+  .wg-t.c-work{background:linear-gradient(135deg,#3a7bd5,#4ecdc4);}
   .wg-t.c-none{background:var(--card);color:var(--muted);border:1px solid var(--line);}
   /* весь віджет — одна велика ціль тапу; кнопки й рядки лежать вище за неї */
   .wg-hit{all:unset;position:absolute;inset:0;cursor:pointer;z-index:0;border-radius:inherit;}

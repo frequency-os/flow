@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 85 |
-| Рядків JS | 33238 |
+| Файлів JS | 86 |
+| Рядків JS | 33341 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10343 |
-| Сутностей верхнього рівня | 2248 |
+| Рядків CSS | 10344 |
+| Сутностей верхнього рівня | 2255 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -64,7 +64,7 @@
 | `src/scripts/core/26-blocks-render.js` | 1449 | 16 |
 | `src/scripts/core/27-canvas.js` | 593 | 27 |
 | `src/scripts/core/28-vision.js` | 528 | 42 |
-| `src/scripts/core/29-more-screen.js` | 571 | 32 |
+| `src/scripts/core/29-more-screen.js` | 588 | 32 |
 | `src/scripts/core/30-upgrade.js` | 296 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
@@ -81,11 +81,12 @@
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
 | `src/scripts/core/46-wallet.js` | 403 | 36 |
-| `src/scripts/core/47-rules.js` | 337 | 29 |
+| `src/scripts/core/47-rules.js` | 340 | 29 |
 | `src/scripts/core/48-hero.js` | 316 | 36 |
-| `src/scripts/core/48-widgets.js` | 191 | 20 |
+| `src/scripts/core/48-widgets.js` | 200 | 20 |
 | `src/scripts/core/49-finlit.js` | 132 | 17 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
+| `src/scripts/core/51-money-reset.js` | 74 | 7 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 883 | 47 |
 | `src/scripts/page-editor/03-premium-pack.js` | 595 | 27 |
@@ -159,7 +160,7 @@
 | `src/styles/core/29-year.css` | 84 | 0 |
 | `src/styles/core/30-wallet.css` | 112 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
-| `src/styles/core/32-widgets.css` | 59 | 0 |
+| `src/styles/core/32-widgets.css` | 60 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (78)
 
@@ -1751,14 +1752,14 @@
 | `fmtMem` | функція | `src/scripts/core/29-more-screen.js:167` |
 | `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:168` |
 | `renderAccount` | функція | `src/scripts/core/29-more-screen.js:183` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:517` |
-| `maskMail` | функція | `src/scripts/core/29-more-screen.js:524` |
-| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:525` |
-| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:540` |
-| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:550` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:563` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:564` |
-| `nm` | значення | `src/scripts/core/29-more-screen.js:565` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:534` |
+| `maskMail` | функція | `src/scripts/core/29-more-screen.js:541` |
+| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:542` |
+| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:557` |
+| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:567` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:580` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:581` |
+| `nm` | значення | `src/scripts/core/29-more-screen.js:582` |
 
 ### `src/scripts/core/30-upgrade.js` — 30 сутностей
 
@@ -2329,11 +2330,11 @@
 | `rlPrevYm` | функція | `src/scripts/core/47-rules.js:259` |
 | `rlRecurring` | функція | `src/scripts/core/47-rules.js:261` |
 | `rlForecast` | функція | `src/scripts/core/47-rules.js:262` |
-| `rlPlanOpen` | функція | `src/scripts/core/47-rules.js:270` |
-| `rlPlanHTML` | функція | `src/scripts/core/47-rules.js:275` |
-| `rlPlanBind` | функція | `src/scripts/core/47-rules.js:294` |
-| `rlPlanEdit` | функція | `src/scripts/core/47-rules.js:302` |
-| `rlPlanRowMenu` | функція | `src/scripts/core/47-rules.js:323` |
+| `rlPlanOpen` | функція | `src/scripts/core/47-rules.js:271` |
+| `rlPlanHTML` | функція | `src/scripts/core/47-rules.js:276` |
+| `rlPlanBind` | функція | `src/scripts/core/47-rules.js:296` |
+| `rlPlanEdit` | функція | `src/scripts/core/47-rules.js:305` |
+| `rlPlanRowMenu` | функція | `src/scripts/core/47-rules.js:326` |
 
 ### `src/scripts/core/48-hero.js` — 36 сутностей
 
@@ -2390,16 +2391,16 @@
 | `wgApply` | функція | `src/scripts/core/48-widgets.js:19` |
 | `wgTile` | функція | `src/scripts/core/48-widgets.js:32` |
 | `wgHTML` | функція | `src/scripts/core/48-widgets.js:33` |
-| `wgAct` | функція | `src/scripts/core/48-widgets.js:94` |
-| `wgFill` | функція | `src/scripts/core/48-widgets.js:113` |
-| `wgFillPage` | функція | `src/scripts/core/48-widgets.js:120` |
-| `wgWalletHTML` | функція | `src/scripts/core/48-widgets.js:125` |
-| `wgHome` | функція | `src/scripts/core/48-widgets.js:126` |
-| `wgRefresh` | функція | `src/scripts/core/48-widgets.js:128` |
-| `wgMoneyCfg` | функція | `src/scripts/core/48-widgets.js:131` |
-| `WG_OLD` | обʼєкт | `src/scripts/core/48-widgets.js:162` |
-| `wgOldScan` | функція | `src/scripts/core/48-widgets.js:163` |
-| `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:170` |
+| `wgAct` | функція | `src/scripts/core/48-widgets.js:101` |
+| `wgFill` | функція | `src/scripts/core/48-widgets.js:121` |
+| `wgFillPage` | функція | `src/scripts/core/48-widgets.js:128` |
+| `wgWalletHTML` | функція | `src/scripts/core/48-widgets.js:133` |
+| `wgHome` | функція | `src/scripts/core/48-widgets.js:135` |
+| `wgRefresh` | функція | `src/scripts/core/48-widgets.js:137` |
+| `wgMoneyCfg` | функція | `src/scripts/core/48-widgets.js:140` |
+| `WG_OLD` | обʼєкт | `src/scripts/core/48-widgets.js:171` |
+| `wgOldScan` | функція | `src/scripts/core/48-widgets.js:172` |
+| `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:179` |
 
 ### `src/scripts/core/49-finlit.js` — 17 сутностей
 
@@ -2432,6 +2433,18 @@
 | `qaClearUrl` | функція | `src/scripts/core/50-quickadd.js:26` |
 | `qaRun` | функція | `src/scripts/core/50-quickadd.js:30` |
 | `qaGuide` | функція | `src/scripts/core/50-quickadd.js:50` |
+
+### `src/scripts/core/51-money-reset.js` — 7 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `wkMoneyInfo` | функція | `src/scripts/core/51-money-reset.js:11` |
+| `wkExpectedMain` | функція | `src/scripts/core/51-money-reset.js:28` |
+| `wkPlanRowHTML` | функція | `src/scripts/core/51-money-reset.js:35` |
+| `wkPlanBind` | функція | `src/scripts/core/51-money-reset.js:40` |
+| `finResetScan` | функція | `src/scripts/core/51-money-reset.js:43` |
+| `finResetReady` | функція | `src/scripts/core/51-money-reset.js:50` |
+| `finResetAll` | функція | `src/scripts/core/51-money-reset.js:55` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

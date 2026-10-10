@@ -6,7 +6,7 @@
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1};
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1};
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -73,6 +73,13 @@
         <span class="wg-two"><span><b class="wg-big">${d.net>0?'+':''}${wgK(d.net)}</b><small>${d.owed||d.owe?'мені винні '+wgK(d.owed)+' · я винен '+wgK(d.owe):'боргів нема'}</small></span>
         <button class="wg-rules" data-wga="rules"><b>🔥 ${s} ${pluralUk(s,'день','дні','днів')}</b><small>${dc.all?'дисципліна '+Math.round(dc.ok/dc.all*100)+'%':'Книга правил ›'}</small></button></span>`);
     }
+    if(t==='wgwork'){
+      const i=typeof wkMoneyInfo==='function'?wkMoneyInfo(ym):null;
+      if(!i) return '';
+      return wgTile('wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
+        <span class="wg-h">⏱ Робота · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
+        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>`);
+    }
     if(t==='wgmoney'){
       const kind=b.kind==='out'?'out':'in', src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&b.cur!==mainCur()&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:'';
       if(!fk) return wgTile('c-'+kind,`<span class="wg-h">${kind==='in'?'＋ Доходи':'− Витрати'}</span><b class="wg-big sm">Лише в папці</b><small>постав віджет у папку-проєкт</small>`);
@@ -104,6 +111,7 @@
     else if(a==='plan'){ const [k,pid]=String(el.dataset.wgp||'').split('|'); try{ rlPlanRowMenu(wlYm(),k,pid); }catch(_){} }
     else if(a==='planadd'){ try{ wlState.tab='plan'; goFinance(); }catch(_){} }
     else if(a==='debts'){ try{ goDebts(); }catch(_){} }
+    else if(a==='work'){ try{ goWork(); }catch(_){} }
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }
     else if(a==='cfg'){ if(id) wgMoneyCfg(id,false); }
@@ -122,7 +130,8 @@
     (root||document).querySelectorAll('[data-wghost]').forEach(h=>{ let b=null; try{ b=getBlock(h.dataset.wghost); }catch(_){} if(b) wgFill(h,b,fk); });
   }
   // плитки в Гаманці (вкладка «Огляд», під кнопками): картка балансу вже зверху, тож без «Гаманця»
-  function wgWalletHTML(){ return '<div class="wg-home wl-wg"><div class="wg-grid">'+['wgmission','wgenv','wgdebt'].map(t=>`<div class="wg-host" data-wghome="${t}"></div>`).join('')+'</div></div>'; }
+  function wgWalletHTML(){ let w=false; try{ w=typeof wkMoneyInfo==='function'&&!!(wkMoneyInfo()||{}).has; }catch(_){}   // «⏱ Робота» — коли в календарі є години цього місяця
+    return '<div class="wg-home wl-wg"><div class="wg-grid">'+(w?['wgmission','wgenv','wgwork','wgdebt']:['wgmission','wgenv','wgdebt']).map(t=>`<div class="wg-host" data-wghome="${t}"></div>`).join('')+'</div></div>'; }
   function wgHome(root){ (root||document).querySelectorAll('[data-wghome]').forEach(h=>wgFill(h,{type:h.dataset.wghome},'')); }
   // після будь-якого запису грошей — перемалювати всі видимі віджети
   function wgRefresh(){ try{ wgFillPage(document); }catch(_){} try{ wgHome(); }catch(_){} }

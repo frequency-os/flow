@@ -271,6 +271,11 @@
             <div class="acc-rtext"><div class="acc-rtitle">Головна валюта</div><div class="acc-rsub">${escA(curSym()+' '+((CUR_LIST[mainCur()]||{}).n||mainCur()))} ${curLocked()?' · зафіксована':' · у ній Гаманець, віджети, призи, План'}</div></div>
             ${chev()}
           </div>
+          <div class="acc-row" data-acc-finreset role="button" tabindex="0">
+            ${ico('reset','red')}
+            <div class="acc-rtext"><div class="acc-rtitle">Почати фінанси з нуля</div><div class="acc-rsub">стерти операції, конверти, План і цілі місяця — місії, Журнал, папки, борги й години Роботи лишаються</div></div>
+            ${chev()}
+          </div>
           <div class="acc-row" data-acc-oldw role="button" tabindex="0">
             ${ico('backup','slate')}
             <div class="acc-rtext"><div class="acc-rtitle">Старі віджети</div><div class="acc-rsub">прибрати старі «Фінанси», «Конверт», «Проєкт», «Фестиваль», KPI зі сторінок папок</div></div>
@@ -351,6 +356,18 @@
 
       const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
       { const cr=host.querySelector('[data-acc-cur]'); if(cr) cr.onclick=()=>curPickSheet(()=>{ try{ renderAccount(); }catch(_){} }); }   // 08-finance.js
+      { const fr=host.querySelector('[data-acc-finreset]'); if(fr) fr.onclick=()=>{   // 51-money-reset.js
+        if(typeof finResetScan!=='function') return;
+        if(!finResetReady()){ try{ plToast('Дані ще звіряються з хмарою — спробуй за хвилину'); }catch(_){} return; }
+        const r=finResetScan(), parts=[r.ops+' операцій', r.envs+' конвертів і скарбничок'];
+        if(r.recs) parts.push(r.recs+' регулярних платежів'); if(r.plans||r.goals) parts.push('План і цілі місяця'); if(r.curs) parts.push(r.curs+' інших валют');
+        actionSheet({title:'Почати фінанси з нуля?', sub:'Зникне: '+parts.join(', ')+'. Місії, Журнал, папки, борги й години Роботи лишаються. Скасувати не можна — спершу збережи бекап. На інших пристроях спершу онови Frequency й нічого там не записуй, доки вони не підтягнуть зміни — інакше старі записи можуть повернутися.',
+          items:[
+            {ic:'down', label:'Спершу бекап у файл', sub:'збереже всі дані, потім натисни ще раз', onClick:()=>{ try{ Promise.resolve(exportRun(false)).catch(e=>{ console.error('export',e); try{ plToast('Бекап не вдався — не стирай, спробуй ще раз'); }catch(_){} }); }catch(e){ console.error('export',e); try{ plToast('Бекап не вдався — не стирай'); }catch(_){} } }},
+            {ic:'trash', label:'Стерти гроші й почати з нуля', danger:true, onClick:()=>confirmSheet({title:'Точно стерти всі гроші?', sub:'Гаманець стане ₴0, конверти зникнуть. Це остаточно.', okLabel:'Стерти назавжди', onOk:()=>{
+              Promise.resolve(finResetAll()).then(ok=>{ if(ok){ try{ plToast('🧹 Фінанси з нуля — додай стартовий залишок у Гаманці'); }catch(_){} try{ renderAccount(); }catch(_){} } }); }})}
+          ]});
+      }; }
       { const ow=host.querySelector('[data-acc-oldw]'); if(ow) ow.onclick=()=>{ try{ wgOldCleanup(); }catch(e){ console.error('wgOldCleanup',e); } }; }   // 48-widgets.js
 
       // ── скидання до заводських ──
