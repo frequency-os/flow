@@ -770,6 +770,38 @@
       if(r&&r.value){ try{ var v=JSON.parse(r.value)||{}; covers=Object.assign({},v,covers); renderCover(); }catch(_){} }
     }).catch(function(){});
   }catch(_){}
+  /* ── В1 (10.10.2026): картинка обкладинки — у сховищі фото (PhotoDB + хмара фото), а в ключі
+     flowPgCovers лише посилання «idb:pc_…». Раніше кожна обкладинка лежала тут як data-URL
+     1200×760 у трьох копіях (localStorage, flowapp_, черга відправки) і вичерпувала памʼять iPhone.
+     Новий id на кожне фото: інший пристрій, що вже має старе фото з тим самим id, інакше не оновив би його.
+     Лише для НОВИХ обкладинок (дія людини). Автоматичного переносу старих нема: памʼять covers — тільки
+     локальна копія, і фоновий запис затер би в хмарі обкладинки, змінені на іншому пристрої. */
+  function covIsData(u){ return typeof u==='string' && u.slice(0,11)==='data:image/'; }
+  function covStore(k,dataUrl){
+    var id='pc_'+String(k).replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+Date.now().toString(36);
+    try{ return (window.photoPut?window.photoPut(id,dataUrl):Promise.resolve(dataUrl)).then(function(r){ return r||dataUrl; },function(){ return dataUrl; }); }
+    catch(_){ return Promise.resolve(dataUrl); }
+  }
+  // стерти фото, лише якщо на нього більше не посилається жодна обкладинка (перенос чат↔папка ділить посилання)
+  function covDropImg(ref){
+    try{
+      if(!ref || !window.photoIsRef || !window.photoIsRef(ref)) return;
+      for(var kk in covers){ if(covers[kk] && covers[kk].img===ref) return; }
+      if(window.photoDel) window.photoDel(ref);
+    }catch(_){}
+  }
+  // адреса для css url(): safeImg розвʼязує «idb:…» через photoSrc; поки фото вантажиться — порожньо, перемалюємо
+  var covRetryT=null, covRetryN={};
+  function covImgUrl(c){
+    var u=''; try{ u=safeImg(c&&c.img); }catch(_){ u=''; }
+    if(u){ if(c&&c.img) delete covRetryN[c.img]; return u; }
+    // фото ще вантажиться з IndexedDB/хмари — кілька повторів, далі не смикаємо мережу
+    if(c && c.img && !covRetryT && (covRetryN[c.img]||0)<5){
+      covRetryN[c.img]=(covRetryN[c.img]||0)+1;
+      covRetryT=setTimeout(function(){ covRetryT=null; try{ renderCover(); covEdSync(); }catch(_){} },500);
+    }
+    return u;
+  }
   var covSaveT=null;
   function saveCovers(){
     if(covSaveT){ clearTimeout(covSaveT); covSaveT=null; }
@@ -808,8 +840,13 @@
       grads:COV_GRADS,
       get:function(k){ return covers[k]||null; },
       keys:function(){ return Object.keys(covers); },   // видалення папки прибирає і її обкладинки (04-folders-nav.js)
-      set:function(k,c){ covers[k]=c; saveCovers(); try{ renderCover(); }catch(_){} },
-      clear:function(k){ delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} },
+      set:function(k,c){
+        var old=covers[k]&&covers[k].img;
+        var done=function(){ covers[k]=c; saveCovers(); try{ renderCover(); }catch(_){} };
+        if(c && covIsData(c.img)) return covStore(k,c.img).then(function(ref){ c.img=ref; done(); });
+        done(); return Promise.resolve();
+      },
+      clear:function(k){ var old=covers[k]&&covers[k].img; delete covers[k]; saveCovers(); try{ renderCover(); }catch(_){} covDropImg(old); },
       // лише з памʼяті, без запису: папку видалили на іншому пристрої, і він уже
       // прибрав її обкладинку в хмарі — наша копія могла б бути застарілою
       forget:function(k){ delete covers[k]; }
@@ -833,7 +870,7 @@
       covEl.className='pg-cover has';
       covEl.innerHTML='<div class="pgcov-img"></div><button class="pgcov-btn" data-covopen>Обкладинка</button>'+covMenuHTML();
       var img=covEl.querySelector('.pgcov-img');
-      if(c.img){ img.style.backgroundImage='url('+c.img+')';
+      if(c.img){ var _u=covImgUrl(c); img.style.backgroundImage=_u?"url('"+_u+"')":'none';
         img.style.backgroundPosition='50% '+(c.pos==null?50:c.pos)+'%'; }
       else{ img.style.background=COV_GRADS[c.g||0]; }
       covEl.style.setProperty('--covh',(c.h||176)+'px');
@@ -867,10 +904,12 @@
           var r=Math.min(1,maxW/w,maxH/h2); w=Math.round(w*r); h2=Math.round(h2*r);
           var cv=document.createElement('canvas'); cv.width=w; cv.height=h2;
           cv.getContext('2d').drawImage(img,0,0,w,h2);
-          var _pc=covers[k]||{};
-          covers[k]={img:cv.toDataURL('image/jpeg',0.72),
-            pos:_pc.pos==null?50:_pc.pos,dark:_pc.dark==null?30:_pc.dark,h:_pc.h||176};
-          saveCovers(); renderCover(); try{ covEdSync(); }catch(_){}
+          var data=cv.toDataURL('image/jpeg',0.72);
+          covStore(k,data).then(function(ref){
+            var _pc=covers[k]||{}, _old=_pc.img;
+            covers[k]={img:ref, pos:_pc.pos==null?50:_pc.pos,dark:_pc.dark==null?30:_pc.dark,h:_pc.h||176};
+            saveCovers(); renderCover(); try{ covEdSync(); }catch(_){}
+          });
         };
         img.src=reader.result;
       };
@@ -904,7 +943,7 @@
   function covEdSync(skipInputs){
     var b=covEdBox; if(!b)return; var c=covEdState(); if(!c)return;
     var im=b.querySelector('[data-covedimg]');
-    if(c.img){ im.style.background='#000'; im.style.backgroundImage='url('+c.img+')';
+    if(c.img){ var _cu=covImgUrl(c); im.style.background='#000'; im.style.backgroundImage=_cu?"url('"+_cu+"')":'none';
       im.style.backgroundSize='cover'; im.style.backgroundPosition='50% '+c.pos+'%'; }
     else { im.style.backgroundImage='none'; im.style.background=COV_GRADS[c.g||0]; }
     b.style.setProperty('--cd',(c.dark/100));
@@ -940,7 +979,7 @@
       var sw=e.target.closest('[data-covedg]');
       if(sw){ delete c.img; c.g=+sw.dataset.covedg; saveCovers(); renderCover(); covEdSync(); return; }
       if(e.target.closest('[data-covedphoto]')){ covPickPhoto(); return; }
-      if(e.target.closest('[data-covedclear]')){ delete covers[covKey()]; saveCovers(); renderCover(); covEdClose(); return; }
+      if(e.target.closest('[data-covedclear]')){ var _ok=covKey(), _o=covers[_ok]&&covers[_ok].img; delete covers[_ok]; saveCovers(); renderCover(); covEdClose(); covDropImg(_o); return; }
     });
     b.querySelector('[data-coveddark]').addEventListener('input',function(){
       var c=covEdState(); if(!c)return; c.dark=+this.value; saveCoversSoon(); renderCover(); covEdSync(true);

@@ -199,7 +199,7 @@
        ${cov?`<button class="ch-sheet-row danger" data-chcov="clear"><span class="ic">${chI('trash')}</span><span>Прибрати обкладинку</span></button>`:''}`,
       (ov,close)=>{
         ov.querySelectorAll('[data-chgrad]').forEach(b=>b.onclick=()=>{ api.set(chBoardKey(),{g:+b.dataset.chgrad}); renderChCover(); chHaptic('select'); close(); });
-        const ph=ov.querySelector('[data-chcov="photo"]'); if(ph) ph.onclick=()=>{ close(); chPickFile(f=>chShrink(f,1200,760,data=>{ const prev=api.get(chBoardKey())||{}; api.set(chBoardKey(),{img:data,pos:prev.pos==null?50:prev.pos,dark:prev.dark==null?30:prev.dark,h:prev.h||176}); renderChCover(); })); };
+        const ph=ov.querySelector('[data-chcov="photo"]'); if(ph) ph.onclick=()=>{ close(); chPickFile(f=>chShrink(f,1200,760,data=>{ const prev=api.get(chBoardKey())||{}; Promise.resolve(api.set(chBoardKey(),{img:data,pos:prev.pos==null?50:prev.pos,dark:prev.dark==null?30:prev.dark,h:prev.h||176})).then(renderChCover); renderChCover(); })); };
         const cl=ov.querySelector('[data-chcov="clear"]'); if(cl) cl.onclick=()=>{ api.clear(chBoardKey()); renderChCover(); close(); };
       });
   }

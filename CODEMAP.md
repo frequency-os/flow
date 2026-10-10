@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 87 |
-| Рядків JS | 33746 |
+| Рядків JS | 33785 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10549 |
-| Сутностей верхнього рівня | 2302 |
+| Сутностей верхнього рівня | 2307 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -95,7 +95,7 @@
 | `src/scripts/page-editor/05-w-decisions.js` | 112 | 4 |
 | `src/scripts/page-editor/06-w-project.js` | 100 | 6 |
 | `src/scripts/page-editor/07-w-habits.js` | 69 | 4 |
-| `src/scripts/page-editor/08-w-projects-hub.js` | 973 | 44 |
+| `src/scripts/page-editor/08-w-projects-hub.js` | 1012 | 49 |
 | `src/scripts/page-editor/09-journal-sheet.js` | 488 | 37 |
 | `src/scripts/page-editor/10-mic.js` | 155 | 10 |
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
@@ -2649,7 +2649,7 @@
 | `hbHTML` | функція | `src/scripts/page-editor/07-w-habits.js:4` |
 | `hbExport` | функція | `src/scripts/page-editor/07-w-habits.js:52` |
 
-### `src/scripts/page-editor/08-w-projects-hub.js` — 44 сутностей
+### `src/scripts/page-editor/08-w-projects-hub.js` — 49 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2681,22 +2681,27 @@
 | `pgRz` | значення | `src/scripts/page-editor/08-w-projects-hub.js:742` |
 | `COVKEY` | значення | `src/scripts/page-editor/08-w-projects-hub.js:764` |
 | `covers` | обʼєкт | `src/scripts/page-editor/08-w-projects-hub.js:765` |
-| `covSaveT` | значення | `src/scripts/page-editor/08-w-projects-hub.js:773` |
-| `saveCovers` | функція | `src/scripts/page-editor/08-w-projects-hub.js:774` |
-| `saveCoversSoon` | функція | `src/scripts/page-editor/08-w-projects-hub.js:783` |
-| `flushCovers` | функція | `src/scripts/page-editor/08-w-projects-hub.js:787` |
-| `COV_GRADS` | масив | `src/scripts/page-editor/08-w-projects-hub.js:797` |
-| `covEl` | значення | `src/scripts/page-editor/08-w-projects-hub.js:803` |
-| `covKey` | функція | `src/scripts/page-editor/08-w-projects-hub.js:818` |
-| `covMenuHTML` | функція | `src/scripts/page-editor/08-w-projects-hub.js:819` |
-| `renderCover` | функція | `src/scripts/page-editor/08-w-projects-hub.js:826` |
-| `covPickPhoto` | функція | `src/scripts/page-editor/08-w-projects-hub.js:856` |
-| `covEdBox` | значення | `src/scripts/page-editor/08-w-projects-hub.js:897` |
-| `covEdState` | функція | `src/scripts/page-editor/08-w-projects-hub.js:898` |
-| `covEdSync` | функція | `src/scripts/page-editor/08-w-projects-hub.js:904` |
-| `covEdBuild` | функція | `src/scripts/page-editor/08-w-projects-hub.js:917` |
-| `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:971` |
-| `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:972` |
+| `covIsData` | функція | `src/scripts/page-editor/08-w-projects-hub.js:779` |
+| `covStore` | функція | `src/scripts/page-editor/08-w-projects-hub.js:780` |
+| `covDropImg` | функція | `src/scripts/page-editor/08-w-projects-hub.js:786` |
+| `covRetryT` | значення | `src/scripts/page-editor/08-w-projects-hub.js:794` |
+| `covImgUrl` | функція | `src/scripts/page-editor/08-w-projects-hub.js:795` |
+| `covSaveT` | значення | `src/scripts/page-editor/08-w-projects-hub.js:805` |
+| `saveCovers` | функція | `src/scripts/page-editor/08-w-projects-hub.js:806` |
+| `saveCoversSoon` | функція | `src/scripts/page-editor/08-w-projects-hub.js:815` |
+| `flushCovers` | функція | `src/scripts/page-editor/08-w-projects-hub.js:819` |
+| `COV_GRADS` | масив | `src/scripts/page-editor/08-w-projects-hub.js:829` |
+| `covEl` | значення | `src/scripts/page-editor/08-w-projects-hub.js:835` |
+| `covKey` | функція | `src/scripts/page-editor/08-w-projects-hub.js:855` |
+| `covMenuHTML` | функція | `src/scripts/page-editor/08-w-projects-hub.js:856` |
+| `renderCover` | функція | `src/scripts/page-editor/08-w-projects-hub.js:863` |
+| `covPickPhoto` | функція | `src/scripts/page-editor/08-w-projects-hub.js:893` |
+| `covEdBox` | значення | `src/scripts/page-editor/08-w-projects-hub.js:936` |
+| `covEdState` | функція | `src/scripts/page-editor/08-w-projects-hub.js:937` |
+| `covEdSync` | функція | `src/scripts/page-editor/08-w-projects-hub.js:943` |
+| `covEdBuild` | функція | `src/scripts/page-editor/08-w-projects-hub.js:956` |
+| `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:1010` |
+| `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:1011` |
 
 ### `src/scripts/page-editor/09-journal-sheet.js` — 37 сутностей
 

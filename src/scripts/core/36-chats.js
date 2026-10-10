@@ -131,7 +131,7 @@
           boards[dst].push(b); n++; });
         delete boards[k];
       });
-      try{ const api=window.__pgCovers; const cov=api&&api.get(FK); if(cov){ api.set(dst,cov); api.clear(FK); } }catch(_){}
+      try{ const api=window.__pgCovers; const cov=api&&api.get(FK); if(cov){ Promise.resolve(api.set(dst,cov)).then(()=>api.clear(FK)); } }catch(_){}
       if(f) delete folders[FK];
       for(let i=order.length-1;i>=0;i--){ if(order[i]===FK) order.splice(i,1); }
       try{ if(typeof spacesMap!=='undefined'){ delete spacesMap[FK]; delete activeSpaceMap[FK]; saveSpacesMeta(); } }catch(_){}
