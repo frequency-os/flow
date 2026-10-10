@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 33341 |
+| Рядків JS | 33412 |
 | Файлів CSS | 46 |
 | Рядків CSS | 10344 |
 | Сутностей верхнього рівня | 2255 |
@@ -31,7 +31,7 @@
 | `src/scripts/21-newyear-countdown.js` | 127 | 11 |
 | `src/scripts/40-pets-3d.js` | 297 | 0 |
 | `src/scripts/41-theme-layer.js` | 153 | 0 |
-| `src/scripts/42-voice-island.js` | 792 | 0 |
+| `src/scripts/42-voice-island.js` | 855 | 0 |
 | `src/scripts/43-planner.js` | 137 | 0 |
 | `src/scripts/44-week.js` | 325 | 0 |
 | `src/scripts/45-month.js` | 662 | 0 |
@@ -40,7 +40,7 @@
 | `src/scripts/core/02-storage.js` | 2091 | 175 |
 | `src/scripts/core/03-platform.js` | 60 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 425 | 58 |
-| `src/scripts/core/05-spaces.js` | 759 | 64 |
+| `src/scripts/core/05-spaces.js` | 767 | 64 |
 | `src/scripts/core/06-wishes.js` | 1468 | 112 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 788 | 101 |
@@ -604,44 +604,44 @@
 | `stgSvg` | функція | `src/scripts/core/05-spaces.js:288` |
 | `stgIco` | функція | `src/scripts/core/05-spaces.js:292` |
 | `renderSettingsCard` | функція | `src/scripts/core/05-spaces.js:307` |
-| `window.renderSettingsCard` | значення | `src/scripts/core/05-spaces.js:389` |
-| `openSettings` | функція | `src/scripts/core/05-spaces.js:394` |
-| `window.openSettingsSheet` | значення | `src/scripts/core/05-spaces.js:401` |
-| `sidebarCollapsed` | значення | `src/scripts/core/05-spaces.js:436` |
-| `applyChrome` | функція | `src/scripts/core/05-spaces.js:441` |
-| `homeWidgets` | значення | `src/scripts/core/05-spaces.js:457` |
-| `applyHomeWidgets` | функція | `src/scripts/core/05-spaces.js:460` |
-| `THEME_SETS` | обʼєкт | `src/scripts/core/05-spaces.js:480` |
-| `THEME_META` | обʼєкт | `src/scripts/core/05-spaces.js:486` |
-| `THEME_KEYS` | значення | `src/scripts/core/05-spaces.js:495` |
-| `isTheme` | функція | `src/scripts/core/05-spaces.js:496` |
-| `themeSetOf` | функція | `src/scripts/core/05-spaces.js:498` |
-| `themeIsDark` | функція | `src/scripts/core/05-spaces.js:502` |
-| `theme` | значення | `src/scripts/core/05-spaces.js:503` |
-| `applyTheme` | функція | `src/scripts/core/05-spaces.js:527` |
-| `setTheme` | функція | `src/scripts/core/05-spaces.js:552` |
-| `setThemeSet` | функція | `src/scripts/core/05-spaces.js:562` |
-| `toggleTheme` | функція | `src/scripts/core/05-spaces.js:566` |
-| `proTheme` | значення | `src/scripts/core/05-spaces.js:580` |
-| `applyProTheme` | функція | `src/scripts/core/05-spaces.js:582` |
-| `toggleProTheme` | функція | `src/scripts/core/05-spaces.js:588` |
-| `cardSkin` | значення | `src/scripts/core/05-spaces.js:598` |
-| `applyCardSkin` | функція | `src/scripts/core/05-spaces.js:600` |
-| `setCardSkin` | функція | `src/scripts/core/05-spaces.js:606` |
-| `RR_DEFS` | обʼєкт | `src/scripts/core/05-spaces.js:627` |
-| `rrCfg` | функція | `src/scripts/core/05-spaces.js:628` |
-| `rrSave` | функція | `src/scripts/core/05-spaces.js:633` |
-| `rrCfgSheet` | функція | `src/scripts/core/05-spaces.js:634` |
-| `renderRightRail` | функція | `src/scripts/core/05-spaces.js:653` |
-| `goGoals` | функція | `src/scripts/core/05-spaces.js:681` |
-| `prjHexToRgb` | функція | `src/scripts/core/05-spaces.js:684` |
-| `prjTileHTML` | функція | `src/scripts/core/05-spaces.js:692` |
-| `renderProjects` | функція | `src/scripts/core/05-spaces.js:700` |
-| `goProjects` | функція | `src/scripts/core/05-spaces.js:733` |
-| `goPlanner` | функція | `src/scripts/core/05-spaces.js:738` |
-| `goValues` | функція | `src/scripts/core/05-spaces.js:743` |
-| `goWishes` | функція | `src/scripts/core/05-spaces.js:745` |
-| `window.goWishes` | значення | `src/scripts/core/05-spaces.js:746` |
+| `window.renderSettingsCard` | значення | `src/scripts/core/05-spaces.js:397` |
+| `openSettings` | функція | `src/scripts/core/05-spaces.js:402` |
+| `window.openSettingsSheet` | значення | `src/scripts/core/05-spaces.js:409` |
+| `sidebarCollapsed` | значення | `src/scripts/core/05-spaces.js:444` |
+| `applyChrome` | функція | `src/scripts/core/05-spaces.js:449` |
+| `homeWidgets` | значення | `src/scripts/core/05-spaces.js:465` |
+| `applyHomeWidgets` | функція | `src/scripts/core/05-spaces.js:468` |
+| `THEME_SETS` | обʼєкт | `src/scripts/core/05-spaces.js:488` |
+| `THEME_META` | обʼєкт | `src/scripts/core/05-spaces.js:494` |
+| `THEME_KEYS` | значення | `src/scripts/core/05-spaces.js:503` |
+| `isTheme` | функція | `src/scripts/core/05-spaces.js:504` |
+| `themeSetOf` | функція | `src/scripts/core/05-spaces.js:506` |
+| `themeIsDark` | функція | `src/scripts/core/05-spaces.js:510` |
+| `theme` | значення | `src/scripts/core/05-spaces.js:511` |
+| `applyTheme` | функція | `src/scripts/core/05-spaces.js:535` |
+| `setTheme` | функція | `src/scripts/core/05-spaces.js:560` |
+| `setThemeSet` | функція | `src/scripts/core/05-spaces.js:570` |
+| `toggleTheme` | функція | `src/scripts/core/05-spaces.js:574` |
+| `proTheme` | значення | `src/scripts/core/05-spaces.js:588` |
+| `applyProTheme` | функція | `src/scripts/core/05-spaces.js:590` |
+| `toggleProTheme` | функція | `src/scripts/core/05-spaces.js:596` |
+| `cardSkin` | значення | `src/scripts/core/05-spaces.js:606` |
+| `applyCardSkin` | функція | `src/scripts/core/05-spaces.js:608` |
+| `setCardSkin` | функція | `src/scripts/core/05-spaces.js:614` |
+| `RR_DEFS` | обʼєкт | `src/scripts/core/05-spaces.js:635` |
+| `rrCfg` | функція | `src/scripts/core/05-spaces.js:636` |
+| `rrSave` | функція | `src/scripts/core/05-spaces.js:641` |
+| `rrCfgSheet` | функція | `src/scripts/core/05-spaces.js:642` |
+| `renderRightRail` | функція | `src/scripts/core/05-spaces.js:661` |
+| `goGoals` | функція | `src/scripts/core/05-spaces.js:689` |
+| `prjHexToRgb` | функція | `src/scripts/core/05-spaces.js:692` |
+| `prjTileHTML` | функція | `src/scripts/core/05-spaces.js:700` |
+| `renderProjects` | функція | `src/scripts/core/05-spaces.js:708` |
+| `goProjects` | функція | `src/scripts/core/05-spaces.js:741` |
+| `goPlanner` | функція | `src/scripts/core/05-spaces.js:746` |
+| `goValues` | функція | `src/scripts/core/05-spaces.js:751` |
+| `goWishes` | функція | `src/scripts/core/05-spaces.js:753` |
+| `window.goWishes` | значення | `src/scripts/core/05-spaces.js:754` |
 
 ### `src/scripts/core/06-wishes.js` — 112 сутностей
 

@@ -3,6 +3,8 @@
    Повністю АДИТИВНИЙ шар: жодних правок чужих функцій.
    — Перехоплює тапи по #aiMic / #fsMic на capture-фазі → свій запис.
    — VAD: авто-стоп після ~1.7с тиші (адаптивний поріг шуму).
+   — Запис не живе сам по собі: закрили чат/спот, згорнули застосунок чи 15 с
+     тиші без жодного слова — скасовуємо (BUGP-2, 10.10.2026).
    — Після запису: транскрипція через воркер /transcribe → aiChatSend/flowSpotSend.
    — Плеєр останнього голосового у капсулі (play/pause + доріжка).
    — Wake «Спарк»: кнопка-«голос» у рядку вводу; SpeechRecognition, фолбек —
@@ -247,6 +249,15 @@ try{
   }
   function hideIsl(){ if(!isl) return; isl.classList.remove('open');
     playerReset(); setTimeout(function(){ if(isl) isl.classList.remove('play'); },300); }
+  /* у чаті AI капсула стає одразу під шапку: вгорі вона лягала на «‹ Назад»
+     і решту кнопок шапки, і з чату не можна було вийти (BUGP-2). Деінде — звичне місце */
+  function islPlace(){
+    if(!isl) return;
+    var top='';
+    try{ var h=document.querySelector('#aiScr .ai-head'), r=h&&h.getBoundingClientRect();
+      if(r&&r.height) top=Math.round(r.bottom+6)+'px'; }catch(_){}
+    isl.style.top=top;
+  }
 
   /* ── canvas-хелпери ── */
   function ctx2d(c){ try{ return (c&&c.getContext&&c.getContext('2d'))||null; }catch(_){ return null; } }
@@ -261,7 +272,21 @@ try{
   var stream=null,audioCtx=null,analyser=null,dataArr=null,mrec=null,chunks=[],recBlob=null;
   var histLive=[],recHist=[],t0=0,timerIv=null,raf=null;
   var SIL_MS=1700,MIN_SPEECH=700,noiseFloor=0.03,spokeAt=0,speechMs=0,lastFrame=0;
+  var IDLE_MS=15000,recT0=0;   // 15 с тиші без жодного слова → запис скасовуємо
   function nowMs(){ return (window.performance&&performance.now)?performance.now():Date.now(); }
+  /* де почали запис: чат AI ('ai') чи спот ('spot'); '' — ніде (виклик голосом з іншого екрана).
+     Закрили його — запис скасовуємо, плеєр ховаємо (див. спостерігач нижче) */
+  var recHost='';
+  function hostNow(){
+    if(document.getElementById('aiScr')) return 'ai';
+    if(document.body.classList.contains('spot-open')) return 'spot';
+    return '';
+  }
+  function hostOpen(h){
+    if(h==='ai') return !!document.getElementById('aiScr');
+    if(h==='spot') return document.body.classList.contains('spot-open');
+    return true;
+  }
 
   async function micOn(){
     if(analyser) return true;
@@ -336,6 +361,16 @@ try{
         if(st){ st.textContent='Тиша… завершую'; st.classList.add('hush'); }
         if(bp) bp.style.width=(k*100)+'%';
         if(sil>=SIL_MS){ REC.stop(true); return; }
+      } else {
+        /* ще нічого не сказали (чи лише кашлянули): після 15 с тиші мікрофон
+           вимикаємо самі — забутий запис не пише далі. Останні 5 с — відлік
+           у капсулі, щоб зупинка не була несподіванкою */
+        var left=IDLE_MS-(now-(spokeAt||recT0));
+        if(left<=0){ REC.cancel('🎙 15 с тиші — мікрофон вимкнено'); return; }
+        if(left<=5000){
+          if(st){ st.textContent='Тиша — вимкну за '+Math.ceil(left/1000)+' с'; st.classList.add('hush'); }
+          if(bp) bp.style.width=((1-left/5000)*100)+'%';
+        }
       }
     }
     raf=requestAnimationFrame(loop);
@@ -349,6 +384,7 @@ try{
       isl.classList.remove('play');
       isl.querySelector('#fdvRecUI').style.display='flex';
       isl.querySelector('#fdvPlayUI').style.display='none';
+      islPlace();
       isl.classList.add('open');
       var red=false; try{ red=matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(_){}
       if(red||!fromEl||!fromEl.getBoundingClientRect) return;
@@ -368,11 +404,13 @@ try{
   REC.start=async function(ctxName,fromEl){
     if(REC.active) return;
     REC.active=true; REC.ctx=ctxName||'ai';
+    recHost=REC.ctx==='ai'?'ai':(REC.ctx==='spot'?'spot':hostNow());
     histLive=[]; recHist=[]; chunks=[]; recBlob=null;
     noiseFloor=0.03; spokeAt=0; speechMs=0; lastFrame=0;
     try{ var f=Gf('aiSpeakStop'); f&&f(); }catch(_){}
     wakePause();
     var ok=await micOn();
+    if(!REC.active){ micOff(); return; }   // поки чекали мікрофон, запис уже скасували (закрили чат)
     if(!ok){ REC.active=false; wakeResume();
       toast(micDenyMsg()); return; }
     chime(true); haptic();
@@ -385,7 +423,7 @@ try{
         mrec.start();
       }catch(e){ mrec=null; }
     }
-    t0=Date.now(); tick(); timerIv=setInterval(tick,250);
+    t0=Date.now(); recT0=nowMs(); tick(); timerIv=setInterval(tick,250);
     var st=document.getElementById('fdvSt'); ensureIsl();
     st=isl.querySelector('#fdvSt'); st.textContent='Слухаю…'; st.classList.remove('hush');
     isl.querySelector('#fdvSil').style.width='0%';
@@ -411,6 +449,12 @@ try{
         finish(); };
       try{ mr.stop(); }catch(e){ finish(); }
     } else { mrec=null; finish(); }
+  };
+  /* скасувати без надсилання і сказати чому: вийшли з чату, згорнули застосунок, довга тиша */
+  REC.cancel=function(why){
+    if(!REC.active) return;
+    REC.stop(false);
+    if(why) toast(why);
   };
 
   /* ── після запису: транскрипція + плеєр ── */
@@ -454,9 +498,10 @@ try{
   async function afterRec(dur){
     var st=isl&&isl.querySelector('#fdvSt');
     if(st){ st.textContent='Розпізнаю…'; st.classList.remove('hush'); }
-    var ctxName=REC.ctx, blob=recBlob, hist=recHist.slice();
+    var ctxName=REC.ctx, blob=recBlob, hist=recHist.slice(), host=recHost;
     var text=await transcribe(blob);
-    showPlayer(blob,hist,dur);
+    if(hostOpen(host)) showPlayer(blob,hist,dur);   // чат уже закрили — плеєр над іншим екраном не потрібен
+    else hideIsl();
     if(text) routeSend(ctxName,text);
     else toast('🎙 Не розчув — скажи чіткіше і трохи довше');
   }
@@ -489,6 +534,7 @@ try{
     ensureIsl(); dur=Math.max(1,dur||1);
     playerReset();
     var bars=downsample(hist,38);
+    islPlace();
     isl.classList.add('open','play');
     isl.querySelector('#fdvRecUI').style.display='none';
     isl.querySelector('#fdvPlayUI').style.display='flex';
@@ -671,7 +717,8 @@ try{
     try{ if(wakeSR){ wakeSR.onend=null; wakeSR.stop(); wakeSR=null; } }catch(_){}
     whisperStop();
   }
-  function wakeResume(){ if(wakeOn&&wakeWant&&fdOn()) setTimeout(function(){ if(wakeOn&&!REC.active) wakeStart(); },450); }
+  // у фоні мікрофон не відкриваємо: повернення в застосунок саме покличе wakeResume
+  function wakeResume(){ if(wakeOn&&wakeWant&&fdOn()&&!document.hidden) setTimeout(function(){ if(wakeOn&&!REC.active&&!document.hidden) wakeStart(); },450); }
   function wakeOff(){
     wakeOn=false; wakeWant=false; wakePause(); wakeSetUI();
     try{ localStorage.setItem(WAKE_KEY,'0'); }catch(_){}
@@ -776,11 +823,27 @@ try{
   }catch(_){}
   injectWakeBtns();
 
-  /* батарея: у фоні глушимо wake-мікрофон, повертаємось — відновлюємо */
+  /* батарея: у фоні глушимо wake-мікрофон, повертаємось — відновлюємо.
+     Запис, що йшов у момент згортання, скасовуємо: писати у фоні не можна (BUGP-2) */
   document.addEventListener('visibilitychange',function(){
-    if(document.hidden){ if(wakeOn) wakePause(); }
+    if(document.hidden){
+      if(REC.active) REC.cancel('🎙 Запис зупинено — застосунок згорнуто');
+      if(wakeOn) wakePause();
+    }
     else wakeResume();
   });
+
+  /* закрили чат AI (зник #aiScr) чи спот (знявся body.spot-open), де почали запис, —
+     запис скасовуємо, плеєр ховаємо. Раніше капсула «Слухаю…» лишалась над усіма
+     екранами, мікрофон писав далі, а сама капсула закривала «‹ Назад» (BUGP-2) */
+  try{
+    new MutationObserver(function(){
+      if(!recHost||hostOpen(recHost)) return;
+      var h=recHost; recHost='';
+      if(REC.active) REC.cancel(h==='ai'?'🎙 Запис скасовано — чат закрито':'🎙 Запис скасовано — вікно закрито');
+      else if(isl&&isl.classList.contains('open')) hideIsl();
+    }).observe(document.body,{childList:true,attributes:true,attributeFilter:['class']});
+  }catch(_){}
 
   /* Після рестарту апки мікрофон САМ не вмикаємо (APP-2, 30.09.2026): раніше збережене
      fd_wake='1' через 1,5 с запускало прослуховування без жодного дотику людини —
