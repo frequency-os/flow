@@ -1641,7 +1641,7 @@
     extra=extra||{};
     const map={h1:'h1',h2:'h2',h3:'h3',note:'note',task:'task',bullet:'bullet',num:'num',
       quote:'quote',divider:'divider',code:'code',callout:'callout',section:'section',
-      habit:'heatmap',progress:'pbar',countdown:'countdown'};
+      habit:'heatmap',countdown:'countdown'};
     const type=map[String(t||'').toLowerCase()]||'note';
     let b;
     try{ b=(typeof buildBlock==='function')?buildBlock(type):null; }catch(_){ b=null; }
@@ -1650,7 +1650,6 @@
     if(type==='task') Object.assign(b,{text:val,done:false});
     else if(type==='divider'){ /* без тексту */ }
     else if(type==='heatmap'){ b.title=val||'Звичка'; if(!b.marks) b.marks={}; }
-    else if(type==='pbar'){ b.title=val||'Прогрес'; b.value=Math.max(0,Math.min(100,parseInt(extra.value)||0)); }
     else if(type==='countdown'){ b.title=val||'Відлік'; b.label=val||''; if(/^\d{4}-\d{2}-\d{2}$/.test(extra.target||'')) b.target=extra.target; }
     else if(['h1','h2','h3','quote','code','callout','section','bullet','num'].includes(type)){ b.text=val; b.title=b.title||''; }
     else b.text=val;

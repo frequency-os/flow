@@ -24,11 +24,6 @@
 
   // ── умовне відображення блоків (SPECblocksv2 §5.3) ──
   var pgShowHidden=false;
-  function pbarAutoValue(b){
-    var loc=locate(b.id); var sibs=(loc&&loc.arr)||[];
-    var tks=sibs.filter(function(x){return x.type==='task';});
-    return tks.length?Math.round(tks.filter(function(x){return x.done;}).length/tks.length*100):0;
-  }
   function condMet(b){
     var c=b&&b.cond; if(!c||!c.on) return true;
     var any=false, ok=true;
@@ -42,12 +37,6 @@
       var dl=new Date(c.deadline+'T00:00:00');
       var diff=Math.round((dl-today)/86400000);
       if(!(diff>=0 && diff<(c.deadlineN||7))) ok=false;
-    }
-    if(c.metric&&b.type==='pbar'){
-      any=true;
-      var val = b.type==='pbar' ? (b.auto?pbarAutoValue(b):(+b.value||0))
-              : ((b.points&&b.points.length)?(+b.points[b.points.length-1].v||0):0);
-      if(c.metric.op==='lt'){ if(!(val<c.metric.v)) ok=false; } else { if(!(val>c.metric.v)) ok=false; }
     }
     return any?ok:true;
   }
@@ -124,12 +113,19 @@
   function dbColType(c){ return c.type || (c.k==='status'?'status':(c.k==='name'?'text':'text')); }
   function dbFmtNum(v){ var n=parseFloat(String(v).replace(/\s/g,'').replace(',','.')); if(isNaN(n))return v||''; return n.toLocaleString('uk-UA'); }
 
+  /* типи блоків, прибрані з коду 10.10.2026 (ізольовані, ні з чим у застосунку не повʼязані).
+     Документи, де вони ще лежать, малюють замість них плашку з кнопкою «Прибрати». */
+  var PG_GONE={journal:'Щоденник',decision:'Лог рішень',ptracker:'Проєкт-трекер',phub:'Проєкти',habits:'Трекер звичок',
+    pbar:'Прогрес',chart:'Графік',progress:'Прогрес',kanban:'Канбан',contacts:'Контакти',caseline:'Таймлайн справи',
+    wpult:'Пульт проєктів',wstack:'Фокус-стек',wpipe:'Пайплайн',wtline:'Таймлайн',wportal:'Портал'};
   function inner(b){
     var t=b.type,id=b.id;
     /* віджети «Гроші» (core/48-widgets.js) — живі плитки; старі фінансові віджети прибрано 09.10.2026 */
     if(typeof wgIs==='function'&&wgIs(t)) return '<div class="pg-content pgwg" data-wghost="'+esc(id)+'"></div>';
     var PG_OLD_FIN={fin:'Фінанси',envelope:'Конверт',project:'Проєкт',festival:'Фестиваль',kpi:'KPI'};
     if(PG_OLD_FIN[t]) return '<div class="pg-content"><div class="pg-oldw">🗂 Старий віджет «'+PG_OLD_FIN[t]+'» — прибирається в <b>Ще → Дані → Старі віджети</b>. Нові — у меню «/» → Гроші.</div></div>';
+    /* прибрані 10.10.2026 ізольовані блоки — у старих документах лишається плашка з «Прибрати» */
+    if(Object.prototype.hasOwnProperty.call(PG_GONE,t)) return '<div class="pg-content"><div class="pg-oldw">Старий блок «'+PG_GONE[t]+'» — більше не підтримується. <button type="button" class="pg-oldw-rm" data-pgoldrm="'+esc(id)+'">Прибрати</button></div></div>';
     /* нотатка = суцільний абзац на аркуші, без рамок */
     if(t==='note'||t==='quick')return '<div class="pg-content pg-empty" contenteditable="true" data-ph="Пишіть…" data-edit="'+id+'">'+esc(txtOf(b))+'</div>';
     if(t==='h1'){var hs1=headingStyle(b);return '<div class="pg-content pgc-h1'+hs1.cls+' pg-empty" style="'+hs1.style+'" contenteditable="true" data-ph="Заголовок 1" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
@@ -153,22 +149,6 @@
         +'<div class="pgf-b"><div class="pgf-n">'+esc(b.fname||'Файл')+'</div><div class="pgf-s">'+(b.fsize||'')+' · тап відкрити</div></div>'
         +'<button class="pgf-x" data-pgfiledel="'+id+'">✕</button></div></div>';
       return '<div class="pg-content"><button class="pgfile-empty" data-pgfilepick="'+id+'"><span class="pgf-ic">📎</span><span>Прикріпити файл</span></button></div>';
-    }
-    if(t==='pbar'){
-      var pv,tks;
-      if(b.auto){
-        var pgLoc=locate(id); var sibs=(pgLoc&&pgLoc.arr)||[];
-        tks=sibs.filter(function(x){return x.type==='task';});
-        pv=pbarAutoValue(b);
-      } else { pv=Math.max(0,Math.min(100,parseInt(b.value)||0)); }
-      return '<div class="pg-content"><div class="pgbar" data-pgbarwrap="'+id+'">'
-        +'<div class="pgbar-top"><span class="pgbar-t pg-empty" contenteditable="true" data-ph="Мета…" data-edit="'+id+'">'+esc(b.title||'')+'</span>'
-        +'<button class="pgbar-auto'+(b.auto?' on':'')+'" data-pgbarauto="'+id+'" title="Авто: % виконаних задач поруч">'+(b.auto?'⚡ авто':'ручний')+'</button>'
-        +'<span class="pgbar-pct">'+pv+'%</span></div>'
-        +'<div class="pgbar-track"><i style="width:'+pv+'%"></i></div>'
-        +(b.auto?(tks&&tks.length?'':'<div style="font-size:12px;color:var(--pg-mut);padding:2px 0">немає задач поруч — додай Завдання в цей самий блок</div>')
-          :'<div class="pgbar-chips">'+[0,25,50,75,100].map(function(p){return '<button class="pgbar-chip'+(pv===p?' on':'')+'" data-pgbarset="'+id+'|'+p+'">'+p+'</button>';}).join('')+'</div>')
-        +'</div></div>';
     }
     /* ═══ PREMIUM PACK V1 · нативні рендери сторінки ═══ */
     if(t==='weekreview'){
@@ -209,28 +189,6 @@
         +'<div class="pghm-top"><span class="pghm-t pg-empty" contenteditable="true" data-ph="Звичка…" data-edit="'+id+'">'+esc(b.title||'')+'</span>'
         +'<span class="pghm-st">🔥 '+hmStreak+' · '+hmTotal+'/84</span></div>'
         +'<div class="pghm-grid">'+hmCells+'</div></div></div>';
-    }
-    if(t==='chart'){
-      var chPts=(b.points||[]).slice(-30), chView=b.view||'bar', chIn;
-      if(!chPts.length){
-        chIn='<button class="pgpp-empty" data-pgchadd="'+id+'">＋ Перша точка</button>';
-      } else {
-        var chMax=1; chPts.forEach(function(p){ if(p.v>chMax) chMax=p.v; });
-        if(chView==='bar'){
-          chIn='<div class="pgch-bars">'+chPts.map(function(p){
-            return '<span class="pgch-b"><i style="height:'+Math.max(5,p.v/chMax*100)+'%"></i><em>'+esc(p.l||'')+'</em></span>';
-          }).join('')+'</div>';
-        } else {
-          var chPoly=''; chPts.forEach(function(p,i){ chPoly+=(i?' ':'')+((i/Math.max(chPts.length-1,1))*280)+','+(64-5-(p.v/chMax)*54); });
-          chIn='<svg class="pgch-line" viewBox="0 0 280 64" preserveAspectRatio="none"><polyline points="'+chPoly+'"/></svg>';
-        }
-      }
-      return '<div class="pg-content"><div class="pgch">'
-        +'<div class="pghm-top"><span class="pghm-t pg-empty" contenteditable="true" data-ph="Графік…" data-edit="'+id+'">'+esc(b.title||'')+'</span>'
-        +'<span class="pgch-ctrl"><button class="pgch-v'+(chView==='bar'?' on':'')+'" data-pgchview="'+id+'|bar">▮▮</button>'
-        +'<button class="pgch-v'+(chView==='line'?' on':'')+'" data-pgchview="'+id+'|line">〜</button>'
-        +'<button class="pgch-v" data-pgchadd="'+id+'">＋</button></span></div>'
-        +chIn+'</div></div>';
     }
     if(t==='tabs'){
       if(!Array.isArray(b.tabs)||!b.tabs.length) b.tabs=[{name:'Нотатки',text:''}];
@@ -370,11 +328,6 @@
         +'<span class="pgrow-go">›</span></div></div>';
     }
     if(t==='countdown')return cdHTML(b);
-    if(t==='journal')return jrHTML(b);
-    if(t==='decision')return dlHTML(b);
-    if(t==='ptracker')return ptHTML(b);
-    if(t==='phub')return phHTML(b);
-    if(t==='habits')return hbHTML(b);
     if(t==='photo'){
       var _pp=b.pos;
       var _pxf=_pp?('transform:translate('+_pp.x+'%,'+_pp.y+'%) scale('+_pp.scale+');'):'';
@@ -396,22 +349,13 @@
     }
     /* вже вставлені віджети/проєктні блоки показуємо чипом (у меню їх поки нема) */
     /* віджети та проєктні блоки — ЖИВІ тайли дошки прямо на сторінці */
-    var PG_TILE_TYPES={progress:1,calendar:1,wpult:1,wstack:1,wpipe:1,wtline:1,wportal:1,wplanday:1,wplanmonth:1,kanban:1,contacts:1,caseline:1};
+    var PG_TILE_TYPES={calendar:1,wplanday:1,wplanmonth:1};
     if(PG_TILE_TYPES[t]) return '<div class="pg-content pgwidget" data-pgwhost="'+id+'"></div>';
     /* невідомі типи — інформативний чип */
     var PGS_WCHIP={
-      progress:{t:'Прогрес',d:'Шкала виконання',c:'#34c77b',ic:'progress'},
       calendar:{t:'Календар',d:'Місяць з відмітками',c:'#5b8def',ic:'calendar'},
-      wpult:{t:'Пульт проєктів',d:'Наступний крок кожного проєкту',c:'#7c8cff',ic:'pult'},
-      wstack:{t:'Фокус-стек',d:'Обліт проєктів по одному',c:'#ff6b9d',ic:'stack'},
-      wpipe:{t:'Пайплайн',d:'Проєкти за статусами',c:'#4ecdc4',ic:'pipe'},
-      wtline:{t:'Таймлайн',d:'Дедлайни на стрічці тижнів',c:'#e8843c',ic:'tline'},
       wplanday:{t:'План на день',d:'Точки проєкту сьогодні',c:'#6a7dff',ic:'calendar'},
-      wplanmonth:{t:'План на місяць',d:'Календар точок проєкту',c:'#8b5cf6',ic:'calendar'},
-      kanban:{t:'Канбан',d:'Заявки → в роботі → готово',c:'#5b8def',ic:'kanban'},
-      contacts:{t:'Контакти',d:'Партнери, клієнти, сервіси',c:'#4ecdc4',ic:'contacts'},
-      caseline:{t:'Таймлайн справи',d:'Хронологія подій з датами',c:'#e8843c',ic:'caseline'},
-      wportal:{t:'Портал',d:'Стрибок у будь-яку папку',c:'#c77dff',ic:'portal'}
+      wplanmonth:{t:'План на місяць',d:'Календар точок проєкту',c:'#8b5cf6',ic:'calendar'}
     };
     var ci=PGS_WCHIP[t]||null;
     if(ci){
@@ -598,21 +542,6 @@
     editor.innerHTML='';
     editor.appendChild(pgHeaStrip());
     try{ requestAnimationFrame(pgSgPlace); }catch(_){ try{ pgSgPlace(); }catch(__){} }
-    // банер: якщо цю папку прив'язано до проєкт-трекера
-    try{
-      var br0=bridge(), ck=br0&&br0.curKey?br0.curKey():'';
-      var fk=String(ck).split('__sp_')[0];
-      var links = fk && br0 && br0.ptrackersFor ? br0.ptrackersFor(fk) : [];
-      if(links&&links.length){
-        var fp = br0.folderProgress?br0.folderProgress(fk):{done:0,total:0,pct:0};
-        var bn=document.createElement('div'); bn.className='pt-banner';
-        bn.innerHTML='<span class="ptb-ic">'+esc(links[0].emoji||'🎯')+'</span>'
-          +'<div class="ptb-body"><div class="ptb-t">Зв\u2019язано з проєктом «'+esc(links[0].title||'')+'»</div>'
-          +'<div class="ptb-s">кожне «виконано» тут = крок у проєкті</div></div>'
-          +'<span class="ptb-pct">'+(fp.pct||0)+'%</span>';
-        editor.appendChild(bn);
-      }
-    }catch(_){}
     if(!arr || !arr.length){
       // порожня сторінка — видима заглушка з викликом до дії
       var empty=document.createElement('div');
@@ -671,21 +600,6 @@
   // ── input / slash ──
   var slashCtx=null;
   editor.addEventListener('input',function(e){
-    var phn=e.target.closest&&e.target.closest('[data-phname]');
-    if(phn){var pn0=phn.dataset.phname.split('|');var lpn=locate(pn0[0]);
-      if(lpn){var pnp=(lpn.block.projects||[]).find(function(x){return x.id===pn0[1];});
-        if(pnp){pnp.name=phn.value;
-          var nameEl=editor.querySelector('[data-phrow="'+pn0[0]+'|'+pn0[1]+'"] .ph-name');
-          if(nameEl){nameEl.childNodes[0]&&(nameEl.childNodes[0].textContent=phn.value+'  ');}
-          save();}}return;}
-    var df=e.target.closest&&e.target.closest('[data-dlfact]');
-    if(df){var f0=df.dataset.dlfact.split('|');var lf=locate(f0[0]);
-      if(lf){var dec=(lf.block.decisions||[]).find(function(x){return String(x.id)===f0[1];});
-        if(dec){dec.fact=df.value;save();}}return;}
-    var jt=e.target.closest&&e.target.closest('[data-jrtoday]');
-    if(jt){var lj=locate(jt.dataset.jrtoday);if(lj){lj.block.entries=lj.block.entries||{};lj.block.entries[jrYmd()]=jt.value;save();}return;}
-    var jp=e.target.closest&&e.target.closest('[data-jrpast]');
-    if(jp){var pp=jp.dataset.jrpast.split('|');var lp=locate(pp[0]);if(lp){lp.block.entries=lp.block.entries||{};lp.block.entries[pp[1]]=jp.value;save();}return;}
     var cl=e.target.closest&&e.target.closest('[data-pgcodelang]');
     if(cl){var lcl=locate(cl.dataset.pgcodelang);if(lcl){lcl.block.lang=cl.textContent;save();}return;}
     var hc=e.target.closest('[data-pgdbhcol]');
@@ -843,51 +757,5 @@
       slashCtx=ced.dataset.edit; openSlash();
       return;
     }
-    /* нова звичка в трекері */
-    var hbi=e.target.closest&&e.target.closest('[data-hbinput]');
-    if(hbi&&e.key==='Enter'){e.preventDefault();var hbv=hbi.value.trim();hbi.value='';if(!hbv)return;
-      var lhbi=locate(hbi.dataset.hbinput);if(!lhbi)return;lhbi.block.habits=lhbi.block.habits||[];
-      lhbi.block.habits.push({id:'h'+Date.now(),name:hbv,emoji:'✅',marks:{}});save();render();
-      var nn=editor.querySelector('[data-hbinput="'+lhbi.block.id+'"]');if(nn)nn.focus();return;}
-    /* крок плану в хабі проєктів */
-    var hsp=e.target.closest&&e.target.closest('[data-phstepinput]');
-    if(hsp&&e.key==='Enter'){e.preventDefault();var hv2=hsp.value.trim();hsp.value='';if(!hv2)return;
-      var hp0=hsp.dataset.phstepinput.split('|');var lhp=locate(hp0[0]);if(!lhp)return;
-      var php=(lhp.block.projects||[]).find(function(x){return x.id===hp0[1];});if(!php)return;
-      php.steps=php.steps||[];php.steps.push({id:'s'+Date.now(),t:hv2,done:false});save();render();
-      var nhi=editor.querySelector('[data-phstepinput="'+hp0[0]+'|'+hp0[1]+'"]');if(nhi)nhi.focus();return;}
-    /* крок плану проєкту */
-    var sp=e.target.closest&&e.target.closest('[data-ptstepinput]');
-    if(sp&&e.key==='Enter'){e.preventDefault();var v=sp.value.trim();sp.value='';if(!v)return;
-      var l=locate(sp.dataset.ptstepinput);if(!l)return;l.block.steps=l.block.steps||[];
-      l.block.steps.push({id:'s'+Date.now(),t:v,done:false});save();render();
-      var ni=editor.querySelector('[data-ptstepinput="'+l.block.id+'"]');if(ni)ni.focus();return;}
-    /* звичка проєкту */
-    var hp=e.target.closest&&e.target.closest('[data-pthabinput]');
-    if(hp&&e.key==='Enter'){e.preventDefault();var hv=hp.value.trim();hp.value='';if(!hv)return;
-      var lh=locate(hp.dataset.pthabinput);if(!lh)return;lh.block.habits=lh.block.habits||[];
-      lh.block.habits.push({id:'h'+Date.now(),name:hv,emoji:'✅',marks:{}});save();render();
-      var nh=editor.querySelector('[data-pthabinput="'+lh.block.id+'"]');if(nh)nh.focus();return;}
-    var ip=e.target.closest&&e.target.closest('[data-jtinput]');
-    if(ip&&e.key==='Enter'){
-      e.preventDefault();
-      var v=ip.value.trim(); ip.value='';
-      if(!v)return;
-      var l=locate(ip.dataset.jtinput); if(!l)return;
-      var y=jrYmd(); l.block.todos=l.block.todos||{};
-      (l.block.todos[y]=l.block.todos[y]||[]).push({id:'t'+Date.now(),t:v,done:false});
-      save();render();
-      var ni=editor.querySelector('[data-jtinput="'+l.block.id+'"]'); if(ni)ni.focus();
-    }
-  });
-  editor.addEventListener('focusout',function(e){
-    var ip=e.target.closest&&e.target.closest('[data-jtinput]');
-    if(!ip)return;
-    var bid=ip.dataset.jtinput, v=ip.value.trim();
-    if(v){var l=locate(bid);
-      if(l){var y=jrYmd();l.block.todos=l.block.todos||{};
-        (l.block.todos[y]=l.block.todos[y]||[]).push({id:'t'+Date.now(),t:v,done:false});save();}}
-    delete jrTdAdd[bid];
-    setTimeout(function(){ if(!jrTdAdd[bid]) render(); },80);
   });
 

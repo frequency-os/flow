@@ -58,3 +58,7 @@
   /* сторінка папки: старий фінансовий віджет — заглушка до прибирання */
   .pg-oldw{padding:10px 12px;border-radius:12px;border:1px dashed var(--line);color:var(--muted);font-size:13px;line-height:1.45;}
   .pg-oldw b{color:var(--text);}
+  /* «Прибрати» на плашці старого блока (прибрані типи, 10.10.2026) */
+  .pg-oldw-rm{display:inline-flex;align-items:center;margin:6px 0 0;padding:6px 12px;border-radius:999px;
+    border:1px solid var(--pg-line,var(--line));background:transparent;color:var(--pg-fg,var(--text));font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;}
+  .pg-oldw-rm:active{transform:scale(.97);}

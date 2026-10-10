@@ -312,7 +312,7 @@
       if(node.hasAttribute && node.hasAttribute('data-i18n-skip')) return; // явно виключені зони (контент користувача)
       // Гарантія «переклад лише показує, а не переписує»: усе, що редагується
       // (contenteditable — журнал, сторінки; поля вводу), не чіпаємо взагалі.
-      // Звідти текст читають назад і зберігають (jeFlush бере innerHTML),
+      // Звідти текст читають назад і зберігають (редактори беруть innerHTML),
       // тож «три дні» перетворилось би на «три days» назавжди.
       if(I18N_NO_TOUCH[node.tagName] || node.isContentEditable) return;
       if(node.tagName==='OPTION' && !node.hasAttribute('value')) return;

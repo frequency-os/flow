@@ -54,12 +54,11 @@
     const t=b.type;
     if(t==='photo'||t==='table'||t==='calendar'||t==='fin'||t==='countdown') return 'w';
     if(t==='divider'||t==='head'||t==='h1'||t==='h2'||t==='h3') return 'w';
-    if(t==='heatmap'||t==='chart'||t==='tabs'||t==='accord'||t==='code'||t==='embed'||t==='audio'||t==='wfocus') return 'w';
+    if(t==='heatmap'||t==='tabs'||t==='accord'||t==='code'||t==='embed'||t==='audio'||t==='wfocus') return 'w';
     if(t==='quick'){ const len=(b.text||'').length; return len>60?'w':'s'; }
     if(t==='note'){ const len=(b.text||'').length; return len>240?'l':(len>40?'w':'s'); }
     if(t==='quote'){ const len=(b.text||'').length; return len>120?'l':'w'; }
     if(t==='check'||t==='list'||t==='numlist'){ const n=(b.items||[]).length; return n>6?'l':(n>2?'w':'s'); }
-    if(t==='progress') return 'w';
     if(t==='task'){ return (b.text||'').length>60?'w':'s'; }
     if(t==='link') return 'w';
     return 'w';
@@ -265,28 +264,6 @@
         <input class="quote-author" placeholder="— Автор (необов'язково)" value="${escAttr(b.author||'')}" data-qauthor="${b.id}">
         <div class="qz-styles">${styleBtns}</div></div>`;
     }
-    if(b.type==='progress'){
-      const v=Math.max(0,Math.min(100,parseInt(b.value)||0));
-      const pv=b.pview||'bar';
-      let view;
-      if(pv==='ring'){
-        const off=Math.round(97*(1-v/100));
-        view=`<div class="prog-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--hair)" stroke-width="3.5"/>
-          <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--tc)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="97" stroke-dashoffset="${off}" transform="rotate(-90 18 18)"/>
-          <text x="18" y="22" text-anchor="middle" font-size="9" font-weight="800" fill="var(--text)">${v}%</text></svg></div>`;
-      } else if(pv==='seg'){
-        const steps=5, fill=Math.round(v/100*steps);
-        view=`<div class="prog-seg">${Array.from({length:steps}).map((_,i)=>`<span class="${i<fill?'on':''}"></span>`).join('')}<b class="prog-segval">${v}%</b></div>`;
-      } else {
-        view=`<div class="progwrap"><div class="progbar"><i style="width:${v}%"></i></div><span class="progval">${v}%</span></div>`;
-      }
-      const viewBtns=[['bar','▬'],['seg','▰'],['ring','◯']].map(([k,l])=>`<button class="pv-style ${pv===k?'on':''}" data-pview="${b.id}|${k}">${l}</button>`).join('');
-      return `<div class="tile ${sz} tprog pv-${pv}" data-tileid="${b.id}" style="--tc:${c}">${head}
-        ${view}
-        <input type="range" min="0" max="100" value="${v}" class="progrange" data-prog="${b.id}">
-        <div class="prog-presets">${[0,25,50,75,100].map(p=>`<button class="prog-chip ${v===p?'on':''}" data-progset="${b.id}|${p}">${p}</button>`).join('')}</div>
-        <div class="pv-styles">${viewBtns}</div></div>`;
-    }
     if(b.type==='calendar'){
       const ym=b.ym||ymLocal();
       const [yy,mm]=ym.split('-').map(Number);
@@ -324,30 +301,6 @@
         <div class="hm-grid">${cells}</div>
         <div class="hm-foot"><span>🔥 ${streak} дн. поспіль</span><span>${total} за 12 тиж.</span></div>
         <div class="hm-hint">тап по сьогодні · довгий тап по будь-якому дню</div></div>`;
-    }
-    if(b.type==='chart'){
-      const pts=(b.points||[]).slice(-30);
-      const view=b.view||'bar';
-      let body;
-      if(!pts.length){
-        body=`<button class="pp-empty" data-chadd="${b.id}">＋ Додай першу точку</button>`;
-      } else {
-        const mx=Math.max(...pts.map(p=>p.v),1);
-        if(view==='bar'){
-          body=`<div class="ch-bars">${pts.map(p=>`<span class="ch-bcol"><i style="height:${Math.max(4,p.v/mx*100)}%"></i><em>${esc(p.l||'')}</em></span>`).join('')}</div>`;
-        } else {
-          const W=280,H=90;
-          const poly=pts.map((p,i)=>`${(i/Math.max(pts.length-1,1))*W},${H-6-(p.v/mx)*(H-12)}`).join(' ');
-          body=`<svg class="ch-line" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${poly}"/></svg>`;
-        }
-      }
-      return `<div class="tile ${sz} tchart" data-tileid="${b.id}" style="--tc:${c}">${head}
-        ${body}
-        <div class="ch-ctrl">
-          <button class="pv-style ${view==='bar'?'on':''}" data-chview="${b.id}|bar">▮▮</button>
-          <button class="pv-style ${view==='line'?'on':''}" data-chview="${b.id}|line">〜</button>
-          ${pts.length?`<button class="pp-ghost" style="margin-top:0" data-chadd="${b.id}">＋ точка</button>`:''}
-        </div></div>`;
     }
     if(b.type==='tabs'){
       if(!Array.isArray(b.tabs)||!b.tabs.length) b.tabs=[{name:'Нотатки',text:''}];
@@ -633,101 +586,6 @@
         <div class="pw-mmini">${cells}</div>
         <button class="pw-btn go" data-wplan="month|${fk}">Відкрити календар</button></div>`;
     }
-    if(b.type==='wpult'||b.type==='wstack'||b.type==='wpipe'||b.type==='wtline'||b.type==='wportal'){
-      const pks=projFolderKeys();
-      const empt=(msg)=>`<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}
-        <div class="pw-empty">${msg}<br><small>Меню папки (⋮) → Роль → Проєкт</small></div></div>`;
-      const st=s=>projStatusMeta(s||'active');
-      if(b.type==='wpult'){
-        if(!pks.length) return empt('Немає папок-проєктів');
-        const rows=pks.map(k=>{const f=folders[k];const pr=folderProgress(k);const nx=folderNextStep(k);const dl=dueLabel(f.due);const s=st(f.status);
-          return `<div class="pw-row" style="--fc:${pwC(f)}">
-            <div class="pw-rt" data-wgo="${esc(k)}">
-              <span class="pw-em">${esc(f.emoji||'📁')}</span>
-              <span class="pw-meat"><b>${esc(f.name)}</b>
-                <span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span>
-                  <span class="fprg"><i style="width:${pr.pct}%"></i></span><span class="pw-pct">${pr.pct}%</span>
-                  ${dl?`<span class="fdue ${dl.late?'late':''}">${dl.t}</span>`:''}</span></span>
-            </div>
-            ${nx?`<div class="pw-next"><button class="pw-cb" data-wpnext="${b.id}|${k}"></button>
-              <span class="pw-nx"><small>НАСТУПНИЙ КРОК</small>${esc(nx.item.text)}</span></div>`
-            :`<div class="pw-next pw-done">✨ всі кроки закриті</div>`}
-          </div>`;}).join('');
-        return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}<div class="pw-list">${rows}</div></div>`;
-      }
-      if(b.type==='wstack'){
-        if(!pks.length) return empt('Немає папок-проєктів');
-        const i=Math.min(parseInt(b.idx)||0, pks.length);
-        if(i>=pks.length){
-          return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}
-            <div class="pw-empty">🎉 Обліт завершено!<br><small>Всі проєкти переглянуто</small>
-            <button class="pw-btn" data-wstack="${b.id}|reset">Пройти ще раз</button></div></div>`;
-        }
-        const f=folders[pks[i]];const pr=folderProgress(pks[i]);const nx=folderNextStep(pks[i]);const dl=dueLabel(f.due);const s=st(f.status);
-        const C2=2*Math.PI*20, off=Math.round(C2*(1-pr.pct/100));
-        return `<div class="tile ${sz} pw pw-stack" data-tileid="${b.id}" style="--tc:${c};--fc:${pwC(f)}">${head}
-          <div class="pw-scard">
-            <div class="pw-shead">
-              <span class="pw-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="var(--hair)" stroke-width="5"/>
-                <circle cx="24" cy="24" r="20" fill="none" stroke="${pwC(f)}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C2}" stroke-dashoffset="${off}" transform="rotate(-90 24 24)"/></svg><b>${pr.pct}%</b></span>
-              <span class="pw-meat"><b>${esc(f.emoji||'📁')} ${esc(f.name)}</b>
-                <span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span>
-                ${dl?`<span class="fdue ${dl.late?'late':''}">⏳ ${dl.t}</span>`:''}</span></span>
-            </div>
-            ${nx?`<div class="pw-next"><span class="pw-nx"><small>НАСТУПНИЙ КРОК</small>${esc(nx.item.text)}</span></div>`:`<div class="pw-next pw-done">✨ всі кроки закриті</div>`}
-            <div class="pw-sbtns">
-              <button class="pw-btn ghost" data-wstack="${b.id}|skip">Пізніше</button>
-              <button class="pw-btn ghost" data-wgo="${pks[i]}">Відкрити</button>
-              ${nx?`<button class="pw-btn go" data-wstack="${b.id}|done|${pks[i]}">Зроблено ✓</button>`:`<button class="pw-btn go" data-wstack="${b.id}|skip">Далі</button>`}
-            </div>
-            <div class="pw-cnt">${i+1} з ${pks.length}</div>
-          </div></div>`;
-      }
-      if(b.type==='wpipe'){
-        if(!pks.length) return empt('Немає папок-проєктів');
-        const cols=PROJECT_STATUSES.map(([sk,sn,sc])=>{
-          const list=pks.filter(k=>(folders[k].status||'active')===sk);
-          return `<div class="pw-col" style="--sc:${sc}"><div class="pw-colh">${sn}<i>${list.length}</i></div>
-            ${list.map(k=>{const f=folders[k];const pr=folderProgress(k);
-              return `<div class="pw-pcard" style="--fc:${pwC(f)}" data-wpipe="${esc(k)}" title="Тап — наступний статус">
-                <b>${esc(f.emoji||'📁')} ${esc(f.name)}</b>
-                <span class="pw-line"><span class="fprg"><i style="width:${pr.pct}%"></i></span><span class="pw-pct">${pr.pct}%</span></span></div>`;}).join('')||'<div class="pw-colempty">—</div>'}
-          </div>`;}).join('');
-        const act=pks.filter(k=>(folders[k].status||'active')==='active').length;
-        return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}
-          <div class="pw-pipe">${cols}</div>
-          ${act>3?`<div class="pw-wip">⚠️ У роботі ${act} проєктів — фокус розмивається</div>`:''}</div>`;
-      }
-      if(b.type==='wtline'){
-        const dks=pks.filter(k=>folders[k].due);
-        if(!dks.length) return empt('Немає проєктів із дедлайном');
-        const WEEKS=6;
-        const wk=k=>{const d=new Date(folders[k].due+'T23:59:59');const days=Math.ceil((d-Date.now())/86400000);return Math.max(0,Math.min(WEEKS-1,Math.floor(days/7)));};
-        const late=k=>{const d=new Date(folders[k].due+'T23:59:59');return d<Date.now();};
-        return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}
-          <div class="pw-tl"><div class="pw-tlin">
-            <div class="pw-hot" style="left:0;width:${100/WEEKS}%"></div>
-            <div class="pw-axis">${Array.from({length:WEEKS},(_,i)=>`<span class="${i===0?'hot':''}">${i===0?'Цей тижд.':'+'+i}</span>`).join('')}</div>
-            ${dks.map(k=>{const f=folders[k];const pr=folderProgress(k);const L=late(k);const w=wk(k);
-              return `<div class="pw-tlrow"><div class="pw-tlbar ${L?'late':''}" style="--fc:${pwC(f)};left:${L?0:w*(100/WEEKS)}%;width:${100/WEEKS*0.96}%" data-wgo="${esc(k)}">
-                <i style="width:${pr.pct}%"></i><span>${esc(f.emoji||'📁')} ${esc(f.name)}</span></div></div>`;}).join('')}
-          </div></div></div>`;
-      }
-      if(b.type==='wportal'){
-        const all=orderedFolderKeys().filter(k=>folders[k]&&folderVisible(k));
-        if(!all.length) return empt('Немає папок');
-        return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c}">${head}
-          <div class="pw-grid">${all.map(k=>{const f=folders[k];const role=f.role||'area';const pr=role==='project'?folderProgress(k):null;const s=st(f.status);
-            return `<div class="pw-gcell" style="--fc:${pwC(f)}" data-wgo="${esc(k)}">
-              <span class="pw-em big">${esc(f.emoji||'📁')}</span><b>${esc(f.name)}</b>
-              ${role==='project'?`<span class="pw-line"><span class="fchip" style="--stc:${s[2]}">${s[1]}</span><span class="fprg"><i style="width:${pr.pct}%"></i></span></span>`
-                :`<span class="pw-role">${role==='page'?'📄 сторінка':'📁 область'}</span>`}</div>`;}).join('')}
-          </div></div>`;
-      }
-    }
-    if(b.type==='kanban')   return kanbanWidgetHtml(b, sz, head);
-    if(b.type==='contacts') return contactsWidgetHtml(b, sz, head);
-    if(b.type==='caseline') return caselineWidgetHtml(b, sz, head);
     if(b.type==='bento'){
       const secs=bentoSectionsHtml(b);
       return `<div class="tile ${sz} tbento" data-tileid="${b.id}" style="--tc:${c}">${head}
@@ -789,53 +647,6 @@
         if(isContainer(o)&&Array.isArray(o.children)) o.children.forEach(reid); };
       reid(copy); copy.pinned=false;
       arr.splice(i+1,0,copy); syncBlocks(); saveBoard(); renderBoard();
-    });
-    // progress slider
-    (window.__btRoot||board).querySelectorAll('[data-prog]').forEach(el=>el.oninput=()=>{
-      const b=getBlock(el.dataset.prog);
-      if(b){ b.value=parseInt(el.value)||0;
-        const tile=el.closest('.tile');
-        const bar=tile.querySelector('.progbar i'); const val=tile.querySelector('.progval');
-        if(bar)bar.style.width=b.value+'%'; if(val)val.textContent=b.value+'%';
-        saveBoard(); }
-    });
-    // progress preset chips
-    (window.__btRoot||board).querySelectorAll('[data-progset]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const [bid,p]=el.dataset.progset.split('|'); const b=getBlock(bid);
-      if(b){ b.value=parseInt(p)||0; saveBoard(); renderBoard(); }
-    });
-    // ── віджети проєктів ──
-    // виконати наступний крок проєкту прямо з віджета
-    (window.__btRoot||board).querySelectorAll('[data-wpnext]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const [,k]=el.dataset.wpnext.split('|');
-      const txt=completeFolderNextStep(k);
-      if(txt!==null){ window.platform.haptic('medium'); renderBoard(); }
-    });
-    // фокус-стек: пізніше / зроблено / спочатку
-    (window.__btRoot||board).querySelectorAll('[data-wstack]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const parts=el.dataset.wstack.split('|'); const b=getBlock(parts[0]); if(!b) return;
-      if(parts[1]==='reset'){ b.idx=0; }
-      else if(parts[1]==='done'){ completeFolderNextStep(parts[2]); b.idx=(parseInt(b.idx)||0)+1; window.platform.haptic('medium'); }
-      else { b.idx=(parseInt(b.idx)||0)+1; window.platform.haptic('light'); }
-      saveBoard(); renderBoard();
-    });
-    // пайплайн: тап по картці → наступний статус
-    (window.__btRoot||board).querySelectorAll('[data-wpipe]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      const k=el.dataset.wpipe; const f=folders[k]; if(!f) return;
-      const idx=PROJECT_STATUSES.findIndex(x=>x[0]===(f.status||'active'));
-      f.status=PROJECT_STATUSES[(idx+1)%PROJECT_STATUSES.length][0];
-      saveFolders(); window.platform.haptic('select');
-      try{ renderDashboard(); }catch(_){}
-      renderBoard();
-    });
-    // перехід у папку з віджета
-    (window.__btRoot||board).querySelectorAll('[data-wgo]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation();
-      goFolder(el.dataset.wgo);
     });
     (window.__btRoot||board).querySelectorAll('[data-wplan]').forEach(el=>el.onclick=e=>{
       e.stopPropagation();
@@ -1139,48 +950,6 @@
       const [bid,ri]=el.dataset.trdel.split('|'); const b=getBlock(bid);
       b.rows.splice(+ri,1); if(!b.rows.length)b.rows.push(b.cols.map(()=>'')); saveBoard(); renderBoard();
     });
-    // ===== ПРОЄКТНІ БЛОКИ: канбан =====
-    (window.__btRoot||board).querySelectorAll('[data-kbaddcol]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const b=getBlock(el.dataset.kbaddcol); if(!b) return;
-      inputModal({title:'Назва колонки', placeholder:'Напр. Аудит', onOk:(v)=>{
-        if(!(v||'').trim()) return;
-        (b.cols=b.cols||[]).push({id:'kc'+Date.now(),name:v.trim(),cards:[]});
-        saveBoard(); renderBoard();
-      }});
-    });
-    (window.__btRoot||board).querySelectorAll('[data-kbaddcard]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,colId]=el.dataset.kbaddcard.split('|');
-      const b=getBlock(id); if(b) kbwAddCard(b,colId);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-kbcol]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,colId]=el.dataset.kbcol.split('|');
-      const b=getBlock(id); if(b) kbwColMenu(b,colId);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-kbcard]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,colId,cardId]=el.dataset.kbcard.split('|');
-      const b=getBlock(id); if(b) kbwCardMenu(b,colId,cardId);
-    });
-    // ===== ПРОЄКТНІ БЛОКИ: контакти =====
-    (window.__btRoot||board).querySelectorAll('[data-ctadd]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const b=getBlock(el.dataset.ctadd); if(b) ctwAdd(b);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-ctrow]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,pid]=el.dataset.ctrow.split('|');
-      const b=getBlock(id); if(b) ctwMenu(b,pid);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-ctgo]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,pid]=el.dataset.ctgo.split('|');
-      const b=getBlock(id); const p=b&&(b.people||[]).find(x=>String(x.id)===String(pid));
-      if(p) ctwOpenLink(p);
-    });
-    // ===== ПРОЄКТНІ БЛОКИ: таймлайн справи =====
-    (window.__btRoot||board).querySelectorAll('[data-cladd]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const b=getBlock(el.dataset.cladd); if(b) clwAdd(b);
-    });
-    (window.__btRoot||board).querySelectorAll('[data-clev]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [id,evId]=el.dataset.clev.split('|');
-      const b=getBlock(id); if(b) clwMenu(b,evId);
-    });
 
     /* ===== АПГРЕЙДИ БЛОКІВ ===== */
     // NOTE: панель форматування
@@ -1214,11 +983,6 @@
     (window.__btRoot||board).querySelectorAll('[data-lstyle]').forEach(el=>el.onclick=e=>{
       e.stopPropagation(); const [bid,s]=el.dataset.lstyle.split('|'); const b=getBlock(bid);
       if(b){ b.lstyle=s; saveBoard(); renderBoard(); }
-    });
-    // PROGRESS: вид
-    (window.__btRoot||board).querySelectorAll('[data-pview]').forEach(el=>el.onclick=e=>{
-      e.stopPropagation(); const [bid,v]=el.dataset.pview.split('|'); const b=getBlock(bid);
-      if(b){ b.pview=v; saveBoard(); renderBoard(); }
     });
     // TASK: підзадачі
     (window.__btRoot||board).querySelectorAll('[data-subadd]').forEach(el=>el.onclick=e=>{
@@ -1308,19 +1072,6 @@
       el.onpointerdown=e=>{ lt=setTimeout(()=>{ lt=null; toggleHm(); },450); };
       el.onpointerup=e=>{ if(lt){ clearTimeout(lt); lt=null; if(hmDs===ymdLocal()) toggleHm(); } };
       el.onpointercancel=()=>{ if(lt){ clearTimeout(lt); lt=null; } };
-    });
-    // графік: додати точку
-    PPR.querySelectorAll('[data-chadd]').forEach(el=>el.onclick=e=>{ e.stopPropagation();
-      ppAsk('Точка графіка','мітка | число  (напр. Пн | 4)','',v=>{
-        const b=getBlock(el.dataset.chadd); if(!b) return;
-        const parts=v.split('|').map(s=>s.trim());
-        const lab=parts.length>1?parts[0]:''; const num=parts.length>1?parts[1]:parts[0];
-        b.points=b.points||[]; b.points.push({l:lab,v:parseFloat(String(num).replace(',','.'))||0});
-        saveBoard(); renderBoard(); });
-    });
-    PPR.querySelectorAll('[data-chview]').forEach(el=>el.onclick=e=>{ e.stopPropagation();
-      const [cvBid,cvV]=el.dataset.chview.split('|'); const b=getBlock(cvBid);
-      if(b){ b.view=cvV; try{window.platform.haptic('select');}catch(_){} saveBoard(); renderBoard(); }
     });
     // tabs
     PPR.querySelectorAll('[data-tab]').forEach(el=>{

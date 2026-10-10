@@ -185,28 +185,6 @@
   .tproj .pj-acts .pj-in{color:var(--hab);} .tproj .pj-acts .pj-out{color:var(--owe);} .tproj .pj-acts .pj-got{color:#fff;background:linear-gradient(135deg,var(--hab),#1f8f56);border-color:transparent;}
   .tproj .pj-acts .pj-env{flex:0 0 56px;font-size:15px;}
   /* ===== ПРОЄКТНІ БЛОКИ: канбан, контакти, таймлайн, подія ===== */
-  .tkbw .kbw-wrap{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
-  .tkbw .kbw-col{flex:0 0 138px;background:color-mix(in srgb,var(--text) 4%,transparent);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;}
-  .tkbw .kbw-ch{display:flex;justify-content:space-between;align-items:center;font:800 10px Manrope;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;cursor:pointer;padding:2px 2px 4px;}
-  .tkbw .kbw-ch i{font-style:normal;background:color-mix(in srgb,var(--text) 8%,transparent);border-radius:99px;padding:1px 7px;font:800 10px Manrope;}
-  .tkbw .kbw-card{background:var(--card);border-radius:10px;padding:8px 9px;font:700 12px Manrope;box-shadow:0 1px 2px rgba(20,30,60,.09);cursor:pointer;border:1px solid var(--line);}
-  .tkbw .kbw-card b{font-weight:700;display:block;}
-  .tkbw .kbw-card .m{display:block;font:600 10.5px Manrope;color:var(--muted);margin-top:2px;}
-  .tkbw .kbw-add{border:none;background:transparent;color:var(--muted);font:700 11px Manrope;padding:4px;border-radius:8px;cursor:pointer;text-align:left;}
-  .tkbw .kbw-add:active{background:color-mix(in srgb,var(--text) 6%,transparent);}
-  .tkbw .kbw-newcol{flex:0 0 96px;border:1.5px dashed var(--line);background:transparent;border-radius:12px;color:var(--muted);font:700 11.5px Manrope;cursor:pointer;min-height:64px;}
-  .tctw .ctw-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;}
-  .tctw .ctw-row:last-of-type{border-bottom:none;}
-  .tctw .ctw-ava{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 12px Manrope;color:#fff;flex-shrink:0;}
-  .tctw .ctw-m{flex:1;min-width:0;} .tctw .ctw-m b{font:800 13px Manrope;display:block;}
-  .tctw .ctw-m span{font:600 11px Manrope;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tctw .ctw-go{border:none;background:color-mix(in srgb,var(--val) 12%,transparent);color:var(--val);width:30px;height:30px;border-radius:10px;font:800 13px Manrope;cursor:pointer;flex-shrink:0;}
-  .tclw .clw-line{border-left:3px solid var(--tc,#e8843c);margin:4px 0 4px 6px;padding-left:14px;}
-  .tclw .clw-ev{position:relative;padding:0 0 12px;cursor:pointer;}
-  .tclw .clw-ev:last-child{padding-bottom:2px;}
-  .tclw .clw-ev::before{content:"";position:absolute;left:-21px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--tc,#e8843c);border:3px solid var(--card);}
-  .tclw .clw-d{display:block;font:800 10px Manrope;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
-  .tclw .clw-t{font:600 12.5px Manrope;line-height:1.4;}
   .tfstw .fstw-hero{display:flex;align-items:center;gap:10px;cursor:pointer;padding:2px 0 8px;}
   .tfstw .fstw-em{font-size:30px;flex-shrink:0;}
   .tfstw .fstw-hm{flex:1;min-width:0;} .tfstw .fstw-hm b{font:800 14.5px Manrope;display:block;}

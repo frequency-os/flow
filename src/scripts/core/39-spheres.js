@@ -25,21 +25,19 @@
     fin:{n:'Кабінет фінансів', d:'Дохід, витрати, ціль місяця', ic:'wallet', c:'#22c55e', bld:'bank', em:'💰',
       chips:['Доходи','Витрати','Гаманець'],
       blocks:()=>[{type:'wgmoney',kind:'in',src:'extra',label:'Доходи',goal:0},{type:'wgmoney',kind:'out',label:'Витрати',goal:0},{type:'wgwallet'}]},
-    sport:{n:'Спорт', d:'Тренування, звичка, прогрес', ic:'dumbbell', c:'#f97316', bld:'gym', em:'🏋️',
-      chips:['Хітмапа','Прогрес','План'],
-      blocks:()=>[{type:'heatmap',title:'Тренування',marks:{}},{type:'progress',title:'Прогрес',value:0},{type:'wplanday',title:'План на день'}]},
-    learn:{n:'Навчання', d:'Серія днів, рівень, уроки', ic:'book', c:'#eab308', bld:'school', em:'📚',
-      chips:['Серія','Рівень','План'],
-      blocks:()=>[{type:'heatmap',title:'Заняття',marks:{}},{type:'progress',title:'Рівень',value:0},{type:'wplanday',title:'План на день'}]},
+    sport:{n:'Спорт', d:'Тренування, звичка, план', ic:'dumbbell', c:'#f97316', bld:'gym', em:'🏋️',
+      chips:['Хітмапа','План'],
+      blocks:()=>[{type:'heatmap',title:'Тренування',marks:{}},{type:'wplanday',title:'План на день'}]},
+    learn:{n:'Навчання', d:'Серія днів, уроки', ic:'book', c:'#eab308', bld:'school', em:'📚',
+      chips:['Серія','План'],
+      blocks:()=>[{type:'heatmap',title:'Заняття',marks:{}},{type:'wplanday',title:'План на день'}]},
     work:{n:'Робота', d:'Заробіток, зміни, план', ic:'server', c:'#3b82f6', bld:'dc', em:'⚡',
       chips:['Заробіток','Хітмапа','План'],
       blocks:()=>[{type:'wgmoney',kind:'in',src:'main',label:'Заробіток',goal:0},
                   {type:'heatmap',title:'Зміни',marks:{}},{type:'wplanday',title:'План на день'}]},
-    brand:{n:'Бренд / контент', d:'Ідеї, публікації, ціль', ic:'video', c:'#a855f7', bld:'media', em:'🎬',
-      chips:['Канбан','Прогрес','План'],
-      blocks:()=>{ const n=Date.now(); return [
-        {type:'kanban',title:'Контент',cols:[{id:'kc'+n,name:'Ідеї',cards:[]},{id:'kc'+(n+1),name:'В роботі',cards:[]},{id:'kc'+(n+2),name:'Опубліковано',cards:[]}]},
-        {type:'progress',title:'Ціль',value:0},{type:'wplanday',title:'План на день'}]; }},
+    brand:{n:'Бренд / контент', d:'Публікації, план', ic:'video', c:'#a855f7', bld:'media', em:'🎬',
+      chips:['Хітмапа','План'],
+      blocks:()=>[{type:'heatmap',title:'Публікації',marks:{}},{type:'wplanday',title:'План на день'}]},
     habit:{n:'Звичка', d:'Дні без зриву, економія', ic:'nosmoke', c:'#14b8a6', bld:'park', em:'🌿',
       chips:['Хітмапа','Відлік'],
       blocks:()=>[{type:'heatmap',title:'Дні без зриву',marks:{}},{type:'countdown',title:'Мета',target:'',label:''}]},
@@ -78,7 +76,7 @@
   function sphStats(key){
     const f=folders[key], T=sphTpl(f); if(!f||!T) return null;
     const bl=sphBlocks(key), find=t=>bl.find(b=>b.type===t);
-    const proj=find('wgmoney'), heat=find('heatmap'), prog=bl.find(b=>b.type==='progress'||b.type==='pbar'), kan=find('kanban');
+    const proj=find('wgmoney'), heat=find('heatmap');   // «Прогрес» і «Канбан» прибрано 10.10.2026
     const r={line:'', pct:null, nums:[], xp:0};
     let inc=0, exp=0, ops=0;
     // гроші сфери — операції Гаманця з міткою цієї папки (віджети «Доходи»/«Витрати», 48-widgets.js)
@@ -89,16 +87,12 @@
     let streak=0, week=0, marks=0;
     if(heat){ const m=heat.marks||{}; streak=sphStreak(m); week=sphWeek(m); marks=Object.keys(m).filter(k=>m[k]>0).length;
       r.nums.push({k:'Серія',v:streak+' дн.'},{k:'Цей тиждень',v:String(week)}); }
-    let pv=null; if(prog){ pv=Math.max(0,Math.min(100,+prog.value||0)); }
-    let kdone=0, kall=0; if(kan&&Array.isArray(kan.cols)){ kan.cols.forEach((c,i)=>{ const n=(c.cards||[]).length; kall+=n; if(i===kan.cols.length-1) kdone+=n; });
-      r.nums.push({k:'Ідей',v:String(kall-kdone)},{k:'Готово',v:String(kdone)}); }
     const tpl=f.sphere.tpl;
     if(tpl==='fin'||tpl==='work'){ r.line = envTxt ? envTxt+' · ціль' : (proj ? 'прибуток '+money(inc-exp) : 'додай віджет «Доходи»'); r.pct = envPct; }
     else if(tpl==='habit'){ r.line = heat ? streak+' '+(streak%10===1&&streak%100!==11?'день':'днів')+' без зриву' : 'додай «Хітмапу»'; r.pct = heat ? Math.min(100,Math.round(streak/30*100)) : null; }
-    else if(tpl==='brand'){ r.line = kan ? (kall-kdone)+' ідей · '+kdone+' готово' : 'додай «Канбан»'; r.pct = pv; }
-    else { r.line = heat ? week+' за тиждень · серія '+streak : (pv!=null?pv+'%':'відкрий і додай блоки'); r.pct = heat ? Math.min(100,Math.round(week/5*100)) : pv; }   // тиждень важливіший за ручний «Прогрес»
-    // досвід: кожна відмітка, запис грошей, готова картка — це дія в житті
-    r.xp = marks*10 + ops*5 + kdone*15 + Math.round((pv||0)/2);
+    else { r.line = heat ? week+' за тиждень · серія '+streak : 'відкрий і додай блоки'; r.pct = heat ? Math.min(100,Math.round(week/5*100)) : null; }   // тиждень важливіший за ручний «Прогрес»
+    // досвід: кожна відмітка і запис грошей — це дія в житті
+    r.xp = marks*10 + ops*5;
     r.lv = 1+Math.floor(r.xp/100);
     return r;
   }

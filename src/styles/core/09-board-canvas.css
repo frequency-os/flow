@@ -138,11 +138,6 @@
   .link-edit-toggle:hover{color:var(--text);}
   .tlinkblock.editing .link-view{display:none;}
   .tlinkblock:not(.editing) .link-fields{display:none;}
-  /* progress presets */
-  .prog-presets{display:flex;gap:6px;margin-top:10px;}
-  .prog-chip{flex:1;background:var(--field);border:1px solid var(--line);border-radius:9px;padding:7px 0;
-    font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;}
-  .prog-chip.on{background:color-mix(in srgb,var(--tc) 20%,transparent);border-color:var(--tc);color:var(--text);}
   /* task priority */
   .prio-row{display:flex;gap:6px;margin:9px 0;}
   .prio-chip{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:5px 11px;

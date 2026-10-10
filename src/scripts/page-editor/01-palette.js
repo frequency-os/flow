@@ -28,7 +28,6 @@
     {cat:'struct',k:'board', t:'Дошка',   d:'Сітка 12 колонок для віджетів, ресайз за кут', c:'#e8843c', ic:'db'},
     {cat:'struct',k:'divider',t:'Роздільник',d:'Лінія між секціями',  c:'#8b93a3', ic:'divider'},
     {cat:'base',k:'code',   t:'Код',        d:'Моноширинний + копіювати', c:'#4ecdc4', ic:'code'},
-    {cat:'data',k:'pbar',   t:'Прогрес',    d:'Смуга виконання 0–100%, або авто з задач', c:'#34c77b', ic:'pbar'},
     /* ═══ Гроші (48-widgets.js, 09.10.2026) — вікна в Гаманець ═══ */
     {cat:'money', k:'wgin',     t:'Доходи',        d:'Дохід цієї папки: тип (основний/додатковий/пасивний), ціль', c:'#34c77b', ic:'envelope'},
     {cat:'money', k:'wgout',    t:'Витрати',       d:'Витрати цієї папки з лімітом на місяць',  c:'#ff7a59', ic:'envelope'},
@@ -39,14 +38,9 @@
     {cat:'data',k:'wplanday', t:'План на день', d:'Точки з Планера для папки-проєкту',    c:'#5b8def', ic:'countdown'},
     {cat:'data',k:'wplanmonth',t:'План на місяць', d:'Ритм проєкту за місяць з Планера',  c:'#5b8def', ic:'calendar'},
     {cat:'data',  k:'countdown',t:'Відлік',  d:'Живий таймер до дати',  c:'#e8843c', ic:'countdown'},
-    {cat:'data',  k:'journal',  t:'Щоденник', d:'Записи на кожен день',  c:'#7c8cff', ic:'journal'},
-    {cat:'data',  k:'decision', t:'Лог рішень', d:'Рішення → очікування → перевірка', c:'#f0b429', ic:'decision'},
-    {cat:'data',  k:'phub', t:'Проєкти', d:'Хаб цілей зі звʼязком з папками', c:'#7c8cff', ic:'phub'},
-    {cat:'data',  k:'habits', t:'Трекер звичок', d:'Щоденні звички + серії', c:'#34c77b', ic:'habits'},
     /* ═══ PREMIUM PACK V1 ═══ */
     {cat:'struct',k:'tabs',   t:'Таби',      d:'Кілька вкладок в одному блоці', c:'#9b8cff', ic:'tabs'},
     {cat:'data',  k:'heatmap', t:'Хітмапа',   d:'12 тижнів звички клітинками',   c:'#34c77b', ic:'heatmap'},
-    {cat:'data',  k:'chart',   t:'Графік',    d:'Точки даних: bar або line',     c:'#5b8def', ic:'chartW'},
     {cat:'data',  k:'wfocus',  t:'Фокус',     d:'Помодоро 25/5 із кільцем',      c:'#e8843c', ic:'wfocus'},
   ];
   /* синоніми UA/EN/транслітом для пошуку в палітрі (SPECblocksv2 §3.2) */
@@ -64,17 +58,11 @@
     divider:['hr','лінія','separator','роздільник'],
     db:['database','база','таблиця','table','board','дошка'],
     code:['code','код','snippet'],
-    pbar:['progress','прогрес','бар'],
     countdown:['timer','таймер','відлік','deadline','дедлайн'],
-    journal:['diary','щоденник'],
-    decision:['decision','рішення','log'],
-    phub:['projects','проєкти','goals','цілі'],
-    habits:['habit','звички','streak','трекер'],
     tabs:['tabs','вкладки','таби'],
     heatmap:['heatmap','хітмапа','calendar','активність'],
     wgin:['дохід','гроші','income','money','заробіток'], wgout:['витрати','гроші','expense','money'], wgwallet:['гаманець','баланс','wallet','гроші'],
     wgmission:['місія','гроші','бюджет'], wgenv:['конверт','платежі','план'], wgdebt:['борги','правила','debt'],
-    chart:['chart','графік','graph','діаграма'],
     wfocus:['focus','фокус','pomodoro','помодоро'],
     ai:['ai','ші','штучний','флоу']
   };

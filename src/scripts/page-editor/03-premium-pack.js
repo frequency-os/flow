@@ -30,7 +30,6 @@
   function openCondSheet(blockId){
     var loc=locate(blockId); if(!loc)return;
     var b=loc.block, c=b.cond||{on:false,days:[],deadline:'',deadlineN:7,metric:null};
-    var showMetric=(b.type==='pbar');
     var WD=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
     var selDays=(c.days||[]).slice();
     var ov=document.createElement('div'); ov.className='pgask-ov';
@@ -43,9 +42,6 @@
       +'<div class="cond-lbl">Дедлайн — показати коли лишилось ≤ N днів</div>'
       +'<div class="cond-row"><input type="date" class="cond-inp" id="condDate" value="'+esc(c.deadline||'')+'">'
       +'<input type="number" class="cond-inp cond-n" id="condN" min="1" placeholder="днів" value="'+(c.deadlineN||7)+'"></div>'
-      +(showMetric?('<div class="cond-lbl">'+(b.type==='pbar'?'Прогрес':'Значення KPI')+'</div>'
-        +'<div class="cond-row"><select class="cond-inp" id="condOp"><option value="lt"'+(!c.metric||c.metric.op==='lt'?' selected':'')+'>менше</option><option value="gt"'+(c.metric&&c.metric.op==='gt'?' selected':'')+'>більше</option></select>'
-        +'<input type="number" class="cond-inp cond-n" id="condVal" placeholder="поріг" value="'+(c.metric?c.metric.v:'')+'"></div>'):'')
       +'<div class="pgask-b"><button class="c">Скасувати</button><button class="ok">Зберегти</button></div>'
       +'</div>';
     document.body.appendChild(ov);
@@ -65,11 +61,6 @@
       var dateV=ov.querySelector('#condDate').value;
       var nV=+ov.querySelector('#condN').value||7;
       var newCond={on:onChk,days:selDays,deadline:dateV||'',deadlineN:nV,metric:null};
-      if(showMetric){
-        var opV=ov.querySelector('#condOp').value, valEl=ov.querySelector('#condVal');
-        var valV=valEl?valEl.value:'';
-        if(valV!=='') newCond.metric={op:opV,v:+valV};
-      }
       var before=l.block.cond?JSON.parse(JSON.stringify(l.block.cond)):null;
       l.block.cond=newCond;
       pushOp(
@@ -216,40 +207,21 @@
     else if(k==='photo'){b.type='photo';b.title=b.title||'Фото';}
     else if(k==='link'){b.type='link';b.url=b.url||'';}
     /* ── віджети: ті ж дефолти, що й на дошці ── */
-    else if(k==='progress'){b.type='progress';b.title=b.title||'Прогрес';if(b.value==null)b.value=0;}
     else if(k==='countdown'){b.type='countdown';b.title=b.title||'Відлік';b.target=b.target||'';b.label=b.label||'';}
     else if(k==='calendar'){b.type='calendar';b.title=b.title||'Календар';b.marks=b.marks||{};
       if(!b.ym){var _d=new Date();b.ym=_d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0');}}
-    else if(k==='journal'){b.type='journal';b.title=b.title||'Щоденник';b.entries=b.entries||{};b.jmode=b.jmode||'full';}
-    else if(k==='decision'){b.type='decision';b.title=b.title||'Лог рішень';b.decisions=b.decisions||[];b.dmode=b.dmode||'full';}
-    else if(k==='ptracker'){b.type='ptracker';b.title=b.title||'Новий проєкт';b.emoji=b.emoji||'🎯';b.color=b.color||'#7c8cff';b.link=b.link||'';b.steps=b.steps||[];b.habits=b.habits||[];b.pmode=b.pmode||'full';}
-    else if(k==='phub'){b.type='phub';b.title=b.title||'Мої проєкти';b.projects=b.projects||[];b.pmode=b.pmode||'full';}
-    else if(k==='habits'){b.type='habits';b.title=b.title||'Звички';b.habits=b.habits||[];b.hmode=b.hmode||'full';}
     else if(k==='code'){b.type='code';b.text=b.text||'';b.lang=b.lang||'';}
     else if(k==='section'){b.type='section';b.text=b.text||'';}
-    else if(k==='pbar'){b.type='pbar';b.title=b.title||'';b.value=b.value||0;if(b.auto==null)b.auto=false;}
     else if(k==='weekreview'){b.type='weekreview';b.title=b.title||'Огляд тижня';b.summary=b.summary||'';b.updatedAt=b.updatedAt||null;b.loading=false;}
     else if(k==='file'){b.type='file';b.data='';b.fname='';b.fsize='';}
-    else if(k==='wpult'||k==='wpipe'||k==='wportal'){b.type=k;b.title=bTitle(k,b.title||'Віджет');}
-    else if(k==='wstack'){b.type='wstack';b.title=bTitle('wstack','Фокус-стек');if(b.idx==null)b.idx=0;}
-    else if(k==='wtline'){b.type='wtline';b.title=bTitle('wtline','Таймлайн');}
     else if(k==='wplanday'||k==='wplanmonth'){
       b.type=k;b.title=bTitle(k,'План');
       try{var _bk=(bridge()&&bridge().curKey&&bridge().curKey())||'';var _bf=String(_bk).split('__sp_')[0];
         if(_bf&&_bf!=='all')b.pfolder=_bf;}catch(_){}
     }
-    /* ── проєктні блоки ── */
-    else if(k==='kanban'){b.type='kanban';b.title=b.title||'Канбан';
-      if(!Array.isArray(b.cols)||!b.cols.length||typeof b.cols[0]==='string'){
-        var _n=Date.now();b.cols=[{id:'kc'+_n,name:'Заявки',cards:[]},{id:'kc'+(_n+1),name:'В роботі',cards:[]},{id:'kc'+(_n+2),name:'Готово',cards:[]}];
-      }
-      delete b.rows;}
-    else if(k==='contacts'){b.type='contacts';b.title=b.title||'Контакти';b.people=b.people||[];}
-    else if(k==='caseline'){b.type='caseline';b.title=b.title||'Таймлайн справи';b.events=b.events||[];}
     /* ═══ PREMIUM PACK V1 ═══ */
     else if(k==='prompt'){b.type='prompt';b.title=b.title||'';b.ptext=b.ptext||'';}
     else if(k==='heatmap'){b.type='heatmap';b.title=b.title||'Звичка';b.marks=b.marks||{};}
-    else if(k==='chart'){b.type='chart';b.title=b.title||'Графік';b.points=b.points||[];b.view=b.view||'bar';}
     else if(k==='tabs'){b.type='tabs';b.title=b.title||'';if(!Array.isArray(b.tabs)||!b.tabs.length)b.tabs=[{name:'Нотатки',text:''}];if(b.ti==null)b.ti=0;}
     else if(k==='accord'){b.type='accord';b.title=b.title||'';if(!Array.isArray(b.secs)||!b.secs.length)b.secs=[{name:'Секція',text:'',open:1}];}
     else if(k==='embed'){b.type='embed';b.title=b.title||'Відео';b.url=b.url||'';b.play=0;}

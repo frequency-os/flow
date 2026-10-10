@@ -352,25 +352,6 @@
   }
   // ключі папок-проєктів (для віджетів)
   function projFolderKeys(){ return orderedFolderKeys().filter(k=>folders[k]&&folders[k].role==='project'&&folderVisible(k)); }
-  // перший невиконаний пункт у дошках папки: {bkey, block, item} або null
-  function folderNextStep(key){
-    let found=null;
-    const walk=(arr,bkey)=>{ (arr||[]).forEach(b=>{
-      if(found||!b) return;
-      if(b.type==='check'&&Array.isArray(b.items)){ const it=b.items.find(i=>i&&!i.done&&(i.text||'').trim()); if(it){found={bkey,block:b,item:it};return;} }
-      if(Array.isArray(b.sections)){ b.sections.forEach(s=>{ if(found)return; if(s&&s.type==='check'&&Array.isArray(s.items)){ const it=s.items.find(i=>i&&!i.done&&(i.text||'').trim()); if(it)found={bkey,block:b,item:it}; } }); }
-      if(!found&&Array.isArray(b.children)) walk(b.children,bkey);
-    }); };
-    try{ Object.keys(boards||{}).forEach(bk=>{ if(!found&&(bk===key||bk.indexOf(key+'__sp_')===0)) walk(boards[bk],bk); }); }catch(_){}
-    return found;
-  }
-  function completeFolderNextStep(key){
-    const nx=folderNextStep(key); if(!nx) return null;
-    nx.item.done=true;
-    try{ if(typeof saveBoard==='function') saveBoard(); }catch(_){}
-    try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
-    return nx.item.text;
-  }
 
   /* ===== вкладені папки (папка в папці) ===== */
   function childFolderKeys(parentKey){

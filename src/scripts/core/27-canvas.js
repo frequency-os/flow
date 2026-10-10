@@ -46,14 +46,12 @@
         b.rows=b.rows.map(r=>Array.isArray(r)?b.cols.map((_,i)=>r[i]||''):b.cols.map(()=>'')); }
       if(t==='link'){ if(typeof b.url!=='string') b.url=''; if(typeof b.label!=='string') b.label=''; }
       if(t==='group'||t==='page'){ b.children=normalizeBlocks(Array.isArray(b.children)?b.children:[]); if(typeof b.open!=='boolean') b.open=true; }
-      if(t==='progress'){ b.value=Math.max(0,Math.min(100,parseInt(b.value)||0)); }
       if(t==='calendar'){ if(!b.marks||typeof b.marks!=='object') b.marks={}; if(!b.ym) b.ym=ymLocal(); }
       if(t==='task'){ if(!b.prio) b.prio='none'; if(!Array.isArray(b.subs)) b.subs=[];
         b.subs=b.subs.map(s=>({id:s&&s.id||Date.now()+Math.random(),text:s&&s.text||'',done:!!(s&&s.done)})); }
       if(t==='callout'){ if(!b.tone) b.tone='tip'; }
       if(t==='quote'){ if(!b.qstyle) b.qstyle='line'; }
       if((t==='list') && !b.lstyle) b.lstyle='bullet';
-      if(t==='progress' && !b.pview) b.pview='bar';
       if(!b.id) b.id=Date.now()+Math.random();
       return b;
     });
