@@ -28,19 +28,30 @@
        human/aiOff). /upload-photo — хмарне сховище фото, а не AI, його не зупиняємо. */
     const ai=opts.ai; if(ai){ opts=Object.assign({},opts); delete opts.ai; }
     if(!/\/upload-photo(\?|$)/.test(String(url||''))) await aiConsentGate(ai);
+    /* 529 — Anthropic перевантажений, зазвичай на секунду-дві: один тихий повтор, і лише
+       тоді людина бачить «AI зараз перевантажений» (GAP2-4). */
+    let r=await aiFetchOnce(url,opts);
+    if(r&&r.status===529){ await new Promise(res=>setTimeout(res,1500)); r=await aiFetchOnce(url,opts); }
+    return r;
+  }
+  // мережева відмова fetch (не відповідь сервера) — позначка e.net: людина побачить «немає інтернету» (BUGS-5)
+  function aiNetFetch(url,opts){
+    return fetch(url,opts).catch(e=>{ if(e&&e.name!=='AbortError'){ try{ e.net=true; }catch(_){} } throw e; });
+  }
+  async function aiFetchOnce(url,opts){
     let tok='';
     try{ if(typeof window.sbAccessToken==='function') tok=await window.sbAccessToken(); }catch(_){}
-    if(!tok) return fetch(url,opts);
+    if(!tok) return aiNetFetch(url,opts);
     const withTok=Object.assign({},opts,{headers:Object.assign({},opts.headers||{},{Authorization:'Bearer '+tok})});
     if(aiAuthOff){
-      const r=await fetch(url,opts);
+      const r=await aiNetFetch(url,opts);
       if(r.status!==401) return r;
-      aiAuthOff=false; return fetch(url,withTok);
+      aiAuthOff=false; return aiNetFetch(url,withTok);
     }
     try{ return await fetch(url,withTok); }
     catch(e){
       if(e && e.name==='AbortError') throw e;
-      const r=await fetch(url,opts);   // впаде й це — значить, справді нема мережі
+      const r=await aiNetFetch(url,opts);   // впаде й це — значить, справді нема мережі
       aiAuthOff=true; return r;
     }
   }
@@ -67,6 +78,10 @@
         prefSet(AI_EP_KEY,t); if(cb) cb();
       }});
   }
+  /* Поле «адреса AI-проксі» — інструмент розробника: людині кнопка лише показує адресу воркера
+     й підказує «перевір URL», якого вона не ставила (BUGP-3). Тому — лише власнику в dev-режимі
+     (flow_dev=1 чи акаунт розробника, upDevOn у 30-upgrade.js) і ніколи на native. */
+  function aiProxyUiOn(){ try{ return !window.FLOW_NATIVE && !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; } }
   function aiSheetClose(){ const ov=document.getElementById('aiOv'); if(ov) ov.remove(); }
   function aiStartSheet(){
     const g=goalsData;
@@ -83,7 +98,7 @@
         <div class="ai-actions" id="aiActs">
           <button class="pri" data-aigen>✨ Розкласти з AI</button>
           <button class="sec" data-ailocal>📝 Базова чернетка без AI</button>
-          <button class="ghost" data-aicfg>⚙️ Проксі підключено · змінити</button>
+          ${aiProxyUiOn()?'<button class="ghost" data-aicfg>⚙️ Проксі підключено · змінити</button>':''}
           <button class="ghost" data-aiclose>Закрити</button>
         </div></div>`;
     } else if(!A||!B){
@@ -99,7 +114,7 @@
         <div class="ai-actions" id="aiActs">
           <button class="pri" data-aigen>✨ Згенерувати з AI</button>
           <button class="sec" data-ailocal>📝 Базова чернетка без AI</button>
-          <button class="ghost" data-aicfg>⚙️ Проксі підключено · змінити</button>
+          ${aiProxyUiOn()?'<button class="ghost" data-aicfg>⚙️ Проксі підключено · змінити</button>':''}
           <button class="ghost" data-aiclose>Закрити</button>
         </div></div>`;
     }
@@ -146,7 +161,7 @@
       }
       const res=await aiFetch(aiEndpoint(),{ method:'POST', headers:{'content-type':'application/json'},
         body:JSON.stringify({ system:sysOut, messages:[{role:'user',content:usr}] }) });
-      if(!res.ok) throw new Error('HTTP '+res.status);
+      if(!res.ok) throw await aiHttpError(res);   // 11-ai-flow.js: вхід, ліміт, «перевантажений» — людськими словами
       const data=await res.json();
       let txt='';
       if(Array.isArray(data.content)) txt=data.content.filter(x=>x&&x.type==='text').map(x=>x.text).join('\n');
@@ -157,9 +172,8 @@
       aiPreview(draft,'AI-чернетка');
     }catch(e){
       if(!(e&&e.aiOff)) console.error('aiGenerate',e);
-      body.innerHTML = (e&&e.aiOff)   // відмова від AI — не поломка проксі; базова чернетка працює і без AI
-        ? `<div class="ai-load">${esc(e.message)}<br>Можна взяти базову чернетку.</div>`
-        : `<div class="ai-load">⚠️ Не вдалось: ${esc(String(e.message||e))}.<br>Перевір URL проксі або спробуй базову чернетку.</div>`;
+      // aiHumanError (11-ai-flow.js): «немає інтернету» / «перевантажений» / «не вдалося», без «перевір URL проксі»
+      body.innerHTML=`<div class="ai-load">${esc(aiHumanError(e))}<br>Можна взяти базову чернетку без AI.</div>`;
       if(acts) acts.style.display='';
     }
   }

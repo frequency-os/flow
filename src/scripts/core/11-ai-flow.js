@@ -10,44 +10,86 @@
       window.storage.set('ai_prompts', JSON.stringify(aiPrompts));
     }catch(e){ console.error('aiPromptsSave',e); }
   }
-  async function aiChatLoad(){
-    if(aiChatLoaded) return;
-    try{
-      const r=await window.storage.get('ai_chat');
-      const j=JSON.parse(r.value);
-      if(Array.isArray(j)) aiChatMsgs=j;                                  // старий формат v1
-      else if(j&&typeof j==='object'){
-        aiChatMsgs=Array.isArray(j.msgs)?j.msgs:[];
-        aiLog=Array.isArray(j.log)?j.log:[];
-        if(j.view) aiView=j.view;
-        aiAuto=!!j.auto;
-        if(typeof j.sum==='string') aiSum=j.sum;
-      }
-    }catch(_){ /* ключа ще нема */ }
-    try{
-      const rm=await window.storage.get('ai_memory');
-      const jm=JSON.parse(rm.value);
-      if(Array.isArray(jm)) aiMem=jm.filter(x=>typeof x==='string');
-    }catch(_){ /* памʼяті ще нема */ }
+  /* Історія (ai_chat) і памʼять (ai_memory) пишуться ЦІЛИМ ключем і синкаються на всі пристрої.
+     Досі дія поза відкритим чатом (Спот, /ai на сторінці, крок цілі) кликала aiChatSave/aiMemSave,
+     коли ці ключі ще не читались: у памʼяті порожньо — і порожнеча з однією новою дією затирала
+     історію, резюме й памʼять скрізь. Тепер запис до читання чекає aiChatLoad, а прочитане
+     ЗЛИВАЄТЬСЯ з тим, що вже встигло лягти в памʼять. «Порожньо» — правда лише тоді, коли сховище
+     справді відповіло (sbDataTrusted, як у saveFolders({auto:true})); інакше ключ «ще не прийшов»,
+     і ми не пишемо нічого, доки синк не відповість. */
+  let aiChatLoading=null;
+  const aiSaveWait={chat:false,mem:false};   // запис, що чекає на читання
+  function aiChatLoad(){
+    if(aiChatLoaded) return Promise.resolve();
+    if(!aiChatLoading) aiChatLoading=aiChatLoadOnce().finally(()=>{ aiChatLoading=null; });
+    return aiChatLoading;
+  }
+  async function aiChatLoadOnce(){
+    // довіра — ДО читання: хмара, що відповіла посеред нього, цього читання не робить правдою
+    const trusted=(typeof window.sbDataTrusted==='function')?window.sbDataTrusted():true;
+    let j=null, jm=null, gotChat=false, gotMem=false;
+    try{ const r=await window.storage.get('ai_chat'); gotChat=r&&r.value!=null; j=JSON.parse(r.value); }catch(_){ /* ключа ще нема */ }
+    try{ const rm=await window.storage.get('ai_memory'); gotMem=rm&&rm.value!=null; jm=JSON.parse(rm.value); }catch(_){ /* памʼяті ще нема */ }
     try{
       const rp=await window.storage.get('ai_prompts');
       const jp=JSON.parse(rp.value);
       if(Array.isArray(jp)) aiPrompts=jp.filter(x=>x&&x.name&&x.text);
     }catch(_){ /* промтів ще нема */ }
+    if(!(gotChat||trusted)||!(gotMem||trusted)) return;   // сховище ще мовчить — не прочитано, нічого не пишемо
+    let msgs=[], log=[];
+    if(Array.isArray(j)) msgs=j;                                  // старий формат v1
+    else if(j&&typeof j==='object'){
+      msgs=Array.isArray(j.msgs)?j.msgs:[];
+      log=Array.isArray(j.log)?j.log:[];
+      if(j.view) aiView=j.view;
+      aiAuto=!!j.auto;
+      if(typeof j.sum==='string') aiSum=j.sum;
+    }
+    // те, що лягло в памʼять до читання (дія зі Споту, факт, перше повідомлення), — дописуємо, а не губимо
+    aiChatMsgs=msgs.concat(aiChatMsgs);
+    aiLog=aiLog.concat(log);                                       // журнал — від новішого
+    const mem=Array.isArray(jm)?jm.filter(x=>typeof x==='string'):[];
+    aiMem=mem.concat(aiMem.filter(f=>!mem.some(x=>x.toLowerCase()===String(f).toLowerCase())));
     aiChatLoaded=true;
+    if(aiSaveWait.chat){ aiSaveWait.chat=false; aiChatSave(); }
+    if(aiSaveWait.mem){ aiSaveWait.mem=false; aiMemSave(); }
+  }
+  // хмара відповіла пізніше — відкладений запис іде тепер, уже злитий із прочитаним
+  try{ ['flowsync','flowsbready'].forEach(ev=>document.addEventListener(ev,()=>{
+    if(aiChatLoaded||!(aiSaveWait.chat||aiSaveWait.mem)) return;
+    aiChatLoad().then(()=>{ if(aiChatLoaded&&document.getElementById('aiScr')){ try{ aiRenderHead(); aiRenderBody(); }catch(_){} } });
+  })); }catch(_){}
+  /* Копія для сховища: ai_chat синкається цілим ключем, тож довге ріжемо — але лише КОПІЮ.
+     Раніше aiChatSave підміняв самі повідомлення обрізаними копіями: хід, що ще писав відповідь у
+     свій обʼєкт (після шторки «додай справу»), писав її вже в нікуди — і в чаті лишалась порожня
+     бульбашка чи «Додаю.» (GAP2-1), а довга відповідь різалась на 2000 символах просто на екрані
+     (GAP2-2). Службовий хвіст FLOW_OPS/FLOW_MEM відкладаємо ДО обрізання і зберігаємо цілим:
+     інакше JSON плану рвався, і картка «Застосувати» зникала. Обрізаний текст — з «…». */
+  const AI_STORE_TXT=2000, AI_STORE_OPS=6000;
+  function aiStoreContent(s){
+    s=String(s||'');
+    const cut=Math.min(...['FLOW_OPS:','FLOW_BLOCKS:','FLOW_MEM:'].map(k=>{ const i=s.indexOf(k); return i<0?Infinity:i; }));
+    let txt=cut===Infinity?s:s.slice(0,cut), tail=cut===Infinity?'':s.slice(cut);
+    if(txt.length>AI_STORE_TXT) txt=txt.slice(0,AI_STORE_TXT).trimEnd()+'…\n';
+    if(tail.length>AI_STORE_OPS) tail='';   // такий план однаково не вміститься — краще без картки, ніж із битим JSON
+    return (txt+tail).trim();
   }
   function aiChatSave(){
+    if(!aiChatLoaded){ aiSaveWait.chat=true; aiChatLoad(); return; }   // спершу прочитати — і злити, а не затерти
     try{
-      aiChatMsgs=aiChatMsgs.slice(-30).map(m=>{
-        const o={role:m.role,content:String(m.content||'').slice(0,2000),applied:!!m.applied,declined:!!m.declined};
+      aiChatMsgs=aiChatMsgs.slice(-30);   // ті самі обʼєкти: хід, що ще пише відповідь у своє повідомлення, її не губить
+      // недописане (хід ще йде) не зберігаємо: хід допише й збереже сам
+      const msgs=aiChatMsgs.filter(m=>!m.streaming).map(m=>{
+        const o={role:m.role,content:aiStoreContent(m.content),applied:!!m.applied,declined:!!m.declined};
         if(m.trace) o.trace=m.trace;   // слід агента: вже компактний (aiTraceFinish обрізає)
         return o;
       });
       aiLog=aiLog.slice(0,15);
-      window.storage.set('ai_chat', JSON.stringify({v:3,msgs:aiChatMsgs,log:aiLog,view:aiView,auto:aiAuto,sum:aiSum.slice(0,1600)}));
+      window.storage.set('ai_chat', JSON.stringify({v:3,msgs:msgs,log:aiLog,view:aiView,auto:aiAuto,sum:aiSum.slice(0,1600)}));
     }catch(e){ console.error('aiChatSave',e); }
   }
   function aiMemSave(){
+    if(!aiChatLoaded){ aiSaveWait.mem=true; aiChatLoad(); return; }    // памʼять до читання — поки лише тут, потім злиття
     try{
       aiMem=aiMem.map(x=>String(x).slice(0,160)).filter(Boolean).slice(-40);
       window.storage.set('ai_memory', JSON.stringify(aiMem));
@@ -143,7 +185,31 @@
     if(res.status===429) msg='Забагато запитів — спробуй за хвилину';
     const e=new Error(msg||('HTTP '+res.status));
     if(msg) e.human=true;
+    if(res.status===529||res.status===503) e.overloaded=true;   // Anthropic перевантажений: «спробуй за хвилину», а не «HTTP 529»
     return e;
+  }
+  // подія error посеред потоку: overloaded_error — «перевантажений», решта — «не вдалося»
+  function aiStreamError(ev){
+    const er=(ev&&ev.error)||{};
+    const e=new Error(er.message||'stream error');
+    if(er.type==='overloaded_error') e.overloaded=true;
+    return e;
+  }
+  /* Людський текст помилки AI — один на всіх: чат, Спот, «Розкласти лист з AI», щоденник
+     (GAP2-4, BUGS-5, BUGP-3, BUGC-3). Людина не має бачити «HTTP 529», «Failed to fetch» чи
+     «Перевір URL проксі»: адресу вона не міняє, а англійська технічна фраза виглядає як поломка.
+     Обрив звʼязку — це і «телефон офлайн», і «Wi-Fi є, а інтернету нема»: fetch не дійшов до
+     сервера (aiFetch позначає таку відмову e.net). */
+  function aiNetDown(e){
+    try{ if(navigator.onLine===false) return true; }catch(_){}
+    return !!(e&&(e.net||(e.name==='TypeError'&&/^(Failed to fetch|Load failed|NetworkError)/.test(String(e.message||'')))));
+  }
+  function aiHumanError(e){
+    if(e&&e.aiOff) return String(e.message||'');               // «Не зараз» чи AI вимкнено — вибір людини, не поломка
+    if(aiNetDown(e)) return '📡 Немає інтернету — спробуй, коли зʼявиться звʼязок.';
+    if(e&&e.human) return '⚠️ '+String(e.message||'');        // вхід, ліміт, зависання — причину вже сказано по-людськи
+    if(e&&e.overloaded) return '⚠️ AI зараз перевантажений, спробуй за хвилину.';
+    return '⚠️ Не вдалося отримати відповідь. Спробуй ще раз.';
   }
   /* Мовна вставка в підказку: англійська — лише коли інтерфейс перемкнуто на en.
      Раніше її додавав тільки aiCall, і агент (увімкнений за замовчуванням) відповідав
@@ -167,7 +233,8 @@
   const AI_NOSTREAM_MS=170000;
   const AI_CUT_NOTE='\n\n✂️ Відповідь обрізано — не вмістилась у ліміт. Напиши «продовж» або звузь запит.';
   const AI_REFUSAL_NOTE='\n\n⚠️ Модель відмовилась продовжувати цю відповідь. Спробуй сформулювати інакше.';
-  let aiLastStop='';                   // чим закінчилась остання відповідь aiCall (max_tokens → спот допише позначку)
+  const AI_BROKEN_NOTE='\n\n⚠️ Відповідь обірвалась — спробуй ще раз.';
+  let aiLastStop='';                   // чим закінчилась остання відповідь aiCall (max_tokens → спот допише позначку; 'cut' — потік обірвався)
   function aiTimeoutError(ms){
     const e=new Error('Відповідь зависла: '+Math.round((ms||AI_IDLE_MS)/1000)+' с без жодних даних. Перевір інтернет і спробуй ще раз.');
     e.human=true; e.timeout=true; return e;
@@ -231,7 +298,7 @@
               if(ev.type==='content_block_delta'&&ev.delta&&typeof ev.delta.text==='string'){
                 full+=ev.delta.text; onDelta(full);
               } else if(ev.type==='message_delta'&&ev.delta&&ev.delta.stop_reason){ stop=ev.delta.stop_reason; }
-              else if(ev.type==='error'){ throw new Error((ev.error&&ev.error.message)||'stream error'); }
+              else if(ev.type==='error'){ throw aiStreamError(ev); }
             }catch(e){ if(String(e.message||'').indexOf('JSON')<0) throw e; }
           }
         }
@@ -241,6 +308,8 @@
         // людина має бачити, що відповідь не вся, а не приймати обрубок за повну
         if(stop==='max_tokens'){ full+=AI_CUT_NOTE; onDelta(full); }
         else if(stop==='refusal'){ full=(full+AI_REFUSAL_NOTE).trim(); onDelta(full); }   // інакше в чаті «…»
+        // потік закрився без кінцевої події (stop_reason) — мережа обірвала його посередині (GAP2-3)
+        else if(!stop){ aiLastStop='cut'; full=(full+AI_BROKEN_NOTE).trim(); onDelta(full); }
         return full;
       }
       // ── фолбек: звичайний JSON (старий воркер без стріму) ──

@@ -117,6 +117,8 @@
     spotBusy=true; const cap=document.getElementById('flowCap'); if(cap) cap.classList.add('busy');
     const ctx=spotCtx();
     try{
+      // памʼять Флоу — у контекст і для звірки фактів; до читання Спот не пише ні ai_chat, ні ai_memory
+      try{ await aiChatLoad(); }catch(_){}
       const sys=AI_CHAT_SYS+'\n\n'+petPersona()+'\n\n'+spotAddon(ctx)+'\n\nКОНТЕКСТ:\n'+aiCtx();
       spotMsgs.push({role:'user',content:q});
       const raw=await aiCall(sys,spotMsgs.slice(-6));
@@ -128,11 +130,14 @@
       const pr=aiParseBlocks(pg.text);
       let done='';
       if(pg.list.length){ const r=applyPageBlocks(pg.list); if(r.n) done+=`<div class="fs-done">✨ Додав ${r.n} блок(и) → ${esc(ctx.label)}</div>`; }
+      // факти FLOW_MEM — як у чаті: шторка і ліміт змін (раніше Спот їх мовчки губив, хоч модель казала «запамʼятав»)
+      let usedW=0;
+      if(pr.mem.length){ usedW=await aiMemGate(pr.mem); if(usedW) done+=`<div class="fs-done">🧠 Запамʼятав</div>`; }
       /* Додане (блоки, кроки, папки) — одразу, як і було. Перенести/закрити/видалити НАЯВНЕ —
          лише через шторку з реальними блоками і в межах ліміту: раніше голосове «прибери
          зайве» видаляло блоки мовчки (AI-3). */
       if(aiOpsCount(pr)){
-        const g=await aiGateOps(pr);
+        const g=await aiGateOps(pr,{room:AI_WRITE_LIMIT-usedW});
         if(!g.pr) done+=`<div class="fs-done">✋ Скасовано — нічого не змінив</div>`;
         else if(aiOpsCount(g.pr)){ try{ aiCommit(g.pr); done+=`<div class="fs-done">📅 Оновив планер</div>`; }catch(e){ console.error(e); } }
         g.notes.forEach(n=>{ done+=`<div class="fs-done">⚠️ ${esc(n)}</div>`; });
@@ -146,7 +151,7 @@
       try{ aiSpeak(say); }catch(_){}
     }catch(e){
       const g=document.getElementById('fsGen'); if(g) g.remove();
-      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">${e&&e.aiOff?'':'⚠️ Не вдалось: '}${String(e.message||e).replace(/</g,'&lt;')}</div>`);
+      body.insertAdjacentHTML('beforeend',`<div class="fs-msg">${esc(aiHumanError(e))}</div>`);   // без «HTTP 529» і «Failed to fetch» (GAP2-4)
     }finally{
       spotBusy=false; if(cap) cap.classList.remove('busy');   // що б не сталось — спот знову приймає питання
     }
@@ -468,8 +473,7 @@
     el.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>aiUndo(+b.dataset.undo));
     el.querySelectorAll('[data-commit]').forEach(b=>b.onclick=()=>{
       const m=aiChatMsgs[+b.dataset.commit]; if(!m||m.applied) return;
-      // applied — ДО aiCommit: той усередині викликає aiChatSave, а він підміняє повідомлення
-      // копіями, тож позначка на старому об'єкті губилась і кнопка лишалась (повторне застосування)
+      // applied — ДО aiCommit: повторний тап, поки пакет застосовується, не застосує його вдруге
       m.applied=true; aiCommit(aiParseBlocks(m.content)); aiChatSave(); aiRenderHead(); aiRenderBody();
     });
     el.querySelectorAll('[data-decline]').forEach(b=>b.onclick=()=>{
@@ -871,7 +875,7 @@
          через шторку і в залишок ліміту цього повідомлення (AI-3). Скасувала — пакет відхилено. */
       if(aiAuto&&aiOpsCount(pr)){
         const g=await aiGateOps(pr,{room:AI_WRITE_LIMIT-usedW});
-        // позначка ДО aiCommit: його aiChatSave підміняє повідомлення копіями
+        // позначка ДО aiCommit: його aiChatSave одразу збереже її разом із пакетом
         if(g.pr){ m.applied=true; if(aiOpsCount(g.pr)) aiCommit(g.pr); } else m.declined=true;
         if(g.notes.length) try{ plToast('⚠️ '+g.notes[0]+(g.notes.length>1?' (+'+(g.notes.length-1)+')':'')); }catch(_){}
       }
@@ -879,9 +883,9 @@
       // обірваний хід не має лишати живу картку; компактний слід — у повідомлення, як і в удалому ході
       try{ const tr=aiTraceFinish(); if(tr) m.trace=tr; }catch(_){}
       if(!(e&&e.aiOff)) console.error('aiChat',e);   // відмова від AI — не помилка
-      /* Текст бачить людина, не розробник. Найчастіша причина — немає мережі,
-         а не «поганий URL»; на native поле проксі взагалі приховане. */
-      const off = (typeof navigator!=='undefined' && navigator.onLine===false);
+      /* Текст бачить людина, не розробник: aiHumanError (11-ai-flow.js) — без «HTTP 529» і
+         «Перевір URL AI-проксі». Обрив звʼязку — і «офлайн», і «Wi-Fi без інтернету» (BUGS-5). */
+      const off = aiNetDown(e);
       /* «Не зараз» чи AI вимкнено — вибір людини, не поломка. Стоїть ПЕРЕД
          перевіркою мережі: запит і не йшов, тож «немає зв’язку» було б неправдою.
          Вкладення повертаємо в рядок вводу — погодиться, і не треба чіпляти знову. */
@@ -897,12 +901,7 @@
         ? '⚠️ Відповідь обірвалась'+(e&&e.timeout?' (зависла)':off?' (немає зв’язку)':'')+', але дещо я вже встиг зробити:\n'
           +done.map(x=>'• '+x).join('\n')
           +'\n\nЦе вже збережено. Не повторюй запит цілком — вийде дубль. Попроси лише те, чого тут нема.'
-        : off
-        ? '📡 Немає зв’язку. Планер, фінанси й нотатки працюють без інтернету — а я повернусь, щойно мережа з’явиться.'
-        : (e && e.human) ? '⚠️ '+e.message     // ліміт чи вхід (aiHttpError) — причина відома, URL тут ні до чого
-        : (window.FLOW_NATIVE
-            ? '⚠️ Не вдалось до мене достукатись. Спробуй ще раз за хвилину.'
-            : '⚠️ Не вдалось: '+String(e.message||e)+'. Перевір URL AI-проксі.');
+        : aiHumanError(e);
       delete m.streaming;
     }finally{
       // що б не сталось (зависання, шторка, виняток) — чат знову приймає повідомлення (AI-8)
