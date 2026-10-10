@@ -16,7 +16,7 @@
 | Файлів JS | 85 |
 | Рядків JS | 33238 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10341 |
+| Рядків CSS | 10343 |
 | Сутностей верхнього рівня | 2248 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
@@ -157,7 +157,7 @@
 | `src/styles/core/27-month.css` | 115 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
-| `src/styles/core/30-wallet.css` | 110 | 0 |
+| `src/styles/core/30-wallet.css` | 112 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 59 | 0 |
 
