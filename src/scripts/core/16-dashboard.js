@@ -901,6 +901,7 @@
       <div class="fmi-label">Порядок</div>
       ${fmRow('pin','pin',f.pinned?'Відкріпити':'Закріпити зверху','')}
       <div class="fmi-label">Звʼязки</div>
+      ${fmRow('links','group','Усі звʼязки папки','місія · звичка · час · календар · гроші · чати')}
       ${fmRow('chat','chat','Чати',linked?('повʼязано: '+linked):'не повʼязано')}
       ${dev?fmRow('sphere','bld','Сфера · будівля в грі',f.sphere?'повʼязано · змінити чи прибрати':'не повʼязано'):''}
       <div class="fmi-label">Особливе для ${f.sphere?'сфери':'папки'}</div>
@@ -1041,6 +1042,7 @@
     if(act==='due'){ closeFolderMenu(); inputModal({title:'Дедлайн проєкту', value:f.due||'', placeholder:'РРРР-ММ-ДД, напр. 2026-08-01', onOk:(v)=>{ const m=(v||'').match(/^\d{4}-\d{2}-\d{2}$/); if(m){ f.due=v; saveFolders(); renderDashboard(); } else if(v){ flowAlert('Формат дати: РРРР-ММ-ДД'); } }}); return; }
     if(act==='look'){ openFolderLook(key); return; }
     if(act==='type'){ openFolderType(key); return; }
+    if(act==='links'){ closeFolderMenu(); try{ lkSheet(key); }catch(e){ console.error('links',e); } return; }
     if(act==='chat'){ closeFolderMenu(); try{ if(typeof window.folderAddSheet==='function') window.folderAddSheet(key); }catch(e){ console.error('chat',e); } return; }
     if(act==='sphere'){ closeFolderMenu(); try{ sphTemplateSheet(key); }catch(e){ console.error('sphere',e); } return; }
     if(act==='rmdue'){ f.due=''; saveFolders(); renderDashboard(); openFolderMenu(key); return; }

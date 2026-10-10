@@ -339,7 +339,7 @@
   function renderPgLinks(){
     const host=document.getElementById('pgLinks'), add=document.getElementById('pgAddLink'); if(!host) return;
     const fk=pgFolderKey();
-    if(!fk){ host.innerHTML=''; host.hidden=true; if(add) add.hidden=true; return; }
+    if(!fk){ host.innerHTML=''; host.hidden=true; if(add) add.hidden=true; try{ lkAsideSync(); }catch(_){} return; }
     if(add) add.hidden=false;
     const list=chatsForFolder(fk).map(c=>({c,last:chatLast(c)})).sort((a,b)=>(b.last?b.last.at:b.c.at)-(a.last?a.last.at:a.c.at));
     host.hidden=false;
@@ -354,6 +354,8 @@
       if(typeof groupKids==='function' && groupKids(ck).length && typeof openGroupAsChosen==='function'){ openGroupAsChosen(ck,fk); return; }
       window.__fgNext=fk; goFolder(ck); window.__fgNext=null; });
     const sn=host.querySelector('[data-pgsubnew]'); if(sn) sn.onclick=()=>createFolder(fk);
+    { const lb=host.querySelector('[data-pglinks]'); if(lb) lb.onclick=()=>lkSheet(fk); }   // «Звʼязки папки» (54-links.js)
+    try{ lkAsideSync(); }catch(_){}   // ноутбук: та сама панель праворуч
   }
   /* ── Хаб звʼязків під назвою документа (Д3, 10.10.2026): Гроші · Час · Місія · Чати.
      Лише читає те, що вже позначено папкою (op.folderKey, блок Планера folder, goal.folderKey,
@@ -381,7 +383,7 @@
     const d=pgHubData(fk);
     const card=(k,ic,lab,val,dim)=>`<button class="pgh-c${dim?' dim':''}" data-pghub="${k}"><span class="pgh-ic">${fmIc(ic)}</span><small>${lab}</small><b>${val}</b></button>`;
     const m=d.money==null?'—':((d.money>0?'+':d.money<0?'−':'')+esc(moneyK(Math.abs(d.money))));
-    return `<div class="pg-hub" role="group" aria-label="Звʼязки папки">`
+    return `<div class="pgh-head"><span>Звʼязки</span><button data-pglinks>Усі звʼязки ›</button></div><div class="pg-hub" role="group" aria-label="Звʼязки папки">`
       +card('money','money','Гроші',m,d.money==null)
       +card('time','cal','Час',d.time?(d.time+' сьогодні'):'—',!d.time)
       +card('mission','target','Місія',d.mission?(d.mission.pct+'%'):'—',!d.mission)
