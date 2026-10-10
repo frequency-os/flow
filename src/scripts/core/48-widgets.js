@@ -6,7 +6,7 @@
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1};   // d* — «Дані» (нижче)
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1};   // d* — «Дані» (нижче)
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -172,10 +172,12 @@
   const WD_META={
     dmission:{t:'Місія папки', h:'Місія', ic:'🎯', per:null, show:[['next','Наступний крок'],['due','Дедлайн'],['ring','Кільце прогресу']]},
     dhabit:{t:'Звичка папки', h:'Звичка', ic:'🔥', per:[['week','Тиждень'],['month','Місяць']], show:[['streak','Серія'],['count','Скільки днів'],['days','Дні періоду']]},
-    dtime:{t:'Час папки', h:'Час', ic:'⏱', per:[['day','День'],['week','Тиждень'],['month','Місяць']], show:[['hours','Години'],['done','Виконані блоки'],['add','Кнопка «＋ блок»']]}
+    dtime:{t:'Час папки', h:'Час', ic:'⏱', per:[['day','День'],['week','Тиждень'],['month','Місяць']], show:[['hours','Години'],['done','Виконані блоки'],['add','Кнопка «＋ блок»']]},
+    dcal:{t:'Календар папки', h:'Календар', ic:'📅', per:null, show:[['hint','Підказка «тап по дню»']]}
   };
+  const wdCalYm={};   // місяць, який гортає віджет «Календар папки» (лише памʼять)
   function wdIs(t){ return Object.prototype.hasOwnProperty.call(WD_META,String(t||'')); }
-  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dtime'?'m':'s'); }
+  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&b.type==='dtime'?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
@@ -284,6 +286,15 @@
         ${wdHead(b,fk)}${sz==='l'?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td):''}
         <span class="wd-acts c"><button data-wga="wdmark" class="pill${on?' on':''}" aria-pressed="${on}">✓ Сьогодні${on?' є':''}</button></span>`,'hab',folders[gk].c);
     }
+    if(t==='dcal'){
+      // календар Планера, але лише ця папка: її блоки (смужки кольору) і події (★); місяць гортається в памʼяті, не пишеться
+      if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">Лише в папці</b><small class="wd-sub">Показує блоки й події з міткою папки</small>`,'empty');
+      const ym=wdCalYm[b.id]||td.slice(0,7);
+      return wdTile(b,fk,`${wdHead(b,fk,esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())+(ym.slice(0,4)!==td.slice(0,4)?' '+ym.slice(0,4):''))}
+        <span class="cal-nav"><button data-wga="wdcalnav" data-n="-1" aria-label="Попередній місяць">‹</button><button data-wga="wdcalnav" data-n="0">Сьогодні</button><button data-wga="wdcalnav" data-n="1" aria-label="Наступний місяць">›</button></span>
+        ${calMonthGridHTML(ym,fk)}
+        ${wdOn(b,'hint')?'<small class="wd-sub cal-hint">Тап по дню — події й блоки папки</small>':''}`,'calw');
+    }
     if(t==='dtime'){
       if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">Лише в папці</b><small class="wd-sub">Час рахується з блоків Планера з міткою папки</small>`,'empty');
       const per=wdPer(b), shown=x=>x&&x.folder===fk&&(wdOn(b,'done')||!x.done);
@@ -343,18 +354,20 @@
     else if(a==='wdadd'){ if(fk) plFolderAddBlock(fk); }
     else if(a==='wdday'){ if(fk) plFolderDaySheet(fk); }
     else if(a==='wdmonth'){ if(fk) plFolderMonthSheet(fk); }
+    else if(a==='wdcalnav'){ const n=+el.dataset.n||0, cur=wdCalYm[b.id]||ymdLocal().slice(0,7); wdCalYm[b.id]=n?moShift(cur,n):ymdLocal().slice(0,7); wgRefresh(); }
+    else if(a==='wdcalday'){ const ds=el.dataset.ds; if(fk&&/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) calDaySheet(ds,{folder:fk,onOpenDay:d=>{ try{ goJournal({tab:'day',ds:d}); }catch(_){} }}); }
   }
 
   // ── ⚙ налаштування віджета: Розмір · Джерело · Період · Показувати · Видалити ──
   function wdCfg(id){
     let b=null; try{ b=getBlock(id); }catch(_){} if(!b||!wdIs(b.type)) return;
-    const m=WD_META[b.type], fk=wgCtxFolder(), fm=wgFolderMission(fk), goals=b.type==='dtime'?[]:wlMissions();
+    const m=WD_META[b.type], fk=wgCtxFolder(), fm=wgFolderMission(fk), goals=(b.type==='dtime'||b.type==='dcal')?[]:wlMissions();
     let sz=wdSz(b), per=wdPer(b), gid=b.goalId&&goals.some(g=>String(g.id)===String(b.goalId))?String(b.goalId):'';
     const show={}; m.show.forEach(([k])=>{ show[k]=wdOn(b,k); });
     jnOverlay(`<div class="jn-ed-h"><b>${m.ic} ${esc(m.t)}</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <small class="dy-fm-sub">Віджет — вікно в ${b.type==='dtime'?'Планер':'місію'}: дані не копіюються, тут лише його вигляд.</small>
+      <small class="dy-fm-sub">Віджет — вікно в ${(b.type==='dtime'||b.type==='dcal')?'Планер':'місію'}: дані не копіюються, тут лише його вигляд.</small>
       <div class="jn-f"><span>Розмір</span><div class="wd-szs">${Object.keys(WD_SZ).map(k=>`<button data-wdsz="${k}" class="${k===sz?'on':''}" aria-pressed="${k===sz}"><i class="wd-szi ${k}"></i><b>${WD_SZ[k].t}</b><small>${WD_SZ[k].d}</small></button>`).join('')}</div></div>
-      ${b.type!=='dtime'?`<div class="jn-f"><span>Джерело</span><div class="wl-chips">
+      ${(b.type!=='dtime'&&b.type!=='dcal')?`<div class="jn-f"><span>Джерело</span><div class="wl-chips">
         <button data-wdg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
         ${goals.map(g=>`<button data-wdg="${esc(g.id)}" class="${String(g.id)===gid?'on':''}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,24))}</button>`).join('')}</div></div>`:''}
       ${m.per?`<div class="jn-f"><span>Період</span><div class="wl-chips">${m.per.map(([k,l])=>`<button data-wdper="${k}" class="${k===per?'on':''}">${l}</button>`).join('')}</div></div>`:''}
@@ -371,7 +384,7 @@
       ov.querySelector('[data-wdok]').onclick=()=>{
         const q=getBlock(id); if(!q){ ov.remove(); return; }
         q.sz=sz; q.gw=WD_SZ[sz].gw; q.gh=WD_SZ[sz].gh;
-        if(q.type!=='dtime'){ if(gid) q.goalId=gid; else delete q.goalId; }
+        if(q.type!=='dtime'&&q.type!=='dcal'){ if(gid) q.goalId=gid; else delete q.goalId; }
         if(m.per) q.period=per;
         const off={}; Object.keys(show).forEach(k=>{ if(!show[k]) off[k]=false; });
         if(Object.keys(off).length) q.show=off; else delete q.show;
@@ -383,7 +396,7 @@
         if(i>=0){
           const was=arr.splice(i,1)[0]; saveBoard();
           // «Скасувати» повертає саме вікно на те саме місце (дані модулів і так не чіпали)
-          flowUndoToast('Віджет прибрано — дані в '+(b.type==='dtime'?'Планері':'місії')+' лишились',()=>{
+          flowUndoToast('Віджет прибрано — дані в '+((b.type==='dtime'||b.type==='dcal')?'Планері':'місії')+' лишились',()=>{
             if(arr.some(x=>x&&String(x.id)===String(was.id))) return;
             arr.splice(Math.min(i,arr.length),0,was); saveBoard(); wdRedraw();
           });

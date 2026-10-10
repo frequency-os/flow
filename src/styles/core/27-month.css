@@ -113,3 +113,38 @@
   .mo-ta{box-sizing:border-box;width:100%;min-height:150px;font:inherit;font-size:16px;line-height:1.45;color:var(--text);background:var(--field);
     border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical;}
   .mo-ta:focus{outline:2px solid var(--accent);outline-offset:0;}
+
+  /* ── календар Планера (49-calendar.js): ★ подія і • платіж у клітинці, шторка дня ── */
+  .mo-d{position:relative;}
+  .mo-d .mo-ev{position:absolute;top:2px;right:4px;font-style:normal;font-size:9px;line-height:1;color:#f5b73b;}
+  .mo-d .mo-pay{position:absolute;top:5px;left:5px;width:5px;height:5px;border-radius:50%;background:#34c77b;}
+  .cal-ov .jn-ed{gap:12px;}
+  .cal-sec{display:flex;flex-direction:column;gap:6px;}
+  .cal-sh{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .cal-sh small{font-size:12px;letter-spacing:0;text-transform:none;}
+  .cal-none{font-size:13px;color:var(--muted);font-weight:600;}
+  .cal-row{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border-radius:14px;
+    background:var(--field);border:1px solid var(--line);color:var(--text);}
+  .cal-row.ro{cursor:default;}
+  .cal-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .cal-row[data-calbl]{border-left:4px solid var(--bc,var(--accent));}
+  .cal-ic{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:14px;}
+  .cal-ic.ev{background:color-mix(in srgb,#f5b73b 22%,transparent);color:#f5b73b;}
+  .cal-ic.pay{background:color-mix(in srgb,#34c77b 20%,transparent);}
+  .cal-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .cal-tx b{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cal-tx b.done{text-decoration:line-through;color:var(--muted);}
+  .cal-tx small{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cal-tm{flex:none;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted);}
+  .cal-go{flex:none;color:var(--muted);font-size:18px;}
+  .cal-ok{flex:none;color:#34c77b;font-weight:800;}
+  .cal-amt{flex:none;font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .cal-amt.in{color:#34c77b;} .cal-amt.out{color:var(--text);}
+  .cal-note{box-sizing:border-box;width:100%;min-height:76px;resize:vertical;padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+    background:var(--field);color:var(--text);font:600 15px/1.4 inherit;font-family:inherit;}
+  .cal-note:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .cal-acts{display:flex;flex-wrap:wrap;gap:8px;}
+  .cal-acts button{all:unset;box-sizing:border-box;cursor:pointer;flex:1 1 30%;min-height:46px;padding:0 12px;border-radius:14px;display:grid;place-items:center;
+    font-size:14px;font-weight:800;color:var(--text);background:var(--field);border:1px solid var(--line);text-align:center;}
+  .cal-acts button[data-calopen]{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .cal-acts button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
