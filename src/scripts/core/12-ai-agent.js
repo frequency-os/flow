@@ -31,30 +31,32 @@
     if(el){ el.innerHTML=aiBusyHTML(); const b=document.getElementById('aiChatBody'); if(b) b.scrollTop=b.scrollHeight; }
   }
   /* ═══ DEV-РЕЖИМ (Нокс): технічний асистент розробника ═══ */
-  /* Dev-режим існує ТІЛЬКИ у web-збірці. У native (Capacitor) він
-     вимкнений на рівні прапорця. Блоки @dev-only задумані, щоб їх вирізав
-     скрипт збірки під App Store (build-ios.mjs), але такого скрипта ПОКИ НЕМА
-     і tools/build.py маркери не обробляє — код лежить у будь-якому бандлі.
-     Тож захист зараз тримають лише прапорці нижче; перед App Store вирізання
-     треба дописати. Прапорець з storage міг приїхати з веб-версії, тому
-     native має пріоритет. */
-  function aiDevOn(){
+  /* Dev-режим — лише для власника і лише у веб-збірці (APP-5, SEC-7).
+     Власник — ті самі ворота upDevOn, що й в екрана «Апгрейд» (30-upgrade.js):
+     акаунт розробника або пристрій із flow_dev=1. На native (Capacitor)
+     режиму нема взагалі: ні жестів, ні шторки, ні інструментів. Прапорець
+     ai_dev сам по собі нічого не відкриває — він міг лишитись зі старої
+     версії, коли шторку вмикав будь-хто, або приїхати з веб-версії.
+     Збірка під App Store (python3 tools/build.py --ios) вирізає блоки
+     @dev-only цілком; ці ворота — захист для звичайної збірки. */
+  function aiDevOwner(){
     try{ if(window.FLOW_NATIVE) return false; }catch(_){}
+    /* @dev-only:start replace="return false;" */
+    try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; }
+    /* @dev-only:end */
+  }
+  function aiDevOn(){
+    if(!aiDevOwner()) return false;
     try{ return localStorage.getItem('ai_dev')==='1'; }catch(_){ return false; }
   }
-  /* dev_eval виконує JS, який написала модель. Dev-режим вмикає будь-хто
-     довгим натиском на аватар, тож одного його мало: отруєний текст
-     (вкладення, пам'ять) міг би підштовхнути Нокса запропонувати шкідливий
-     код, а людина — натиснути «Виконати». Тому dev_eval — лише для власника:
-     акаунт розробника або пристрій із flow_dev=1 (ті самі ворота upDevOn, що
-     й в екрана «Апгрейд»). Для решти інструмента нема навіть у списку, який
-     бачить модель, і виклик відхиляється ще й у виконавці. */
-  function aiDevEvalOn(){
-    if(!aiDevOn()) return false;
-    try{ return !!(window.upDevOn&&window.upDevOn()); }catch(_){ return false; }
-  }
   /* @dev-only:start */
+  /* Інструменти Нокса, що бачать сире сховище чи виконують код (storage, бекап/відкат,
+     JS) — ОДНА перевірка для всіх: власник у dev-режимі. Ворота і тут, і у виконавці
+     (flowToolExec), і в кожному devTool*: модель могла б назвати інструмент сама. */
+  function aiDevToolsOn(){ return aiDevOn(); }
+  const AI_DEV_DENY='⚠️ доступно лише власнику в dev-режимі';
   function aiDevToggleSheet(){
+    if(!aiDevOwner()) return;   // на native і для не-власника шторки нема
     const on=aiDevOn();
     confirmSheet({
       title:on?'Вийти з режиму розробника?':'⚙️ Режим розробника',
@@ -98,11 +100,9 @@
     +'Також доступні звичайні інструменти (get_data, planner, goals, finance, patterns, memory) — для перевірки поведінки. '
     +'Стиль: технічно, стисло, українською; код у ```; конкретні ключі/рядки/цифри. Нічого не вигадуй: немає даних — так і скажи. '
     +'Ти НЕ можеш змінювати код апки; можеш запропонувати патч текстом.';
-  /* dev_eval згадуємо лише тоді, коли він справді є у списку інструментів
-     (власник, див. aiDevEvalOn). Інакше модель обіцяла людині «виконаю код»
-     і пробувала викликати інструмент, якого їй не дали. */
+  /* dev_eval тепер є завжди, коли є сам dev-режим: обидва — лише для власника (aiDevOn) */
   const AI_DEV_EVAL_HINT=', dev_eval (JS у живій апці — з підтвердженням і авто-бекапом; для фіксів даних: змінив → save-функція → перевір check-ом)';
-  function aiDevSys(){ return AI_DEV_SYS.replace('%EVAL%', aiDevEvalOn()?AI_DEV_EVAL_HINT:''); }
+  function aiDevSys(){ return AI_DEV_SYS.replace('%EVAL%', AI_DEV_EVAL_HINT); }
   function aiDevCtx(){
     const p=[];
     try{ p.push('Endpoint: '+aiEndpoint()); }catch(_){}
@@ -185,7 +185,12 @@
   ];
   /* @dev-only:end */
   /* @dev-only:start */
+  /* Мітка власника пристрою (02-storage.js) і пошта — не для моделі: усе, що бачить
+     Нокс, іде через воркер в історію чату. Ключ ховаємо, пошту в значеннях — маскуємо. */
+  const DEV_HIDDEN_KEY=/^sb-|auth-token|^flowapp___owner$/i;
+  function devMaskMail(v){ return String(v).replace(/[^\s"'<>@,;:]+@[^\s"'<>@,;:]+\.[a-z]{2,}/gi,'[пошта прихована]'); }
   function devToolStorage(inp){
+    if(!aiDevToolsOn()) return AI_DEV_DENY;
     if(inp.action==='keys'){
       const reg={}; (window.FLOW_KEYS||[]).forEach(k=>reg['flowapp_'+k]=1);   // у localStorage вони з префіксом
       // сирі ключі (опис у 01-base.js) і дзеркала prefSet — теж «свої»
@@ -194,6 +199,7 @@
       const rows=[];
       for(let i=0;i<localStorage.length;i++){
         const k=localStorage.key(i), v=localStorage.getItem(k)||'';
+        if(/^flowapp___owner$/.test(k)) continue;
         // службові flowapp___* і прапорці міграцій flowapp_*_v1 — не дані, але й не «чужі»
         rows.push({k:k, b:v.length, reg:!!reg[k] || /^flowapp___|^flowapp_\w+_v\d+$/.test(k)});
       }
@@ -203,10 +209,10 @@
     if(inp.action==='get'){
       const k=String(inp.key||'');
       // токен входу Supabase моделі не віддаємо: він пішов би через воркер в історію чату
-      if(/^sb-|auth-token/i.test(k)) return '⚠️ «'+k+'» — токен входу, його не показую';
+      if(DEV_HIDDEN_KEY.test(k)) return '⚠️ «'+k+'» — службовий ключ входу чи власника, його не показую';
       const v=localStorage.getItem(k);
       if(v==null) return '⚠️ ключа «'+k+'» немає';
-      return k+' ('+v.length+'Б):\n'+v.slice(0,1300)+(v.length>1300?'\n…(обрізано)':'');
+      return k+' ('+v.length+'Б):\n'+devMaskMail(v.slice(0,1300))+(v.length>1300?'\n…(обрізано)':'');
     }
     if(inp.action==='check'){
       const out=[];
@@ -284,6 +290,7 @@
     return out.join('\n');
   }
   async function devToolData(inp){
+    if(!aiDevToolsOn()) return AI_DEV_DENY;
     if(inp.action==='backup'){
       window.__devBak=devSnapshot();
       const n=Object.keys(window.__devBak).length;
@@ -304,7 +311,7 @@
     return '⚠️ невідома дія';
   }
   async function devToolEval(inp){
-    if(!aiDevEvalOn()) return '⚠️ dev_eval доступний лише власнику (акаунт розробника або flow_dev=1)';
+    if(!aiDevToolsOn()) return AI_DEV_DENY;
     const code=String(inp.code||'').trim();
     if(!code) return '⚠️ порожній code';
     if(code.length>3000) return '⚠️ код задовгий (>3000) — розбий на кроки';
@@ -324,7 +331,7 @@
     try{ await aiChatLoad(); }catch(_){}   // памʼять Флоу — у контекст; і запис факту не затре її (11-ai-flow.js)
     const sysStable=AI_CORE_SYS+AI_AGENT_ADDON;
     const sysDyn='РЕЖИМ СТОРІНКИ: людина викликала тебе слеш-командою зі сторінки редактора. Нижче — текст цієї сторінки. Виконай прохання; за потреби використовуй інструменти (planner/goals/finance/memory/get_data). Відповідь — стислий текст, який ляже блоком на цю сторінку: без FLOW_OPS, без заголовків, без markdown.'
-      +'\n\nСТОРІНКА:\n'+(pageTxt||'(порожньо)')
+      +'\n\nСТОРІНКА:\n'+aiQuoteData(pageTxt||'(порожньо)')
       +'\n\nКОНТЕКСТ:\n'+aiCtx(null);
     return await aiAgentTurn(sysStable,sysDyn,[{role:'user',content:q}],q,null);
   }
@@ -572,14 +579,11 @@
       if(name==='folders')  return await flowToolFolders(inp||{});
       if(name==='diary')    return aiSectionOff('diary') ? aiSectionOffMsg('diary') : await flowToolDiary(inp||{});
       /* @dev-only:start */
-      if(name==='dev_storage'||name==='dev_errors'||name==='dev_cost'){
-        if(!aiDevOn()) return '⚠️ доступно лише в dev-режимі';
-        if(name==='dev_storage') return devToolStorage(inp||{});
-        if(name==='dev_errors')  return devToolErrors(inp||{});
-        if(name==='dev_cost')    return devToolCost();
-      }
-      if(name==='dev_selftest'||name==='dev_data'||name==='dev_eval'){
-        if(!aiDevOn()) return '⚠️ доступно лише в dev-режимі';
+      if(/^dev_/.test(name)){
+        if(!aiDevToolsOn()) return AI_DEV_DENY;   // одна перевірка для всіх dev-інструментів
+        if(name==='dev_storage')  return devToolStorage(inp||{});
+        if(name==='dev_errors')   return devToolErrors(inp||{});
+        if(name==='dev_cost')     return devToolCost();
         if(name==='dev_selftest') return await devToolSelftest();
         if(name==='dev_data')     return await devToolData(inp||{});
         if(name==='dev_eval')     return await devToolEval(inp||{});
@@ -697,7 +701,7 @@
           }).join('; '));
         }catch(_){}
         if(!out.length) return 'щоденник порожній';
-        return out.join('\n\n');
+        return aiQuoteData(out.join('\n\n'));   // записи — цитата, не накази (SEC-9)
       }catch(_){ return 'щоденник недоступний'; }
     }
     if(inp.what==='vision'){
@@ -1377,8 +1381,8 @@
   async function aiAgentTurn(sysStable,sysDynamic,msgs,userQ,onDelta){
     const conv=msgs.slice();
     const dev=aiDevOn();
-    // dev_eval моделі показуємо лише власнику (див. aiDevEvalOn)
-    const TOOLS=dev?FLOW_TOOLS.concat(aiDevEvalOn()?DEV_TOOLS:DEV_TOOLS.filter(t=>t.name!=='dev_eval')):FLOW_TOOLS;
+    // dev-інструменти бачить лише власник у dev-режимі (aiDevOn); у збірці --ios DEV_TOOLS порожній
+    const TOOLS=dev?FLOW_TOOLS.concat(DEV_TOOLS):FLOW_TOOLS;
     const model=dev?AI_MODELS.main:aiPickModel(userQ);      // один раз на весь хід (AI-9)
     // мова інтерфейсу — у динамічну частину, щоб кешований стабільний шар не залежав від мови (AI-6)
     const dyn=String(sysDynamic||'')+aiLangDirective();
@@ -1507,8 +1511,9 @@
       ylAiCtx(false).forEach(l=>out.push(l));
     }
     if(want('fin')) out.push(aiSectionOff('finance') ? 'Фінанси: '+aiSectionOffMsg('finance') : 'Фінанси:\n'+aiFinCtx());
-    if(aiMem.length) out.push('ПАМʼЯТЬ ПРО ЛЮДИНУ (з минулих розмов): '+aiMem.join(' | '));
-    if(aiSum) out.push('РЕЗЮМЕ СТАРІШОЇ ІСТОРІЇ: '+aiSum);
+    // памʼять і резюме — тексти, які могли прийти з чужого вкладення: лише як цитата (SEC-9)
+    if(aiMem.length) out.push('ПАМʼЯТЬ ПРО ЛЮДИНУ (з минулих розмов):\n'+aiQuoteData(aiMem.join(' | ')));
+    if(aiSum) out.push('РЕЗЮМЕ СТАРІШОЇ ІСТОРІЇ:\n'+aiQuoteData(aiSum));
     out.push('РЕЖИМ ТОНУ: '+aiMood());
     return out.join('\n');
   }

@@ -366,11 +366,11 @@
   /* ═══ DEV-РЕЖИМ: переклад КОНТЕНТУ КОРИСТУВАЧА (папки/нотатки/тощо) ═══
      На відміну від i18nApply() вище (тільки системний UI), це для
      довільного тексту, який пише сам користувач. Працює лише коли
-     ai_dev==='1' (той самий Dev-режим/Нокс) І lang_pref==='en'.
+     увімкнено dev-режим власника (aiDevOn, 12-ai-agent.js) І lang_pref==='en'.
      Кешується у storage за хешем оригіналу — повторно не перекладаємо. */
   (function(){
     function contentTranslateOn(){
-      try{ return localStorage.getItem('ai_dev')==='1' && localStorage.getItem('lang_pref')==='en' && localStorage.getItem('dev_translate_content')==='1'; }catch(_){ return false; }
+      try{ return aiDevOn() && localStorage.getItem('lang_pref')==='en' && localStorage.getItem('dev_translate_content')==='1'; }catch(_){ return false; }
     }
     window.flowContentTranslateOn = contentTranslateOn;
     function hash(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return 'h'+h; }

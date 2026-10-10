@@ -306,12 +306,15 @@
       const cap=h.querySelector('#aiCapPet'); if(!cap) return;
       let lp=false, tm=null;
       /* @dev-only:start */
+      // довгий натиск — вхід у dev лише для власника у веб-версії; іншим жесту нема (APP-5)
+      if(aiDevOwner()){
       const start=e=>{ lp=false; tm=setTimeout(()=>{ lp=true; try{ window.platform.haptic('medium'); }catch(_){} aiDevToggleSheet(); }, 550); };
       const stop=()=>{ if(tm){ clearTimeout(tm); tm=null; } };
       cap.addEventListener('pointerdown',start);
       cap.addEventListener('touchstart',e=>{ if(!tm) start(e); },{passive:true});
       ['pointerup','pointercancel','touchend','touchcancel'].forEach(ev=>cap.addEventListener(ev,stop));
       cap.addEventListener('contextmenu',e=>{ try{ e.preventDefault(); }catch(_){} });
+      }
       /* @dev-only:end */
       cap.onclick=()=>{
         if(lp){ lp=false; return; }

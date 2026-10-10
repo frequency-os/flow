@@ -15,13 +15,16 @@
      · youtube.com — вбудоване відео у плитці; картинки й медіа — будь-який https,
        бо обкладинки, фото і аудіо люди вставляють посиланнями.
      'unsafe-inline' — бо розмітка має inline-обробники й стилі.
-     'unsafe-eval' — лише заради двох dev-інструментів власника в AI-чаті
-     (12-ai-agent.js): dev_eval виконує код через new Function, dev_selftest
-     перевіряє наявність функцій через eval. Решта застосунку eval не потребує
-     (pdf.js працює з isEvalSupported:false). Без нього зламаються тільки ці два
-     інструменти; прибирати чи ні — рішення за Ярославом, поки лишаємо.
      Адреса AI поза connect-src не спрацює, тож aiConfig (09-goals.js) чужу не зберігає.
      Додаєш новий домен у код — допиши його сюди, інакше він тихо не спрацює. -->
+<!-- @dev-only:start -->
+<!-- 'unsafe-eval' — лише заради двох dev-інструментів власника в AI-чаті
+     (12-ai-agent.js): dev_eval виконує код через new Function, dev_selftest
+     перевіряє наявність функцій через eval. Решта застосунку eval не потребує
+     (pdf.js працює з isEvalSupported:false). Збірка для iOS (tools/build.py --ios)
+     вирізає ці інструменти разом із цим коментарем і прибирає 'unsafe-eval' з CSP;
+     у веб-версії поки лишаємо — рішення за Ярославом. -->
+<!-- @dev-only:end -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://mogtitbgvrhzyhxmzvhs.supabase.co wss://mogtitbgvrhzyhxmzvhs.supabase.co https://flowai.life-yaroslav-kril.workers.dev; frame-src 'self' https://www.youtube.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Frequency</title>
 <!-- шерінг: щоб посилання розгорталось карткою, а не голим URL (аудит Т6) -->

@@ -1,6 +1,8 @@
 .DS_Store
 backups/
 dist/
+# збірка під App Store (python3 tools/build.py --ios) — як і dist/, з src/
+dist-ios/
 node_modules/
 release/
 баги-з-телефона

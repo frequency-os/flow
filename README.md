@@ -30,6 +30,19 @@ src/  (те, що ти правиш)  ──збірка──▶  dist/index.ht
 cd ~/frequency && python3 tools/build.py
 ```
 
+### Збірка для iPhone (App Store)
+
+```bash
+npm run build:ios    # = python3 tools/build.py --ios && ./tools/check-ios.sh
+```
+
+Кладе програму в окрему теку `dist-ios/` (звичайний `dist/` не чіпає):
+вирізає код між мітками `@dev-only:start … @dev-only:end` (режим розробника,
+інструменти Нокса, що бачать сире сховище чи виконують код) і прибирає
+`'unsafe-eval'` з політики безпеки. `tools/check-ios.sh` перевіряє, що в
+`dist-ios/index.html` не лишилось `dev_eval` і `unsafe-eval`; у `check.sh` це
+крок 8, і він пропускається, якщо `dist-ios/` ще не збирали.
+
 ## Як перевірити, що нічого не зламано
 
 ```bash

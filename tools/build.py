@@ -4,12 +4,44 @@
 build.py — збирає src/ назад в один файл dist/index.html.
 Це і є «готова програма»: саме її відкриває браузер, Mac, iPhone, Android.
 Правиш файли в src/ → запускаєш build → отримуєш dist/index.html.
+
+python3 tools/build.py --ios — збірка під App Store у dist-ios/ (звичайний
+dist/ не чіпає): вирізає все між мітками @dev-only:start … @dev-only:end
+(режим розробника, інструменти Нокса, що виконують код) і прибирає
+'unsafe-eval' з політики безпеки (CSP). Перевірка: tools/check-ios.sh.
 """
 import os, re, shutil, subprocess, sys, time
 
+IOS  = '--ios' in sys.argv[1:]
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC  = os.path.join(ROOT, 'src')
-DIST = os.path.join(ROOT, 'dist')
+DIST = os.path.join(ROOT, 'dist-ios' if IOS else 'dist')
+OUTN = 'dist-ios' if IOS else 'dist'
+
+# Мітки dev-коду. У JS: /* @dev-only:start */ … /* @dev-only:end */, з
+# необовʼязковим replace="…" — чим замінити блок (щоб лишився валідний код).
+# У HTML: <!-- @dev-only:start --> … <!-- @dev-only:end -->. Вкладати не можна.
+DEV_JS   = re.compile(r'/\*\s*@dev-only:start(?:\s+replace="([^"]*)")?\s*\*/.*?/\*\s*@dev-only:end\s*\*/', re.S)
+DEV_HTML = re.compile(r'<!--\s*@dev-only:start\s*-->.*?<!--\s*@dev-only:end\s*-->\n?', re.S)
+
+def strip_dev(out):
+    """Вирізає dev-блоки й 'unsafe-eval'. Будь-яка невідповідність міток — помилка
+    збірки: краще не зібрати, ніж тихо віддати в App Store шматок dev-коду."""
+    starts = len(re.findall(r'@dev-only:start', out))
+    ends   = len(re.findall(r'@dev-only:end', out))
+    out, nh = DEV_HTML.subn('', out)
+    out, nj = DEV_JS.subn(lambda m: m.group(1) or '', out)
+    left = re.findall(r'@dev-only:(?:start|end)', out)
+    if starts != ends or starts != nh + nj or left:
+        print('ПОМИЛКА --ios: мітки @dev-only не парні чи вкладені (start %d, end %d, вирізано %d, лишилось %d)'
+              % (starts, ends, nh + nj, len(left)))
+        sys.exit(1)
+    csp = re.compile(r'(<meta http-equiv="Content-Security-Policy" content="[^"]*?)\s*\'unsafe-eval\'')
+    out, nc = csp.subn(r'\1', out)
+    if nc != 1:
+        print("ПОМИЛКА --ios: не знайшов 'unsafe-eval' у CSP (знайдено %d)" % nc); sys.exit(1)
+    print('iOS: вирізано dev-блоків %d (JS %d, HTML %d), з CSP прибрано \'unsafe-eval\'' % (nh + nj, nj, nh))
+    return out
 
 def read(p):
     with open(p, 'r', encoding='utf-8', newline='') as f:
@@ -83,13 +115,16 @@ def main():
         print('Прибери його з src/ (копії — у scratchpad або git) і збери знову.')
         sys.exit(1)
 
+    if IOS:
+        out = strip_dev(out)
+
     os.makedirs(DIST, exist_ok=True)
     dest = os.path.join(DIST, 'index.html')
     with open(dest, 'w', encoding='utf-8', newline='') as f:
         f.write(out)
 
-    print('Зібрано %d частин → dist/index.html (%.1f KB, %d рядків), версія %s'
-          % (len(used), len(out.encode('utf-8'))/1024, out.count('\n') + 1, stamp))
+    print('Зібрано %d частин → %s/index.html (%.1f KB, %d рядків), версія %s'
+          % (len(used), OUTN, len(out.encode('utf-8'))/1024, out.count('\n') + 1, stamp))
 
     # Іконка + маніфест: щоб сайт можна було поставити на телефон
     # як застосунок (повний екран, своя іконка, без адресного рядка).
@@ -104,7 +139,7 @@ def main():
                     f.write(sw)
             else:
                 shutil.copy2(os.path.join(wsrc, n), os.path.join(DIST, n))
-        print('Скопійовано в dist/: %s' % ', '.join(names))
+        print('Скопійовано в %s/: %s' % (OUTN, ', '.join(names)))
 
     # Бібліотеки (PDF, EPUB, вхід через Google) кладемо поруч, а не всередину:
     # вони важкі й потрібні рідко, тому вантажаться лише коли справді треба.
@@ -114,6 +149,6 @@ def main():
         shutil.copytree(vsrc, vdst)
         names = sorted(os.listdir(vdst))
         size = sum(os.path.getsize(os.path.join(vdst, f)) for f in names)
-        print('Скопійовано dist/vendor/: %s (%.0f KB)' % (', '.join(names), size/1024))
+        print('Скопійовано %s/vendor/: %s (%.0f KB)' % (OUTN, ', '.join(names), size/1024))
 
 main()
