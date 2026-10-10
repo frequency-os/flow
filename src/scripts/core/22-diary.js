@@ -302,6 +302,7 @@
     const body=days.map(k=>diaFmtDate(k)+':\n'+diaryEntries[k].text).join('\n\n---\n\n');
     btn.disabled=true; btn.textContent='Аналізую…';
     out.style.display='block'; out.textContent='';
+    let note='';
     try{
       const txt=await aiCall(
         'Ти — уважний і чесний аналітик щоденника. Тобі дають записи людини за один тиждень (від старіших до новіших). '
@@ -312,10 +313,14 @@
         (partial)=>{ out.textContent=partial; },
         {uses:['diary']}
       );
-      if(txt){ diaInsights.weeks=diaInsights.weeks||{}; diaInsights.weeks[mon]={text:txt,ts:Date.now()}; saveDiaInsights(); }
-    }catch(e){ out.textContent=(e&&e.aiOff) ? e.message : 'Не вдалося проаналізувати: '+(e.message||'спробуй пізніше.'); }
+      if(aiLastStop==='cut') note=txt;   // обірваний потік (GAP2-3): видно з позначкою, але назавжди не зберігаємо
+      else if(txt){ diaInsights.weeks=diaInsights.weeks||{}; diaInsights.weeks[mon]={text:txt,ts:Date.now()}; saveDiaInsights(); }
+    }catch(e){ note=aiHumanError(e); }   // 11-ai-flow.js: «немає інтернету», «не вдалося» — людськими словами
     btn.disabled=false;
     renderDiaView();
+    /* Помилку чи обрубок — ПІСЛЯ перемальовування: renderDiaView ховає блок, коли збереженого
+       аналізу нема, і стирав повідомлення миттєво — кнопка ніби нічого не робила (BUGC-3). */
+    if(note){ out.style.display='block'; out.textContent=note; }
   }
   { const b=document.getElementById('diaWeekBtn'); if(b) b.onclick=diaWeekAnalyze; }
   // 🧠 батч-оцінка настрою: один виклик на всі дні без смайлика і без кешу

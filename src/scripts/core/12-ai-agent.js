@@ -321,6 +321,7 @@
   /* @dev-only:end */
   /* ── /ai зі сторінки редактора: агентний хід з текстом сторінки в контексті ── */
   async function aiPageAsk(q,pageTxt){
+    try{ await aiChatLoad(); }catch(_){}   // памʼять Флоу — у контекст; і запис факту не затре її (11-ai-flow.js)
     const sysStable=AI_CORE_SYS+AI_AGENT_ADDON;
     const sysDyn='РЕЖИМ СТОРІНКИ: людина викликала тебе слеш-командою зі сторінки редактора. Нижче — текст цієї сторінки. Виконай прохання; за потреби використовуй інструменти (planner/goals/finance/memory/get_data). Відповідь — стислий текст, який ляже блоком на цю сторінку: без FLOW_OPS, без заголовків, без markdown.'
       +'\n\nСТОРІНКА:\n'+(pageTxt||'(порожньо)')
@@ -1301,7 +1302,7 @@
             stop=ev.delta.stop_reason;
             if(ev.usage&&ev.usage.output_tokens) _u.o=ev.usage.output_tokens;
           } else if(ev.type==='error'){
-            throw new Error((ev.error&&ev.error.message)||'stream error');
+            throw aiStreamError(ev);   // 11-ai-flow.js: overloaded_error → «AI перевантажений»
           }
         }
       }
@@ -1311,7 +1312,8 @@
         return b;
       }).filter(b=>!(b.type==='text'&&!String(b.text||'').trim())); // порожній text-блок (модель одразу пішла в tool_use) валить наступний хоп 400-кою
       aiUsageAdd(payload.model,_u);
-      return {content:blocks, stop_reason:stop||'end_turn'};
+      // без stop_reason потік не дійшов до кінця — обрив, а не відповідь (GAP2-3)
+      return {content:blocks, stop_reason:stop||'cut'};
     }
     const data=await g.wait(res.json());
     if(data.usage) aiUsageAdd(payload.model,{i:data.usage.input_tokens||0,o:data.usage.output_tokens||0,
@@ -1407,6 +1409,12 @@
            недописаний виклик інструмента не виконуємо — його вхід міг обірватись (AI-8). */
         if(resp.stop_reason==='max_tokens') return (fin+AI_CUT_NOTE).trim();
         if(resp.stop_reason==='refusal') return (fin+AI_REFUSAL_NOTE).trim();
+        /* Потік обірвався посередині (GAP2-3): показуємо, що встигло прийти, і кажемо про обрив;
+           недописаний виклик інструмента не виконуємо. Якщо хід уже щось змінив — що саме, щоб
+           повтор не зробив дубль. */
+        if(resp.stop_reason==='cut') return (fin+(aiTurnDone.length
+          ? '\n\n⚠️ Відповідь обірвалась, але дещо я вже встиг зробити:\n'+aiTurnDone.slice(0,6).map(x=>'• '+x).join('\n')+'\nНе повторюй запит цілком — вийде дубль.'
+          : AI_BROKEN_NOTE)).trim();
         return fin||(toolsUsed?'✅ Зроблено.':'Не зміг відповісти — спробуй ще раз.');
       }
       const results=[];

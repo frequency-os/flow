@@ -164,7 +164,7 @@
         <div class="dpr-nm">${esc(name)}<small>${sub}</small></div>
       </div>
       <button class="dpr-i" data-act="ai">✨ Відкрити Флоу</button>
-      ${window.FLOW_NATIVE ? '' : '<button class="dpr-i" data-act="proxy">⚙️ AI-проксі</button>'}
+      ${(typeof aiProxyUiOn==='function'&&aiProxyUiOn()) ? '<button class="dpr-i" data-act="proxy">⚙️ AI-проксі</button>' : ''}
       <button class="dpr-i" data-act="theme">🌓 Змінити тему</button>
       <button class="dpr-i" data-act="settings">⚙️ Всі налаштування</button>
     </div>`;
@@ -244,11 +244,11 @@
     const um=(window.uiMode==='lite')?'lite':'pro';
     const petOn=!(typeof window.petHidden==='function' && window.petHidden());
     /* AI-проксі — для розробника: адреса за замовчуванням уже вшита (09-goals.js).
-       Показуємо лише в dev-режимі або коли людина колись поставила свою адресу —
-       щоб вона могла її повернути. */
+       Показуємо лише власнику в dev-режимі (aiProxyUiOn; ai_dev вмикає будь-хто довгим
+       натиском) або коли людина колись поставила свою адресу — щоб могла її повернути. */
     let epCustom=false;
     try{ epCustom = typeof aiEndpoint==='function' && typeof AI_EP_DEFAULT!=='undefined' && aiEndpoint()!==AI_EP_DEFAULT; }catch(_){}
-    const showProxy=!window.FLOW_NATIVE && (devOn || epCustom);
+    const showProxy=!window.FLOW_NATIVE && ((typeof aiProxyUiOn==='function'&&aiProxyUiOn()) || epCustom);
     // мініатюри наборів: тло темної теми + акцент набору (01-tokens-base.css)
     const SW={desk:['#101317','#7c93ff'], studio:['#0e1011','#d4a24c'], classic:['#0c0e14','#8b7cff']};
     const swatches=Object.keys(THEME_SETS).map(id=>{
