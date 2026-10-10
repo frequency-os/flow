@@ -48,7 +48,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-10-1946-671c5ef';
+  var BUILD='2026-10-10-2001-24aabe1';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -8022,30 +8022,63 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
   .in-ph{display:block;border-radius:12px;background:color-mix(in srgb,var(--accent) 22%,var(--card));
     background-size:cover;background-position:center;}
-  /* 1 — міні-Огляд */
+  /* 8:00 — колаж Карти бажань */
   .in-v1{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
   .in-col{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:64px 64px;gap:5px;
     grid-template-areas:"sea run home home" "sea run study travel";}
   .in-sea{grid-area:sea}.in-run{grid-area:run}.in-home{grid-area:home}.in-study{grid-area:study}.in-travel{grid-area:travel}
-  .in-tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-  .in-tile{position:relative;height:64px;border-radius:12px;overflow:hidden;background:color-mix(in srgb,var(--c) 35%,var(--card));}
-  .in-tile .in-ph{position:absolute;inset:0;border-radius:0;}
-  .in-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),rgba(0,0,0,0) 70%);}
-  .in-tile b{position:absolute;left:8px;bottom:6px;z-index:1;color:#fff;font-size:12px;font-weight:800;}
-  /* 2 — ланцюжок мрія → ціль → сьогодні */
-  .in-v2{display:flex;flex-direction:column;align-items:stretch;}
-  .in-step{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
-  .in-step > span:not(.in-ic):not(.in-ok){flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;}
-  .in-step small{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
-  .in-step b{font-size:15px;font-weight:800;}
-  .in-wish .in-ph{width:52px;height:52px;flex:none;}
-  .in-ic{width:52px;height:52px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:22px;
+  .in-ic{width:44px;height:44px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:20px;
     background:color-mix(in srgb,var(--accent) 16%,var(--card));}
-  .in-bar{display:block;height:6px;border-radius:3px;background:var(--line);margin-top:4px;overflow:hidden;}
-  .in-bar i{display:block;height:100%;background:var(--accent);border-radius:3px;}
-  .in-today{border-color:color-mix(in srgb,var(--accent) 60%,var(--line));}
-  .in-ok{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:#34c77b;}
-  .in-arr{align-self:center;width:2px;height:18px;background:linear-gradient(var(--line),var(--accent));}
+  /* мітка часу картки — «День із життя» */
+  .in-time{align-self:flex-start;font-size:13px;font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:999px;
+    color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);}
+  /* 7:00 — ранковий ритуал */
+  .in-v-rit{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
+  .in-rit-h{display:flex;justify-content:space-between;align-items:baseline;}
+  .in-rit-h b{font-size:16px;font-weight:800;}
+  .in-rit-h span{font-size:13px;font-weight:700;color:#ff9f43;}
+  .in-rit-cal{display:flex;justify-content:space-between;margin:2px 0 4px;}
+  .in-rit-cal span{display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .in-rit-cal em{font-style:normal;font-size:11px;font-weight:600;color:var(--muted);}
+  .in-rit-cal i{width:24px;height:24px;border-radius:8px;background:var(--line);}
+  .in-rit-cal .ok i{background:color-mix(in srgb,#ff9f43 75%,var(--card));}
+  .in-rit-cal .now i{outline:2px solid var(--accent);outline-offset:2px;}
+  .in-rit-step{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:color-mix(in srgb,var(--line) 45%,transparent);}
+  .in-rit-step b{font-size:14px;font-weight:700;}
+  .in-rit-step.ok b{color:var(--muted);text-decoration:line-through;}
+  .in-chk{width:22px;height:22px;flex:none;border-radius:7px;display:grid;place-items:center;font-size:13px;font-weight:800;
+    border:2px solid var(--line);color:#fff;}
+  .in-rit-step.ok .in-chk{background:#34c77b;border-color:#34c77b;}
+  .in-rit-done{margin-top:2px;text-align:center;padding:10px;border-radius:12px;font-size:14px;font-weight:800;color:#fff;
+    background:linear-gradient(90deg,#ff7a45,#ff9f43);}
+  /* 8:00 — Карта бажань: підпис і «ціна мрії» */
+  .in-wcap{display:flex;align-items:center;gap:10px;padding:2px 2px 0;}
+  .in-wthumb{width:40px;height:40px;flex:none;border-radius:10px;}
+  .in-wcap span{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .in-wcap b{font-size:15px;font-weight:800;}
+  .in-wcap small{font-size:12px;color:var(--muted);}
+  /* 9:00 — план дня по годинах */
+  .in-v-plan{display:flex;flex-direction:column;padding:10px 14px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
+  .in-hr{display:flex;align-items:stretch;gap:12px;min-height:54px;border-top:1px solid var(--line);padding:6px 0;}
+  .in-hr:first-child{border-top:0;}
+  .in-hr em{font-style:normal;width:42px;flex:none;font-size:12px;font-weight:700;color:var(--muted);padding-top:4px;}
+  .in-blk{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:6px 10px;border-radius:10px;
+    background:color-mix(in srgb,var(--accent) 10%,var(--card));border-left:3px solid color-mix(in srgb,var(--accent) 45%,var(--line));}
+  .in-blk b{font-size:14px;font-weight:700;}
+  .in-blk small{font-size:12px;font-weight:700;color:var(--accent);}
+  .in-hr.on .in-blk{background:color-mix(in srgb,var(--accent) 22%,var(--card));border-left-color:var(--accent);}
+  /* 21:00 — щоденник і Журнал героя */
+  .in-v-eve{display:flex;flex-direction:column;gap:10px;}
+  .in-diary{padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);}
+  .in-diary small{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .in-diary p{margin:6px 0 0;font-family:'Caveat',cursive;font-size:22px;line-height:1.25;}
+  .in-jr{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);}
+  .in-jr > span:not(.in-ic){flex:1;display:flex;flex-direction:column;gap:2px;}
+  .in-jr b{font-size:15px;font-weight:800;}
+  .in-jr small{font-size:12px;color:var(--muted);}
+  .in-ring{width:40px;height:40px;flex:none;border-radius:50%;
+    background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0);
+    -webkit-mask:radial-gradient(farthest-side,transparent 70%,#000 71%);mask:radial-gradient(farthest-side,transparent 70%,#000 71%);}
   /* 3 — ріст: тиждень і досягнута ціль */
   .in-v3{display:flex;flex-direction:column;gap:10px;}
   .in-wk{padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;}
@@ -8066,7 +8099,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .in-done-t b{font-size:17px;font-weight:800;}
   /* низькі екрани (iPhone SE): картинки менші, щоб текст і кнопка лишились видно */
   @media (max-height:700px){
-    .in-col{grid-template-rows:48px 48px;} .in-tile{height:48px;} .in-done{height:110px;}
+    .in-col{grid-template-rows:48px 48px;} .in-done{height:110px;} .in-hr{min-height:44px;} .in-rit-step{padding:6px 10px;}
     .in-slide h2{font-size:23px;} .in-vis{margin-bottom:10px;}
   }
 </style>
@@ -9336,6 +9369,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // Наповнюється поступово, екран за екраном. Ключі — точний текст,
     // який реально є в DOM (без зайвих пробілів).
     const I18N_DICT = {
+      // «Ще → Про застосунок»: прев'ю «Що таке Frequency» (54-intro.js)
+      'Що таке Frequency':'What is Frequency', 'коротка екскурсія: навіщо це і як допомагає рости':'a short tour: why it exists and how it helps you grow',
       // нижня навігація
       'Огляд':'Overview', 'Планер':'Planner', 'Гроші':'Money', 'Проєкти':'Projects', 'Ще':'More',
       // профіль / шторка налаштувань
@@ -27864,7 +27899,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <div class="mr-grp" data-sec="about">
           <div class="acc-row" data-acc-intro>
             ${ico('compass','violet')}
-            <div class="acc-rtext"><div class="acc-rtitle">Що таке Frequency</div><div class="acc-rsub">три картки: навіщо це і як допомагає рости</div></div>
+            <div class="acc-rtext"><div class="acc-rtitle">Що таке Frequency</div><div class="acc-rsub">коротка екскурсія: навіщо це і як допомагає рости</div></div>
             ${chev()}
           </div>
           <div class="acc-row" data-acc-ver style="cursor:default">
@@ -34945,19 +34980,40 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
          «порожньо» ≠ порожній акаунт — інакше приклад вискочив би людині з даними в хмарі.
      Фото — ліниво з starter-assets.js (src/web), лише коли набір справді потрібен. */
   const ST_KEY='flow_starter';
+  /* Дві мови (10.10.2026): тексти — парами uk/en, показується мова програми (flowLang, 01-base.js).
+     Не через словник I18N_DICT: назви папок і підписи мрій після «Зробити своїм» стають ДАНИМИ
+     людини, а словник дані не перекладає — англомовна людина мусить отримати «Health», не «Здоров'я».
+     Тексти — без родових форм («ти змінився» ✗): застосунок і для чоловіків, і для жінок. */
+  const stLang=()=>{ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } };
+  const stL=o=>o[stLang()]||o.uk;
+  const ST_T={
+    uk:{tag:'приклад', week:'цього тижня', jr:'Журнал героя', jrSub:'4 з 7 днів у русі', go:'✨ Зробити своїм', clean:'Почати з чистого аркуша',
+      pickH:'Обери, що з цього — твоє', close:'Закрити',
+      pickSub:'Позначене стане твоїм: мрії з фото лягнуть у Карту бажань, папки — на Огляд. Цифри прикладу не переносяться — твій відлік почнеться з нуля. Назви й фото потім можна змінити.',
+      wishes:'Мрії', folders:'Папки', done:'Готово', none:'Познач хоча б одне — або обери «Почати з чистого аркуша»',
+      busy:'Дані ще звіряються з хмарою — спробуй за хвилину', photos:'Фото ще вантажаться — спробуй за мить', ok:'✨ Готово — тепер це твоє',
+      days:['Пн','Вт','Ср','Чт','Пт','Сб','Нд']},
+    en:{tag:'example', week:'this week', jr:'Hero journal', jrSub:'4 of 7 days in motion', go:'✨ Make it mine', clean:'Start with a blank page',
+      pickH:'Pick what is yours', close:'Close',
+      pickSub:'What you tick becomes yours: dreams with photos go to your Wish map, folders to Overview. The example numbers stay behind — your count starts from zero. You can rename anything and change photos later.',
+      wishes:'Dreams', folders:'Folders', done:'Done', none:'Tick at least one — or choose “Start with a blank page”',
+      busy:'Your data is still syncing with the cloud — try again in a minute', photos:'Photos are still loading — try again in a moment', ok:'✨ Done — it’s yours now',
+      days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun']},
+  };
+  const stT=k=>ST_T[stLang()][k];
   const ST_WISHES=[
-    {a:'sea',    cap:'Зустріти світанок біля моря', size:'tall'},
-    {a:'run',    cap:'Пробігти 10 км у горах',       size:'tall'},
-    {a:'home',   cap:'Свій затишний дім',            size:'wide'},
-    {a:'study',  cap:'Опанувати нову професію',      size:'sq'},
-    {a:'travel', cap:'Подорож мрії',                 size:'sq'},
+    {a:'sea',    cap:{uk:'Зустріти світанок біля моря', en:'Watch a sunrise by the sea'},  size:'tall'},
+    {a:'run',    cap:{uk:'Пробігти 10 км у горах',       en:'Run 10 km in the mountains'}, size:'tall'},
+    {a:'home',   cap:{uk:'Свій затишний дім',            en:'A cozy home of my own'},      size:'wide'},
+    {a:'study',  cap:{uk:'Опанувати нову професію',      en:'Master a new profession'},    size:'sq'},
+    {a:'travel', cap:{uk:'Подорож мрії',                 en:'My dream trip'},              size:'sq'},
   ];
   // «Кар'єра», а не «Робота»: папка «Робота» вже є в кожному акаунті (вкладка «Проєкти»)
   const ST_FOLDERS=[
-    {a:'health', name:"Здоров'я", emoji:'❤️', c:'#34c77b', stat:'3 звички'},
-    {a:'money',  name:'Гроші',    emoji:'💰', c:'#f0b429', stat:'ціль 68%'},
-    {a:'learn',  name:'Навчання', emoji:'📚', c:'#5b8def', stat:'курс 40%'},
-    {a:'work',   name:"Кар'єра",  emoji:'💼', c:'#c77dff', stat:'5 задач'},
+    {a:'health', name:{uk:"Здоров'я", en:'Health'},   emoji:'❤️', c:'#34c77b', stat:{uk:'3 звички', en:'3 habits'}},
+    {a:'money',  name:{uk:'Гроші',    en:'Money'},    emoji:'💰', c:'#f0b429', stat:{uk:'ціль 68%', en:'goal 68%'}},
+    {a:'learn',  name:{uk:'Навчання', en:'Learning'}, emoji:'📚', c:'#5b8def', stat:{uk:'курс 40%', en:'course 40%'}},
+    {a:'work',   name:{uk:"Кар'єра",  en:'Career'},   emoji:'💼', c:'#c77dff', stat:{uk:'5 задач', en:'5 tasks'}},
   ];
   let stLoading=false, stBusy=false;
   function stOff(){ try{ return !!localStorage.getItem(ST_KEY); }catch(_){ return false; } }
@@ -34998,10 +35054,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const topBar=document.querySelector('#scr-home .top'); if(topBar) topBar.classList.add('top-photobleed');
     let h=card.querySelector('.st-hero');
     if(!h){ h=document.createElement('div'); h.className='st-hero'; card.prepend(h); }
-    const days=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+    const days=stT('days');
     h.innerHTML=`<div class="st-col">${ST_WISHES.map(w=>`<i class="st-ph st-${w.a}" ${stBg(w.a)}></i>`).join('')}</div>
-      <span class="st-tag">приклад</span>
-      <div class="st-hstat"><b>57<small>%</small></b><span>цього тижня · <b>4/7</b></span></div>
+      <span class="st-tag">${stT('tag')}</span>
+      <div class="st-hstat"><b>57<small>%</small></b><span>${stT('week')} · <b>4/7</b></span></div>
       <div class="st-week">${days.map((d,i)=>`<span class="${i<4?'on':''}"><em>${d}</em><i></i></span>`).join('')}</div>`;
     h.onclick=e=>{ e.stopPropagation(); stPick(); };
   }
@@ -35013,11 +35069,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     grid.innerHTML=`<div class="st-wrap">
       <div class="st-tiles">${ST_FOLDERS.map(f=>`<button class="st-tile" style="--c:${f.c}" data-stp>
         <i class="st-tbg" ${stBg(f.a)}></i><span class="st-veil"></span>
-        <span class="st-em">${f.emoji}</span><b>${esc(f.name)}</b><small>${esc(f.stat)}</small></button>`).join('')}</div>
-      <button class="st-jr" data-stp><span class="st-jr-ic">📖</span><span class="st-jr-t"><b>Журнал героя</b><small>4 з 7 днів у русі</small></span>
+        <span class="st-em">${f.emoji}</span><b>${esc(stL(f.name))}</b><small>${esc(stL(f.stat))}</small></button>`).join('')}</div>
+      <button class="st-jr" data-stp><span class="st-jr-ic">📖</span><span class="st-jr-t"><b>${stT('jr')}</b><small>${stT('jrSub')}</small></span>
         <svg viewBox="0 0 40 16" aria-hidden="true"><path d="M2 13l8-5 7 3 9-8 12 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button class="st-go" data-stp>✨ Зробити своїм</button>
-      <button class="st-clean" data-stclean>Почати з чистого аркуша</button>
+      <button class="st-go" data-stp>${stT('go')}</button>
+      <button class="st-clean" data-stclean>${stT('clean')}</button>
     </div>`;
     grid.querySelectorAll('[data-stp]').forEach(b=>b.onclick=stPick);
     grid.querySelector('[data-stclean]').onclick=()=>{
@@ -35033,22 +35089,24 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     try{ renderDashboard(); }catch(_){}
     try{ updateSummaryBg(); }catch(_){}
   }
+  // мову перемкнули, поки видно приклад — перемальовуємо його новою мовою
+  document.addEventListener('flowlangchange',()=>{ try{ if(starterActive()) stRefresh(); }catch(_){} });
 
   /* ── шторка «Обери, що з цього — твоє» ── */
   function stPick(){
     const row=(kind,i,img,title)=>`<label class="st-pick"><input type="checkbox" data-${kind}="${i}" checked>
       <i class="st-pth" ${stBg(img)}></i><span>${esc(title)}</span></label>`;
-    jnOverlay(`<div class="jn-ed-h"><b>Обери, що з цього — твоє</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <small class="dy-fm-sub">Позначене стане твоїм: мрії з фото лягнуть у Карту бажань, папки — на Огляд. Цифри прикладу не переносяться — твій відлік почнеться з нуля. Назви й фото потім можна змінити.</small>
-      <div class="st-pick-h">Мрії</div>${ST_WISHES.map((w,i)=>row('stw',i,w.a,w.cap)).join('')}
-      <div class="st-pick-h">Папки</div>${ST_FOLDERS.map((f,i)=>row('stf',i,f.a,f.emoji+' '+f.name)).join('')}
-      <div class="jn-ed-foot"><button class="jn-btn" data-stok>Готово</button></div>`, ov=>{
+    jnOverlay(`<div class="jn-ed-h"><b>${stT('pickH')}</b><button data-jnx aria-label="${stT('close')}">✕</button></div>
+      <small class="dy-fm-sub">${stT('pickSub')}</small>
+      <div class="st-pick-h">${stT('wishes')}</div>${ST_WISHES.map((w,i)=>row('stw',i,w.a,stL(w.cap))).join('')}
+      <div class="st-pick-h">${stT('folders')}</div>${ST_FOLDERS.map((f,i)=>row('stf',i,f.a,f.emoji+' '+stL(f.name))).join('')}
+      <div class="jn-ed-foot"><button class="jn-btn" data-stok>${stT('done')}</button></div>`, ov=>{
       ov.querySelector('[data-stok]').onclick=async()=>{
         const wi=[...ov.querySelectorAll('[data-stw]:checked')].map(x=>+x.dataset.stw);
         const fi=[...ov.querySelectorAll('[data-stf]:checked')].map(x=>+x.dataset.stf);
-        if(!wi.length&&!fi.length){ plToast('Познач хоча б одне — або обери «Почати з чистого аркуша»'); return; }
-        if(!stTrusted()){ plToast('Дані ще звіряються з хмарою — спробуй за хвилину'); return; }
-        if(!window.STARTER_A){ plToast('Фото ще вантажаться — спробуй за мить'); stLoad(); return; }
+        if(!wi.length&&!fi.length){ plToast(stT('none')); return; }
+        if(!stTrusted()){ plToast(stT('busy')); return; }
+        if(!window.STARTER_A){ plToast(stT('photos')); stLoad(); return; }
         if(stBusy) return;
         stBusy=true;
         try{ await stMakeOwn(wi,fi); ov.remove(); }
@@ -35069,11 +35127,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const nw=[], nf=[];
     for(const i of wi){
       const w=ST_WISHES[i], id='w'+t+'_'+i;
-      nw.push({id, img:await stPut('wi_'+id,w.a), cap:w.cap, size:w.size});
+      nw.push({id, img:await stPut('wi_'+id,w.a), cap:stL(w.cap), size:w.size});
     }
     for(const i of fi){
       const f=ST_FOLDERS[i], key='f_'+t+'_'+i;
-      nf.push({ key, c:f.c, emoji:f.emoji, icon:folderIconFor(f.emoji), name:f.name, pct:0,
+      nf.push({ key, c:f.c, emoji:f.emoji, icon:folderIconFor(f.emoji), name:stL(f.name), pct:0,
         photo:await stPut('ph_'+key,f.a), flayout:'a', pinned:false, custom:true, widgets:[] });
     }
     nw.forEach(w=>wishes.push(w));
@@ -35084,15 +35142,17 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(wi.length) saveWishes();
     try{ renderWishes(); }catch(_){}
     stRefresh();
-    plToast('✨ Готово — тепер це твоє');
+    plToast(stT('ok'));
   }
-  /* ════════ Прев'ю «Що таке Frequency» (54-intro.js, 10.10.2026) ════════
-     Три картки на весь екран перед «Стартовим набором» (53-starter.js): прев'ю каже, НАВІЩО
-     програма, набір показує, ЯК вона виглядає в житті. На кожній картці — «живий екран»,
-     зібраний з тих самих стилів і фото прикладу (starter-assets.js), а не скріншот.
-       • показ: акаунт порожній (starterActive — та сама перевірка, що в набору) і на цьому
-         пристрої прев'ю ще не бачили; позначка flow_intro — лише після «Почати»/«Пропустити»;
-       • у дані й хмару не пише нічого;
+  /* ════════ Прев'ю «Що таке Frequency» — «День із життя» (54-intro.js, 10.10.2026) ════════
+     П'ять карток перед «Стартовим набором» (53-starter.js), як один день: 7:00 ранковий ритуал →
+     8:00 Карта бажань → 9:00 план дня по годинах → 21:00 вечір і Журнал → неділя, видно ріст.
+     Прев'ю каже, НАВІЩО програма; набір показує, ЯК вона виглядає. На кожній картці — «живий
+     екран», зібраний з тих самих стилів і фото прикладу (starter-assets.js), а не скріншот,
+     і лише те, що програма справді вміє (ритуал, колаж, сітка годин, Журнал героя).
+       • дві мови — тексти парами uk/en (stL/stLang з 53-starter.js), без родових форм;
+       • показ: акаунт порожній (starterActive) і на цьому пристрої прев'ю ще не бачили; позначка
+         flow_intro — лише після «Почати»/«Пропустити»; у дані й хмару не пише нічого;
        • «Ще → Про застосунок → Що таке Frequency» відкриває ті самі картки будь-коли.
      Гортання — нативний горизонтальний скрол зі scroll-snap: свайп пальцем без бібліотек. */
   const IN_KEY='flow_intro';
@@ -35103,68 +35163,118 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function introMaybe(){
     if(inShownNow||inSeen()) return;
     inShownNow=true;
-    introOpen();
+    inOpen();
   }
+  const IN_T={
+    uk:{label:'Що таке Frequency', skip:'Пропустити', next:'Далі', start:'Почати', sunday:'Неділя',
+      s:[
+        {t:'Ранок задає тон', d:'Кілька простих кроків — і день починається з тебе, а не з телефона.'},
+        {t:'Мрії перед очима', d:'Карта бажань нагадує щодня, заради чого ти все це робиш.'},
+        {t:'Велика мета — маленькі кроки', d:'План дня по годинах, і кожен крок веде до мрії.'},
+        {t:'Вечір підбиває підсумок', d:'Кілька рядків у щоденнику — і видно, що сьогодні вдалося.'},
+        {t:'Бачиш свій ріст', d:'Кожен день лишає слід — і через місяць видно, як ти змінюєшся.'},
+      ],
+      rit:'Мій ранок', streak:'стрік 5 днів', steps:['Склянка води','Зарядка 10 хв','3 вдячності'], ritDone:'🔥 День зараховано',
+      wish:'Пробігти 10 км у горах', price:'Ціна мрії: менше сидіти в телефоні',
+      plan:[['7:00','Пробіжка 3 км','🎯 до мрії'],['10:00','Робота: проєкт',''],['13:00','Курс · урок 4',''],['19:00','Вечеря з рідними','']],
+      diary:'Щоденник', diaryAlt:'Пробіжка вранці, урок курсу, вечір з рідними.',
+      jr:'Журнал героя', jrSub:'сьогодні: 3 з 4 кроків',
+      week:'цього тижня', done:'Ціль досягнуто ✓', goal:'Зустріти світанок біля моря',
+      days:['Пн','Вт','Ср','Чт','Пт','Сб','Нд']},
+    en:{label:'What is Frequency', skip:'Skip', next:'Next', start:'Get started', sunday:'Sunday',
+      s:[
+        {t:'Morning sets the tone', d:'A few simple steps — and the day starts with you, not your phone.'},
+        {t:'Dreams in sight', d:'Your Wish map reminds you every day what it’s all for.'},
+        {t:'Big goal, small steps', d:'An hour-by-hour plan, where every step leads to a dream.'},
+        {t:'The evening sums it up', d:'A few lines in your diary — and you see what went well today.'},
+        {t:'See yourself grow', d:'Every day leaves a trace — and a month later you can see how you’re changing.'},
+      ],
+      rit:'My morning', streak:'5-day streak', steps:['Glass of water','10-min workout','3 things I’m grateful for'], ritDone:'🔥 Day counted',
+      wish:'Run 10 km in the mountains', price:'The price: less time on my phone',
+      plan:[['7:00','Run 3 km','🎯 to a dream'],['10:00','Work: project',''],['13:00','Course · lesson 4',''],['19:00','Dinner with family','']],
+      diary:'Diary', diaryAlt:'Morning run, a lesson of my course, an evening with family.',
+      jr:'Hero journal', jrSub:'today: 3 of 4 steps',
+      week:'this week', done:'Goal reached ✓', goal:'Watch a sunrise by the sea',
+      days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun']},
+  };
+  const inT=k=>IN_T[stLang()][k];
   const inPh=(a,cls)=>`<i class="in-ph ${cls||''}" ${stBg(a)}></i>`;
+  const inTime=['7:00','8:00','9:00','21:00',null];
   function inSlides(){
+    const S=inT('s');
+    // щоденник — нейтральний текст без «втомився/втомилась»: у прикладі нема статі
+    const diaryTxt=inT('diaryAlt');
     return [
-      { t:'Мрії, гроші й справи — в одному місці', d:'Не п\'ять застосунків, а одне твоє життя.',
-        v:`<div class="in-v1">
+      { v:`<div class="in-v-rit">
+            <div class="in-rit-h"><b>${esc(inT('rit'))}</b><span>🔥 ${esc(inT('streak'))}</span></div>
+            <div class="in-rit-cal">${inT('days').map((d,i)=>`<span class="${i<5?'ok':''}${i===4?' now':''}"><em>${esc(d)}</em><i></i></span>`).join('')}</div>
+            ${inT('steps').map((t,i)=>`<div class="in-rit-step${i<2?' ok':''}"><span class="in-chk">${i<2?'✓':''}</span><b>${esc(t)}</b></div>`).join('')}
+            <div class="in-rit-done">${esc(inT('ritDone'))}</div>
+          </div>` },
+      { v:`<div class="in-v1">
             <div class="in-col">${['sea','run','home','study','travel'].map(a=>inPh(a,'in-'+a)).join('')}</div>
-            <div class="in-tiles">${ST_FOLDERS.map(f=>`<span class="in-tile" style="--c:${f.c}">${inPh(f.a)}<b>${f.emoji} ${esc(f.name)}</b></span>`).join('')}</div>
+            <div class="in-wcap">${inPh('run','in-wthumb')}<span><b>${esc(inT('wish'))}</b><small>${esc(inT('price'))}</small></span></div>
           </div>` },
-      { t:'Від мрії до сьогодні', d:'Велика мета розкладається на маленькі кроки дня.',
-        v:`<div class="in-v2">
-            <div class="in-step in-wish">${inPh('run')}<span><small>Мрія</small><b>Пробігти 10 км у горах</b></span></div>
-            <i class="in-arr" aria-hidden="true"></i>
-            <div class="in-step"><span class="in-ic">🎯</span><span><small>Ціль року</small><b>10 км до серпня</b><em class="in-bar"><i style="width:35%"></i></em></span></div>
-            <i class="in-arr" aria-hidden="true"></i>
-            <div class="in-step in-today"><span class="in-ic">☀️</span><span><small>Сьогодні · 7:00</small><b>Пробіжка 3 км</b></span><span class="in-ok">✓</span></div>
+      { v:`<div class="in-v-plan">${inT('plan').map(([h,t,tag],i)=>`<div class="in-hr${i===0?' on':''}"><em>${h}</em>
+            <span class="in-blk"><b>${esc(t)}</b>${tag?`<small>${esc(tag)}</small>`:''}</span></div>`).join('')}</div>` },
+      { v:`<div class="in-v-eve">
+            <div class="in-diary"><small>📓 ${esc(inT('diary'))}</small><p>${esc(diaryTxt)}</p></div>
+            <div class="in-jr"><span class="in-ic">🛡️</span><span><b>${esc(inT('jr'))}</b><small>${esc(inT('jrSub'))}</small></span>
+              <em class="in-ring" style="--p:75"></em></div>
           </div>` },
-      { t:'Бачиш свій ріст', d:'Кожен день лишає слід — і через місяць видно, як ти змінився.',
-        v:`<div class="in-v3">
-            <div class="in-wk"><b>57<small>%</small></b><span>цього тижня · <b>4/7</b></span>
-              <div class="in-dots">${['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map((d,i)=>`<span class="${i<4?'on':''}"><em>${d}</em><i></i></span>`).join('')}</div></div>
-            <div class="in-done">${inPh('sea')}<span class="in-veil"></span><span class="in-done-t"><small>Ціль досягнуто ✓</small><b>Зустріти світанок біля моря</b></span></div>
+      { v:`<div class="in-v3">
+            <div class="in-wk"><b>57<small>%</small></b><span>${esc(inT('week'))} · <b>4/7</b></span>
+              <div class="in-dots">${inT('days').map((d,i)=>`<span class="${i<4?'on':''}"><em>${esc(d)}</em><i></i></span>`).join('')}</div></div>
+            <div class="in-done">${inPh('sea')}<span class="in-veil"></span><span class="in-done-t"><small>${esc(inT('done'))}</small><b>${esc(inT('goal'))}</b></span></div>
           </div>` },
-    ];
+    ].map((x,i)=>Object.assign(x,S[i],{time:inTime[i]||inT('sunday')}));
   }
-  function introOpen(){
+  function inOpen(at){
     const old=document.querySelector('.in-ov'); if(old) old.remove();
     // фото прикладу — той самий лінивий файл, що й у набору
     try{ stLoad(); }catch(_){}
     const S=inSlides();
     const ov=document.createElement('div');
-    ov.className='in-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','Що таке Frequency');
+    // data-i18n-skip: тексти вже потрібною мовою — словниковий перекладач (01-base.js) їх не чіпає
+    ov.className='in-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.setAttribute('aria-label',inT('label')); ov.setAttribute('data-i18n-skip','1');
     ov.innerHTML=`<div class="in-top"><div class="in-pg">${S.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>
-        <button class="in-skip" data-inskip>Пропустити</button></div>
+        <button class="in-skip" data-inskip>${esc(inT('skip'))}</button></div>
       <div class="in-track">${S.map((s,i)=>`<section class="in-slide" data-i="${i}">
           <div class="in-vis">${s.v}</div>
+          <span class="in-time">${esc(s.time)}</span>
           <h2>${esc(s.t)}</h2><p>${esc(s.d)}</p></section>`).join('')}</div>
-      <div class="in-foot"><button class="in-next" data-innext>Далі</button></div>`;
+      <div class="in-foot"><button class="in-next" data-innext>${esc(inT('next'))}</button></div>`;
     document.body.appendChild(ov);
     const track=ov.querySelector('.in-track'), next=ov.querySelector('[data-innext]');
     const cur=()=>Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
     const sync=()=>{
       const i=cur();
       ov.querySelectorAll('.in-pg i').forEach((d,k)=>d.classList.toggle('on',k===i));
-      next.textContent=i>=S.length-1?'Почати':'Далі';
+      next.textContent=i>=S.length-1?inT('start'):inT('next');
     };
     const close=()=>{ inMark(); ov.remove(); document.removeEventListener('keydown',onKey); };
     const onKey=e=>{ if(e.key==='Escape') close(); };
     track.addEventListener('scroll',()=>requestAnimationFrame(sync),{passive:true});
     next.onclick=()=>{ const i=cur(); if(i>=S.length-1) close(); else track.scrollTo({left:(i+1)*track.clientWidth,behavior:'smooth'}); };
     ov.querySelector('[data-inskip]').onclick=close;
+    ov.__inKey=onKey;
     document.addEventListener('keydown',onKey);
+    if(at){ track.scrollLeft=at*track.clientWidth; sync(); }
     try{ window.platform.haptic('light'); }catch(_){}
   }
-  // фото доїхали, поки картки відкриті — домальовуємо їх без перезапуску гортання
+  // фото доїхали або мову перемкнули, поки картки відкриті — малюємо заново на тій самій картці
   function introRefresh(){
     const ov=document.querySelector('.in-ov'); if(!ov) return;
-    const S=inSlides();
-    ov.querySelectorAll('.in-slide .in-vis').forEach((v,i)=>{ if(S[i]) v.innerHTML=S[i].v; });
+    const tr=ov.querySelector('.in-track');
+    const at=tr?Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth)):0;
+    if(ov.__inKey) document.removeEventListener('keydown',ov.__inKey);
+    inOpen(at);
   }
-  try{ window.introOpen=introOpen; }catch(_){}
+  document.addEventListener('flowlangchange',()=>{ try{ introRefresh(); }catch(_){} });
+  /* назовні — під іншим ім'ям: функції ядра верхнього рівня і так живуть на window, тож
+     window.introOpen=()=>introOpen() переписав би саму себе і викликав себе без кінця */
+  try{ window.introOpen=()=>inOpen(); }catch(_){}
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
