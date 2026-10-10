@@ -247,6 +247,9 @@
     folderTombs.ids[key]=Date.now(); folderTombs=tombsNorm(folderTombs); saveFolderTombs();
     folderPurge(key);
     saveFolders();
+    /* якщо видалили папку, чий документ зараз відкритий, — на Огляд; інакше документ
+       лишався на екрані, а дописане йшло в дошку-сироту і зникало (10.10.2026) */
+    try{ leaveTombedFolder([]); }catch(_){}
     return true;
   }
   /* Крок 1 після читання сховища (load у 27-canvas.js) — ДО застосування конфігу
@@ -337,7 +340,7 @@
     const walk=(arr)=>{ (arr||[]).forEach(b=>{
       if(!b) return;
       if(b.type==='check'&&Array.isArray(b.items)){ b.items.forEach(it=>{ if(it&&(it.text||'').trim()){ total++; if(it.done)done++; } }); }
-      if(b.type==='task'){ total++; if(b.done)done++; }
+      if(b.type==='task' && String(b.text||'').trim()){ total++; if(b.done)done++; }
       if(Array.isArray(b.sections)){ b.sections.forEach(s=>{ if(s&&s.type==='check'&&Array.isArray(s.items)) s.items.forEach(it=>{ if(it&&(it.text||'').trim()){ total++; if(it.done)done++; } }); }); }
       if(Array.isArray(b.children)) walk(b.children);
     }); };

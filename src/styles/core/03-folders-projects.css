@@ -685,9 +685,9 @@
   .pgb-row:disabled{opacity:.4;cursor:default;}
   .pgb-ic{width:30px;height:30px;border-radius:10px;background:var(--hair);display:grid;place-items:center;font-size:15px;flex:none;}
   .pgb-tx{display:flex;flex-direction:column;}
-  .pgb-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 6px 4px;}
+  .pgb-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 6px 4px;}
   .pgb-seg button{height:40px;border-radius:12px;border:1px solid var(--line);background:none;color:var(--text);
-    font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+    font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0 4px;}
   .pgb-seg button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);}
   .fgs-row.on{background:var(--hair);}
   /* меню папки (крок 3): щільніші рядки, щоб «Видалити» влазило без прокрутки на 375×812 */

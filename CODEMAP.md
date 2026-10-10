@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 86 |
-| Рядків JS | 33355 |
+| Рядків JS | 33422 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10481 |
-| Сутностей верхнього рівня | 2258 |
+| Сутностей верхнього рівня | 2263 |
 | Ключів сховища (FLOW_KEYS) | 78 |
 
 ## Файли JS
@@ -39,26 +39,26 @@
 | `src/scripts/core/01-base.js` | 410 | 39 |
 | `src/scripts/core/02-storage.js` | 2091 | 175 |
 | `src/scripts/core/03-platform.js` | 60 | 14 |
-| `src/scripts/core/04-folders-nav.js` | 425 | 58 |
+| `src/scripts/core/04-folders-nav.js` | 428 | 58 |
 | `src/scripts/core/05-spaces.js` | 759 | 64 |
 | `src/scripts/core/06-wishes.js` | 1468 | 112 |
 | `src/scripts/core/07-values.js` | 202 | 18 |
 | `src/scripts/core/08-finance.js` | 788 | 101 |
-| `src/scripts/core/09-goals.js` | 690 | 27 |
+| `src/scripts/core/09-goals.js` | 692 | 27 |
 | `src/scripts/core/10-planner.js` | 923 | 49 |
 | `src/scripts/core/11-ai-flow.js` | 258 | 26 |
 | `src/scripts/core/12-ai-agent.js` | 1832 | 94 |
 | `src/scripts/core/13-pets.js` | 227 | 13 |
 | `src/scripts/core/14-react.js` | 337 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 2067 | 97 |
-| `src/scripts/core/16-dashboard.js` | 1030 | 56 |
+| `src/scripts/core/16-dashboard.js` | 1052 | 56 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 195 | 18 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
 | `src/scripts/core/20-work.js` | 521 | 51 |
 | `src/scripts/core/21-patterns.js` | 191 | 21 |
 | `src/scripts/core/22-diary.js` | 531 | 54 |
-| `src/scripts/core/23-board.js` | 323 | 29 |
+| `src/scripts/core/23-board.js` | 332 | 29 |
 | `src/scripts/core/24-reminders.js` | 191 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
 | `src/scripts/core/26-blocks-render.js` | 1449 | 16 |
@@ -89,7 +89,7 @@
 | `src/scripts/core/51-money-reset.js` | 74 | 7 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 893 | 49 |
-| `src/scripts/page-editor/03-premium-pack.js` | 599 | 28 |
+| `src/scripts/page-editor/03-premium-pack.js` | 630 | 33 |
 | `src/scripts/page-editor/04-w-journal.js` | 107 | 9 |
 | `src/scripts/page-editor/05-w-decisions.js` | 112 | 4 |
 | `src/scripts/page-editor/06-w-project.js` | 100 | 6 |
@@ -547,33 +547,33 @@
 | `window.folderTombsReset` | функція | `src/scripts/core/04-folders-nav.js:185` |
 | `folderPurge` | функція | `src/scripts/core/04-folders-nav.js:196` |
 | `folderDelete` | функція | `src/scripts/core/04-folders-nav.js:243` |
-| `mergeFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:258` |
-| `applyFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:267` |
-| `leaveTombedFolder` | функція | `src/scripts/core/04-folders-nav.js:295` |
-| `folderWidgets` | обʼєкт | `src/scripts/core/04-folders-nav.js:314` |
-| `FWKEY` | значення | `src/scripts/core/04-folders-nav.js:315` |
-| `saveFolderWidgets` | функція | `src/scripts/core/04-folders-nav.js:316` |
-| `orderedFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:318` |
-| `FOLDER_ROLES` | обʼєкт | `src/scripts/core/04-folders-nav.js:324` |
-| `PROJECT_STATUSES` | масив | `src/scripts/core/04-folders-nav.js:329` |
-| `projStatusMeta` | функція | `src/scripts/core/04-folders-nav.js:333` |
-| `folderProgress` | функція | `src/scripts/core/04-folders-nav.js:335` |
-| `dueLabel` | функція | `src/scripts/core/04-folders-nav.js:347` |
-| `projFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:356` |
-| `folderNextStep` | функція | `src/scripts/core/04-folders-nav.js:358` |
-| `completeFolderNextStep` | функція | `src/scripts/core/04-folders-nav.js:369` |
-| `childFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:378` |
-| `topFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:381` |
-| `isDescendantFolder` | функція | `src/scripts/core/04-folders-nav.js:385` |
-| `moveFolderTo` | функція | `src/scripts/core/04-folders-nav.js:393` |
-| `goHome` | функція | `src/scripts/core/04-folders-nav.js:403` |
-| `goFolder` | функція | `src/scripts/core/04-folders-nav.js:404` |
-| `goDebts` | функція | `src/scripts/core/04-folders-nav.js:419` |
-| `goFinance` | функція | `src/scripts/core/04-folders-nav.js:420` |
-| `goEnvelopes` | функція | `src/scripts/core/04-folders-nav.js:421` |
-| `goSpend` | функція | `src/scripts/core/04-folders-nav.js:422` |
-| `workOrigin` | значення | `src/scripts/core/04-folders-nav.js:423` |
-| `goWork` | функція | `src/scripts/core/04-folders-nav.js:424` |
+| `mergeFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:261` |
+| `applyFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:270` |
+| `leaveTombedFolder` | функція | `src/scripts/core/04-folders-nav.js:298` |
+| `folderWidgets` | обʼєкт | `src/scripts/core/04-folders-nav.js:317` |
+| `FWKEY` | значення | `src/scripts/core/04-folders-nav.js:318` |
+| `saveFolderWidgets` | функція | `src/scripts/core/04-folders-nav.js:319` |
+| `orderedFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:321` |
+| `FOLDER_ROLES` | обʼєкт | `src/scripts/core/04-folders-nav.js:327` |
+| `PROJECT_STATUSES` | масив | `src/scripts/core/04-folders-nav.js:332` |
+| `projStatusMeta` | функція | `src/scripts/core/04-folders-nav.js:336` |
+| `folderProgress` | функція | `src/scripts/core/04-folders-nav.js:338` |
+| `dueLabel` | функція | `src/scripts/core/04-folders-nav.js:350` |
+| `projFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:359` |
+| `folderNextStep` | функція | `src/scripts/core/04-folders-nav.js:361` |
+| `completeFolderNextStep` | функція | `src/scripts/core/04-folders-nav.js:372` |
+| `childFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:381` |
+| `topFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:384` |
+| `isDescendantFolder` | функція | `src/scripts/core/04-folders-nav.js:388` |
+| `moveFolderTo` | функція | `src/scripts/core/04-folders-nav.js:396` |
+| `goHome` | функція | `src/scripts/core/04-folders-nav.js:406` |
+| `goFolder` | функція | `src/scripts/core/04-folders-nav.js:407` |
+| `goDebts` | функція | `src/scripts/core/04-folders-nav.js:422` |
+| `goFinance` | функція | `src/scripts/core/04-folders-nav.js:423` |
+| `goEnvelopes` | функція | `src/scripts/core/04-folders-nav.js:424` |
+| `goSpend` | функція | `src/scripts/core/04-folders-nav.js:425` |
+| `workOrigin` | значення | `src/scripts/core/04-folders-nav.js:426` |
+| `goWork` | функція | `src/scripts/core/04-folders-nav.js:427` |
 
 ### `src/scripts/core/05-spaces.js` — 64 сутностей
 
@@ -920,7 +920,7 @@
 | `dgSync` | функція | `src/scripts/core/09-goals.js:332` |
 | `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:353` |
 | `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:405` |
-| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:444` |
+| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:446` |
 
 ### `src/scripts/core/10-planner.js` — 49 сутностей
 
@@ -1292,48 +1292,48 @@
 | `R` | значення | `src/scripts/core/16-dashboard.js:44` |
 | `moveOrderItem` | функція | `src/scripts/core/16-dashboard.js:47` |
 | `enableFolderDrag` | функція | `src/scripts/core/16-dashboard.js:54` |
-| `FC3_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:169` |
-| `fc3Svg` | функція | `src/scripts/core/16-dashboard.js:173` |
-| `fc3Meta` | функція | `src/scripts/core/16-dashboard.js:175` |
-| `fc3Tile` | функція | `src/scripts/core/16-dashboard.js:183` |
-| `fc3GroupRow` | функція | `src/scripts/core/16-dashboard.js:216` |
-| `fc3Add` | функція | `src/scripts/core/16-dashboard.js:233` |
-| `renderFolderCovers` | функція | `src/scripts/core/16-dashboard.js:239` |
-| `renderDashboard` | функція | `src/scripts/core/16-dashboard.js:270` |
-| `inputModal` | функція | `src/scripts/core/16-dashboard.js:365` |
-| `createFolder` | функція | `src/scripts/core/16-dashboard.js:400` |
-| `groupKids` | функція | `src/scripts/core/16-dashboard.js:422` |
-| `fgIcon` | функція | `src/scripts/core/16-dashboard.js:425` |
-| `fgSub` | функція | `src/scripts/core/16-dashboard.js:428` |
-| `fgToast` | функція | `src/scripts/core/16-dashboard.js:435` |
-| `fgSheet` | функція | `src/scripts/core/16-dashboard.js:436` |
-| `openFolderGroup` | функція | `src/scripts/core/16-dashboard.js:448` |
-| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:475` |
-| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:492` |
-| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:532` |
-| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:539` |
-| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:583` |
-| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:585` |
-| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:590` |
-| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:604` |
-| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:611` |
-| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:630` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:669` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:689` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:716` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:788` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:803` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:804` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:805` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:806` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:863` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:880` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:899` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:906` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:939` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:955` |
-| `cycleFolderColor` | функція | `src/scripts/core/16-dashboard.js:994` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1000` |
+| `FC3_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:174` |
+| `fc3Svg` | функція | `src/scripts/core/16-dashboard.js:178` |
+| `fc3Meta` | функція | `src/scripts/core/16-dashboard.js:180` |
+| `fc3Tile` | функція | `src/scripts/core/16-dashboard.js:188` |
+| `fc3GroupRow` | функція | `src/scripts/core/16-dashboard.js:221` |
+| `fc3Add` | функція | `src/scripts/core/16-dashboard.js:238` |
+| `renderFolderCovers` | функція | `src/scripts/core/16-dashboard.js:244` |
+| `renderDashboard` | функція | `src/scripts/core/16-dashboard.js:275` |
+| `inputModal` | функція | `src/scripts/core/16-dashboard.js:370` |
+| `createFolder` | функція | `src/scripts/core/16-dashboard.js:405` |
+| `groupKids` | функція | `src/scripts/core/16-dashboard.js:427` |
+| `fgIcon` | функція | `src/scripts/core/16-dashboard.js:430` |
+| `fgSub` | функція | `src/scripts/core/16-dashboard.js:433` |
+| `fgToast` | функція | `src/scripts/core/16-dashboard.js:440` |
+| `fgSheet` | функція | `src/scripts/core/16-dashboard.js:441` |
+| `openFolderGroup` | функція | `src/scripts/core/16-dashboard.js:453` |
+| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:480` |
+| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:497` |
+| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:537` |
+| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:544` |
+| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:588` |
+| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:590` |
+| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:595` |
+| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:609` |
+| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:616` |
+| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:635` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:676` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:696` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:724` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:796` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:811` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:812` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:813` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:814` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:871` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:888` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:919` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:928` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:961` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:977` |
+| `cycleFolderColor` | функція | `src/scripts/core/16-dashboard.js:1016` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1022` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -1536,28 +1536,28 @@
 | `curBoard` | функція | `src/scripts/core/23-board.js:7` |
 | `blocks` | масив | `src/scripts/core/23-board.js:8` |
 | `syncBlocks` | функція | `src/scripts/core/23-board.js:9` |
-| `resortPinned` | функція | `src/scripts/core/23-board.js:50` |
-| `BLOCK_TYPES` | обʼєкт | `src/scripts/core/23-board.js:60` |
-| `ICONS` | обʼєкт | `src/scripts/core/23-board.js:113` |
-| `blockIcon` | функція | `src/scripts/core/23-board.js:150` |
-| `blockSearchText` | функція | `src/scripts/core/23-board.js:159` |
-| `collectBlocks` | функція | `src/scripts/core/23-board.js:175` |
-| `window.flowSearchBoards` | функція | `src/scripts/core/23-board.js:184` |
-| `window.flowOpenBlock` | функція | `src/scripts/core/23-board.js:201` |
-| `undoSnapshot` | значення | `src/scripts/core/23-board.js:220` |
-| `snapshotForUndo` | функція | `src/scripts/core/23-board.js:221` |
-| `flowUndoToast` | функція | `src/scripts/core/23-board.js:234` |
-| `window.flowUndoToast` | значення | `src/scripts/core/23-board.js:244` |
-| `hideUndo` | функція | `src/scripts/core/23-board.js:245` |
-| `doUndo` | функція | `src/scripts/core/23-board.js:246` |
-| `INBOX_TITLE` | значення | `src/scripts/core/23-board.js:267` |
-| `INBOX_FKEY` | значення | `src/scripts/core/23-board.js:268` |
-| `ensureInboxFolder` | функція | `src/scripts/core/23-board.js:269` |
-| `openQuickCapture` | функція | `src/scripts/core/23-board.js:282` |
-| `closeQuickCapture` | функція | `src/scripts/core/23-board.js:288` |
-| `saveQuickCapture` | функція | `src/scripts/core/23-board.js:289` |
-| `window.flowQuickCapture` | значення | `src/scripts/core/23-board.js:317` |
-| `window.flowOpenInbox` | функція | `src/scripts/core/23-board.js:319` |
+| `resortPinned` | функція | `src/scripts/core/23-board.js:59` |
+| `BLOCK_TYPES` | обʼєкт | `src/scripts/core/23-board.js:69` |
+| `ICONS` | обʼєкт | `src/scripts/core/23-board.js:122` |
+| `blockIcon` | функція | `src/scripts/core/23-board.js:159` |
+| `blockSearchText` | функція | `src/scripts/core/23-board.js:168` |
+| `collectBlocks` | функція | `src/scripts/core/23-board.js:184` |
+| `window.flowSearchBoards` | функція | `src/scripts/core/23-board.js:193` |
+| `window.flowOpenBlock` | функція | `src/scripts/core/23-board.js:210` |
+| `undoSnapshot` | значення | `src/scripts/core/23-board.js:229` |
+| `snapshotForUndo` | функція | `src/scripts/core/23-board.js:230` |
+| `flowUndoToast` | функція | `src/scripts/core/23-board.js:243` |
+| `window.flowUndoToast` | значення | `src/scripts/core/23-board.js:253` |
+| `hideUndo` | функція | `src/scripts/core/23-board.js:254` |
+| `doUndo` | функція | `src/scripts/core/23-board.js:255` |
+| `INBOX_TITLE` | значення | `src/scripts/core/23-board.js:276` |
+| `INBOX_FKEY` | значення | `src/scripts/core/23-board.js:277` |
+| `ensureInboxFolder` | функція | `src/scripts/core/23-board.js:278` |
+| `openQuickCapture` | функція | `src/scripts/core/23-board.js:291` |
+| `closeQuickCapture` | функція | `src/scripts/core/23-board.js:297` |
+| `saveQuickCapture` | функція | `src/scripts/core/23-board.js:298` |
+| `window.flowQuickCapture` | значення | `src/scripts/core/23-board.js:326` |
+| `window.flowOpenInbox` | функція | `src/scripts/core/23-board.js:328` |
 
 ### `src/scripts/core/24-reminders.js` — 16 сутностей
 
@@ -2523,7 +2523,7 @@
 | `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:779` |
 | `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:788` |
 
-### `src/scripts/page-editor/03-premium-pack.js` — 28 сутностей
+### `src/scripts/page-editor/03-premium-pack.js` — 33 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2533,28 +2533,33 @@
 | `positionSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:155` |
 | `pgMenuTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:180` |
 | `openSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:181` |
-| `closeSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:188` |
-| `applySlash` | функція | `src/scripts/page-editor/03-premium-pack.js:190` |
-| `drag` | значення | `src/scripts/page-editor/03-premium-pack.js:318` |
-| `dstart` | функція | `src/scripts/page-editor/03-premium-pack.js:321` |
-| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:331` |
-| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:340` |
-| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:341` |
-| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:342` |
-| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:343` |
-| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:365` |
-| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:377` |
-| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:456` |
-| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:457` |
-| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:491` |
-| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:537` |
-| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:538` |
-| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:541` |
-| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:559` |
-| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:569` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:578` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:579` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:584` |
+| `pgAddPending` | значення | `src/scripts/page-editor/03-premium-pack.js:190` |
+| `dropPendingAdd` | функція | `src/scripts/page-editor/03-premium-pack.js:191` |
+| `closeSlash` | функція | `src/scripts/page-editor/03-premium-pack.js:198` |
+| `applySlash` | функція | `src/scripts/page-editor/03-premium-pack.js:200` |
+| `drag` | значення | `src/scripts/page-editor/03-premium-pack.js:329` |
+| `dstart` | функція | `src/scripts/page-editor/03-premium-pack.js:332` |
+| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:342` |
+| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:351` |
+| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:352` |
+| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:353` |
+| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:354` |
+| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:376` |
+| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:388` |
+| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:467` |
+| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:468` |
+| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:502` |
+| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:548` |
+| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:549` |
+| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:552` |
+| `window.__pgThemeAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:563` |
+| `window.__pgThemeIsAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:564` |
+| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:578` |
+| `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:581` |
+| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:600` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:609` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:610` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:615` |
 
 ### `src/scripts/page-editor/04-w-journal.js` — 9 сутностей
 

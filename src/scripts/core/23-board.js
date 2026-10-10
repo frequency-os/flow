@@ -19,6 +19,15 @@
       folderList:function(){ try{ return orderedFolderKeys().filter(function(k){ try{ return folderVisible(k); }catch(_){ return true; } }).map(function(k){ return {key:k, name:(folders[k]&&folders[k].name)||k, emoji:(folders[k]&&folders[k].emoji)||'📁'}; }); }catch(_){ return []; } },
       folderProgress:function(k){ try{ return folderProgress(k); }catch(_){ return {done:0,total:0,pct:0}; } },
       folderName:function(k){ try{ var base=k?String(k):String(boardKey||'').split('__sp_')[0]; return (folders[base]&&folders[base].name)||''; }catch(_){ return ''; } },
+      /* заголовок документа = назва папки: змінили там — змінюємо й папку (дія людини, тож звичайний saveFolders) */
+      renameFolder:function(name){ try{
+        var base=String(boardKey||'').split('__sp_')[0], f=folders[base];
+        var nm=String(name||'').replace(/\s+/g,' ').trim().slice(0,80);
+        if(!f || !nm || f.name===nm) return false;
+        f.name=nm; saveFolders(); renderDashboard();
+        try{ if(window.pgBarSync) window.pgBarSync(); }catch(_){}
+        return true;
+      }catch(e){ console.error('renameFolder',e); return false; } },
       ptrackersFor:function(fkey){ /* усі проєкти (одиночні + у хабах), прив'язані до папки fkey */
         var res=[];
         try{ Object.keys(boards||{}).forEach(function(bk){

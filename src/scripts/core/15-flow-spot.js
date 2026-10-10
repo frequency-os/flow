@@ -1687,7 +1687,7 @@
     while(h<p.dayEnd-1 && busy(h)) h++;
     h=Math.min(h, Math.max(p.dayStart, p.dayEnd-1));
     list.push({ id:'b_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), h:h, endH:h+1,
-      t:st.name, done:false, tag:'', folder:gl.folder||'',
+      t:st.name, done:false, tag:'', folder:(gl.folderKey&&folders[gl.folderKey])?gl.folderKey:(gl.folder||''),
       link:{type:'goalstep', goalId:(gl.id||gl.name), goalName:gl.name, stepId:st.id} });
     saveGoals(); try{ window.platform.haptic('light'); }catch(_){}
     plToast('📅 «'+st.name+'» → сьогодні '+plHM(h));

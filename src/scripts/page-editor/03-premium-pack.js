@@ -185,9 +185,20 @@
     /* автофокус лише на десктопі: на iOS клавіатура зсуває viewport і тапи по fixed-меню промахуються */
     if(window.innerWidth>=760) setTimeout(function(){ssearch.focus();},60);
   }
-  function closeSlash(){slash.classList.remove('show');slash.classList.remove('anch');backdrop.classList.remove('show');slashCtx=null;}
+  /* «＋ Додати блок» спершу створює порожній рядок, а вже тоді відкриває меню. Закрили меню
+     без вибору — рядок лишався «Пишіть…» у кінці документа. Тепер прибираємо, якщо він порожній. */
+  var pgAddPending=null;
+  function dropPendingAdd(){
+    var id=pgAddPending; pgAddPending=null; if(!id) return;
+    var loc=locate(id); if(!loc) return;
+    var b=loc.block;
+    if(b.type!=='note' || String(b.text||'').trim() || (b.children&&b.children.length)) return;
+    loc.arr.splice(loc.idx,1); save(); render();
+  }
+  function closeSlash(){slash.classList.remove('show');slash.classList.remove('anch');backdrop.classList.remove('show');slashCtx=null;dropPendingAdd();}
   ssearch.addEventListener('input',function(){buildSlash(ssearch.value);});
   function applySlash(k){
+    pgAddPending=null;   /* вибір зроблено — рядок лишається, навіть якщо це «Текст» */
     try{ if(k&&k!=='note'){ pgLastSet(k); pgRecentAdd(k); } }catch(_){}
     if(!slashCtx){closeSlash();return;}
     var loc=locate(slashCtx);if(!loc){closeSlash();return;}
@@ -542,10 +553,18 @@
     var c=null; try{ c=localStorage.getItem(THKEY); }catch(_){}
     if(c==='ink'||c==='paper') return c;
     var dark=true;
-    try{ var t=document.documentElement.getAttribute('data-theme')||'dark';
-      dark = !(t==='light'||t==='desk-light'||t==='studio-light'); }catch(_){}
+    try{ var r=document.documentElement, t=r.getAttribute('data-theme')||'dark';
+      dark = !(r.classList.contains('t-light')||t==='light'||t==='desk-light'||t==='studio-light'); }catch(_){}
     return dark?'ink':'paper';
   }
+  /* «Як застосунок»: забуваємо ручний вибір — документ знову йде за темою застосунку.
+     Раніше перший тап «Темна/Світла» закріплював тему назавжди і лише на цьому пристрої,
+     звідси різний вигляд на телефоні й ноуті (10.10.2026). */
+  window.__pgThemeAuto=function(){ try{ localStorage.removeItem(THKEY); }catch(_){} applyTheme(pageThemeDefault(),false); };
+  window.__pgThemeIsAuto=function(){ var c=null; try{ c=localStorage.getItem(THKEY); }catch(_){} return !(c==='ink'||c==='paper'); };
+  /* змінили тему застосунку, поки відкритий документ без ручного вибору, — документ слідом */
+  try{ new MutationObserver(function(){ if(window.__pgThemeIsAuto()) applyTheme(pageThemeDefault(),false); })
+    .observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class']}); }catch(_){}
   document.getElementById('pgTheme').addEventListener('click',function(e){var b=e.target.closest('[data-pgtheme]');if(b)applyTheme(b.dataset.pgtheme,true);});
   document.getElementById('pgUndoBtn').onclick=function(){doUndo();};
   document.getElementById('pgShowHiddenBtn').onclick=function(){
@@ -557,7 +576,19 @@
 
   // ── назва сторінки → назва папки ──
   var pgTitle=document.getElementById('pgTitle');
-  pgTitle.addEventListener('input',function(){/* назва папки редагується в самому Flow; тут лише показ */});
+  /* назва в документі = назва папки: зберігаємо, коли людина закінчила (Enter або вийшла з поля).
+     Раніше поле редагувалось, але нічого не писалось — назва поверталась (10.10.2026). */
+  function pgTitleCommit(){
+    var b=bridge(); if(!b||!b.renameFolder) return;
+    var v=pgTitle.value.trim();
+    if(!v){ pgTitle.value=b.folderName()||''; return; }
+    b.renameFolder(v);
+  }
+  pgTitle.addEventListener('change',pgTitleCommit);
+  pgTitle.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){ e.preventDefault(); pgTitle.blur(); }
+    else if(e.key==='Escape'){ var b=bridge(); pgTitle.value=(b&&b.folderName())||pgTitle.value; pgTitle.blur(); }
+  });
 
   // ── back ──
   document.getElementById('pgBack').onclick=function(){
@@ -571,7 +602,7 @@
     if(!bridge())return;
     var nb={id:uid(),type:'note',text:''};
     pgResolve().arr.push(nb); save(); render();
-    slashCtx=nb.id; openSlash();
+    slashCtx=nb.id; openSlash(); pgAddPending=nb.id;
   };
 
   // ── віджет «Відлік»: живий циферблат ──

@@ -432,10 +432,12 @@
         onOk:(nm,emojiVal)=>{
           const used=order.length;
           const key='f_'+Date.now();
+          const em=(emojiVal!==undefined?emojiVal:'📁');
           folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
-            emoji:(emojiVal!==undefined?emojiVal:'📁'),
+            emoji:em, icon:folderIconFor(em),
             name:(nm||('Папка '+(used+1))), pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
           order.push(key); saveFolders();
+          try{ renderDashboard(); }catch(_){}
           onPick(key);
         }});
     };

@@ -92,7 +92,7 @@
     const keys=Object.keys(by).sort((a,b)=>(by[b].inc-by[b].out)-(by[a].inc-by[a].out));
     let h=keys.length?'':`<div class="dy-empty"><b>Ще нема грошей папок</b><span>Додай у папку-проєкт віджет «Доходи» чи «Витрати» (меню «/» → Гроші) — записи з нього будуть тут.</span></div>`;
     keys.forEach(k=>{ const a=by[k], f=folders[a.f]||{}, pr=a.inc-a.out;
-      h+=`<button class="wl-m" data-wlfd="${esc(a.f)}" style="--c:${safeColor(f.color,'#c48cff')}"><span class="wl-m-h"><span>${safeEmoji(f.emoji,'📁')}</span><b>${esc(f.name||'Папка')}${a.c?' · '+esc(curSym(a.c)):''}</b><span class="${pr>=0?'in':'out'}">${pr>=0?'+':'−'}${esc(money(Math.abs(pr),a.c))}</span></span>
+      h+=`<button class="wl-m" data-wlfd="${esc(a.f)}" style="--c:${safeColor(f.c,'#c48cff')}"><span class="wl-m-h"><span>${safeEmoji(f.emoji,'📁')}</span><b>${esc(f.name||'Папка')}${a.c?' · '+esc(curSym(a.c)):''}</b><span class="${pr>=0?'in':'out'}">${pr>=0?'+':'−'}${esc(money(Math.abs(pr),a.c))}</span></span>
         <span class="wl-m-d"><span>дохід <b>${esc(money(a.inc,a.c))}</b></span><span>витрати <b>${esc(money(a.out,a.c))}</b></span><span>${a.n} ${pluralUk(a.n,'запис','записи','записів')}</span></span></button>`; });
     return h;
   }

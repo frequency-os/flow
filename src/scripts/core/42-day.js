@@ -190,7 +190,7 @@
         const dur=(+el.dataset.min||45)/60, h=dyFreeSlot(ds,dur);
         if(h===null){ plToast('Нема вільних '+plDurLabel(0,dur)+' до кінця дня'); return; }
         const link={type:'habit', goalId:g.id, goalName:g.name||''};
-        plBlocksFor(ds).push({id:dyNewId(), h, endH:h+dur, t:g.name||'Місія', c:'val', link, tag:plLinkTag(link), folder:'', done:false});
+        plBlocksFor(ds).push({id:dyNewId(), h, endH:h+dur, t:g.name||'Місія', c:'val', link, tag:plLinkTag(link), folder:(g.folderKey&&folders[g.folderKey])?g.folderKey:'', done:false});
         saveGoals(); ov.remove(); plRerender();
         try{ window.platform.haptic('light'); }catch(_){}
         plToast('📅 «'+(g.name||'Місія')+'» о '+plHM(h));
