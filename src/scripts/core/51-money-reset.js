@@ -49,7 +49,7 @@
   // довіра: хмара реально відповіла (sbDataTrusted) і ключі прочитано — інакше стара локальна копія (офлайн) затерла б чужі правки
   function finResetReady(){
     if(window.sbDataTrusted&&!window.sbDataTrusted()) return false;
-    return !(window.storeKeyReady&&!['fin_ops',ENVKEY,'goals_data','work_cfg'].every(k=>window.storeKeyReady(k)));
+    return !(window.storeKeyReady&&!['fin_ops',ENVKEY,'goals_data','work_cfg','debts'].every(k=>window.storeKeyReady(k)));
   }
   // перед стиранням — свіжі дані з хмари в памʼять (з входом); гість — лише локальні дані, звіряти нема з чим
   async function finResetAll(){
@@ -67,6 +67,8 @@
     // призи місій: прив'язку до видаленої скарбнички знімаємо (сам приз і ціна лишаються)
     try{ (goalsData.goals||[]).forEach(g=>{ if(g&&g.reward&&typeof g.reward==='object') delete g.reward.envId; }); saveGoals(); }catch(_){}   // «отримано» — досягнення, лишається
     try{ wlCurSave([]); }catch(_){}
+    // борги: самі борги лишаються, а позначка «записано в Гаманець» знімається — операцій уже нема, можна провести знову
+    try{ let ch=false; (debtItems||[]).forEach(i=>{ if(i&&(i.synced||i.finOpId)){ i.synced=false; i.finOpId=null; ch=true; } }); if(ch) debtSave(); }catch(_){}
     // години Роботи (work_sessions) не переписуємо — лише налаштування з позначками зарплат (work_cfg)
     try{ const q=window.storage.set(WORKCFGKEY,JSON.stringify({rate:workRate,cur:workCur,payday:workPayday,postedSal:workPostedSal,cardId:workCardId}),false); if(q&&q.catch)q.catch(()=>{}); }catch(_){}
     try{ renderFinance(); }catch(_){} try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}

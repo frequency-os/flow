@@ -36,6 +36,7 @@
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
       <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="folders"${wlState.tab==='folders'?' class="on"':''}>Папки</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
     const plan=wlState.tab==='plan'&&typeof rlPlanHTML==='function';   // план місяця (47-rules.js)
+    if(wlState.tab==='overview') h+=wlStartHTML();   // порожній Гаманець — «З чого почнемо?» першим, над плитками
     if(wlState.tab==='overview'&&typeof wgWalletHTML==='function') h+=wgWalletHTML();   // плитки Місія · Конверти · Борги (48-widgets.js)
     h+=plan?rlPlanHTML(ym):wlState.tab==='missions'?wlMissionsHTML(ops):wlState.tab==='folders'?wlFoldersHTML(ops):wlOverviewHTML(ops,all,ym);
     body.innerHTML=h+'<div class="jn-pad"></div>';
@@ -120,6 +121,7 @@
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
     { const st=c.querySelector('[data-wlstarter]'); if(st) st.onclick=()=>wlEnvStarter(); }
+    wlStartBind(c);
     { const qa=c.querySelector('[data-wlqa]'); if(qa) qa.onclick=()=>qaGuide(); }
     { const ev=c.querySelector('[data-wlenv]'); if(ev) ev.onclick=()=>{ finView='envelopes'; renderFinance(); }; }
     { const d=c.querySelector('[data-wldebts]'); if(d) d.onclick=()=>{ try{ goDebts(); }catch(_){} }; }
@@ -399,5 +401,39 @@
         saveEnvelopes(); ov.remove(); renderFinance();
         plToast('🗂 Створено '+n+' '+pluralUk(n,'конверт','конверти','конвертів')+' — поповни їх із вільних чи правилом «Зарплата по конвертах»');
       };
+    });
+  }
+
+  /* ════ «З чого почнемо?» — порожній Гаманець (новий чи після «Почати фінанси з нуля», 10.10.2026) ════
+     Показується, лише коли записів у Гаманці нема зовсім і fin_ops справді прочитано з хмари.
+     Стартовий залишок — як у старті гри (id start_…): не дохід місяця, не блокує вибір головної валюти. */
+  // «порожньо» = нема конвертів і нема записів, крім самого стартового залишку (крок 1 картки)
+  function wlStartDone(){ return (finOps||[]).some(o=>o&&String(o.id||'').startsWith('start_')&&!o.cur); }
+  function wlIsEmpty(){ return !(envelopes||[]).length&&!(finOps||[]).some(o=>o&&!String(o.id||'').startsWith('start_')); }
+  function wlStartTrusted(){
+    if(typeof window.sbDataTrusted==='function'&&!window.sbDataTrusted()) return false;
+    return !(window.storeKeyReady&&!window.storeKeyReady('fin_ops'));
+  }
+  function wlStartHTML(){
+    if(!wlIsEmpty()) return '';
+    if(!wlStartTrusted()) return '';   // офлайн-копія «[]» ≠ справді порожній Гаманець (інший пристрій міг уже записати)
+    let wk=false; try{ wk=typeof wkMoneyInfo==='function'&&!!(wkMoneyInfo()||{}).has; }catch(_){}
+    return `<div class="wl-start"><b>З чого почнемо?</b><small>Три кроки — і Гаманець показує правду.</small>
+      ${wlStartDone()?`<div class="wl-start-ok">✓ Стартовий залишок записано</div>`:`<button data-wlstart="bal"><span>💰</span><span><b>Скільки зараз на рахунку?</b><small>стартовий залишок — не рахується як дохід</small></span><i>›</i></button>`}
+      <button data-wlstart="env"><span>🗂</span><span><b>Розклади по конвертах</b><small>Продукти, Кафе, Житло… — стандартні або свої</small></span><i>›</i></button>
+      <button data-wlstart="work"><span>⏱</span><span><b>Робота і зарплата</b><small>${wk?'години цього місяця вже є — зарплата зʼявиться в Плані':'календар годин — очікувана зарплата в Плані'}</small></span><i>›</i></button></div>`;
+  }
+  function wlStartBind(c){
+    c.querySelectorAll('[data-wlstart]').forEach(b=>b.onclick=()=>{
+      const k=b.dataset.wlstart;
+      if(k==='env') return wlEnvStarter();
+      if(k==='work') { try{ goWork(); }catch(_){} return; }
+      inputModal({title:'Скільки зараз на рахунку, '+curSym()+'?', placeholder:'Напр. 12000', onOk:v=>{
+        const a=Math.round(parseFloat(String(v||'').replace(',','.').replace(/[^\d.]/g,''))*100)/100; if(!(Number.isFinite(a)&&a>0&&a<1e9)){ plToast('Введи суму числом, напр. 12000'); return; }
+        if(!wlStartTrusted()){ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); return; }
+        if(wlStartDone()){ plToast('Стартовий залишок уже є'); return; }
+        let card; try{ ensureCards(); card=mainCard().id; }catch(_){}
+        finOps.push({id:'start_'+Date.now(), type:'in', amount:a, label:'Стартовий залишок', date:ymdLocal(), card});
+        saveFinOps(); renderFinance(); plToast('💰 Старт: '+money(a)); }});
     });
   }

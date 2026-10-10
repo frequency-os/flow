@@ -110,3 +110,10 @@
   .wl-fromlink{padding:9px 12px;border-radius:12px;font-size:13px;font-weight:700;line-height:1.4;color:var(--text);background:color-mix(in srgb,#f0b429 22%,var(--card));border:1px solid color-mix(in srgb,#f0b429 50%,var(--line));margin-bottom:8px;}
   /* .jn-f має display:flex — без цього [hidden] (місія / конверт для іншої валюти) не ховався */
   .jn-ed .jn-f[hidden]{display:none;}
+  /* «З чого почнемо?» — порожній Гаманець */
+  .wl-start{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:20px;margin-bottom:12px;background:linear-gradient(135deg,color-mix(in srgb,#7f8cff 16%,var(--card)),var(--card));border:1px solid var(--line);}
+  .wl-start>b{font-size:17px;font-weight:800;color:var(--text);} .wl-start>small{font-size:13px;color:var(--muted);margin-bottom:4px;}
+  .wl-start button{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);}
+  .wl-start button>span:first-child{font-size:22px;} .wl-start button>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:1px;}
+  .wl-start button b{font-size:14.5px;font-weight:800;color:var(--text);} .wl-start button small{font-size:12px;color:var(--muted);} .wl-start button i{font-style:normal;color:var(--muted);font-size:18px;}
+  .wl-start-ok{min-height:44px;display:flex;align-items:center;padding:0 12px;border-radius:14px;font-size:14px;font-weight:700;color:#34c77b;background:color-mix(in srgb,#34c77b 12%,transparent);}
