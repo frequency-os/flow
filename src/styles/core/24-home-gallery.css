@@ -207,3 +207,9 @@
 .fmc-sw{width:36px;height:36px;padding:0;border-radius:50%;cursor:pointer;
   border:4px solid var(--sheet,var(--card));background:var(--sw);box-shadow:0 0 0 1px var(--line);}
 .fmc-sw.on{box-shadow:0 0 0 2px var(--text);}
+/* Д1 (10.10.2026): кнопка біля вкладок однакова для Папок (⚙), Чатів і Сфер (＋) */
+#scr-home .sec-htabs .htab-add{border:0;background:var(--text);color:var(--bg);}
+#scr-home .sec-htabs .htab-add svg{width:19px;height:19px;}
+#scr-home .sec-htabs .htab-add:active{transform:scale(.94);}
+/* шапка шторки чату: великий емодзі замість водяного знака папки */
+.fmc-em{position:absolute;right:18px;top:14px;z-index:0;font-size:58px;line-height:1;opacity:.92;}

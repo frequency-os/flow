@@ -203,22 +203,11 @@
         const cl=ov.querySelector('[data-chcov="clear"]'); if(cl) cl.onclick=()=>{ api.clear(chBoardKey()); renderChCover(); close(); };
       });
   }
+  // «⋯» у шапці чату — та сама шторка налаштувань, що й у папки (36-chats.js openChatSettings),
+  // плюс «Медіа» як особливе для чату (10.10.2026)
   function chMoreSheet(){
     const c=chChat(); if(!c) return;
-    const media=chTopic==='media';
-    chSheet('',
-      `<button class="ch-sheet-row" data-chm="media"><span class="ic">${chI('image')}</span><span>${media?'Усі записи':'Медіа'}</span></button>
-       <button class="ch-sheet-row" data-chm="folders"><span class="ic">${chI('folder')}</span><span>Папки чату</span></button>
-       <button class="ch-sheet-row" data-chm="cover"><span class="ic">${chI('camera')}</span><span>Обкладинка</span></button>
-       <button class="ch-sheet-row" data-chm="rename"><span class="ic">${chI('edit')}</span><span>Перейменувати</span></button>
-       ${chKey!==INBOX_CHAT?`<button class="ch-sheet-row danger" data-chm="delete"><span class="ic">${chI('trash')}</span><span>Видалити чат</span></button>`:''}`,
-      (ov,close)=>{
-        ov.querySelector('[data-chm="media"]').onclick=()=>{ close(); chTopic=media?'all':'media'; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); };
-        ov.querySelector('[data-chm="folders"]').onclick=()=>{ close(); setTimeout(()=>chatAddSheet(chKey),200); };
-        ov.querySelector('[data-chm="cover"]').onclick=()=>{ close(); setTimeout(chCoverSheet,200); };
-        ov.querySelector('[data-chm="rename"]').onclick=()=>{ close(); setTimeout(()=>chatRename(chKey),200); };
-        const d=ov.querySelector('[data-chm="delete"]'); if(d) d.onclick=()=>{ close(); setTimeout(()=>chatDelete(chKey),200); };
-      });
+    openChatSettings(chKey,{inChat:true});
   }
 
   /* ── чипи: прикріплені папки чату (тап — документ папки, довгий тап — дії) ── */

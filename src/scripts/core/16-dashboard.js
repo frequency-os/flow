@@ -340,7 +340,7 @@
       inner+=`<div class="fc2-em"><span class="fc2-emj">${emojiShow}</span>`+
              `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></div>`;
       inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}</div>`;
-      inner+=`<button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування">⋮</button>`+
+      inner+=`<button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування" aria-label="Налаштування папки">⋯</button>`+
              `<button class="fdrag-handle" title="Перетягнути" aria-label="Перетягнути">⠿</button>`;
       el.innerHTML=inner;
       el.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
@@ -806,6 +806,8 @@
     photo:'<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 15.5l-4.2-4.2a1.5 1.5 0 0 0-2.1 0L7 19"/>',
     cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
     plus:'<path d="M12 5v14M5 12h14"/>',
+    folder:'<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>',
+    media:'<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
     proj:'<path d="M12 3.5c3 3 5 5.5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2.5-5 .3 1.6 1 2.5 2 3 0-3 .2-5 .5-7z"/>'
   };
   function fmIc(n){ return '<span class="pgb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(FM_IC[n]||'')+'</svg></span>'; }
@@ -816,7 +818,7 @@
     const kids=groupKids(key);
     const par=(f.parent&&folders[f.parent])?f.parent:'';
     const sub=kids.length ? ('група · '+kids.length+' '+pluralUk(kids.length,'папка','папки','папок'))
-            : par ? ('у групі «'+esc(folders[par].name)+'»') : 'папка';
+            : par ? ('у групі «'+esc(folders[par].name)+'»') : (f.sphere?'сфера в «Моєму світі»':'');
     const role=f.role||'area';
     let linked=0; try{ linked=(typeof window.chatsForFolder==='function')?window.chatsForFolder(key).length:0; }catch(_){}
     const dev=!!(window.upDevOn&&window.upDevOn());
@@ -828,30 +830,31 @@
       <div class="fmc${ph?' fmc-photo':''}" style="--c:${safeColor(f.c,'#6a7dff')}">
         ${ph?`<div class="fmc-bg" style="background-image:url('${esc(safeImg(window.photoSrc(f.photo)))}');${xf}"></div>`
             :`<svg class="ico fmc-wm" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}
-        <div class="fmc-t"><small>Обкладинка</small><b data-i18n-skip="1">${esc(f.name)}</b><span data-i18n-skip="1">${sub}</span></div>
+        <div class="fmc-t"><small>${f.sphere?'Сфера':'Папка'}</small><b data-i18n-skip="1">${esc(f.name)}</b>${sub?`<span data-i18n-skip="1">${sub}</span>`:''}</div>
       </div>
       <div class="fmc-acts">
-        <button type="button" class="fmc-btn fmc-main" data-act="photo">${fmIc('photo')}${ph?'Змінити фото':'Додати фото'}</button>
+        <button type="button" class="fmc-btn fmc-main" data-act="photo">${fmIc('photo')}${ph?'Змінити обкладинку':'Додати обкладинку'}</button>
         ${ph?`<button type="button" class="fmc-btn" data-act="cropphoto">Кадрувати</button><button type="button" class="fmc-btn fmc-del" data-act="rmphoto" aria-label="Прибрати фото">${fmIc('del')}</button>`:''}
       </div>
       <div class="fmc-colors"><span>Колір</span>${FOLDER_COLORS.map(c=>`<button type="button" class="fmc-sw${curC===c?' on':''}" data-fcolor="${c}" style="--sw:${c}" aria-label="Колір обкладинки" aria-pressed="${curC===c}"></button>`).join('')}</div>
+      <div class="fmi-label">Вигляд</div>
+      ${fmRow('rename','pen','Назва','<span data-i18n-skip="1">'+esc(f.name)+'</span>')}
+      ${fmRow('look','look','Значок','лінійна іконка чи емодзі')}
+      <div class="fmi-label">Порядок</div>
+      ${fmRow('pin','pin',f.pinned?'Відкріпити':'Закріпити зверху','')}
+      <div class="fmi-label">Звʼязки</div>
+      ${fmRow('chat','chat','Чати',linked?('повʼязано: '+linked):'не повʼязано')}
+      ${dev?fmRow('sphere','bld','Сфера · будівля в грі',f.sphere?'повʼязано · змінити чи прибрати':'не повʼязано'):''}
+      <div class="fmi-label">Особливе для ${f.sphere?'сфери':'папки'}</div>
+      ${fmRow('type','type','Тип · '+FM_TYPE[role],'звичайна, проєкт чи сторінка')}
       ${role==='project'?`
-      <div class="fmi-label">Статус проєкту</div>
       <div class="fstatus-pick">
         ${PROJECT_STATUSES.map(([s,n,c])=>`<button class="fst-opt ${(f.status||'active')===s?'on':''}" data-status="${s}" style="--stc:${c}">${n}</button>`).join('')}
       </div>
       ${fmRow('due','cal',f.due?('Дедлайн: '+esc(f.due)):'Встановити дедлайн','')}
       ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
-      <div class="fmi-label">Папка</div>
-      ${fmRow('rename','pen','Перейменувати','')}
-      ${fmRow('look','look','Значок','лінійна іконка чи емодзі')}
-      ${fmRow('type','type','Тип · '+FM_TYPE[role],'звичайна, проєкт чи сторінка')}
       ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
       ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
-      ${fmRow('pin','pin',f.pinned?'Відкріпити':'Закріпити зверху','')}
-      <div class="fmi-label">Звʼязки · за бажанням</div>
-      ${fmRow('chat','chat','Чат',linked?('повʼязано: '+linked):'не повʼязано')}
-      ${dev?fmRow('sphere','bld','Будівля в грі',f.sphere?'повʼязано · змінити чи прибрати':'не повʼязано'):''}
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));

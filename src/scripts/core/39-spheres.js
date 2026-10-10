@@ -111,15 +111,19 @@
     if(!keys.length) h+=`<div class="sph-empty"><b>Сфер ще нема</b><span>Сфера — це папка твого життя (робота, зал, доходи), яка в «Моєму світі» стає будівлею. Створи з шаблону або зроби сферою наявну папку через її меню.</span></div>`;
     keys.forEach(k=>{
       const f=folders[k], T=sphTpl(f), s=sphStats(k)||{line:'',pct:null,lv:1};
-      h+=`<button class="sph-row" data-sph="${esc(k)}" style="--sc:${T.c}">
-        <span class="sph-ic">${sphIcon(T.ic)}</span>
-        <span class="sph-body"><span class="sph-top"><b data-i18n-skip="1">${esc(f.name)}</b><span class="sph-lv">рів. ${s.lv}</span></span>
-          <small data-i18n-skip="1">${esc(s.line)}</small>
-          ${s.pct!=null?`<span class="sph-bar"><i style="width:${s.pct}%"></i></span>`:''}</span></button>`;
+      /* сфера — це папка: колір і значок беремо з папки (як на плитці й у меню), шаблон — лише підписом.
+         «⋯» відкриває ту саму шторку налаштувань, що й у папки (10.10.2026) */
+      h+=`<div class="sph-item"><button class="sph-row" data-sph="${esc(k)}" style="--sc:${safeColor(f.c,T.c)}">
+        <span class="sph-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>
+        <span class="sph-body"><span class="sph-top"><b data-i18n-skip="1">${f.pinned?'<span class="chl-pin" aria-label="закріплено">📌</span>':''}${esc(f.name)}</b><span class="sph-lv">рів. ${s.lv}</span></span>
+          <small data-i18n-skip="1">${esc(T.n)}${s.line?' · '+esc(s.line):''}</small>
+          ${s.pct!=null?`<span class="sph-bar"><i style="width:${s.pct}%"></i></span>`:''}</span></button>
+        <button class="sph-more" data-sphmore="${esc(k)}" aria-label="Налаштування сфери «${escAttr(f.name)}»" title="Налаштування">⋯</button></div>`;
     });
     h+=`<button class="sph-new" id="sphNewBtn"><span>＋</span>Нова сфера</button>`;
     host.innerHTML=h;
     host.querySelectorAll('[data-sph]').forEach(b=>b.onclick=()=>goFolder(b.dataset.sph));
+    host.querySelectorAll('[data-sphmore]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.sphmore); });
     const nb=document.getElementById('sphNewBtn'); if(nb) nb.onclick=()=>sphTemplateSheet(null);
   }
   // викликає chatsHomeSync (36-chats.js) при кожному малюванні Огляду
@@ -129,6 +133,9 @@
     if(btn) btn.hidden=!on;
     try{ const c=document.getElementById('sphCountBadge'); if(c) c.textContent=sphKeys().length; }catch(_){}
     if(list) list.hidden=!(on&&active);
+    // «＋» біля вкладок — та сама кругла кнопка, що ⚙ у папок і «＋» у чатів
+    const add=document.getElementById('sphAddBtn');
+    if(add){ add.hidden=!(on&&active); if(!add.__init){ add.__init=true; add.onclick=()=>sphTemplateSheet(null); } }
     if(on&&active) sphRenderList();
   }
 

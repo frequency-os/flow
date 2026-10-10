@@ -228,7 +228,9 @@
     // ⚙ «Вигляд папок» (16-dashboard.js) — лише на вкладці «Папки»
     const look=document.getElementById('folderLookBtn'); if(look) look.hidden=(on||sph);
     try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.length; }catch(_){}
-    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).length; }catch(_){}
+    // лічильник папок теж тут: коли відкрита вкладка «Чати» чи «Сфери», сітка папок не малюється
+    // і цифра лишалась застарілою (на старті — взагалі «5» з розмітки)
+    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).length; }catch(_){}
     if(on) renderChatList();
     return on||sph;
   }
@@ -264,12 +266,12 @@
     rows.forEach(({c,last})=>{
       const fl=chatFolders(c);
       const pill = fl.length ? `<span class="chl-pill" data-i18n-skip="1">${esc(fl[0].emoji||'📁')} ${esc(fl[0].name)}${fl.length>1?' +'+(fl.length-1):''}</span>` : '';
-      h+=`<button class="chl-row" data-chat="${esc(c.id)}" style="--cc:${safeColor(c.c,'var(--accent)')}">
+      h+=`<div class="chl-item"><button class="chl-row" data-chat="${esc(c.id)}" style="--cc:${safeColor(c.c,'var(--accent)')}">
         <span class="chl-av">${esc(c.emoji||'💬')}</span>
         <span class="chl-body">
-          <span class="chl-top"><b data-i18n-skip="1">${esc(c.name)}</b><small>${chatTimeLabel(last?last.at:0)}</small></span>
+          <span class="chl-top"><b data-i18n-skip="1">${c.pinned?'<span class="chl-pin" aria-label="закріплено">📌</span>':''}${esc(c.name)}</b><small>${chatTimeLabel(last?last.at:0)}</small></span>
           <span class="chl-sub">${pill}<span class="chl-prev" data-i18n-skip="1">${esc(chatPreview(last&&last.b))}</span></span>
-        </span></button>`;
+        </span></button><button class="chl-more" data-chmore="${esc(c.id)}" aria-label="Налаштування чату «${escAttr(c.name)}»" title="Налаштування">⋯</button></div>`;
     });
     h+=`<button class="chl-add" id="chatListAdd">${chI('plus')}<span>Новий чат</span></button>`;
     host.innerHTML=h;
@@ -277,23 +279,60 @@
       b.onclick=()=>{ if(chLongPressed){ chLongPressed=false; return; } goChat(b.dataset.chat,{from:'home'}); };
       chAttachLongPress(b,()=>chatMenu(b.dataset.chat));
     });
+    host.querySelectorAll('[data-chmore]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openChatSettings(b.dataset.chmore); });
     const add=host.querySelector('#chatListAdd'); if(add) add.onclick=()=>createChat();
     // котик-напарник плаває праворуч унизу: хай поступиться, якщо накрив рядок чи «Новий чат»
     try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
   }
-  // довгий тап по рядку чату на Огляді
-  function chatMenu(id){
-    const c=chatById(id); if(!c) return;
-    chSheet(esc(c.name),
-      `<button class="ch-sheet-row" data-cm="rename"><span class="ic">${chI('edit')}</span><span>Перейменувати</span></button>
-       <button class="ch-sheet-row" data-cm="folders"><span class="ic">${chI('folder')}</span><span>Папки чату${chatFolders(c).length?' · '+chatFolders(c).length:''}</span></button>
-       ${id!==INBOX_CHAT?`<button class="ch-sheet-row danger" data-cm="delete"><span class="ic">${chI('trash')}</span><span>Видалити чат</span></button>`:''}`,
-      (ov,close)=>{
-        ov.querySelector('[data-cm="rename"]').onclick=()=>{ close(); setTimeout(()=>chatRename(id),200); };
-        ov.querySelector('[data-cm="folders"]').onclick=()=>{ close(); setTimeout(()=>chatAddSheet(id),200); };
-        const d=ov.querySelector('[data-cm="delete"]'); if(d) d.onclick=()=>{ close(); setTimeout(()=>chatDelete(id),200); };
+  // довгий тап або «⋯» по рядку чату на Огляді
+  function chatMenu(id){ openChatSettings(id); }
+  /* ── налаштування чату — та сама шторка, що й у папки (16-dashboard.js openFolderMenu):
+     шапка-превʼю, обкладинка, колір, далі Вигляд → Порядок → Звʼязки → Особливе → Видалити.
+     Поля c і pinned у чату були й раніше, але змінити їх ніде не можна було (10.10.2026). */
+  function openChatSettings(id, o){
+    o=o||{}; const c=chatById(id); if(!c) return;
+    const inChat=!!o.inChat;
+    let cov=null; try{ const api=window.__pgCovers; cov=api?api.get(chatBk(id)):null; }catch(_){}
+    const ph=!!(cov&&cov.img);
+    const nf=chatFolders(c).length, nm=(c.members||[]).length;
+    const curC=String(c.c||'').toLowerCase();
+    const em=(c.emoji&&c.emoji.trim())?esc(c.emoji.trim()):esc((c.name||'?').trim().charAt(0).toUpperCase());
+    const sub=[nm>1?(nm+' '+pluralUk(nm,'учасник','учасники','учасників')):'лише ти', nf?(nf+' '+pluralUk(nf,'папка','папки','папок')):''].filter(Boolean).join(' · ');
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmc${ph?' fmc-photo':''}" style="--c:${safeColor(c.c,'#5b8def')}">
+        ${ph?`<div class="fmc-bg" style="background-image:url('${esc(safeImg(cov.img))}');background-position:50% ${cov.pos==null?50:(+cov.pos||0)}%;"></div>`
+            :`<span class="fmc-em" aria-hidden="true">${em}</span>`}
+        <div class="fmc-t"><small>Чат</small><b data-i18n-skip="1">${esc(c.name)}</b><span>${esc(sub)}</span></div>
+      </div>
+      <div class="fmc-acts"><button type="button" class="fmc-btn fmc-main" data-act="cover">${fmIc('photo')}${ph?'Змінити обкладинку':'Додати обкладинку'}</button></div>
+      <div class="fmc-colors"><span>Колір</span>${CHAT_PALETTE.map(x=>`<button type="button" class="fmc-sw${curC===x?' on':''}" data-ccolor="${x}" style="--sw:${x}" aria-label="Колір чату" aria-pressed="${curC===x}"></button>`).join('')}</div>
+      <div class="fmi-label">Вигляд</div>
+      ${fmRow('rename','pen','Назва і емодзі','<span data-i18n-skip="1">'+esc(c.name)+'</span>')}
+      <div class="fmi-label">Порядок</div>
+      ${fmRow('pin','pin',c.pinned?'Відкріпити':'Закріпити зверху','')}
+      <div class="fmi-label">Звʼязки</div>
+      ${fmRow('folders','folder','Папки',nf?('повʼязано: '+nf):'не повʼязано')}
+      ${inChat?`<div class="fmi-label">Особливе для чату</div>
+      ${fmRow('media','media',chTopic==='media'?'Усі записи':'Медіа',chTopic==='media'?'повернутись до стрічки':'лише фото й файли')}`:''}
+      ${id!==INBOX_CHAT?fmRow('delete','del','Видалити чат','','danger'):''}`,
+    m=>{
+      const later=(fn)=>{ closeFolderMenu(); setTimeout(fn,180); };
+      m.querySelectorAll('[data-ccolor]').forEach(b=>b.onclick=()=>{
+        c.c=b.dataset.ccolor; saveChats(); chatsRefresh(); openChatSettings(id,o);
+        try{ window.platform.haptic('select'); }catch(_){}
       });
+      m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
+        const a=b.dataset.act;
+        if(a==='cover'){ if(inChat) later(chCoverSheet); else { closeFolderMenu(); goChat(id,{from:'home'}); setTimeout(chCoverSheet,350); } }
+        if(a==='rename') later(()=>chatRename(id));
+        if(a==='pin'){ c.pinned=!c.pinned; saveChats(); chatsRefresh(); closeFolderMenu(); }
+        if(a==='folders') later(()=>chatAddSheet(id));
+        if(a==='media'){ closeFolderMenu(); chTopic=chTopic==='media'?'all':'media'; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); }
+        if(a==='delete') later(()=>chatDelete(id));
+      });
+    });
   }
+  window.openChatSettings=openChatSettings;
 
   /* ── документ папки: «+» у шапці і блок «Чати папки» під назвою ── */
   function pgFolderKey(){ try{ const base=String(boardKey||'').split('__sp_')[0]; return folders[base]?base:''; }catch(_){ return ''; } }
