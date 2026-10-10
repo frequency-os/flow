@@ -490,8 +490,9 @@
     border:1px solid rgba(255,255,255,.18);border-radius:24px;
     box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 22px 54px -18px rgba(0,0,0,.6);
     transform:translateY(calc(100% + 40px));transition:transform .28s cubic-bezier(.22,1,.34,1),opacity .2s;
-    opacity:0;}
-  .pg-slash.show,.pg-bmenu.show{opacity:1;}
+    opacity:0;pointer-events:none;}
+  /* схована панель не ловить тапи (як на широкому екрані): навіть якщо лишиться над нижньою панеллю */
+  .pg-slash.show,.pg-bmenu.show{opacity:1;pointer-events:auto;}
   .pg-slash.show,.pg-bmenu.show{transform:translateY(0);}
   .pg-slash{max-height:52vh;display:flex;flex-direction:column;overflow:hidden;}
   /* якірний режим (всі екрани): поплавок прямо під блоком, який додаєш */

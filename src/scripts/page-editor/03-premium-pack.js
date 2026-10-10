@@ -151,10 +151,15 @@
     },1000,{now:true});
   }
 
-  /* якір: ставимо меню одразу ПІД блоком, який додаємо (всі екрани) */
-  function positionSlash(){
+  /* зняти якір. Кличемо і при закритті: інакше inline top/left лишались, схована
+     панель (z-index 230) лягала поверх нижньої панелі (200) і глушила її тапи */
+  function unanchorSlash(){
     slash.classList.remove('anch');
     slash.style.left='';slash.style.top='';slash.style.width='';slash.style.maxHeight='';
+  }
+  /* якір: ставимо меню одразу ПІД блоком, який додаємо (всі екрани) */
+  function positionSlash(){
+    unanchorSlash();
     if(!slashCtx)return;
     var row=null;
     try{row=editor.querySelector('.pgb[data-id="'+String(slashCtx).replace(/"/g,'\\"')+'"]');}catch(_){}
@@ -195,7 +200,7 @@
     if(b.type!=='note' || String(b.text||'').trim() || (b.children&&b.children.length)) return;
     loc.arr.splice(loc.idx,1); save(); render();
   }
-  function closeSlash(){slash.classList.remove('show');slash.classList.remove('anch');backdrop.classList.remove('show');slashCtx=null;dropPendingAdd();}
+  function closeSlash(){slash.classList.remove('show');unanchorSlash();backdrop.classList.remove('show');slashCtx=null;dropPendingAdd();}
   ssearch.addEventListener('input',function(){buildSlash(ssearch.value);});
   function applySlash(k){
     pgAddPending=null;   /* вибір зроблено — рядок лишається, навіть якщо це «Текст» */
@@ -466,6 +471,9 @@
   // ── block menu ──
   var bmenu=document.getElementById('pgBmenu'),bmId=null;
   function openBmenu(id){bmId=id;pgMenuTheme(bmenu);bmenu.classList.add('show');backdrop.classList.add('show');}
+  /* «⋮» на живих тайлах у документі (bindTiles, 26-blocks-render.js) відкриває це ж меню.
+     false — такого блока на сторінці нема, тайл лишається зі своєю старою поведінкою */
+  try{ window.__pgBlockMenu=function(id){ if(!locate(id))return false; openBmenu(id); return true; }; }catch(_){}
   /* ── довге натискання на блок → меню (видалити / закріпити / дублювати) ── */
   (function(){
     var lp=null;
