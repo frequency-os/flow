@@ -1,7 +1,6 @@
   /* ============ ПРОСТОРИ · ПРОЄКТИ · САЙДБАР · ТЕМИ ============
-     Колишній 05-agency.js: Агенцію (Захист.SK) і Vault вирізано 04.09.2026,
-     лишилось усе, що не було агенцією — простори, екран «Проєкти», профіль
-     сайдбара, бекап, десктопні панелі, стилі карток і теми. */
+     Простори, екран «Проєкти», профіль сайдбара, бекап, десктопні панелі,
+     стилі карток і теми. */
   /* ============ ДОДАТКОВІ ПРОСТОРИ (листки) ============ */
   // Простори існують у КОНТЕКСТІ: загальний Простір (ctx='__root__') або всередині папки (ctx=folderKey).
   // Кожен простір контексту має свій boardKey: головний = baseKey, додаткові = baseKey+'__sp_'+id.
@@ -35,9 +34,7 @@
     return spacesMap[ctx];
   }
   function activeSpaceFor(ctx){ const a=activeSpaceMap[ctx]; const list=spacesFor(ctx); return list.some(s=>s.id===a)?a:'main'; }
-  function spaceByIdIn(ctx,id){ return spacesFor(ctx).find(s=>s.id===id)||spacesFor(ctx)[0]; }
   function keyForSpaceIn(ctx,id){ const base=ctxBaseKey(ctx); return id==='main'?base:(base+'__sp_'+id); }
-  function spaceCountIn(ctx,id){ const arr=boards[keyForSpaceIn(ctx,id)]; return Array.isArray(arr)?arr.length:0; }
 
   // перемкнути простір у поточному контексті (теми папки; Простору більше нема)
   function switchSpace(id){
@@ -250,8 +247,8 @@
     const um=(window.uiMode==='lite')?'lite':'pro';
     const petOn=!(typeof window.petHidden==='function' && window.petHidden());
     /* AI-проксі — для розробника: адреса за замовчуванням уже вшита (09-goals.js).
-       Показуємо лише власнику в dev-режимі (aiProxyUiOn; ai_dev вмикає будь-хто довгим
-       натиском) або коли людина колись поставила свою адресу — щоб могла її повернути. */
+       Показуємо лише власнику (aiProxyUiOn → upDevOn: акаунт розробника чи flow_dev=1,
+       лише веб) або коли людина колись поставила свою адресу — щоб могла її повернути. */
     let epCustom=false;
     try{ epCustom = typeof aiEndpoint==='function' && typeof AI_EP_DEFAULT!=='undefined' && aiEndpoint()!==AI_EP_DEFAULT; }catch(_){}
     const showProxy=!window.FLOW_NATIVE && ((typeof aiProxyUiOn==='function'&&aiProxyUiOn()) || epCustom);
@@ -542,12 +539,6 @@
     document.querySelectorAll('[data-cardskin]').forEach(b=>b.classList.toggle('on', b.dataset.cardskin===cardSkin));
   }
   prefCatchup('flowcardskin', v=>{ if(v==='classic'||v==='glass'||v==='bento'){ cardSkin=v; applyCardSkin(); } });
-  function setCardSkin(v){
-    cardSkin=v;
-    try{ prefSet('flowcardskin', v); }catch(_){}
-    applyCardSkin();
-    window.platform.haptic('select');
-  }
   try{ applyCardSkin(); }catch(_){}
   try{ applyProTheme(); }catch(_){}
 

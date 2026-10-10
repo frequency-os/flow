@@ -109,7 +109,6 @@
   let homeGlass=false;
   try{ if(Array.isArray(window.FLOW_KEYS)&&window.FLOW_KEYS.indexOf(HOMEGLASS_KEY)<0) window.FLOW_KEYS.push(HOMEGLASS_KEY); }catch(_){}
   async function loadHomeGlass(){ try{ const r=await window.storage.get(HOMEGLASS_KEY,false); homeGlass = !!(r && r.value==='1'); }catch(_){} }
-  function saveHomeGlass(){ try{ const p=window.storage.set(HOMEGLASS_KEY, homeGlass?'1':'0', false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
   function applyHomeGlass(){ try{ document.documentElement.classList.toggle('home-glass', !!homeGlass); }catch(_){} }
 
   // ── Ціна мрії: одноразова обіцянка (завжди видна вгорі Карти бажань, редагується будь-коли) ──
@@ -615,7 +614,6 @@
     setTimeout(()=>{ try{ const el=document.getElementById('ritInline');
       if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(_){}} ,180);
   }catch(e){ console.error('goRitual',e); } }
-  { const b=document.getElementById('ritBack'); if(b) b.onclick=()=>{ ritStopAll(); try{ renderWishes(); }catch(_){} show('scr-wishes'); }; }
 
   // ── вранці ритуал уже відкритий: без тапів по «Відкрити» ──
   try{
@@ -1293,7 +1291,6 @@
   }
 
   // ── FD26T · Тема «Вітрина»: фокус-колода з датами, відліком і ритуалом ──
-  let wdkShow=null;
   function wishDateInfo(t){
     // вільний текст targetDate → дата: «2029», «січ 2027», «літо 2027», «09.2026», «2026-09»
     try{

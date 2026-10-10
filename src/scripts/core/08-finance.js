@@ -138,7 +138,6 @@
       items:Object.keys(CUR_LIST).map(k=>({ic:k===cur?'target':'refresh', label:CUR_LIST[k].s+'  '+CUR_LIST[k].n+(k===cur?' · зараз':''), onClick:()=>{ if(k!==cur) setMainCur(k); if(after) after(k); }}))});
   }
   try{ prefCatchup('main_cur', v=>{ if(CUR_LIST[v]){ try{ renderFinance(); }catch(_){} try{ renderDashboard(); }catch(_){} } }); }catch(_){}
-  function _projCardId(){ return WALLET_ID; }
 
   /* ==== Чужа валюта → головна валюта Гаманця ====
      Гаманець веде головну валюту (mainCur), а проєкт, зміна на Роботі чи борг можуть бути
@@ -350,7 +349,6 @@
   /* ============ МОЯ ФІНАНСОВА ГРАМОТНІСТЬ ============ */
 
 
-  let finTab='overview'; // legacy (kept for compatibility)
   let finView='dash'; // 'dash' | 'envelopes'
   function finBalance(){ return finOps.reduce((s,o)=>s+(!opMain(o)?0:o.type==='in'?o.amount:(o.envSpend?0:-o.amount)),0); }
 

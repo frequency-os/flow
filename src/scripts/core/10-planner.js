@@ -750,9 +750,6 @@
 
   // денне зведення: що день дав екосистемі (з завершених блоків)
   /* ═══ Fusion: «Зараз»-картка · швидкий ввід · перекат · стрік ═══ */
-  let plNowIv=null;
-  function plFmtHMS(sec){ sec=Math.max(0,Math.round(sec)); const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
-    return (h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
   function plNowInfo(){
     const p=plData(); const td=plTodayStr();
     if((p.selDate||td)!==td) return {cur:null,next:null,nowDec:0};
@@ -761,46 +758,6 @@
     const cur=blocks.find(b=>!b.done && nowDec>=b.h && nowDec<plBlockEnd(b))||null;
     const next=blocks.find(b=>!b.done && b.h>nowDec)||null;
     return {cur,next,nowDec};
-  }
-  function plNowCardHTML(){
-    const {cur,next,nowDec}=plNowInfo();
-    if(cur){
-      const end=plBlockEnd(cur); const total=Math.max(1,(end-cur.h)*3600); const left=Math.max(0,(end-nowDec)*3600);
-      const pct=Math.min(100,Math.round((1-left/total)*100));
-      const cc=plGoalColorFor(cur);
-      const tmrBtn=cur.fromRecur?'':`<button class="pl-nowtmr" data-plnowtmr="${cur.id}">→ Завтра</button>`;
-      return `<div class="pl-nowcard" style="border-color:${cc}66">
-        <div class="nc-eyebrow" style="color:${cc}">● Зараз</div>
-        <h3>${esc(cur.t)}</h3>
-        <div class="nc-rng">${plHM(cur.h)}–${plHM(Math.min(end,24))}${cur.tag?' · #'+esc(cur.tag):''}${cur.link&&cur.link.goalName?' · 🎯 '+esc(cur.link.goalName):''}</div>
-        <div class="pl-nowtimer"><b id="plNowLeft">${plFmtHMS(left)}</b><span>лишилось</span></div>
-        <div class="pl-nowbar"><i id="plNowBar" style="width:${pct}%;background:${cc}"></i></div>
-        <div class="pl-nowacts"><button class="pl-nowdone" data-plnowdone="${cur.id}">✓ Виконано</button>${tmrBtn}</div>
-      </div>`;
-    }
-    if(next) return `<div class="pl-nownext">⏭ Далі о <b>${plHM(next.h)}</b> · <b>${esc(next.t)}</b></div>`;
-    return '';
-  }
-  function plNowTick(){
-    if(plNowIv){ clearInterval(plNowIv); plNowIv=null; }
-    if(!document.getElementById('plNowLeft')) return;
-    plNowIv=setInterval(()=>{
-      const el=document.getElementById('plNowLeft');
-      if(!el){ clearInterval(plNowIv); plNowIv=null; return; }
-      const {cur,nowDec}=plNowInfo();
-      if(!cur){ clearInterval(plNowIv); plNowIv=null; plRerender(); return; }
-      const end=plBlockEnd(cur); const total=Math.max(1,(end-cur.h)*3600); const left=Math.max(0,(end-nowDec)*3600);
-      el.textContent=plFmtHMS(left);
-      const bar=document.getElementById('plNowBar'); if(bar) bar.style.width=Math.min(100,Math.round((1-left/total)*100))+'%';
-    },1000);
-  }
-  function plNowLineHTML(){ const n=new Date();
-    return `<div class="pl-nowline"><em>${('0'+n.getHours()).slice(-2)}:${('0'+n.getMinutes()).slice(-2)}</em></div>`; }
-  function plQuickAddHTML(){
-    const p=plData(); const ds=p.selDate||plTodayStr();
-    let hasBlocks=false; try{ hasBlocks=(plBlocksFor(ds)||[]).length>0; }catch(_){}
-    const hint=hasBlocks?'':`<div class="pl-qhint">Пиши природно з часом — блок сам стане на місце. Без часу — на першу вільну годину.</div>`;
-    return `<div class="pl-qadd" style="margin-top:12px"><input id="plQaIn" placeholder="Спорт 18-19 · Англ 20:00 45хв" enterkeyhint="done"><button data-plqago>＋</button></div>${hint}`;
   }
   function plParseQuick(text){
     let t=String(text||'').trim(); if(!t) return null;

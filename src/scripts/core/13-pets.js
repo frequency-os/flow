@@ -116,23 +116,6 @@
     ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
     ov.querySelector('[data-petclose]').onclick=()=>ov.remove();
     { const hw=ov.querySelector('#heroWardBtn'); if(hw) hw.onclick=()=>{ ov.remove(); heroWardrobe(petCur()); }; }
-    /* @dev-only:start */
-    // прихований вхід у dev: 5 швидких тапів по заголовку «Твій напарник» —
-    // лише власнику у веб-версії (aiDevOwner, 12-ai-agent.js); на iPhone жесту нема (APP-5)
-    (function(){
-      if(!aiDevOwner()) return;
-      const t=ov.querySelector('h3'); if(!t) return;
-      let n=0, t0=0;
-      t.style.cssText+=';-webkit-user-select:none;user-select:none;cursor:pointer';
-      t.onclick=()=>{
-        const now=Date.now();
-        if(now-t0>2500){ n=0; }
-        t0=now; n++;
-        if(n===3){ try{ window.platform.haptic('light'); }catch(_){} }
-        if(n>=5){ n=0; ov.remove(); aiDevToggleSheet(); }
-      };
-    })();
-    /* @dev-only:end */
     // ── налаштування ефектів ──
     function fxSync(){
       const m=frMode();

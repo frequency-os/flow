@@ -48,6 +48,10 @@
 
     /* dev-ворота: бачить лише власник акаунта або пристрій із flow_dev=1 */
     function upDevOn(){
+      /* Збірка під App Store (build.py --ios) замінює тіло на «return false;»:
+         dev-екрани (Апгрейд, Місто дня, Сфери, Мій світ) там не відкриваються ніколи.
+         Перевірка — tools/check-ios.sh. */
+      /* @dev-only:start replace="return false;" */
       try{ if(localStorage.getItem('flow_dev')==='1') return true; }catch(_){}
       try{
         const u=window.sbUser&&window.sbUser(); const em=u?String(u.email||'').toLowerCase():'';
@@ -60,6 +64,7 @@
           if(upDevProbe.ok){ try{ if(typeof window.renderMore==='function') window.renderMore(); }catch(_){} } } }).catch(()=>{});
       }catch(_){}
       return false;
+      /* @dev-only:end */
     }
     async function upSha256(s){
       const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
@@ -282,6 +287,8 @@
     }
 
     function goUpgrade(){
+      // dev-екран: без воріт (і завжди в збірці під App Store) — повертаємо на «Ще»
+      if(!upDevOn()){ try{ if(window.goMore) window.goMore(); }catch(_){} return; }
       (async()=>{
         try{
           await upLoad(); renderUpgrade();

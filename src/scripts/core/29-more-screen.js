@@ -90,6 +90,7 @@
       // без мережі не переходимо: воркер її не кешує, а в застосунку з екрана «Додому» на iPhone
       // зі сторінки «немає інтернету» нема кнопки «назад» — вийти можна лише закривши застосунок
       if(key==='misto'){
+        if(!(window.upDevOn&&window.upDevOn())) return;   // dev-гра: лише за воротами upDevOn
         if(navigator.onLine===false){ if(typeof flowAlert==='function') flowAlert('Гра відкривається лише з інтернетом. Спробуй, коли зʼявиться мережа.','Немає мережі'); return; }
         location.href='misto.html'; return;
       }

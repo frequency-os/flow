@@ -171,12 +171,6 @@
       <span class="jn-fc-b"><small>${gl?esc(gl.name||'Місія')+' · ':''}${jnHm(b.h)}</small><b>${esc(b.t||'Справа')}</b>
         <button class="jn-fc-btn" data-jndone="${esc(b.id)}">Зроблено</button></span></div>`;
   }
-  function jnTaskRow(b){
-    const gl=jnGoalById(jnBlockGoal(b)), c=gl?safeColor(gl.color,'#3ec7b4'):'var(--accent)';
-    return `<button class="jn-tk${b.done?' done':''}" data-jnfocus="${esc(b.id)}" style="--c:${c}">
-      <span class="jn-tk-ic">${b.done?'✓':(gl?safeEmoji(gl.emoji,'🎯'):'⏱')}</span>
-      <span class="jn-tk-b"><b>${esc(b.t||'Справа')}</b><small>${gl?esc(gl.name||'')+' · ':''}${jnHm(b.h)}</small></span></button>`;
-  }
 
   function jnRender(){
     const body=jnEl('jnBody'); if(!body) return;

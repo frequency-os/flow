@@ -117,7 +117,6 @@
     document.getElementById('name').value=''; document.getElementById('amount').value=''; document.getElementById('note').value='';
     debtSave(); debtRender();
   };
-  function debtDel(id){ debtItems=debtItems.filter(i=>i.id!==id); debtSave(); debtRender(); if(curId===id) closeModal(); }
 
   function debtRender(){
     document.getElementById('cnt').textContent=debtItems.length;

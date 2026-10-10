@@ -163,7 +163,7 @@
          ключів (перейменування/видалення тут навмисно НЕ робимо).
        • прапорці міграцій: 'space_purge_v1', 'legacy_widgets_purge_v1',
          'theme_flat_default_v1' — сирі; 'flowapp_*_v1' (wallet_migrated,
-         seedfolders_removed, agency_purged, space_removed, inbox_chat) — з
+         seedfolders_removed, space_removed, inbox_chat тощо) — з
          префіксом, але це НЕ дані: див. MIGRATIONS_ONCE у 27-canvas.js.
        • службові з префіксом: 'flowapp___sb_outbox', 'flowapp___ph_push',
          'flowapp___ph_ts', 'flowapp___seeded' (Preferences), 'flowapp___owner'

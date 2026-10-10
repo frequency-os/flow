@@ -13,12 +13,6 @@
   const FKEY='folders_cfg', FOKEY='folders_order';
   const FOLDER_COLORS=['#e8843c','#34c77b','#5b8def','#c77dff','#ff6b9d','#4ecdc4','#f0b429','#9b8cff','#ff5a5f','#2dd4bf'];
   const FOLDER_EMOJIS=['📁','💰','🏃','⭐','📚','🎯','💡','❤️','🏠','✈️','🍎','💪','🧠','🎨','🎵','📈'];
-  /* ── лінійні іконки папок (нові теми) ──
-     Той самий порядок, що й у FOLDER_EMOJIS: нова папка отримує пару
-     «емодзі + іконка», тож виглядає правильно в будь-якій темі.
-     Поле emoji НЕ прибрано: у старих темах малюється воно. */
-  const FOLDER_ICONS=['fo-folder','fo-coin','fo-run','fo-star','fo-book','fo-target','fo-bulb','fo-heart',
-                      'fo-home','fo-plane','fo-apple','fo-dumbbell','fo-brain','fo-palette','fo-music','fo-chart'];
   /* Мапа для переїзду вже наявних папок: емодзі, яке ти колись поставив,
      → найближча іконка. Що не впізналось — стає загальною текою (fo-folder). */
   const EMOJI_ICON={
@@ -81,7 +75,7 @@
   ];
   try{ window.folderIconFor=folderIconFor; }catch(_){}
 
-  // видимість папки: Vault (сховані папки за PIN) вирізано 04.09.2026 — усі папки видимі
+  // видимість папки: показуємо кожну наявну папку
   function folderVisible(k){ return !!folders[k]; }
 
   /* ═══════ ЗАПОБІЖНИК ВІД ВТРАТИ ПАПОК ═══════
