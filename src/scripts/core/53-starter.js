@@ -43,7 +43,7 @@
   function stLoad(){
     if(window.STARTER_A||stLoading) return;
     stLoading=true;
-    window.starterAssetsReady=()=>{ try{ renderDashboard(); }catch(_){} try{ updateSummaryBg(); }catch(_){} };
+    window.starterAssetsReady=()=>{ try{ renderDashboard(); }catch(_){} try{ updateSummaryBg(); }catch(_){} try{ introRefresh(); }catch(_){} };
     const s=document.createElement('script');
     s.src='starter-assets.js'; s.async=true;
     s.onerror=()=>{ stLoading=false; };   // офлайн без кешу — плитки лишаються кольоровими
@@ -93,6 +93,8 @@
     };
     try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent='0'; }catch(_){}
     stHero();
+    // нова людина спершу бачить три картки «Що таке Frequency» (54-intro.js), потім цей набір
+    try{ introMaybe(); }catch(e){ console.error('intro',e); }
   }
   function stRefresh(){
     try{ renderDashboard(); }catch(_){}

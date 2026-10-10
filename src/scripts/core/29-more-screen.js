@@ -291,6 +291,11 @@
         </div>
         <div class="mr-sl" data-sec="about">Про застосунок</div>
         <div class="mr-grp" data-sec="about">
+          <div class="acc-row" data-acc-intro>
+            ${ico('compass','violet')}
+            <div class="acc-rtext"><div class="acc-rtitle">Що таке Frequency</div><div class="acc-rsub">три картки: навіщо це і як допомагає рости</div></div>
+            ${chev()}
+          </div>
           <div class="acc-row" data-acc-ver style="cursor:default">
             ${ico('info','slate')}
             <div class="acc-rtext"><div class="acc-rtitle">Версія</div><div class="acc-rsub">${escA(window.FLOW_BUILD||'невідома')} · дата збірки й код коміту</div></div>
@@ -493,6 +498,9 @@
         };
       }
 
+      // прев'ю «Що таке Frequency» (54-intro.js) — те саме, що бачить нова людина
+      const inRow=host.querySelector('[data-acc-intro]');
+      if(inRow) inRow.onclick=()=>{ if(window.introOpen) window.introOpen(); };
       const elRow=host.querySelector('[data-acc-errlog-row]');
       if(elRow) elRow.onclick=()=>toggle('[data-acc-errlog-expand]');
       const elShare=host.querySelector('[data-acc-errlog-share]');

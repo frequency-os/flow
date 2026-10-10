@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 86 |
-| Рядків JS | 32988 |
-| Файлів CSS | 48 |
-| Рядків CSS | 10447 |
-| Сутностей верхнього рівня | 2326 |
+| Файлів JS | 87 |
+| Рядків JS | 33077 |
+| Файлів CSS | 49 |
+| Рядків CSS | 10520 |
+| Сутностей верхнього рівня | 2335 |
 | Ключів сховища (FLOW_KEYS) | 79 |
 
 ## Файли JS
@@ -64,7 +64,7 @@
 | `src/scripts/core/26-blocks-render.js` | 1203 | 16 |
 | `src/scripts/core/27-canvas.js` | 594 | 27 |
 | `src/scripts/core/28-vision.js` | 528 | 42 |
-| `src/scripts/core/29-more-screen.js` | 588 | 32 |
+| `src/scripts/core/29-more-screen.js` | 596 | 32 |
 | `src/scripts/core/30-upgrade.js` | 296 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
@@ -89,7 +89,8 @@
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
 | `src/scripts/core/51-money-reset.js` | 132 | 15 |
 | `src/scripts/core/52-fresh-start.js` | 204 | 27 |
-| `src/scripts/core/53-starter.js` | 153 | 18 |
+| `src/scripts/core/53-starter.js` | 155 | 18 |
+| `src/scripts/core/54-intro.js` | 79 | 9 |
 | `src/scripts/page-editor/01-palette.js` | 180 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 764 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 649 | 35 |
@@ -163,6 +164,7 @@
 | `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 292 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
+| `src/styles/core/34-intro.css` | 73 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (79)
 
@@ -1745,14 +1747,14 @@
 | `fmtMem` | функція | `src/scripts/core/29-more-screen.js:167` |
 | `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:168` |
 | `renderAccount` | функція | `src/scripts/core/29-more-screen.js:183` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:534` |
-| `maskMail` | функція | `src/scripts/core/29-more-screen.js:541` |
-| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:542` |
-| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:557` |
-| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:567` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:580` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:581` |
-| `nm` | значення | `src/scripts/core/29-more-screen.js:582` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:542` |
+| `maskMail` | функція | `src/scripts/core/29-more-screen.js:549` |
+| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:550` |
+| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:565` |
+| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:575` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:588` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:589` |
+| `nm` | значення | `src/scripts/core/29-more-screen.js:590` |
 
 ### `src/scripts/core/30-upgrade.js` — 30 сутностей
 
@@ -2583,10 +2585,24 @@
 | `stHeroOff` | функція | `src/scripts/core/53-starter.js:55` |
 | `stHero` | функція | `src/scripts/core/53-starter.js:60` |
 | `starterRender` | функція | `src/scripts/core/53-starter.js:77` |
-| `stRefresh` | функція | `src/scripts/core/53-starter.js:97` |
-| `stPick` | функція | `src/scripts/core/53-starter.js:103` |
-| `stPut` | функція | `src/scripts/core/53-starter.js:127` |
-| `stMakeOwn` | функція | `src/scripts/core/53-starter.js:131` |
+| `stRefresh` | функція | `src/scripts/core/53-starter.js:99` |
+| `stPick` | функція | `src/scripts/core/53-starter.js:105` |
+| `stPut` | функція | `src/scripts/core/53-starter.js:129` |
+| `stMakeOwn` | функція | `src/scripts/core/53-starter.js:133` |
+
+### `src/scripts/core/54-intro.js` — 9 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `IN_KEY` | значення | `src/scripts/core/54-intro.js:10` |
+| `inShownNow` | значення | `src/scripts/core/54-intro.js:11` |
+| `inSeen` | функція | `src/scripts/core/54-intro.js:12` |
+| `inMark` | функція | `src/scripts/core/54-intro.js:13` |
+| `introMaybe` | функція | `src/scripts/core/54-intro.js:15` |
+| `inPh` | функція | `src/scripts/core/54-intro.js:20` |
+| `inSlides` | функція | `src/scripts/core/54-intro.js:21` |
+| `introOpen` | функція | `src/scripts/core/54-intro.js:44` |
+| `introRefresh` | функція | `src/scripts/core/54-intro.js:74` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

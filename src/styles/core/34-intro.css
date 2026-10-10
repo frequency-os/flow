@@ -1,0 +1,73 @@
+  /* ════════ Прев'ю «Що таке Frequency» (54-intro.js, 10.10.2026) ════════
+     Шар на весь екран поверх програми (і над нижньою панеллю), під safe-area.
+     Гортання — горизонтальний скрол зі scroll-snap; кольори — токени теми. */
+  .in-ov{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;background:var(--bg);color:var(--text);
+    padding:calc(env(safe-area-inset-top) + 10px) 0 calc(env(safe-area-inset-bottom) + 16px);}
+  .in-top{display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 24px;min-height:44px;}
+  .in-pg{display:flex;gap:6px;}
+  .in-pg i{width:8px;height:8px;border-radius:4px;background:var(--line);transition:width .2s,background .2s;}
+  .in-pg i.on{width:22px;background:var(--accent);}
+  .in-skip{all:unset;cursor:pointer;padding:10px 8px;font-size:15px;font-weight:600;color:var(--muted);}
+  .in-track{flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;overscroll-behavior-x:contain;}
+  .in-track::-webkit-scrollbar{display:none;}
+  .in-slide{flex:0 0 100%;box-sizing:border-box;scroll-snap-align:start;scroll-snap-stop:always;padding:8px 24px 0;
+    display:flex;flex-direction:column;justify-content:center;gap:10px;overflow:hidden;}
+  .in-vis{margin-bottom:18px;}
+  .in-slide h2{margin:0;font-size:27px;line-height:1.15;font-weight:800;letter-spacing:-.01em;}
+  .in-slide p{margin:0;font-size:16px;line-height:1.45;color:var(--muted);}
+  .in-foot{padding:12px 24px 0;}
+  .in-next{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;text-align:center;min-height:54px;line-height:54px;
+    border-radius:16px;font-size:16px;font-weight:800;color:#fff;background:var(--accent);
+    box-shadow:0 8px 24px -8px color-mix(in srgb,var(--accent) 70%,transparent);}
+  .in-next:active{transform:scale(.98);}
+
+  .in-ph{display:block;border-radius:12px;background:color-mix(in srgb,var(--accent) 22%,var(--card));
+    background-size:cover;background-position:center;}
+  /* 1 — міні-Огляд */
+  .in-v1{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
+  .in-col{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:64px 64px;gap:5px;
+    grid-template-areas:"sea run home home" "sea run study travel";}
+  .in-sea{grid-area:sea}.in-run{grid-area:run}.in-home{grid-area:home}.in-study{grid-area:study}.in-travel{grid-area:travel}
+  .in-tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .in-tile{position:relative;height:64px;border-radius:12px;overflow:hidden;background:color-mix(in srgb,var(--c) 35%,var(--card));}
+  .in-tile .in-ph{position:absolute;inset:0;border-radius:0;}
+  .in-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),rgba(0,0,0,0) 70%);}
+  .in-tile b{position:absolute;left:8px;bottom:6px;z-index:1;color:#fff;font-size:12px;font-weight:800;}
+  /* 2 — ланцюжок мрія → ціль → сьогодні */
+  .in-v2{display:flex;flex-direction:column;align-items:stretch;}
+  .in-step{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
+  .in-step > span:not(.in-ic):not(.in-ok){flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .in-step small{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .in-step b{font-size:15px;font-weight:800;}
+  .in-wish .in-ph{width:52px;height:52px;flex:none;}
+  .in-ic{width:52px;height:52px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:22px;
+    background:color-mix(in srgb,var(--accent) 16%,var(--card));}
+  .in-bar{display:block;height:6px;border-radius:3px;background:var(--line);margin-top:4px;overflow:hidden;}
+  .in-bar i{display:block;height:100%;background:var(--accent);border-radius:3px;}
+  .in-today{border-color:color-mix(in srgb,var(--accent) 60%,var(--line));}
+  .in-ok{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:#34c77b;}
+  .in-arr{align-self:center;width:2px;height:18px;background:linear-gradient(var(--line),var(--accent));}
+  /* 3 — ріст: тиждень і досягнута ціль */
+  .in-v3{display:flex;flex-direction:column;gap:10px;}
+  .in-wk{padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;}
+  .in-wk > b{font-size:40px;font-weight:800;line-height:1;}
+  .in-wk > b small{font-size:20px;color:var(--muted);}
+  .in-wk > span{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .in-wk > span b{color:var(--text);}
+  .in-dots{flex-basis:100%;display:flex;gap:14px;}
+  .in-dots span{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .in-dots em{font-style:normal;font-size:12px;font-weight:600;color:var(--muted);}
+  .in-dots i{width:12px;height:12px;border-radius:50%;background:var(--line);}
+  .in-dots .on i{background:var(--accent);box-shadow:0 0 10px color-mix(in srgb,var(--accent) 60%,transparent);}
+  .in-done{position:relative;height:150px;border-radius:18px;overflow:hidden;}
+  .in-done .in-ph{position:absolute;inset:0;border-radius:0;}
+  .in-veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75),rgba(0,0,0,0) 65%);}
+  .in-done-t{position:absolute;left:14px;right:14px;bottom:12px;display:flex;flex-direction:column;gap:2px;color:#fff;}
+  .in-done-t small{font-size:13px;font-weight:800;color:#7ee2a8;}
+  .in-done-t b{font-size:17px;font-weight:800;}
+  /* низькі екрани (iPhone SE): картинки менші, щоб текст і кнопка лишились видно */
+  @media (max-height:700px){
+    .in-col{grid-template-rows:48px 48px;} .in-tile{height:48px;} .in-done{height:110px;}
+    .in-slide h2{font-size:23px;} .in-vis{margin-bottom:10px;}
+  }
