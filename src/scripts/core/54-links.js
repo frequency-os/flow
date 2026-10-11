@@ -195,7 +195,9 @@
   /* ════════ Дерево папок у бічному меню ноутбука (нічний макет №8) ════════
      Під пунктом «Папки»: папки верхнього рівня, групи розгортаються (Фінанси → YouTube…), відкрита папка підсвічена.
      Лише читає folders/order; тап — та сама навігація, що й на Огляді. Розгорнуті групи — у памʼяті. */
-  const dsbOpen=Object.create(null);   // без прототипу: ключ папки «constructor» не вдаватиме розгорнуту групу
+  const dsbOpen=Object.create(null);
+  // дерево під «Папки» можна згорнути (стрілка ˅); вибір — на пристрої (зручність вигляду, не дані)
+  let dsbTreeHidden=false; try{ dsbTreeHidden=localStorage.getItem('dsbTreeHidden')==='1'; }catch(_){}   // без прототипу: ключ папки «constructor» не вдаватиме розгорнуту групу
   function dsbTreeHTML(){
     let cur=''; try{ const s=document.getElementById('scr-page'); if(s&&s.classList.contains('active')) cur=pgFolderKey()||''; }catch(_){}
     const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project';
@@ -213,7 +215,19 @@
     const nav=document.querySelector('#desktopSidebar .dsb-nav'), fb=nav&&nav.querySelector('.dsb-i[data-dnav="folders"]'); if(!fb) return;
     let t=document.getElementById('dsbTree');
     if(!t){ t=document.createElement('div'); t.id='dsbTree'; t.className='dsb-tree'; t.setAttribute('aria-label','Папки'); fb.insertAdjacentElement('afterend',t); }
-    t.innerHTML=dsbTreeHTML();
+    // стрілка біля «Папки»: згорнути / розгорнути дерево
+    let tw=fb.querySelector('.dsb-tw');
+    if(!tw){ tw=document.createElement('span'); tw.className='dsb-tw'; tw.setAttribute('role','button'); tw.tabIndex=0;
+      tw.onclick=e=>{ e.stopPropagation(); dsbTreeHidden=!dsbTreeHidden; try{ localStorage.setItem('dsbTreeHidden',dsbTreeHidden?'1':'0'); }catch(_){} dsbTreeSync(); };
+      tw.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tw.onclick(e); } };
+      fb.appendChild(tw); }
+    tw.textContent='˅'; tw.classList.toggle('shut',dsbTreeHidden);
+    tw.setAttribute('aria-label',dsbTreeHidden?'Показати папки':'Сховати папки'); tw.setAttribute('aria-expanded',String(!dsbTreeHidden));
+    // згорнуто: лишається лише відкрита папка (щоб було видно, де ти)
+    let curK=''; try{ const sp=document.getElementById('scr-page'); if(sp&&sp.classList.contains('active')) curK=pgFolderKey()||''; }catch(_){}
+    if(dsbTreeHidden){ const f=curK&&folders[curK];
+      t.innerHTML=f?`<div class="dsbt-r on" style="--lvl:0"><span class="dsbt-tw sp"></span><button class="dsbt-b" data-dsbt="${esc(curK)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`:'';
+    } else t.innerHTML=dsbTreeHTML();
     t.querySelectorAll('[data-dsbtw]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.dsbtw; dsbOpen[k]=!(b.classList.contains('open')); dsbTreeSync(); });
     t.querySelectorAll('[data-dsbt]').forEach(b=>b.onclick=()=>{ const k=b.dataset.dsbt; if(!folders[k]) return;
       try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ dsbOpen[k]=true; openGroupAsChosen(k); dsbTreeSync(); return; } }catch(_){}

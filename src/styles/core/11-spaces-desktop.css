@@ -197,3 +197,12 @@
     .dsbt-tw:focus-visible,.dsbt-b:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
   }
   @media (min-width:760px) and (max-width:1023.98px){ .dsb-tree{display:none!important;} }
+  /* стрілка згортання дерева біля «Папки» */
+  @media (min-width:1024px){
+    .dsb-i[data-dnav="folders"]{position:relative;}
+    .dsb-tw{margin-left:auto;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:14px;font-weight:800;color:var(--muted);transition:transform .15s;}
+    .dsb-tw:hover{background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--text);}
+    .dsb-tw.shut{transform:rotate(-90deg);}
+    .dsb-tw:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+  }
+  @media (min-width:760px) and (max-width:1023.98px){ .dsb-tw{display:none;} }

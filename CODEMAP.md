@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 88 |
-| Рядків JS | 32566 |
+| Рядків JS | 32580 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10355 |
-| Сутностей верхнього рівня | 2340 |
+| Рядків CSS | 10364 |
+| Сутностей верхнього рівня | 2341 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -90,7 +90,7 @@
 | `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
-| `src/scripts/core/54-links.js` | 223 | 25 |
+| `src/scripts/core/54-links.js` | 237 | 26 |
 | `src/scripts/page-editor/01-palette.js` | 178 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 767 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 747 | 42 |
@@ -141,7 +141,7 @@
 | `src/styles/core/08-work.css` | 202 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
-| `src/styles/core/11-spaces-desktop.css` | 199 | 0 |
+| `src/styles/core/11-spaces-desktop.css` | 208 | 0 |
 | `src/styles/core/12-pets-more-planner.css` | 1228 | 0 |
 | `src/styles/core/13-search-capture.css` | 84 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
@@ -2542,7 +2542,7 @@
 | `introRefresh` | функція | `src/scripts/core/54-intro.js:121` |
 | `window.introOpen` | функція | `src/scripts/core/54-intro.js:130` |
 
-### `src/scripts/core/54-links.js` — 25 сутностей
+### `src/scripts/core/54-links.js` — 26 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2569,8 +2569,9 @@
 | `lkViewApply` | функція | `src/scripts/core/54-links.js:181` |
 | `lkSegBind` | функція | `src/scripts/core/54-links.js:191` |
 | `dsbOpen` | значення | `src/scripts/core/54-links.js:198` |
-| `dsbTreeHTML` | функція | `src/scripts/core/54-links.js:199` |
-| `dsbTreeSync` | функція | `src/scripts/core/54-links.js:211` |
+| `dsbTreeHidden` | значення | `src/scripts/core/54-links.js:200` |
+| `dsbTreeHTML` | функція | `src/scripts/core/54-links.js:201` |
+| `dsbTreeSync` | функція | `src/scripts/core/54-links.js:213` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
