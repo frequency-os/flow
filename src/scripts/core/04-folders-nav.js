@@ -80,6 +80,12 @@
      запис) відкладається на 10 с; до того папка лише схована з екрана. Закрили застосунок раніше —
      папка лишається: помилка в бік збереження, синк нічого не встигає побачити. */
   const folderDelPending={};
+  /* Пріоритет папки: h — високий, m — середній, l — низький; нема — без пріоритету */
+  const FPRIO={h:['Високий','#e5484d'],m:['Середній','#f0a020'],l:['Низький','#3fb8af']};
+  const FPRIO_ORDER=['h','m','l'];
+  function folderPrioOk(p){ return p==='h'||p==='m'||p==='l'; }
+  function folderPrio(k){ const p=folders[k]&&folders[k].prio; return folderPrioOk(p)?p:''; }
+  function prioDot(k){ const p=folderPrio(k); return p?`<span class="prio-dot" style="--pc:${FPRIO[p][1]}" title="Пріоритет: ${FPRIO[p][0]}" aria-label="Пріоритет: ${FPRIO[p][0]}" role="img"></span>`:''; }
   function folderVisible(k){ return !!folders[k] && !folderDelPending[k]; }
   function folderDeleteLater(key, ms){
     if(!folders[key] || !folders[key].custom) return false;
@@ -149,6 +155,8 @@
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
         // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
         if(f.gview==='folder'||f.gview==='ios') cfg[k].gview=f.gview;
+        // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
+        if(folderPrioOk(f.prio)) cfg[k].prio=f.prio;
       });
       const put=()=>{
         const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});

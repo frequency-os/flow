@@ -215,7 +215,7 @@
       // знімок у папки є, і новий тихо затер би його (той самий id 'ph_'+key, і в хмарі)
       if(!f.photo) h+=`<button class="fc3-photo" data-fphoto="${esc(k)}" aria-label="Додати фото-обкладинку">${fc3Svg('cam')}</button>`;
     }
-    h+=`<div class="fc3-label"><div class="fc3-name" data-i18n-skip="1">${f.pinned?`<span class="fc3-pin" title="Закріплена">${fc3Svg('pin')}</span>`:''}${esc(f.name)}</div>${meta?`<div class="fc3-meta">${esc(meta)}</div>`:''}</div>`;
+    h+=`<div class="fc3-label"><div class="fc3-name" data-i18n-skip="1">${prioDot(k)}${f.pinned?`<span class="fc3-pin" title="Закріплена">${fc3Svg('pin')}</span>`:''}${esc(f.name)}</div>${meta?`<div class="fc3-meta">${esc(meta)}</div>`:''}</div>`;
     h+=`<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню папки «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
     el.innerHTML=h;
     el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
@@ -332,7 +332,7 @@
         const r=document.createElement('div'); r.className='fcard fr'+(isGroup?' fr-group':''); r.dataset.fkey=k;
         r.style.setProperty('--c',safeColor(f.c,'#6a7dff'));
         r.innerHTML=`<span class="fr-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>
-          <span class="fr-b"><b data-i18n-skip="1">${esc(f.name)}</b><small>${f.pinned?'📌 ':''}${esc(sub)}</small>${!isGroup&&pr.total?`<span class="fr-bar"><i style="width:${Math.max(0,Math.min(100,+pr.pct||0))}%"></i></span>`:''}</span>
+          <span class="fr-b"><b data-i18n-skip="1">${prioDot(k)}${esc(f.name)}</b><small>${f.pinned?'📌 ':''}${esc(sub)}</small>${!isGroup&&pr.total?`<span class="fr-bar"><i style="width:${Math.max(0,Math.min(100,+pr.pct||0))}%"></i></span>`:''}</span>
           <button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування" aria-label="Налаштування папки «${esc(String(f.name||'').slice(0,30))}»">⋯</button>`;
         r.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
           if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
@@ -361,7 +361,7 @@
       // перемикання теми міняє вигляд миттєво, без перемальовування списку.
       inner+=`<div class="fc2-em"><span class="fc2-emj">${emojiShow}</span>`+
              `<svg class="ico fc2-ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></div>`;
-      inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${esc(f.name)}</div>${metaHtml}</div>`;
+      inner+=`<div class="fc2-body"><div class="fc2-name" data-i18n-skip="1">${prioDot(k)}${esc(f.name)}</div>${metaHtml}</div>`;
       inner+=`<button class="fmenu" data-fmenu="${esc(k)}" title="Налаштування" aria-label="Налаштування папки">⋯</button>`+
              `<button class="fdrag-handle" title="Перетягнути" aria-label="Перетягнути">⠿</button>`;
       el.innerHTML=inner;
@@ -547,6 +547,24 @@
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
         const v=b.dataset.gv; if(v==='stack') delete f.gview; else f.gview=v;
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
+        try{ window.platform.haptic('select'); }catch(_){}
+      });
+      m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
+    });
+  }
+  function openFolderPrioSheet(key){
+    const f=folders[key]; if(!f) return;
+    const cur=folderPrio(key);
+    const opts=FPRIO_ORDER.map(p=>[p,FPRIO[p][0],FPRIO[p][1]]).concat([['','Без пріоритету','']]);
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Пріоритет · <span data-i18n-skip="1">${esc(f.name)}</span></div>
+      ${opts.map(([p,n,c])=>`<button class="fgs-row fgs-prio${cur===p?' on':''}" data-prio="${p}" aria-pressed="${cur===p}">
+        <span class="prio-dot big" style="--pc:${c||'transparent'}"></span><span class="fgs-t"><b>${n}</b></span><span class="fgs-go">${cur===p?'✓':''}</span></button>`).join('')}
+      <button class="fmi" data-back>‹ Назад до меню</button>`,
+    m=>{
+      m.querySelectorAll('[data-prio]').forEach(b=>b.onclick=()=>{
+        const p=b.dataset.prio; if(folderPrioOk(p)) f.prio=p; else delete f.prio;
+        saveFolders(); renderDashboard(); try{ dsbTreeSync(); }catch(_){} openFolderPrioSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
       m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
@@ -873,6 +891,7 @@
      «Звʼязки» (чат, будівля в грі) → Видалити. Дії ті самі (folderAction),
      формат даних не змінено. Документні дії — у «⋯» самого документа. */
   const FM_IC={
+    flag:'<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
     pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
     look:'<circle cx="12" cy="12" r="8.5"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/><path d="M12 20.5a2.5 2.5 0 0 1 0-5h2"/>',
     type:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
@@ -923,6 +942,7 @@
       ${fmRow('look','look','Значок','лінійна іконка чи емодзі')}
       <div class="fmi-label">Порядок</div>
       ${fmRow('pin','pin',f.pinned?'Відкріпити':'Закріпити зверху','')}
+      ${fmRow('prio','flag','Пріоритет · '+(folderPrio(key)?FPRIO[folderPrio(key)][0]:'без'),'високий, середній чи низький')}
       <div class="fmi-label">Звʼязки</div>
       ${fmRow('links','group','Усі звʼязки папки','місія · звичка · час · календар · гроші · чати')}
       ${fmRow('chat','chat','Чати',linked?('повʼязано: '+linked):'не повʼязано')}
@@ -1095,6 +1115,7 @@
     if(act==='move'){ closeFolderMenu(); openFolderMovePicker(key); return; }
     if(act==='subnew'){ closeFolderMenu(); createFolder(key); return; }
     if(act==='gview'){ openGroupViewSheet(key); return; }
+    if(act==='prio'){ openFolderPrioSheet(key); return; }
     if(act==='icon'){ openFolderIconPicker(key); return; }
     // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
     // губився б мовчки. Автоматичну — переобираємо під нове емодзі.

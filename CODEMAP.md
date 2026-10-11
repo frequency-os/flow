@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 89 |
-| Рядків JS | 32672 |
+| Рядків JS | 32706 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10400 |
-| Сутностей верхнього рівня | 2350 |
+| Рядків CSS | 10406 |
+| Сутностей верхнього рівня | 2356 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -38,7 +38,7 @@
 | `src/scripts/core/01-base.js` | 414 | 39 |
 | `src/scripts/core/02-storage.js` | 2150 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
-| `src/scripts/core/04-folders-nav.js` | 417 | 57 |
+| `src/scripts/core/04-folders-nav.js` | 425 | 62 |
 | `src/scripts/core/05-spaces.js` | 689 | 57 |
 | `src/scripts/core/06-wishes.js` | 1461 | 109 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1695 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1137 | 61 |
+| `src/scripts/core/16-dashboard.js` | 1158 | 62 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -61,7 +61,7 @@
 | `src/scripts/core/24-reminders.js` | 181 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
 | `src/scripts/core/26-blocks-render.js` | 1207 | 16 |
-| `src/scripts/core/27-canvas.js` | 594 | 27 |
+| `src/scripts/core/27-canvas.js` | 595 | 27 |
 | `src/scripts/core/28-vision.js` | 36 | 3 |
 | `src/scripts/core/29-more-screen.js` | 597 | 32 |
 | `src/scripts/core/30-upgrade.js` | 303 | 30 |
@@ -90,7 +90,7 @@
 | `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
-| `src/scripts/core/54-links.js` | 261 | 28 |
+| `src/scripts/core/54-links.js` | 265 | 28 |
 | `src/scripts/page-editor/01-palette.js` | 180 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 768 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 754 | 42 |
@@ -134,7 +134,7 @@
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
 | `src/styles/core/02-page-editor.css` | 1104 | 9 |
-| `src/styles/core/03-folders-projects.css` | 645 | 0 |
+| `src/styles/core/03-folders-projects.css` | 650 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
@@ -142,7 +142,7 @@
 | `src/styles/core/08-work.css` | 202 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
-| `src/styles/core/11-spaces-desktop.css` | 208 | 0 |
+| `src/styles/core/11-spaces-desktop.css` | 209 | 0 |
 | `src/styles/core/12-pets-more-planner.css` | 1228 | 0 |
 | `src/styles/core/13-search-capture.css` | 84 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
@@ -520,7 +520,7 @@
 | `window.platform` | обʼєкт | `src/scripts/core/03-platform.js:48` |
 | `window.micDenyMsg` | функція | `src/scripts/core/03-platform.js:54` |
 
-### `src/scripts/core/04-folders-nav.js` — 57 сутностей
+### `src/scripts/core/04-folders-nav.js` — 62 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -538,49 +538,54 @@
 | `folderIcon` | функція | `src/scripts/core/04-folders-nav.js:63` |
 | `ICON_ALL` | масив | `src/scripts/core/04-folders-nav.js:66` |
 | `folderDelPending` | обʼєкт | `src/scripts/core/04-folders-nav.js:82` |
-| `folderVisible` | функція | `src/scripts/core/04-folders-nav.js:83` |
-| `folderDeleteLater` | функція | `src/scripts/core/04-folders-nav.js:84` |
-| `folderDeleteCancel` | функція | `src/scripts/core/04-folders-nav.js:94` |
-| `foldersLoaded` | значення | `src/scripts/core/04-folders-nav.js:114` |
-| `markFoldersLoaded` | функція | `src/scripts/core/04-folders-nav.js:115` |
-| `foldersLookFactory` | функція | `src/scripts/core/04-folders-nav.js:117` |
-| `storedFolderCount` | функція | `src/scripts/core/04-folders-nav.js:122` |
-| `saveFolders` | функція | `src/scripts/core/04-folders-nav.js:131` |
-| `FDELKEY` | значення | `src/scripts/core/04-folders-nav.js:175` |
-| `FDEL_MAX` | значення | `src/scripts/core/04-folders-nav.js:176` |
-| `tombsNorm` | функція | `src/scripts/core/04-folders-nav.js:177` |
-| `tombsMerge` | функція | `src/scripts/core/04-folders-nav.js:186` |
-| `tombsSame` | функція | `src/scripts/core/04-folders-nav.js:191` |
-| `folderTombs` | обʼєкт | `src/scripts/core/04-folders-nav.js:195` |
-| `folderTombed` | функція | `src/scripts/core/04-folders-nav.js:198` |
-| `saveFolderTombs` | функція | `src/scripts/core/04-folders-nav.js:199` |
-| `window.folderTombsReset` | функція | `src/scripts/core/04-folders-nav.js:201` |
-| `folderPurge` | функція | `src/scripts/core/04-folders-nav.js:212` |
-| `folderDelete` | функція | `src/scripts/core/04-folders-nav.js:259` |
-| `mergeFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:277` |
-| `applyFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:286` |
-| `leaveTombedFolder` | функція | `src/scripts/core/04-folders-nav.js:314` |
-| `folderWidgets` | обʼєкт | `src/scripts/core/04-folders-nav.js:333` |
-| `FWKEY` | значення | `src/scripts/core/04-folders-nav.js:334` |
-| `saveFolderWidgets` | функція | `src/scripts/core/04-folders-nav.js:335` |
-| `orderedFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:337` |
-| `PROJECT_STATUSES` | масив | `src/scripts/core/04-folders-nav.js:343` |
-| `projStatusMeta` | функція | `src/scripts/core/04-folders-nav.js:347` |
-| `folderProgress` | функція | `src/scripts/core/04-folders-nav.js:349` |
-| `dueLabel` | функція | `src/scripts/core/04-folders-nav.js:361` |
-| `projFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:370` |
-| `childFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:373` |
-| `topFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:376` |
-| `isDescendantFolder` | функція | `src/scripts/core/04-folders-nav.js:380` |
-| `moveFolderTo` | функція | `src/scripts/core/04-folders-nav.js:388` |
-| `goHome` | функція | `src/scripts/core/04-folders-nav.js:398` |
-| `goFolder` | функція | `src/scripts/core/04-folders-nav.js:399` |
-| `goDebts` | функція | `src/scripts/core/04-folders-nav.js:411` |
-| `goFinance` | функція | `src/scripts/core/04-folders-nav.js:412` |
-| `goEnvelopes` | функція | `src/scripts/core/04-folders-nav.js:413` |
-| `goSpend` | функція | `src/scripts/core/04-folders-nav.js:414` |
-| `workOrigin` | значення | `src/scripts/core/04-folders-nav.js:415` |
-| `goWork` | функція | `src/scripts/core/04-folders-nav.js:416` |
+| `FPRIO` | обʼєкт | `src/scripts/core/04-folders-nav.js:84` |
+| `FPRIO_ORDER` | масив | `src/scripts/core/04-folders-nav.js:85` |
+| `folderPrioOk` | функція | `src/scripts/core/04-folders-nav.js:86` |
+| `folderPrio` | функція | `src/scripts/core/04-folders-nav.js:87` |
+| `prioDot` | функція | `src/scripts/core/04-folders-nav.js:88` |
+| `folderVisible` | функція | `src/scripts/core/04-folders-nav.js:89` |
+| `folderDeleteLater` | функція | `src/scripts/core/04-folders-nav.js:90` |
+| `folderDeleteCancel` | функція | `src/scripts/core/04-folders-nav.js:100` |
+| `foldersLoaded` | значення | `src/scripts/core/04-folders-nav.js:120` |
+| `markFoldersLoaded` | функція | `src/scripts/core/04-folders-nav.js:121` |
+| `foldersLookFactory` | функція | `src/scripts/core/04-folders-nav.js:123` |
+| `storedFolderCount` | функція | `src/scripts/core/04-folders-nav.js:128` |
+| `saveFolders` | функція | `src/scripts/core/04-folders-nav.js:137` |
+| `FDELKEY` | значення | `src/scripts/core/04-folders-nav.js:183` |
+| `FDEL_MAX` | значення | `src/scripts/core/04-folders-nav.js:184` |
+| `tombsNorm` | функція | `src/scripts/core/04-folders-nav.js:185` |
+| `tombsMerge` | функція | `src/scripts/core/04-folders-nav.js:194` |
+| `tombsSame` | функція | `src/scripts/core/04-folders-nav.js:199` |
+| `folderTombs` | обʼєкт | `src/scripts/core/04-folders-nav.js:203` |
+| `folderTombed` | функція | `src/scripts/core/04-folders-nav.js:206` |
+| `saveFolderTombs` | функція | `src/scripts/core/04-folders-nav.js:207` |
+| `window.folderTombsReset` | функція | `src/scripts/core/04-folders-nav.js:209` |
+| `folderPurge` | функція | `src/scripts/core/04-folders-nav.js:220` |
+| `folderDelete` | функція | `src/scripts/core/04-folders-nav.js:267` |
+| `mergeFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:285` |
+| `applyFolderTombsRaw` | функція | `src/scripts/core/04-folders-nav.js:294` |
+| `leaveTombedFolder` | функція | `src/scripts/core/04-folders-nav.js:322` |
+| `folderWidgets` | обʼєкт | `src/scripts/core/04-folders-nav.js:341` |
+| `FWKEY` | значення | `src/scripts/core/04-folders-nav.js:342` |
+| `saveFolderWidgets` | функція | `src/scripts/core/04-folders-nav.js:343` |
+| `orderedFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:345` |
+| `PROJECT_STATUSES` | масив | `src/scripts/core/04-folders-nav.js:351` |
+| `projStatusMeta` | функція | `src/scripts/core/04-folders-nav.js:355` |
+| `folderProgress` | функція | `src/scripts/core/04-folders-nav.js:357` |
+| `dueLabel` | функція | `src/scripts/core/04-folders-nav.js:369` |
+| `projFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:378` |
+| `childFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:381` |
+| `topFolderKeys` | функція | `src/scripts/core/04-folders-nav.js:384` |
+| `isDescendantFolder` | функція | `src/scripts/core/04-folders-nav.js:388` |
+| `moveFolderTo` | функція | `src/scripts/core/04-folders-nav.js:396` |
+| `goHome` | функція | `src/scripts/core/04-folders-nav.js:406` |
+| `goFolder` | функція | `src/scripts/core/04-folders-nav.js:407` |
+| `goDebts` | функція | `src/scripts/core/04-folders-nav.js:419` |
+| `goFinance` | функція | `src/scripts/core/04-folders-nav.js:420` |
+| `goEnvelopes` | функція | `src/scripts/core/04-folders-nav.js:421` |
+| `goSpend` | функція | `src/scripts/core/04-folders-nav.js:422` |
+| `workOrigin` | значення | `src/scripts/core/04-folders-nav.js:423` |
+| `goWork` | функція | `src/scripts/core/04-folders-nav.js:424` |
 
 ### `src/scripts/core/05-spaces.js` — 57 сутностей
 
@@ -1244,7 +1249,7 @@
 | `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1641` |
 | `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1644` |
 
-### `src/scripts/core/16-dashboard.js` — 61 сутностей
+### `src/scripts/core/16-dashboard.js` — 62 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1284,31 +1289,32 @@
 | `window.openGroupAsChosen` | значення | `src/scripts/core/16-dashboard.js:516` |
 | `openFolderGroupIOS` | функція | `src/scripts/core/16-dashboard.js:517` |
 | `openGroupViewSheet` | функція | `src/scripts/core/16-dashboard.js:538` |
-| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:556` |
-| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:573` |
-| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:613` |
-| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:621` |
-| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:665` |
-| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:667` |
-| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:672` |
-| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:686` |
-| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:693` |
-| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:712` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:753` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:775` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:803` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:875` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:894` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:895` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:896` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:897` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:958` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:974` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1005` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1014` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1047` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1063` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1107` |
+| `openFolderPrioSheet` | функція | `src/scripts/core/16-dashboard.js:555` |
+| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:574` |
+| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:591` |
+| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:631` |
+| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:639` |
+| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:683` |
+| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:685` |
+| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:690` |
+| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:704` |
+| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:711` |
+| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:730` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:771` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:793` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:821` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:893` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:913` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:914` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:915` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:916` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:978` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:994` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1025` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1034` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1067` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1083` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1128` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -1625,19 +1631,19 @@
 | `migDeferred` | значення | `src/scripts/core/27-canvas.js:233` |
 | `runMigrations` | функція | `src/scripts/core/27-canvas.js:234` |
 | `applyFolderCfgRaw` | функція | `src/scripts/core/27-canvas.js:273` |
-| `applyFolderOrderRaw` | функція | `src/scripts/core/27-canvas.js:291` |
-| `loadInFlight` | значення | `src/scripts/core/27-canvas.js:301` |
-| `load` | функція | `src/scripts/core/27-canvas.js:302` |
-| `loadOnce` | функція | `src/scripts/core/27-canvas.js:307` |
-| `vv` | значення | `src/scripts/core/27-canvas.js:507` |
-| `FIELD` | значення | `src/scripts/core/27-canvas.js:508` |
-| `isField` | функція | `src/scripts/core/27-canvas.js:510` |
-| `kbHeight` | функція | `src/scripts/core/27-canvas.js:513` |
-| `syncKb` | функція | `src/scripts/core/27-canvas.js:517` |
-| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:524` |
-| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:560` |
-| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:567` |
-| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:585` |
+| `applyFolderOrderRaw` | функція | `src/scripts/core/27-canvas.js:292` |
+| `loadInFlight` | значення | `src/scripts/core/27-canvas.js:302` |
+| `load` | функція | `src/scripts/core/27-canvas.js:303` |
+| `loadOnce` | функція | `src/scripts/core/27-canvas.js:308` |
+| `vv` | значення | `src/scripts/core/27-canvas.js:508` |
+| `FIELD` | значення | `src/scripts/core/27-canvas.js:509` |
+| `isField` | функція | `src/scripts/core/27-canvas.js:511` |
+| `kbHeight` | функція | `src/scripts/core/27-canvas.js:514` |
+| `syncKb` | функція | `src/scripts/core/27-canvas.js:518` |
+| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:525` |
+| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:561` |
+| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:568` |
+| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:586` |
 
 ### `src/scripts/core/28-vision.js` — 3 сутностей
 
@@ -2572,9 +2578,9 @@
 | `dsbOpen` | значення | `src/scripts/core/54-links.js:198` |
 | `dsbTreeHidden` | значення | `src/scripts/core/54-links.js:200` |
 | `dsbTreeHTML` | функція | `src/scripts/core/54-links.js:201` |
-| `dsbTreeSync` | функція | `src/scripts/core/54-links.js:213` |
-| `lkSwitchHTML` | функція | `src/scripts/core/54-links.js:242` |
-| `lkSwitchBind` | функція | `src/scripts/core/54-links.js:252` |
+| `dsbTreeSync` | функція | `src/scripts/core/54-links.js:217` |
+| `lkSwitchHTML` | функція | `src/scripts/core/54-links.js:246` |
+| `lkSwitchBind` | функція | `src/scripts/core/54-links.js:256` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

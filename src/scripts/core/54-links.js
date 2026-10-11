@@ -206,9 +206,13 @@
     const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
       return `<div class="dsbt-r${k===cur?' on':''}" style="--lvl:${lvl}">
         ${kids.length?`<button class="dsbt-tw${open?' open':''}" data-dsbtw="${esc(k)}" aria-label="${open?'Згорнути':'Розгорнути'} «${esc(String(f.name||'Папка').slice(0,30))}»" aria-expanded="${open}">›</button>`:'<span class="dsbt-tw sp"></span>'}
-        <button class="dsbt-b" data-dsbt="${esc(k)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`
+        <button class="dsbt-b" data-dsbt="${esc(k)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${prioDot(k)}${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`
         +(kids.length&&open&&lvl<2?kids.map(ck=>row(ck,lvl+1)).join(''):''); };
-    return tops.slice(0,40).map(k=>row(k,0)).join('');
+    tops=tops.slice(0,40);
+    // є пріоритети — верхній рівень розкладаємо секціями «Високий / Середній / Низький / Без пріоритету»
+    if(!tops.some(k=>folderPrio(k))) return tops.map(k=>row(k,0)).join('');
+    return FPRIO_ORDER.concat(['']).map(p=>{ const ks=tops.filter(k=>folderPrio(k)===p); if(!ks.length) return '';
+      return `<div class="dsbt-sec"${p?` style="--pc:${FPRIO[p][1]}"`:''}>${p?FPRIO[p][0]:'Без пріоритету'}</div>`+ks.map(k=>row(k,0)).join(''); }).join('');
   }
   function dsbTreeSync(){
     if(window.innerWidth<1024) return;
@@ -245,7 +249,7 @@
     const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project'&&k!=='work';
     let sib=[]; try{ sib=(par?childFolderKeys(par):topFolderKeys()).filter(vis); }catch(_){ return ''; }
     if(sib.length<2&&!par) return '';
-    const chip=k=>{ const x=folders[k]; return `<button class="lks-c${k===fk?' on':''}" data-lksw="${esc(k)}" style="--c:${safeColor(x.c,'#6a7dff')}"${k===fk?' aria-current="page"':''}><span class="lks-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(x))}"/></svg></span><span data-i18n-skip="1">${esc(String(x.name||'Папка').slice(0,28))}</span></button>`; };
+    const chip=k=>{ const x=folders[k]; return `<button class="lks-c${k===fk?' on':''}" data-lksw="${esc(k)}" style="--c:${safeColor(x.c,'#6a7dff')}"${k===fk?' aria-current="page"':''}><span class="lks-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(x))}"/></svg></span><span data-i18n-skip="1">${prioDot(k)}${esc(String(x.name||'Папка').slice(0,28))}</span></button>`; };
     return `<div class="lks"><button class="lks-grp" data-lksgrp="${esc(par)}">${par?`<span data-i18n-skip="1">${esc(String(folders[par].name||'Група').slice(0,30))}</span>`:'Папки'} ›</button>
       <div class="lks-row">${sib.slice(0,40).map(chip).join('')}<button class="lks-c add" data-lksnew="${esc(par)}">＋ Папка</button></div></div>`;
   }

@@ -13,7 +13,7 @@
     var sub=kids?(kids+' '+(kids===1?'папка':kids<5?'папки':'папок')+' всередині'):'Відкрити папку';
     return '<div class="pg-content"><div class="fd" style="--c:'+(typeof safeColor==='function'?safeColor(f.c,'#6a7dff'):'#6a7dff')+'">'
       +'<button class="fd-open" data-fdopen="'+id+'">'+fdIco(f)
-      +'<span class="fd-t"><b data-i18n-skip="1">'+esc(String(f.name||'Папка').slice(0,60))+'</b><small>'+sub+'</small></span><span class="fd-go">›</span></button>'
+      +'<span class="fd-t"><b data-i18n-skip="1">'+(typeof prioDot==='function'?prioDot(k):'')+esc(String(f.name||'Папка').slice(0,60))+'</b><small>'+sub+'</small></span><span class="fd-go">›</span></button>'
       +'<button class="fd-ch" data-fdpick="'+id+'" aria-label="Змінити папку" title="Змінити папку">⇄</button></div></div>';
   }
   function fdSet(bid,k){
