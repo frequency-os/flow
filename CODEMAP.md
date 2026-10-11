@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 88 |
-| Рядків JS | 32559 |
-| Файлів CSS | 46 |
-| Рядків CSS | 10353 |
-| Сутностей верхнього рівня | 2340 |
+| Файлів JS | 89 |
+| Рядків JS | 32818 |
+| Файлів CSS | 47 |
+| Рядків CSS | 10422 |
+| Сутностей верхнього рівня | 2372 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -91,6 +91,7 @@
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
 | `src/scripts/core/54-links.js` | 223 | 25 |
+| `src/scripts/core/55-focus.js` | 259 | 32 |
 | `src/scripts/page-editor/01-palette.js` | 178 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 767 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 747 | 42 |
@@ -163,6 +164,7 @@
 | `src/styles/core/32-widgets.css` | 316 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
 | `src/styles/core/34-intro.css` | 106 | 0 |
+| `src/styles/core/35-focus.css` | 69 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (80)
 
@@ -2571,6 +2573,43 @@
 | `dsbOpen` | значення | `src/scripts/core/54-links.js:198` |
 | `dsbTreeHTML` | функція | `src/scripts/core/54-links.js:199` |
 | `dsbTreeSync` | функція | `src/scripts/core/54-links.js:211` |
+
+### `src/scripts/core/55-focus.js` — 32 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `FC_RUN_KEY` | значення | `src/scripts/core/55-focus.js:9` |
+| `fcLang` | функція | `src/scripts/core/55-focus.js:10` |
+| `FC_T` | обʼєкт | `src/scripts/core/55-focus.js:11` |
+| `fcT` | функція | `src/scripts/core/55-focus.js:25` |
+| `fcIdx` | значення | `src/scripts/core/55-focus.js:26` |
+| `fcReady` | функція | `src/scripts/core/55-focus.js:29` |
+| `fcRun` | функція | `src/scripts/core/55-focus.js:31` |
+| `fcRunSet` | функція | `src/scripts/core/55-focus.js:32` |
+| `fcLeft` | функція | `src/scripts/core/55-focus.js:33` |
+| `fcNowDec` | функція | `src/scripts/core/55-focus.js:34` |
+| `fcCands` | функція | `src/scripts/core/55-focus.js:37` |
+| `fcHadToday` | функція | `src/scripts/core/55-focus.js:56` |
+| `fcMakeBlock` | функція | `src/scripts/core/55-focus.js:59` |
+| `fcStepBlock` | функція | `src/scripts/core/55-focus.js:69` |
+| `fcDone` | функція | `src/scripts/core/55-focus.js:74` |
+| `fcStart` | функція | `src/scripts/core/55-focus.js:83` |
+| `fcBeep` | функція | `src/scripts/core/55-focus.js:90` |
+| `fcStartTimer` | функція | `src/scripts/core/55-focus.js:96` |
+| `fcStopTimer` | функція | `src/scripts/core/55-focus.js:102` |
+| `fcFinish` | функція | `src/scripts/core/55-focus.js:110` |
+| `fcLoop` | функція | `src/scripts/core/55-focus.js:119` |
+| `fcMMSS` | функція | `src/scripts/core/55-focus.js:130` |
+| `fcPaintTime` | функція | `src/scripts/core/55-focus.js:131` |
+| `fcBadge` | функція | `src/scripts/core/55-focus.js:138` |
+| `fcMate` | функція | `src/scripts/core/55-focus.js:147` |
+| `fcDurHTML` | функція | `src/scripts/core/55-focus.js:152` |
+| `fcBodyHTML` | функція | `src/scripts/core/55-focus.js:155` |
+| `fcRender` | функція | `src/scripts/core/55-focus.js:194` |
+| `fcClose` | функція | `src/scripts/core/55-focus.js:218` |
+| `fcKey` | функція | `src/scripts/core/55-focus.js:224` |
+| `openFocus` | функція | `src/scripts/core/55-focus.js:233` |
+| `window.openFocus` | значення | `src/scripts/core/55-focus.js:251` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
