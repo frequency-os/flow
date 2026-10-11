@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 88 |
-| Рядків JS | 32555 |
+| Рядків JS | 32559 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10343 |
+| Рядків CSS | 10353 |
 | Сутностей верхнього рівня | 2340 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -74,7 +74,7 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 743 | 63 |
+| `src/scripts/core/41-journal.js` | 747 | 63 |
 | `src/scripts/core/42-day.js` | 363 | 41 |
 | `src/scripts/core/43-month.js` | 257 | 34 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
@@ -153,7 +153,7 @@
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
 | `src/styles/core/24-home-gallery.css` | 238 | 0 |
-| `src/styles/core/25-journal.css` | 301 | 0 |
+| `src/styles/core/25-journal.css` | 311 | 0 |
 | `src/styles/core/26-day.css` | 173 | 0 |
 | `src/styles/core/27-month.css` | 202 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
@@ -2036,25 +2036,25 @@
 | `jnFloatRender` | функція | `src/scripts/core/41-journal.js:204` |
 | `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:218` |
 | `jnRenderToday` | функція | `src/scripts/core/41-journal.js:226` |
-| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:301` |
-| `jnDone` | функція | `src/scripts/core/41-journal.js:314` |
-| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:319` |
-| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:323` |
-| `jnStoryView` | функція | `src/scripts/core/41-journal.js:349` |
-| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:380` |
-| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:389` |
-| `jnOverlay` | функція | `src/scripts/core/41-journal.js:405` |
-| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:418` |
-| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:426` |
-| `jnTplDows` | функція | `src/scripts/core/41-journal.js:429` |
-| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:436` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:457` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:589` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:594` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:676` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:689` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:725` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:736` |
+| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:305` |
+| `jnDone` | функція | `src/scripts/core/41-journal.js:318` |
+| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:323` |
+| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:327` |
+| `jnStoryView` | функція | `src/scripts/core/41-journal.js:353` |
+| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:384` |
+| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:393` |
+| `jnOverlay` | функція | `src/scripts/core/41-journal.js:409` |
+| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:422` |
+| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:430` |
+| `jnTplDows` | функція | `src/scripts/core/41-journal.js:433` |
+| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:440` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:461` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:593` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:598` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:680` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:693` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:729` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:740` |
 
 ### `src/scripts/core/42-day.js` — 41 сутностей
 

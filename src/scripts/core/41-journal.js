@@ -238,7 +238,8 @@
     const week=jnWeek().map(ds=>{ const l=jnDayLevel(ds), d=new Date(ds+'T12:00:00');
       return `<button class="jn-d${ds===td?' today':''}${ds>td?' fut':''}" data-jnday="${ds}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></button>`; }).join('');
     const dev=!!(window.upDevOn&&window.upDevOn());
-    body.innerHTML=`
+    /* ноутбук (≥1180px): ліворуч день по годинах, праворуч герой, місії, ресурси — 32-journal… CSS .jn-cols; телефон — той самий порядок */
+    body.innerHTML=`<div class="jn-cols"><div class="jn-side">
       ${hero.started?'':jnStartCard()}
       <div class="jn-top">
         <span class="jn-duo"><button class="jn-me" data-jnhero><span class="jn-av sm">${jnAvatar()}</span>
@@ -251,8 +252,10 @@
       ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
       ${jnFocusCard(list)}
       ${typeof rlJournalHTML==='function'?rlJournalHTML():''}
+      </div><div class="jn-main">
       <div class="jn-sec"><span>День по годинах</span><button data-dyfrom>＋ З місій</button></div>
       ${calAllDayHTML(td)}${dyRibbonHTML(td)}${calNoteCardHTML(td)}
+      </div><div class="jn-side2">
       <div class="jn-sec"><span>Ресурси</span><button data-jnhist>Історія днів ›</button></div>
       <div class="jn-res">
         <button class="jn-r t" data-jnres="time"><small>Час</small><b>${free===null?'—':String(free).replace('.',',')+' год'}</b><small>вільно сьогодні</small></button>
@@ -265,6 +268,7 @@
       <button class="jn-arch" data-rlbook>📖 Правила гри</button>
       <button class="jn-arch" data-jnset>Налаштування гри</button>
       ${dev?`<button class="jn-map" data-jnmap>Карта · «Мій світ» (розробник)</button>`:''}
+      </div></div>
       <div class="jn-pad"></div>`;
     body.querySelectorAll('[data-jnm]').forEach(b=>b.onclick=()=>{ const gl=goals.find(g=>String(g.id)===b.dataset.jnm); if(gl) jnEditor(gl); });
     body.querySelectorAll('[data-jnstory]').forEach(b=>b.onclick=()=>{ const i=stories.findIndex(g=>String(g.id)===b.dataset.jnstory); if(i>=0) jnStoryView(stories,i); });

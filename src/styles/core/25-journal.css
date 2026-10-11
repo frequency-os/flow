@@ -299,3 +299,13 @@
   .jn-mate svg{width:30px;height:30px;}
   .jn-mate:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   .jn-mate-n{font-weight:700;color:var(--muted);}
+
+  /* ── Журнал на ноутбуці (≥1180px): ліворуч день по годинах, праворуч герой · місії · ресурси ── */
+  @media (min-width:1180px){
+    .jn-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,380px);grid-template-areas:"main side" "main side2";grid-template-rows:auto 1fr;column-gap:28px;row-gap:0;align-items:start;}
+    .jn-cols>.jn-side{grid-area:side;min-width:0;}
+    .jn-cols>.jn-main{grid-area:main;min-width:0;position:sticky;top:12px;}
+    .jn-cols>.jn-side2{grid-area:side2;min-width:0;}
+    .jn-cols .jn-main .dg-wrap{max-height:calc(100vh - 260px);}
+    .jn-cols .jn-side .jn-sts{flex-wrap:wrap;}
+  }
