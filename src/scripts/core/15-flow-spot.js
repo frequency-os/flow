@@ -998,9 +998,10 @@
      поточний тиждень — «скільки з семи» і сім крапок Пн→Нд, де видно і
      пропуски, і що вихідні ще попереду.
 
-     Правило дня лишилось те саме (Щоденник АБО Карта бажань). Сусідній
-     plStreak() сюди не годиться: він рахує виконані блоки
-     Планера, а це інша річ. */
+     Правило дня — dayInMotion() з 41-journal.js, спільне з серією Журналу.
+     12.10.2026 (план за «тестовим місяцем», погоджено Ярославом) до Щоденника
+     й Карти бажань додано закриту справу дня: інакше місяць роботи в Журналі
+     виглядав тут як «за місяць поки жодного дня». */
   function heroWeekDays(){
     const labels=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
     const today=new Date(); today.setHours(0,0,0,0);
@@ -1010,9 +1011,8 @@
     for(let i=0;i<7;i++){
       const d=new Date(monday); d.setDate(monday.getDate()+i);
       const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-      const hasDiary=!!(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim());
-      const hasWish=!!(typeof wishActiveDays!=='undefined'&&wishActiveDays[ds]);
-      const on=hasDiary||hasWish; if(on) filled++;
+      // майбутній день «у русі» не буває: справу можна закрити наперед у Планері, але тиждень рахує лише прожите
+      const on=+d<=+today&&dayInMotion(ds); if(on) filled++;
       out.push({ l:labels[i], on, future:+d>+today, today:+d===+today });
     }
     return { days:out, filled };
@@ -1024,9 +1024,7 @@
     let filled=0;
     for(let d=1; d<=total; d++){
       const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-      const hasDiary=!!(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim());
-      const hasWish=!!(typeof wishActiveDays!=='undefined'&&wishActiveDays[ds]);
-      if(hasDiary||hasWish) filled++;
+      if(dayInMotion(ds)) filled++;
     }
     return { pct: total?Math.round(filled/total*100):0, filled, total };
   }

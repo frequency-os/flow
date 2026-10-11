@@ -4,11 +4,24 @@
   function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
   function targetDate(){return new Date(new Date().getFullYear()+1,0,1,0,0,0,0);}
   function daysInYear(y){return ((y%4===0&&y%100!==0)||y%400===0)?366:365;}
+  // точка Б з листа (40-year-letter.js, goalsData.letter) — коли лист написаний і дата ще попереду,
+  // маленький лічильник на Огляді рахує до неї, а тап веде в Журнал → Рік, де живе лист (12.10.2026).
+  // Нема листа — усе як було: до Нового року і власний екран scr-nyc.
+  function pointB(){
+    try{
+      var L=(typeof goalsData!=='undefined'&&goalsData)?goalsData.letter:null;
+      if(!L||typeof L.text!=='string'||!L.text.trim()) return null;
+      var ds=typeof L.date==='string'?L.date:'';
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)) return null;
+      var t=new Date(+ds.slice(0,4),+ds.slice(5,7)-1,+ds.slice(8,10),0,0,0,0);
+      return t>new Date()?t:null;
+    }catch(_){return null;}
+  }
 
   // ── дрібний віджет на головному ──
   function tickWidget(){
     var d=document.getElementById('nycD');if(!d)return;
-    var t=targetDate(),diff=t-new Date();if(diff<0)diff=0;
+    var pb=pointB(),t=pb||targetDate(),diff=t-new Date();if(diff<0)diff=0;
     var s=Math.floor(diff/1000);
     var dd=Math.floor(s/86400);s-=dd*86400;
     var h=Math.floor(s/3600);s-=h*3600;
@@ -17,8 +30,16 @@
     document.getElementById('nycH').textContent=String(h).padStart(2,'0');
     document.getElementById('nycM').textContent=String(m).padStart(2,'0');
     document.getElementById('nycS').textContent=String(s).padStart(2,'0');
-    var tt=document.getElementById('nycTitle');if(tt)tt.textContent='До '+t.getFullYear()+' року';
+    var title=pb?'До точки Б':'До '+t.getFullYear()+' року';
+    var tt=document.getElementById('nycTitle');if(tt&&tt.textContent!==title)tt.textContent=title;
+    var box=document.getElementById('nyCountdown');
+    if(box){var al=pb?'Лічильник до точки Б з листа — відкрити Рік у Журналі':'Лічильник до Нового року';if(box.getAttribute('aria-label')!==al)box.setAttribute('aria-label',al);}
   }
+  // тап по лічильнику на Огляді (onclick у index.html)
+  window.__nycTap=function(){
+    if(pointB()&&typeof window.goJournal==='function'){window.goJournal({tab:'year'});return;}
+    if(window.goNYC)window.goNYC();
+  };
 
   // ── великий екран ──
   var curView='grid';
