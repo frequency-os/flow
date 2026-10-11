@@ -290,7 +290,13 @@
     if(typeof wdIs==='function'&&wdIs(k)){ pgDataInsert(k,loc); return; }   /* «Дані» — у дошку віджетів */
     var BT=(bridge()&&bridge().blockTypes())||{};
     function bTitle(t,fb){ return (BT[t]&&BT[t].title)||fb; }
-    if(k==='tbl'){tbInit(b);}
+    if(k==='fold'&&String(txtOf(b)||'').trim()){   /* у рядку вже текст — папка лягає під ним, текст не стирається */
+      var fdN={id:uid(),type:'fold'}, fdA=loc.arr, fdI=loc.idx+1; fdA.splice(fdI,0,fdN);
+      pushOp(function(){ var i=fdA.indexOf(fdN); if(i>=0) fdA.splice(i,1); },function(){ if(fdA.indexOf(fdN)<0) fdA.splice(Math.min(fdI,fdA.length),0,fdN); });
+      closeSlash(); save(); render(); setTimeout(function(){ fdPick(fdN.id); },150); return;
+    }
+    if(k==='fold'){b.type='fold';delete b.text;}
+    else if(k==='tbl'){tbInit(b);}
     else if(k==='divider'){b.type='divider';}
     else if(k==='db'){b.type='db';b.dbName=b.title||'Нова база';b.view='table';b.cols=[{k:'name',t:'Назва'},{k:'status',t:'Статус'},{k:'note',t:'Нотатка'}];b.rows=[{name:'Запис 1',status:'Нова',note:''}];}
     else if(k==='callout'){b.type='callout';b.emo='💡';}
@@ -389,6 +395,7 @@
       rb.classList.add('pg-born');
       setTimeout(function(){try{rb.classList.remove('pg-born');}catch(_){}},900);
     }
+    if(k==='fold'&&!b.folder) setTimeout(function(){ fdPick(was); },150);   /* одразу вибрати папку */
   }
   /* «Дані» (core/48-widgets.js → wdInit): віджет лягає в дошку віджетів — ту, в якій стоїть рядок;
      інакше в уже наявну дошку віджетів сторінки (wboard:true); інакше рядок стає новою дошкою.

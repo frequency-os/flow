@@ -1078,3 +1078,27 @@
   .tb-cchip{display:block;font-size:10px;font-weight:700;line-height:1.2;padding:2px 4px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--sc) 22%,transparent);border-left:2px solid var(--sc);}
   .tb-cd small{font-size:10px;font-weight:800;color:var(--pg-mut,var(--muted));}
+  /* блок «Папка» (05-fold.js) — одна справжня папка в документі */
+  .fd{display:flex;align-items:stretch;gap:6px;min-width:0;}
+  .fd-open,.fd.fd-empty{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 14px 10px 10px;border-radius:16px;
+    background:color-mix(in srgb,var(--c,#f0b429) 10%,var(--pg-card,transparent));border:1.5px solid color-mix(in srgb,var(--c,#f0b429) 45%,var(--pg-edge,var(--line)));color:var(--pg-fg,var(--text));}
+  .fd.fd-empty{border-style:dashed;--c:#f0b429;width:100%;}
+  .fd-ic{flex:none;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:var(--c);color:#fff;}
+  .fd-ic .ico{width:22px;height:22px;}
+  .fd-ic0{background:color-mix(in srgb,var(--c) 22%,transparent);color:var(--c);}
+  .fd-ic0 svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;}
+  .fd-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .fd-t b{font-size:16px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fd-t small{font-size:12.5px;font-weight:600;color:var(--pg-mut,var(--muted));}
+  .fd-go{flex:none;font-size:22px;font-weight:700;color:var(--c);}
+  .fd-ch{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:44px;border-radius:14px;display:grid;place-items:center;font-size:17px;color:var(--pg-mut,var(--muted));border:1.5px solid var(--pg-edge,var(--line));}
+  .fd-open:focus-visible,.fd-ch:focus-visible,.fd.fd-empty:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .fdsheet .fds-new{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;min-height:48px;padding:0 14px;border-radius:12px;border:1.5px dashed #6a7dff;color:#aab4ff;font-weight:800;font-size:15px;line-height:48px;margin-bottom:10px;}
+  .fdsheet .fds-list{max-height:min(52vh,420px);overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
+  .fdsheet .fds-i{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:48px;padding:4px 10px 4px calc(8px + var(--d,0) * 22px);border-radius:12px;color:#f3f5f8;font-weight:700;font-size:15px;}
+  .fdsheet .fds-i span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fdsheet .fds-i .fd-ic{width:32px;height:32px;border-radius:10px;}
+  .fdsheet .fds-i .fd-ic .ico{width:17px;height:17px;}
+  .fdsheet .fds-i.on{background:rgba(106,125,255,.18);}
+  .fdsheet .fds-i:focus-visible,.fdsheet .fds-new:focus-visible{outline:2px solid #6a7dff;}
+  .fdsheet .fds-none{color:#8b93a3;padding:8px 4px;}

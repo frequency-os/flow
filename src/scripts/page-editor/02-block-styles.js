@@ -316,6 +316,7 @@
         +(safeHref(_au)?'<a class="pglk-go" href="'+esc(safeHref(_au))+'" target="_blank" rel="noopener">↗</a>':'')   /* лише http(s)/mailto (SEC-6) */
         +'</div></div>';
     }
+    if(t==='fold')return fdHTML(b);   /* «Папка» (05-fold.js) */
     if(t==='tbl')return tbHTML(b);   /* «Таблиця» (04-table.js) */
     if(t==='db'||t==='table')return dbHTML(b);
     // будь-який інший тип Flow показуємо як текст-плейсхолдер із назвою
