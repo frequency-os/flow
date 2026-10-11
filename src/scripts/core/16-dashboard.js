@@ -245,7 +245,7 @@
   function fc3Add(){
     const a=document.createElement('button'); a.type='button'; a.className='fc3-add';
     a.innerHTML='<span class="fc3-plus" aria-hidden="true">＋</span><span>Нова папка</span>';
-    a.onclick=()=>createFolder();
+    a.onclick=()=>openNewFolderChoice();
     return a;
   }
   function renderFolderCovers(grid, keys){
@@ -375,7 +375,7 @@
     const add=document.createElement('div');
     add.className=homeFolderView==='rows'?'fr fr-add':'fc2 fc2-add '+(homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
     add.innerHTML=homeFolderView==='rows'?`<span class="fr-ic" style="background:transparent;box-shadow:none;color:var(--accent);font-size:22px">＋</span><span>Нова папка</span>`:`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
-    add.onclick=createFolder;
+    add.onclick=()=>openNewFolderChoice();
     grid.appendChild(add);
     }
     // bind menus
@@ -587,16 +587,29 @@
       m.querySelector('[data-gback]').onclick=()=>openFolderGroup(key);
     });
   }
-  // «Обʼєднати»: кілька папок з головної → нова група
-  function openFolderMerge(){
+  // «＋ Нова папка» на головній: порожня папка чи група з кількох наявних (12.10.2026 — «Обʼєднати» було сховане в ⚙)
+  function openNewFolderChoice(){
+    const n=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && folders[k].role!=='project').length;
+    if(n<2){ createFolder(); return; }
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Що створити</div>
+      ${fmRow('nf','plus','Нова папка','порожня, назву даси зараз')}
+      ${fmRow('ng','group','Група з кількох папок','обери 2+ папки — вони ляжуть усередину')}`,
+    m=>{
+      m.querySelector('[data-act="nf"]').onclick=()=>{ closeFolderMenu(); createFolder(); };
+      m.querySelector('[data-act="ng"]').onclick=()=>openFolderMerge();
+    });
+  }
+  // «Обʼєднати»: кілька папок з головної → нова група; pre — папка, вже відмічена (з перемикача в документі)
+  function openFolderMerge(pre){
     const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && folders[k].role!=='project');
-    const sel=new Set();
+    const sel=new Set(typeof pre==='string'&&cand.includes(pre)?[pre]:[]);
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Обʼєднати в групу</div>
       <label class="fgm-lbl" for="fgmName">Назва групи</label>
       <input class="fgm-name" id="fgmName" maxlength="60" placeholder="напр. Фінанси" autocomplete="off">
       <div class="fmi-label">Які папки</div>
-      ${cand.map(k=>`<button class="fgs-row" data-gsel="${esc(k)}" aria-pressed="false">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b>${groupKids(k).length?'<small>група</small>':''}</span><span class="fgm-chk" aria-hidden="true"></span></button>`).join('')}
+      ${cand.map(k=>`<button class="fgs-row${sel.has(k)?' on':''}" data-gsel="${esc(k)}" aria-pressed="${sel.has(k)}">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b>${groupKids(k).length?'<small>група</small>':''}</span><span class="fgm-chk" aria-hidden="true"></span></button>`).join('')}
       <button class="fgm-ok" data-gok disabled>Обери хоча б дві папки</button>`,
     m=>{
       const ok=m.querySelector('[data-gok]'), inp=m.querySelector('#fgmName');
@@ -607,6 +620,7 @@
         try{ window.platform.haptic('select'); }catch(_){}
         sync();
       });
+      sync();
       ok.onclick=()=>{
         if(sel.size<2) return;
         const picked=cand.filter(k=>sel.has(k));
