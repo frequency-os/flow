@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-12-0013-8d10429';
+  var BUILD='2026-10-12-0102-97e6a74';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1629,6 +1629,31 @@
   .tbsheet .tbs-ty i{font-style:normal;font-size:15px;}
   .tbsheet .tbs-del{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;min-height:44px;text-align:center;border-radius:12px;color:#e5484d;font-weight:800;margin-bottom:8px;}
   .tb-grid.days{grid-template-columns:64px repeat(var(--m),minmax(110px,1fr)) 40px;}
+  /* «Таблиця», етап 2: перемикач видів, дошка, календар */
+  .tb-views{display:inline-flex;align-self:flex-start;gap:3px;padding:3px;border-radius:12px;background:color-mix(in srgb,var(--pg-fg,#888) 7%,transparent);}
+  .tb-views button{all:unset;cursor:pointer;min-height:34px;padding:0 12px;border-radius:9px;font-size:13px;font-weight:800;color:var(--pg-mut,var(--muted));}
+  .tb-views button.on{background:var(--pg-surface,var(--card));color:var(--pg-fg,var(--text));box-shadow:0 1px 3px rgba(0,0,0,.12);}
+  .tb-views button:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:1px;}
+  .tb-need{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:13.5px;font-weight:600;color:var(--pg-mut,var(--muted));}
+  .tb-need button{all:unset;cursor:pointer;min-height:40px;padding:0 12px;border-radius:12px;font-weight:800;color:var(--pg-acc,var(--accent));border:1px dashed var(--pg-edge,var(--line));}
+  .tb-board{display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scroll-snap-type:x proximity;}
+  .tb-bcol{flex:0 0 min(78%,260px);scroll-snap-align:start;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:16px;background:color-mix(in srgb,var(--pg-fg,#888) 4%,transparent);border:1px solid var(--pg-edge,var(--line));}
+  .tb-bh{display:flex;align-items:center;gap:8px;font-size:13.5px;}
+  .tb-bh i{width:10px;height:10px;border-radius:50%;background:var(--sc);} .tb-bh b{flex:1;font-weight:800;} .tb-bh small{font-weight:800;color:var(--pg-mut,var(--muted));}
+  .tb-card{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;background:var(--pg-surface,var(--card));border:1px solid var(--pg-edge,var(--line));}
+  .tb-card b{font-size:14px;font-weight:800;overflow-wrap:anywhere;} .tb-card b i{font-weight:600;color:var(--pg-mut,var(--muted));}
+  .tb-chips{display:flex;flex-wrap:wrap;gap:4px;} .tb-chip{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:99px;background:color-mix(in srgb,var(--pg-fg,#888) 8%,transparent);color:var(--pg-mut,var(--muted));}
+  .tb-next{all:unset;cursor:pointer;align-self:flex-start;min-height:32px;padding:0 10px;border-radius:9px;font-size:12px;font-weight:800;color:var(--sc);background:color-mix(in srgb,var(--sc) 14%,transparent);}
+  .tb-badd{all:unset;cursor:pointer;min-height:38px;padding:0 10px;border-radius:10px;font-size:13px;font-weight:800;color:var(--pg-acc,var(--accent));}
+  .tb-next:focus-visible,.tb-badd:focus-visible,.tb-cdn:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:1px;}
+  .tb-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;}
+  .tb-cal>b{font-size:10.5px;font-weight:800;color:var(--pg-mut,var(--muted));text-align:center;padding-bottom:2px;}
+  .tb-cd{min-height:58px;padding:3px;border-radius:9px;display:flex;flex-direction:column;gap:2px;min-width:0;background:color-mix(in srgb,var(--pg-fg,#888) 4%,transparent);}
+  .tb-cd.td{box-shadow:inset 0 0 0 2px var(--pg-acc,var(--accent));}
+  .tb-cdn{all:unset;cursor:pointer;font-size:11.5px;font-weight:800;color:var(--pg-mut,var(--muted));min-height:20px;}
+  .tb-cchip{display:block;font-size:10px;font-weight:700;line-height:1.2;padding:2px 4px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--sc) 22%,transparent);border-left:2px solid var(--sc);}
+  .tb-cd small{font-size:10px;font-weight:800;color:var(--pg-mut,var(--muted));}
 /* ══════════════════════════════════════════════════════════════════
    ЧОМУ ТУТ СКРІЗЬ var(--c, #6a7dff), а не просто var(--c)
 
@@ -6605,6 +6630,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 .fr .fmenu{position:static;flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer;opacity:1;}
 .fr .fmenu:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
 .fr.fr-add{justify-content:flex-start;gap:10px;min-height:52px;border-style:dashed;background:transparent;color:var(--accent);font-weight:800;font-size:14.5px;}
+/* ноутбук: «Рядки» у дві колонки — довгі смуги на всю ширину не потрібні */
+@media (min-width:1024px){
+  #folderGrid.fv2-rows{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  #folderGrid.fv2-rows .fr-add{grid-column:1 / -1;}
+}
   /* ============ ЖУРНАЛ ГЕРОЯ (41-journal.js): герой, ресурси, тиждень, місії; редактор місії ============ */
   #jnBody{display:flex;flex-direction:column;gap:12px;}
   #jnBody button{font-family:inherit;}
@@ -6906,6 +6936,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .jn-mate svg{width:30px;height:30px;}
   .jn-mate:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   .jn-mate-n{font-weight:700;color:var(--muted);}
+
+  /* ── Журнал на ноутбуці (≥1180px): ліворуч день по годинах, праворуч герой · місії · ресурси ── */
+  @media (min-width:1180px){
+    .jn-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,380px);grid-template-areas:"main side" "main side2";grid-template-rows:auto 1fr;column-gap:28px;row-gap:0;align-items:start;}
+    .jn-cols>.jn-side{grid-area:side;min-width:0;}
+    .jn-cols>.jn-main{grid-area:main;min-width:0;position:sticky;top:12px;}
+    .jn-cols>.jn-side2{grid-area:side2;min-width:0;}
+    .jn-cols .jn-main .dg-wrap{max-height:calc(100vh - 260px);}
+    .jn-cols .jn-side .jn-sts{flex-wrap:wrap;}
+  }
   /* ============ ПЛАНЕР · ДЕНЬ «Стрічка» (42-day.js): тиждень, справи за часом, вільні проміжки ============ */
   .dy-wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:14px;}
   .dy-d{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:58px;padding:7px 0 6px;
@@ -7926,6 +7966,30 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .wd-subs button.on i{background:var(--fc);}
   .wd-subs button.on{color:var(--pg-mut,var(--muted));text-decoration:line-through;}
   .wd-subs button:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:1px;border-radius:6px;}
+
+  /* ── ноутбук (≥1024px): віджети по-«компʼютерному» — L на всю ширину й нижчий, усередині дві колонки ── */
+  @media (min-width:1024px){
+    #scr-page .pg-board.wboard .pg-bitem[data-sz="m"]{grid-column:span 6;}
+    #scr-page .pg-board.wboard .pg-bitem[data-sz="l"]{grid-column:span 12;grid-row:span 3;}
+    #scr-page .pg-board.wboard .pg-bitem[data-sz="l"]:has(.calw){grid-row:span 4;}
+    /* L: дві колонки — ліва «що зараз», права «картина періоду» */
+    .wg-t.wd.sz-l:not(.calw){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;row-gap:8px;align-content:start;}
+    .wg-t.wd.sz-l:not(.calw)>*{grid-column:1;}
+    .wg-t.wd.sz-l>.wd-h{grid-column:1 / -1;}
+    .wg-t.wd.sz-l>.wg-hit,.wg-t.wd.sz-l>.wd-cfg{grid-column:auto;}
+    /* Час: тиждень стовпчиками праворуч; список і «＋ блок» лишаються ліворуч */
+    .wg-t.wd.tim.sz-l>.wd-bars{grid-column:2;grid-row:2 / span 4;height:100%;max-height:none;align-self:stretch;}
+    .wg-t.wd.tim.sz-l>.wd-foot{margin-top:4px;}
+    /* Звичка: сітка 4 тижнів праворуч */
+    .wg-t.wd.hab.sz-l>.wd-hg{grid-column:2;grid-row:2 / span 5;align-self:center;}
+    .wg-t.wd.hab.sz-l .wd-hg i{height:22px;}
+    /* Місія: кроки праворуч від кільця */
+    .wg-t.wd.mis.sz-l>.wd-lv{grid-column:2;grid-row:2 / span 3;align-self:center;margin-top:0;}
+    /* M: кільце і текст поруч, без порожнечі */
+    .wg-t.wd.sz-m .wd-big{font-size:28px;}
+  }
+  /* ноутбук: плитки Гаманця — 4 колонки (місія · конверти · борги×2 стають в один ряд, без дірки праворуч) */
+  @media (min-width:1024px){ #scr-finance .wg-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row dense;} }
   /* ════════ «Стартовий набір» — порожній Огляд нової людини (53-starter.js, 10.10.2026) ════════
      Банер Карти бажань → колаж мрій; сітка папок → 4 приклади + Журнал + «Зробити своїм».
      Кольори лише з токенів теми; текст на фото — білий під затемненням знизу. */
@@ -29922,7 +29986,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const week=jnWeek().map(ds=>{ const l=jnDayLevel(ds), d=new Date(ds+'T12:00:00');
       return `<button class="jn-d${ds===td?' today':''}${ds>td?' fut':''}" data-jnday="${ds}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></button>`; }).join('');
     const dev=!!(window.upDevOn&&window.upDevOn());
-    body.innerHTML=`
+    /* ноутбук (≥1180px): ліворуч день по годинах, праворуч герой, місії, ресурси — 32-journal… CSS .jn-cols; телефон — той самий порядок */
+    body.innerHTML=`<div class="jn-cols"><div class="jn-side">
       ${hero.started?'':jnStartCard()}
       <div class="jn-top">
         <span class="jn-duo"><button class="jn-me" data-jnhero><span class="jn-av sm">${jnAvatar()}</span>
@@ -29935,8 +30000,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ${act.length?'':`<div class="jn-empty"><b>Ще нема місій</b>Почни з головної — того, куди йдеш. Рівні, дні й бюджет задаси в ній.<button data-jnadd>+ Перша місія</button></div>`}
       ${jnFocusCard(list)}
       ${typeof rlJournalHTML==='function'?rlJournalHTML():''}
+      </div><div class="jn-main">
       <div class="jn-sec"><span>День по годинах</span><button data-dyfrom>＋ З місій</button></div>
       ${calAllDayHTML(td)}${dyRibbonHTML(td)}${calNoteCardHTML(td)}
+      </div><div class="jn-side2">
       <div class="jn-sec"><span>Ресурси</span><button data-jnhist>Історія днів ›</button></div>
       <div class="jn-res">
         <button class="jn-r t" data-jnres="time"><small>Час</small><b>${free===null?'—':String(free).replace('.',',')+' год'}</b><small>вільно сьогодні</small></button>
@@ -29949,6 +30016,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <button class="jn-arch" data-rlbook>📖 Правила гри</button>
       <button class="jn-arch" data-jnset>Налаштування гри</button>
       ${dev?`<button class="jn-map" data-jnmap>Карта · «Мій світ» (розробник)</button>`:''}
+      </div></div>
       <div class="jn-pad"></div>`;
     body.querySelectorAll('[data-jnm]').forEach(b=>b.onclick=()=>{ const gl=goals.find(g=>String(g.id)===b.dataset.jnm); if(gl) jnEditor(gl); });
     body.querySelectorAll('[data-jnstory]').forEach(b=>b.onclick=()=>{ const i=stories.findIndex(g=>String(g.id)===b.dataset.jnstory); if(i>=0) jnStoryView(stories,i); });
@@ -36229,13 +36297,49 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(days){ var cc=cols.find(function(c){ return c.id===b.chart&&(c.ty==='num'||c.ty==='plan'); })||cols.find(function(c){ return c.ty==='plan'||c.ty==='num'; });
       if(cc){ var vals=rows.map(function(r){ return cc.ty==='plan'?tbPlanMin(r.ds,fk):tbNum(r.c[cc.id]); }), mx=Math.max.apply(null,vals.concat([1]));
         chart='<div class="tb-chart" aria-label="Графік «'+esc(cc.t)+'»"><small>'+esc(cc.t)+' по днях</small><div class="tb-bars">'+vals.map(function(v,i){ return '<i class="'+(rows[i].ds===td?'td':'')+'" style="height:'+(v?Math.max(6,Math.round(v/mx*100)):2)+'%" title="'+(+rows[i].ds.slice(8))+': '+tbFmt(v)+'"></i>'; }).join('')+'</div></div>'; } }
-    var ym=tbYm(b);
+    var ym=tbYm(b), view=days?'table':(b.view==='board'||b.view==='cal'?b.view:'table');
+    var mon='<span class="tb-mon"><button data-tmon="'+esc(b.id)+'|-1" aria-label="Попередній місяць">‹</button><b>'+esc((typeof MO_NAMES!=='undefined'?MO_NAMES[+ym.slice(5,7)-1]:ym.slice(5,7))+' '+ym.slice(0,4))+'</b><button data-tmon="'+esc(b.id)+'|1" aria-label="Наступний місяць">›</button></span>';
+    var seg=days?'':'<div class="tb-views" role="tablist">'+[['table','Таблиця'],['board','Дошка'],['cal','Календар']].map(function(v){ return '<button role="tab" data-tview="'+esc(b.id)+'|'+v[0]+'" aria-selected="'+(view===v[0])+'" class="'+(view===v[0]?'on':'')+'">'+v[1]+'</button>'; }).join('')+'</div>';
+    var main;
+    if(view==='board') main=tbBoardHTML(b,cols,rows,fk);
+    else if(view==='cal') main=tbCalHTML(b,cols,rows);
+    else main=chart+'<div class="tb-scroll"><div class="tb-grid'+(days?' days':'')+'" style="--n:'+(cols.length+(days?1:0))+';--m:'+cols.length+'">'+head+body+sum+'</div></div>'
+      +(days||rows.length>=TB_MAXR?'':'<button class="tb-addr" data-taddrow="'+esc(b.id)+'">＋ рядок</button>');
     return '<div class="pg-content tb" data-tbl="'+esc(b.id)+'">'
       +'<div class="tb-top"><div class="tb-name" contenteditable="true" data-tname="'+esc(b.id)+'" data-i18n-skip="1">'+esc(String(b.title||'Таблиця'))+'</div>'
-      +(days?'<span class="tb-mon"><button data-tmon="'+esc(b.id)+'|-1" aria-label="Попередній місяць">‹</button><b>'+esc((typeof MO_NAMES!=='undefined'?MO_NAMES[+ym.slice(5,7)-1]:ym.slice(5,7))+' '+ym.slice(0,4))+'</b><button data-tmon="'+esc(b.id)+'|1" aria-label="Наступний місяць">›</button></span>':'')
+      +(days||view==='cal'?mon:'')
       +'<button class="tb-cfg" data-tcfg="'+esc(b.id)+'" aria-label="Налаштування таблиці">⚙</button></div>'
-      +chart+'<div class="tb-scroll"><div class="tb-grid'+(days?' days':'')+'" style="--n:'+(cols.length+(days?1:0))+';--m:'+cols.length+'">'+head+body+sum+'</div></div>'
-      +(days||rows.length>=TB_MAXR?'':'<button class="tb-addr" data-taddrow="'+esc(b.id)+'">＋ рядок</button>')+'</div>';
+      +seg+main+'</div>';
+  }
+  /* ── вигляд «Дошка» (етап 2): картки за першою колонкою «Статус»; назва — перша текстова, дата — перша «Дата» ── */
+  function tbTitleCol(cols){ return cols.find(function(c){ return c.ty==='text'; })||null; }
+  function tbBoardHTML(b,cols,rows,fk){
+    var sc=cols.find(function(c){ return c.ty==='status'; });
+    if(!sc) return '<div class="tb-need">Для дошки потрібна колонка «Статус».<button data-taddtype="'+esc(b.id)+'|status">＋ Колонка «Статус»</button></div>';
+    var tc=tbTitleCol(cols), dc=cols.find(function(c){ return c.ty==='date'; }), pc=cols.find(function(c){ return c.ty==='plan'; });
+    var groups=[['','Без статусу']].concat(TB_ST.map(function(x){ return [x,x]; }));
+    return '<div class="tb-board">'+groups.map(function(g){
+      var rs=rows.filter(function(r){ var v=r.c[sc.id]; return g[0]?v===g[0]:TB_ST.indexOf(v)<0; });
+      if(!g[0]&&!rs.length) return '';
+      return '<div class="tb-bcol" style="--sc:'+(TB_STC[g[0]]||'#8b93a3')+'"><div class="tb-bh"><i></i><b>'+esc(g[1])+'</b><small>'+rs.length+'</small></div>'
+        +rs.map(function(r){ var t=tc?String(r.c[tc.id]||''):'', d=dc?String(r.c[dc.id]||''):'';
+          return '<div class="tb-card"><b data-i18n-skip="1">'+(t?esc(t.slice(0,80)):'<i>без назви</i>')+'</b>'
+            +'<span class="tb-chips">'+(/^\d{4}-\d{2}-\d{2}$/.test(d)?'<span class="tb-chip">📅 '+esc(typeof jnDateTxt==='function'?jnDateTxt(d):d)+'</span>':'')
+            +(pc&&/^\d{4}-\d{2}-\d{2}$/.test(d)?'<span class="tb-chip">🔗 '+tbPlanMin(d,fk)+' хв</span>':'')+'</span>'
+            +'<button class="tb-next" data-tstat="'+esc(b.id)+'|'+esc(r.id)+'|'+esc(sc.id)+'">'+(g[0]==='Готово'?'↺ Без статусу':'→ '+(TB_ST[TB_ST.indexOf(g[0])+1]||TB_ST[0]))+'</button></div>'; }).join('')
+        +(g[0]&&rows.length<TB_MAXR?'<button class="tb-badd" data-taddst="'+esc(b.id)+'|'+esc(sc.id)+'|'+esc(g[0])+'">＋ картка</button>':'')+'</div>'; }).join('')+'</div>';
+  }
+  /* ── вигляд «Календар» (етап 2): рядки на днях місяця за першою колонкою «Дата»; порожній день — новий рядок з цією датою ── */
+  function tbCalHTML(b,cols,rows){
+    var dc=cols.find(function(c){ return c.ty==='date'; });
+    if(!dc) return '<div class="tb-need">Для календаря потрібна колонка «Дата».<button data-taddtype="'+esc(b.id)+'|date">＋ Колонка «Дата»</button></div>';
+    var tc=tbTitleCol(cols), sc=cols.find(function(c){ return c.ty==='status'; }), ym=tbYm(b), td=ymdLocal(), days=tbDays(b);
+    var lead=(new Date(ym+'-01T12:00:00').getDay()+6)%7, h=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(function(d){ return '<b>'+d+'</b>'; }).join('')+new Array(lead+1).join('<span></span>');
+    days.forEach(function(ds){ var rs=rows.filter(function(r){ return r.c[dc.id]===ds; });
+      h+='<div class="tb-cd'+(ds===td?' td':'')+'"><button class="tb-cdn" data-tcalday="'+esc(b.id)+'|'+esc(dc.id)+'|'+ds+'" aria-label="Новий рядок на '+(+ds.slice(8))+'">'+(+ds.slice(8))+'</button>'
+        +rs.slice(0,3).map(function(r){ var st=sc&&TB_ST.indexOf(r.c[sc.id])>=0?r.c[sc.id]:''; return '<span class="tb-cchip" style="--sc:'+(TB_STC[st]||'#8b93a3')+'" data-i18n-skip="1">'+esc(String(tc?(r.c[tc.id]||'·'):'·').slice(0,24))+'</span>'; }).join('')
+        +(rs.length>3?'<small>+'+(rs.length-3)+'</small>':'')+'</div>'; });
+    return '<div class="tb-cal">'+h+'</div>';
   }
   /* ── дії: усе лише з тапу; структурні — з «Скасувати» (pushOp на тих самих обʼєктах) ── */
   function tbLoc(id){ var l=locate(id); return l&&l.block&&l.block.type==='tbl'?l.block:null; }
@@ -36268,7 +36372,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     var v=/^\d{4}-\d{2}-\d{2}$/.test(d.value)?d.value:''; tbSetUndo(o,p[2],v); save(); render();
   });
   editor.addEventListener('click',function(e){
-    var t=e.target.closest&&e.target.closest('[data-tcheck],[data-tstat],[data-taddrow],[data-taddcol],[data-trowdel],[data-tbcol],[data-tcfg],[data-tmon]'); if(!t) return;
+    var t=e.target.closest&&e.target.closest('[data-tcheck],[data-tstat],[data-taddrow],[data-taddcol],[data-trowdel],[data-tbcol],[data-tcfg],[data-tmon],[data-tview],[data-taddst],[data-tcalday],[data-taddtype]'); if(!t) return;
     e.preventDefault(); e.stopPropagation();
     var ds=t.dataset;
     if(ds.tcheck||ds.tstat){ var p=(ds.tcheck||ds.tstat).split('|'), b=tbLoc(p[0]); if(!b) return; var o=tbCellObj(b,p[1]); if(!o) return;
@@ -36284,6 +36388,21 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       var gone=arr3.splice(idx,1)[0];
       pushOp(function(){ if(arr3.indexOf(gone)<0) arr3.splice(Math.min(idx,arr3.length),0,gone); },function(){ var j=arr3.indexOf(gone); if(j>=0) arr3.splice(j,1); });
       save(); render(); try{ if(typeof window.__flowToast==='function') window.__flowToast('Рядок видалено — «Скасувати» вгорі поверне'); }catch(_){} return; }
+    if(ds.tview){ var pv=ds.tview.split('|'), bv=tbLoc(pv[0]); if(!bv) return; if(['table','board','cal'].indexOf(pv[1])<0) return; var ov=bv.view, nv=pv[1]==='table'?undefined:pv[1];
+      if(nv) bv.view=nv; else delete bv.view;
+      pushOp(function(){ if(ov) bv.view=ov; else delete bv.view; },function(){ if(nv) bv.view=nv; else delete bv.view; });
+      save(); render(); return; }
+    if(ds.taddst||ds.tcalday){ var pa=(ds.taddst||ds.tcalday).split('|'), ba=tbLoc(pa[0]); if(!ba||ba.mode==='days') return; if(!Array.isArray(ba.rows)) ba.rows=[];
+      if(ba.rows.length>=TB_MAXR) return;
+      var colOk=tbCols(ba).some(function(c){ return c.id===pa[1]&&c.ty===(ds.tcalday?'date':'status'); }); if(!colOk) return;
+      var val=ds.tcalday?(/^\d{4}-\d{2}-\d{2}$/.test(pa[2])?pa[2]:''):(TB_ST.indexOf(pa[2])>=0?pa[2]:''); if(!val) return;
+      var nr={id:tbId('r'),c:{}}; nr.c[pa[1]]=val; var arr4=ba.rows; arr4.push(nr);
+      pushOp(function(){ var i=arr4.indexOf(nr); if(i>=0) arr4.splice(i,1); },function(){ if(arr4.indexOf(nr)<0) arr4.push(nr); });
+      save(); render(); try{ if(typeof window.__flowToast==='function') window.__flowToast(ds.tcalday?'Рядок на '+(+val.slice(8))+' число додано — назву впиши в «Таблиці»':'Картку додано — назву впиши в «Таблиці»'); }catch(_){} return; }
+    if(ds.taddtype){ var pt=ds.taddtype.split('|'), bt=tbLoc(pt[0]); if(!bt||!tbHasTy(pt[1])) return; if(!Array.isArray(bt.cols)) bt.cols=[]; if(tbCols(bt).length>=TB_MAXC) return;
+      var ncol={id:tbId('c'),t:TB_TY[pt[1]][0],ty:pt[1]}, arr5=bt.cols; arr5.push(ncol);
+      pushOp(function(){ var i=arr5.indexOf(ncol); if(i>=0) arr5.splice(i,1); },function(){ if(arr5.indexOf(ncol)<0) arr5.push(ncol); });
+      save(); render(); return; }
     if(ds.taddcol){ tbColSheet(ds.taddcol,''); return; }
     if(ds.tbcol){ var p3=ds.tbcol.split('|'); tbColSheet(p3[0],p3[1]); return; }
     if(ds.tcfg){ tbCfgSheet(ds.tcfg); return; }
