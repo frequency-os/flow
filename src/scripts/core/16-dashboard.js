@@ -72,6 +72,9 @@
         if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return it; }
       return null;
     }
+    // підказка один раз за сеанс: що робить перетягування
+    let hinted=false;
+    function dragHint(){ if(hinted) return; hinted=true; try{ (window.__flowToast||function(){})('Тягни на папку — покласти всередину · між папками — переставити'); }catch(_){} }
     function begin(card,x,y){
       const key=card.dataset.fkey; if(!key) return;
       const rect=card.getBoundingClientRect();
@@ -154,7 +157,7 @@
         return;
       }
       armed=false;
-      holdTimer=setTimeout(()=>{ holdTimer=null; if(startedKey){ armed=true; try{window.platform.haptic('light');}catch(_){} } }, LONG);
+      holdTimer=setTimeout(()=>{ holdTimer=null; if(startedKey){ armed=true; try{window.platform.haptic('light');}catch(_){} dragHint(); } }, LONG);
     });
     grid.addEventListener('pointermove',e=>{
       if(st){ e.preventDefault(); lastX=e.clientX; lastY=e.clientY; scheduleFrame(); return; }
@@ -163,6 +166,10 @@
       if(armed){ if(dx>3||dy>3){ try{grid.setPointerCapture(pid);}catch(_){} begin(startCard,e.clientX,e.clientY); } }
       else if(dx>JITTER||dy>JITTER){ cancelPending(); }
     },{passive:false});
+    /* iPhone вирішує «гортати сторінку» ще на дотику, і touch-action, увімкнений пізніше, не діє — жест забирала прокрутка
+       (папки «не перетягувались»). Після довгого натиску гасимо прокрутку самі: touchmove не пасивний (12.10.2026). */
+    grid.addEventListener('touchmove',e=>{ if(st||armed) e.preventDefault(); },{passive:false});
+    grid.addEventListener('contextmenu',e=>{ if(e.target.closest('.fcard[data-fkey]')) e.preventDefault(); });
     grid.addEventListener('pointerup',()=>{ if(st) finish(true); else cancelPending(); });
     grid.addEventListener('pointercancel',()=>{ if(st) finish(false); else cancelPending(); });
   }

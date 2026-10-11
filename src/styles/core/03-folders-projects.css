@@ -641,3 +641,5 @@
   /* меню папки (крок 3): щільніші рядки, щоб «Видалити» влазило без прокрутки на 375×812 */
   .fmenu-in .pgb-row{padding:8px 10px;min-height:46px;}
   .fmenu-in .fgs-head{margin-bottom:4px;}
+  /* довгий натиск на папку — без системного виділення й меню iOS (інакше воно перебиває перетягування) */
+  #folderGrid .fcard{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
