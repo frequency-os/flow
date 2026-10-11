@@ -62,13 +62,49 @@
     if(days){ var cc=cols.find(function(c){ return c.id===b.chart&&(c.ty==='num'||c.ty==='plan'); })||cols.find(function(c){ return c.ty==='plan'||c.ty==='num'; });
       if(cc){ var vals=rows.map(function(r){ return cc.ty==='plan'?tbPlanMin(r.ds,fk):tbNum(r.c[cc.id]); }), mx=Math.max.apply(null,vals.concat([1]));
         chart='<div class="tb-chart" aria-label="Графік «'+esc(cc.t)+'»"><small>'+esc(cc.t)+' по днях</small><div class="tb-bars">'+vals.map(function(v,i){ return '<i class="'+(rows[i].ds===td?'td':'')+'" style="height:'+(v?Math.max(6,Math.round(v/mx*100)):2)+'%" title="'+(+rows[i].ds.slice(8))+': '+tbFmt(v)+'"></i>'; }).join('')+'</div></div>'; } }
-    var ym=tbYm(b);
+    var ym=tbYm(b), view=days?'table':(b.view==='board'||b.view==='cal'?b.view:'table');
+    var mon='<span class="tb-mon"><button data-tmon="'+esc(b.id)+'|-1" aria-label="Попередній місяць">‹</button><b>'+esc((typeof MO_NAMES!=='undefined'?MO_NAMES[+ym.slice(5,7)-1]:ym.slice(5,7))+' '+ym.slice(0,4))+'</b><button data-tmon="'+esc(b.id)+'|1" aria-label="Наступний місяць">›</button></span>';
+    var seg=days?'':'<div class="tb-views" role="tablist">'+[['table','Таблиця'],['board','Дошка'],['cal','Календар']].map(function(v){ return '<button role="tab" data-tview="'+esc(b.id)+'|'+v[0]+'" aria-selected="'+(view===v[0])+'" class="'+(view===v[0]?'on':'')+'">'+v[1]+'</button>'; }).join('')+'</div>';
+    var main;
+    if(view==='board') main=tbBoardHTML(b,cols,rows,fk);
+    else if(view==='cal') main=tbCalHTML(b,cols,rows);
+    else main=chart+'<div class="tb-scroll"><div class="tb-grid'+(days?' days':'')+'" style="--n:'+(cols.length+(days?1:0))+';--m:'+cols.length+'">'+head+body+sum+'</div></div>'
+      +(days||rows.length>=TB_MAXR?'':'<button class="tb-addr" data-taddrow="'+esc(b.id)+'">＋ рядок</button>');
     return '<div class="pg-content tb" data-tbl="'+esc(b.id)+'">'
       +'<div class="tb-top"><div class="tb-name" contenteditable="true" data-tname="'+esc(b.id)+'" data-i18n-skip="1">'+esc(String(b.title||'Таблиця'))+'</div>'
-      +(days?'<span class="tb-mon"><button data-tmon="'+esc(b.id)+'|-1" aria-label="Попередній місяць">‹</button><b>'+esc((typeof MO_NAMES!=='undefined'?MO_NAMES[+ym.slice(5,7)-1]:ym.slice(5,7))+' '+ym.slice(0,4))+'</b><button data-tmon="'+esc(b.id)+'|1" aria-label="Наступний місяць">›</button></span>':'')
+      +(days||view==='cal'?mon:'')
       +'<button class="tb-cfg" data-tcfg="'+esc(b.id)+'" aria-label="Налаштування таблиці">⚙</button></div>'
-      +chart+'<div class="tb-scroll"><div class="tb-grid'+(days?' days':'')+'" style="--n:'+(cols.length+(days?1:0))+';--m:'+cols.length+'">'+head+body+sum+'</div></div>'
-      +(days||rows.length>=TB_MAXR?'':'<button class="tb-addr" data-taddrow="'+esc(b.id)+'">＋ рядок</button>')+'</div>';
+      +seg+main+'</div>';
+  }
+  /* ── вигляд «Дошка» (етап 2): картки за першою колонкою «Статус»; назва — перша текстова, дата — перша «Дата» ── */
+  function tbTitleCol(cols){ return cols.find(function(c){ return c.ty==='text'; })||null; }
+  function tbBoardHTML(b,cols,rows,fk){
+    var sc=cols.find(function(c){ return c.ty==='status'; });
+    if(!sc) return '<div class="tb-need">Для дошки потрібна колонка «Статус».<button data-taddtype="'+esc(b.id)+'|status">＋ Колонка «Статус»</button></div>';
+    var tc=tbTitleCol(cols), dc=cols.find(function(c){ return c.ty==='date'; }), pc=cols.find(function(c){ return c.ty==='plan'; });
+    var groups=[['','Без статусу']].concat(TB_ST.map(function(x){ return [x,x]; }));
+    return '<div class="tb-board">'+groups.map(function(g){
+      var rs=rows.filter(function(r){ var v=r.c[sc.id]; return g[0]?v===g[0]:TB_ST.indexOf(v)<0; });
+      if(!g[0]&&!rs.length) return '';
+      return '<div class="tb-bcol" style="--sc:'+(TB_STC[g[0]]||'#8b93a3')+'"><div class="tb-bh"><i></i><b>'+esc(g[1])+'</b><small>'+rs.length+'</small></div>'
+        +rs.map(function(r){ var t=tc?String(r.c[tc.id]||''):'', d=dc?String(r.c[dc.id]||''):'';
+          return '<div class="tb-card"><b data-i18n-skip="1">'+(t?esc(t.slice(0,80)):'<i>без назви</i>')+'</b>'
+            +'<span class="tb-chips">'+(/^\d{4}-\d{2}-\d{2}$/.test(d)?'<span class="tb-chip">📅 '+esc(typeof jnDateTxt==='function'?jnDateTxt(d):d)+'</span>':'')
+            +(pc&&/^\d{4}-\d{2}-\d{2}$/.test(d)?'<span class="tb-chip">🔗 '+tbPlanMin(d,fk)+' хв</span>':'')+'</span>'
+            +'<button class="tb-next" data-tstat="'+esc(b.id)+'|'+esc(r.id)+'|'+esc(sc.id)+'">'+(g[0]==='Готово'?'↺ Без статусу':'→ '+(TB_ST[TB_ST.indexOf(g[0])+1]||TB_ST[0]))+'</button></div>'; }).join('')
+        +(g[0]&&rows.length<TB_MAXR?'<button class="tb-badd" data-taddst="'+esc(b.id)+'|'+esc(sc.id)+'|'+esc(g[0])+'">＋ картка</button>':'')+'</div>'; }).join('')+'</div>';
+  }
+  /* ── вигляд «Календар» (етап 2): рядки на днях місяця за першою колонкою «Дата»; порожній день — новий рядок з цією датою ── */
+  function tbCalHTML(b,cols,rows){
+    var dc=cols.find(function(c){ return c.ty==='date'; });
+    if(!dc) return '<div class="tb-need">Для календаря потрібна колонка «Дата».<button data-taddtype="'+esc(b.id)+'|date">＋ Колонка «Дата»</button></div>';
+    var tc=tbTitleCol(cols), sc=cols.find(function(c){ return c.ty==='status'; }), ym=tbYm(b), td=ymdLocal(), days=tbDays(b);
+    var lead=(new Date(ym+'-01T12:00:00').getDay()+6)%7, h=['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(function(d){ return '<b>'+d+'</b>'; }).join('')+new Array(lead+1).join('<span></span>');
+    days.forEach(function(ds){ var rs=rows.filter(function(r){ return r.c[dc.id]===ds; });
+      h+='<div class="tb-cd'+(ds===td?' td':'')+'"><button class="tb-cdn" data-tcalday="'+esc(b.id)+'|'+esc(dc.id)+'|'+ds+'" aria-label="Новий рядок на '+(+ds.slice(8))+'">'+(+ds.slice(8))+'</button>'
+        +rs.slice(0,3).map(function(r){ var st=sc&&TB_ST.indexOf(r.c[sc.id])>=0?r.c[sc.id]:''; return '<span class="tb-cchip" style="--sc:'+(TB_STC[st]||'#8b93a3')+'" data-i18n-skip="1">'+esc(String(tc?(r.c[tc.id]||'·'):'·').slice(0,24))+'</span>'; }).join('')
+        +(rs.length>3?'<small>+'+(rs.length-3)+'</small>':'')+'</div>'; });
+    return '<div class="tb-cal">'+h+'</div>';
   }
   /* ── дії: усе лише з тапу; структурні — з «Скасувати» (pushOp на тих самих обʼєктах) ── */
   function tbLoc(id){ var l=locate(id); return l&&l.block&&l.block.type==='tbl'?l.block:null; }
@@ -101,7 +137,7 @@
     var v=/^\d{4}-\d{2}-\d{2}$/.test(d.value)?d.value:''; tbSetUndo(o,p[2],v); save(); render();
   });
   editor.addEventListener('click',function(e){
-    var t=e.target.closest&&e.target.closest('[data-tcheck],[data-tstat],[data-taddrow],[data-taddcol],[data-trowdel],[data-tbcol],[data-tcfg],[data-tmon]'); if(!t) return;
+    var t=e.target.closest&&e.target.closest('[data-tcheck],[data-tstat],[data-taddrow],[data-taddcol],[data-trowdel],[data-tbcol],[data-tcfg],[data-tmon],[data-tview],[data-taddst],[data-tcalday],[data-taddtype]'); if(!t) return;
     e.preventDefault(); e.stopPropagation();
     var ds=t.dataset;
     if(ds.tcheck||ds.tstat){ var p=(ds.tcheck||ds.tstat).split('|'), b=tbLoc(p[0]); if(!b) return; var o=tbCellObj(b,p[1]); if(!o) return;
@@ -117,6 +153,21 @@
       var gone=arr3.splice(idx,1)[0];
       pushOp(function(){ if(arr3.indexOf(gone)<0) arr3.splice(Math.min(idx,arr3.length),0,gone); },function(){ var j=arr3.indexOf(gone); if(j>=0) arr3.splice(j,1); });
       save(); render(); try{ if(typeof window.__flowToast==='function') window.__flowToast('Рядок видалено — «Скасувати» вгорі поверне'); }catch(_){} return; }
+    if(ds.tview){ var pv=ds.tview.split('|'), bv=tbLoc(pv[0]); if(!bv) return; if(['table','board','cal'].indexOf(pv[1])<0) return; var ov=bv.view, nv=pv[1]==='table'?undefined:pv[1];
+      if(nv) bv.view=nv; else delete bv.view;
+      pushOp(function(){ if(ov) bv.view=ov; else delete bv.view; },function(){ if(nv) bv.view=nv; else delete bv.view; });
+      save(); render(); return; }
+    if(ds.taddst||ds.tcalday){ var pa=(ds.taddst||ds.tcalday).split('|'), ba=tbLoc(pa[0]); if(!ba||ba.mode==='days') return; if(!Array.isArray(ba.rows)) ba.rows=[];
+      if(ba.rows.length>=TB_MAXR) return;
+      var colOk=tbCols(ba).some(function(c){ return c.id===pa[1]&&c.ty===(ds.tcalday?'date':'status'); }); if(!colOk) return;
+      var val=ds.tcalday?(/^\d{4}-\d{2}-\d{2}$/.test(pa[2])?pa[2]:''):(TB_ST.indexOf(pa[2])>=0?pa[2]:''); if(!val) return;
+      var nr={id:tbId('r'),c:{}}; nr.c[pa[1]]=val; var arr4=ba.rows; arr4.push(nr);
+      pushOp(function(){ var i=arr4.indexOf(nr); if(i>=0) arr4.splice(i,1); },function(){ if(arr4.indexOf(nr)<0) arr4.push(nr); });
+      save(); render(); try{ if(typeof window.__flowToast==='function') window.__flowToast(ds.tcalday?'Рядок на '+(+val.slice(8))+' число додано — назву впиши в «Таблиці»':'Картку додано — назву впиши в «Таблиці»'); }catch(_){} return; }
+    if(ds.taddtype){ var pt=ds.taddtype.split('|'), bt=tbLoc(pt[0]); if(!bt||!tbHasTy(pt[1])) return; if(!Array.isArray(bt.cols)) bt.cols=[]; if(tbCols(bt).length>=TB_MAXC) return;
+      var ncol={id:tbId('c'),t:TB_TY[pt[1]][0],ty:pt[1]}, arr5=bt.cols; arr5.push(ncol);
+      pushOp(function(){ var i=arr5.indexOf(ncol); if(i>=0) arr5.splice(i,1); },function(){ if(arr5.indexOf(ncol)<0) arr5.push(ncol); });
+      save(); render(); return; }
     if(ds.taddcol){ tbColSheet(ds.taddcol,''); return; }
     if(ds.tbcol){ var p3=ds.tbcol.split('|'); tbColSheet(p3[0],p3[1]); return; }
     if(ds.tcfg){ tbCfgSheet(ds.tcfg); return; }

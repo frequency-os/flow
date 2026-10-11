@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 88 |
-| Рядків JS | 32504 |
+| Рядків JS | 32555 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10289 |
-| Сутностей верхнього рівня | 2337 |
+| Рядків CSS | 10336 |
+| Сутностей верхнього рівня | 2340 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -94,7 +94,7 @@
 | `src/scripts/page-editor/01-palette.js` | 178 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 767 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 747 | 42 |
-| `src/scripts/page-editor/04-table.js` | 177 | 23 |
+| `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 689 | 41 |
 | `src/scripts/page-editor/09-open-page.js` | 33 | 1 |
 | `src/scripts/page-editor/10-mic.js` | 154 | 10 |
@@ -132,7 +132,7 @@
 | `src/styles/22-more-screen.css` | 181 | 0 |
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1055 | 9 |
+| `src/styles/core/02-page-editor.css` | 1080 | 9 |
 | `src/styles/core/03-folders-projects.css` | 643 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -160,7 +160,7 @@
 | `src/styles/core/29-year.css` | 84 | 0 |
 | `src/styles/core/30-wallet.css` | 150 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
-| `src/styles/core/32-widgets.css` | 292 | 0 |
+| `src/styles/core/32-widgets.css` | 314 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
 | `src/styles/core/34-intro.css` | 106 | 0 |
 
@@ -2695,7 +2695,7 @@
 | `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:727` |
 | `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:732` |
 
-### `src/scripts/page-editor/04-table.js` — 23 сутностей
+### `src/scripts/page-editor/04-table.js` — 26 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2717,11 +2717,14 @@
 | `tbFmt` | функція | `src/scripts/page-editor/04-table.js:31` |
 | `tbCellHTML` | функція | `src/scripts/page-editor/04-table.js:32` |
 | `tbHTML` | функція | `src/scripts/page-editor/04-table.js:40` |
-| `tbLoc` | функція | `src/scripts/page-editor/04-table.js:74` |
-| `tbCellObj` | функція | `src/scripts/page-editor/04-table.js:75` |
-| `tbSetUndo` | функція | `src/scripts/page-editor/04-table.js:77` |
-| `tbColSheet` | функція | `src/scripts/page-editor/04-table.js:127` |
-| `tbCfgSheet` | функція | `src/scripts/page-editor/04-table.js:155` |
+| `tbTitleCol` | функція | `src/scripts/page-editor/04-table.js:80` |
+| `tbBoardHTML` | функція | `src/scripts/page-editor/04-table.js:81` |
+| `tbCalHTML` | функція | `src/scripts/page-editor/04-table.js:98` |
+| `tbLoc` | функція | `src/scripts/page-editor/04-table.js:110` |
+| `tbCellObj` | функція | `src/scripts/page-editor/04-table.js:111` |
+| `tbSetUndo` | функція | `src/scripts/page-editor/04-table.js:113` |
+| `tbColSheet` | функція | `src/scripts/page-editor/04-table.js:178` |
+| `tbCfgSheet` | функція | `src/scripts/page-editor/04-table.js:206` |
 
 ### `src/scripts/page-editor/08-w-projects-hub.js` — 41 сутностей
 
