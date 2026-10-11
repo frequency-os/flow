@@ -5,6 +5,9 @@
      «Зроблено» — той самий шлях, що в Журналі (jnToggleBlock → plCompleteBlock): досвід і серія рахуються.
      Таймер зберігає ЧАС СТАРТУ (не лічить секунди), тож переживає перезапуск програми.
      Стан таймера — лише цього пристрою (localStorage 'focus_run'), у хмару не йде.
+     Стрічка «Прийшло на сьогодні» (пакет 2): справа за ≤15 хв, нагадування завдань на сьогодні (дошки папок),
+     одна м'яка підказка напарника. Лічильник на іконці — лише те, що вже настало (або за ≤15 хв) і ще не бачене;
+     відкрили «Фокус» — побачене. Поки йде таймер, стрічку сховано: не відволікати.
      Тексти — парами uk/en, без родових форм. */
   const FC_RUN_KEY='focus_run';
   const fcLang=()=>{ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } };
@@ -14,13 +17,21 @@
       emptyH:'Що одне зробиш зараз?', emptyPh:'Напиши одну справу', emptyGo:'Почати',
       allDone:'На сьогодні все зроблено', allDoneSub:'Можна відпочити — або взяти одну справу на завтра.',
       left:'лишилось', over:'Час вийшов. Як справа?', more5:'Ще 5 хв',
-      mate:' поруч', mateRun:' поруч, поки йде таймер', ended:'⏱ Таймер «Фокусу» завершився', block:'Справа'},
+      mate:' поруч', mateRun:' поруч, поки йде таймер', ended:'⏱ Таймер «Фокусу» завершився', block:'Справа',
+      feed:'Прийшло на сьогодні', soonA:'Через ', soonB:' хв — ', remAt:'нагадування · о ', remPast:'настало о ', task:'Завдання',
+      ok:'Готово', later:'Пізніше', laterToast:'🔔 Нагадаю о ', okToast:'✓ Готово',
+      hintBreak:'Сесія позаду. 5 хвилин перерви: вода й трохи руху?', hintLate:'Уже пізно. Залиш одну справу на завтра — і відпочинок.',
+      hintMorning:'Один маленький крок — і день уже рушив.'},
     en:{loading:'Loading your tasks…', title:'Focus', close:'Close', step:'Your one step', now:'now · until ', at:'at ', was:'was at ', wasTail:' — fine to do now',
       mission:'mission step', other:'Something else', done:'Done', start:'Start', stop:'Stop', min:'min',
       emptyH:'What one thing will you do now?', emptyPh:'Write one thing', emptyGo:'Start',
       allDone:'Everything for today is done', allDoneSub:'Time to rest — or pick one thing for tomorrow.',
       left:'left', over:'Time is up. How did it go?', more5:'5 more min',
-      mate:' is with you', mateRun:' is with you while the timer runs', ended:'⏱ Focus timer is over', block:'Task'}
+      mate:' is with you', mateRun:' is with you while the timer runs', ended:'⏱ Focus timer is over', block:'Task',
+      feed:'Came in for today', soonA:'In ', soonB:' min — ', remAt:'reminder · at ', remPast:'due since ', task:'Task',
+      ok:'Done', later:'Later', laterToast:'🔔 Will remind at ', okToast:'✓ Done',
+      hintBreak:'Session done. 5 minutes of break: water and a little movement?', hintLate:'It is late. Leave one thing for tomorrow — and rest.',
+      hintMorning:'One small step — and the day is moving.'}
   };
   const fcT=k=>(FC_T[fcLang()]||FC_T.uk)[k];
   let fcIdx=0, fcDur=15, fcTick=null, fcAudio=null;
@@ -114,6 +125,7 @@
     try{ const f=plFocusToday(); f.sessions++; f.seconds+=r.dur*60; window.storeAuto?window.storeAuto(()=>saveGoals()):saveGoals(); }catch(_){}
     try{ window.platform.haptic('heavy'); }catch(_){}
     fcBeep();
+    try{ localStorage.setItem('focus_last_end',String(Date.now())); }catch(_){}
     if(!document.querySelector('.fc-ov')){ try{ plToast(fcT('ended')); }catch(_){} }
   }
   function fcLoop(){
@@ -134,13 +146,52 @@
     if(tm) tm.textContent=fcMMSS(left);
     if(ring) ring.style.setProperty('--p',Math.round((1-left/(r.dur*60))*100)+'%');
   }
-  /* мітка на іконці: поки йде таймер — хвилини, що лишились */
+  /* ── стрічка «Прийшло на сьогодні» (лише читання даних; запис — тільки з тапів «Готово» / «Пізніше») ── */
+  function fcBoardTasks(){   // завдання дошок папок із нагадуванням на сьогодні, ще не зроблені
+    const out=[], td=new Date().toDateString();
+    try{ Object.keys(boards||{}).forEach(k=>{ const st=[...(boards[k]||[])];
+      while(st.length){ const b=st.pop(); if(!b) continue;
+        if(b.type==='task'&&b.remindAt&&!b.done){ const d=new Date(b.remindAt); if(!isNaN(d.getTime())&&d.toDateString()===td) out.push(b); }
+        if(isContainer(b)&&Array.isArray(b.children)) st.push(...b.children); } }); }catch(_){}
+    return out.sort((a,b)=>new Date(a.remindAt)-new Date(b.remindAt));
+  }
+  function fcHint(){
+    const h=new Date().getHours(), td=ymdLocal();
+    let last=0; try{ last=+localStorage.getItem('focus_last_end')||0; }catch(_){}
+    if(last&&Date.now()-last<15*60000) return {id:'mate:break:'+last, kind:'mate', sub:fcT('hintBreak')};
+    if(h>=22||h<5) return {id:'mate:late:'+td, kind:'mate', sub:fcT('hintLate')};
+    if(h<11&&!fcHadToday()) return {id:'mate:morning:'+td, kind:'mate', sub:fcT('hintMorning')};
+    return null;
+  }
+  function fcFeed(){
+    const out=[], now=Date.now(), nd=fcNowDec(), td=ymdLocal();
+    try{ jnDayBlocks(td).filter(b=>b&&!b.done&&+b.h>nd&&+b.h-nd<=0.25).forEach(b=>{
+      const m=Math.max(1,Math.round((+b.h-nd)*60));
+      out.push({id:'soon:'+(b.fromRecur||b.id)+':'+td, kind:'soon', due:true, b, t:fcT('soonA')+m+fcT('soonB')+(b.t||fcT('block')), sub:fcT('at')+jnHm(b.h)}); }); }catch(_){}
+    fcBoardTasks().forEach(b=>{ const d=new Date(b.remindAt), hm=jnHm(d.getHours()+d.getMinutes()/60);
+      out.push({id:'rem:'+b.id+':'+b.remindAt, kind:'rem', due:d.getTime()<=now+15*60000, b, t:b.title||fcT('task'), sub:(d.getTime()<=now?fcT('remPast'):fcT('remAt'))+hm}); });
+    const hint=fcHint(); if(hint){ hint.due=true; try{ hint.t=FLOW_PETS[petCur()].name; }catch(_){ hint.t=''; } out.push(hint); }
+    return out;
+  }
+  // побачене — лише на цьому пристрої (localStorage 'focus_seen'), у хмару не йде
+  function fcSeen(){ try{ const x=JSON.parse(localStorage.getItem('focus_seen')||'null'); return x&&Array.isArray(x.ids)?x.ids:[]; }catch(_){ return []; } }
+  function fcMarkSeen(items){
+    const due=items.filter(i=>i.due).map(i=>i.id); if(!due.length) return;
+    try{ localStorage.setItem('focus_seen',JSON.stringify({ids:[...new Set(fcSeen().concat(due))].slice(-80)})); }catch(_){}
+  }
+  function fcUnseen(){
+    if(!fcReady()) return 0;
+    const seen=new Set(fcSeen()); return fcFeed().filter(i=>i.due&&!seen.has(i.id)).length;
+  }
+  /* мітка на іконці: поки йде таймер — хвилини, що лишились; інакше — скільки нового прийшло */
   function fcBadge(){
     const btn=document.getElementById('homeFocusBtn'); if(!btn) return;
     const r=fcRun(), bd=btn.querySelector('.fc-bd');
     const on=!!(r&&fcLeft(r)>0);
     btn.classList.toggle('fc-on',on);
-    if(bd){ bd.hidden=!on; if(on) bd.textContent=Math.ceil(fcLeft(r)/60)+'′'; }
+    let n=0; if(!on){ try{ n=fcUnseen(); }catch(_){} }
+    if(bd){ bd.hidden=!on&&!n; bd.textContent=on?Math.ceil(fcLeft(r)/60)+'′':String(n); }
+    btn.setAttribute('aria-label',fcT('title')+(n?' · '+n:''));
   }
 
   /* ── шторка ── */
@@ -149,10 +200,22 @@
       return `<div class="fc-mate"><span class="fc-mate-av">${petSVG(id,40)}</span><span>${esc(p.name)}${running?fcT('mateRun'):fcT('mate')}</span></div>`;
     }catch(_){ return ''; }
   }
+  function fcFeedHTML(items){
+    if(!items.length) return '';
+    return `<div class="fc-feed"><small class="fc-feed-h">${fcT('feed')}</small>${items.map((it,i)=>{
+      const lead=it.kind==='mate'?(()=>{ try{ return `<span class="fc-fi-av">${petSVG(petCur(),32)}</span>`; }catch(_){ return ''; } })()
+        :`<span class="fc-fi-ic" aria-hidden="true">${it.kind==='soon'?'⏰':'🔔'}</span>`;
+      const acts=it.kind==='soon'?`<button class="fc-chip" data-fcfeed="${i}" data-act="go">▶ ${fcT('start')}</button>`
+        :it.kind==='rem'?`<button class="fc-chip" data-fcfeed="${i}" data-act="ok">✓ ${fcT('ok')}</button><button class="fc-chip" data-fcfeed="${i}" data-act="later">${fcT('later')}</button>`:'';
+      return `<div class="fc-fi${it.kind==='mate'?' mate':''}">${lead}<div class="fc-fi-b"><b>${esc(it.t||'')}</b>${it.sub?`<span>${esc(it.sub)}</span>`:''}${acts?`<div class="fc-fi-a">${acts}</div>`:''}</div></div>`;
+    }).join('')}</div>`;
+  }
   function fcDurHTML(){
     return `<div class="fc-durs" role="group" aria-label="${fcT('min')}">${[5,15,25].map(m=>`<button class="fc-dur${m===fcDur?' on':''}" data-fcdur="${m}" aria-pressed="${m===fcDur}">${m} ${fcT('min')}</button>`).join('')}</div>`;
   }
-  function fcBodyHTML(){
+  function fcBodyHTML(feed){
+    feed=feed||[];
+    const tail=fcFeedHTML(feed)+(feed.some(i=>i.kind==='mate')?'':fcMate(false));   // напарник уже в стрічці — не дублювати
     if(!fcReady()) return `<div class="fc-card"><p class="fc-over">${fcT('loading')}</p></div>`;
     const r=fcRun();
     if(r){ // таймер іде або щойно скінчився
@@ -172,13 +235,13 @@
     }
     const cs=fcCands();
     if(!cs.length){
-      if(fcHadToday()) return `<div class="fc-card fc-win"><b class="fc-t">${fcT('allDone')}</b><p class="fc-over">${fcT('allDoneSub')}</p></div>${fcMate(false)}`;
+      if(fcHadToday()) return `<div class="fc-card fc-win"><b class="fc-t">${fcT('allDone')}</b><p class="fc-over">${fcT('allDoneSub')}</p></div>${tail}`;
       return `<div class="fc-card">
           <label class="fc-t" for="fcIn">${fcT('emptyH')}</label>
           <input id="fcIn" class="fc-in" maxlength="120" placeholder="${fcT('emptyPh')}" autocomplete="off" enterkeyhint="go">
           ${fcDurHTML()}
           <button class="fc-pri" data-fcnew>${fcT('emptyGo')}</button>
-        </div>${fcMate(false)}`;
+        </div>${tail}`;
     }
     if(fcIdx>=cs.length) fcIdx=0;
     const c=cs[fcIdx];
@@ -189,12 +252,18 @@
         ${fcDurHTML()}
         <button class="fc-pri" data-fcgo>▶ ${fcT('start')}</button>
         <div class="fc-row"><button class="fc-sec" data-fcdone>✓ ${fcT('done')}</button>${cs.length>1?`<button class="fc-sec" data-fcnext>${fcT('other')}</button>`:''}</div>
-      </div>${fcMate(false)}`;
+      </div>${tail}`;
   }
   function fcRender(){
     const ov=document.querySelector('.fc-ov'); if(!ov) return;
-    const body=ov.querySelector('.fc-body'); body.innerHTML=fcBodyHTML();
-    const r=fcRun(); if(r) fcPaintTime(r);
+    const r=fcRun(), all=(fcReady()&&!r)?fcFeed():[];
+    // справа, що вже стоїть головною карткою, у стрічці не повторюється
+    const top=(!r&&fcReady())?fcCands()[fcIdx]||fcCands()[0]:null, topId=top&&top.kind==='block'?(top.b.fromRecur||top.b.id):'';
+    const feed=all.filter(i=>!(i.kind==='soon'&&topId&&(i.b.fromRecur||i.b.id)===topId));
+    const body=ov.querySelector('.fc-body'); body.innerHTML=fcBodyHTML(feed);
+    if(r) fcPaintTime(r);
+    body.querySelectorAll('[data-fcfeed]').forEach(el=>el.onclick=()=>fcFeedAct(feed[+el.dataset.fcfeed],el.dataset.act));
+    fcMarkSeen(all); fcBadge();
     const cs=r?[]:fcCands(), c=cs[fcIdx];
     const on=(sel,fn)=>{ const el=body.querySelector(sel); if(el) el.onclick=fn; };
     body.querySelectorAll('[data-fcdur]').forEach(b=>b.onclick=()=>{ fcDur=+b.dataset.fcdur; try{ window.platform.haptic('light'); }catch(_){}
@@ -214,6 +283,28 @@
       on('[data-fcnew]',go);
       inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } };
     }
+  }
+  function fcFeedAct(it,act){
+    if(!it) return;
+    try{ window.platform.haptic('light'); }catch(_){}
+    if(act==='go'){ fcStart({kind:'block',b:it.b}); return; }
+    // завдання дошки: пишемо лише в прочитану дошку (інакше заглушка затре справжні завдання)
+    if(typeof window.storeKeyReady==='function'&&window.storeKeyReady('board')!==true) return;
+    // дошку могли перечитати з хмари, поки шторка відкрита: беремо СВІЖЕ завдання за id, а не копію з рендеру
+    const b=fcBoardTasks().find(x=>x.id===it.b.id);
+    if(!b){ fcRender(); return; }
+    if(act==='ok'){
+      b.done=true;
+      if(reminderTimers[b.id]){ clearTimeout(reminderTimers[b.id]); delete reminderTimers[b.id]; }
+      saveBoard(); try{ renderBoard(); }catch(_){}
+      try{ plToast(fcT('okToast')); }catch(_){}
+    } else if(act==='later'){
+      const d=new Date(Date.now()+3600e3);
+      b.remindAt=d.toISOString(); b.remindFired=false;
+      saveBoard(); try{ scheduleReminder(b); }catch(_){} try{ renderBoard(); }catch(_){}
+      try{ plToast(fcT('laterToast')+jnHm(d.getHours()+d.getMinutes()/60)); }catch(_){}
+    }
+    fcRender();
   }
   function fcClose(){
     const ov=document.querySelector('.fc-ov'); if(!ov) return;
@@ -254,6 +345,7 @@
     if(b){ b.onclick=openFocus; b.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openFocus(); } }; } }
   // таймер, запущений до перезапуску програми, продовжує йти (або повідомляє, що скінчився).
   // Мітку показуємо одразу (лише читання), а лічильник із записом — лише після того, як load() прочитав goals_data.
+  try{ setInterval(()=>{ if(!document.hidden) fcBadge(); },60000); }catch(_){}   // нове «прийшло» з'являється з часом — мітка оновлюється раз на хвилину (лише читання)
   try{ fcBadge();
-    if(fcRun()){ let n=0; const w=setInterval(()=>{ n++; if(fcReady()){ clearInterval(w); fcLoop(); } else if(n>300) clearInterval(w); },400); }
+    { let n=0; const w=setInterval(()=>{ n++; if(fcReady()){ clearInterval(w); if(fcRun()) fcLoop(); else fcBadge(); } else if(n>300) clearInterval(w); },400); }
   }catch(_){}

@@ -56,6 +56,24 @@
   .fc-ring b{font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;}
   .fc-ring small{text-transform:none;letter-spacing:0;}
 
+  /* стрічка «Прийшло на сьогодні» */
+  .fc-feed{display:flex;flex-direction:column;gap:8px;}
+  .fc-feed-h{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:2px 4px 0;}
+  .fc-fi{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
+  .fc-fi-ic{width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:10px;font-size:16px;
+    background:color-mix(in srgb,var(--accent) 14%,transparent);}
+  .fc-fi-av{width:32px;height:32px;flex:none;display:grid;place-items:center;}
+  .fc-fi-av svg,.fc-fi-av img{max-width:32px;max-height:32px;}
+  .fc-fi-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .fc-fi-b b{font-size:15px;font-weight:700;overflow-wrap:anywhere;}
+  .fc-fi-b span{font-size:13px;line-height:1.4;color:var(--muted);}
+  .fc-fi.mate .fc-fi-b span{color:var(--text);}
+  .fc-fi-a{display:flex;gap:8px;margin-top:8px;}
+  .fc-chip{all:unset;cursor:pointer;box-sizing:border-box;min-height:44px;padding:0 14px;display:inline-flex;align-items:center;border-radius:12px;
+    font-size:14px;font-weight:700;color:var(--text);border:1px solid var(--line);}
+  .fc-chip:active{transform:scale(.98);}
+  .fc-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
   .fc-mate{display:flex;align-items:center;gap:10px;padding:2px 4px;font-size:14px;color:var(--muted);}
   .fc-mate-av{width:40px;height:40px;flex:none;display:grid;place-items:center;}
   .fc-mate-av svg,.fc-mate-av img{max-width:40px;max-height:40px;}
