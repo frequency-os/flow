@@ -16,7 +16,7 @@
 | Файлів JS | 88 |
 | Рядків JS | 32555 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10336 |
+| Рядків CSS | 10343 |
 | Сутностей верхнього рівня | 2340 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -152,7 +152,7 @@
 | `src/styles/core/21-spheres.css` | 82 | 0 |
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
-| `src/styles/core/24-home-gallery.css` | 233 | 0 |
+| `src/styles/core/24-home-gallery.css` | 238 | 0 |
 | `src/styles/core/25-journal.css` | 301 | 0 |
 | `src/styles/core/26-day.css` | 173 | 0 |
 | `src/styles/core/27-month.css` | 202 | 0 |
@@ -160,7 +160,7 @@
 | `src/styles/core/29-year.css` | 84 | 0 |
 | `src/styles/core/30-wallet.css` | 150 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
-| `src/styles/core/32-widgets.css` | 314 | 0 |
+| `src/styles/core/32-widgets.css` | 316 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
 | `src/styles/core/34-intro.css` | 106 | 0 |
 
