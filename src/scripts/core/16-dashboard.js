@@ -424,7 +424,8 @@
   }
 
   // parent — ключ групи, якщо папку створюють зі шторки групи (з картки «＋» приходить подія — її ігноруємо)
-  function createFolder(parent){
+  // opts.onCreated(key) — хто викликав, той сам вирішує, що далі (напр. блок «Папка» в документі); без навігації
+  function createFolder(parent,opts){
     const par=(typeof parent==='string' && folders[parent]) ? parent : '';
     inputModal({ title:par?('Нова папка в «'+folders[par].name+'»'):'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'📁',
       onOk:(name, emojiVal)=>{
@@ -438,6 +439,7 @@
         if(par) folders[key].parent=par;
         order.push(key);
         saveFolders(); renderDashboard();
+        if(opts&&typeof opts.onCreated==='function'){ try{ opts.onCreated(key); }catch(_){} return; }
         if(par){ const act=document.querySelector('.screen.active');
           if(act&&act.id==='scr-page'&&pgBarFolder()===par){ try{ renderPgLinks(); }catch(_){} }
           else openGroupAsChosen(par); }

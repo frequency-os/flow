@@ -235,3 +235,27 @@
   }
   try{ window.addEventListener('resize',()=>{ clearTimeout(window.__dsbRz); window.__dsbRz=setTimeout(dsbTreeSync,200); }); }catch(_){}
   try{ document.addEventListener('flowsync',()=>{ try{ dsbTreeSync(); }catch(_){} }); }catch(_){}
+
+  /* ════════ Перемикач папок у шапці документа (12.10.2026, макет «перемикач зверху») ════════
+     Сусідні папки (та сама група, або верхній рівень) чипами + «＋ Папка»; над ними — група «Навчання ›».
+     Лише навігація; нова папка — звичайний createFolder (дія людини). */
+  function lkSwitchHTML(fk){
+    const f=folders[fk]; if(!f) return '';
+    const par=f.parent&&folders[f.parent]?f.parent:'';
+    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project'&&k!=='work';
+    let sib=[]; try{ sib=(par?childFolderKeys(par):topFolderKeys()).filter(vis); }catch(_){ return ''; }
+    if(sib.length<2&&!par) return '';
+    const chip=k=>{ const x=folders[k]; return `<button class="lks-c${k===fk?' on':''}" data-lksw="${esc(k)}" style="--c:${safeColor(x.c,'#6a7dff')}"${k===fk?' aria-current="page"':''}><span class="lks-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(x))}"/></svg></span><span data-i18n-skip="1">${esc(String(x.name||'Папка').slice(0,28))}</span></button>`; };
+    return `<div class="lks"><button class="lks-grp" data-lksgrp="${esc(par)}">${par?`<span data-i18n-skip="1">${esc(String(folders[par].name||'Група').slice(0,30))}</span>`:'Папки'} ›</button>
+      <div class="lks-row">${sib.slice(0,40).map(chip).join('')}<button class="lks-c add" data-lksnew="${esc(par)}">＋ Папка</button></div></div>`;
+  }
+  function lkSwitchBind(root,fk){
+    root.querySelectorAll('[data-lksw]').forEach(b=>b.onclick=()=>{ const k=b.dataset.lksw; if(k===fk||!folders[k]) return;
+      try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ openGroupAsChosen(k); return; } }catch(_){}
+      try{ goFolder(k); }catch(_){} });
+    root.querySelectorAll('[data-lksgrp]').forEach(b=>b.onclick=()=>{ const p=b.dataset.lksgrp;
+      if(p&&folders[p]){ try{ openGroupAsChosen(p); }catch(_){ try{ goFolder(p); }catch(__){} } } else { try{ goHome(); }catch(_){} } });
+    root.querySelectorAll('[data-lksnew]').forEach(b=>b.onclick=()=>{ const p=b.dataset.lksnew;
+      try{ createFolder(p&&folders[p]?p:'',{onCreated:k=>{ try{ goFolder(k); }catch(_){} }}); }catch(_){} });
+    const on=root.querySelector('.lks-c.on'); if(on){ try{ on.scrollIntoView({block:'nearest',inline:'center'}); }catch(_){} }
+  }
