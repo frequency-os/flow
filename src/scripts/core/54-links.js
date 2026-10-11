@@ -236,6 +236,41 @@
     t.querySelectorAll('[data-dsbt]').forEach(b=>b.onclick=()=>{ const k=b.dataset.dsbt; if(!folders[k]) return;
       try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ dsbOpen[k]=true; openGroupAsChosen(k); dsbTreeSync(); return; } }catch(_){}
       try{ goFolder(k); }catch(_){} });
+    if(!dsbTreeHidden) dsbDragBind(t,fb);
+  }
+  /* Перетягування в дереві (ноутбук, мишка): на папку — лягає всередину; на «Папки» — виходить на головну.
+     Ті самі правила, що й на головній (16-dashboard.js): не в себе, не у власну підпапку; «Робота» й проєкти не рухаються. */
+  let dsbDragKey='';
+  function dsbCanDrop(src,dst){
+    if(!src||!folders[src]||src==='work'||folders[src].role==='project') return false;
+    if(dst==='') return !!(folders[src].parent&&folders[folders[src].parent]);
+    if(!folders[dst]||dst===src||dst==='work'||folders[dst].role==='project') return false;
+    if((folders[src].parent||'')===dst) return false;
+    return !isDescendantFolder(dst,src);
+  }
+  function dsbMove(src,dst){
+    const prev=(folders[src]&&folders[src].parent)||'';
+    moveFolderTo(src,dst); if(dst) dsbOpen[dst]=true; dsbTreeSync();
+    try{ window.platform.haptic('success'); }catch(_){}
+    try{ if(window.flowUndoToast&&folders[src]) window.flowUndoToast(dst&&folders[dst]?('Покладено в «'+folders[dst].name+'»'):'Винесено на головну', ()=>{ moveFolderTo(src,prev); dsbTreeSync(); }); }catch(_){}
+  }
+  function dsbDragBind(t,fb){
+    const clear=()=>{ document.querySelectorAll('.dsbt-into').forEach(e=>e.classList.remove('dsbt-into')); };
+    t.querySelectorAll('[data-dsbt]').forEach(b=>{ const k=b.dataset.dsbt; if(!folders[k]||k==='work'||folders[k].role==='project') return;
+      b.draggable=true;
+      b.ondragstart=e=>{ dsbDragKey=k; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(folders[k].name||'')); }catch(_){} document.body.classList.add('dsbt-dragging'); };
+      b.ondragend=()=>{ dsbDragKey=''; clear(); document.body.classList.remove('dsbt-dragging'); };
+    });
+    t.querySelectorAll('.dsbt-r').forEach(r=>{ const b=r.querySelector('[data-dsbt]'); if(!b) return; const k=b.dataset.dsbt;
+      r.ondragover=e=>{ if(!dsbCanDrop(dsbDragKey,k)) return; e.preventDefault(); try{ e.dataTransfer.dropEffect='move'; }catch(_){} if(!r.classList.contains('dsbt-into')){ clear(); r.classList.add('dsbt-into'); } };
+      r.ondragleave=e=>{ if(!r.contains(e.relatedTarget)) r.classList.remove('dsbt-into'); };
+      r.ondrop=e=>{ e.preventDefault(); const src=dsbDragKey; clear(); if(dsbCanDrop(src,k)) dsbMove(src,k); };
+    });
+    if(fb&&!fb.__dsbDrop){ fb.__dsbDrop=1;
+      fb.addEventListener('dragover',e=>{ if(!dsbCanDrop(dsbDragKey,'')) return; e.preventDefault(); clear(); fb.classList.add('dsbt-into'); });
+      fb.addEventListener('dragleave',e=>{ if(!fb.contains(e.relatedTarget)) fb.classList.remove('dsbt-into'); });
+      fb.addEventListener('drop',e=>{ const src=dsbDragKey; if(!dsbCanDrop(src,'')) return; e.preventDefault(); clear(); dsbMove(src,''); });
+    }
   }
   try{ window.addEventListener('resize',()=>{ clearTimeout(window.__dsbRz); window.__dsbRz=setTimeout(dsbTreeSync,200); }); }catch(_){}
   try{ document.addEventListener('flowsync',()=>{ try{ dsbTreeSync(); }catch(_){} }); }catch(_){}

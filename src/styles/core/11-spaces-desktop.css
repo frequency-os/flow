@@ -186,6 +186,9 @@
     .dsb-tree{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px;}
     .dsbt-r{display:flex;align-items:center;gap:2px;padding-left:calc(14px + var(--lvl,0) * 14px);border-radius:9px;}
     .dsbt-r.on{background:color-mix(in srgb,var(--accent) 16%,transparent);}
+    .dsbt-r.dsbt-into,.dsb-i.dsbt-into{background:color-mix(in srgb,var(--accent) 28%,transparent);box-shadow:inset 0 0 0 1.5px var(--accent);}
+    .dsbt-b[draggable=true]{cursor:grab;}
+    body.dsbt-dragging .dsbt-b{cursor:grabbing;}
     .dsbt-sec{margin:8px 0 2px;padding-left:16px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--pc,var(--muted));opacity:.9;}
     .dsbt-tw{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:22px;height:30px;display:grid;place-items:center;color:var(--muted);font-size:14px;font-weight:800;transition:transform .15s;}
     .dsbt-tw.open{transform:rotate(90deg);} .dsbt-tw.sp{cursor:default;}

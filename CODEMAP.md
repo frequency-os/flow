@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 89 |
-| Рядків JS | 32721 |
+| Рядків JS | 32756 |
 | Файлів CSS | 46 |
-| Рядків CSS | 10406 |
-| Сутностей верхнього рівня | 2357 |
+| Рядків CSS | 10409 |
+| Сутностей верхнього рівня | 2361 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -90,7 +90,7 @@
 | `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
-| `src/scripts/core/54-links.js` | 266 | 28 |
+| `src/scripts/core/54-links.js` | 301 | 32 |
 | `src/scripts/page-editor/01-palette.js` | 180 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 768 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 754 | 42 |
@@ -142,7 +142,7 @@
 | `src/styles/core/08-work.css` | 202 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
-| `src/styles/core/11-spaces-desktop.css` | 209 | 0 |
+| `src/styles/core/11-spaces-desktop.css` | 212 | 0 |
 | `src/styles/core/12-pets-more-planner.css` | 1228 | 0 |
 | `src/styles/core/13-search-capture.css` | 84 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
@@ -2550,7 +2550,7 @@
 | `introRefresh` | функція | `src/scripts/core/54-intro.js:121` |
 | `window.introOpen` | функція | `src/scripts/core/54-intro.js:130` |
 
-### `src/scripts/core/54-links.js` — 28 сутностей
+### `src/scripts/core/54-links.js` — 32 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2580,8 +2580,12 @@
 | `dsbTreeHidden` | значення | `src/scripts/core/54-links.js:200` |
 | `dsbTreeHTML` | функція | `src/scripts/core/54-links.js:201` |
 | `dsbTreeSync` | функція | `src/scripts/core/54-links.js:217` |
-| `lkSwitchHTML` | функція | `src/scripts/core/54-links.js:246` |
-| `lkSwitchBind` | функція | `src/scripts/core/54-links.js:256` |
+| `dsbDragKey` | значення | `src/scripts/core/54-links.js:243` |
+| `dsbCanDrop` | функція | `src/scripts/core/54-links.js:244` |
+| `dsbMove` | функція | `src/scripts/core/54-links.js:251` |
+| `dsbDragBind` | функція | `src/scripts/core/54-links.js:257` |
+| `lkSwitchHTML` | функція | `src/scripts/core/54-links.js:281` |
+| `lkSwitchBind` | функція | `src/scripts/core/54-links.js:291` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
