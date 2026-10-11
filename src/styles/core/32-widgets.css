@@ -290,3 +290,25 @@
   .wd-subs button.on i{background:var(--fc);}
   .wd-subs button.on{color:var(--pg-mut,var(--muted));text-decoration:line-through;}
   .wd-subs button:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:1px;border-radius:6px;}
+
+  /* ── ноутбук (≥1024px): віджети по-«компʼютерному» — L на всю ширину й нижчий, усередині дві колонки ── */
+  @media (min-width:1024px){
+    #scr-page .pg-board.wboard .pg-bitem[data-sz="m"]{grid-column:span 6;}
+    #scr-page .pg-board.wboard .pg-bitem[data-sz="l"]{grid-column:span 12;grid-row:span 3;}
+    #scr-page .pg-board.wboard .pg-bitem[data-sz="l"]:has(.calw){grid-row:span 4;}
+    /* L: дві колонки — ліва «що зараз», права «картина періоду» */
+    .wg-t.wd.sz-l:not(.calw){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;row-gap:8px;align-content:start;}
+    .wg-t.wd.sz-l:not(.calw)>*{grid-column:1;}
+    .wg-t.wd.sz-l>.wd-h{grid-column:1 / -1;}
+    .wg-t.wd.sz-l>.wg-hit,.wg-t.wd.sz-l>.wd-cfg{grid-column:auto;}
+    /* Час: тиждень стовпчиками праворуч; список і «＋ блок» лишаються ліворуч */
+    .wg-t.wd.tim.sz-l>.wd-bars{grid-column:2;grid-row:2 / span 4;height:100%;max-height:none;align-self:stretch;}
+    .wg-t.wd.tim.sz-l>.wd-foot{margin-top:4px;}
+    /* Звичка: сітка 4 тижнів праворуч */
+    .wg-t.wd.hab.sz-l>.wd-hg{grid-column:2;grid-row:2 / span 5;align-self:center;}
+    .wg-t.wd.hab.sz-l .wd-hg i{height:22px;}
+    /* Місія: кроки праворуч від кільця */
+    .wg-t.wd.mis.sz-l>.wd-lv{grid-column:2;grid-row:2 / span 3;align-self:center;margin-top:0;}
+    /* M: кільце і текст поруч, без порожнечі */
+    .wg-t.wd.sz-m .wd-big{font-size:28px;}
+  }
