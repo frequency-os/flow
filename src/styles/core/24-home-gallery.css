@@ -231,3 +231,8 @@
 .fr .fmenu{position:static;flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer;opacity:1;}
 .fr .fmenu:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
 .fr.fr-add{justify-content:flex-start;gap:10px;min-height:52px;border-style:dashed;background:transparent;color:var(--accent);font-weight:800;font-size:14.5px;}
+/* ноутбук: «Рядки» у дві колонки — довгі смуги на всю ширину не потрібні */
+@media (min-width:1024px){
+  #folderGrid.fv2-rows{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  #folderGrid.fv2-rows .fr-add{grid-column:1 / -1;}
+}

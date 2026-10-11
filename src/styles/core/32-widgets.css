@@ -312,3 +312,5 @@
     /* M: кільце і текст поруч, без порожнечі */
     .wg-t.wd.sz-m .wd-big{font-size:28px;}
   }
+  /* ноутбук: плитки Гаманця — 4 колонки (місія · конверти · борги×2 стають в один ряд, без дірки праворуч) */
+  @media (min-width:1024px){ #scr-finance .wg-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row dense;} }
