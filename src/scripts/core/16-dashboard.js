@@ -577,7 +577,9 @@
     m=>{
       m.querySelectorAll('[data-prio]').forEach(b=>b.onclick=()=>{
         const p=b.dataset.prio; if(folderPrioOk(p)) f.prio=p; else delete f.prio;
-        saveFolders(); renderDashboard(); try{ dsbTreeSync(); }catch(_){} openFolderPrioSheet(key);
+        saveFolders(); renderDashboard(); try{ dsbTreeSync(); }catch(_){}
+        const now=folderPrio(key);   // оновити позначку на місці — шторка не їде вниз-вгору вдруге
+        m.querySelectorAll('[data-prio]').forEach(x=>{ const on=x.dataset.prio===now; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); const g=x.querySelector('.fgs-go'); if(g) g.textContent=on?'✓':''; });
         try{ window.platform.haptic('select'); }catch(_){}
       });
       m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
@@ -650,7 +652,8 @@
         fgToast('Група «'+nm+'»: '+picked.length+' '+pluralUk(picked.length,'папка','папки','папок'));
         openFolderGroup(key);
       };
-      setTimeout(()=>{ try{ inp.focus(); }catch(_){} },120);
+      /* на телефоні не ставимо курсор одразу: клавіатура закрила б список і кнопку (назва необовʼязкова — «Група») */
+      try{ if(!matchMedia('(pointer:coarse)').matches) setTimeout(()=>{ try{ inp.focus(); }catch(_){} },120); }catch(_){}
     });
   }
   /* ── шторка ⚙ «Вигляд папок» (06.10.2026): замість рядка «Список · Сітка ·

@@ -25,7 +25,7 @@
   // дерево папок для вибору: верхній рівень і вкладені (до 3 рівнів), без проєктів і без поточної папки
   function fdTree(cur){
     var out=[], seen=Object.create(null);
-    var walk=function(keys,d){ keys.forEach(function(k){ if(seen[k]||!fdOk(k)||folders[k].role==='project') return; seen[k]=1;
+    var walk=function(keys,d){ keys.forEach(function(k){ if(seen[k]||!fdOk(k)||k==='work'||folders[k].role==='project') return; seen[k]=1;
       if(k!==cur) out.push({k:k,d:d}); if(d<2){ try{ walk(childFolderKeys(k),d+1); }catch(_){} } }); };
     try{ walk(topFolderKeys(),0); }catch(_){}
     return out.slice(0,200);
