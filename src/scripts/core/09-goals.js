@@ -308,7 +308,6 @@
     const body=document.getElementById('goalsBody');
     if(!body) return;
     const g=goalsData;
-    if(window.uiMode==='lite' && g.tab!=='goals') g.tab='goals';
     const doneCount=g.goals.filter(x=>x.done).length;
     const avg = g.goals.length ? Math.round(g.goals.reduce((s,x)=>s+(x.progress||0),0)/g.goals.length) : 0;
     document.getElementById('goalsSub').textContent = `${g.goals.length} цілей · ${doneCount} виконано · ${avg}% прогрес`;

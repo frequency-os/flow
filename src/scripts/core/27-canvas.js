@@ -490,7 +490,6 @@
     try{ chatsInit(); }catch(e){ console.error('chatsInit',e); }
     try{ spheresInit(); }catch(e){ console.error('spheresInit',e); }
     try{ renderDashboard(); }catch(e){ console.error('dashboard',e); }
-    try{ if(window.uiMode==='lite') goPlanner(); }catch(_){}
     try{ updateSummaryBg(); }catch(_){}
     } finally { endAuto(); }
   }

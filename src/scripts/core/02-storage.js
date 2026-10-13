@@ -1474,7 +1474,7 @@
     window.uiMode=m; prefSet(UIMODE_KEY,m); applyUiMode();
     if(!changed) return;
     try{ window.platform.haptic('light'); }catch(_){}
-    if(m==='lite'){ try{ goPlanner(); }catch(_){} }
+    // з 12.10.2026 «lite» = «Сховати гру» (55-focus.js): Огляд лишається, бо на ньому живе «Фокус»
   }
   window.setUiMode=setUiMode;
   applyUiMode();
