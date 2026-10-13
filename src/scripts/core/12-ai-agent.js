@@ -345,7 +345,10 @@
       if(localStorage.getItem('ai_brief_ds')===ds) return;
       if(new Date().getHours()>=12) return;
       localStorage.setItem('ai_brief_ds',ds);
-      aiChatSend('Ранковий бриф: подивись мій сьогоднішній план і вчорашній день, скажи що в плані, що я не закрив учора, і один головний фокус дня. Стисло, без води.');
+      // без докорів і без родових форм («що я не закрив учора» звучало як провина — аудит СДВГ, 12.10.2026)
+      aiChatSend(((window.flowLang&&window.flowLang())==='en')
+        ?'Morning brief: look at my plan for today and at yesterday. Tell me what is planned, what went well yesterday and what is left from it — no reproach — and one main focus for the day. Short, no fluff.'
+        :'Ранковий бриф: подивись мій сьогоднішній план і вчорашній день. Скажи, що в плані, що вчора вийшло і що з учорашнього лишилось — без докорів, — і один головний фокус дня. Стисло, без води.');
     }catch(e){ console.error('aiMorningMaybe',e); }
   }
   /* ── тижневий огляд: неділя з 17:00, раз на тиждень ── */
