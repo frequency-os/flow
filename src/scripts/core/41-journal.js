@@ -75,10 +75,19 @@
     const r=bl.filter(b=>b.done).length/bl.length;
     return r>=1?3:r>=.5?2:r>0?1:0;
   }
+  /* «День у русі» — ОДНЕ правило для Огляду (картка Карти бажань) і серії Журналу (12.10.2026):
+     запис у Щоденнику, дотик до Карти бажань або хоч одна закрита справа дня.
+     Раніше Огляд рахував лише Щоденник і Карту, а Журнал — лише справи, тож після місяця
+     роботи Огляд показував «за місяць поки жодного дня». Нове місце, де треба «чи був день», — кличе це. */
+  function dayInMotion(ds){
+    try{ const e=diaryEntries[ds]; if(e&&e.text&&String(e.text).trim()) return true; }catch(_){}
+    try{ if(typeof wishActiveDays!=='undefined'&&wishActiveDays&&wishActiveDays[ds]) return true; }catch(_){}
+    try{ return jnDayBlocks(ds).some(b=>b&&b.done); }catch(_){ return false; }
+  }
   function jnStreak(){
     let n=0; const d=new Date();
-    if(jnDayLevel(ymdLocal(d))<1) d.setDate(d.getDate()-1);   // сьогодні ще не закрито — рахуємо від учора
-    for(let i=0;i<366;i++){ if(jnDayLevel(ymdLocal(d))<1) break; n++; d.setDate(d.getDate()-1); }
+    if(!dayInMotion(ymdLocal(d))) d.setDate(d.getDate()-1);   // сьогодні ще не в русі — рахуємо від учора
+    for(let i=0;i<366;i++){ if(!dayInMotion(ymdLocal(d))) break; n++; d.setDate(d.getDate()-1); }
     return n;
   }
   function jnWeek(){

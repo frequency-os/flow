@@ -156,6 +156,7 @@
     <div class="top">
       <div class="brand"><div class="logo lg-glass" id="brandMark" title="Frequency"><i class="lg-spec"></i><i class="lg-sweep"></i><svg viewBox="0 0 24 24" fill="none"><path class="lg-w" d="M2 12h3.2l2.4-6.6 3.8 13.2 2.9-8.4 1.9 3.8H22"/></svg></div><div><h1>Frequency</h1><span>сценарій пишеш ти</span></div></div>
       <div style="display:flex;gap:8px;">
+        <div class="icon-btn fc-btn" id="homeFocusBtn" title="Фокус" role="button" tabindex="0" aria-label="Фокус"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.6"/><circle cx="12" cy="12" r=".6" fill="currentColor"/></svg><span class="fc-bd" hidden></span></div>
         <div class="icon-btn" id="homeSearchBtn" title="Пошук (⌘K)" role="button" tabindex="0" aria-label="Пошук"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.2 4.2"/></svg></div>
         <div class="icon-btn" id="themeToggle" title="Тема" role="button" tabindex="0" aria-label="Тема"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 019.5 3.5a8.5 8.5 0 1011 11z"/></svg></div>
         <div class="icon-btn space-layout-toggle" id="homeWidgetsToggle" title="Панель віджетів" role="button" tabindex="0" aria-label="Панель віджетів"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.2"/><path d="M14 4v16"/></svg></div>
@@ -186,7 +187,7 @@
           <b>Щоденник</b>
         </button>
       </div>
-      <div class="nyc" id="nyCountdown" style="cursor:pointer" role="button" tabindex="0" aria-label="Лічильник до Нового року" onclick="event.stopPropagation();window.goNYC&&window.goNYC()">
+      <div class="nyc" id="nyCountdown" style="cursor:pointer" role="button" tabindex="0" aria-label="Лічильник до Нового року" onclick="event.stopPropagation();window.__nycTap?window.__nycTap():(window.goNYC&&window.goNYC())">
       <div class="nyc-head"><span class="nyc-emoji">🎄</span><span class="nyc-title" id="nycTitle">До Нового року</span></div>
       <div class="nyc-grid">
         <div class="nyc-cell"><b id="nycD">0</b><span>днів</span></div>

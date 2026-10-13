@@ -1,0 +1,87 @@
+  /* ════════ «Фокус» (55-focus.js, 12.10.2026) ════════
+     Іконка-мішень у шапці Огляду + шторка з однією справою і таймером.
+     Телефон — шторка знизу над усім (і над нижньою панеллю), під safe-area; ноутбук — картка по центру.
+     Кольори — лише токени теми. */
+  #homeFocusBtn{position:relative;}
+  #homeFocusBtn.fc-on{color:var(--accent);border-color:var(--accent);}
+  .fc-bd{position:absolute;top:-6px;right:-8px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;box-sizing:border-box;
+    display:flex;align-items:center;justify-content:center;font:800 10px/1 Manrope,system-ui,sans-serif;color:#fff;background:var(--accent);
+    pointer-events:none;}
+  .fc-bd[hidden]{display:none;}
+  /* «Панель віджетів» працює лише на ноутбуці — на телефоні кнопку ховаємо, місце бере «Фокус» */
+  @media (max-width:1023.98px){ #homeWidgetsToggle{display:none;} }
+
+  .fc-ov{position:fixed;inset:0;z-index:9500;display:flex;align-items:flex-end;justify-content:center;
+    background:rgba(0,0,0,0);transition:background .2s;}
+  .fc-ov.show{background:rgba(0,0,0,.5);}
+  .fc-sheet{box-sizing:border-box;width:100%;max-height:calc(100% - env(safe-area-inset-top) - 24px);overflow:auto;
+    background:var(--bg);color:var(--text);border-radius:24px 24px 0 0;border:1px solid var(--line);border-bottom:0;
+    padding:14px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(100%);transition:transform .22s ease-out;}
+  .fc-ov.show .fc-sheet{transform:none;}
+  .fc-top{display:flex;align-items:center;justify-content:space-between;min-height:44px;}
+  .fc-top h2{margin:0;font-size:20px;font-weight:800;}
+  .fc-x{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;font-size:18px;color:var(--muted);}
+  .fc-x:focus-visible,.fc-pri:focus-visible,.fc-sec:focus-visible,.fc-dur:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .fc-body{display:flex;flex-direction:column;gap:12px;padding-top:6px;}
+
+  .fc-card{display:flex;flex-direction:column;gap:10px;padding:18px 16px;border-radius:20px;background:var(--card);border:1px solid var(--line);}
+  .fc-card small{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .fc-t{display:block;font-size:22px;line-height:1.2;font-weight:800;overflow-wrap:anywhere;}
+  .fc-sub{font-size:14px;color:var(--muted);margin-top:-4px;}
+  .fc-over{margin:0;font-size:15px;line-height:1.4;color:var(--muted);}
+  .fc-win .fc-t{color:var(--accent);}
+
+  .fc-durs{display:flex;gap:8px;}
+  .fc-dur{all:unset;cursor:pointer;flex:1;box-sizing:border-box;min-height:44px;text-align:center;line-height:44px;border-radius:12px;
+    font-size:15px;font-weight:700;color:var(--muted);border:1px solid var(--line);}
+  .fc-dur.on{color:var(--accent);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);}
+
+  .fc-pri{all:unset;cursor:pointer;box-sizing:border-box;display:block;width:100%;min-height:54px;line-height:54px;text-align:center;
+    border-radius:16px;font-size:17px;font-weight:800;color:#fff;background:var(--accent);}
+  .fc-pri:active,.fc-sec:active,.fc-dur:active{transform:scale(.98);}
+  /* темні теми: світлий акцент (#7c93ff, #d4a24c…) з білим текстом дає контраст 2.3–2.8 — беремо темний текст (6–8) */
+  html:not(.t-light) .fc-pri,html:not(.t-light) .fc-bd{color:#10131a;}
+  .fc-sheet:focus{outline:none;}
+  .fc-row{display:flex;gap:8px;}
+  .fc-sec{all:unset;cursor:pointer;box-sizing:border-box;flex:1;min-height:46px;line-height:46px;text-align:center;border-radius:14px;
+    font-size:15px;font-weight:700;color:var(--text);border:1px solid var(--line);}
+
+  .fc-in{box-sizing:border-box;width:100%;min-height:48px;padding:0 14px;border-radius:14px;border:1px solid var(--line);
+    background:var(--bg);color:var(--text);font-size:16px;font-family:inherit;}
+  .fc-in:focus{outline:2px solid var(--accent);outline-offset:0;}
+
+  .fc-ring{--p:0%;align-self:center;width:168px;height:168px;border-radius:50%;margin:6px 0;display:grid;place-items:center;
+    background:conic-gradient(var(--accent) var(--p),color-mix(in srgb,var(--line) 70%,transparent) 0);}
+  .fc-ring>span{width:146px;height:146px;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+  .fc-ring b{font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .fc-ring small{text-transform:none;letter-spacing:0;}
+
+  /* стрічка «Прийшло на сьогодні» */
+  .fc-feed{display:flex;flex-direction:column;gap:8px;}
+  .fc-feed-h{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:2px 4px 0;}
+  .fc-fi{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
+  .fc-fi-ic{width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:10px;font-size:16px;
+    background:color-mix(in srgb,var(--accent) 14%,transparent);}
+  .fc-fi-av{width:32px;height:32px;flex:none;display:grid;place-items:center;}
+  .fc-fi-av svg,.fc-fi-av img{max-width:32px;max-height:32px;}
+  .fc-fi-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .fc-fi-b b{font-size:15px;font-weight:700;overflow-wrap:anywhere;}
+  .fc-fi-b span{font-size:13px;line-height:1.4;color:var(--muted);}
+  .fc-fi.mate .fc-fi-b span{color:var(--text);}
+  .fc-fi-a{display:flex;gap:8px;margin-top:8px;}
+  .fc-chip{all:unset;cursor:pointer;box-sizing:border-box;min-height:44px;padding:0 14px;display:inline-flex;align-items:center;border-radius:12px;
+    font-size:14px;font-weight:700;color:var(--text);border:1px solid var(--line);}
+  .fc-chip:active{transform:scale(.98);}
+  .fc-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .fc-mate{display:flex;align-items:center;gap:10px;padding:2px 4px;font-size:14px;color:var(--muted);}
+  .fc-mate-av{width:40px;height:40px;flex:none;display:grid;place-items:center;}
+  .fc-mate-av svg,.fc-mate-av img{max-width:40px;max-height:40px;}
+
+  @media (min-width:1024px){
+    .fc-ov{align-items:center;}
+    .fc-sheet{width:440px;border-radius:24px;border-bottom:1px solid var(--line);padding-bottom:20px;transform:translateY(16px);opacity:0;
+      transition:transform .2s ease-out,opacity .2s;}
+    .fc-ov.show .fc-sheet{transform:none;opacity:1;}
+  }
+  @media (prefers-reduced-motion:reduce){ .fc-sheet,.fc-ov{transition:none;} }
