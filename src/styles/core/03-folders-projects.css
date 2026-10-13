@@ -648,3 +648,7 @@
   .prio-dot.big{width:14px;height:14px;margin:0 4px 0 2px;top:0;}
   .fgs-row .prio-dot.big[style*="transparent"]{box-shadow:inset 0 0 0 1.5px var(--muted);}
   .fgs-row.fgs-prio{min-height:48px;}
+  /* розділ «Високий / Середній / …» між папками на головній (порядок «За пріоритетом») */
+  .fprio-h{grid-column:1/-1;flex:0 0 100%;display:flex;align-items:center;gap:2px;margin:10px 2px 2px;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--pc,var(--muted));}
+  .fprio-h:first-child{margin-top:0;}
+  .fprio-h .prio-dot[style*="transparent"]{box-shadow:inset 0 0 0 1.5px var(--muted);}

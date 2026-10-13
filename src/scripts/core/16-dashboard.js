@@ -17,7 +17,7 @@
   function foptParse(raw){
     let o={}; try{ o=JSON.parse(raw||'{}')||{}; }catch(_){}
     return { size:['s','m','l'].includes(o.size)?o.size:'m',
-             sort:o.sort==='name'?'name':'manual',
+             sort:(o.sort==='name'||o.sort==='prio')?o.sort:'manual',
              covers:o.covers===0?0:1 };
   }
   let folderOpts=Object.assign({},FOPT_DEF);
@@ -105,7 +105,7 @@
         const forbidden=isDescendantFolder(okey, st.key);
         if(!forbidden && relX>0.28 && relX<0.72){ st.mode='into'; st.targetKey=okey; intoEl=it.el; }
         // «За назвою» порядок задає абетка — переставляти нема чого (вкласти в папку можна)
-        else if(folderOpts.sort!=='name' && (folders[okey].parent||'')===(folders[st.key].parent||'')){
+        else if(folderOpts.sort==='manual' && (folders[okey].parent||'')===(folders[st.key].parent||'')){
           const before=relX<0.5; st.mode='reorder'; st.targetKey=before?okey:nextAfterCached(okey);
           const gr=grid.getBoundingClientRect();
           lineStyle={ top:(r.top-gr.top+r.height*0.15), height:(r.height*0.7),
@@ -248,6 +248,15 @@
     a.onclick=()=>openNewFolderChoice();
     return a;
   }
+  /* заголовки-розділи між папками при порядку «За пріоритетом» (лише коли хоч в одної папки є пріоритет) */
+  let prioHeadLast=null, prioHeadOn=false;
+  function prioHeadReset(keys){ prioHeadLast=null; prioHeadOn=folderOpts.sort==='prio' && keys.some(k=>folderPrio(k)); }
+  function prioHeadMaybe(box,k){
+    if(!prioHeadOn) return; const p=folderPrio(k); if(p===prioHeadLast) return; prioHeadLast=p;
+    const h=document.createElement('div'); h.className='fprio-h'; if(p) h.style.setProperty('--pc',FPRIO[p][1]);
+    h.innerHTML=`<span class="prio-dot"${p?'':' style="--pc:transparent"'}></span>${p?FPRIO[p][0]:'Без пріоритету'}`;
+    box.appendChild(h);
+  }
   function renderFolderCovers(grid, keys){
     const v=homeFolderView;
     grid.classList.add('fsz-'+folderOpts.size);
@@ -263,7 +272,8 @@
       if(pinned.length){ const row=sec('Закріплені',pinned.length,'fsec-row'); pinned.forEach(k=>row.appendChild(fc3Tile(k,'wide'))); }
       if(groups.length){ const box=sec('Групи',groups.length,'fsec-groups'); groups.forEach(k=>box.appendChild(fc3GroupRow(k))); }
       const all=sec((pinned.length||groups.length)?'Усі папки':'Папки',0,'fsec-grid');
-      rest.forEach(k=>all.appendChild(fc3Tile(k,'')));
+      prioHeadReset(rest);   /* у «Секціях» групи окремо — розділи рахуємо лише по решті папок */
+      rest.forEach(k=>{ prioHeadMaybe(all,k); all.appendChild(fc3Tile(k,'')); });
       all.appendChild(fc3Add());
       return;
     }
@@ -275,7 +285,7 @@
         if(!bigUsed && folders[k].pinned){ shape='big'; bigUsed=true; }
         else if(groupKids(k).length) shape='tall';
       }
-      grid.appendChild(fc3Tile(k,shape));
+      prioHeadMaybe(grid,k); grid.appendChild(fc3Tile(k,shape));
     });
     grid.appendChild(fc3Add());
   }
@@ -297,6 +307,9 @@
     // «за назвою»: закріплені однаково зверху, решта — за абеткою
     if(folderOpts.sort==='name') keys=keys.slice().sort((a,b)=>
       ((folders[b].pinned?1:0)-(folders[a].pinned?1:0)) || String(folders[a].name||'').localeCompare(String(folders[b].name||''),'uk'));
+    // «за пріоритетом»: Високий → Середній → Низький → без; усередині — ручний порядок (sort стабільний)
+    if(folderOpts.sort==='prio'){ const rk=k=>{ const p=folderPrio(k); return p?FPRIO_ORDER.indexOf(p):3; }; keys=keys.slice().sort((a,b)=>rk(a)-rk(b)); }
+    prioHeadReset(keys);
     if(FV_COVER.includes(homeFolderView)) renderFolderCovers(grid, keys);
     else {
     keys.forEach((k,idx)=>{
@@ -337,7 +350,7 @@
         r.onclick=(e)=>{ if(e.target.closest('.fmenu')) return;
           if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
           if(isGroup){ openGroupAsChosen(k); return; } goFolder(k); };
-        grid.appendChild(r); return;
+        prioHeadMaybe(grid,k); grid.appendChild(r); return;
       }
       // ── v2 (Список · Журнал): єдина розмітка, режим вирішує лише клас-обгортку ──
       const modeClass = homeFolderView==='mag' ? 'fc2-mag' : 'fc2-row';
@@ -369,7 +382,7 @@
         if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
         if(isGroup){ openGroupAsChosen(k); return; }
         goFolder(k); };
-      grid.appendChild(el);
+      prioHeadMaybe(grid,k); grid.appendChild(el);
     });
     // add-folder card — під поточний режим
     const add=document.createElement('div');
@@ -657,7 +670,7 @@
       <div class="fvs-head"><b>Вигляд папок</b><button type="button" class="fvs-done" data-fvdone>Готово</button></div>
       <div class="fvs-views">${FV_ORDER.map(v=>`<button type="button" class="fvs-view${v===homeFolderView?' on':''}" data-fv="${v}" aria-pressed="${v===homeFolderView}"><span class="fvs-prev fvs-prev-${v}" aria-hidden="true">${FV_PREV[v]}</span><span class="fvs-vn">${FV_NAME[v]}</span></button>`).join('')}</div>
       ${seg('size','Розмір плиток',[['l','Великі'],['m','Звичайні'],['s','Дрібні']],folderOpts.size)}
-      ${seg('sort','Порядок',[['manual','Вручну'],['name','За назвою']],folderOpts.sort)}
+      ${seg('sort','Порядок',[['manual','Вручну'],['name','За назвою'],['prio','За пріоритетом']],folderOpts.sort)}
       <button type="button" class="fvs-tog" data-fotog role="switch" aria-checked="${folderOpts.covers?'true':'false'}"><span class="fvs-tt">Фото на всю плитку<small>вимкнеш — усі папки будуть кольоровими обкладинками</small></span><i class="fvs-sw" aria-hidden="true"></i></button>
       <div class="fvs-acts">
         ${fmRow('merge','group','Обʼєднати папки в групу','')}
