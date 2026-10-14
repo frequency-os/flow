@@ -66,6 +66,11 @@
           return; } }catch(_){}
         if(window.__show)window.__show('scr-home'); };
       window.openFlowPage(opts||null);
+      // напис «назад» каже, куди повернешся: «‹ Навчання» для папки в групі, інакше «‹ Папки» (14.10.2026)
+      try{ const bb=document.getElementById('pgBack');
+        if(bb){ const gn=fgBack&&folders[fgBack]?String(folders[fgBack].name||'').trim():'';
+          if(gn){ bb.textContent='‹ '+(gn.length>18?gn.slice(0,17)+'…':gn); bb.setAttribute('data-i18n-skip','1'); bb.setAttribute('aria-label','Назад до «'+gn.slice(0,40)+'»'); }
+          else { bb.textContent='‹ Папки'; bb.removeAttribute('data-i18n-skip'); bb.removeAttribute('aria-label'); } } }catch(_){}
     }catch(e){ console.error('goSpaceFor', e); goHome(); }
   }
   let spaceFromFolder=null;
