@@ -458,7 +458,6 @@
 
   function renderPlanner(c){
     const p=plData();
-    if(window.uiMode==='lite') p.scope='day';
     if(p.scope==='quarter') p.scope='day'; // квартал переїхав у Горизонт (Цілі)
     const periodTasks=p.tasks.filter(t=>t.scope===p.scope);
     const done=periodTasks.filter(t=>t.done).length;

@@ -97,7 +97,8 @@
     el.querySelector('#fsNm').textContent=p.name;
     el.querySelector('#fsCtx').textContent=ctx.label;
     el.style.borderColor=p.glow+'66';
-    el.querySelector('#fsInput').placeholder='Скажи '+p.name+'у, що зробити…';
+    // без відмінків: «Скажи »+ім'я+«у» давало «Міау», «Ліраy» (аудит СДВГ, 12.10.2026)
+    el.querySelector('#fsInput').placeholder=((window.flowLang&&window.flowLang())==='en')?p.name+' is listening — what to do…':p.name+' слухає — що зробити…';
     const ch=el.querySelector('#fsChips');
     ch.innerHTML=spotChips(ctx.key).map(c=>`<span class="fs-chip">${c}</span>`).join('');
     ch.querySelectorAll('.fs-chip').forEach(c=>c.onclick=()=>flowSpotSend(c.textContent));

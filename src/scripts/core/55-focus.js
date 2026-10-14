@@ -8,6 +8,9 @@
      Стрічка «Прийшло на сьогодні» (пакет 2): справа за ≤15 хв, нагадування завдань на сьогодні (дошки папок),
      одна м'яка підказка напарника. Лічильник на іконці — лише те, що вже настало (або за ≤15 хв) і ще не бачене;
      відкрили «Фокус» — побачене. Поки йде таймер, стрічку сховано: не відволікати.
+     Пакет 3: поле «думка у Вхідні» внизу (видно й під час таймера — «припаркувати» думку, не зриваючись;
+     голос — мікрофон клавіатури iPhone, без AI) і перемикач «Сховати гру» (= ui_mode 'lite', 02-storage.js;
+     що ховається — 35-focus.css body.mode-lite).
      Тексти — парами uk/en, без родових форм. */
   const FC_RUN_KEY='focus_run';
   const fcLang=()=>{ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } };
@@ -21,7 +24,9 @@
       feed:'Прийшло на сьогодні', soonA:'Через ', soonB:' хв — ', remAt:'нагадування · о ', remPast:'настало о ', task:'Завдання',
       ok:'Готово', later:'Пізніше', laterToast:'🔔 Нагадаю о ', okToast:'✓ Готово',
       hintBreak:'Сесія позаду. 5 хвилин перерви: вода й трохи руху?', hintLate:'Уже пізно. Залиш одну справу на завтра — і відпочинок.',
-      hintMorning:'Один маленький крок — і день уже рушив.'},
+      hintMorning:'Один маленький крок — і день уже рушив.',
+      capPh:'Думка? Збережу у Вхідні', capSave:'Зберегти у Вхідні', capHint:'🎙 Голосом — мікрофон на клавіатурі',
+      capOk:'📥 Збережено у Вхідні', capWait:'Ще вантажу — спробуй за мить', game:'Сховати гру', gameSub:'рівні, серії, призи й відсотки'},
     en:{loading:'Loading your tasks…', title:'Focus', close:'Close', step:'Your one step', now:'now · until ', at:'at ', was:'was at ', wasTail:' — fine to do now',
       mission:'mission step', other:'Something else', done:'Done', start:'Start', stop:'Stop', min:'min',
       emptyH:'What one thing will you do now?', emptyPh:'Write one thing', emptyGo:'Start',
@@ -31,7 +36,9 @@
       feed:'Came in for today', soonA:'In ', soonB:' min — ', remAt:'reminder · at ', remPast:'due since ', task:'Task',
       ok:'Done', later:'Later', laterToast:'🔔 Will remind at ', okToast:'✓ Done',
       hintBreak:'Session done. 5 minutes of break: water and a little movement?', hintLate:'It is late. Leave one thing for tomorrow — and rest.',
-      hintMorning:'One small step — and the day is moving.'}
+      hintMorning:'One small step — and the day is moving.',
+      capPh:'A thought? Saved to Inbox', capSave:'Save to Inbox', capHint:'🎙 By voice — the mic on your keyboard',
+      capOk:'📥 Saved to Inbox', capWait:'Still loading — try in a moment', game:'Hide the game', gameSub:'levels, streaks, prizes and percentages'}
   };
   const fcT=k=>(FC_T[fcLang()]||FC_T.uk)[k];
   let fcIdx=0, fcDur=15, fcTick=null, fcAudio=null;
@@ -210,6 +217,32 @@
       return `<div class="fc-fi${it.kind==='mate'?' mate':''}">${lead}<div class="fc-fi-b"><b>${esc(it.t||'')}</b>${it.sub?`<span>${esc(it.sub)}</span>`:''}${acts?`<div class="fc-fi-a">${acts}</div>`:''}</div></div>`;
     }).join('')}</div>`;
   }
+  /* думка у «Вхідні» — той самий запис, що «Швидкий запис» (23-board.js saveQuickCapture) */
+  function fcCapHTML(){
+    let touch=false; try{ touch=matchMedia('(pointer:coarse)').matches; }catch(_){}
+    return `<div class="fc-cap"><div class="fc-cap-r">
+        <input id="fcCap" class="fc-in" maxlength="2000" placeholder="${fcT('capPh')}" autocomplete="off" enterkeyhint="send" aria-label="${fcT('capSave')}">
+        <button class="fc-cap-go" data-fccap aria-label="${fcT('capSave')}">↑</button></div>
+        ${touch?`<small class="fc-cap-h">${fcT('capHint')}</small>`:''}</div>`;
+  }
+  function fcGameHTML(){
+    const on=window.uiMode==='lite';
+    return `<button class="fc-game" role="switch" aria-checked="${on}" data-fcgame><span><b>${fcT('game')}</b><small>${fcT('gameSub')}</small></span><i class="fc-sw${on?' on':''}"></i></button>`;
+  }
+  function fcSaveThought(inp){
+    const v=(inp.value||'').trim(); if(!v){ inp.focus(); return; }
+    // пишемо лише в прочитану дошку: інакше заглушка затре справжні записи (SYNC-2)
+    if(typeof window.storeKeyReady==='function'&&window.storeKeyReady('board')!==true){ try{ plToast(fcT('capWait')); }catch(_){} return; }
+    try{
+      ensureInboxChat();
+      boards[chatBk(INBOX_CHAT)].push({ id:'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), type:'note', title:'', text:v, at:Date.now(), by:'me' });
+      syncBlocks(); saveBoard();
+      try{ renderBoard(); }catch(_){}
+    }catch(err){ console.error('fcSaveThought',err); return; }
+    inp.value=''; try{ inp.blur(); }catch(_){}
+    try{ window.platform.haptic('light'); }catch(_){}
+    try{ plToast(fcT('capOk')); }catch(_){}
+  }
   function fcDurHTML(){
     return `<div class="fc-durs" role="group" aria-label="${fcT('min')}">${[5,15,25].map(m=>`<button class="fc-dur${m===fcDur?' on':''}" data-fcdur="${m}" aria-pressed="${m===fcDur}">${m} ${fcT('min')}</button>`).join('')}</div>`;
   }
@@ -260,8 +293,15 @@
     // справа, що вже стоїть головною карткою, у стрічці не повторюється
     const top=(!r&&fcReady())?fcCands()[fcIdx]||fcCands()[0]:null, topId=top&&top.kind==='block'?(top.b.fromRecur||top.b.id):'';
     const feed=all.filter(i=>!(i.kind==='soon'&&topId&&(i.b.fromRecur||i.b.id)===topId));
-    const body=ov.querySelector('.fc-body'); body.innerHTML=fcBodyHTML(feed);
+    const body=ov.querySelector('.fc-body');
+    const draft=(body.querySelector('#fcCap')||{}).value||'';   // недописана думка переживає перемальовування
+    body.innerHTML=fcBodyHTML(feed)+(fcReady()?fcCapHTML()+fcGameHTML():'');
+    if(draft){ const ci=body.querySelector('#fcCap'); if(ci) ci.value=draft; }
     if(r) fcPaintTime(r);
+    { const ci=body.querySelector('#fcCap'), cb=body.querySelector('[data-fccap]');
+      if(ci){ ci.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); fcSaveThought(ci); } }; if(cb) cb.onclick=()=>fcSaveThought(ci); } }
+    { const g=body.querySelector('[data-fcgame]'); if(g) g.onclick=()=>{ try{ window.setUiMode(window.uiMode==='lite'?'pro':'lite'); }catch(_){}
+        const on=window.uiMode==='lite'; g.setAttribute('aria-checked',on); const sw=g.querySelector('.fc-sw'); if(sw) sw.classList.toggle('on',on); }; }
     body.querySelectorAll('[data-fcfeed]').forEach(el=>el.onclick=()=>fcFeedAct(feed[+el.dataset.fcfeed],el.dataset.act));
     fcMarkSeen(all); fcBadge();
     const cs=r?[]:fcCands(), c=cs[fcIdx];

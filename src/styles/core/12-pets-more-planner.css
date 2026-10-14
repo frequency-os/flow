@@ -608,11 +608,7 @@
   .pl-blk-miss span{font-size:11.5px;color:#e2b23e;flex:1;}
   .pl-blk-micro-btn{border:0;border-radius:8px;padding:6px 10px;font:800 11px Manrope;cursor:pointer;
     background:#e2b23e;color:#2b1d00;flex-shrink:0;white-space:nowrap;}
-  /* ── Режим Lite: тільки ядро (Планер · Гроші · Цілі), Pro-шар схований ── */
-  body.mode-lite #navHome{display:none;}
-  body.mode-lite [data-dnav="home"]{display:none;}
-  body.mode-lite .pl-seg{display:none;}
-  body.mode-lite .gtabs{display:none;}
+  /* ── Режим Lite = «Сховати гру» (з 12.10.2026; що саме ховається — 35-focus.css). Огляд, вкладки Цілей і масштаб Планера лишаються ── */
   .mh-projects{margin-bottom:14px;}
   .mh-mode{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
     border-radius:16px;padding:13px 14px;margin-bottom:14px;}

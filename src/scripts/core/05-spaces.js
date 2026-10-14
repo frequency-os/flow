@@ -283,8 +283,8 @@
             <button data-l="uk" class="${lang==='uk'?'on':''}">UA</button>
             <button data-l="en" class="${lang==='en'?'on':''}">EN</button></span></div>`:''}
         <div class="mr-row">${stgIco('mode','slate')}
-          <span class="mr-tx"><b>Режим</b><small>${um==='lite'?'Lite: внизу лише Планер і Гроші':'Pro: увесь Frequency з Оглядом'}</small></span>
-          ${seg('uimode',[['lite','Lite'],['pro','Pro']],um)}</div>
+          <span class="mr-tx"><b>Гра</b><small>${um==='lite'?'Сховано':'На виду'}</small></span>
+          ${seg('uimode',[['pro','Показати'],['lite','Сховати']],um)}</div>
       </div>
       <div class="mr-sl" data-sec="pet">Напарник</div>
       <div class="mr-grp" data-sec="pet">
