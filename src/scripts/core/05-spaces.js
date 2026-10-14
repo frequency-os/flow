@@ -685,12 +685,7 @@
   { const sc=document.getElementById('summaryCard'); if(sc) sc.onclick=goWishes; }
   document.getElementById('debtsBack').onclick = () => goFolder('fin');
   document.getElementById('spendBack').onclick = () => goFolder('fin');
-  { const wb=document.getElementById('workBack'); if(wb) wb.onclick=()=>{
-      // «назад» веде в Канал папки, з якої прийшли (старого екрана папки з віджетами більше нема)
-      if(!workOrigin || workOrigin==='work' || !folders[workOrigin]) goProjects();
-      else goFolder(workOrigin);
-  }; }
-  { const sb=document.getElementById('wkSpacesBtn'); if(sb) sb.onclick=()=>{ if(workOrigin&&workOrigin!=='work'&&folders[workOrigin]) goFolder(workOrigin); else goProjects(); }; }
+  { const wb=document.getElementById('workBack'); if(wb) wb.onclick=workBack; }   // туди, звідки прийшли (04-folders-nav.js)
   document.getElementById('finBack').onclick = () => { currentFolderKey=null; goHome(); };
   (function(){ const d=document.getElementById('e2Dim'); if(d) d.onclick=()=>{ try{closeEnvSheet();}catch(_){}}; })();
 

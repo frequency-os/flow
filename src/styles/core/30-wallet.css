@@ -148,3 +148,11 @@
   /* борги на картці балансу */
   .wl-card .wl-debt{all:unset;box-sizing:border-box;cursor:pointer;position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;width:100%;min-height:44px;margin-top:10px;padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.16);color:inherit;font-size:12.5px;font-weight:600;}
   .wl-card .wl-debt span:last-child{font-size:13.5px;} .wl-card .wl-debt b{font-weight:800;font-variant-numeric:tabular-nums;}
+  /* «⏱ Робота» — години й зарплата; Робота — інструмент Гаманця (14.10.2026) */
+  .wl-work{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 14px;margin-bottom:10px;border-radius:14px;
+    background:color-mix(in srgb,var(--text) 5%,transparent);border:1px solid var(--line);color:var(--text);}
+  .wl-work span{font-size:18px;}
+  .wl-work b{font-size:15px;font-weight:800;}
+  .wl-work small{flex:1;min-width:0;font-size:12.5px;color:var(--muted);}
+  .wl-work i{font-style:normal;font-size:20px;color:var(--muted);}
+  .wl-work:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}

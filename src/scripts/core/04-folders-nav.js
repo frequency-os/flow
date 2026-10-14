@@ -420,6 +420,20 @@
   function goFinance(){ finView='dash'; renderFinance(); show('scr-finance'); }
   function goEnvelopes(){ finView='envelopes'; renderFinance(); show('scr-finance'); }
   function goSpend(){ renderSpend(); show('scr-spend'); }
-  let workOrigin='work';
-  function goWork(){ workOrigin=currentFolderKey||'work'; renderWork(); show('scr-work'); }
+  let workOrigin='work', workFrom='';
+  /* «Робота» — інструмент Гаманця (14.10.2026): запамʼятовуємо екран, з якого прийшли, і «назад» веде туди ж
+     (раніше вело в «Проєкти» або в давно відкриту папку) */
+  function goWork(){
+    const a=document.querySelector('.screen.active'); const from=a?a.id:'';
+    if(from!=='scr-work'){ workFrom=from; workOrigin=(from==='scr-page'&&currentFolderKey)?currentFolderKey:'work'; }
+    renderWork(); show('scr-work'); }
+  function workBack(){
+    try{
+      if(workFrom==='scr-page'&&workOrigin&&workOrigin!=='work'&&folders[workOrigin]){ goFolder(workOrigin); return; }
+      if(workFrom==='scr-journal'&&typeof goJournal==='function'){ goJournal(); return; }
+      if(workFrom==='scr-more'&&window.goMore){ window.goMore(); return; }
+      if(workFrom==='scr-home'){ goHome(); return; }
+    }catch(_){}
+    goFinance();   // за замовчуванням — у Гаманець: Робота живе там
+  }
 

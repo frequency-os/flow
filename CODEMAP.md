@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 90 |
-| Рядків JS | 33199 |
+| Рядків JS | 33200 |
 | Файлів CSS | 47 |
-| Рядків CSS | 10525 |
-| Сутностей верхнього рівня | 2410 |
+| Рядків CSS | 10533 |
+| Сутностей верхнього рівня | 2411 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -38,8 +38,8 @@
 | `src/scripts/core/01-base.js` | 414 | 39 |
 | `src/scripts/core/02-storage.js` | 2150 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
-| `src/scripts/core/04-folders-nav.js` | 425 | 62 |
-| `src/scripts/core/05-spaces.js` | 696 | 57 |
+| `src/scripts/core/04-folders-nav.js` | 439 | 63 |
+| `src/scripts/core/05-spaces.js` | 691 | 57 |
 | `src/scripts/core/06-wishes.js` | 1461 | 109 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 653 | 84 |
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1694 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1188 | 66 |
+| `src/scripts/core/16-dashboard.js` | 1178 | 66 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -79,7 +79,7 @@
 | `src/scripts/core/43-month.js` | 257 | 34 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
-| `src/scripts/core/46-wallet.js` | 422 | 38 |
+| `src/scripts/core/46-wallet.js` | 424 | 38 |
 | `src/scripts/core/47-rules.js` | 351 | 29 |
 | `src/scripts/core/48-hero.js` | 338 | 41 |
 | `src/scripts/core/48-widgets.js` | 463 | 46 |
@@ -160,7 +160,7 @@
 | `src/styles/core/27-month.css` | 202 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
 | `src/styles/core/29-year.css` | 84 | 0 |
-| `src/styles/core/30-wallet.css` | 150 | 0 |
+| `src/styles/core/30-wallet.css` | 158 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 316 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
@@ -524,7 +524,7 @@
 | `window.platform` | обʼєкт | `src/scripts/core/03-platform.js:48` |
 | `window.micDenyMsg` | функція | `src/scripts/core/03-platform.js:54` |
 
-### `src/scripts/core/04-folders-nav.js` — 62 сутностей
+### `src/scripts/core/04-folders-nav.js` — 63 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -589,7 +589,8 @@
 | `goEnvelopes` | функція | `src/scripts/core/04-folders-nav.js:421` |
 | `goSpend` | функція | `src/scripts/core/04-folders-nav.js:422` |
 | `workOrigin` | значення | `src/scripts/core/04-folders-nav.js:423` |
-| `goWork` | функція | `src/scripts/core/04-folders-nav.js:424` |
+| `goWork` | функція | `src/scripts/core/04-folders-nav.js:426` |
+| `workBack` | функція | `src/scripts/core/04-folders-nav.js:430` |
 
 ### `src/scripts/core/05-spaces.js` — 57 сутностей
 
@@ -1302,27 +1303,27 @@
 | `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:619` |
 | `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:661` |
 | `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:669` |
-| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:713` |
-| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:715` |
-| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:720` |
-| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:734` |
-| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:741` |
-| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:760` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:801` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:823` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:851` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:923` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:943` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:944` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:945` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:946` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1008` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1024` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1055` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1064` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1097` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1113` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1158` |
+| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:712` |
+| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:714` |
+| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:719` |
+| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:733` |
+| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:740` |
+| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:759` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:800` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:822` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:850` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:922` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:942` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:943` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:944` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:945` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1007` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1023` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1045` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1054` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1087` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1103` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1148` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -2226,34 +2227,34 @@
 | `wlRing` | функція | `src/scripts/core/46-wallet.js:21` |
 | `wlOpRow` | функція | `src/scripts/core/46-wallet.js:22` |
 | `wlRender` | функція | `src/scripts/core/46-wallet.js:30` |
-| `wlDebtTotals` | функція | `src/scripts/core/46-wallet.js:50` |
-| `wlDebtLineHTML` | функція | `src/scripts/core/46-wallet.js:56` |
-| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:61` |
-| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:91` |
-| `wlFoldersHTML` | функція | `src/scripts/core/46-wallet.js:102` |
-| `wlFolderSheet` | функція | `src/scripts/core/46-wallet.js:113` |
-| `wlBind` | функція | `src/scripts/core/46-wallet.js:126` |
-| `WL_SRC` | обʼєкт | `src/scripts/core/46-wallet.js:150` |
-| `wlSrc` | функція | `src/scripts/core/46-wallet.js:151` |
-| `wlFolderName` | функція | `src/scripts/core/46-wallet.js:152` |
-| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:154` |
-| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:220` |
-| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:240` |
-| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:246` |
-| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:259` |
-| `wlCurList` | функція | `src/scripts/core/46-wallet.js:281` |
-| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:286` |
-| `curBalance` | функція | `src/scripts/core/46-wallet.js:287` |
-| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:288` |
-| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:290` |
-| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:295` |
-| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:306` |
-| `wlExchange` | функція | `src/scripts/core/46-wallet.js:323` |
-| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:369` |
-| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:375` |
-| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:377` |
-| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:379` |
-| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:380` |
+| `wlDebtTotals` | функція | `src/scripts/core/46-wallet.js:51` |
+| `wlDebtLineHTML` | функція | `src/scripts/core/46-wallet.js:57` |
+| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:62` |
+| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:92` |
+| `wlFoldersHTML` | функція | `src/scripts/core/46-wallet.js:103` |
+| `wlFolderSheet` | функція | `src/scripts/core/46-wallet.js:114` |
+| `wlBind` | функція | `src/scripts/core/46-wallet.js:127` |
+| `WL_SRC` | обʼєкт | `src/scripts/core/46-wallet.js:152` |
+| `wlSrc` | функція | `src/scripts/core/46-wallet.js:153` |
+| `wlFolderName` | функція | `src/scripts/core/46-wallet.js:154` |
+| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:156` |
+| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:222` |
+| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:242` |
+| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:248` |
+| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:261` |
+| `wlCurList` | функція | `src/scripts/core/46-wallet.js:283` |
+| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:288` |
+| `curBalance` | функція | `src/scripts/core/46-wallet.js:289` |
+| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:290` |
+| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:292` |
+| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:297` |
+| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:308` |
+| `wlExchange` | функція | `src/scripts/core/46-wallet.js:325` |
+| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:371` |
+| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:377` |
+| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:379` |
+| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:381` |
+| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:382` |
 
 ### `src/scripts/core/47-rules.js` — 29 сутностей
 

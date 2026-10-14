@@ -301,7 +301,7 @@
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
     try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
-    let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project'));
+    let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');   // проєкти — звичайні папки зі статусом (14.10.2026)
     // порожній акаунт — «Стартовий набір» замість голого «＋ Нова папка» (53-starter.js)
     try{ if(starterActive()){ starterRender(grid); return; } stHeroOff(); }catch(e){ console.error('starter',e); }
     // «за назвою»: закріплені однаково зверху, решта — за абеткою
@@ -395,7 +395,7 @@
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
     // «фото» на кольоровій обкладинці — одразу вибір знімка
     grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pickFolderPhoto(b.dataset.fphoto); });
-    try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).length; }catch(_){}
+    try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length; }catch(_){}
     if(!grid.__dragInit){ grid.__dragInit=true; enableFolderDrag(grid); }
     try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
   }
@@ -464,7 +464,7 @@
      стосом карток, тап відкриває шторку зі списком її папок. Формат даних той
      самий, що й у «Перемістити в папку»; усе пишеться лише з дії людини. */
   function groupKids(key){
-    return childFolderKeys(key).filter(folderVisible).filter(ck=>folders[ck].role!=='project');
+    return childFolderKeys(key).filter(folderVisible);
   }
   function fgIcon(f, cls){
     return `<span class="${cls||'fgs-ic'}" style="--c:${safeColor(f.c,'#6a7dff')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
@@ -587,7 +587,7 @@
   }
   // додати в групу папку, що вже є на головній
   function openFolderGroupAdd(key){
-    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!==key && k!=='work' && folders[k].role!=='project' && !isDescendantFolder(key,k));
+    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!==key && k!=='work' && !isDescendantFolder(key,k));
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Додати в «<span data-i18n-skip="1">${esc(folders[key].name)}</span>»</div>
       ${cand.map(k=>`<button class="fgs-row" data-gpick="${esc(k)}">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b></span><span class="fgs-go">＋</span></button>`).join('')
@@ -604,7 +604,7 @@
   }
   // «＋ Нова папка» на головній: порожня папка чи група з кількох наявних (12.10.2026 — «Обʼєднати» було сховане в ⚙)
   function openNewFolderChoice(){
-    const n=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && folders[k].role!=='project').length;
+    const n=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length;
     if(n<2){ createFolder(); return; }
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Що створити</div>
@@ -617,7 +617,7 @@
   }
   // «Обʼєднати»: кілька папок з головної → нова група; pre — папка, вже відмічена (з перемикача в документі)
   function openFolderMerge(pre){
-    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && folders[k].role!=='project');
+    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');
     const sel=new Set(typeof pre==='string'&&cand.includes(pre)?[pre]:[]);
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Обʼєднати в групу</div>
@@ -678,7 +678,6 @@
       <div class="fvs-acts">
         ${fmRow('merge','group','Обʼєднати папки в групу','')}
         ${fmRow('newf','plus','Нова папка','')}
-        ${fmRow('projects','proj','Проєкти','окремий екран зі статусами й дедлайнами')}
       </div>`,
     m=>{
       m.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{
@@ -840,7 +839,7 @@
         try{ renderDashboard(); }catch(_){}
         try{ if(typeof renderBoard==='function') renderBoard(); }catch(_){}
         try{ if(typeof renderProjects==='function') renderProjects(); }catch(_){}
-        flowAlert('Проєкт «'+nm+'» створено'+(parent&&folders[parent]?(' у папці «'+folders[parent].name+'»'):' у вкладці «Проєкти»')+'.\nВіджети «Пульт», «Пайплайн», «Фокус-стек» і «Таймлайн» бачать його автоматично.');
+        flowAlert('Проєкт «'+nm+'» створено'+(parent&&folders[parent]?(' у папці «'+folders[parent].name+'»'):' на Огляді')+'.\nВіджети «Пульт», «Пайплайн», «Фокус-стек» і «Таймлайн» бачать його автоматично.');
         try{ flowReact('folder',{say:true}); }catch(_){}
       }});
   }
@@ -1024,7 +1023,7 @@
   function openFolderType(key){
     const f=folders[key]; if(!f) return;
     const cur=f.role||'area';
-    const D={area:'Документ для планування і нотаток',project:'Має статус і дедлайн, живе на вкладці «Проєкти»',page:'Відкривається одразу як аркуш'};
+    const D={area:'Документ для планування і нотаток',project:'Звичайна папка зі статусом і дедлайном',page:'Відкривається одразу як аркуш'};
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Тип · <span data-i18n-skip="1">${esc(f.name)}</span></div>
       ${Object.keys(FM_TYPE).map(r=>`<button class="fgs-row${cur===r?' on':''}" data-role="${r}" aria-pressed="${cur===r}">
@@ -1038,15 +1037,6 @@
           saveFolders(); renderDashboard(); openFolderMenu(key);
           try{ window.platform.haptic('select'); }catch(_){}
         };
-        /* проєкти живуть на вкладці «Проєкти», а не на Огляді — разом із ними зникли б і папки групи */
-        const kids=groupKids(key);
-        if(b.dataset.role==='project' && cur!=='project' && kids.length){
-          closeFolderMenu();
-          actionSheet({ title:'Зробити групу проєктом?',
-            sub:'Проєкти показуються на вкладці «Проєкти», не на Огляді. '+kids.length+' '+pluralUk(kids.length,'папка','папки','папок')+' цієї групи теж '+pluralUk(kids.length,'зникне','зникнуть','зникнуть')+' з Огляду. Краще спершу розгрупувати.',
-            items:[{ic:'target', label:'Усе одно зробити проєктом', primary:true, onClick:apply}], cancel:'Скасувати' });
-          return;
-        }
         apply();
       });
       m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
@@ -1097,7 +1087,7 @@
   function openFolderMovePicker(key){
     const f=folders[key]; if(!f) return;
     closeFolderMenu();
-    const targets=orderedFolderKeys().filter(k=>k!==key && k!=='work' && folders[k] && folders[k].role!=='project' && !isDescendantFolder(k,key) && folderVisible(k));
+    const targets=orderedFolderKeys().filter(k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k));
     const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='fmenuSheet';
     const rootRow=(f.parent||'')?`<button class="fmi" data-mv="">🏠 На головну (без папки)</button>`:'';
     const rows=targets.map(k=>{ const tf=folders[k]; const cur=(f.parent||'')===k?' ✓':'';

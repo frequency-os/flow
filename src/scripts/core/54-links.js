@@ -200,7 +200,7 @@
   let dsbTreeHidden=false; try{ dsbTreeHidden=localStorage.getItem('dsbTreeHidden')==='1'; }catch(_){}   // без прототипу: ключ папки «constructor» не вдаватиме розгорнуту групу
   function dsbTreeHTML(){
     let cur=''; try{ const s=document.getElementById('scr-page'); if(s&&s.classList.contains('active')) cur=pgFolderKey()||''; }catch(_){}
-    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project';
+    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k));
     let tops=[]; try{ tops=topFolderKeys().filter(vis); }catch(_){ return ''; }
     if(!tops.length) return '';
     const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
@@ -242,9 +242,9 @@
      Ті самі правила, що й на головній (16-dashboard.js): не в себе, не у власну підпапку; «Робота» й проєкти не рухаються. */
   let dsbDragKey='';
   function dsbCanDrop(src,dst){
-    if(!src||!folders[src]||src==='work'||folders[src].role==='project') return false;
+    if(!src||!folders[src]||src==='work') return false;
     if(dst==='') return !!(folders[src].parent&&folders[folders[src].parent]);
-    if(!folders[dst]||dst===src||dst==='work'||folders[dst].role==='project') return false;
+    if(!folders[dst]||dst===src||dst==='work') return false;
     if((folders[src].parent||'')===dst) return false;
     return !isDescendantFolder(dst,src);
   }
@@ -256,7 +256,7 @@
   }
   function dsbDragBind(t,fb){
     const clear=()=>{ document.querySelectorAll('.dsbt-into').forEach(e=>e.classList.remove('dsbt-into')); };
-    t.querySelectorAll('[data-dsbt]').forEach(b=>{ const k=b.dataset.dsbt; if(!folders[k]||k==='work'||folders[k].role==='project') return;
+    t.querySelectorAll('[data-dsbt]').forEach(b=>{ const k=b.dataset.dsbt; if(!folders[k]||k==='work') return;
       b.draggable=true;
       b.ondragstart=e=>{ dsbDragKey=k; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(folders[k].name||'')); }catch(_){} document.body.classList.add('dsbt-dragging'); };
       b.ondragend=()=>{ dsbDragKey=''; clear(); document.body.classList.remove('dsbt-dragging'); };
@@ -281,7 +281,7 @@
   function lkSwitchHTML(fk){
     const f=folders[fk]; if(!f) return '';
     const par=f.parent&&folders[f.parent]?f.parent:'';
-    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project'&&k!=='work';
+    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&k!=='work';
     let sib=[]; try{ sib=(par?childFolderKeys(par):topFolderKeys()).filter(vis); }catch(_){ return ''; }
     if(sib.length<2&&!par) return '';
     const chip=k=>{ const x=folders[k]; return `<button class="lks-c${k===fk?' on':''}" data-lksw="${esc(k)}" style="--c:${safeColor(x.c,'#6a7dff')}"${k===fk?' aria-current="page"':''}><span class="lks-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(x))}"/></svg></span><span data-i18n-skip="1">${prioDot(k)}${esc(String(x.name||'Папка').slice(0,28))}</span></button>`; };

@@ -56,7 +56,7 @@
   }
   // той самий відбір, що в renderDashboard: Робота й проєкти на Огляді не живуть
   function stEmpty(){
-    const keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work'&&!(folders[k]&&folders[k].role==='project'));
+    const keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');
     return !keys.length && !(wishes||[]).length;
   }
   function starterActive(){ return !stOff() && stTrusted() && stEmpty(); }

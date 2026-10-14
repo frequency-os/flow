@@ -8,7 +8,7 @@
       '2':['Планер',     ()=>goPlanner()],
       '3':['Флоу (чат)', ()=>aiChatSheet()],
       '4':['Гроші',      ()=>goFinance()],
-      '5':['Проєкти',    ()=>goProjects()],
+      '5':['Робота',     ()=>goWork()],
       '6':['Ще',         ()=>goMore()],
     };
     function typing(){

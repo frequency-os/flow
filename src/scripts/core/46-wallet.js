@@ -34,6 +34,7 @@
     let h=`<div class="wl-card"><button class="wl-cur" data-wlcur aria-label="Головна валюта">${esc(curSym())}${curLocked()?'':' ▾'}</button><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}${wlCurList().length?`<span>разом ≈ <b>${wlMoney(wlTotalApprox()+pz)}</b></span>`:''}</span>${wlDebtLineHTML(bal+pz)}</div>
       ${wlCursHTML()}
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
+      <button class="wl-work" data-wlwork><span>⏱</span><b>Робота</b><small>години й зарплата</small><i aria-hidden="true">›</i></button>
       <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="folders"${wlState.tab==='folders'?' class="on"':''}>Папки</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
     const plan=wlState.tab==='plan'&&typeof rlPlanHTML==='function';   // план місяця (47-rules.js)
     if(wlState.tab==='overview'&&typeof wlStartHTML==='function') h+=wlStartHTML();   // порожній Гаманець — «З чого почнемо?» першим, над плитками
@@ -130,6 +131,7 @@
     { const ad=c.querySelector('[data-wlcadd]'); if(ad) ad.onclick=wlCurAdd; }
     { const ex=c.querySelector('[data-wlx]'); if(ex) ex.onclick=()=>wlExchange(''); }
     { const p=c.querySelector('[data-wlpz]'); if(p) p.onclick=()=>{ if(typeof pzScreen==='function') pzScreen(); }; }
+    { const w=c.querySelector('[data-wlwork]'); if(w) w.onclick=()=>{ try{ goWork(); }catch(_){} }; }
     c.querySelectorAll('[data-wltab]').forEach(b=>b.onclick=()=>{ wlState.tab=b.dataset.wltab; renderFinance(); });
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }

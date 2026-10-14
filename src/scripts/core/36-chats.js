@@ -230,7 +230,7 @@
     try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.length; }catch(_){}
     // лічильник папок теж тут: коли відкрита вкладка «Чати» чи «Сфери», сітка папок не малюється
     // і цифра лишалась застарілою (на старті — взагалі «5» з розмітки)
-    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).length; }catch(_){}
+    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length; }catch(_){}
     if(on) renderChatList();
     return on||sph;
   }
