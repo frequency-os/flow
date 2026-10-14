@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-14-0611-391f77f';
+  var BUILD='2026-10-14-1919-c0316c5';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -7658,6 +7658,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* борги на картці балансу */
   .wl-card .wl-debt{all:unset;box-sizing:border-box;cursor:pointer;position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;width:100%;min-height:44px;margin-top:10px;padding:8px 12px;border-radius:14px;background:rgba(0,0,0,.16);color:inherit;font-size:12.5px;font-weight:600;}
   .wl-card .wl-debt span:last-child{font-size:13.5px;} .wl-card .wl-debt b{font-weight:800;font-variant-numeric:tabular-nums;}
+  /* «⏱ Робота» — години й зарплата; Робота — інструмент Гаманця (14.10.2026) */
+  .wl-work{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 14px;margin-bottom:10px;border-radius:14px;
+    background:color-mix(in srgb,var(--text) 5%,transparent);border:1px solid var(--line);color:var(--text);}
+  .wl-work span{font-size:18px;}
+  .wl-work b{font-size:15px;font-weight:800;}
+  .wl-work small{flex:1;min-width:0;font-size:12.5px;color:var(--muted);}
+  .wl-work i{font-style:normal;font-size:20px;color:var(--muted);}
+  .wl-work:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   /* ============ ПРАВИЛА ГРИ (47-rules.js): пропозиції, Книга правил, розподіл зарплати, план місяця ============ */
   .rl-offer{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:1250;max-width:460px;margin:0 auto;padding:14px 14px 12px;border-radius:20px;
     background:var(--card);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.35);animation:rlUp .28s ease-out;}
@@ -8696,7 +8704,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   <section class="screen" id="scr-work">
     <div class="wk-headrow">
       <button class="back" id="workBack" style="--c:#6a7dff">‹ Назад</button>
-      <button class="wk-spaces-btn" id="wkSpacesBtn">📋 Простори</button>
     </div>
     <div class="ph" style="--c:#6a7dff">
       <div class="ey">Папка · <b>Робота</b></div>
@@ -12278,8 +12285,22 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function goFinance(){ finView='dash'; renderFinance(); show('scr-finance'); }
   function goEnvelopes(){ finView='envelopes'; renderFinance(); show('scr-finance'); }
   function goSpend(){ renderSpend(); show('scr-spend'); }
-  let workOrigin='work';
-  function goWork(){ workOrigin=currentFolderKey||'work'; renderWork(); show('scr-work'); }
+  let workOrigin='work', workFrom='';
+  /* «Робота» — інструмент Гаманця (14.10.2026): запамʼятовуємо екран, з якого прийшли, і «назад» веде туди ж
+     (раніше вело в «Проєкти» або в давно відкриту папку) */
+  function goWork(){
+    const a=document.querySelector('.screen.active'); const from=a?a.id:'';
+    if(from!=='scr-work'){ workFrom=from; workOrigin=(from==='scr-page'&&currentFolderKey)?currentFolderKey:'work'; }
+    renderWork(); show('scr-work'); }
+  function workBack(){
+    try{
+      if(workFrom==='scr-page'&&workOrigin&&workOrigin!=='work'&&folders[workOrigin]){ goFolder(workOrigin); return; }
+      if(workFrom==='scr-journal'&&typeof goJournal==='function'){ goJournal(); return; }
+      if(workFrom==='scr-more'&&window.goMore){ window.goMore(); return; }
+      if(workFrom==='scr-home'){ goHome(); return; }
+    }catch(_){}
+    goFinance();   // за замовчуванням — у Гаманець: Робота живе там
+  }
 
   /* ============ ПРОСТОРИ · ПРОЄКТИ · САЙДБАР · ТЕМИ ============
      Простори, екран «Проєкти», профіль сайдбара, бекап, десктопні панелі,
@@ -12968,12 +12989,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   { const sc=document.getElementById('summaryCard'); if(sc) sc.onclick=goWishes; }
   document.getElementById('debtsBack').onclick = () => goFolder('fin');
   document.getElementById('spendBack').onclick = () => goFolder('fin');
-  { const wb=document.getElementById('workBack'); if(wb) wb.onclick=()=>{
-      // «назад» веде в Канал папки, з якої прийшли (старого екрана папки з віджетами більше нема)
-      if(!workOrigin || workOrigin==='work' || !folders[workOrigin]) goProjects();
-      else goFolder(workOrigin);
-  }; }
-  { const sb=document.getElementById('wkSpacesBtn'); if(sb) sb.onclick=()=>{ if(workOrigin&&workOrigin!=='work'&&folders[workOrigin]) goFolder(workOrigin); else goProjects(); }; }
+  { const wb=document.getElementById('workBack'); if(wb) wb.onclick=workBack; }   // туди, звідки прийшли (04-folders-nav.js)
   document.getElementById('finBack').onclick = () => { currentFolderKey=null; goHome(); };
   (function(){ const d=document.getElementById('e2Dim'); if(d) d.onclick=()=>{ try{closeEnvSheet();}catch(_){}}; })();
 
@@ -21453,7 +21469,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
     try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
-    let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project'));
+    let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');   // проєкти — звичайні папки зі статусом (14.10.2026)
     // порожній акаунт — «Стартовий набір» замість голого «＋ Нова папка» (53-starter.js)
     try{ if(starterActive()){ starterRender(grid); return; } stHeroOff(); }catch(e){ console.error('starter',e); }
     // «за назвою»: закріплені однаково зверху, решта — за абеткою
@@ -21547,7 +21563,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
     // «фото» на кольоровій обкладинці — одразу вибір знімка
     grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pickFolderPhoto(b.dataset.fphoto); });
-    try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).length; }catch(_){}
+    try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length; }catch(_){}
     if(!grid.__dragInit){ grid.__dragInit=true; enableFolderDrag(grid); }
     try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
   }
@@ -21616,7 +21632,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      стосом карток, тап відкриває шторку зі списком її папок. Формат даних той
      самий, що й у «Перемістити в папку»; усе пишеться лише з дії людини. */
   function groupKids(key){
-    return childFolderKeys(key).filter(folderVisible).filter(ck=>folders[ck].role!=='project');
+    return childFolderKeys(key).filter(folderVisible);
   }
   function fgIcon(f, cls){
     return `<span class="${cls||'fgs-ic'}" style="--c:${safeColor(f.c,'#6a7dff')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
@@ -21739,7 +21755,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   // додати в групу папку, що вже є на головній
   function openFolderGroupAdd(key){
-    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!==key && k!=='work' && folders[k].role!=='project' && !isDescendantFolder(key,k));
+    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!==key && k!=='work' && !isDescendantFolder(key,k));
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Додати в «<span data-i18n-skip="1">${esc(folders[key].name)}</span>»</div>
       ${cand.map(k=>`<button class="fgs-row" data-gpick="${esc(k)}">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b></span><span class="fgs-go">＋</span></button>`).join('')
@@ -21756,7 +21772,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   // «＋ Нова папка» на головній: порожня папка чи група з кількох наявних (12.10.2026 — «Обʼєднати» було сховане в ⚙)
   function openNewFolderChoice(){
-    const n=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && folders[k].role!=='project').length;
+    const n=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length;
     if(n<2){ createFolder(); return; }
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Що створити</div>
@@ -21769,7 +21785,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   // «Обʼєднати»: кілька папок з головної → нова група; pre — папка, вже відмічена (з перемикача в документі)
   function openFolderMerge(pre){
-    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && folders[k].role!=='project');
+    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');
     const sel=new Set(typeof pre==='string'&&cand.includes(pre)?[pre]:[]);
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Обʼєднати в групу</div>
@@ -21830,7 +21846,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <div class="fvs-acts">
         ${fmRow('merge','group','Обʼєднати папки в групу','')}
         ${fmRow('newf','plus','Нова папка','')}
-        ${fmRow('projects','proj','Проєкти','окремий екран зі статусами й дедлайнами')}
       </div>`,
     m=>{
       m.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{
@@ -21992,7 +22007,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         try{ renderDashboard(); }catch(_){}
         try{ if(typeof renderBoard==='function') renderBoard(); }catch(_){}
         try{ if(typeof renderProjects==='function') renderProjects(); }catch(_){}
-        flowAlert('Проєкт «'+nm+'» створено'+(parent&&folders[parent]?(' у папці «'+folders[parent].name+'»'):' у вкладці «Проєкти»')+'.\nВіджети «Пульт», «Пайплайн», «Фокус-стек» і «Таймлайн» бачать його автоматично.');
+        flowAlert('Проєкт «'+nm+'» створено'+(parent&&folders[parent]?(' у папці «'+folders[parent].name+'»'):' на Огляді')+'.\nВіджети «Пульт», «Пайплайн», «Фокус-стек» і «Таймлайн» бачать його автоматично.');
         try{ flowReact('folder',{say:true}); }catch(_){}
       }});
   }
@@ -22176,7 +22191,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function openFolderType(key){
     const f=folders[key]; if(!f) return;
     const cur=f.role||'area';
-    const D={area:'Документ для планування і нотаток',project:'Має статус і дедлайн, живе на вкладці «Проєкти»',page:'Відкривається одразу як аркуш'};
+    const D={area:'Документ для планування і нотаток',project:'Звичайна папка зі статусом і дедлайном',page:'Відкривається одразу як аркуш'};
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Тип · <span data-i18n-skip="1">${esc(f.name)}</span></div>
       ${Object.keys(FM_TYPE).map(r=>`<button class="fgs-row${cur===r?' on':''}" data-role="${r}" aria-pressed="${cur===r}">
@@ -22190,15 +22205,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           saveFolders(); renderDashboard(); openFolderMenu(key);
           try{ window.platform.haptic('select'); }catch(_){}
         };
-        /* проєкти живуть на вкладці «Проєкти», а не на Огляді — разом із ними зникли б і папки групи */
-        const kids=groupKids(key);
-        if(b.dataset.role==='project' && cur!=='project' && kids.length){
-          closeFolderMenu();
-          actionSheet({ title:'Зробити групу проєктом?',
-            sub:'Проєкти показуються на вкладці «Проєкти», не на Огляді. '+kids.length+' '+pluralUk(kids.length,'папка','папки','папок')+' цієї групи теж '+pluralUk(kids.length,'зникне','зникнуть','зникнуть')+' з Огляду. Краще спершу розгрупувати.',
-            items:[{ic:'target', label:'Усе одно зробити проєктом', primary:true, onClick:apply}], cancel:'Скасувати' });
-          return;
-        }
         apply();
       });
       m.querySelector('[data-back]').onclick=()=>openFolderMenu(key);
@@ -22249,7 +22255,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function openFolderMovePicker(key){
     const f=folders[key]; if(!f) return;
     closeFolderMenu();
-    const targets=orderedFolderKeys().filter(k=>k!==key && k!=='work' && folders[k] && folders[k].role!=='project' && !isDescendantFolder(k,key) && folderVisible(k));
+    const targets=orderedFolderKeys().filter(k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k));
     const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='fmenuSheet';
     const rootRow=(f.parent||'')?`<button class="fmi" data-mv="">🏠 На головну (без папки)</button>`:'';
     const rows=targets.map(k=>{ const tf=folders[k]; const cur=(f.parent||'')===k?' ✓':'';
@@ -27974,7 +27980,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       '2':['Планер',     ()=>goPlanner()],
       '3':['Флоу (чат)', ()=>aiChatSheet()],
       '4':['Гроші',      ()=>goFinance()],
-      '5':['Проєкти',    ()=>goProjects()],
+      '5':['Робота',     ()=>goWork()],
       '6':['Ще',         ()=>goMore()],
     };
     function typing(){
@@ -28953,7 +28959,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.length; }catch(_){}
     // лічильник папок теж тут: коли відкрита вкладка «Чати» чи «Сфери», сітка папок не малюється
     // і цифра лишалась застарілою (на старті — взагалі «5» з розмітки)
-    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work' && !(folders[k]&&folders[k].role==='project')).length; }catch(_){}
+    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length; }catch(_){}
     if(on) renderChatList();
     return on||sph;
   }
@@ -31723,6 +31729,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     let h=`<div class="wl-card"><button class="wl-cur" data-wlcur aria-label="Головна валюта">${esc(curSym())}${curLocked()?'':' ▾'}</button><small>Баланс</small><b>${wlMoney(bal+pz)}</b><span class="wl-sp"><span>вільно <b>${wlMoney(bal)}</b></span>${pz?`<span>🏆 на призи <b>${wlMoney(pz)}</b></span>`:''}${wlCurList().length?`<span>разом ≈ <b>${wlMoney(wlTotalApprox()+pz)}</b></span>`:''}</span>${wlDebtLineHTML(bal+pz)}</div>
       ${wlCursHTML()}
       <div class="wl-acts"><button class="pri" data-wladd="out">− Витрата</button><button data-wladd="in">＋ Дохід</button><button data-wlpz>🏆 Відкласти</button></div>
+      <button class="wl-work" data-wlwork><span>⏱</span><b>Робота</b><small>години й зарплата</small><i aria-hidden="true">›</i></button>
       <div class="wl-seg"><button data-wltab="overview"${wlState.tab==='overview'?' class="on"':''}>Огляд</button><button data-wltab="missions"${wlState.tab==='missions'?' class="on"':''}>Місії</button><button data-wltab="folders"${wlState.tab==='folders'?' class="on"':''}>Папки</button><button data-wltab="plan"${wlState.tab==='plan'?' class="on"':''}>План</button></div>`;
     const plan=wlState.tab==='plan'&&typeof rlPlanHTML==='function';   // план місяця (47-rules.js)
     if(wlState.tab==='overview'&&typeof wlStartHTML==='function') h+=wlStartHTML();   // порожній Гаманець — «З чого почнемо?» першим, над плитками
@@ -31819,6 +31826,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     { const ad=c.querySelector('[data-wlcadd]'); if(ad) ad.onclick=wlCurAdd; }
     { const ex=c.querySelector('[data-wlx]'); if(ex) ex.onclick=()=>wlExchange(''); }
     { const p=c.querySelector('[data-wlpz]'); if(p) p.onclick=()=>{ if(typeof pzScreen==='function') pzScreen(); }; }
+    { const w=c.querySelector('[data-wlwork]'); if(w) w.onclick=()=>{ try{ goWork(); }catch(_){} }; }
     c.querySelectorAll('[data-wltab]').forEach(b=>b.onclick=()=>{ wlState.tab=b.dataset.wltab; renderFinance(); });
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
@@ -34172,7 +34180,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   // той самий відбір, що в renderDashboard: Робота й проєкти на Огляді не живуть
   function stEmpty(){
-    const keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work'&&!(folders[k]&&folders[k].role==='project'));
+    const keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');
     return !keys.length && !(wishes||[]).length;
   }
   function starterActive(){ return !stOff() && stTrusted() && stEmpty(); }
@@ -34625,7 +34633,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   let dsbTreeHidden=false; try{ dsbTreeHidden=localStorage.getItem('dsbTreeHidden')==='1'; }catch(_){}   // без прототипу: ключ папки «constructor» не вдаватиме розгорнуту групу
   function dsbTreeHTML(){
     let cur=''; try{ const s=document.getElementById('scr-page'); if(s&&s.classList.contains('active')) cur=pgFolderKey()||''; }catch(_){}
-    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project';
+    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k));
     let tops=[]; try{ tops=topFolderKeys().filter(vis); }catch(_){ return ''; }
     if(!tops.length) return '';
     const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
@@ -34667,9 +34675,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      Ті самі правила, що й на головній (16-dashboard.js): не в себе, не у власну підпапку; «Робота» й проєкти не рухаються. */
   let dsbDragKey='';
   function dsbCanDrop(src,dst){
-    if(!src||!folders[src]||src==='work'||folders[src].role==='project') return false;
+    if(!src||!folders[src]||src==='work') return false;
     if(dst==='') return !!(folders[src].parent&&folders[folders[src].parent]);
-    if(!folders[dst]||dst===src||dst==='work'||folders[dst].role==='project') return false;
+    if(!folders[dst]||dst===src||dst==='work') return false;
     if((folders[src].parent||'')===dst) return false;
     return !isDescendantFolder(dst,src);
   }
@@ -34681,7 +34689,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   function dsbDragBind(t,fb){
     const clear=()=>{ document.querySelectorAll('.dsbt-into').forEach(e=>e.classList.remove('dsbt-into')); };
-    t.querySelectorAll('[data-dsbt]').forEach(b=>{ const k=b.dataset.dsbt; if(!folders[k]||k==='work'||folders[k].role==='project') return;
+    t.querySelectorAll('[data-dsbt]').forEach(b=>{ const k=b.dataset.dsbt; if(!folders[k]||k==='work') return;
       b.draggable=true;
       b.ondragstart=e=>{ dsbDragKey=k; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(folders[k].name||'')); }catch(_){} document.body.classList.add('dsbt-dragging'); };
       b.ondragend=()=>{ dsbDragKey=''; clear(); document.body.classList.remove('dsbt-dragging'); };
@@ -34706,7 +34714,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function lkSwitchHTML(fk){
     const f=folders[fk]; if(!f) return '';
     const par=f.parent&&folders[f.parent]?f.parent:'';
-    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&folders[k].role!=='project'&&k!=='work';
+    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&k!=='work';
     let sib=[]; try{ sib=(par?childFolderKeys(par):topFolderKeys()).filter(vis); }catch(_){ return ''; }
     if(sib.length<2&&!par) return '';
     const chip=k=>{ const x=folders[k]; return `<button class="lks-c${k===fk?' on':''}" data-lksw="${esc(k)}" style="--c:${safeColor(x.c,'#6a7dff')}"${k===fk?' aria-current="page"':''}><span class="lks-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(x))}"/></svg></span><span data-i18n-skip="1">${prioDot(k)}${esc(String(x.name||'Папка').slice(0,28))}</span></button>`; };
@@ -37246,7 +37254,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // дерево папок для вибору: верхній рівень і вкладені (до 3 рівнів), без проєктів і без поточної папки
   function fdTree(cur){
     var out=[], seen=Object.create(null);
-    var walk=function(keys,d){ keys.forEach(function(k){ if(seen[k]||!fdOk(k)||k==='work'||folders[k].role==='project') return; seen[k]=1;
+    var walk=function(keys,d){ keys.forEach(function(k){ if(seen[k]||!fdOk(k)||k==='work') return; seen[k]=1;
       if(k!==cur) out.push({k:k,d:d}); if(d<2){ try{ walk(childFolderKeys(k),d+1); }catch(_){} } }); };
     try{ walk(topFolderKeys(),0); }catch(_){}
     return out.slice(0,200);
