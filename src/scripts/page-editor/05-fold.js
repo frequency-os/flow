@@ -46,7 +46,17 @@
       try{ createFolder(cur&&folders[cur]?cur:'',{onCreated:function(k){ fdSet(bid,k); }}); }catch(_){} };
     document.body.appendChild(ov);
   }
+  /* ════════ Блок «Підпапки» (16.10.2026) — стрічка-сторіс дітей цієї папки ════════
+     Зберігає лише {type:'subs'}; картки малює pgSubStripHTML (core/36-chats.js) з поля parent. */
+  function sbHTML(){
+    var fk=tbFolder();
+    if(!fk||typeof folders==='undefined'||!folders[fk]) return '<div class="pg-content"><div class="sbs sbs-none">Підпапки бувають лише в папці — цей документ не папка.</div></div>';
+    try{ return '<div class="pg-content">'+pgSubStripHTML(fk)+'</div>'; }catch(_){ return '<div class="pg-content"></div>'; }
+  }
   editor.addEventListener('click',function(e){
+    var s=e.target.closest&&e.target.closest('[data-pgsub],[data-pgsubnew]');
+    if(s&&editor.contains(s)){ e.preventDefault(); e.stopPropagation(); var fk=tbFolder();
+      if(s.hasAttribute('data-pgsubnew')) pgSubNew(fk); else pgSubOpen(fk,s.dataset.pgsub); return; }
     var t=e.target.closest&&e.target.closest('[data-fdpick],[data-fdopen]'); if(!t) return;
     e.preventDefault(); e.stopPropagation();
     if(t.dataset.fdpick){ fdPick(t.dataset.fdpick); return; }

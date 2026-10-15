@@ -290,12 +290,28 @@
     if(typeof wdIs==='function'&&wdIs(k)){ pgDataInsert(k,loc); return; }   /* «Дані» — у дошку віджетів */
     var BT=(bridge()&&bridge().blockTypes())||{};
     function bTitle(t,fb){ return (BT[t]&&BT[t].title)||fb; }
+    if(k==='subs'){   /* «Підпапки»: одна стрічка на документ; у рядку текст — лягає під ним */
+      var sbBk=(bridge()&&bridge().curKey&&bridge().curKey())||'';
+      if(typeof pgHasSubsBlock==='function'&&pgHasSubsBlock(sbBk)){
+        closeSlash(); plToastSafe('Стрічка підпапок уже є в цій папці');
+        if(!String(txtOf(b)||'').trim()&&(!b.type||b.type==='note')){   /* порожній рядок від «＋ Додати блок» не лишаємо */
+          var sbE=loc.arr.indexOf(b); if(sbE>=0){ loc.arr.splice(sbE,1); save(); render(); } }
+        var sbOld=editor.querySelector('.sbs'); if(sbOld){ try{ sbOld.scrollIntoView({block:'center',behavior:'smooth'}); }catch(_){} }
+        return;
+      }
+      if(String(txtOf(b)||'').trim()){
+        var sbN={id:uid(),type:'subs'}, sbA=loc.arr, sbI=loc.idx+1; sbA.splice(sbI,0,sbN);
+        pushOp(function(){ var i=sbA.indexOf(sbN); if(i>=0) sbA.splice(i,1); },function(){ if(sbA.indexOf(sbN)<0) sbA.splice(Math.min(sbI,sbA.length),0,sbN); });
+        closeSlash(); save(); render(); try{ renderPgLinks(); }catch(_){} return;
+      }
+    }
     if(k==='fold'&&String(txtOf(b)||'').trim()){   /* у рядку вже текст — папка лягає під ним, текст не стирається */
       var fdN={id:uid(),type:'fold'}, fdA=loc.arr, fdI=loc.idx+1; fdA.splice(fdI,0,fdN);
       pushOp(function(){ var i=fdA.indexOf(fdN); if(i>=0) fdA.splice(i,1); },function(){ if(fdA.indexOf(fdN)<0) fdA.splice(Math.min(fdI,fdA.length),0,fdN); });
       closeSlash(); save(); render(); setTimeout(function(){ fdPick(fdN.id); },150); return;
     }
     if(k==='fold'){b.type='fold';delete b.text;}
+    else if(k==='subs'){b.type='subs';delete b.text;}
     else if(k==='tbl'){tbInit(b);}
     else if(k==='divider'){b.type='divider';}
     else if(k==='db'){b.type='db';b.dbName=b.title||'Нова база';b.view='table';b.cols=[{k:'name',t:'Назва'},{k:'status',t:'Статус'},{k:'note',t:'Нотатка'}];b.rows=[{name:'Запис 1',status:'Нова',note:''}];}
@@ -396,6 +412,7 @@
       setTimeout(function(){try{rb.classList.remove('pg-born');}catch(_){}},900);
     }
     if(k==='fold'&&!b.folder) setTimeout(function(){ fdPick(was); },150);   /* одразу вибрати папку */
+    if(k==='subs'){ try{ renderPgLinks(); }catch(_){} }   /* блок став — запобіжна стрічка під назвою ховається */
   }
   /* «Дані» (core/48-widgets.js → wdInit): віджет лягає в дошку віджетів — ту, в якій стоїть рядок;
      інакше в уже наявну дошку віджетів сторінки (wboard:true); інакше рядок стає новою дошкою.
