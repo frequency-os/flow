@@ -195,6 +195,98 @@ def journal(limit=60):
     return days, dirty
 
 
+# ─────────────── Конвеєр: правиться → гілки → закомічено → на сайті ───────────────
+
+ALIVE_H = 48   # гілка «жива», якщо в ній був рух за останні 48 годин
+
+
+def topic_key(path):
+    """56-run.js і 36-run.css → «run»: тема = імʼя файлу без номера й розширення."""
+    stem = os.path.splitext(os.path.basename(path.rstrip('/')))[0]
+    return re.sub(r'^\d+-', '', stem)
+
+
+def work_now(names):
+    """Незакомічене в головній папці, згруповане за темами, з +/− рядків."""
+    nums = {}
+    for ln in git('diff', 'HEAD', '--numstat').splitlines():
+        a, d, p = (ln.split('\t') + ['', '', ''])[:3]
+        nums[p] = (int(a) if a.isdigit() else 0, int(d) if d.isdigit() else 0)
+    topics = {}
+    for ln in git('status', '--porcelain', '--untracked-files=all').splitlines():
+        if len(ln) < 4:
+            continue
+        code, path = ln[:2], ln[3:].split(' -> ')[-1].strip('"')
+        new = code == '??' or 'A' in code
+        add, rem = nums.get(path, (0, 0))
+        if code == '??':
+            add = read(path).count('\n')
+        # Різні файли однієї теми (pult.py, temy.json → «Пульт») — в одну картку.
+        key = topic_key(path)
+        t = topics.setdefault(names.get(key, key), {'key': key, 'name': names.get(key, ''), 'files': [],
+                                    'add': 0, 'rem': 0, 'new': False})
+        t['files'].append({'path': path, 'new': new, 'add': add, 'rem': rem})
+        t['add'] += add
+        t['rem'] += rem
+        t['new'] = t['new'] or new
+    return sorted(topics.values(), key=lambda t: -(t['add'] + t['rem']))
+
+
+def branches():
+    """Гілки з комітами, яких справді нема в main (git cherry: той самий патч не рахується)."""
+    trees, cur = {}, None
+    for ln in git('worktree', 'list', '--porcelain').splitlines():
+        if ln.startswith('worktree '):
+            cur = ln[9:]
+        elif ln.startswith('branch refs/heads/') and cur:
+            trees[ln[18:]] = cur
+    now = datetime.now().timestamp()
+    out = []
+    for b in git('branch', '--no-merged', 'main', '--format=%(refname:short)').split():
+        ahead = len([l for l in git('cherry', 'main', b).splitlines() if l.startswith('+')])
+        if not ahead:
+            continue
+        ts, subj = (git('log', '-1', '--format=%ct\t%s', b).strip().split('\t') + ['', ''])[:2]
+        last = int(ts) if ts.isdigit() else 0
+        wt = trees.get(b, '')
+        dirty, touched = 0, last
+        if wt and os.path.isdir(wt):
+            for ln in git('-C', wt, 'status', '--porcelain').splitlines():
+                dirty += 1
+                try:
+                    touched = max(touched, os.path.getmtime(os.path.join(wt, ln[3:].strip('"'))))
+                except OSError:
+                    pass
+        out.append({'name': b, 'ahead': ahead, 'subj': subj, 'last': last, 'wt': wt,
+                    'dirty': dirty, 'alive': now - touched < ALIVE_H * 3600})
+    return sorted(out, key=lambda x: (not x['alive'], -x['last']))
+
+
+def site():
+    """Остання публікація (тег pub-*) і коміти main після неї."""
+    tag = (git('tag', '-l', 'pub-*', '--sort=-creatordate').split() or [''])[0]
+    if not tag:
+        return None, []
+    ts = git('log', '-1', '--format=%ct', tag).strip()
+    waiting = []
+    for ln in git('log', '--format=%h\t%ct\t%s', f'{tag}..main').splitlines():
+        h, t, s = (ln.split('\t') + ['', '', ''])[:3]
+        waiting.append({'hash': h, 'ts': int(t) if t.isdigit() else 0, 'subj': s})
+    return {'tag': tag, 'ts': int(ts) if ts.isdigit() else 0}, waiting
+
+
+def ago(ts):
+    """«3 год тому», «2 дні тому» — для людини, а не для машини."""
+    if not ts:
+        return ''
+    m = int((datetime.now().timestamp() - ts) // 60)
+    if m < 60:
+        return f'{max(m, 1)} хв тому'
+    if m < 48 * 60:
+        return f'{m // 60} год тому'
+    return f'{m // 1440} дн. тому'
+
+
 # ───────────────────────── HTML ─────────────────────────
 
 def prompt_edit(kind, path):
@@ -238,6 +330,10 @@ def render():
              for n in ROOT_FILES if os.path.isfile(os.path.join(ROOT, n))]
     scripts = npm_scripts()
     days, dirty = journal()
+    names = json.loads(read('pult/temy.json') or '{}').get('names', {})
+    now_topics, brs = work_now(names), branches()
+    pub, waiting = site()
+    dir_id = lambda rel: 'd-' + re.sub(r'[^\w-]', '-', rel)
 
     # Покажчик «тип + імʼя → якір у дереві» для чипів карти.
     index = {}
@@ -255,21 +351,107 @@ def render():
     for c in cands:
         index[('planned', c['name'])] = 'k-' + re.sub(r'[^\w-]', '-', c['name'])
 
-    counts = [('скілів', len(folders[0][3])), ('рецензентів', len(folders[1][3])),
-              ('команд', len(scripts)),
-              ('промптів', sum(len(f[3]) for f in folders if f[0].startswith('prompts'))),
-              ('кандидатів', len([c for c in cands if c.get('status') in ('розглядаємо', 'беремо')]))]
+    # Лічильники вгорі — кнопки: торкнешся «7 скілів» — пульт відкриє саму папку.
+    counts = [('скілів', len(folders[0][3]), dir_id('.claude/skills')),
+              ('рецензентів', len(folders[1][3]), dir_id('.claude/agents')),
+              ('команд', len(scripts), 'd-npm'),
+              ('промптів', sum(len(f[3]) for f in folders if f[0].startswith('prompts')), dir_id('prompts')),
+              ('кандидатів', len([c for c in cands if c.get('status') in ('розглядаємо', 'беремо')]), 'sec-kand')]
+    alive = [b for b in brs if b['alive']]
 
     o = []
     w = o.append
     w('<header class="top"><div><h1>Пульт Frequency</h1>'
       '<p class="muted">Що в нас є і яким шляхом іде кожна задача. '
       f'Зібрано {esc(datetime.now().strftime("%d.%m.%Y %H:%M"))} · оновити: <code>npm run pult</code></p></div>'
-      '<div class="counts">' + ''.join(f'<div><b>{n}</b><span>{esc(l)}</span></div>' for l, n in counts)
+      '<div class="counts">' + ''.join(f'<button data-go="{esc(g)}"><b>{n}</b><span>{esc(l)}</span></button>'
+                                       for l, n, g in counts)
       + '</div></header>')
 
+    # Навігація: блоки сторінки, липка смужка вгорі.
+    nfiles = sum(len(t['files']) for t in now_topics)
+    nav = [('sec-work', 'В роботі', str(nfiles)),
+           ('sec-route', 'Маршрут', ''), ('sec-tree', 'Папки', ''),
+           ('sec-log', 'Журнал', ''), ('sec-kand', 'Кандидати', str(counts[4][1]))]
+    w('<nav class="nav" aria-label="Блоки пульта">' + ''.join(
+        f'<button data-go="{i}">{esc(l)}' + (f'<span>{esc(c)}</span>' if c else '') + '</button>'
+        for i, l, c in nav) + '</nav>')
+
+    # 0) Конвеєр: правиться зараз → окремі гілки → закомічено → на сайті
+    w('<section id="sec-work"><div class="sec-h"><h2>Що в роботі</h2>'
+      '<p class="muted">Кожна робота рухається зліва направо. Стан на момент збірки — свіже після <code>npm run pult</code>.</p></div>'
+      '<div class="conv">')
+
+    w(f'<div class="col" id="col-now"><div class="col-h"><span>Правиться зараз</span><b>{nfiles}</b></div>'
+      '<p class="col-s">Не закомічено в головній папці. Хто саме править — git не знає: тут кілька сесій.</p>')
+    for t in now_topics:
+        files = ', '.join(f['path'].split('/')[-1] for f in t['files'])
+        label = t['name'] or t['key']
+        ask = (f'Тема «{label}» не закомічена в головній папці: {files}.\n'
+               'Подивись, чия це робота і чи вона готова. Скажи, що з нею робити, — '
+               'нічого не комітити без мого «так».')
+        name_ask = (f'Дай людську назву темі `{t["key"]}` у pult/temy.json: <назва>. Після — npm run pult.')
+        head = (esc(t['name']) if t['name'] else
+                 f'<code>{esc(t["key"])}</code> <button class="link" data-copy="{esc(name_ask)}">назвати</button>')
+        w(f'<div class="it"><div class="it-h"><b>{head}</b>'
+          + ('<span class="tag new">нове</span>' if t['new'] else '')
+          + f'<span class="pm"><i>+{t["add"]}</i> <s>−{t["rem"]}</s></span>'
+          f'<button class="ico sm" data-copy="{esc(ask)}" aria-label="Запит про тему {esc(label)}">✎</button></div>'
+          f'<div class="it-f">{esc(files)}</div></div>')
+    if not now_topics:
+        w('<p class="empty">Усе закомічено ✓</p>')
+    w('</div>')
+
+    def branch_item(b):
+        where = f' (папка {b["wt"].replace(ROOT + "/", "")})' if b['wt'] else ''
+        if b['alive']:
+            ask = (f'Гілка {b["name"]}{where}: {b["ahead"]} коміт(ів) ще не в main. '
+                   'Що там зроблено, що лишилось до злиття і чи все перевірено? Нічого не зливати без мого «так».')
+        else:
+            ask = (f'Розберись з гілкою {b["name"]}{where}: {b["ahead"]} коміт(ів) git вважає не злитими, '
+                   'останній рух ' + ago(b['last']) + '. Чи її вміст уже в main (могли влити зі змінами)? '
+                   'Запропонуй: злити, прибрати чи лишити. Нічого не видаляти без мого «так».')
+        meta = f'{b["ahead"]} ком. · {ago(b["last"])}' + (f' · {b["dirty"]} незакоміч.' if b['dirty'] else '')
+        return (f'<div class="it"><div class="it-h"><b class="mono">{esc(b["name"])}</b>'
+                f'<button class="ico sm" data-copy="{esc(ask)}" aria-label="Запит про гілку {esc(b["name"])}">✎</button></div>'
+                f'<div class="it-m">{esc(meta)}</div><div class="it-f">{esc(b["subj"])}</div></div>')
+
+    stale = [b for b in brs if not b['alive']]
+    w(f'<div class="col" id="col-br"><div class="col-h"><span>Окремі гілки</span><b>{len(alive)}</b></div>'
+      f'<p class="col-s">Паралельні сесії у своїх папках. Живі — рух за {ALIVE_H} год.</p>'
+      + ''.join(branch_item(b) for b in alive)
+      + ('' if alive else '<p class="empty">Живих гілок нема</p>'))
+    if stale:
+        w(f'<details class="stale"><summary>Застиглі: {len(stale)} — перевірити</summary>'
+          + ''.join(branch_item(b) for b in stale) + '</details>')
+    w('</div>')
+
+    deploy_ask = (f'Задеплой: на сайті ще нема {len(waiting)} коміт(ів) після {pub["tag"] if pub else "останньої публікації"}. '
+                  'Покажи перелік того, що поїде (і чиї це коміти), і дочекайся мого «так».')
+    w(f'<div class="col" id="col-wait"><div class="col-h"><span>Закомічено, не на сайті</span><b>{len(waiting)}</b></div>'
+      '<p class="col-s">Уже в main, але телефон їх ще не бачить.</p>')
+    for c in waiting[:10]:
+        dim = ' dim' if c['subj'].startswith('Карта коду') else ''
+        w(f'<div class="it{dim}"><div class="it-f">{esc(c["subj"])}</div><div class="it-m">{esc(ago(c["ts"]))} · {esc(c["hash"])}</div></div>')
+    if len(waiting) > 10:
+        w(f'<button class="link more-log" data-go="sec-log">ще {len(waiting) - 10} — у журналі</button>')
+    if waiting:
+        w(f'<button class="act" data-copy="{esc(deploy_ask)}">Задеплой…</button>')
+    else:
+        w('<p class="empty">Усе вже на сайті ✓</p>')
+    w('</div>')
+
+    w('<div class="col" id="col-site"><div class="col-h"><span>На сайті</span><b>✓</b></div>')
+    if pub:
+        d = datetime.fromtimestamp(pub['ts']).strftime('%d.%m %H:%M') if pub['ts'] else ''
+        w(f'<p class="col-s">Остання публікація</p><div class="big">{esc(d)}</div>'
+          f'<div class="it-m">{esc(ago(pub["ts"]))}</div><code class="tagname">{esc(pub["tag"])}</code>')
+    else:
+        w('<p class="empty">Публікацій ще не було</p>')
+    w('</div></div></section>')
+
     # 1) Карта метро
-    w('<section><div class="sec-h"><h2>Маршрут задачі</h2>'
+    w('<section id="sec-route"><div class="sec-h"><h2>Маршрут задачі</h2>'
       '<p class="muted">Натисни чип — покажу, де цей файл лежить. ✎ біля станції — змінити саму станцію.</p></div>'
       '<ol class="metro">')
     stations = route.get('stations', [])
@@ -287,7 +469,7 @@ def render():
       '<span class="chip t-planned">заплановано</span></p></section>')
 
     # 2) Дерево папок
-    w('<section><div class="sec-h"><h2>Де що лежить</h2>'
+    w('<section id="sec-tree"><div class="sec-h"><h2>Де що лежить</h2>'
       '<p class="muted">Торкнись файлу — повний опис. ✎ — запит «зміни», ＋ — запит «додай». '
       'Обидва йдуть у буфер: встав у чат із Claude.</p></div><div class="tree">')
 
@@ -307,13 +489,13 @@ def render():
       f'{len(roots)}</span></summary>' + ''.join(file_row(it, 'файл') for it in roots) + '</details>')
 
     for rel, kind, desc, items in folders:
-        w(f'<details class="dir" open><summary><span class="dn">📁 {esc(rel)}/</span>'
+        w(f'<details class="dir" open id="{esc(dir_id(rel))}"><summary><span class="dn">📁 {esc(rel)}/</span>'
           f'<span class="dd">{esc(desc)}</span><span class="cnt">{len(items)}</span>'
           f'<button class="ico add" data-copy="{esc(prompt_add(kind, rel, desc))}" '
           f'aria-label="Додати в {esc(rel)}">＋</button></summary>'
           + ''.join(file_row(it, kind) for it in items) + '</details>')
 
-    w('<details class="dir" open><summary><span class="dn">⌨ npm run …</span>'
+    w('<details class="dir" open id="d-npm"><summary><span class="dn">⌨ npm run …</span>'
       '<span class="dd">Команди з package.json — що запускати в терміналі</span>'
       f'<span class="cnt">{len(scripts)}</span></summary>')
     for s in scripts:
@@ -325,7 +507,7 @@ def render():
     w('</details></div></section>')
 
     # 3) Журнал
-    w('<section><div class="sec-h"><h2>Що робили</h2><p class="muted">Останні коміти з git, по днях. '
+    w('<section id="sec-log"><div class="sec-h"><h2>Що робили</h2><p class="muted">Останні коміти з git, по днях. '
       '<span class="chip t-pub">на сайті</span> — публікація.'
       + (f' Зараз не закомічено файлів: <b>{dirty}</b> (зокрема робота інших сесій).' if dirty else '')
       + '</p></div><div class="journal">')
@@ -343,7 +525,7 @@ def render():
     w('</div></section>')
 
     # 4) Кандидати
-    w('<section><div class="sec-h"><h2>Кандидати з GitHub</h2><p class="muted">'
+    w('<section id="sec-kand"><div class="sec-h"><h2>Кандидати з GitHub</h2><p class="muted">'
       'Чуже береться лише після того, як Claude прочитав кожен файл і зафіксував версію.</p></div>'
       '<div class="cands">')
     order = {s: i for i, s in enumerate(STATUSES)}
@@ -393,8 +575,44 @@ section{background:var(--card);border:1px solid var(--line);border-radius:16px;p
 .sec-h{margin-bottom:14px}
 .top{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end}
 .counts{display:flex;gap:8px;flex-wrap:wrap}
-.counts div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-width:76px}
+.counts button{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-width:76px;text-align:left}
+.counts button:hover,.nav button:hover{border-color:var(--ac)}
 .counts b{display:block;font-size:20px}.counts span{font-size:12px;color:var(--mu)}
+/* липка смужка блоків */
+.nav{position:sticky;top:0;z-index:5;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+margin:12px -16px 0;padding:10px 16px;background:var(--bg)}
+.nav::-webkit-scrollbar{display:none}
+.nav button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:0 14px;min-height:40px;font-size:14px}
+.nav span{margin-left:6px;color:var(--mu);font-size:12.5px}
+section,.dir,.file,.cand{scroll-margin-top:70px}
+/* конвеєр */
+.conv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1000px){.conv{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.conv{grid-template-columns:1fr}}
+.col{border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0;position:relative}
+.col::after{content:"→";position:absolute;right:-12px;top:12px;color:var(--mu);font-size:13px}
+.col:last-child::after{content:none}
+@media (max-width:1000px){.col::after{content:none}}
+.col-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600}
+.col-h b{font-size:22px}
+#col-now .col-h b{color:var(--cm)}#col-br .col-h b{color:var(--ac)}#col-wait .col-h b{color:var(--sk)}#col-site .col-h b{color:var(--pub)}
+.col-s{font-size:12.5px;color:var(--mu);margin:2px 0 8px}
+.it{border-top:1px solid var(--line);padding:7px 0;font-size:13.5px;min-width:0}
+.it.dim{opacity:.55}
+.it-h{display:flex;align-items:center;gap:6px;min-width:0}
+.it-h b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.mono{font:12.5px ui-monospace,Menlo,monospace}
+.it-f{color:var(--mu);font-size:12.5px;overflow-wrap:anywhere}
+.it-m{color:var(--mu);font-size:12px}
+.pm{font-size:12px;flex:none}.pm i{font-style:normal;color:var(--sk)}.pm s{text-decoration:none;color:var(--bad)}
+.tag.new{background:var(--cm-bg);color:var(--cm);border-radius:6px;padding:0 6px}
+.ico.sm{min-width:32px;height:32px;font-size:13px}
+.link{border:0;background:none;color:var(--ac);padding:4px 2px;font-size:12.5px}
+.act{margin-top:8px;width:100%;min-height:42px;border-radius:10px;border:1px solid var(--ac);background:var(--ac-bg);color:var(--ac);font-weight:600}
+.stale{margin-top:6px}.stale>summary{cursor:pointer;color:var(--mu);font-size:13px;padding:6px 0;min-height:32px}
+.empty{color:var(--mu);font-size:13px;margin:6px 0}
+.big{font-size:22px;font-weight:600}
+.tagname{color:var(--mu);font-size:11.5px;display:block;margin-top:6px;overflow-wrap:anywhere}
 button{font:inherit;color:inherit;cursor:pointer}
 .chip{display:inline-block;border:0;border-radius:8px;padding:3px 8px;margin:3px 4px 0 0;font-size:12.5px;line-height:1.4;
 background:var(--line);color:var(--tx);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
@@ -504,8 +722,9 @@ background:var(--card);color:var(--tx);padding:10px}
       e.preventDefault();e.stopPropagation();
       var id=g.getAttribute('data-go'),el=id&&document.getElementById(id);
       if(!el){say('Цього ще нема в дереві — перевір pult/marshrut.json');return}
-      for(var p=el.parentElement;p;p=p.parentElement){if(p.tagName==='DETAILS')p.open=true}
-      el.scrollIntoView({behavior:'smooth',block:'center'});
+      for(var p=el;p;p=p.parentElement){if(p.tagName==='DETAILS')p.open=true}
+      var top=el.tagName==='SECTION'||el.classList.contains('dir');
+      el.scrollIntoView({behavior:'smooth',block:top?'start':'center'});
       el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
     }
   });
