@@ -67,7 +67,7 @@
   function flH24(amount,label,proceed,defer){
     if(!rlOn('h24')) return false;
     const lim=Math.max(100,+rlN('h24')||5000); if(!(+amount>=lim)) return false;
-    actionSheet({title:'⏳ Велика покупка · '+money(amount), sub:'Правило 24 годин: почекай добу — якщо завтра все ще потрібно, купуй спокійно. Якщо вже купив — тисни «Записати зараз».',
+    actionSheet({title:'⏳ Велика покупка · '+money(amount), sub:'Правило 24 годин: почекай добу — якщо завтра все ще потрібно, купуй спокійно. Якщо покупку вже зроблено — тисни «Записати зараз».',
       items:[
         {ic:'calendar', label:'Подумати до завтра', sub:'нагадування в планері, витрату не записую', onClick:()=>{
           const ds=dyAddDays(ymdLocal(),1); let h=null; try{ h=dyFreeSlot(ds,0.25); }catch(_){}

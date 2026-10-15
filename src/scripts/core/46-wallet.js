@@ -76,12 +76,12 @@
     const g=(jnHero().money&&jnHero().money[ym])||null, svd=typeof pzMonthSaved==='function'?Math.max(0,pzMonthSaved(ym)):0;
     let h='';
     if(g&&(+g.earn>0||+g.spend>0||+g.save>0)){
-      h+=`<div class="wl-rings">${+g.earn>0?wlRing('var(--hab,#34c77b)',all.inc/g.earn*100,Math.round(all.inc/g.earn*100)+'%','Заробив',wlMoney(all.inc)+' / '+wlMoney(g.earn)):''}
-        ${+g.spend>0?wlRing(all.out>g.spend?'#ff4d6d':'#e8930c',all.out/g.spend*100,Math.round(all.out/g.spend*100)+'%','Витратив',wlMoney(all.out)+' / '+wlMoney(g.spend)):''}
+      h+=`<div class="wl-rings">${+g.earn>0?wlRing('var(--hab,#34c77b)',all.inc/g.earn*100,Math.round(all.inc/g.earn*100)+'%','Зароблено',wlMoney(all.inc)+' / '+wlMoney(g.earn)):''}
+        ${+g.spend>0?wlRing(all.out>g.spend?'#ff4d6d':'#e8930c',all.out/g.spend*100,Math.round(all.out/g.spend*100)+'%','Витрачено',wlMoney(all.out)+' / '+wlMoney(g.spend)):''}
         ${+g.save>0?wlRing('#f0b429',svd/g.save*100,Math.round(svd/g.save*100)+'%','Відклав',wlMoney(svd)+' / '+wlMoney(g.save)):''}</div>
         <button class="wl-link" data-wlgoals>змінити цілі місяця</button>`;
     } else {
-      h+=`<div class="wl-fact"><span>Заробив <b>${wlMoney(all.inc)}</b></span><span>Витратив <b>${wlMoney(all.out)}</b></span></div><button class="mo-set" data-wlgoals>Задати цілі місяця</button>`;
+      h+=`<div class="wl-fact"><span>Зароблено <b>${wlMoney(all.inc)}</b></span><span>Витрачено <b>${wlMoney(all.out)}</b></span></div><button class="mo-set" data-wlgoals>Задати цілі місяця</button>`;
     }
     { const by={main:0,extra:0,passive:0}; ops.forEach(o=>{ if(_isRealIncome(o)) by[wlSrc(o)]+=+o.amount||0; });
       if(by.extra||by.passive){ const tot=by.main+by.extra+by.passive||1;

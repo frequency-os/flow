@@ -414,9 +414,9 @@
     const emojiRow = o.emoji ? `
       <div class="im-label">Емодзі (необов'язково)</div>
       <div class="im-emoji-row">
-        <input class="im-emoji" maxlength="4" value="${escAttr(o.emojiVal||'')}" placeholder="напр. 💰">
+        <input class="im-emoji" maxlength="16" value="${escAttr(o.emojiVal||'')}" placeholder="${escAttr(o.emojiPh||'напр. 💰')}" aria-label="Емодзі">
         <button type="button" class="im-noemoji">Без емодзі</button>
-      </div>` : '';
+      </div>${Array.isArray(o.emojiPicks)&&o.emojiPicks.length?`<div class="im-picks" role="group" aria-label="Готові емодзі">${o.emojiPicks.map(e=>`<button type="button" data-impick="${escAttr(e)}">${esc(e)}</button>`).join('')}</div>`:''}` : '';
     ov.innerHTML=`<div class="im-in">
       <div class="im-grip"></div>
       <div class="im-title">${esc(o.title||'Назва')}</div>
@@ -434,8 +434,14 @@
     const close=()=>ov.remove();
     ov.querySelector('.im-cancel').onclick=close;
     ov.onclick=e=>{ if(e.target===ov) close(); };
-    if(o.emoji){ ov.querySelector('.im-noemoji').onclick=()=>{ emo.value=''; }; }
-    const ok=()=>{ const v=inp.value.trim(); const ev=o.emoji?(emo.value.trim()):undefined; close(); if(o.onOk) o.onOk(v, ev); };
+    if(o.emoji){ ov.querySelector('.im-noemoji').onclick=()=>{ emo.value=''; };
+      // поле могло прийти з 📁 — фокус виділяє, тож введене ЗАМІНЮЄ, а не дописується поруч (було «🇬📁»)
+      emo.onfocus=()=>{ try{ emo.select(); }catch(_){} };
+      ov.querySelectorAll('[data-impick]').forEach(b=>b.onclick=()=>{ emo.value=b.dataset.impick; ov.querySelectorAll('[data-impick]').forEach(x=>x.classList.toggle('on',x===b)); }); }
+    // один символ, як його бачить людина: прапорець 🇬🇧 — це 4 «літери» JS, але один знак (раніше maxlength=4 різав його)
+    const oneEmoji=s=>{ s=String(s||'').trim(); if(!s) return '';
+      try{ const it=new Intl.Segmenter('uk',{granularity:'grapheme'}).segment(s)[Symbol.iterator]().next(); return it.done?'':it.value.segment; }catch(_){ return [...s].slice(0,2).join(''); } };
+    const ok=()=>{ const v=inp.value.trim(); const ev=o.emoji?oneEmoji(emo.value):undefined; close(); if(o.onOk) o.onOk(v, ev); };
     ov.querySelector('.im-ok').onclick=ok;
     inp.onkeydown=e=>{ if(e.key==='Enter') ok(); };
   }
@@ -444,12 +450,13 @@
   // opts.onCreated(key) — хто викликав, той сам вирішує, що далі (напр. блок «Папка» в документі); без навігації
   function createFolder(parent,opts){
     const par=(typeof parent==='string' && folders[parent]) ? parent : '';
-    inputModal({ title:par?('Нова папка в «'+folders[par].name+'»'):'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'📁',
+    inputModal({ title:par?('Нова папка в «'+folders[par].name+'»'):'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'', emojiPh:'📁',
+      emojiPicks:['📁','🇬🇧','✨','📱','🛍','💰','🎨','📚','💪','🎯','🏡','🎬'],
       onOk:(name, emojiVal)=>{
         const used=order.length;
         const nm = name || ('Папка '+(used+1));
         const key='f_'+Date.now();
-        const em=(emojiVal!==undefined?emojiVal:FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]);
+        const em=(emojiVal!==undefined?(emojiVal||'📁'):FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]);   // порожнє поле — 📁 (як підказка)
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
           emoji:em, icon:folderIconFor(em),
           name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
