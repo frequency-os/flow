@@ -20,6 +20,7 @@
       "uses": [
         {"type": "file", "name": "CODEMAP.md"},
         {"type": "skill", "name": "frequency-new-screen"},
+        {"type": "skill", "name": "frequency-design"},
         {"type": "skill", "name": "frequency-migration"},
         {"type": "skill", "name": "frequency-agent-tool"},
         {"type": "command", "name": "map"}

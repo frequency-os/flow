@@ -33,9 +33,9 @@
       "url": "https://github.com/anthropics/skills",
       "stars": "181k",
       "kind": "скіли",
-      "status": "розглядаємо",
+      "status": "взяли",
       "value": "frontend-design — гарніші нові екрани; webapp-testing — скрипти, що самі клікають програму (частина правила 3).",
-      "minus": "frontend-design може тягнути свій стиль — допишемо, що головний у нас напрям «Глибина»."
+      "minus": "16.10: взяли frontend-design → скіл frequency-design (наша «Глибина» головна, сміливість в одному місці, тексти). webapp-testing не беремо: потрібні Python Playwright і окремий браузер, а smoke.js і вбудований браузер уже є."
     },
     {
       "name": "dequelabs/axe-core",
