@@ -188,6 +188,10 @@
     const n=groupKids(k).length;
     if(n) return 'група · '+n+' '+pluralUk(n,'папка','папки','папок');
     if(f.role==='page') return 'сторінка';
+    // папка-сфера з місією (12.10.2026): відсоток місії і справи цього тижня — щоб з Огляду було видно рух
+    try{ const g=wgFolderMission(k); if(g){ let done=0, plan=0;
+      jnWeek().forEach(ds=>jnDayBlocks(ds).forEach(b=>{ if(jnBlockGoal(b)===String(g.id)){ plan++; if(b.done) done++; } }));
+      return jnPct(g)+'%'+(plan?' · '+done+' з '+plan+' цього тижня':''); } }catch(_){}
     const active=(f.widgets||[]).filter(w=>w.ready).length;
     return active ? (active+' '+pluralUk(active,'активний','активні','активних')) : '';
   }

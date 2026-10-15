@@ -38,7 +38,7 @@
     try{ if(typeof rlRecurring==='function') rlRecurring().forEach(r=>{ if(hit(r.day)) out.push({k:'out', t:String(r.name||'Регулярний'), amt:+r.amount||0, cur:'', rec:true}); }); }catch(_){}
     return out;
   }
-  function calBlocks(ds,fk){ let bl=[]; try{ bl=plBlocksDisplay(ds); }catch(_){} return bl.filter(b=>b&&(!fk||b.folder===fk)).sort((a,c)=>(+a.h||0)-(+c.h||0)); }
+  function calBlocks(ds,fk){ let bl=[]; try{ bl=plBlocksDisplay(ds); }catch(_){} return bl.filter(b=>b&&(!fk||inFolderBlock(b,fk))).sort((a,c)=>(+a.h||0)-(+c.h||0)); }
   function calBlockColor(b){
     let c=''; try{ c=dyColor(b); }catch(_){}
     if(!c&&b.folder&&typeof moOwnFolder==='function'&&moOwnFolder(b.folder)) c=safeColor(folders[b.folder].c,'');

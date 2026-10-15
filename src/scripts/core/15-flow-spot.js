@@ -1108,8 +1108,9 @@
       const td=plTodayStr();
       const showAll=!!p.fdayAll[key];
       const all=plBlocksFor(td).slice().sort((a,b)=>a.h-b.h);
-      const rows=all.filter(b=>showAll||b.folder===key).map(b=>{
-        const mine=b.folder===key;
+      // свої — з міткою папки або справи місії цієї папки (inFolderBlock, 54-links.js); ритм нижче — лише власний папки
+      const rows=all.filter(b=>showAll||inFolderBlock(b,key)).map(b=>{
+        const mine=inFolderBlock(b,key);
         const cc=mine?safeColor(f.c,'#c77dff'):'var(--muted)';   // колір папки — з даних, у style
         return `<div class="fps-row ${b.done?'done':''} ${mine?'':'dim'}">
           <span class="fps-tm">${plHM(b.h)}</span>

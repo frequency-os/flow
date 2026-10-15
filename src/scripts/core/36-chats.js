@@ -373,9 +373,9 @@
   }
   function pgHubData(fk){
     const d={money:null, time:0, mission:null, chats:0};
-    try{ const ops=wlMonthOps(wlYm()).filter(o=>String(o.folderKey||'')===String(fk)).filter(opMain);
+    try{ const ops=wlMonthOps(wlYm()).filter(o=>inFolderOp(o,fk)).filter(opMain);   // своя мітка або місія папки (54-links.js)
       if(ops.length){ const inc=ops.filter(_isRealIncome).reduce((s,o)=>s+(+o.amount||0),0), out=ops.filter(_isRealExpense).reduce((s,o)=>s+(+o.amount||0),0); d.money=inc-out; } }catch(_){}
-    try{ d.time=plBlocksDisplay(plTodayStr()).filter(b=>b&&b.folder===fk&&!b.done).length; }catch(_){}
+    try{ d.time=plBlocksDisplay(plTodayStr()).filter(b=>inFolderBlock(b,fk)&&!b.done).length; }catch(_){}
     try{ const g=wgFolderMission(fk); if(g) d.mission={g, pct:jnPct(g)}; }catch(_){}
     try{ d.chats=chatsForFolder(fk).length; }catch(_){}
     return d;
@@ -386,7 +386,7 @@
     const m=d.money==null?'—':((d.money>0?'+':d.money<0?'−':'')+esc(moneyK(Math.abs(d.money))));
     return `<div class="pgh-head"><span>Звʼязки</span><button data-pglinks>Усі звʼязки ›</button></div><div class="pg-hub" role="group" aria-label="Звʼязки папки">`
       +card('money','money','Гроші',m,d.money==null)
-      +card('time','cal','Час',d.time?(d.time+' сьогодні'):'—',!d.time)
+      +card('time','cal',d.time?'Сьогодні':'Час',d.time?String(d.time):'—',!d.time)   // «1 сьогодні» не влазило в плитку
       +card('mission','target','Місія',d.mission?(d.mission.pct+'%'):'—',!d.mission)
       +card('chats','chat','Чати',nChats?String(nChats):'—',!nChats)
       +`</div>`;

@@ -102,11 +102,23 @@
     if(typeof qaGuide==='function') h+=`<button class="wl-link" data-wlqa>💳 Записувати покупки з Apple Pay автоматично ›</button>`;   // 50-quickadd.js
     return h;
   }
+  /* Гроші місій: «Цей місяць · Весь час» (12.10.2026) — для сфер-справ важливий підсумок з початку, години й «₴ за годину».
+     Години — виконані справи місії × їх тривалість (Планер). Нічого нового не записуємо, лише рахуємо. */
+  function wlGoalHours(gid, ym){
+    let h=0; try{ const by=plData().blocksByDay||{};
+      Object.keys(by).forEach(ds=>{ if(ym&&ds.slice(0,7)!==ym) return; (by[ds]||[]).forEach(b=>{ if(b&&b.done&&jnBlockGoal(b)===String(gid)) h+=Math.max(0,Math.min(plBlockEnd(b),24)-(+b.h||0)); }); }); }catch(_){}
+    return Math.round(h*10)/10;
+  }
   function wlMissionsHTML(ops){
-    const ms=wlMissions(); let h='';
-    ms.forEach(g=>{ const a=wlAgg(ops,g.id), bud=g.budget&&+g.budget.money>0?+g.budget.money:0, c=safeColor(g.color,'#3ec7b4'), pr=a.inc-a.out;
-      h+=`<button class="wl-m" data-wlm="${esc(g.id)}" style="--c:${c}"><span class="wl-m-h"><span>${safeEmoji(g.emoji,'🎯')}</span><b>${esc(g.name||'Місія')}</b><span class="${pr>=0?'in':'out'}">${pr>=0?'+':'−'}${wlMoney(Math.abs(pr))}</span></span>
-        <span class="wl-m-d"><span>дохід <b>${wlMoney(a.inc)}</b></span><span>витрати <b>${wlMoney(a.out)}</b>${bud?' / '+wlMoney(bud):''}</span>${g.reward&&g.reward.t?`<span>${safeEmoji(g.reward.emoji,'🎁')} ${esc(g.reward.t)}</span>`:''}</span>
+    const all=wlState.mPer==='all', ym=wlYm();
+    if(all) ops=(finOps||[]).filter(o=>o&&!String(o.id||'').startsWith('start_'));
+    const ms=wlMissions(); let h=`<div class="wl-chips wl-per" role="group" aria-label="Період"><button data-wlmper="month"${all?'':' class="on"'}>Цей місяць</button><button data-wlmper="all"${all?' class="on"':''}>Весь час</button></div>`;
+    ms.forEach(g=>{ const a=wlAgg(ops,g.id), bud=!all&&g.budget&&+g.budget.money>0?+g.budget.money:0, c=safeColor(g.color,'#3ec7b4'), pr=a.inc-a.out;
+      const hrs=wlGoalHours(g.id, all?'':ym), inv=!a.inc&&a.out>0;   // нічого ще не заробила — це вкладення, а не «мінус»
+      const top=!a.inc&&!a.out?`<span class="inv">—</span>`:inv?`<span class="inv">вкладено ${wlMoney(a.out)}</span>`:`<span class="${pr>=0?'in':'out'}">${pr>=0?'+':'−'}${wlMoney(Math.abs(pr))}</span>`;
+      const per=pr>0&&hrs>0?`<span>≈ <b>${wlMoney(Math.round(pr/hrs))}</b> за годину</span>`:'';
+      h+=`<button class="wl-m" data-wlm="${esc(g.id)}" style="--c:${c}"><span class="wl-m-h"><span>${safeEmoji(g.emoji,'🎯')}</span><b>${esc(g.name||'Місія')}</b>${top}</span>
+        <span class="wl-m-d"><span>дохід <b>${wlMoney(a.inc)}</b></span><span>витрати <b>${wlMoney(a.out)}</b>${bud?' / '+wlMoney(bud):''}</span>${hrs?`<span><b>${String(hrs).replace('.',',')}</b> год</span>`:''}${per}${g.reward&&g.reward.t?`<span>${safeEmoji(g.reward.emoji,'🎁')} ${esc(g.reward.t)}</span>`:''}</span>
         ${bud?`<span class="wl-bar"><i class="${a.out>bud?'over':''}" style="width:${Math.min(100,Math.round(a.out/bud*100))}%"></i></span>`:''}</button>`; });
     const none=wlAgg(ops,'');
     h+=`<button class="wl-m none" data-wlm=""><span class="wl-m-h"><span>📦</span><b>Без місії</b><span class="out">−${wlMoney(none.out)}</span></span><span class="wl-m-d"><span>побутові витрати й доходи без місії${none.inc?' · дохід '+wlMoney(none.inc):''}</span></span></button>`;
@@ -126,7 +138,7 @@
   }
   function wlFolderSheet(k){
     const f=folders[k]; if(!f) return;
-    const ym=wlYm(), all=wlMonthOps(ym).filter(o=>String(o.folderKey||'')===String(k)&&(_isIncAny(o)||_isExpAny(o))), ops=all.filter(opMain);
+    const ym=wlYm(), all=wlMonthOps(ym).filter(o=>inFolderOp(o,k)&&(_isIncAny(o)||_isExpAny(o)))   /* своя мітка або місія папки (54-links.js) */, ops=all.filter(opMain);
     const inc=ops.filter(_isRealIncome).reduce((s,o)=>s+(+o.amount||0),0), out=ops.filter(_isRealExpense).reduce((s,o)=>s+(+o.amount||0),0);
     jnOverlay(`<div class="jn-ed-h"><b>${safeEmoji(f.emoji,'📁')} ${esc(f.name||'Папка')}</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">${esc(MO_NAMES[+ym.slice(5,7)-1])}: дохід ${wlMoney(inc)} · витрати ${wlMoney(out)} · ${inc-out>=0?'прибуток':'мінус'} ${wlMoney(Math.abs(inc-out))}</small>
@@ -146,6 +158,7 @@
     { const p=c.querySelector('[data-wlpz]'); if(p) p.onclick=()=>{ if(typeof pzScreen==='function') pzScreen(); }; }
     { const w=c.querySelector('[data-wlwork]'); if(w) w.onclick=()=>{ try{ goWork(); }catch(_){} }; }
     c.querySelectorAll('[data-wltab]').forEach(b=>b.onclick=()=>{ wlState.tab=b.dataset.wltab; renderFinance(); });
+    c.querySelectorAll('[data-wlmper]').forEach(b=>b.onclick=()=>{ wlState.mPer=b.dataset.wlmper; renderFinance(); });
     c.querySelectorAll('[data-wlgoals]').forEach(b=>b.onclick=()=>moMoneySheet(wlYm(),()=>renderFinance()));
     { const hs=c.querySelector('[data-wlhist]'); if(hs) hs.onclick=()=>{ try{ goSpend(); }catch(_){} }; }
     { const st=c.querySelector('[data-wlstarter]'); if(st) st.onclick=()=>wlEnvStarter(); }

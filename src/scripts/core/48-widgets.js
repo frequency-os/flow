@@ -85,7 +85,7 @@
       const kind=b.kind==='out'?'out':'in', src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&b.cur!==mainCur()&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:'';
       if(!fk) return wgTile('c-'+kind,`<span class="wg-h">${kind==='in'?'＋ Доходи':'− Витрати'}</span><b class="wg-big sm">Лише в папці</b><small>постав віджет у папку-проєкт</small>`);
       // віджет із валютою (етап 2) рахує лише свою валюту; без — головну
-      const ops=wlMonthOps(ym).filter(o=>String(o.folderKey||'')===String(fk)&&(o.cur||'')===cur&&(kind==='in'?_isIncAny(o)&&wlSrc(o)===src:_isExpAny(o)));
+      const ops=wlMonthOps(ym).filter(o=>inFolderOp(o,fk)&&(o.cur||'')===cur&&(kind==='in'?_isIncAny(o)&&wlSrc(o)===src:_isExpAny(o)));
       const sum=ops.reduce((s,o)=>s+(+o.amount||0),0), goal=+b.goal>0?+b.goal:0, last=ops[ops.length-1];
       return wgTile('c-'+kind,`<button class="wg-hit" data-wga="folderops" aria-label="Записи папки"></button>
         <button class="wg-cfg" data-wga="cfg" aria-label="Налаштувати віджет">⚙</button>
@@ -297,7 +297,7 @@
     }
     if(t==='dtime'){
       if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">Лише в папці</b><small class="wd-sub">Час рахується з блоків Планера з міткою папки</small>`,'empty');
-      const per=wdPer(b), shown=x=>x&&x.folder===fk&&(wdOn(b,'done')||!x.done);
+      const per=wdPer(b), shown=x=>inFolderBlock(x,fk)&&(wdOn(b,'done')||!x.done);
       const mine=ds=>plBlocksDisplay(ds).filter(shown).sort((a,c)=>(+a.h||0)-(+c.h||0));
       const hrs=x=>Math.max(0,Math.min(plBlockEnd(x),24)-(+x.h||0));
       const add=wdOn(b,'add')?`<span class="wd-acts"><button data-wga="wdadd">＋ блок</button></span>`:'';

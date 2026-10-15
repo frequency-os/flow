@@ -566,7 +566,7 @@
       const f=folders[fk];
       if(b.type==='wplanday'){
         const td=plTodayStr();
-        const bs=plBlocksDisplay(td).filter(x=>x.folder===fk).sort((a,b2)=>a.h-b2.h);
+        const bs=plBlocksDisplay(td).filter(x=>inFolderBlock(x,fk)).sort((a,b2)=>a.h-b2.h);
         const dn=bs.filter(x=>x.done).length;
         const rows=bs.slice(0,4).map(x=>`<div class="pw-planrow ${x.done?'done':''}" style="--fc:${pwC(f)}">
           <span>${plHM(x.h)}</span><b>${esc(x.t)}</b>${x.fromRecur?'<em>🔁</em>':''}</div>`).join('')
@@ -581,7 +581,7 @@
       let nd=0;
       const cells=weeks.map(w=>w.map(ds=>{
         if(!ds) return '<i></i>';
-        const has=plBlocksDisplay(ds).some(x=>x.folder===fk); if(has) nd++;
+        const has=plBlocksDisplay(ds).some(x=>inFolderBlock(x,fk)); if(has) nd++;
         return `<i class="${has?'dot':''}${ds===td?' td':''}"></i>`;
       }).join('')).join('');
       return `<div class="tile ${sz} pw" data-tileid="${b.id}" style="--tc:${c};--fc:${pwC(f)}">${head}

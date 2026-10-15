@@ -183,32 +183,52 @@
     const LT=ylLetter().text;
     const t=((g.pointA||'')+' '+(g.pointB||'')+' '+LT).toLowerCase();
     const sents=ylSentences(LT);
-    // правило: слова-ключі → ціль; реченням цілі стає перше речення листа з таким словом
+    // число біля слова: «5000 підписників», «10 продажів» (12.10.2026 — мета місії з листа, а не порожня)
+    const numNear=re=>{ const m=t.match(new RegExp('(\\d[\\d\\s]{0,6})\\s*(?:'+re+')')); return m?String(+m[1].replace(/\s/g,'')):''; };
+    const lvl=(t.match(/\b([abc][12])\b/i)||[])[1];
+    // правило: слова-ключі → місія; реченням стає перше речення листа з таким словом; fold — як зветься папка цієї сфери
     const rules=[
-      [/англ|english|b1|b2/, {emoji:'🇬🇧',name:'Англійська — стабільний ритм',
+      [/англ|english|b1|b2|c1/, {emoji:'🇬🇧',name:'Англійська'+(lvl?' — '+lvl.toUpperCase():' — стабільний ритм'), to:lvl?lvl.toUpperCase():'', fold:/англ|english/,
         steps:['Обрати курс або підручник','20 хв у перерві — 4 тижні поспіль','Пробний тест рівня'],
         schedule:{dows:[1,3,6],h:19,endH:20,title:'Англійська'}}],
-      [/борг|кредит|debt|фінанс|конверт/, {emoji:'💶',name:'Вийти з боргів',
+      [/бренд|підписник|instagram|інстаграм|tiktok|тікток|аудитор/, {emoji:'✨',name:'Особистий бренд'+(numNear('підписник')?' — '+numNear('підписник')+' підписників':''), from:numNear('підписник')?'0':'', to:numNear('підписник'), fold:/бренд|блог|instagram|інстаграм/,
+        steps:['Обрати формат і платформу','Перші 10 публікацій без оцінки якості','Ритм 3 публікації на тиждень'],
+        schedule:{dows:[1,3,5],h:8,endH:8.5,title:'Публікація'}}],
+      [/app store|appstore|застосун|додаток|програм|стартап/, {emoji:'📱',name:'Вихід в App Store', fold:/frequency|застосун|додаток|програм|app/,
+        steps:['Бета для 10 друзів (TestFlight)','Подати на рев\'ю Apple','Перші платні користувачі'],
+        schedule:{dows:[1,2,3,4,5],h:21,endH:22.5,title:'Розробка'}}],
+      [/shopify|etsy|магазин|продаж|продаю|продаються/, {emoji:'🛍',name:'Продажі'+(numNear('продаж')?' — '+numNear('продаж')+' на місяць':''), from:numNear('продаж')?'0':'', to:numNear('продаж'), fold:/shopify|etsy|магазин|продаж/,
+        steps:['Відкрити магазин і виставити перші роботи','Перші 3 продажі','Ритм нових робіт щотижня'],
+        schedule:{dows:[6,0],h:11,endH:13,title:'Магазин'}}],
+      [/борг|кредит|debt/, {emoji:'💶',name:'Вийти з боргів', fold:/борг|гроші|фінанс/,
         steps:['Зібрати всі борги в одному місці (Гроші → Борги)','Зафіксувати платіж/міс — тапни картку «Вільний від боргу»','Закрити найдорожчий борг першим']}],
-      [/спорт|зал|біг|трену|тіло/, {emoji:'💪',name:'Тіло та енергія',
+      [/спорт|зал|біг|трену|тіло/, {emoji:'💪',name:'Тіло та енергія', fold:/спорт|здоров|тіло/,
         steps:['Обрати 2 фіксовані дні тренувань','4 тижні без пропусків (мікроверсія 15 хв рятує)','Сон 7+ годин'],
         schedule:{dows:[1,4],h:18,endH:19,title:'Спорт'}}],
-      [/блог|контент|відео|youtube|reels|build|марафон/, {emoji:'📹',name:'Контент build-in-public',
+      [/блог|контент|відео|youtube|reels|build|марафон/, {emoji:'📹',name:'Контент build-in-public', fold:/блог|контент/, skipIf:/бренд|підписник/,
         steps:['Зафіксувати формат і платформу','Перші 10 постів без оцінки якості','Ритм 3 пости/тиждень'],
         schedule:{dows:[2,4,0],h:20,endH:21,title:'Пост у блог'}}],
       [/сон|сплю|спати|00:00|недосип/, {emoji:'😴',name:'Сон 7+ годин',
         steps:['Лягати до 00:00','Вечірній блок «підготовка до сну» 23:15','14 днів поспіль'],
         schedule:{dows:[0,1,2,3,4,5,6],h:23,endH:23.5,title:'Підготовка до сну'}}],
-      [/ai|аі|ші|модел|нейро/, {emoji:'🤖',name:'Освоїти AI-інструменти',
+      [/\bai\b|аі|ші|модел|нейро/, {emoji:'🤖',name:'Освоїти AI-інструменти',
         steps:['Обрати 1 інструмент на місяць','2 практики/тиждень по 45 хв','Перший реальний результат — у блог']}]
     ];
     const goals=[];
-    rules.forEach(([re,gd])=>{ if(!re.test(t)) return;
+    rules.forEach(([re,gd])=>{ if(!re.test(t)||(gd.skipIf&&gd.skipIf.test(t))) return;
       const s=sents.find(x=>re.test(x.toLowerCase())); if(s) gd.sentence=s;
+      // папка сфери з тією ж назвою — щоб місія одразу була в ній (як у редакторі місії)
+      if(gd.fold){ try{ const k=Object.keys(folders).find(k=>aiDraftFolder(k)&&gd.fold.test(String(folders[k].name||'').toLowerCase())); if(k) gd.folderKey=k; }catch(_){} }
       goals.push(gd); });
     if(!goals.length) goals.push({emoji:'🎯',name:'Перша ціль на 90 днів',
       steps:['Сформулювати конкретний результат','Розбити на 3 кроки','Перший крок → 📅 у Планер сьогодні']});
-    return { goals:goals.slice(0,5), envelopes:[{name:'Подушка безпеки',emoji:'🛟',goal:1500}] };
+    // подушка: «на N місяців» з листа × середні витрати (правило cushion, 49-finlit.js); витрат ще нема — без вигаданого числа
+    const envs=[];
+    if(/подушк|резерв|запас|доход|витрат|гроші|фінанс/.test(t)){
+      const nm=+((t.match(/(\d+)\s*(?:міс|month)/)||[])[1])||3, avg=typeof flAvgSpend==='function'?flAvgSpend():0;
+      envs.push({name:'Подушка безпеки',emoji:'🛟',goal:avg>0?Math.round(avg*nm/100)*100:0, note:nm+' '+pluralUk(nm,'місяць','місяці','місяців')+' витрат'});
+    }
+    return { goals:goals.slice(0,5), envelopes:envs };
   }
   const DOW_SHORT=['нд','пн','вт','ср','чт','пт','сб'];
   function aiPreview(draft,label){
@@ -226,12 +246,12 @@
       items.push(`<div class="ai-item on" data-aitem="g${i}"><div class="ck">✓</div>
         <div class="tx"><b>${safeEmoji(gd.emoji,'🎯')} ${esc(gd.name||'Ціль')}</b>
         ${sent?`<span class="ai-sent">«${esc(sent.length>90?sent.slice(0,90)+'…':sent)}»</span>`:''}
-        <span>${(gd.steps||[]).length} кроків${nMs?' · '+nMs+' віх':''}${schTxt}</span></div></div>`);
+        <span>${(gd.steps||[]).length} ${pluralUk((gd.steps||[]).length,'крок','кроки','кроків')}${nMs?' · '+nMs+' '+pluralUk(nMs,'віха','віхи','віх'):''}${gd.to?' · мета '+esc(String(gd.to)):''}${schTxt}</span></div></div>`);
     });
     (draft.envelopes||[]).forEach((ed,i)=>{
       items.push(`<div class="ai-item on" data-aitem="e${i}"><div class="ck">✓</div>
         <div class="tx"><b>${safeEmoji(ed.emoji,'✉️')} ${esc(ed.name||'Конверт')}</b>
-        <span>конверт у Грошах${ed.goal?' · ціль '+fmt(parseInt(ed.goal)||0):''}</span></div></div>`);
+        <span>конверт у Грошах${ed.goal?' · ціль '+esc(money(parseInt(ed.goal)||0)):(ed.note?' · '+esc(ed.note):'')}</span></div></div>`);
     });
     body.innerHTML=`<div class="sub" style="margin:4px 0 10px">${esc(label||'Чернетка')} — тапни, щоб виключити зайве:</div>
       ${items.join('')}
@@ -261,6 +281,8 @@
       .filter(m=>m&&typeof m.ym==='string'&&/^\d{4}-(0[1-9]|1[0-2])$/.test(m.ym)&&m.ym>=from&&m.ym<=to&&String(m.t||'').trim())
       .slice(0,24);
   }
+  // папка з чернетки: лише власна видима папка (не «Робота», не службові ключі обʼєкта на кшталт constructor) — чернетку AI теж сюди
+  function aiDraftFolder(k){ k=String(k||''); return k&&k!=='work'&&Object.prototype.hasOwnProperty.call(folders,k)&&folders[k]&&folderVisible(k)?k:null; }
   function aiApplyDraft(draft){
     const colors=['#5b8def','#34c77b','#e8843c','#c77dff','#f0b429','#4ecdc4'];
     const p=plData(); const today=plTodayStr();
@@ -272,7 +294,8 @@
         color:colors[goalsData.goals.length%colors.length],
         steps:(gd.steps||[]).slice(0,7).map(s=>({ id:'st_ai_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
           name:String(s).slice(0,120), done:false })),
-        track:{}, days:{}, folderKey:null, open:true,
+        track:{}, days:{}, folderKey:aiDraftFolder(gd.folderKey), open:true,
+        ...(gd.from!=null&&String(gd.from)!==''?{from:String(gd.from).slice(0,30)}:{}), ...(gd.to?{to:String(gd.to).slice(0,30)}:{}),
         sentence:aiDraftSentence(gd),
         ms:aiDraftMonths(gd).map((m,mi)=>({ id:'ms_ai_'+Date.now()+'_'+nG+'_'+mi+'_'+Math.random().toString(36).slice(2,5),
           ym:m.ym, t:String(m.t).trim().slice(0,80), done:false })) });
@@ -418,8 +441,9 @@
   function pickFolderForGoal(onPick){
     const existing=document.getElementById('goalFolderSheet'); if(existing) existing.remove();
     const sheet=document.createElement('div');
-    sheet.className='fmenu-sheet'; sheet.id='goalFolderSheet';
-    const keys=(typeof order!=='undefined'?order:Object.keys(folders)).filter(k=>folders[k] && folderVisible(k));
+    sheet.className='fmenu-sheet on-top'; sheet.id='goalFolderSheet';   // кличуть і з вікна місії — мусить лягти над ним
+    // службову «Роботу» (на Огляді її не видно) не пропонуємо — як і у виборі блоку «Папка»
+    const keys=(typeof order!=='undefined'?order:Object.keys(folders)).filter(k=>k!=='work' && folders[k] && folderVisible(k));
     const rows=keys.map(k=>{
       const f=folders[k];
       return `<button class="gfp-row" data-gfk="${esc(k)}">
@@ -429,7 +453,7 @@
     }).join('');
     sheet.innerHTML=`<div class="fmenu-in">
       <div class="fmenu-grip"></div>
-      <div class="fmenu-title">Куди привʼязати ціль?</div>
+      <div class="fmenu-title">Куди привʼязати місію?</div>
       <button class="gfp-row gfp-new" data-gfnew="1"><span class="gfp-em">➕</span><span class="gfp-nm">Нова папка</span></button>
       ${rows?`<div class="gfp-sec">Існуючі папки</div>${rows}`:''}
       <button class="gfp-row gfp-none" data-gfnone="1"><span class="gfp-em">○</span><span class="gfp-nm">Без папки</span></button>
@@ -486,7 +510,7 @@
     }
 
     const goalsHtml=g.goals.map(gl=>{
-      const steps=gl.steps||[];
+      const steps=(gl.steps||[]).filter(s=>s&&!s.auto);   // старі «✅ День закрито» — журнал днів, не кроки
       const doneSteps=steps.filter(s=>s.done).length;
       const pct=steps.length?Math.round(doneSteps/steps.length*100):(gl.progress||0);
       const open=!!gl.open;

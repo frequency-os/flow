@@ -5,6 +5,12 @@
      Перемикач «показати в папці» додає / прибирає віджет цього звʼязку в дошці віджетів папки (boards[fk]) —
      лише тапом людини, зі «Скасувати». Привʼязати місію = поставити їй folderKey (як у редакторі місії). */
   const LK_W={mission:'dmission', habit:'dhabit', time:'dtime', cal:'dcal'};   // звʼязок → віджет у папці
+  /* «Що належить папці» — ОДНЕ правило (12.10.2026): власна мітка папки АБО місія, привʼязана до папки (goal.folderKey).
+     Раніше папка бачила лише свою мітку: місія бренду в папці «Особистий бренд», а Гроші «—», Час «—».
+     Блоки й записи місії мітки папки не несуть — папка питає «що в моєї місії», дані не копіюються. */
+  function lkGoalFolder(gid){ if(!gid) return ''; const g=(goalsData.goals||[]).find(x=>x&&String(x.id)===String(gid)); return g&&g.folderKey?String(g.folderKey):''; }
+  function inFolderOp(o,fk){ return !!o&&!!fk&&(String(o.folderKey||'')===String(fk)||(!!o.goalId&&lkGoalFolder(o.goalId)===String(fk))); }
+  function inFolderBlock(b,fk){ return !!b&&!!fk&&(b.folder===fk||(!!b.link&&!!b.link.goalId&&lkGoalFolder(b.link.goalId)===String(fk))); }
   // дошка, яку зараз видно: сторінка теми папки (fk__sp_x) має свою — інакше boards[fk]
   function lkKey(fk){ try{ if(typeof boardKey==='string'&&boardKey.split('__sp_')[0]===fk) return boardKey; }catch(_){} return fk; }
   function lkBoard(fk){ const k=lkKey(fk); return Array.isArray(boards[k])?boards[k]:[]; }
@@ -19,13 +25,13 @@
     let tr=null; try{ tr=g&&moOwnFolder(g.folderKey)?moTracker(g.folderKey):null; }catch(_){}
     let st=0; if(tr){ const d=new Date(); if(!moMarked(tr,ymdLocal(d))) d.setDate(d.getDate()-1); for(let i=0;i<400&&moMarked(tr,ymdLocal(d));i++){ st++; d.setDate(d.getDate()-1); } }
     rows.push({k:'habit', ic:'🔥', t:'Звичка', v:tr?'трекер місії · '+st+' '+pluralUk(st,'день','дні','днів')+' поспіль':g?'у папці місії ще нема трекера':'спершу привʼяжи місію', on:!!tr, act:tr?'':g?'＋ Трекер':''});
-    let bl=[]; try{ bl=plBlocksDisplay(td).filter(b=>b&&b.folder===fk); }catch(_){}
+    let bl=[]; try{ bl=plBlocksDisplay(td).filter(b=>inFolderBlock(b,fk)); }catch(_){}
     const h=bl.reduce((s,b)=>s+Math.max(0,Math.min(plBlockEnd(b),24)-(+b.h||0)),0);
-    rows.push({k:'time', ic:'⏱', t:'Час', v:bl.length?'блоки Планера з міткою папки · '+bl.length+' сьогодні · '+String(Math.round(h*10)/10).replace('.',',')+' год':'сьогодні блоків папки нема', on:bl.length>0, act:'＋ Блок'});
+    rows.push({k:'time', ic:'⏱', t:'Час', v:bl.length?'справи папки й місії · '+bl.length+' сьогодні · '+String(Math.round(h*10)/10).replace('.',',')+' год':'сьогодні блоків папки нема', on:bl.length>0, act:'＋ Блок'});
     let ev=0; try{ for(let i=0;i<31;i++){ const d=new Date(); d.setDate(d.getDate()+i); ev+=calEventsOn(ymdLocal(d),fk).length; } }catch(_){}
     rows.push({k:'cal', ic:'📅', t:'Календар', v:ev?'подій папки за місяць · '+ev:'подій папки нема', on:ev>0, act:'★ Подія'});
     let m=null; try{ const d=pgHubData(fk); m=d.money; }catch(_){}
-    rows.push({k:'money', ic:'💳', t:'Гроші', v:m==null?'записів з міткою папки цього місяця нема':((m>0?'+':m<0?'−':'')+esc(moneyK(Math.abs(m)))+' за місяць'), on:m!=null, act:'Відкрити'});
+    rows.push({k:'money', ic:'💳', t:'Гроші', v:m==null?'записів папки й місії цього місяця нема':((m>0?'+':m<0?'−':'')+esc(moneyK(Math.abs(m)))+' за місяць'), on:m!=null, act:'Відкрити'});
     let ch=0; try{ ch=chatsForFolder(fk).length; }catch(_){}
     rows.push({k:'chats', ic:'💬', t:'Чати', v:ch?ch+' '+pluralUk(ch,'чат','чати','чатів'):'не привʼязано', on:ch>0, act:ch?'Відкрити':'＋ Привʼязати'});
     return rows;
@@ -120,11 +126,11 @@
     const td=ymdLocal(), card=(k,ic,t,body,act)=>`<button class="lkc" data-lk="${k}"><span class="lkc-h"><span>${ic}</span><b>${t}</b>${act?`<em>${act}</em>`:'<em>›</em>'}</span>${body}</button>`;
     // Гроші місяця з міткою папки
     let inc=0,out=0,has=false;
-    try{ wlMonthOps(wlYm()).filter(o=>String(o.folderKey||'')===String(fk)).filter(opMain).forEach(o=>{ has=true; if(_isRealIncome(o)) inc+=(+o.amount||0); else if(_isRealExpense(o)) out+=(+o.amount||0); }); }catch(_){}
+    try{ wlMonthOps(wlYm()).filter(o=>inFolderOp(o,fk)).filter(opMain).forEach(o=>{ has=true; if(_isRealIncome(o)) inc+=(+o.amount||0); else if(_isRealExpense(o)) out+=(+o.amount||0); }); }catch(_){}
     const tot=inc+out, money=has?`<span class="lkc-money"><span><b class="in">+${esc(moneyK(inc))}</b><small>дохід</small></span><span><b class="out">−${esc(moneyK(out))}</b><small>витрати</small></span></span>
       <span class="lkc-bar"><i style="width:${tot?Math.round(inc/tot*100):0}%"></i></span>`:'<small class="lkc-none">Записів з міткою папки цього місяця нема</small>';
     // Час сьогодні
-    let bl=[]; try{ bl=plBlocksDisplay(td).filter(b=>b&&b.folder===fk).sort((a,c)=>(+a.h||0)-(+c.h||0)); }catch(_){}
+    let bl=[]; try{ bl=plBlocksDisplay(td).filter(b=>inFolderBlock(b,fk)).sort((a,c)=>(+a.h||0)-(+c.h||0)); }catch(_){}
     const time=bl.length?`<span class="lkc-list">${bl.slice(0,4).map(b=>`<span class="${b.done?'done':''}"><em>${plHM(+b.h||0)}</em><span>${esc(String(b.t||'Блок').slice(0,34))}</span>${typeof subBadge==='function'&&subBadge(b)?`<small>${subBadge(b)}</small>`:''}</span>`).join('')}</span>`:'<small class="lkc-none">Сьогодні блоків папки нема</small>';
     // Місія
     let g=null; try{ g=wgFolderMission(fk); }catch(_){}
@@ -155,7 +161,7 @@
     try{ (finOps||[]).forEach(o=>{ if(!o||String(o.folderKey||'')!==String(fk)) return; const inc=o.type==='in';
       add(String(o.date||''),0,inc?'＋':'−',(inc?'+':'−')+money(+o.amount||0,o.cur||undefined),o.label||(inc?'Дохід':'Витрата'),inc?'in':'out'); }); }catch(_){}
     try{ for(let i=0;i<=30;i++){ const d=new Date(); d.setDate(d.getDate()-i); const ds=ymdLocal(d);
-      plBlocksDisplay(ds).forEach(b=>{ if(b&&b.done&&b.folder===fk){ const h=Math.max(0,Math.min(plBlockEnd(b),24)-(+b.h||0));
+      plBlocksDisplay(ds).forEach(b=>{ if(b&&b.done&&inFolderBlock(b,fk)){ const h=Math.max(0,Math.min(plBlockEnd(b),24)-(+b.h||0));
         add(ds,(+b.h||0)*3600e3,'⏱','Блок виконано · '+String(b.t||'Блок'),plHM(+b.h||0)+' · '+String(Math.round(h*10)/10).replace('.',',')+' год','done'); } });
       calEventsOn(ds,fk).forEach(e=>add(ds,1,'★',String(e.t||'Подія'),'подія календаря','ev')); } }catch(_){}
     try{ const g=wgFolderMission(fk), tr=g&&moOwnFolder(g.folderKey)?moTracker(g.folderKey):null;
