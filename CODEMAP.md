@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 90 |
-| Рядків JS | 33430 |
+| Рядків JS | 33435 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10564 |
 | Сутностей верхнього рівня | 2432 |
@@ -43,7 +43,7 @@
 | `src/scripts/core/06-wishes.js` | 1464 | 109 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 655 | 84 |
-| `src/scripts/core/09-goals.js` | 727 | 31 |
+| `src/scripts/core/09-goals.js` | 730 | 31 |
 | `src/scripts/core/10-planner.js` | 879 | 43 |
 | `src/scripts/core/11-ai-flow.js` | 336 | 36 |
 | `src/scripts/core/12-ai-agent.js` | 1860 | 98 |
@@ -74,7 +74,7 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 818 | 72 |
+| `src/scripts/core/41-journal.js` | 820 | 72 |
 | `src/scripts/core/42-day.js` | 363 | 41 |
 | `src/scripts/core/43-month.js` | 274 | 37 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
@@ -893,14 +893,14 @@
 | `aiDraftMonths` | функція | `src/scripts/core/09-goals.js:278` |
 | `aiDraftFolder` | функція | `src/scripts/core/09-goals.js:285` |
 | `aiApplyDraft` | функція | `src/scripts/core/09-goals.js:286` |
-| `renderGoals` | функція | `src/scripts/core/09-goals.js:330` |
-| `dgDateStr` | функція | `src/scripts/core/09-goals.js:362` |
-| `dgWeekDates` | функція | `src/scripts/core/09-goals.js:363` |
-| `dgListFor` | функція | `src/scripts/core/09-goals.js:366` |
-| `dgSync` | функція | `src/scripts/core/09-goals.js:368` |
-| `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:388` |
-| `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:440` |
-| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:482` |
+| `renderGoals` | функція | `src/scripts/core/09-goals.js:333` |
+| `dgDateStr` | функція | `src/scripts/core/09-goals.js:365` |
+| `dgWeekDates` | функція | `src/scripts/core/09-goals.js:366` |
+| `dgListFor` | функція | `src/scripts/core/09-goals.js:369` |
+| `dgSync` | функція | `src/scripts/core/09-goals.js:371` |
+| `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:391` |
+| `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:443` |
+| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:485` |
 
 ### `src/scripts/core/10-planner.js` — 43 сутностей
 
@@ -2074,13 +2074,13 @@
 | `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:495` |
 | `jnTplDows` | функція | `src/scripts/core/41-journal.js:498` |
 | `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:505` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:526` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:664` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:669` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:751` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:764` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:800` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:811` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:527` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:666` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:671` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:753` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:766` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:802` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:813` |
 
 ### `src/scripts/core/42-day.js` — 41 сутностей
 
