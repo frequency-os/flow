@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 90 |
-| Рядків JS | 33359 |
+| Рядків JS | 33430 |
 | Файлів CSS | 47 |
-| Рядків CSS | 10547 |
-| Сутностей верхнього рівня | 2423 |
+| Рядків CSS | 10564 |
+| Сутностей верхнього рівня | 2432 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -43,14 +43,14 @@
 | `src/scripts/core/06-wishes.js` | 1464 | 109 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 655 | 84 |
-| `src/scripts/core/09-goals.js` | 729 | 31 |
+| `src/scripts/core/09-goals.js` | 727 | 31 |
 | `src/scripts/core/10-planner.js` | 879 | 43 |
 | `src/scripts/core/11-ai-flow.js` | 336 | 36 |
 | `src/scripts/core/12-ai-agent.js` | 1860 | 98 |
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1695 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1182 | 66 |
+| `src/scripts/core/16-dashboard.js` | 1189 | 66 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -74,9 +74,9 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 756 | 64 |
+| `src/scripts/core/41-journal.js` | 818 | 72 |
 | `src/scripts/core/42-day.js` | 363 | 41 |
-| `src/scripts/core/43-month.js` | 270 | 36 |
+| `src/scripts/core/43-month.js` | 274 | 37 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
 | `src/scripts/core/46-wallet.js` | 511 | 43 |
@@ -135,7 +135,7 @@
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
 | `src/styles/core/02-page-editor.css` | 1104 | 9 |
-| `src/styles/core/03-folders-projects.css` | 660 | 0 |
+| `src/styles/core/03-folders-projects.css` | 665 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
@@ -155,11 +155,11 @@
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
 | `src/styles/core/24-home-gallery.css` | 238 | 0 |
-| `src/styles/core/25-journal.css` | 311 | 0 |
+| `src/styles/core/25-journal.css` | 316 | 0 |
 | `src/styles/core/26-day.css` | 173 | 0 |
-| `src/styles/core/27-month.css` | 210 | 0 |
+| `src/styles/core/27-month.css` | 212 | 0 |
 | `src/styles/core/28-prizes.css` | 43 | 0 |
-| `src/styles/core/29-year.css` | 84 | 0 |
+| `src/styles/core/29-year.css` | 89 | 0 |
 | `src/styles/core/30-wallet.css` | 161 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
 | `src/styles/core/32-widgets.css` | 316 | 0 |
@@ -898,9 +898,9 @@
 | `dgWeekDates` | функція | `src/scripts/core/09-goals.js:363` |
 | `dgListFor` | функція | `src/scripts/core/09-goals.js:366` |
 | `dgSync` | функція | `src/scripts/core/09-goals.js:368` |
-| `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:389` |
-| `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:441` |
-| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:483` |
+| `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:388` |
+| `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:440` |
+| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:482` |
 
 ### `src/scripts/core/10-planner.js` — 43 сутностей
 
@@ -1285,46 +1285,46 @@
 | `renderFolderCovers` | функція | `src/scripts/core/16-dashboard.js:264` |
 | `renderDashboard` | функція | `src/scripts/core/16-dashboard.js:296` |
 | `inputModal` | функція | `src/scripts/core/16-dashboard.js:409` |
-| `createFolder` | функція | `src/scripts/core/16-dashboard.js:445` |
-| `groupKids` | функція | `src/scripts/core/16-dashboard.js:470` |
-| `fgIcon` | функція | `src/scripts/core/16-dashboard.js:473` |
-| `fgSub` | функція | `src/scripts/core/16-dashboard.js:476` |
-| `fgToast` | функція | `src/scripts/core/16-dashboard.js:483` |
-| `fgSheet` | функція | `src/scripts/core/16-dashboard.js:484` |
-| `openFolderGroup` | функція | `src/scripts/core/16-dashboard.js:496` |
-| `GVIEW` | обʼєкт | `src/scripts/core/16-dashboard.js:525` |
-| `gviewOf` | функція | `src/scripts/core/16-dashboard.js:526` |
-| `openGroupAsChosen` | функція | `src/scripts/core/16-dashboard.js:527` |
-| `window.openGroupAsChosen` | значення | `src/scripts/core/16-dashboard.js:533` |
-| `openFolderGroupIOS` | функція | `src/scripts/core/16-dashboard.js:534` |
-| `openGroupViewSheet` | функція | `src/scripts/core/16-dashboard.js:555` |
-| `openFolderPrioSheet` | функція | `src/scripts/core/16-dashboard.js:572` |
-| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:593` |
-| `openNewFolderChoice` | функція | `src/scripts/core/16-dashboard.js:610` |
-| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:623` |
-| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:665` |
-| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:673` |
-| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:716` |
-| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:718` |
-| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:723` |
-| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:737` |
-| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:744` |
-| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:763` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:804` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:826` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:854` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:926` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:946` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:947` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:948` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:949` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1011` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1027` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1049` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1058` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1091` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1107` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1152` |
+| `createFolder` | функція | `src/scripts/core/16-dashboard.js:451` |
+| `groupKids` | функція | `src/scripts/core/16-dashboard.js:477` |
+| `fgIcon` | функція | `src/scripts/core/16-dashboard.js:480` |
+| `fgSub` | функція | `src/scripts/core/16-dashboard.js:483` |
+| `fgToast` | функція | `src/scripts/core/16-dashboard.js:490` |
+| `fgSheet` | функція | `src/scripts/core/16-dashboard.js:491` |
+| `openFolderGroup` | функція | `src/scripts/core/16-dashboard.js:503` |
+| `GVIEW` | обʼєкт | `src/scripts/core/16-dashboard.js:532` |
+| `gviewOf` | функція | `src/scripts/core/16-dashboard.js:533` |
+| `openGroupAsChosen` | функція | `src/scripts/core/16-dashboard.js:534` |
+| `window.openGroupAsChosen` | значення | `src/scripts/core/16-dashboard.js:540` |
+| `openFolderGroupIOS` | функція | `src/scripts/core/16-dashboard.js:541` |
+| `openGroupViewSheet` | функція | `src/scripts/core/16-dashboard.js:562` |
+| `openFolderPrioSheet` | функція | `src/scripts/core/16-dashboard.js:579` |
+| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:600` |
+| `openNewFolderChoice` | функція | `src/scripts/core/16-dashboard.js:617` |
+| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:630` |
+| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:672` |
+| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:680` |
+| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:723` |
+| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:725` |
+| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:730` |
+| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:744` |
+| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:751` |
+| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:770` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:811` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:833` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:861` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:933` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:953` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:954` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:955` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:956` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1018` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1034` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1056` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1065` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1098` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1114` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1159` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -2005,7 +2005,7 @@
 | `ylAiCtx` | функція | `src/scripts/core/40-year-letter.js:266` |
 | `ylForWorld` | функція | `src/scripts/core/40-year-letter.js:284` |
 
-### `src/scripts/core/41-journal.js` — 64 сутностей
+### `src/scripts/core/41-journal.js` — 72 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2024,55 +2024,63 @@
 | `jnRole` | функція | `src/scripts/core/41-journal.js:27` |
 | `jnStatus` | функція | `src/scripts/core/41-journal.js:28` |
 | `jnLevels` | функція | `src/scripts/core/41-journal.js:29` |
-| `jnPct` | функція | `src/scripts/core/41-journal.js:32` |
-| `jnDayBlocks` | функція | `src/scripts/core/41-journal.js:39` |
-| `jnBlockGoal` | функція | `src/scripts/core/41-journal.js:52` |
-| `jnXP` | функція | `src/scripts/core/41-journal.js:55` |
-| `jnHeroXP` | функція | `src/scripts/core/41-journal.js:63` |
-| `jnFreeHours` | функція | `src/scripts/core/41-journal.js:65` |
-| `jnDayLevel` | функція | `src/scripts/core/41-journal.js:73` |
-| `dayInMotion` | функція | `src/scripts/core/41-journal.js:82` |
-| `jnStreak` | функція | `src/scripts/core/41-journal.js:87` |
-| `jnWeek` | функція | `src/scripts/core/41-journal.js:93` |
-| `jnMateOn` | функція | `src/scripts/core/41-journal.js:100` |
-| `jnMateName` | функція | `src/scripts/core/41-journal.js:101` |
-| `jnMateHTML` | функція | `src/scripts/core/41-journal.js:102` |
-| `jnAvatar` | функція | `src/scripts/core/41-journal.js:108` |
-| `jnName` | функція | `src/scripts/core/41-journal.js:114` |
-| `jnSchedTxt` | функція | `src/scripts/core/41-journal.js:120` |
-| `jnMissionCard` | функція | `src/scripts/core/41-journal.js:125` |
-| `jnFocus` | значення | `src/scripts/core/41-journal.js:142` |
-| `jnTab` | значення | `src/scripts/core/41-journal.js:145` |
-| `jnMissionPhoto` | функція | `src/scripts/core/41-journal.js:148` |
-| `jnGoalById` | функція | `src/scripts/core/41-journal.js:155` |
-| `jnBg` | функція | `src/scripts/core/41-journal.js:156` |
-| `jnStory` | функція | `src/scripts/core/41-journal.js:160` |
-| `jnTodayList` | функція | `src/scripts/core/41-journal.js:167` |
-| `jnFocusCard` | функція | `src/scripts/core/41-journal.js:171` |
-| `jnRender` | функція | `src/scripts/core/41-journal.js:184` |
-| `jnTop` | функція | `src/scripts/core/41-journal.js:211` |
-| `jnFloatRender` | функція | `src/scripts/core/41-journal.js:213` |
-| `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:227` |
-| `jnRenderToday` | функція | `src/scripts/core/41-journal.js:235` |
-| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:314` |
-| `jnDone` | функція | `src/scripts/core/41-journal.js:327` |
-| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:332` |
-| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:336` |
-| `jnStoryView` | функція | `src/scripts/core/41-journal.js:362` |
-| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:393` |
-| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:402` |
-| `jnOverlay` | функція | `src/scripts/core/41-journal.js:418` |
-| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:431` |
-| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:439` |
-| `jnTplDows` | функція | `src/scripts/core/41-journal.js:442` |
-| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:449` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:470` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:602` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:607` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:689` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:702` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:738` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:749` |
+| `jnNumOf` | функція | `src/scripts/core/41-journal.js:38` |
+| `jnNumIncome` | функція | `src/scripts/core/41-journal.js:39` |
+| `jnNum` | функція | `src/scripts/core/41-journal.js:40` |
+| `jnRhythm` | функція | `src/scripts/core/41-journal.js:51` |
+| `jnHasMeasure` | функція | `src/scripts/core/41-journal.js:59` |
+| `jnPct` | функція | `src/scripts/core/41-journal.js:60` |
+| `jnPathTxt` | функція | `src/scripts/core/41-journal.js:68` |
+| `jnNumSheet` | функція | `src/scripts/core/41-journal.js:73` |
+| `jnMsSetDone` | функція | `src/scripts/core/41-journal.js:92` |
+| `jnDayBlocks` | функція | `src/scripts/core/41-journal.js:95` |
+| `jnBlockGoal` | функція | `src/scripts/core/41-journal.js:108` |
+| `jnXP` | функція | `src/scripts/core/41-journal.js:111` |
+| `jnHeroXP` | функція | `src/scripts/core/41-journal.js:119` |
+| `jnFreeHours` | функція | `src/scripts/core/41-journal.js:121` |
+| `jnDayLevel` | функція | `src/scripts/core/41-journal.js:129` |
+| `dayInMotion` | функція | `src/scripts/core/41-journal.js:138` |
+| `jnStreak` | функція | `src/scripts/core/41-journal.js:143` |
+| `jnWeek` | функція | `src/scripts/core/41-journal.js:149` |
+| `jnMateOn` | функція | `src/scripts/core/41-journal.js:156` |
+| `jnMateName` | функція | `src/scripts/core/41-journal.js:157` |
+| `jnMateHTML` | функція | `src/scripts/core/41-journal.js:158` |
+| `jnAvatar` | функція | `src/scripts/core/41-journal.js:164` |
+| `jnName` | функція | `src/scripts/core/41-journal.js:170` |
+| `jnSchedTxt` | функція | `src/scripts/core/41-journal.js:176` |
+| `jnMissionCard` | функція | `src/scripts/core/41-journal.js:181` |
+| `jnFocus` | значення | `src/scripts/core/41-journal.js:198` |
+| `jnTab` | значення | `src/scripts/core/41-journal.js:201` |
+| `jnMissionPhoto` | функція | `src/scripts/core/41-journal.js:204` |
+| `jnGoalById` | функція | `src/scripts/core/41-journal.js:211` |
+| `jnBg` | функція | `src/scripts/core/41-journal.js:212` |
+| `jnStory` | функція | `src/scripts/core/41-journal.js:216` |
+| `jnTodayList` | функція | `src/scripts/core/41-journal.js:223` |
+| `jnFocusCard` | функція | `src/scripts/core/41-journal.js:227` |
+| `jnRender` | функція | `src/scripts/core/41-journal.js:240` |
+| `jnTop` | функція | `src/scripts/core/41-journal.js:267` |
+| `jnFloatRender` | функція | `src/scripts/core/41-journal.js:269` |
+| `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:283` |
+| `jnRenderToday` | функція | `src/scripts/core/41-journal.js:291` |
+| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:370` |
+| `jnDone` | функція | `src/scripts/core/41-journal.js:383` |
+| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:388` |
+| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:392` |
+| `jnStoryView` | функція | `src/scripts/core/41-journal.js:418` |
+| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:449` |
+| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:458` |
+| `jnOverlay` | функція | `src/scripts/core/41-journal.js:474` |
+| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:487` |
+| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:495` |
+| `jnTplDows` | функція | `src/scripts/core/41-journal.js:498` |
+| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:505` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:526` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:664` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:669` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:751` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:764` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:800` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:811` |
 
 ### `src/scripts/core/42-day.js` — 41 сутностей
 
@@ -2120,7 +2128,7 @@
 | `dyTaskToDay` | функція | `src/scripts/core/42-day.js:335` |
 | `dyWeekTasksBind` | функція | `src/scripts/core/42-day.js:344` |
 
-### `src/scripts/core/43-month.js` — 36 сутностей
+### `src/scripts/core/43-month.js` — 37 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2136,30 +2144,31 @@
 | `moMoney` | функція | `src/scripts/core/43-month.js:17` |
 | `moPassed` | функція | `src/scripts/core/43-month.js:19` |
 | `moLate` | функція | `src/scripts/core/43-month.js:20` |
-| `moMissions` | функція | `src/scripts/core/43-month.js:21` |
-| `moQuarters` | функція | `src/scripts/core/43-month.js:24` |
-| `moCard` | функція | `src/scripts/core/43-month.js:28` |
-| `moMoneyHTML` | функція | `src/scripts/core/43-month.js:41` |
-| `MO_CAT_COLORS` | масив | `src/scripts/core/43-month.js:60` |
-| `moCatsHTML` | функція | `src/scripts/core/43-month.js:61` |
-| `moCalHTML` | функція | `src/scripts/core/43-month.js:72` |
-| `moMonthHTML` | функція | `src/scripts/core/43-month.js:85` |
-| `moBind` | функція | `src/scripts/core/43-month.js:97` |
-| `moMoneySheet` | функція | `src/scripts/core/43-month.js:106` |
-| `moMissionPage` | функція | `src/scripts/core/43-month.js:124` |
-| `moPathTab` | функція | `src/scripts/core/43-month.js:152` |
-| `moOwnFolder` | функція | `src/scripts/core/43-month.js:181` |
-| `moBoard` | функція | `src/scripts/core/43-month.js:182` |
-| `moTracker` | функція | `src/scripts/core/43-month.js:184` |
-| `moNotes` | функція | `src/scripts/core/43-month.js:185` |
-| `moVision` | функція | `src/scripts/core/43-month.js:186` |
-| `moMarked` | функція | `src/scripts/core/43-month.js:187` |
-| `moToggleMark` | функція | `src/scripts/core/43-month.js:190` |
-| `moAddTracker` | функція | `src/scripts/core/43-month.js:198` |
-| `moFolderTab` | функція | `src/scripts/core/43-month.js:203` |
-| `moChatsTab` | функція | `src/scripts/core/43-month.js:223` |
-| `moTextSheet` | функція | `src/scripts/core/43-month.js:231` |
-| `moBindMission` | функція | `src/scripts/core/43-month.js:239` |
+| `moLateDays` | функція | `src/scripts/core/43-month.js:22` |
+| `moMissions` | функція | `src/scripts/core/43-month.js:24` |
+| `moQuarters` | функція | `src/scripts/core/43-month.js:27` |
+| `moCard` | функція | `src/scripts/core/43-month.js:31` |
+| `moMoneyHTML` | функція | `src/scripts/core/43-month.js:44` |
+| `MO_CAT_COLORS` | масив | `src/scripts/core/43-month.js:63` |
+| `moCatsHTML` | функція | `src/scripts/core/43-month.js:64` |
+| `moCalHTML` | функція | `src/scripts/core/43-month.js:75` |
+| `moMonthHTML` | функція | `src/scripts/core/43-month.js:88` |
+| `moBind` | функція | `src/scripts/core/43-month.js:100` |
+| `moMoneySheet` | функція | `src/scripts/core/43-month.js:109` |
+| `moMissionPage` | функція | `src/scripts/core/43-month.js:127` |
+| `moPathTab` | функція | `src/scripts/core/43-month.js:156` |
+| `moOwnFolder` | функція | `src/scripts/core/43-month.js:185` |
+| `moBoard` | функція | `src/scripts/core/43-month.js:186` |
+| `moTracker` | функція | `src/scripts/core/43-month.js:188` |
+| `moNotes` | функція | `src/scripts/core/43-month.js:189` |
+| `moVision` | функція | `src/scripts/core/43-month.js:190` |
+| `moMarked` | функція | `src/scripts/core/43-month.js:191` |
+| `moToggleMark` | функція | `src/scripts/core/43-month.js:194` |
+| `moAddTracker` | функція | `src/scripts/core/43-month.js:202` |
+| `moFolderTab` | функція | `src/scripts/core/43-month.js:207` |
+| `moChatsTab` | функція | `src/scripts/core/43-month.js:227` |
+| `moTextSheet` | функція | `src/scripts/core/43-month.js:235` |
+| `moBindMission` | функція | `src/scripts/core/43-month.js:243` |
 
 ### `src/scripts/core/44-prizes.js` — 24 сутностей
 
