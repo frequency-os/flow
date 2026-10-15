@@ -324,7 +324,10 @@
     aiSheetClose();
     try{ renderGoals(); }catch(_){}
     try{ window.platform.haptic('medium'); }catch(_){}
-    try{ plToast('✨ Створено: '+nG+' цілей · '+nS+' розкладів · '+nE+' конвертів'); }catch(_){}
+    try{ if(typeof jnRender==='function') jnRender(); }catch(_){}   // Журнал одразу бачить нові місії (раніше — «Ще нема місій» до переходу на іншу вкладку)
+    try{ plToast('✨ Створено: '+nG+' '+pluralUk(nG,'ціль','цілі','цілей')+' · '+nS+' '+pluralUk(nS,'розклад','розклади','розкладів')+' · '+nE+' '+pluralUk(nE,'конверт','конверти','конвертів')); }catch(_){}
+    // прийшли з майстра «Старт гри» (крок 4) — повертаємось туди, а не губимо майстра; позначка живе 10 хв
+    { const t=+window.__jnStartBack||0; window.__jnStartBack=0; if(t&&Date.now()-t<600000&&typeof jnStart==='function') setTimeout(()=>{ try{ jnStart(4); }catch(_){} },400); }
   }
 
   function renderGoals(){

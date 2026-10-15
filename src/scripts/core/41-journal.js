@@ -227,7 +227,7 @@
   function jnFocusCard(list){
     const undone=list.filter(b=>!b.done);
     if(!list.length) return `<div class="jn-fc empty"><b>На сьогодні справ нема</b><span>Візьми справу з місії, додай у вільний час або дай місії розклад — тоді вона зʼявиться тут.</span><button class="jn-fc-btn" data-jnfull>Розписати день</button></div>`;
-    if(!undone.length) return `<div class="jn-fc empty win"><b>Усе на сьогодні зроблено 🎉</b><span>${list.length} ${pluralUk(list.length,'справа','справи','справ')} закрито. Серія тримається.</span></div>`;
+    if(!undone.length) return `<div class="jn-fc empty win"><b>Усе на сьогодні зроблено 🎉</b><span>${list.length} ${pluralUk(list.length,'справу','справи','справ')} закрито. Серія тримається.</span></div>`;
     const b=undone.find(x=>x.id===jnFocus)||undone[0], gl=jnGoalById(jnBlockGoal(b));
     const c=gl?safeColor(gl.color,'#3ec7b4'):'var(--accent)', bg=jnBg(gl);
     return `<div class="jn-fc${bg?' ph':''}" style="--c:${c};${bg}">
@@ -447,7 +447,7 @@
   }
 
   function jnEnergySheet(){
-    const vals=[[20,'Ледве живий'],[40,'Втомлений'],[60,'Нормально'],[80,'Бадьорий'],[100,'На максимумі']];
+    const vals=[[20,'Ледь тримаюсь'],[40,'Втома'],[60,'Нормально'],[80,'Бадьоро'],[100,'На максимумі']];   // без родових форм (для всіх)
     actionSheet({title:'Енергія сьогодні', sub:'Від неї залежить, скільки брати на день',
       items:vals.map(([v,l])=>({ic:'', label:v+' · '+l, onClick:()=>{
         const h=jnHero(); if(!h.energy||typeof h.energy!=='object') h.energy={};
@@ -523,7 +523,8 @@
     if(i>=0) p.recurring[i]=Object.assign(prev,tpl); else p.recurring.push(tpl);
   }
 
-  function jnEditor(gl){
+  // opts.after — що робити після «Зберегти» (майстер «Старт гри» повертається на крок 4, а не закривається)
+  function jnEditor(gl, opts){
     const isNew=!gl;
     const others=gl?jnOtherTpls(gl):[];
     const adopt=(gl&&!gl.sched&&others.length===1&&/^rt_ai_/.test(String(others[0].id)))?others:[];
@@ -619,13 +620,13 @@
         if(d.role==='main') (goalsData.goals||[]).forEach(x=>{ if(x!==g&&jnRole(x)==='main') x.role='side'; });
         g.role=d.role; g.status=d.status;
         g.from=String(q('#jnFrom').value||'').trim().slice(0,30); g.to=String(q('#jnTo').value||'').trim().slice(0,30);
-        const endV=String(q('#jnEnd').value||''), ymNow=/^\d{4}-\d{2}-\d{2}$/.test(endV)?endV.slice(0,7):ymdLocal().slice(0,7), keep=Array.isArray(g.ms)?g.ms.filter(m=>!(m&&typeof m==='object'&&/^\d{4}-\d{2}$/.test(m.ym||''))||(m&&m.id&&!d.startIds.includes(m.id)&&!d.levels.some(x=>x.id===m.id))):[];
-        g.ms=keep.concat(d.levels.filter(m=>String(m.t||'').trim()).map((m,i)=>{
         { const ns=String(q('#jnNumSrc')&&q('#jnNumSrc').value||''); if(ns==='in_month'||ns==='in_all') g.numSrc=ns; else delete g.numSrc;
           // старт числа — лише для нової місії: відсоток іде від нього («120 → 260 з 1000» = 16%); старим місіям старт не вигадуємо
           if(isNew&&!g.numSrc){ const f=jnNumOf(g.from), t=jnNumOf(g.to); if(f!==null&&t!==null&&f!==t) g.numStart=f; } }
           const due=/^\d{4}-\d{2}-\d{2}$/.test(m.due||'')?m.due:'';
           const old=Array.isArray(g.ms)?g.ms.find(x=>x&&x.id&&x.id===m.id):null;
+        const endV=String(q('#jnEnd').value||''), ymNow=/^\d{4}-\d{2}-\d{2}$/.test(endV)?endV.slice(0,7):ymdLocal().slice(0,7), keep=Array.isArray(g.ms)?g.ms.filter(m=>!(m&&typeof m==='object'&&/^\d{4}-\d{2}$/.test(m.ym||''))||(m&&m.id&&!d.startIds.includes(m.id)&&!d.levels.some(x=>x.id===m.id))):[];
+        g.ms=keep.concat(d.levels.filter(m=>String(m.t||'').trim()).map((m,i)=>{
           return Object.assign(old||{}, { id:m.id||('ms_m_'+Date.now()+'_'+i+'_'+Math.random().toString(36).slice(2,5)),
             ym:due?due.slice(0,7):(m.ym||ymNow), t:String(m.t).trim().slice(0,80), done:!!m.done, due,
             // дата «взято» — лише в момент, коли віху позначили зараз; стара взята віха без дати лишається без неї (запізнення не вгадуємо)
@@ -657,6 +658,7 @@
         try{ plToast(pzKeep?'Збережено, але приз лишився: спершу поверни гроші зі скарбнички':(isNew?'Місію додано':'Збережено')); }catch(_){}
       };
     });
+        if(opts&&typeof opts.after==='function') setTimeout(()=>{ try{ opts.after(); }catch(_){} },300);
   }
 
   /* ─── СТАРТ ГРИ: 5 кроків, усе вводить людина (жодних прикладів і заготовок) ───
@@ -716,8 +718,8 @@
         ov.querySelectorAll('#jsCur [data-cur]').forEach(x=>x.classList.toggle('on',x===b));
         const lb=ov.querySelector('#jsBal'); if(lb&&lb.previousElementSibling) lb.previousElementSibling.textContent='Скільки зараз на рахунку, '+curSym(); });
       ov.querySelectorAll('#jsCls [data-v]').forEach(b=>b.onclick=()=>{ cls=(cls===b.dataset.v)?'':b.dataset.v; ov.querySelectorAll('#jsCls [data-v]').forEach(x=>x.classList.toggle('on',x.dataset.v===cls)); });
-      const ai=q('[data-jsai]'); if(ai) ai.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); try{ aiStartSheet(); }catch(e){ console.error('aiStart',e); } };
-      const ad=q('[data-jsadd]'); if(ad) ad.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); jnEditor(null); };
+      const ai=q('[data-jsai]'); if(ai) ai.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); window.__jnStartBack=Date.now(); try{ aiStartSheet(); }catch(e){ console.error('aiStart',e); } };   // aiApplyDraft поверне на крок 4
+      const ad=q('[data-jsadd]'); if(ad) ad.onclick=()=>{ h.startStep=4; saveGoals(); ov.remove(); jnEditor(null,{after:()=>jnStart(4)}); };   // після «Зберегти» — назад у крок 4
       const bk=q('[data-jnback]'); if(bk) bk.onclick=()=>jnStart(step-1);
       q('[data-jnnext]').onclick=()=>{
         if(step===1){
