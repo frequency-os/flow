@@ -82,6 +82,30 @@ echo "8) Збірка для iOS (dist-ios/ без dev-коду і без 'unsaf
 # Сам dist-ios не збирає: python3 tools/build.py --ios. Нема теки — крок пропускається.
 ./tools/check-ios.sh || bad=$((bad+1))
 
+echo "9) Секрети (gitleaks: ключі, токени, паролі в історії git і в незакомічених правках):"
+# Репо публічне: забутий ключ видно всьому світу. Правила й винятки — .gitleaks.toml.
+GL=tools/bin/gitleaks
+if [ ! -x "$GL" ]; then
+  echo "   (gitleaks нема на цьому Mac — крок пропущено; як поставити — tools/bin/.gitignore)"
+else
+  if "$GL" git . --redact --no-banner --log-level error -v > "$TMP/gl.log" 2>&1 \
+     && "$GL" git . --pre-commit --redact --no-banner --log-level error -v >> "$TMP/gl.log" 2>&1; then
+    echo "   ✅ ні в історії, ні в незакомічених правках секретів нема"
+  else
+    echo "   ❌ знайдено щось схоже на секрет (значення приховано):"
+    grep -E "RuleID|File|Line|Commit" "$TMP/gl.log" | sed 's/^/      /'; bad=$((bad+1))
+  fi
+  # Хук перед комітом — та сама перевірка для кожного коміту. Ставимо/оновлюємо копію.
+  HOOK=.git/hooks/pre-commit
+  if [ -d .git/hooks ] && ! cmp -s tools/git-pre-commit.sh "$HOOK"; then
+    if [ -e "$HOOK" ] && ! grep -q gitleaks "$HOOK"; then
+      echo "   ⚠️  .git/hooks/pre-commit уже є і він не наш — не чіпаю"
+    else
+      cp tools/git-pre-commit.sh "$HOOK" && chmod +x "$HOOK" && echo "   ✅ хук перед комітом встановлено"
+    fi
+  fi
+fi
+
 rm -rf "$TMP"
 # Код виходу важливий: за ним deploy.sh вирішує, чи можна публікувати.
 [ "$bad" = 0 ] && { echo "\nВсе гаразд."; exit 0; }

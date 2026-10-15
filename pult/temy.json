@@ -92,6 +92,10 @@
     "temy": "Пульт",
     "marshrut": "Пульт",
     "kandydaty": "Пульт",
-    "package": "Команди (package.json)"
+    "package": "Команди (package.json)",
+    "check": "Перевірка",
+    "git-pre-commit": "Сканер секретів",
+    ".gitleaks": "Сканер секретів",
+    ".gitleaksignore": "Сканер секретів"
   }
 }

@@ -32,7 +32,8 @@
         {"type": "command", "name": "check"},
         {"type": "command", "name": "smoke"},
         {"type": "command", "name": "test:migrations"},
-        {"type": "planned", "name": "gitleaks/gitleaks"}
+        {"type": "file", "name": ".gitleaks.toml"},
+        {"type": "file", "name": "tools/git-pre-commit.sh"}
       ]
     },
     {

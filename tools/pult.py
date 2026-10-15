@@ -38,7 +38,7 @@ FOLDERS = [
     ('docs', 'документ', 'Документи — словник і чернетки'),
     ('pult', 'файл пульта', 'Пульт — маршрут і кандидати, які ведемо руками'),
 ]
-ROOT_FILES = ['CLAUDE.md', 'CODEMAP.md', 'README.md']
+ROOT_FILES = ['CLAUDE.md', 'CODEMAP.md', 'README.md', '.gitleaks.toml']
 
 STATUSES = ['розглядаємо', 'беремо', 'взяли', 'відмовились']
 TYPE_LABEL = {'skill': 'скіл', 'agent': 'рецензент', 'command': 'команда',
