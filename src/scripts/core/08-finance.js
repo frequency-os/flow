@@ -344,7 +344,8 @@
   function _isIncAny(o){ return o.type==='in' && !o._tr; }
   function _isRealExpense(o){ return _isExpAny(o) && opMain(o); }
   function _isRealIncome(o){ return _isIncAny(o) && opMain(o); }
-  function monthAgg(ym){ let inn=0,out=0; finOps.forEach(o=>{ if(String(o.date||'').slice(0,7)!==ym) return; if(_isRealIncome(o)) inn+=o.amount; else if(_isRealExpense(o)) out+=o.amount; }); return {in:inn,out}; }
+  // одне правило з Гаманцем (46-wallet.js wlAgg/wlMonthOps): стартовий залишок — не дохід місяця
+  function monthAgg(ym){ const a=wlAgg(wlMonthOps(ym)); return {in:a.inc,out:a.out}; }
 
   /* ============ МОЯ ФІНАНСОВА ГРАМОТНІСТЬ ============ */
 

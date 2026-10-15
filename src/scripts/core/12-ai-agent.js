@@ -639,7 +639,7 @@
         return (b.done?'✓ ':'· ')+String(b.t||'блок').slice(0,60)+(gn?' ['+gn+']':''); });
       const extra=[];
       const en=h.energy&&typeof h.energy[ds]==='number'?h.energy[ds]:null; if(en!==null) extra.push('енергія '+en);
-      if(!finOff){ try{ const ops=walletOps().filter(o=>o&&o.date===ds&&!o._tr); const inS=ops.filter(o=>o.type==='in').reduce((a,o)=>a+(+o.amount||0),0), outS=ops.filter(o=>o.type!=='in').reduce((a,o)=>a+(+o.amount||0),0);
+      if(!finOff){ try{ const ag=wlAgg(wlDayOps(ds)), inS=ag.inc, outS=ag.out;   // як у Гаманці: витрати з конвертів — так, поповнення й перекази — ні
         if(inS) extra.push('дохід '+money(inS)); if(outS) extra.push('витрати '+money(outS)); }catch(_){} }
       if(!diaOff){ try{ if(diaryEntries[ds]&&diaryEntries[ds].text&&diaryEntries[ds].text.trim()) extra.push('є запис у щоденнику'); }catch(_){} }
       if(!items.length&&!extra.length){ out.push(ds+': —'); continue; }

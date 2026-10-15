@@ -40,21 +40,34 @@
   }
   function moMoneyHTML(ym){
     const h=jnHero(), g=(h.money&&typeof h.money==='object'&&h.money[ym])||null;
-    const ops=(()=>{ try{ return walletOps().filter(o=>o&&String(o.date||'').slice(0,7)===ym&&!String(o.id||'').startsWith('start_')); }catch(_){ return []; } })();
-    // ті самі правила, що в Гаманці: перекази й рухи конвертів — не дохід і не витрата
-    const inc=ops.filter(o=>_isRealIncome(o)).reduce((s,o)=>s+(+o.amount||0),0), out=ops.filter(o=>_isRealExpense(o)).reduce((s,o)=>s+(+o.amount||0),0);
+    // ті самі числа, що в Гаманці (46-wallet.js wlAgg): витрати з конвертів рахуються, поповнення й перекази — ні
+    let inc=0, out=0, cats=[]; try{ const a=wlAgg(wlMonthOps(ym)); inc=a.inc; out=a.out; cats=wlMonthCats(ym); }catch(_){}
+    const catsH=moCatsHTML(cats,out);
     const svd=Math.max(0,typeof pzMonthSaved==='function'?pzMonthSaved(ym):0);
     const mark=Math.round(moPassed(ym)*100);
     const bar=(val,goal,cls)=>`<span class="mo-bar ${cls}"><i style="width:${goal>0?Math.min(100,Math.round(val/goal*100)):0}%"></i>${goal>0&&mark>0&&mark<100?`<s style="left:${mark}%"></s>`:''}</span>`;
     if(!g||!(+g.earn>0||+g.spend>0||+g.save>0)) return `<div class="mo-card"><div class="mo-h"><span>Гроші · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span></div>
       <div class="mo-fact"><span>Зароблено <b>${moMoney(inc)}</b></span><span>Витрачено <b>${moMoney(out)}</b></span></div>
-      <button class="mo-set" data-moset>Задати цілі місяця</button></div>`;
+      ${catsH}<button class="mo-set" data-moset>Задати цілі місяця</button></div>`;
     const earn=+g.earn||0, spend=+g.spend||0, save=+g.save||0;
     return `<div class="mo-card"><div class="mo-h"><span>Гроші · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><button data-moset>змінити</button></div>
       ${earn?`<div class="mo-m"><span class="mo-m-r"><span>Заробити</span><span>${moMoney(inc)} / ${moMoney(earn)}</span></span>${bar(inc,earn,'in')}</div>`:''}
       ${spend?`<div class="mo-m"><span class="mo-m-r"><span>Витратити не більше</span><span>${moMoney(out)} / ${moMoney(spend)}</span></span>${bar(out,spend,out>spend?'over':'out')}</div>`:''}
       ${save?`<div class="mo-m"><span class="mo-m-r"><span>🏆 Відкласти на призи</span><span>${moMoney(svd)} / ${moMoney(save)}</span></span>${bar(svd,save,'sv')}</div>`:''}
-      ${mark>0&&mark<100?`<small class="mo-note">риска — скільки місяця минуло (${mark}%)</small>`:''}</div>`;
+      ${mark>0&&mark<100?`<small class="mo-note">риска — скільки місяця минуло (${mark}%)</small>`:''}${catsH}</div>`;
+  }
+  /* куди пішли гроші: смужка з 5 найбільших категорій + «з конвертів / з вільних» (12.10.2026) */
+  const MO_CAT_COLORS=['#7c93ff','#f6b04f','#5fd49c','#fb923c','#c48cff'];
+  function moCatsHTML(cats,out){
+    if(!(out>0)||!cats.length) return '';
+    const top=cats.slice(0,4), rest=cats.slice(4).reduce((s,c)=>s+c.sum,0);
+    if(rest>0) top.push({label:'Інше',sum:rest});
+    const fromEnv=cats.filter(c=>c.env).reduce((s,c)=>s+c.sum,0);
+    const pct=v=>Math.max(1,Math.round(v/out*100));
+    return `<div class="mo-cats" role="img" aria-label="Витрати за категоріями: ${esc(top.map(c=>c.label+' '+money(c.sum)).join(', '))}">
+        <span class="mo-seg">${top.map((c,i)=>`<i style="width:${pct(c.sum)}%;background:${MO_CAT_COLORS[i%MO_CAT_COLORS.length]}"></i>`).join('')}</span>
+        <span class="mo-leg">${top.map((c,i)=>`<span><i style="background:${MO_CAT_COLORS[i%MO_CAT_COLORS.length]}"></i>${esc(c.label.length>18?c.label.slice(0,17)+'…':c.label)} <b>${moMoney(c.sum)}</b></span>`).join('')}</span>
+      </div>${fromEnv>0?`<small class="mo-note">з конвертів ${moMoney(fromEnv)} · з вільних ${moMoney(out-fromEnv)}</small>`:''}`;
   }
   function moCalHTML(ym){
     const td=ymdLocal(), first=new Date(ym+'-01T12:00:00'), lead=(first.getDay()+6)%7, dim=moDim(ym);

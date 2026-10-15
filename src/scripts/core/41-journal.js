@@ -708,8 +708,8 @@
     const done=bl.filter(b=>b.done);
     const moved=[...new Set(done.map(jnBlockGoal).filter(Boolean))].map(gById).filter(Boolean);
     const h=jnHero(), en=h.energy&&typeof h.energy[ds]==='number'?h.energy[ds]:null;
-    let ops=[]; try{ ops=walletOps().filter(o=>o&&o.date===ds&&!o._tr); }catch(_){}   // обмін і перекази — не витрати дня
-    const inS=ops.filter(o=>o.type==='in').reduce((s,o)=>s+(+o.amount||0),0), outS=ops.filter(o=>o.type!=='in').reduce((s,o)=>s+(+o.amount||0),0);
+    // те саме правило, що в Гаманці (wlAgg): витрати з конвертів — так, поповнення конверта, обмін і перекази — ні
+    let inS=0, outS=0; try{ const a=wlAgg(wlDayOps(ds)); inS=a.inc; outS=a.out; }catch(_){}
     let dia=''; try{ const e=diaryEntries[ds]; if(e&&e.text&&e.text.trim()) dia=e.text.trim(); }catch(_){}
     const d=new Date(ds+'T12:00:00');
     // календар місяця

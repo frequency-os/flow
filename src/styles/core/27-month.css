@@ -43,6 +43,14 @@
   .mo-note{font-size:11.5px;color:var(--muted);}
   .mo-fact{display:flex;gap:14px;font-size:13px;color:var(--muted);}
   .mo-fact b{color:var(--text);font-variant-numeric:tabular-nums;}
+  /* куди пішли гроші (moCatsHTML) */
+  .mo-cats{display:flex;flex-direction:column;gap:7px;}
+  .mo-seg{display:flex;gap:2px;height:8px;border-radius:5px;overflow:hidden;background:color-mix(in srgb,var(--line) 70%,transparent);}
+  .mo-seg i{display:block;height:100%;}
+  .mo-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);}
+  .mo-leg span{display:inline-flex;align-items:center;gap:5px;min-width:0;}
+  .mo-leg i{width:8px;height:8px;border-radius:2px;flex:none;}
+  .mo-leg b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;}
   .mo-set{all:unset;cursor:pointer;box-sizing:border-box;display:block;text-align:center;min-height:44px;padding:12px;font-size:14px;font-weight:800;color:var(--accent);
     border:1px dashed var(--line);border-radius:14px;}
 

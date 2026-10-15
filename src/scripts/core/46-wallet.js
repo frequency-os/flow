@@ -8,6 +8,19 @@
   const wlState={tab:'overview'};
   function wlYm(){ return ymdLocal().slice(0,7); }
   function wlMonthOps(ym){ return (finOps||[]).filter(o=>o&&String(o.date||'').slice(0,7)===ym&&!String(o.id||'').startsWith('start_')); }
+  /* «Скільки зароблено й витрачено» — ОДНЕ правило для всіх екранів (12.10.2026): wlAgg(wlMonthOps(ym)) / wlAgg(wlDayOps(ds)).
+     Витрати з конвертів рахуються, поповнення конвертів, перекази й стартовий залишок — ні.
+     Раніше Журнал брав walletOps() (це про баланс, без витрат з конвертів) і за листопад показував 700 ₴ замість 12 802 ₴. */
+  function wlDayOps(ds){ return (finOps||[]).filter(o=>o&&o.date===ds&&!String(o.id||'').startsWith('start_')); }
+  // витрати місяця по категоріях: конверт → місія → «Інше»; [{k, label, sum, env}] за спаданням
+  function wlMonthCats(ym){
+    const m=new Map();
+    wlMonthOps(ym).forEach(o=>{ if(!_isRealExpense(o)) return;
+      const g=wlGoal(o.goalId), env=String(o.env||'');   // поповнення конверта сюди не доходить — _isRealExpense його відкидає
+      const k=env?'e:'+env:(g?'g:'+g.id:'x'), label=env||(g?String(g.name||'Місія'):'Інше');
+      const c=m.get(k)||{k,label,sum:0,env:!!env}; c.sum+=+o.amount||0; m.set(k,c); });
+    return [...m.values()].sort((a,b)=>b.sum-a.sum);
+  }
   function wlGoal(id){ return id?(goalsData.goals||[]).find(g=>g&&String(g.id)===String(id))||null:null; }
   function wlMissions(){ return (goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)!=='archive').sort((a,b)=>(jnRole(a)==='main'?0:1)-(jnRole(b)==='main'?0:1)); }
   function wlMoney(n){ return money(n); }   // головна валюта (08-finance.js)
