@@ -342,7 +342,6 @@
     if(!fk){ host.innerHTML=''; host.hidden=true; if(add) add.hidden=true; try{ lkAsideSync(); lkViewApply(''); }catch(_){} return; }
     if(add) add.hidden=false;
     const list=chatsForFolder(fk).map(c=>({c,last:chatLast(c)})).sort((a,b)=>(b.last?b.last.at:b.c.at)-(a.last?a.last.at:a.c.at));
-    host.hidden=false;
     // папка — чиста нотатка (16.10.2026): «Документ · Стрічка» і «Звʼязки» переїхали в меню ⋯ (16-dashboard.js),
     // рядок сусідніх папок «Папки ›» прибрано — свої папки живуть усередині
     host.innerHTML=pgSubHTML(fk)+(!list.length?'':`<div class="pgl-box"><div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
@@ -350,6 +349,7 @@
         <span class="pgl-av">${esc(c.emoji||'💬')}</span>
         <span class="pgl-body"><b data-i18n-skip="1">${esc(c.name)}</b><small data-i18n-skip="1">${esc(chatPreview(last&&last.b))}</small></span>
         <small class="pgl-time">${chatTimeLabel(last?last.at:0)}</small></button>`).join('')+`</div>`);
+    host.hidden=!host.innerHTML;   // нема підпапок і чатів — без порожньої смужки під назвою
     host.querySelectorAll('[data-pgchat]').forEach(b=>b.onclick=()=>goChat(b.dataset.pgchat,{from:'page',key:fk}));
     host.querySelectorAll('[data-pgsub]').forEach(b=>b.onclick=()=>{ const ck=b.dataset.pgsub;
       if(typeof groupKids==='function' && groupKids(ck).length && typeof openGroupAsChosen==='function'){ openGroupAsChosen(ck,fk); return; }
