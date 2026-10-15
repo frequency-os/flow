@@ -826,8 +826,8 @@
     top.__pgb=true; top.classList.add('pgb-v2');
     const up=document.getElementById('pgCrumbUp'), nm=document.getElementById('pgCrumbName'), more=document.getElementById('pgMoreBtn');
     if(up) up.onclick=()=>{ const f=folders[pgBarFolder()]; const p=f&&f.parent;
-      if(p&&folders[p]&&folders[p].gview==='folder'){ goFolder(p); return; }   // «як папка» — вгору в документ групи
-      goHome(); if(p&&folders[p]) setTimeout(()=>openGroupAsChosen(p),60); };
+      if(p&&folders[p]){ goFolder(p); return; }   // вгору — у документ папки-батька (16.10.2026, «папка-нотатка»)
+      goHome(); };
     if(nm) nm.onclick=pgBarSwitchSheet;
     if(more) more.onclick=pgBarMoreSheet;
     // шлях і назва оновлюються при кожному відкритті документа

@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 91 |
-| Рядків JS | 33642 |
+| Рядків JS | 33705 |
 | Файлів CSS | 47 |
-| Рядків CSS | 10550 |
-| Сутностей верхнього рівня | 2438 |
+| Рядків CSS | 10580 |
+| Сутностей верхнього рівня | 2439 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -94,7 +94,7 @@
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 769 | 49 |
-| `src/scripts/page-editor/03-premium-pack.js` | 771 | 42 |
+| `src/scripts/page-editor/03-premium-pack.js` | 834 | 43 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
@@ -127,7 +127,7 @@
 | `src/styles/13-planner.css` | 82 | 0 |
 | `src/styles/15-month.css` | 227 | 2 |
 | `src/styles/16-mx.css` | 242 | 2 |
-| `src/styles/17-horizon.css` | 246 | 1 |
+| `src/styles/17-horizon.css` | 244 | 1 |
 | `src/styles/18-standalone.css` | 43 | 1 |
 | `src/styles/19-themes-flat.css` | 408 | 3 |
 | `src/styles/20-depth.css` | 129 | 8 |
@@ -135,7 +135,7 @@
 | `src/styles/22-more-screen.css` | 181 | 0 |
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1104 | 9 |
+| `src/styles/core/02-page-editor.css` | 1136 | 9 |
 | `src/styles/core/03-folders-projects.css` | 665 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -2740,7 +2740,7 @@
 | `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:701` |
 | `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:710` |
 
-### `src/scripts/page-editor/03-premium-pack.js` — 42 сутностей
+### `src/scripts/page-editor/03-premium-pack.js` — 43 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2783,9 +2783,10 @@
 | `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:719` |
 | `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:722` |
 | `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:741` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:750` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:751` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:756` |
+| `pgAddViaMenu` | функція | `src/scripts/page-editor/03-premium-pack.js:742` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:813` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:814` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:819` |
 
 ### `src/scripts/page-editor/04-table.js` — 26 сутностей
 

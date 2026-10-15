@@ -739,12 +739,75 @@
 
   // ── кнопка «+ Додати блок»: створює порожній рядок і одразу відкриває меню ──
   var addBtn=document.getElementById('pgAddBlock');
-  if(addBtn) addBtn.onclick=function(){
+  function pgAddViaMenu(){
     if(!bridge())return;
     var nb={id:uid(),type:'note',text:''};
     pgResolve().arr.push(nb); save(); render();
     slashCtx=nb.id; openSlash(); pgAddPending=nb.id;
-  };
+  }
+  if(addBtn) addBtn.onclick=pgAddViaMenu;
+
+  /* ── Нижнє поле документа (16.10.2026, «папка-нотатка» етап 3) ──
+     «＋» — усі блоки (те саме меню, що й «＋ Додати блок»); поле — швидкий запис у кінець документа.
+     За «›» — Текст · Завдання · Список; вибір ховає іконки. Enter / ↑ — додати, курсор лишається в полі. */
+  (function(){
+    var box=document.getElementById('pgComposer'); if(!box) return;
+    var inp=document.getElementById('pgcInput'), send=document.getElementById('pgcSend'),
+        chev=document.getElementById('pgcChev'), modes=document.getElementById('pgcModes'),
+        scr=document.getElementById('scr-page');
+    var MODE_PH={note:'Нотатка…', task:'Нове завдання…', bullet:'Пункт списку…'};
+    var mode='note';
+    function setMode(m){
+      mode=MODE_PH[m]?m:'note'; inp.placeholder=MODE_PH[mode];
+      modes.querySelectorAll('[data-pgcmode]').forEach(function(b){ var on=b.dataset.pgcmode===mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); });
+      chev.dataset.mode=mode;
+    }
+    function tools(open){ modes.hidden=!open; chev.classList.toggle('open',open); chev.setAttribute('aria-expanded',open); }
+    function grow(){ inp.style.height='auto'; inp.style.height=Math.min(120,inp.scrollHeight)+'px'; send.disabled=!inp.value.trim(); }
+    function add(){
+      var t=inp.value.trim(); if(!t||!bridge()) return;
+      var arr=pgResolve().arr, last=arr[arr.length-1], nb;
+      if(last&&last.type==='note'&&!String(last.text||'').trim()&&!(last.children&&last.children.length)){
+        // порожній рядок у кінці («Пишіть…») — заповнюємо його, а не ставимо запис після нього
+        nb=last; var was={type:last.type,text:last.text,done:last.done};
+        nb.type=mode; nb.text=t; if(mode==='task') nb.done=false;
+        pushOp(function(){ nb.type=was.type; nb.text=was.text; if(was.done==null) delete nb.done; else nb.done=was.done; },function(){ nb.type=mode; nb.text=t; if(mode==='task') nb.done=false; });
+      } else {
+        nb={id:uid(),type:mode,text:t}; if(mode==='task') nb.done=false;
+        arr.push(nb);
+        pushOp(function(){ var i=arr.indexOf(nb); if(i>=0) arr.splice(i,1); },function(){ if(arr.indexOf(nb)<0) arr.push(nb); });
+      }
+      save(); render();
+      inp.value=''; grow(); inp.focus();
+      var rb=editor.querySelector('.pgb[data-id="'+nb.id+'"]');
+      if(rb){ try{ rb.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} rb.classList.add('pg-born'); setTimeout(function(){ try{ rb.classList.remove('pg-born'); }catch(_){} },900); }
+    }
+    document.getElementById('pgcPlus').onclick=function(){ tools(false); pgAddViaMenu(); };
+    chev.onclick=function(){ tools(modes.hidden); };
+    modes.querySelectorAll('[data-pgcmode]').forEach(function(b){ b.onclick=function(){ setMode(b.dataset.pgcmode); tools(false); inp.focus(); }; });
+    inp.addEventListener('input',grow);
+    inp.addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); add(); } });
+    send.onclick=add;
+    setMode('note');
+    // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі
+    var vv=window.visualViewport;
+    if(vv){ var kb=function(){ if(!scr.classList.contains('active')){ box.style.bottom=''; return; }
+        var h=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); box.style.bottom = h>120 ? (h+8)+'px' : ''; };
+      vv.addEventListener('resize',kb); vv.addEventListener('scroll',kb); }
+    // видно лише в документі (і не в «Стрічці» папки); на ноутбуці — по ширині колонки документа
+    function sync(){
+      var on=scr.classList.contains('active')&&!scr.classList.contains('lk-feedmode')&&!!bridge();
+      box.hidden=!on; scr.classList.toggle('pgc-on',on); document.body.classList.toggle('pgc-live',on);
+      if(!on) return;
+      var doc=scr.querySelector('.pg-doc'); if(!doc) return;
+      if(window.innerWidth>=1024){ var r=doc.getBoundingClientRect(); box.style.left=(r.left+12)+'px'; box.style.width=Math.max(240,r.width-24)+'px'; }
+      else { box.style.left=''; box.style.width=''; }
+    }
+    try{ new MutationObserver(sync).observe(scr,{attributes:true,attributeFilter:['class']}); }catch(_){}
+    try{ var docEl=scr.querySelector('.pg-doc'); if(docEl&&window.ResizeObserver) new ResizeObserver(sync).observe(docEl); }catch(_){}   // ноутбук: панель «Звʼязки» звужує колонку
+    window.addEventListener('resize',sync);
+    sync();
+  })();
 
   // ── віджет «Відлік»: живий циферблат ──
   var CD_MONTHS=['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];

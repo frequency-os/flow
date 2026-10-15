@@ -723,6 +723,20 @@
       <div id="pgEditor" data-i18n-skip="1"></div>
       <button class="pg-addblock" id="pgAddBlock">＋ Додати блок</button>
     </div>
+    <!-- нижнє поле документа (16.10.2026): «＋» — усі блоки; поле — швидкий запис (Текст · Завдання · Список за «›») -->
+    <div class="pgc" id="pgComposer" hidden>
+      <button class="pgc-plus" id="pgcPlus" aria-label="Додати блок: фото, картка, таблиця, підпапки…"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <div class="pgc-field">
+        <button class="pgc-chev" id="pgcChev" aria-label="Що пишу: текст, завдання чи список" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+        <div class="pgc-modes" id="pgcModes" role="group" aria-label="Що пишу" hidden>
+          <button data-pgcmode="note" aria-label="Текст" title="Текст"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M12 6v13"/></svg></button>
+          <button data-pgcmode="task" aria-label="Завдання" title="Завдання"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></button>
+          <button data-pgcmode="bullet" aria-label="Список" title="Список"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><circle cx="5" cy="6" r="1.2"/><circle cx="5" cy="12" r="1.2"/><circle cx="5" cy="18" r="1.2"/></svg></button>
+        </div>
+        <textarea class="pgc-input" id="pgcInput" rows="1" placeholder="Нотатка…" enterkeyhint="send" aria-label="Новий запис у документ"></textarea>
+        <button class="pgc-send" id="pgcSend" aria-label="Додати в документ" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+      </div>
+    </div>
 
   </section>
 

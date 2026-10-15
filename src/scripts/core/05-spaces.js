@@ -61,8 +61,8 @@
       window.__fgNext=null;
       window.__flowExitPage=function(){
         try{ if(typeof goHome==='function'){ goHome();
-          if(fgBack && folders[fgBack] && folders[fgBack].gview==='folder'){ goFolder(fgBack); return; }   // група «як папка» — назад у її документ
-          if(fgBack && folders[fgBack] && typeof window.openGroupAsChosen==='function') setTimeout(()=>{ try{ window.openGroupAsChosen(fgBack); }catch(_){} },60);
+          // «назад» — як у Telegram (16.10.2026): з підпапки у документ папки-батька (раніше — Огляд + шторка групи)
+          if(fgBack && folders[fgBack]){ goFolder(fgBack); return; }
           return; } }catch(_){}
         if(window.__show)window.__show('scr-home'); };
       window.openFlowPage(opts||null);
