@@ -775,6 +775,8 @@
     const live=!!(mic&&mic.classList.contains('live'));
     const wideOn=document.getElementById('scr-page').classList.contains('pg-wide');
     const hasCond=pgBarHasCond(), hidOn=!!(hid&&hid.classList.contains('on'));
+    const hasCov=document.getElementById('scr-page').classList.contains('pg-hascov');
+    const feed=!!fk&&lkView[fk]==='feed';   // «Документ · Стрічка» (54-links.js)
     const r=(act,ic,t,sub,dis)=>`<button class="fmi pgb-row" data-pgm="${act}"${dis?' disabled':''}><span class="pgb-ic" aria-hidden="true">${ic}</span><span class="pgb-tx">${t}${sub?`<small class="fmi-sub">${sub}</small>`:''}</span></button>`;
     fgSheet(`<div class="fmenu-grip"></div>
       ${fk?`<div class="fmenu-title" data-i18n-skip="1">${esc(folders[fk].name)}</div>`:''}
@@ -787,7 +789,12 @@
         <button data-pgth="auto" class="${theme==='auto'?'on':''}" aria-pressed="${theme==='auto'}">Як застосунок</button>
         <button data-pgth="ink" class="${theme==='ink'?'on':''}" aria-pressed="${theme==='ink'}">Темна</button>
         <button data-pgth="paper" class="${theme==='paper'?'on':''}" aria-pressed="${theme==='paper'}">Світла</button></div>
+      ${r('cover','🖼',hasCov?'Обкладинка':'Додати обкладинку',hasCov?'змінити, зсунути чи прибрати':'фото або колір над назвою')}
       ${fk?`<div class="fmi-label">Папка</div>
+      <div class="pgb-seg" role="group" aria-label="Вигляд папки">
+        <button data-lkv="doc" class="${feed?'':'on'}" aria-pressed="${!feed}">Документ</button>
+        <button data-lkv="feed" class="${feed?'on':''}" aria-pressed="${feed}">Стрічка</button></div>
+      ${r('links','🔗','Звʼязки','місія, звичка, час, календар, гроші, чати')}
       ${r('chats','💬','Чати папки','повʼязати новий чи наявний чат','')}
       ${r('fmenu','⚙︎','Налаштування папки','назва, колір, група, видалення','')}`:''}`,
     m=>{
@@ -798,8 +805,14 @@
         if(a==='mic') run(()=>mic&&mic.click());
         if(a==='wide') run(()=>wide&&wide.click());
         if(a==='hid') run(()=>hid&&hid.click());
+        if(a==='cover') run(()=>{ const c=document.querySelector('#pgCover [data-covopen]'); if(c) c.click(); });
+        if(a==='links') run(()=>lkSheet(fk));
         if(a==='chats') run(()=>{ const pa=document.getElementById('pgAddLink'); if(pa) pa.click(); });
         if(a==='fmenu') run(()=>openFolderMenu(fk));
+      });
+      m.querySelectorAll('[data-lkv]').forEach(b=>b.onclick=()=>{
+        lkView[fk]=b.dataset.lkv; try{ renderPgLinks(); }catch(_){}
+        m.querySelectorAll('[data-lkv]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
       });
       m.querySelectorAll('[data-pgth]').forEach(b=>b.onclick=()=>{
         if(b.dataset.pgth==='auto'){ try{ window.__pgThemeAuto&&window.__pgThemeAuto(); }catch(_){} }

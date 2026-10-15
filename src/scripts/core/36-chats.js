@@ -343,25 +343,22 @@
     if(add) add.hidden=false;
     const list=chatsForFolder(fk).map(c=>({c,last:chatLast(c)})).sort((a,b)=>(b.last?b.last.at:b.c.at)-(a.last?a.last.at:a.c.at));
     host.hidden=false;
-    host.innerHTML=lkSwitchHTML(fk)+lkSegHTML(fk)+pgSubHTML(fk)+pgHubHTML(fk,list.length)+(!list.length?'':`<div class="pgl-box"><div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
+    // папка — чиста нотатка (16.10.2026): «Документ · Стрічка» і «Звʼязки» переїхали в меню ⋯ (16-dashboard.js),
+    // рядок сусідніх папок «Папки ›» прибрано — свої папки живуть усередині
+    host.innerHTML=pgSubHTML(fk)+(!list.length?'':`<div class="pgl-box"><div class="pgl-head"><span>💬</span>Чати папки · ${list.length}</div>`+list.map(({c,last})=>
       `<button class="pgl-row" data-pgchat="${esc(c.id)}" style="--cc:${safeColor(c.c,'var(--accent)')}">
         <span class="pgl-av">${esc(c.emoji||'💬')}</span>
         <span class="pgl-body"><b data-i18n-skip="1">${esc(c.name)}</b><small data-i18n-skip="1">${esc(chatPreview(last&&last.b))}</small></span>
         <small class="pgl-time">${chatTimeLabel(last?last.at:0)}</small></button>`).join('')+`</div>`);
     host.querySelectorAll('[data-pgchat]').forEach(b=>b.onclick=()=>goChat(b.dataset.pgchat,{from:'page',key:fk}));
-    host.querySelectorAll('[data-pghub]').forEach(b=>b.onclick=()=>pgHubOpen(fk,b.dataset.pghub));
     host.querySelectorAll('[data-pgsub]').forEach(b=>b.onclick=()=>{ const ck=b.dataset.pgsub;
       if(typeof groupKids==='function' && groupKids(ck).length && typeof openGroupAsChosen==='function'){ openGroupAsChosen(ck,fk); return; }
       window.__fgNext=fk; goFolder(ck); window.__fgNext=null; });
     const sn=host.querySelector('[data-pgsubnew]'); if(sn) sn.onclick=()=>createFolder(fk);
-    { const lb=host.querySelector('[data-pglinks]'); if(lb) lb.onclick=()=>lkSheet(fk); }   // «Звʼязки папки» (54-links.js)
-    try{ lkAsideSync(); }catch(_){}   // ноутбук: та сама панель праворуч
-    try{ lkSwitchBind(host,fk); lkSegBind(host,fk); lkViewApply(fk); }catch(_){}   // «Документ · Стрічка» (54-links.js)
+    try{ lkAsideSync(); }catch(_){}   // ноутбук: «Звʼязки» панеллю праворуч
+    try{ lkViewApply(fk); }catch(_){}   // «Документ · Стрічка» — вибір у меню ⋯ (54-links.js)
   }
-  /* ── Хаб звʼязків під назвою документа (Д3, 10.10.2026): Гроші · Час · Місія · Чати.
-     Лише читає те, що вже позначено папкою (op.folderKey, блок Планера folder, goal.folderKey,
-     chat.folders) — формат даних не змінюється. Тап — та шторка, де цим керують. */
-  /* ── підпапки папки рядом плиток над хабом (10.10.2026): видно, лише коли вони є,
+  /* ── підпапки папки рядом плиток під назвою (10.10.2026): видно, лише коли вони є,
      або коли групу відкривають «як папку». Тап — підпапка, «＋» — нова всередині. */
   function pgSubHTML(fk){
     let kids=[]; try{ kids=typeof groupKids==='function'?groupKids(fk):[]; }catch(_){}
@@ -371,6 +368,7 @@
     return `<div class="pg-subs"><div class="pgs-head"><span>Підпапки · ${kids.length}</span><button class="pgs-new" data-pgsubnew>＋ Підпапка</button></div>
       <div class="pgs-row">${kids.map(t).join('')}</div></div>`;
   }
+  // гроші, час, місія й чати папки — для рядка «Гроші» у «Звʼязках» (54-links.js)
   function pgHubData(fk){
     const d={money:null, time:0, mission:null, chats:0};
     try{ const ops=wlMonthOps(wlYm()).filter(o=>inFolderOp(o,fk)).filter(opMain);   // своя мітка або місія папки (54-links.js)
@@ -379,26 +377,6 @@
     try{ const g=wgFolderMission(fk); if(g) d.mission={g, pct:jnPct(g)}; }catch(_){}
     try{ d.chats=chatsForFolder(fk).length; }catch(_){}
     return d;
-  }
-  function pgHubHTML(fk,nChats){
-    const d=pgHubData(fk);
-    const card=(k,ic,lab,val,dim)=>`<button class="pgh-c${dim?' dim':''}" data-pghub="${k}"><span class="pgh-ic">${fmIc(ic)}</span><small>${lab}</small><b>${val}</b></button>`;
-    const m=d.money==null?'—':((d.money>0?'+':d.money<0?'−':'')+esc(moneyK(Math.abs(d.money))));
-    return `<div class="pgh-head"><span>Звʼязки</span><button data-pglinks>Усі звʼязки ›</button></div><div class="pg-hub" role="group" aria-label="Звʼязки папки">`
-      +card('money','money','Гроші',m,d.money==null)
-      +card('time','cal',d.time?'Сьогодні':'Час',d.time?String(d.time):'—',!d.time)   // «1 сьогодні» не влазило в плитку
-      +card('mission','target','Місія',d.mission?(d.mission.pct+'%'):'—',!d.mission)
-      +card('chats','chat','Чати',nChats?String(nChats):'—',!nChats)
-      +`</div>`;
-  }
-  function pgHubOpen(fk,k){
-    try{
-      if(k==='money') wlFolderSheet(fk);
-      else if(k==='time') plFolderDaySheet(fk);
-      else if(k==='chats') folderAddSheet(fk);
-      else if(k==='mission'){ const g=wgFolderMission(fk);
-        if(g) moMissionPage(g); else plToast('Місію з папкою повʼязують у редакторі місії: «Папка місії»'); }
-    }catch(e){ console.error('pgHub',e); }
   }
   function folderAddSheet(fk){
     const f=folders[fk]; if(!f) return;

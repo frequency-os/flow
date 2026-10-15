@@ -150,7 +150,7 @@
       ${card('chats','💬','Чати',ch,chs.length?'':'＋ Привʼязати')}</div>`;
   }
 
-  /* ════════ «Стрічка папки» (нічний макет №3, 10.10.2026): перемикач «Документ · Стрічка» над документом.
+  /* ════════ «Стрічка папки» (нічний макет №3, 10.10.2026): вибір «Документ · Стрічка» у меню ⋯ документа (16-dashboard.js).
      Стрічка — усе, що сталось у папці за 30 днів, по днях: записи Гаманця, виконані блоки Планера, позначки звички,
      події календаря, повідомлення привʼязаних чатів, нові записи документа. Лише читання; режим — у памʼяті. ── */
   const lkView={};   // fk → 'doc' | 'feed' (не зберігається)
@@ -181,8 +181,6 @@
       h+=`<div class="lkf-it ${x.cls}"><span class="lkf-ic">${esc(x.ic)}</span><span class="lkf-tx"><b data-i18n-skip="1">${esc(String(x.title).slice(0,80))}</b>${x.sub?`<small data-i18n-skip="1">${esc(String(x.sub).slice(0,120))}</small>`:''}</span></div>`; });
     return h+'</div>';
   }
-  function lkSegHTML(fk){ const v=lkView[fk]==='feed'?'feed':'doc';
-    return `<div class="lkv-seg" role="tablist" aria-label="Вигляд папки"><button role="tab" data-lkview="doc" aria-selected="${v==='doc'}" class="${v==='doc'?'on':''}">Документ</button><button role="tab" data-lkview="feed" aria-selected="${v==='feed'}" class="${v==='feed'?'on':''}">Стрічка</button></div>`; }
   // показати / сховати документ і стрічку; викликається з renderPgLinks
   function lkViewApply(fk){
     const scr=document.getElementById('scr-page'); if(!scr) return;
@@ -193,9 +191,6 @@
     if(!on){ if(feed) feed.remove(); if(ed) ed.hidden=false; return; }
     if(!feed){ feed=document.createElement('div'); feed.id='lkFeed'; if(host&&host.parentNode) host.parentNode.insertBefore(feed,host.nextSibling); else scr.appendChild(feed); }
     feed.innerHTML=lkFeedHTML(fk); if(ed) ed.hidden=true;
-  }
-  function lkSegBind(root,fk){
-    root.querySelectorAll('[data-lkview]').forEach(b=>b.onclick=()=>{ lkView[fk]=b.dataset.lkview; try{ renderPgLinks(); }catch(_){} });
   }
 
   /* ════════ Дерево папок у бічному меню ноутбука (нічний макет №8) ════════
@@ -281,27 +276,3 @@
   try{ window.addEventListener('resize',()=>{ clearTimeout(window.__dsbRz); window.__dsbRz=setTimeout(dsbTreeSync,200); }); }catch(_){}
   try{ document.addEventListener('flowsync',()=>{ try{ dsbTreeSync(); }catch(_){} }); }catch(_){}
 
-  /* ════════ Перемикач папок у шапці документа (12.10.2026, макет «перемикач зверху») ════════
-     Сусідні папки (та сама група, або верхній рівень) чипами + «＋ Папка»; над ними — група «Навчання ›».
-     Лише навігація; нова папка — звичайний createFolder (дія людини). */
-  function lkSwitchHTML(fk){
-    const f=folders[fk]; if(!f) return '';
-    const par=f.parent&&folders[f.parent]?f.parent:'';
-    const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k))&&k!=='work';
-    let sib=[]; try{ sib=(par?childFolderKeys(par):topFolderKeys()).filter(vis); }catch(_){ return ''; }
-    if(sib.length<2&&!par) return '';
-    const chip=k=>{ const x=folders[k]; return `<button class="lks-c${k===fk?' on':''}" data-lksw="${esc(k)}" style="--c:${safeColor(x.c,'#6a7dff')}"${k===fk?' aria-current="page"':''}><span class="lks-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(x))}"/></svg></span><span data-i18n-skip="1">${prioDot(k)}${esc(String(x.name||'Папка').slice(0,28))}</span></button>`; };
-    return `<div class="lks"><button class="lks-grp" data-lksgrp="${esc(par)}">${par?`<span data-i18n-skip="1">${esc(String(folders[par].name||'Група').slice(0,30))}</span>`:'Папки'} ›</button>
-      <div class="lks-row">${sib.slice(0,40).map(chip).join('')}<button class="lks-c add" data-lksnew="${esc(par)}">＋ Папка</button>${par?'':`<button class="lks-c add" data-lksgroup="${esc(fk)}">⊞ У групу</button>`}</div></div>`;
-  }
-  function lkSwitchBind(root,fk){
-    root.querySelectorAll('[data-lksw]').forEach(b=>b.onclick=()=>{ const k=b.dataset.lksw; if(k===fk||!folders[k]) return;
-      try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ openGroupAsChosen(k); return; } }catch(_){}
-      try{ goFolder(k); }catch(_){} });
-    root.querySelectorAll('[data-lksgrp]').forEach(b=>b.onclick=()=>{ const p=b.dataset.lksgrp;
-      if(p&&folders[p]){ try{ openGroupAsChosen(p); }catch(_){ try{ goFolder(p); }catch(__){} } } else { try{ goHome(); }catch(_){} } });
-    root.querySelectorAll('[data-lksnew]').forEach(b=>b.onclick=()=>{ const p=b.dataset.lksnew;
-      try{ createFolder(p&&folders[p]?p:'',{onCreated:k=>{ try{ goFolder(k); }catch(_){} }}); }catch(_){} });
-    root.querySelectorAll('[data-lksgroup]').forEach(b=>b.onclick=()=>{ try{ openFolderMerge(b.dataset.lksgroup); }catch(_){} });
-    const on=root.querySelector('.lks-c.on'); if(on){ try{ on.scrollIntoView({block:'nearest',inline:'center'}); }catch(_){} }
-  }
