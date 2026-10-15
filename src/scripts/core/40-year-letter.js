@@ -141,7 +141,7 @@
       else if(a==='behind') ylAskFlow('Я відстаю з віхами цього місяця в «Дорозі року». Подивись мої цілі й віхи: що перенести на наступний місяць або спростити, щоб встигнути? Запропонуй, але без моєї згоди нічого не змінюй.');
     });
     root.querySelectorAll('[data-yms]').forEach(b=>ylPress(b,
-      ()=>{ const f=ylFindMs(b.dataset.yms); if(!f) return; f.m.done=!f.m.done; saveGoals(); renderGoals();
+      ()=>{ const f=ylFindMs(b.dataset.yms); if(!f) return; jnMsSetDone(f.m,!f.m.done); saveGoals(); renderGoals();
         try{ if(f.m.done) window.platform.haptic('light'); }catch(_){} },
       ()=>{ const f=ylFindMs(b.dataset.yms); if(!f) return;
         actionSheet({title:f.m.t, sub:(f.gl.emoji||'🎯')+' '+(f.gl.name||'')+' · '+ylMonName(f.m.ym), items:[

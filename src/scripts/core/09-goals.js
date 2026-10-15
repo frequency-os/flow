@@ -371,12 +371,11 @@
     if(!gl.track) gl.track={};
     const allDone = list.length>0 && list.every(it=>it.done);
     if(allDone){
+      // день закрито → лише клітинка трекера. Авто-кроків «✅ День закрито» більше не пишемо (12.10.2026):
+      // перевірка if(!gl._autoStep) пускала їх раз за життя цілі, а один такий «крок» давав місії без кроків 100%.
+      // Ритм днів видно з трекера й з jnRhythm (41-journal.js); старі авто-кроки лишаються в даних, але не рахуються.
       gl.track[ds]=true;
-      if(!gl._autoStep){                  // авто-крок додаємо лише один раз на закриття дня
-        if(!gl.steps) gl.steps=[];
-        gl.steps.push({ id:'st_auto_'+Date.now(), name:'✅ День закрито · '+ds, done:true, auto:true });
-        gl._autoStep=ds;
-      }
+      gl._autoStep=ds;   // мітка «цю клітинку засвітив dgSync» — щоб гілка нижче гасила лише її, а не ручні позначки
     } else {
       // якщо день розкрили назад (додали нову ціль) — гасимо клітинку й прибираємо авто-крок цього дня
       if(gl._autoStep===ds){
@@ -512,7 +511,7 @@
     const goalsHtml=g.goals.map(gl=>{
       const steps=(gl.steps||[]).filter(s=>s&&!s.auto);   // старі «✅ День закрито» — журнал днів, не кроки
       const doneSteps=steps.filter(s=>s.done).length;
-      const pct=steps.length?Math.round(doneSteps/steps.length*100):(gl.progress||0);
+      const pct=jnHasMeasure(gl)?jnPct(gl):(gl.progress||0);   // одне правило відсотка з Журналом (41-journal.js)
       const open=!!gl.open;
       const stepsHtml=steps.map(s=>`
         <div class="b-item ${s.done?'done':''}" data-step="${esc(gl.id)}|${esc(s.id)}">
@@ -560,8 +559,7 @@
     let wishStripHtml='';
     if(wishGoals.length){
       const cards=wishGoals.map(gl=>{
-        const steps=gl.steps||[]; const sd=steps.filter(s=>s.done).length;
-        const pct=steps.length?Math.round(sd/steps.length*100):(gl.progress||0);
+        const pct=jnHasMeasure(gl)?jnPct(gl):(gl.progress||0);
         return `<div class="wgs-card" data-wgoal="${esc(gl.id)}" style="background-image:url('${safeImg(gl.wishImg)}')">
           <div class="wgs-ov"></div>
           ${pct>=100?'<div class="wgs-done">✓</div>':''}

@@ -875,7 +875,7 @@
       if(!m) return '⚠️ невиконану віху «'+(inp.t||'')+'» не знайдено. Відкриті віхи: '+(open.slice(0,6).map(x=>x.ym+' '+x.t).join('; ')||'нема');
       const ok=await aiToolConfirm('Відмітити зробленою віху «'+m.t+'» ('+ylMonName(m.ym)+') у цілі «'+(gl.name||'')+'»',{title:'🎯 Frequency хоче змінити ціль'});
       if(!ok) return 'людина скасувала — не повторюй';
-      m.done=true; saveGoals(); try{ renderGoals(); }catch(_){}
+      jnMsSetDone(m,true); saveGoals(); try{ renderGoals(); }catch(_){}   // разом із датою «взято» (41-journal.js) — для «+N днів» у Році
       try{ plToast('🤖 віху зроблено: '+m.t); }catch(_){}
       return 'віху «'+m.t+'» відмічено ✓'+(ylLit(gl)&&gl.sentence?' — речення листа «'+String(gl.sentence).slice(0,80)+'» проявилось':'');
     }

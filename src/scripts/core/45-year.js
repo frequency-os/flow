@@ -22,7 +22,7 @@
   function yrLv(g,q){ const y=yrYear(); return jnLevels(g).filter(m=>m.ym.slice(0,4)===y&&(q<0||moQ(m.ym)===q)); }
   function yrChip(g,m,drag){
     const cls=m.done?'ok':moLate(m,m.ym)?'late':'';
-    return `<button class="yr-lv ${cls}" data-yrlv="${esc(g.id)}|${esc(m.id)}"${drag?' draggable="true"':''} title="${esc(m.t)}">${m.done?'✓ ':''}${esc(m.t)}${!m.done&&m.due?' · '+jnDateTxt(m.due):''}</button>`;
+    return `<button class="yr-lv ${cls}" data-yrlv="${esc(g.id)}|${esc(m.id)}"${drag?' draggable="true"':''} title="${esc(m.t)}">${m.done?'✓ ':''}${esc(m.t)}${!m.done&&m.due?' · '+jnDateTxt(m.due):''}${moLateDays(m)?` <em class="yr-late">+${moLateDays(m)} ${pluralUk(moLateDays(m),'день','дні','днів')}</em>`:''}</button>`;
   }
   function yrPrize(g){
     if(!(g.reward&&String(g.reward.t||'').trim())) return '<span class="yr-mute">—</span>';
@@ -51,7 +51,7 @@
     h+=`<div class="yr-tbl"><div class="yr-th">Місія</div>${MO_Q.map((q,i)=>`<div class="yr-th${i===cq?' cur':''}">${q} кв${i===cq?' · зараз':''}</div>`).join('')}<div class="yr-th">Приз</div><div class="yr-th">Папка · год/тиж</div>`;
     ms.forEach(g=>{
       const c=safeColor(g.color,'#3ec7b4'), fk=typeof moOwnFolder==='function'&&moOwnFolder(g.folderKey)?g.folderKey:'';
-      h+=`<button class="yr-mn" data-yrm="${esc(g.id)}" style="--c:${c}"><span class="yr-em">${safeEmoji(g.emoji,'🎯')}</span><span><b>${esc(g.name||'Місія')}</b><small>${(g.from||g.to)?esc(g.from||'?')+' → '+esc(g.to||'?')+' · ':''}${jnPct(g)}%</small><i class="yr-pg"><u style="width:${jnPct(g)}%"></u></i></span></button>`;
+      h+=`<button class="yr-mn" data-yrm="${esc(g.id)}" style="--c:${c}"><span class="yr-em">${safeEmoji(g.emoji,'🎯')}</span><span><b>${esc(g.name||'Місія')}</b><small>${jnPathTxt(g)?jnPathTxt(g)+' · ':''}${jnPct(g)}%</small><i class="yr-pg"><u style="width:${jnPct(g)}%"></u></i></span></button>`;
       [0,1,2,3].forEach(q=>{ h+=`<div class="yr-cell${q===cq?' cur':''}" data-yrdrop="${esc(g.id)}|${q}" style="--c:${c}">${yrLv(g,q).map(m=>yrChip(g,m,true)).join('')}<button class="yr-add" data-yradl="${esc(g.id)}|${q}" aria-label="Додати рівень у ${MO_Q[q]} квартал">＋</button></div>`; });
       h+=`<div class="yr-cell">${yrPrize(g)}</div><div class="yr-cell yr-mute">${fk?`<button class="yr-fold" data-yrfold="${esc(fk)}">${safeEmoji(folders[fk].emoji,'📁')} ${esc(folders[fk].name||'Папка')}</button>`:'—'}<br>${g.budget&&+g.budget.hWeek?dyNum(+g.budget.hWeek)+' год':''}</div>`;
     });
@@ -70,7 +70,7 @@
       h+=`<div class="yr-mx"><span></span>${MO_Q.map((t,i)=>`<button class="yr-mx-q${i===q?' on':''}${i===cq?' now':''}" data-yrq="${i}">${t}</button>`).join('')}`;
       ms.forEach(g=>{ const c=safeColor(g.color,'#3ec7b4');
         h+=`<span class="yr-mx-n">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'').slice(0,10))}</span>`;
-        [0,1,2,3].forEach(i=>{ const L=yrLv(g,i); h+=`<button class="yr-mx-c${i===q?' on':''}" data-yrq="${i}" style="--c:${c}" aria-label="${esc(g.name||'')}: ${MO_Q[i]} квартал, ${L.filter(m=>m.done).length} з ${L.length}">${L.slice(0,4).map(m=>`<i class="${m.done?'ok':moLate(m,m.ym)?'l':'p'}"></i>`).join('')}${L.length>4?'<small>+'+(L.length-4)+'</small>':''}</button>`; });
+        [0,1,2,3].forEach(i=>{ const L=yrLv(g,i); h+=`<button class="yr-mx-c${i===q?' on':''}" data-yrq="${i}" style="--c:${c}" aria-label="${esc(g.name||'')}: ${MO_Q[i]} квартал, ${L.filter(m=>m.done).length} з ${L.length}">${L.slice(0,4).map(m=>`<i class="${m.done?'ok':moLate(m,m.ym)?'l':'p'}" aria-hidden="true"></i>`).join('')}${L.length>4?'<small>+'+(L.length-4)+'</small>':''}</button>`; });
       });
       h+=`</div><div class="yr-leg"><span><i class="ok"></i>взято</span><span><i class="p"></i>план</span><span><i class="l"></i>прострочено</span></div>`;
     } else {
@@ -98,7 +98,7 @@
   function yrLvMenu(key){
     const {g,m}=yrFind(key); if(!g||!m) return;
     actionSheet({title:m.t, sub:(g.name||'Місія')+' · '+MO_NAMES[+m.ym.slice(5,7)-1].toLowerCase()+(m.due?' · до '+jnDateTxt(m.due):''), items:[
-      {ic:'target', label:m.done?'Зняти «взято»':'Рівень взято ✓', primary:!m.done, onClick:()=>{ m.done=!m.done; saveGoals(); jnRender(); }},
+      {ic:'target', label:m.done?'Зняти «взято»':'Рівень взято ✓', primary:!m.done, onClick:()=>{ jnMsSetDone(m,!m.done); saveGoals(); jnRender(); }},
       {ic:'calendar', label:'В інший квартал', onClick:()=>actionSheet({title:'У який квартал?', sub:m.t, items:[0,1,2,3].filter(i=>i!==moQ(m.ym)).map(i=>({ic:'calendar', label:MO_Q[i]+' квартал', onClick:()=>yrMove(g,m,i)}))})},
       {ic:'edit', label:'Змінити в редакторі місії', onClick:()=>jnEditor(g)} ]});
   }

@@ -71,6 +71,11 @@
     background:var(--field);border:1px solid var(--line);border-radius:12px;padding:9px 11px;}
   .jn-ed input:focus{outline:2px solid var(--accent);outline-offset:0;}
   .jn-row{display:flex;gap:8px;align-items:center;}
+  /* «Оновити число» (jnNumSheet, 12.10.2026) */
+  .jn-num{display:flex;gap:10px;align-items:center;}
+  .jn-num input{flex:1;min-width:0;box-sizing:border-box;min-height:52px;text-align:center;font:inherit;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:14px;}
+  .jn-num button{all:unset;cursor:pointer;width:52px;height:52px;flex:none;display:grid;place-items:center;font-size:24px;font-weight:800;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:14px;}
+  .jn-num button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   .jn-row3{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .jn-emo{flex:0 0 56px;text-align:center;}
   .jn-name{flex:1;}

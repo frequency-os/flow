@@ -18,6 +18,9 @@
   // частка місяця, що минула: для риски на смужках грошей
   function moPassed(ym){ const td=ymdLocal(), cur=td.slice(0,7); if(ym<cur) return 1; if(ym>cur) return 0; return (+td.slice(8))/moDim(ym); }
   function moLate(m,ym){ if(m.done) return false; const td=ymdLocal(); if(m.due) return m.due<td; return ym<td.slice(0,7); }
+  // віху взято ПІЗНІШЕ дати: скільки днів запізнення (0 — вчасно або дату взяття не знаємо — старі віхи без doneAt)
+  function moLateDays(m){ if(!m||!m.done||!/^\d{4}-\d{2}-\d{2}$/.test(m.doneAt||'')||!/^\d{4}-\d{2}-\d{2}$/.test(m.due||'')||m.doneAt<=m.due) return 0;
+    return Math.round((new Date(m.doneAt+'T12:00:00')-new Date(m.due+'T12:00:00'))/86400000); }
   function moMissions(){ return (goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)!=='archive'&&jnRole(g)!=='wait')
     .sort((a,b)=>(jnRole(a)==='main'?0:1)-(jnRole(b)==='main'?0:1)); }
 
@@ -28,7 +31,7 @@
   function moCard(gl,ym){
     const c=safeColor(gl.color,'#3ec7b4'), qs=moQuarters(gl,ym.slice(0,4)), cq=moQ(ym);
     const mlv=jnLevels(gl).filter(m=>m.ym===ym);
-    const path=(gl.from||gl.to)?esc(gl.from||'?')+' → '+esc(gl.to||'?')+' · ':'';
+    const path=jnPathTxt(gl)?jnPathTxt(gl)+' · ':'';
     return `<button class="mo-c" data-mom="${esc(gl.id)}" style="--c:${c}">
       <span class="mo-c-t"><span class="mo-c-em">${safeEmoji(gl.emoji,'🎯')}</span>
         <span class="mo-c-n"><b>${esc(gl.name||'Місія')}</b><small>${path}${jnPct(gl)}%${jnRole(gl)==='main'?' · головна':''}</small></span><span class="mo-c-go" aria-hidden="true">›</span></span>
@@ -134,12 +137,13 @@
         <div class="mo-mp-top"><button data-mpx>‹ Назад</button><button data-mped>Редагувати</button></div>
         <div class="mo-mp-hero"><span class="mo-mp-em">${safeEmoji(g.emoji,'🎯')}</span>
           <small>${jnRole(g)==='main'?'головна місія':'місія'}${g.to?' · мета: '+esc(g.to):''}</small><b>${esc(g.name||'Місія')}</b>
-          <span class="mo-mp-p"><span>${pct}%</span><i><u style="width:${pct}%"></u></i><span>${(g.from||g.to)?esc(g.from||'?')+' → '+esc(g.to||'?'):''}</span></span></div>
+          <span class="mo-mp-p"><span>${pct}%</span><i><u style="width:${pct}%"></u></i><span>${jnPathTxt(g)}${jnNum(g)&&!jnNumIncome(g)?' <button class="mo-mp-num" data-mpnum>＋ оновити</button>':''}</span></span></div>
         <div class="mo-tabs" role="tablist">${[['path','Шлях'],['folder','Папка'],['chats','Чати'+(chats.length?' · '+chats.length:'')]].map(([k,l])=>`<button role="tab" data-mptab="${k}"${tab===k?' class="on" aria-selected="true"':''}>${l}</button>`).join('')}</div>
         <div class="mo-mp-body">${tab==='folder'?moFolderTab(g,fk):tab==='chats'?moChatsTab(g,fk,chats):moPathTab(g)}</div>
       </div>`;
       ov.querySelector('[data-mpx]').onclick=()=>ov.remove();
       ov.querySelector('[data-mped]').onclick=()=>{ ov.remove(); jnEditor(g); };
+      { const nb=ov.querySelector('[data-mpnum]'); if(nb) nb.onclick=()=>jnNumSheet(g,draw); }
       ov.querySelectorAll('[data-mptab]').forEach(b=>b.onclick=()=>{ tab=b.dataset.mptab; draw(); });
       ov.querySelectorAll('[data-mpfolder]').forEach(b=>b.onclick=()=>{ ov.remove(); try{ goFolder(fk); }catch(_){} });
       ov.querySelectorAll('[data-mpchat]').forEach(b=>b.onclick=()=>{ ov.remove(); try{ goChat(b.dataset.mpchat,fk?{from:'page',key:fk}:undefined); }catch(_){} });

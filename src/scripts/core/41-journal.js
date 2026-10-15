@@ -29,11 +29,67 @@
   function jnLevels(gl){
     return ylGoalMs(gl).slice().sort((a,b)=>String(a.due||a.ym+'-99').localeCompare(String(b.due||b.ym+'-99')));
   }
+  /* Відсоток місії — ОДНЕ правило (12.10.2026, «тестовий місяць»):
+     1) число мети: «зараз → мета» — обидва числа (260 з 1000 = 26%; зі стартом numStart — шлях від старту);
+        numSrc 'in_month' | 'in_all' — «зараз» = скільки доходів записано до місії (+1 за кожен продаж);
+     2) рівні (віхи) — частка взятих;
+     3) кроки — БЕЗ авто-позначок «✅ День закрито» (то журнал днів, а не крок: через них англійська мала 100% за 1 день);
+     4) нічого з цього, але є розклад — ритм місяця: виконані справи з запланованих до сьогодні. */
+  function jnNumOf(v){ const s=String(v==null?'':v).replace(/[\s\u00a0]/g,'').replace(',','.'); return /^-?\d+(\.\d+)?$/.test(s)?+s:null; }
+  function jnNumIncome(gl){ return gl&&(gl.numSrc==='in_month'||gl.numSrc==='in_all'); }
+  function jnNum(gl){
+    if(!gl) return null; const to=jnNumOf(gl.to); if(to===null) return null;
+    let cur;
+    if(jnNumIncome(gl)){ const ym=ymdLocal().slice(0,7);
+      cur=(finOps||[]).filter(o=>o&&o.type==='in'&&!o._tr&&String(o.goalId||'')===String(gl.id)&&(gl.numSrc==='in_all'||String(o.date||'').slice(0,7)===ym)).length; }
+    else { cur=jnNumOf(gl.from); if(cur===null) return null; }
+    // старт: збережений numStart; для старих місій без нього — 0, якщо мета більша (для «90 → 80 кг» без старту відсоток не вгадуємо)
+    const st0=jnNumIncome(gl)?0:jnNumOf(gl.numStart), start=st0!==null?st0:(cur<=to?0:null);
+    if(start===null||start===to) return null;
+    return { cur, to, start, pct:Math.max(0,Math.min(100,Math.round((cur-start)/(to-start)*100))) };
+  }
+  function jnRhythm(gl, ym){
+    ym=ym||ymdLocal().slice(0,7); const td=ymdLocal(); let plan=0, done=0;
+    const dim=new Date(+ym.slice(0,4), +ym.slice(5,7), 0).getDate();
+    for(let d=1; d<=dim; d++){ const ds=ym+'-'+String(d).padStart(2,'0'); if(ds>td) break;
+      jnDayBlocks(ds).forEach(b=>{ if(jnBlockGoal(b)===String(gl.id)){ plan++; if(b.done) done++; } }); }
+    return {plan, done};
+  }
+  // чи є в місії що міряти (число, рівні, кроки, розклад) — інакше старі екрани беруть gl.progress
+  function jnHasMeasure(gl){ return !!gl&&(!!jnNum(gl)||jnLevels(gl).length>0||(gl.steps||[]).some(s=>s&&!s.auto)||!!(gl.sched&&Array.isArray(gl.sched.dows)&&gl.sched.dows.length)); }
   function jnPct(gl){
+    const n=jnNum(gl); if(n) return n.pct;
     const lv=jnLevels(gl); if(lv.length) return Math.round(lv.filter(m=>m.done).length/lv.length*100);
-    const st=gl.steps||[]; if(st.length) return Math.round(st.filter(s=>s.done).length/st.length*100);
+    const st=(gl.steps||[]).filter(s=>s&&!s.auto); if(st.length) return Math.round(st.filter(s=>s.done).length/st.length*100);
+    if(gl.sched&&Array.isArray(gl.sched.dows)&&gl.sched.dows.length){ const r=jnRhythm(gl); if(r.plan) return Math.round(r.done/r.plan*100); }
     return 0;
   }
+  // підпис шляху місії: число мети — «260 з 1000», інакше «A2 → B2» (уже екрановано)
+  function jnPathTxt(gl){
+    const n=jnNum(gl); if(n) return esc(String(n.cur))+' з '+esc(String(n.to))+(gl.numSrc==='in_month'?' цього місяця':'');
+    return (gl.from||gl.to)?esc(gl.from||'?')+' → '+esc(gl.to||'?'):'';
+  }
+  // «Оновити число» (12.10.2026): нове «зараз» для місії з числом мети — ± або ввести; пишеться лише тапом «Зберегти»
+  function jnNumSheet(gl, after){
+    const n=jnNum(gl); if(!n||jnNumIncome(gl)) return;
+    jnOverlay(`<div class="jn-ed-h"><b>${esc(String(gl.name||'Місія').slice(0,40))}</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="mo-note">Скільки зараз? Мета — ${esc(String(n.to))}. Було ${esc(String(n.cur))}.</small>
+      <div class="jn-num"><button data-jnnm="-1" aria-label="Мінус 1">−</button><input id="jnNumV" type="number" inputmode="decimal" value="${esc(String(n.cur))}" aria-label="Скільки зараз"><button data-jnnm="1" aria-label="Плюс 1">＋</button></div>
+      <div class="jn-ed-foot"><button class="jn-btn" data-jnnok>Зберегти</button></div>`, ov=>{
+      const inp=ov.querySelector('#jnNumV');
+      ov.querySelectorAll('[data-jnnm]').forEach(b=>b.onclick=()=>{ const v=jnNumOf(inp.value); inp.value=String((v===null?n.cur:v)+(+b.dataset.jnnm)); });
+      ov.querySelector('[data-jnnok]').onclick=()=>{
+        const v=jnNumOf(inp.value); if(v===null){ plToast('Вкажи число'); return; }
+        const g=(goalsData.goals||[]).find(x=>x&&x.id===gl.id);   // поки шторка відкрита, синк міг підмінити goalsData
+        if(!g){ ov.remove(); plToast('Місію змінили на іншому пристрої'); return; }
+        const was=jnNumOf(g.from); g.from=String(v).slice(0,30); saveGoals(); ov.remove();
+        try{ jnRender(); }catch(_){} if(after) try{ after(); }catch(_){}
+        plToast('✓ '+String(v)+' з '+String(n.to)+(was!==null&&v>was?' · +'+String(Math.round((v-was)*100)/100):''));
+      };
+    });
+  }
+  // віху взято / знято — разом із датою, коли взято (для «+3 дні» запізнення в «Році»)
+  function jnMsSetDone(m, v){ if(!m) return; m.done=!!v; if(m.done){ if(!/^\d{4}-\d{2}-\d{2}$/.test(m.doneAt||'')) m.doneAt=ymdLocal(); } else delete m.doneAt; }
 
   /* блоки дня БЕЗ розгортання повторюваних у памʼять (читання нічого не змінює) */
   function jnDayBlocks(ds){
@@ -126,7 +182,7 @@
     const c=safeColor(gl.color,'#3ec7b4'), pct=jnPct(gl), lv=jnLevels(gl), next=lv.find(m=>!m.done);
     const today=jnDayBlocks(ymdLocal()).filter(b=>jnBlockGoal(b)===String(gl.id));
     const role=jnRole(gl), st=jnStatus(gl);
-    const lvTxt=[(gl.from||gl.to)?esc(gl.from||'?')+' → '+esc(gl.to||'?'):'', next?'далі: '+esc(next.t)+(next.due?' до '+jnDateTxt(next.due):''):''].filter(Boolean).join(' · ');
+    const lvTxt=[jnPathTxt(gl), next?'далі: '+esc(next.t)+(next.due?' до '+jnDateTxt(next.due):''):''].filter(Boolean).join(' · ');
     const dayTxt=today.length?'Сьогодні '+today.map(b=>jnHm(b.h)+(b.done?' ✓':'')).join(', '):jnSchedTxt(gl);
     return `<button class="jn-m${role==='main'?' main':''}${st!=='active'?' off':''}" data-jnm="${esc(gl.id)}" style="--c:${c}">
       <span class="jn-m-ic">${safeEmoji(gl.emoji,'🎯')}</span>
@@ -375,7 +431,7 @@
             <button data-svx aria-label="Закрити">✕</button></div>
           <span class="jn-sv-tap l" data-svprev aria-hidden="true"></span><span class="jn-sv-tap r" data-svnext aria-hidden="true"></span>
           <div class="jn-sv-b">
-            <div class="jn-sv-pct"><b>${pct}%</b><span>${(gl.from||gl.to)?esc(gl.from||'?')+' → '+esc(gl.to||'?'):'шлях місії'}</span></div>
+            <div class="jn-sv-pct"><b>${pct}%</b><span>${jnPathTxt(gl)||'шлях місії'}</span></div>
             <span class="jn-bar"><i style="width:${pct}%"></i></span>
             ${lv.length?`<div class="jn-sv-lv">${lv.slice(0,6).map(m=>`<span class="${m.done?'ok':''}">${m.done?'✓':'○'} ${esc(m.t)}${m.due?' · '+jnDateTxt(m.due):''}</span>`).join('')}${lv.length>6?`<span>ще ${lv.length-6}…</span>`:''}</div>`:''}
             <div class="jn-sv-row"><span>📅 ${esc(today.length?'Сьогодні '+today.map(b=>jnHm(b.h)+(b.done?' ✓':'')).join(', '):jnSchedTxt(gl))}</span>
@@ -475,7 +531,7 @@
     const sc=(gl&&gl.sched)||(adopt[0]?{dows:jnTplDows(adopt[0]), h:+adopt[0].h||18, min:Math.round(((+adopt[0].endH||(+adopt[0].h+1))-(+adopt[0].h||0))*60)||45, start:adopt[0].startDate||'', end:adopt[0].endDate||''}:{});
     const d={ name:gl?gl.name:'', emoji:gl?gl.emoji:'🎯', color:gl?gl.color:JN_COLORS[(goalsData.goals||[]).length%JN_COLORS.length],
       role:gl?jnRole(gl):((goalsData.goals||[]).some(g=>jnRole(g)==='main'&&jnStatus(g)!=='archive')?'side':'main'),
-      status:gl?jnStatus(gl):'active', from:gl?gl.from||'':'', to:gl?gl.to||'':'',
+      status:gl?jnStatus(gl):'active', from:gl?gl.from||'':'', to:gl?gl.to||'':'', numSrc:gl&&jnNumIncome(gl)?gl.numSrc:'',
       levels:gl?jnLevels(gl).map(m=>({id:m.id,t:m.t,due:m.due||'',ym:m.ym,done:!!m.done})):[],
       startIds:gl?jnLevels(gl).map(m=>m.id):[],
       dows:Array.isArray(sc.dows)?sc.dows.slice():[], min:+sc.min||45, h:typeof sc.h==='number'?sc.h:18,
@@ -495,6 +551,7 @@
       <div class="jn-f"><span>Зараз → мета</span><div class="jn-row"><input id="jnFrom" maxlength="30" value="${esc(d.from)}" placeholder="A2"><span class="jn-arr">→</span><input id="jnTo" maxlength="30" value="${esc(d.to)}" placeholder="B2"></div></div>
       <div class="jn-f"><span>Рівні</span><div id="jnLvls">${d.levels.map(lvRow).join('')}</div><button class="jn-mini" data-lvadd>+ Рівень</button></div>
       <div class="jn-f"><span>Дні</span><div class="jn-chips" id="jnDows">${JN_DOW_ORDER.map(x=>`<button class="jn-chip${d.dows.includes(x)?' on':''}" data-v="${x}">${JN_DOW[x]}</button>`).join('')}</div></div>
+      <div class="jn-f"><span>Як рухається «зараз»</span><select id="jnNumSrc"><option value="">вписую сам (кнопка «оновити»)</option><option value="in_month"${d.numSrc==='in_month'?' selected':''}>+1 за кожен дохід до місії · за місяць</option><option value="in_all"${d.numSrc==='in_all'?' selected':''}>+1 за кожен дохід до місії · за весь час</option></select></div>
       <div class="jn-row3"><label class="jn-f"><span>О котрій</span><input type="time" id="jnTime" value="${jnHm(d.h)}"></label>
         <label class="jn-f"><span>Хвилин</span><input type="number" id="jnMin" min="5" max="600" step="5" value="${d.min}"></label></div>
       <div class="jn-row3"><label class="jn-f"><span>Від</span><input type="date" id="jnStart" value="${esc(d.start)}"></label>
@@ -564,10 +621,15 @@
         g.from=String(q('#jnFrom').value||'').trim().slice(0,30); g.to=String(q('#jnTo').value||'').trim().slice(0,30);
         const endV=String(q('#jnEnd').value||''), ymNow=/^\d{4}-\d{2}-\d{2}$/.test(endV)?endV.slice(0,7):ymdLocal().slice(0,7), keep=Array.isArray(g.ms)?g.ms.filter(m=>!(m&&typeof m==='object'&&/^\d{4}-\d{2}$/.test(m.ym||''))||(m&&m.id&&!d.startIds.includes(m.id)&&!d.levels.some(x=>x.id===m.id))):[];
         g.ms=keep.concat(d.levels.filter(m=>String(m.t||'').trim()).map((m,i)=>{
+        { const ns=String(q('#jnNumSrc')&&q('#jnNumSrc').value||''); if(ns==='in_month'||ns==='in_all') g.numSrc=ns; else delete g.numSrc;
+          // старт числа — лише для нової місії: відсоток іде від нього («120 → 260 з 1000» = 16%); старим місіям старт не вигадуємо
+          if(isNew&&!g.numSrc){ const f=jnNumOf(g.from), t=jnNumOf(g.to); if(f!==null&&t!==null&&f!==t) g.numStart=f; } }
           const due=/^\d{4}-\d{2}-\d{2}$/.test(m.due||'')?m.due:'';
           const old=Array.isArray(g.ms)?g.ms.find(x=>x&&x.id&&x.id===m.id):null;
           return Object.assign(old||{}, { id:m.id||('ms_m_'+Date.now()+'_'+i+'_'+Math.random().toString(36).slice(2,5)),
-            ym:due?due.slice(0,7):(m.ym||ymNow), t:String(m.t).trim().slice(0,80), done:!!m.done, due });
+            ym:due?due.slice(0,7):(m.ym||ymNow), t:String(m.t).trim().slice(0,80), done:!!m.done, due,
+            // дата «взято» — лише в момент, коли віху позначили зараз; стара взята віха без дати лишається без неї (запізнення не вгадуємо)
+            doneAt:m.done?(old&&old.done?(/^\d{4}-\d{2}-\d{2}$/.test(old.doneAt||'')?old.doneAt:''):ymdLocal()):'' });
         }));
         g.sched={ dows:d.dows.slice().sort(), min:Math.min(600,Math.max(5,+q('#jnMin').value||45)),
           h:Math.min(23.75,Math.max(0,(+tm[0]||0)+(+tm[1]||0)/60)),
