@@ -550,9 +550,9 @@
       <div class="jn-f"><span>Роль</span>${seg('role',[['main','Головна'],['side','Побічна'],['wait','Чекає']],d.role)}</div>
       <div class="jn-f"><span>Стан</span>${seg('status',[['active','Активна'],['pause','Пауза'],['archive','Архів']],d.status)}</div>
       <div class="jn-f"><span>Зараз → мета</span><div class="jn-row"><input id="jnFrom" maxlength="30" value="${esc(d.from)}" placeholder="A2"><span class="jn-arr">→</span><input id="jnTo" maxlength="30" value="${esc(d.to)}" placeholder="B2"></div></div>
+      <div class="jn-f"><span>Як рухається «зараз»</span><select id="jnNumSrc"><option value="">вписую сам (кнопка «оновити»)</option><option value="in_month"${d.numSrc==='in_month'?' selected':''}>+1 за кожен дохід до місії · за місяць</option><option value="in_all"${d.numSrc==='in_all'?' selected':''}>+1 за кожен дохід до місії · за весь час</option></select></div>
       <div class="jn-f"><span>Рівні</span><div id="jnLvls">${d.levels.map(lvRow).join('')}</div><button class="jn-mini" data-lvadd>+ Рівень</button></div>
       <div class="jn-f"><span>Дні</span><div class="jn-chips" id="jnDows">${JN_DOW_ORDER.map(x=>`<button class="jn-chip${d.dows.includes(x)?' on':''}" data-v="${x}">${JN_DOW[x]}</button>`).join('')}</div></div>
-      <div class="jn-f"><span>Як рухається «зараз»</span><select id="jnNumSrc"><option value="">вписую сам (кнопка «оновити»)</option><option value="in_month"${d.numSrc==='in_month'?' selected':''}>+1 за кожен дохід до місії · за місяць</option><option value="in_all"${d.numSrc==='in_all'?' selected':''}>+1 за кожен дохід до місії · за весь час</option></select></div>
       <div class="jn-row3"><label class="jn-f"><span>О котрій</span><input type="time" id="jnTime" value="${jnHm(d.h)}"></label>
         <label class="jn-f"><span>Хвилин</span><input type="number" id="jnMin" min="5" max="600" step="5" value="${d.min}"></label></div>
       <div class="jn-row3"><label class="jn-f"><span>Від</span><input type="date" id="jnStart" value="${esc(d.start)}"></label>
@@ -623,10 +623,10 @@
         { const ns=String(q('#jnNumSrc')&&q('#jnNumSrc').value||''); if(ns==='in_month'||ns==='in_all') g.numSrc=ns; else delete g.numSrc;
           // старт числа — лише для нової місії: відсоток іде від нього («120 → 260 з 1000» = 16%); старим місіям старт не вигадуємо
           if(isNew&&!g.numSrc){ const f=jnNumOf(g.from), t=jnNumOf(g.to); if(f!==null&&t!==null&&f!==t) g.numStart=f; } }
-          const due=/^\d{4}-\d{2}-\d{2}$/.test(m.due||'')?m.due:'';
-          const old=Array.isArray(g.ms)?g.ms.find(x=>x&&x.id&&x.id===m.id):null;
         const endV=String(q('#jnEnd').value||''), ymNow=/^\d{4}-\d{2}-\d{2}$/.test(endV)?endV.slice(0,7):ymdLocal().slice(0,7), keep=Array.isArray(g.ms)?g.ms.filter(m=>!(m&&typeof m==='object'&&/^\d{4}-\d{2}$/.test(m.ym||''))||(m&&m.id&&!d.startIds.includes(m.id)&&!d.levels.some(x=>x.id===m.id))):[];
         g.ms=keep.concat(d.levels.filter(m=>String(m.t||'').trim()).map((m,i)=>{
+          const due=/^\d{4}-\d{2}-\d{2}$/.test(m.due||'')?m.due:'';
+          const old=Array.isArray(g.ms)?g.ms.find(x=>x&&x.id&&x.id===m.id):null;
           return Object.assign(old||{}, { id:m.id||('ms_m_'+Date.now()+'_'+i+'_'+Math.random().toString(36).slice(2,5)),
             ym:due?due.slice(0,7):(m.ym||ymNow), t:String(m.t).trim().slice(0,80), done:!!m.done, due,
             // дата «взято» — лише в момент, коли віху позначили зараз; стара взята віха без дати лишається без неї (запізнення не вгадуємо)
@@ -656,9 +656,9 @@
         jnSyncRecur(g, willOn?adopt.map(t=>t.id):[], (willOn&&adopt[0]&&adopt[0].active===false)?false:undefined);
         saveGoals(); ov.remove(); jnRender(); try{ renderGoals(); }catch(_){}
         try{ plToast(pzKeep?'Збережено, але приз лишився: спершу поверни гроші зі скарбнички':(isNew?'Місію додано':'Збережено')); }catch(_){}
+        if(opts&&typeof opts.after==='function') setTimeout(()=>{ try{ opts.after(); }catch(_){} },300);
       };
     });
-        if(opts&&typeof opts.after==='function') setTimeout(()=>{ try{ opts.after(); }catch(_){} },300);
   }
 
   /* ─── СТАРТ ГРИ: 5 кроків, усе вводить людина (жодних прикладів і заготовок) ───

@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 90 |
-| Рядків JS | 33435 |
+| Файлів JS | 91 |
+| Рядків JS | 33633 |
 | Файлів CSS | 47 |
 | Рядків CSS | 10564 |
-| Сутностей верхнього рівня | 2432 |
+| Сутностей верхнього рівня | 2439 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -112,6 +112,7 @@
 | `tools/scriptcheck.js` | 98 | 12 |
 | `tools/smoke.js` | 61 | 5 |
 | `tools/test-migrations.js` | 374 | 34 |
+| `tools/test-month.js` | 198 | 7 |
 | `worker/flow-ai-worker.js` | 581 | 20 |
 | `worker/test-worker.mjs` | 151 | 11 |
 
@@ -2987,6 +2988,18 @@
 | `MARK` | значення | `tools/test-migrations.js:272` |
 | `scenarioN` | функція | `tools/test-migrations.js:274` |
 | `scenarioSilent` | функція | `tools/test-migrations.js:318` |
+
+### `tools/test-month.js` — 7 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `fs` | значення | `tools/test-month.js:18` |
+| `path` | значення | `tools/test-month.js:19` |
+| `target` | функція | `tools/test-month.js:22` |
+| `WAIT` | значення | `tools/test-month.js:23` |
+| `sleep` | функція | `tools/test-month.js:24` |
+| `errors` | масив | `tools/test-month.js:25` |
+| `pageMain` | функція | `tools/test-month.js:32` |
 
 ### `worker/flow-ai-worker.js` — 20 сутностей
 
