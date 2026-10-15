@@ -53,7 +53,8 @@
       "uses": [
         {"type": "agent", "name": "data-safety-reviewer"},
         {"type": "agent", "name": "security-reviewer"},
-        {"type": "skill", "name": "frequency-audit"}
+        {"type": "skill", "name": "frequency-audit"},
+        {"type": "skill", "name": "frequency-supabase"}
       ]
     },
     {

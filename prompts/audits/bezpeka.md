@@ -50,8 +50,13 @@ AI — через власний воркер (`worker/`).
 - [ ] **Воркер** (`worker/`): хто може його викликати, які ліміти (частота,
       розмір тіла, `max_tokens`, дозволені моделі), CORS. Секретів у клієнті нема?
 - [ ] **CSP** — є? Що дозволяє?
-- [ ] **Секрети в дереві:** grep на `sk-`, `eyJ`, `apikey`, `secret`, `token`
-      поза `node_modules/`; `.gitignore` закриває `backups/`, `original/`.
+- [ ] **Секрети в дереві й історії:** крок 9 `npm run check` (gitleaks) зелений?
+      Винятки в `.gitleaks.toml` / `.gitleaksignore` — кожен справді не секрет?
+      `.gitignore` закриває `backups/`, `original/`, `tools/bin/`.
+- [ ] **Хмара (RLS).** Пройди чекліст скіла `/frequency-supabase`: RLS на `user_data`,
+      політики на всі 4 дії з умовою власника, `with check` в INSERT/UPDATE,
+      `upsert` = INSERT + SELECT + UPDATE. Без доступу до бази — дай Ярославу SQL
+      для звірки й живий тест «чужий рядок» звідти ж.
 - [ ] **Service worker** (`src/web/sw.js`): що кешує; чи не кешує відповіді з токенами.
 
 ## Як відтворювати

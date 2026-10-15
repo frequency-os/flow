@@ -24,9 +24,9 @@
       "url": "https://github.com/supabase/agent-skills",
       "stars": "2.8k",
       "kind": "скіли",
-      "status": "розглядаємо",
+      "status": "взяли",
       "value": "Офіційні скіли Supabase: правила доступу RLS і запити до бази. Закриває ризик з аудиту 31.08.",
-      "minus": "Зірок мало, але набір від самої Supabase."
+      "minus": "16.10: взяли лише чекліст безпеки → скіл frequency-supabase (RLS для user_data, SQL для звірки, тест «чужий рядок»). Частини про Next.js, CLI, MCP і швидкодію Postgres не взято."
     },
     {
       "name": "anthropics/skills",
