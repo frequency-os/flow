@@ -9,6 +9,7 @@
         {"type": "file", "name": "CLAUDE.md"},
         {"type": "file", "name": "prompts/00-yak-stavyty-zadachu.md"},
         {"type": "skill", "name": "frequency-phone-bug"},
+        {"type": "skill", "name": "frequency-debugging"},
         {"type": "planned", "name": "obra/superpowers"}
       ]
     },

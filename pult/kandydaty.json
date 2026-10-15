@@ -15,9 +15,9 @@
       "url": "https://github.com/obra/superpowers",
       "stars": "300k",
       "kind": "скіли",
-      "status": "розглядаємо",
+      "status": "взяли",
       "value": "Лише 2 скіли: systematic-debugging (корінь бага, а не латка — для синку) і brainstorming (наше правило 1 покроково).",
-      "minus": "Весь пакет не беремо: свої правила англійською, тести наперед, телеметрія. Беремо 2 файли й перекладаємо."
+      "minus": "16.10: взяли лише systematic-debugging → скіл frequency-debugging (українською, з нашими перевірками). brainstorming не беремо: суперечить правилу «варіанти на вибір», тягне сервер із телеметрією."
     },
     {
       "name": "supabase/agent-skills",
