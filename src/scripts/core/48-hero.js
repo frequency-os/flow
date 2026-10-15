@@ -49,12 +49,14 @@
     crown:'<path d="M3 18 L4.5 7 L9.5 12 L12 4.5 L14.5 12 L19.5 7 L21 18 Z" fill="currentColor"/>',
     shield:'<path d="M12 2 L20 5 V11 C20 16 16.5 20 12 22 C7.5 20 4 16 4 11 V5 Z" fill="currentColor"/>',
     fire:'<path d="M12 2 C13 7 18 9 18 15 A6 6 0 0 1 6 15 C6 11 9 10 9 6 C11 8 12 9 12 2 Z" fill="currentColor"/>',
+    flag:'<path d="M5 22 V2.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M6 3 H20 L17 7.5 L20 12 H6 Z" fill="currentColor"/>',
     tear:'<path d="M12 2.5 C16 9 19 12.5 19 16 A7 7 0 0 1 5 16 C5 12.5 8 9 12 2.5 Z" fill="none" stroke="currentColor" stroke-width="2.6"/>'
   };
   const HERO_NEED={
     lvl3:{t:'рівень 3', ok:u=>u.lvl>=3},   lvl10:{t:'рівень 10', ok:u=>u.lvl>=10},
     ms:{t:'перша віха', ok:u=>u.ms},       prize:{t:'приз місії', ok:u=>u.prize},
-    fire7:{t:'серія 7 днів', ok:u=>u.streak>=7}
+    fire7:{t:'серія 7 днів', ok:u=>u.streak>=7},
+    run:{t:'фініш забігу', ok:u=>u.run}
   };
   const HERO_PATCHES={
     none:{n:'Без'},
@@ -64,7 +66,8 @@
     star:{n:'Зірка', bg:'#22305e', fg:'#f5c84c', need:'lvl3'},
     crown:{n:'Корона', bg:'#f5c84c', fg:'#3a2a00', need:'prize'},
     shield:{n:'Щит', bg:'#2e9e6e', fg:'#ffffff', need:'lvl10'},
-    fire:{n:'Вогонь', bg:'#ff6a3d', fg:'#ffffff', need:'fire7'}
+    fire:{n:'Вогонь', bg:'#ff6a3d', fg:'#ffffff', need:'fire7'},
+    flag:{n:'Фініш', bg:'#14322e', fg:'#3ec7b4', need:'run'}   // фініш «Забігу» (56-run.js)
   };
   const HERO_TATS={
     none:{n:'Без'}, heart:{n:'Серце'}, tear:{n:'Сльоза'},
@@ -194,11 +197,12 @@
 
   /* що відкрито: рівень Журналу, віхи, призи, серія — з наявних даних, кожне у своєму try */
   function heroUnlocks(){
-    const u={lvl:1, ms:false, prize:false, streak:0};
+    const u={lvl:1, ms:false, prize:false, streak:0, run:false};
     try{ u.lvl=1+Math.floor(jnHeroXP()/JN_XP_LVL); }catch(_){}
     try{ u.ms=(goalsData.goals||[]).some(g=>g&&jnLevels(g).some(m=>m.done)); }catch(_){}
     try{ u.prize=pzGoals().some(g=>g.reward.claimed); }catch(_){}
     try{ u.streak=jnStreak(); }catch(_){}
+    try{ u.run=!!(window.runFinishedAny&&window.runFinishedAny()); }catch(_){}
     return u;
   }
   function heroItemOpen(item,u){ return !item.need || HERO_NEED[item.need].ok(u||heroUnlocks()); }

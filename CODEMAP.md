@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 91 |
-| Рядків JS | 33633 |
-| Файлів CSS | 47 |
-| Рядків CSS | 10564 |
-| Сутностей верхнього рівня | 2439 |
+| Файлів JS | 93 |
+| Рядків JS | 34122 |
+| Файлів CSS | 48 |
+| Рядків CSS | 10621 |
+| Сутностей верхнього рівня | 2506 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -28,7 +28,7 @@
 | `desktop/preload.js` | 21 | 0 |
 | `src/scripts/01-crash-screen.js` | 111 | 14 |
 | `src/scripts/03-quota-banner.js` | 14 | 2 |
-| `src/scripts/21-newyear-countdown.js` | 148 | 13 |
+| `src/scripts/21-newyear-countdown.js` | 152 | 14 |
 | `src/scripts/40-pets-3d.js` | 297 | 0 |
 | `src/scripts/41-theme-layer.js` | 153 | 0 |
 | `src/scripts/42-voice-island.js` | 855 | 0 |
@@ -74,14 +74,14 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
 | `src/scripts/core/40-year-letter.js` | 292 | 30 |
-| `src/scripts/core/41-journal.js` | 820 | 72 |
+| `src/scripts/core/41-journal.js` | 822 | 72 |
 | `src/scripts/core/42-day.js` | 363 | 41 |
 | `src/scripts/core/43-month.js` | 274 | 37 |
 | `src/scripts/core/44-prizes.js` | 171 | 24 |
 | `src/scripts/core/45-year.js` | 145 | 21 |
 | `src/scripts/core/46-wallet.js` | 511 | 43 |
 | `src/scripts/core/47-rules.js` | 351 | 29 |
-| `src/scripts/core/48-hero.js` | 338 | 41 |
+| `src/scripts/core/48-hero.js` | 342 | 41 |
 | `src/scripts/core/48-widgets.js` | 463 | 46 |
 | `src/scripts/core/49-calendar.js` | 310 | 36 |
 | `src/scripts/core/49-finlit.js` | 150 | 18 |
@@ -92,6 +92,7 @@
 | `src/scripts/core/54-intro.js` | 131 | 13 |
 | `src/scripts/core/54-links.js` | 307 | 35 |
 | `src/scripts/core/55-focus.js` | 391 | 43 |
+| `src/scripts/core/56-run.js` | 347 | 50 |
 | `src/scripts/page-editor/01-palette.js` | 180 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 768 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 754 | 42 |
@@ -113,6 +114,7 @@
 | `tools/smoke.js` | 61 | 5 |
 | `tools/test-migrations.js` | 374 | 34 |
 | `tools/test-month.js` | 198 | 7 |
+| `tools/test-rls.mjs` | 132 | 16 |
 | `worker/flow-ai-worker.js` | 581 | 20 |
 | `worker/test-worker.mjs` | 151 | 11 |
 
@@ -167,6 +169,7 @@
 | `src/styles/core/33-starter.css` | 63 | 0 |
 | `src/styles/core/34-intro.css` | 106 | 0 |
 | `src/styles/core/35-focus.css` | 112 | 0 |
+| `src/styles/core/36-run.css` | 57 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (80)
 
@@ -250,7 +253,7 @@
 | `window.__quotaHit` | значення | `src/scripts/03-quota-banner.js:2` |
 | `window.showQuotaBanner` | функція | `src/scripts/03-quota-banner.js:6` |
 
-### `src/scripts/21-newyear-countdown.js` — 13 сутностей
+### `src/scripts/21-newyear-countdown.js` — 14 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -259,14 +262,15 @@
 | `targetDate` | функція | `src/scripts/21-newyear-countdown.js:5` |
 | `daysInYear` | функція | `src/scripts/21-newyear-countdown.js:6` |
 | `pointB` | функція | `src/scripts/21-newyear-countdown.js:10` |
-| `tickWidget` | функція | `src/scripts/21-newyear-countdown.js:22` |
-| `window.__nycTap` | функція | `src/scripts/21-newyear-countdown.js:39` |
-| `curView` | значення | `src/scripts/21-newyear-countdown.js:45` |
-| `tickHero` | функція | `src/scripts/21-newyear-countdown.js:46` |
-| `renderView` | функція | `src/scripts/21-newyear-countdown.js:66` |
-| `refreshScreen` | функція | `src/scripts/21-newyear-countdown.js:121` |
-| `window.__nycRefresh` | значення | `src/scripts/21-newyear-countdown.js:122` |
-| `window.goNYC` | функція | `src/scripts/21-newyear-countdown.js:143` |
+| `runEnd` | функція | `src/scripts/21-newyear-countdown.js:22` |
+| `tickWidget` | функція | `src/scripts/21-newyear-countdown.js:25` |
+| `window.__nycTap` | функція | `src/scripts/21-newyear-countdown.js:42` |
+| `curView` | значення | `src/scripts/21-newyear-countdown.js:49` |
+| `tickHero` | функція | `src/scripts/21-newyear-countdown.js:50` |
+| `renderView` | функція | `src/scripts/21-newyear-countdown.js:70` |
+| `refreshScreen` | функція | `src/scripts/21-newyear-countdown.js:125` |
+| `window.__nycRefresh` | значення | `src/scripts/21-newyear-countdown.js:126` |
+| `window.goNYC` | функція | `src/scripts/21-newyear-countdown.js:147` |
 
 ### `src/scripts/40-pets-3d.js` — порожньо на верхньому рівні
 
@@ -2063,25 +2067,25 @@
 | `jnFloatRender` | функція | `src/scripts/core/41-journal.js:269` |
 | `jnRenderOtherDay` | функція | `src/scripts/core/41-journal.js:283` |
 | `jnRenderToday` | функція | `src/scripts/core/41-journal.js:291` |
-| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:370` |
-| `jnDone` | функція | `src/scripts/core/41-journal.js:383` |
-| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:388` |
-| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:392` |
-| `jnStoryView` | функція | `src/scripts/core/41-journal.js:418` |
-| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:449` |
-| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:458` |
-| `jnOverlay` | функція | `src/scripts/core/41-journal.js:474` |
-| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:487` |
-| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:495` |
-| `jnTplDows` | функція | `src/scripts/core/41-journal.js:498` |
-| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:505` |
-| `jnEditor` | функція | `src/scripts/core/41-journal.js:527` |
-| `jnStartCard` | функція | `src/scripts/core/41-journal.js:666` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:671` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:753` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:766` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:802` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:813` |
+| `jnToggleBlock` | функція | `src/scripts/core/41-journal.js:372` |
+| `jnDone` | функція | `src/scripts/core/41-journal.js:385` |
+| `jnUndoSheet` | функція | `src/scripts/core/41-journal.js:390` |
+| `jnCelebrate` | функція | `src/scripts/core/41-journal.js:394` |
+| `jnStoryView` | функція | `src/scripts/core/41-journal.js:420` |
+| `jnEnergySheet` | функція | `src/scripts/core/41-journal.js:451` |
+| `jnHeroSheet` | функція | `src/scripts/core/41-journal.js:460` |
+| `jnOverlay` | функція | `src/scripts/core/41-journal.js:476` |
+| `jnClearFuture` | функція | `src/scripts/core/41-journal.js:489` |
+| `jnOtherTpls` | функція | `src/scripts/core/41-journal.js:497` |
+| `jnTplDows` | функція | `src/scripts/core/41-journal.js:500` |
+| `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:507` |
+| `jnEditor` | функція | `src/scripts/core/41-journal.js:529` |
+| `jnStartCard` | функція | `src/scripts/core/41-journal.js:668` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:673` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:755` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:768` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:804` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:815` |
 
 ### `src/scripts/core/42-day.js` — 41 сутностей
 
@@ -2324,35 +2328,35 @@
 | `HERO_TECH` | обʼєкт | `src/scripts/core/48-hero.js:39` |
 | `HERO_LOOK_DEF` | обʼєкт | `src/scripts/core/48-hero.js:40` |
 | `HERO_ICON` | обʼєкт | `src/scripts/core/48-hero.js:44` |
-| `HERO_NEED` | обʼєкт | `src/scripts/core/48-hero.js:54` |
-| `HERO_PATCHES` | обʼєкт | `src/scripts/core/48-hero.js:59` |
-| `HERO_TATS` | обʼєкт | `src/scripts/core/48-hero.js:69` |
-| `HERO_PATCH_AT` | обʼєкт | `src/scripts/core/48-hero.js:74` |
-| `HERO_TAT_AT` | обʼєкт | `src/scripts/core/48-hero.js:75` |
-| `heroLoading` | значення | `src/scripts/core/48-hero.js:76` |
-| `heroOf` | функція | `src/scripts/core/48-hero.js:78` |
-| `heroReady` | функція | `src/scripts/core/48-hero.js:79` |
-| `heroLookAll` | функція | `src/scripts/core/48-hero.js:83` |
-| `heroLookNorm` | функція | `src/scripts/core/48-hero.js:86` |
-| `heroLook` | функція | `src/scripts/core/48-hero.js:98` |
-| `heroRerender` | функція | `src/scripts/core/48-hero.js:100` |
-| `heroLoad` | функція | `src/scripts/core/48-hero.js:107` |
-| `heroOutfitsLoad` | функція | `src/scripts/core/48-hero.js:124` |
-| `heroOverBudget` | функція | `src/scripts/core/48-hero.js:135` |
-| `heroReactTo` | функція | `src/scripts/core/48-hero.js:142` |
-| `heroMood` | функція | `src/scripts/core/48-hero.js:154` |
-| `heroChestLines` | функція | `src/scripts/core/48-hero.js:170` |
-| `heroChestText` | функція | `src/scripts/core/48-hero.js:177` |
-| `heroUnlocks` | функція | `src/scripts/core/48-hero.js:196` |
-| `heroItemOpen` | функція | `src/scripts/core/48-hero.js:204` |
-| `heroPatchSVG` | функція | `src/scripts/core/48-hero.js:205` |
-| `heroTatSVG` | функція | `src/scripts/core/48-hero.js:213` |
-| `heroSVG` | функція | `src/scripts/core/48-hero.js:222` |
-| `heroWard` | значення | `src/scripts/core/48-hero.js:258` |
-| `heroWardRedraw` | функція | `src/scripts/core/48-hero.js:259` |
-| `heroWardSave` | функція | `src/scripts/core/48-hero.js:270` |
-| `heroWardItem` | функція | `src/scripts/core/48-hero.js:282` |
-| `heroWardrobe` | функція | `src/scripts/core/48-hero.js:290` |
+| `HERO_NEED` | обʼєкт | `src/scripts/core/48-hero.js:55` |
+| `HERO_PATCHES` | обʼєкт | `src/scripts/core/48-hero.js:61` |
+| `HERO_TATS` | обʼєкт | `src/scripts/core/48-hero.js:72` |
+| `HERO_PATCH_AT` | обʼєкт | `src/scripts/core/48-hero.js:77` |
+| `HERO_TAT_AT` | обʼєкт | `src/scripts/core/48-hero.js:78` |
+| `heroLoading` | значення | `src/scripts/core/48-hero.js:79` |
+| `heroOf` | функція | `src/scripts/core/48-hero.js:81` |
+| `heroReady` | функція | `src/scripts/core/48-hero.js:82` |
+| `heroLookAll` | функція | `src/scripts/core/48-hero.js:86` |
+| `heroLookNorm` | функція | `src/scripts/core/48-hero.js:89` |
+| `heroLook` | функція | `src/scripts/core/48-hero.js:101` |
+| `heroRerender` | функція | `src/scripts/core/48-hero.js:103` |
+| `heroLoad` | функція | `src/scripts/core/48-hero.js:110` |
+| `heroOutfitsLoad` | функція | `src/scripts/core/48-hero.js:127` |
+| `heroOverBudget` | функція | `src/scripts/core/48-hero.js:138` |
+| `heroReactTo` | функція | `src/scripts/core/48-hero.js:145` |
+| `heroMood` | функція | `src/scripts/core/48-hero.js:157` |
+| `heroChestLines` | функція | `src/scripts/core/48-hero.js:173` |
+| `heroChestText` | функція | `src/scripts/core/48-hero.js:180` |
+| `heroUnlocks` | функція | `src/scripts/core/48-hero.js:199` |
+| `heroItemOpen` | функція | `src/scripts/core/48-hero.js:208` |
+| `heroPatchSVG` | функція | `src/scripts/core/48-hero.js:209` |
+| `heroTatSVG` | функція | `src/scripts/core/48-hero.js:217` |
+| `heroSVG` | функція | `src/scripts/core/48-hero.js:226` |
+| `heroWard` | значення | `src/scripts/core/48-hero.js:262` |
+| `heroWardRedraw` | функція | `src/scripts/core/48-hero.js:263` |
+| `heroWardSave` | функція | `src/scripts/core/48-hero.js:274` |
+| `heroWardItem` | функція | `src/scripts/core/48-hero.js:286` |
+| `heroWardrobe` | функція | `src/scripts/core/48-hero.js:294` |
 
 ### `src/scripts/core/48-widgets.js` — 46 сутностей
 
@@ -2665,6 +2669,61 @@
 | `fcKey` | функція | `src/scripts/core/55-focus.js:355` |
 | `openFocus` | функція | `src/scripts/core/55-focus.js:364` |
 | `window.openFocus` | значення | `src/scripts/core/55-focus.js:382` |
+
+### `src/scripts/core/56-run.js` — 50 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `rnLang` | функція | `src/scripts/core/56-run.js:17` |
+| `RN_T` | обʼєкт | `src/scripts/core/56-run.js:18` |
+| `rnT` | функція | `src/scripts/core/56-run.js:60` |
+| `RN_MON_G` | масив | `src/scripts/core/56-run.js:61` |
+| `RN_MAX_DAYS` | значення | `src/scripts/core/56-run.js:62` |
+| `rnDraft` | значення | `src/scripts/core/56-run.js:63` |
+| `rnReady` | функція | `src/scripts/core/56-run.js:66` |
+| `rnOkDs` | функція | `src/scripts/core/56-run.js:69` |
+| `rnD` | функція | `src/scripts/core/56-run.js:70` |
+| `rnDiff` | функція | `src/scripts/core/56-run.js:71` |
+| `rnAdd` | функція | `src/scripts/core/56-run.js:72` |
+| `rnDateTxt` | функція | `src/scripts/core/56-run.js:73` |
+| `rnDaysWord` | функція | `src/scripts/core/56-run.js:78` |
+| `rnNum` | функція | `src/scripts/core/56-run.js:79` |
+| `rnParse` | функція | `src/scripts/core/56-run.js:80` |
+| `rnId` | функція | `src/scripts/core/56-run.js:81` |
+| `rnGoalNorm` | функція | `src/scripts/core/56-run.js:84` |
+| `rnCur` | функція | `src/scripts/core/56-run.js:90` |
+| `rnGoals` | функція | `src/scripts/core/56-run.js:95` |
+| `rnEnd` | функція | `src/scripts/core/56-run.js:96` |
+| `rnOver` | функція | `src/scripts/core/56-run.js:97` |
+| `rnVal` | функція | `src/scripts/core/56-run.js:98` |
+| `rnPct` | функція | `src/scripts/core/56-run.js:99` |
+| `rnMoving` | функція | `src/scripts/core/56-run.js:100` |
+| `rnHit` | функція | `src/scripts/core/56-run.js:101` |
+| `rnTime` | функція | `src/scripts/core/56-run.js:102` |
+| `rnLvDone` | функція | `src/scripts/core/56-run.js:107` |
+| `rnXP` | функція | `src/scripts/core/56-run.js:108` |
+| `rnStats` | функція | `src/scripts/core/56-run.js:111` |
+| `window.runTarget` | функція | `src/scripts/core/56-run.js:135` |
+| `window.runFinishedAny` | функція | `src/scripts/core/56-run.js:137` |
+| `runStripHTML` | функція | `src/scripts/core/56-run.js:145` |
+| `runBind` | функція | `src/scripts/core/56-run.js:157` |
+| `rnHead` | функція | `src/scripts/core/56-run.js:160` |
+| `rnStatsHTML` | функція | `src/scripts/core/56-run.js:161` |
+| `rnGoalHTML` | функція | `src/scripts/core/56-run.js:173` |
+| `rnCardHTML` | функція | `src/scripts/core/56-run.js:182` |
+| `rnFinHTML` | функція | `src/scripts/core/56-run.js:193` |
+| `rnPresetEnd` | функція | `src/scripts/core/56-run.js:205` |
+| `rnStartHTML` | функція | `src/scripts/core/56-run.js:212` |
+| `rnReadDraft` | функція | `src/scripts/core/56-run.js:237` |
+| `rnStartBind` | функція | `src/scripts/core/56-run.js:245` |
+| `rnLogSheet` | функція | `src/scripts/core/56-run.js:270` |
+| `rnLive` | функція | `src/scripts/core/56-run.js:301` |
+| `rnArchive` | функція | `src/scripts/core/56-run.js:305` |
+| `rnConfirm` | функція | `src/scripts/core/56-run.js:311` |
+| `rnCardBind` | функція | `src/scripts/core/56-run.js:317` |
+| `rnAfter` | функція | `src/scripts/core/56-run.js:335` |
+| `runOpen` | функція | `src/scripts/core/56-run.js:337` |
+| `window.runOpen` | значення | `src/scripts/core/56-run.js:347` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
@@ -3000,6 +3059,27 @@
 | `sleep` | функція | `tools/test-month.js:24` |
 | `errors` | масив | `tools/test-month.js:25` |
 | `pageMain` | функція | `tools/test-month.js:32` |
+
+### `tools/test-rls.mjs` — 16 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `ROOT` | значення | `tools/test-rls.mjs:20` |
+| `storage` | значення | `tools/test-rls.mjs:21` |
+| `SB_URL` | значення | `tools/test-rls.mjs:22` |
+| `SB_KEY` | значення | `tools/test-rls.mjs:23` |
+| `envFile` | значення | `tools/test-rls.mjs:26` |
+| `env` | обʼєкт | `tools/test-rls.mjs:27` |
+| `need` | функція | `tools/test-rls.mjs:34` |
+| `pass` | значення | `tools/test-rls.mjs:37` |
+| `check` | функція | `tools/test-rls.mjs:38` |
+| `signIn` | функція | `tools/test-rls.mjs:44` |
+| `rest` | функція | `tools/test-rls.mjs:53` |
+| `enc` | значення | `tools/test-rls.mjs:61` |
+| `denied` | функція | `tools/test-rls.mjs:62` |
+| `KEY` | значення | `tools/test-rls.mjs:64` |
+| `onA` | значення | `tools/test-rls.mjs:72` |
+| `readA` | функція | `tools/test-rls.mjs:73` |
 
 ### `worker/flow-ai-worker.js` — 20 сутностей
 

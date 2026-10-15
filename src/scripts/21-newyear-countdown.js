@@ -18,10 +18,13 @@
     }catch(_){return null;}
   }
 
+  // активний «Забіг» (56-run.js) важливіший за лист: людина сама поставила цю дату (15.10.2026)
+  function runEnd(){ try{ return window.runTarget?window.runTarget():null; }catch(_){ return null; } }
+
   // ── дрібний віджет на головному ──
   function tickWidget(){
     var d=document.getElementById('nycD');if(!d)return;
-    var pb=pointB(),t=pb||targetDate(),diff=t-new Date();if(diff<0)diff=0;
+    var rn=runEnd(),pb=rn?null:pointB(),t=rn||pb||targetDate(),diff=t-new Date();if(diff<0)diff=0;
     var s=Math.floor(diff/1000);
     var dd=Math.floor(s/86400);s-=dd*86400;
     var h=Math.floor(s/3600);s-=h*3600;
@@ -30,13 +33,14 @@
     document.getElementById('nycH').textContent=String(h).padStart(2,'0');
     document.getElementById('nycM').textContent=String(m).padStart(2,'0');
     document.getElementById('nycS').textContent=String(s).padStart(2,'0');
-    var title=pb?'До точки Б':'До '+t.getFullYear()+' року';
+    var title=rn?'До фінішу забігу':pb?'До точки Б':'До '+t.getFullYear()+' року';
     var tt=document.getElementById('nycTitle');if(tt&&tt.textContent!==title)tt.textContent=title;
     var box=document.getElementById('nyCountdown');
-    if(box){var al=pb?'Лічильник до точки Б з листа — відкрити Рік у Журналі':'Лічильник до Нового року';if(box.getAttribute('aria-label')!==al)box.setAttribute('aria-label',al);}
+    if(box){var al=rn?'Лічильник до фінішу забігу — відкрити Забіг':pb?'Лічильник до точки Б з листа — відкрити Рік у Журналі':'Лічильник до Нового року';if(box.getAttribute('aria-label')!==al)box.setAttribute('aria-label',al);}
   }
   // тап по лічильнику на Огляді (onclick у index.html)
   window.__nycTap=function(){
+    if(runEnd()&&typeof window.runOpen==='function'){window.runOpen();return;}
     if(pointB()&&typeof window.goJournal==='function'){window.goJournal({tab:'year'});return;}
     if(window.goNYC)window.goNYC();
   };

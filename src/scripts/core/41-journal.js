@@ -311,6 +311,7 @@
           <span class="jn-me-b"><b>${esc(jnName())}${jnMateName()}</b><span class="jn-xp"><span class="jn-bar gold"><i style="width:${Math.round(xpIn/JN_XP_LVL*100)}%"></i></span>рів. ${lvl}</span></span></button>${jnMateHTML()}</span>
         <span class="jn-top-r">${pzPillHTML()}<span class="jn-fire${streak?'':' zero'}">🔥 ${streak} ${pluralUk(streak,'день','дні','днів')}</span></span>
       </div>
+      ${typeof runStripHTML==='function'?runStripHTML():''}
       <div class="jn-sts">${stories.map(jnStory).join('')}
         <button class="jn-st add" data-jnadd><span class="jn-st-r"><span class="jn-st-i">＋</span></span><small>Місія</small></button></div>
       ${pzStripHTML()}
@@ -346,6 +347,7 @@
     { const d=body.querySelector('[data-jndone]'); if(d) d.onclick=()=>{ const bl=list.find(x=>x.id===d.dataset.jndone); if(bl) jnDone(bl); }; }
     dyBind(body,td,{onDone:jnDone}); calBindDay(body,td,jnRender);   // стрічка/наступні справи: «Зроблено» зі святом, меню справи, «вільно ＋», «＋ З місій»
     pzBind(body);   // 🏆 у шапці і смужка призу (44-prizes.js)
+    if(typeof runBind==='function') runBind(body);   // смужка «Забігу» (56-run.js)
     if(typeof rlJournalBind==='function') rlJournalBind(body);   // картки правил і Книга правил (47-rules.js)
     { const h=body.querySelector('[data-jnhero]'); if(h) h.onclick=jnHeroSheet; }
     { const m=body.querySelector('[data-jnmate]'); if(m) m.onclick=e=>{ e.stopPropagation();
