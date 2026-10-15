@@ -1,0 +1,76 @@
+{
+  "_opys": "Карта метро пульта: шлях будь-якої задачі від задуму до телефона. Кожна станція — етап, uses — чим на ньому користуємось. Типи: skill (.claude/skills), agent (.claude/agents), command (npm run …), file (шлях від кореня), planned (кандидат із kandydaty.json, ще не взятий).",
+  "stations": [
+    {
+      "id": "zadum",
+      "name": "Задум",
+      "hint": "Питання по одному → варіанти → «так»",
+      "uses": [
+        {"type": "file", "name": "CLAUDE.md"},
+        {"type": "file", "name": "prompts/00-yak-stavyty-zadachu.md"},
+        {"type": "skill", "name": "frequency-phone-bug"},
+        {"type": "planned", "name": "obra/superpowers"}
+      ]
+    },
+    {
+      "id": "kod",
+      "name": "Код",
+      "hint": "Правимо src/, не dist/",
+      "uses": [
+        {"type": "file", "name": "CODEMAP.md"},
+        {"type": "skill", "name": "frequency-new-screen"},
+        {"type": "skill", "name": "frequency-migration"},
+        {"type": "skill", "name": "frequency-agent-tool"},
+        {"type": "command", "name": "map"}
+      ]
+    },
+    {
+      "id": "perevirka",
+      "name": "Перевірка",
+      "hint": "Свіжий вивід, а не «має працювати»",
+      "uses": [
+        {"type": "command", "name": "check"},
+        {"type": "command", "name": "smoke"},
+        {"type": "command", "name": "test:migrations"},
+        {"type": "planned", "name": "gitleaks/gitleaks"}
+      ]
+    },
+    {
+      "id": "brauzer",
+      "name": "Браузер",
+      "hint": "375×812 і ноутбук, знімок",
+      "uses": [
+        {"type": "skill", "name": "frequency-verify"},
+        {"type": "agent", "name": "ui-verifier"}
+      ]
+    },
+    {
+      "id": "retsenziia",
+      "name": "Рецензія",
+      "hint": "Інший погляд до коміту",
+      "uses": [
+        {"type": "agent", "name": "data-safety-reviewer"},
+        {"type": "agent", "name": "security-reviewer"},
+        {"type": "skill", "name": "frequency-audit"}
+      ]
+    },
+    {
+      "id": "komit",
+      "name": "Коміт",
+      "hint": "Лише свої файли: git commit -- шляхи",
+      "uses": [
+        {"type": "file", "name": "tools/snapshot.sh"}
+      ]
+    },
+    {
+      "id": "telefon",
+      "name": "Телефон",
+      "hint": "Лише своє і лише перевірене",
+      "uses": [
+        {"type": "skill", "name": "frequency-deploy"},
+        {"type": "command", "name": "deploy"},
+        {"type": "command", "name": "build:mac"}
+      ]
+    }
+  ]
+}

@@ -19,7 +19,8 @@
     "deploy": "./tools/deploy.sh",
     "bugs": "./tools/bugs.sh",
     "refs": "./tools/refs.sh",
-    "map": "python3 tools/codemap.py"
+    "map": "python3 tools/codemap.py",
+    "pult": "python3 tools/pult.py && open pult/index.html"
   },
   "build": {
     "appId": "com.yarosla.frequency",

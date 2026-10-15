@@ -1,0 +1,104 @@
+{
+  "_opys": "Знахідки з GitHub, які можуть нам допомогти. Статус: розглядаємо · беремо · взяли · відмовились. Зірки — на день пошуку (15.10.2026).",
+  "items": [
+    {
+      "name": "gitleaks/gitleaks",
+      "url": "https://github.com/gitleaks/gitleaks",
+      "stars": "30k",
+      "kind": "програма",
+      "status": "розглядаємо",
+      "value": "Сканер секретів: перед комітом і в npm run check шукає ключі й токени. Репо публічне — ловить витік до того, як він піде на GitHub.",
+      "minus": "Треба поставити програму (brew). Хибні тривоги позначаємо в списку винятків."
+    },
+    {
+      "name": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers",
+      "stars": "300k",
+      "kind": "скіли",
+      "status": "розглядаємо",
+      "value": "Лише 2 скіли: systematic-debugging (корінь бага, а не латка — для синку) і brainstorming (наше правило 1 покроково).",
+      "minus": "Весь пакет не беремо: свої правила англійською, тести наперед, телеметрія. Беремо 2 файли й перекладаємо."
+    },
+    {
+      "name": "supabase/agent-skills",
+      "url": "https://github.com/supabase/agent-skills",
+      "stars": "2.8k",
+      "kind": "скіли",
+      "status": "розглядаємо",
+      "value": "Офіційні скіли Supabase: правила доступу RLS і запити до бази. Закриває ризик з аудиту 31.08.",
+      "minus": "Зірок мало, але набір від самої Supabase."
+    },
+    {
+      "name": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills",
+      "stars": "181k",
+      "kind": "скіли",
+      "status": "розглядаємо",
+      "value": "frontend-design — гарніші нові екрани; webapp-testing — скрипти, що самі клікають програму (частина правила 3).",
+      "minus": "frontend-design може тягнути свій стиль — допишемо, що головний у нас напрям «Глибина»."
+    },
+    {
+      "name": "dequelabs/axe-core",
+      "url": "https://github.com/dequelabs/axe-core",
+      "stars": "7.6k",
+      "kind": "бібліотека",
+      "status": "розглядаємо",
+      "value": "Автоперевірка доступності: контраст, підписи кнопок. Для App Store і «білий фон не читається».",
+      "minus": "Нова бібліотека — лише в перевірці, не в програмі."
+    },
+    {
+      "name": "addyosmani/agent-skills",
+      "url": "https://github.com/addyosmani/agent-skills",
+      "stars": "107k",
+      "kind": "скіли",
+      "status": "розглядаємо",
+      "value": "Сильні скіли безпеки і швидкодії на телефоні.",
+      "minus": "Здебільшого дублює наші аудити — брати хіба 1–2 точково."
+    },
+    {
+      "name": "ayghri/i-have-adhd",
+      "url": "https://github.com/ayghri/i-have-adhd",
+      "stars": "57k",
+      "kind": "скіл",
+      "status": "розглядаємо",
+      "value": "Коротші відповіді: дія спершу, кроки пронумеровані.",
+      "minus": "Може сперечатися з режимом навчання, де Claude пояснює терміни."
+    },
+    {
+      "name": "affaan-m/ECC",
+      "url": "https://github.com/affaan-m/ECC",
+      "stars": "280k",
+      "kind": "комбайн",
+      "status": "відмовились",
+      "value": "Величезний набір скілів, памʼяті й правил.",
+      "minus": "Перепише наші правила під себе."
+    },
+    {
+      "name": "JuliusBrussee/caveman",
+      "url": "https://github.com/JuliusBrussee/caveman",
+      "stars": "112k",
+      "kind": "скіл",
+      "status": "відмовились",
+      "value": "Ріже слова, щоб витрачати менше токенів.",
+      "minus": "Ярослав вчиться — короткі «печерні» відповіді шкодять навчанню."
+    },
+    {
+      "name": "thedotmack/claude-mem",
+      "url": "https://github.com/thedotmack/claude-mem",
+      "stars": "101k",
+      "kind": "памʼять",
+      "status": "відмовились",
+      "value": "Записує все із сесій між розмовами.",
+      "minus": "Памʼять у нас уже є, а при публічному репо це ризик витоку."
+    },
+    {
+      "name": "microsoft/playwright-mcp",
+      "url": "https://github.com/microsoft/playwright-mcp",
+      "stars": "38k",
+      "kind": "браузер",
+      "status": "відмовились",
+      "value": "Керування браузером для Claude.",
+      "minus": "Вбудований браузер у нас уже є."
+    }
+  ]
+}
