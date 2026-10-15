@@ -542,7 +542,8 @@
     var k=covKey(), c=covers[k];
     if(!c){
       covEl.className='pg-cover empty';
-      covEl.innerHTML='<button class="pgcov-add" data-covopen>'+pgsIc('photo')+'Додати обкладинку</button>'+covMenuHTML();
+      // документ відкривається без обкладинки; маленький «＋» вгорі — додати за бажанням
+      covEl.innerHTML='<button class="pgcov-add" data-covopen aria-label="Додати обкладинку"><span aria-hidden="true">＋</span>Обкладинка</button>'+covMenuHTML();
     }else{
       covEl.className='pg-cover has';
       covEl.innerHTML='<div class="pgcov-img"></div><button class="pgcov-btn" data-covopen>Обкладинка</button>'+covMenuHTML();
@@ -556,7 +557,8 @@
     try{
       var _t=document.getElementById('pgTitle');
       if(_t){ _t.style.position='relative'; _t.style.zIndex='2';
-        _t.style.marginTop=(c?Math.max(64,(c.h||176)-80):62)+'px'; _t.style.marginBottom='12px'; }
+        // без обкладинки над назвою — рядок для «＋ Обкладинка» під верхньою панеллю
+        _t.style.marginTop=(c?Math.max(64,(c.h||176)-80):100)+'px'; _t.style.marginBottom='12px'; }
       /* значки в одну капсулу */
       var _th=document.getElementById('pgTheme'), _wb=document.getElementById('pgWideBtn');
       if(_th&&_wb&&_wb.parentNode!==_th) _th.appendChild(_wb);

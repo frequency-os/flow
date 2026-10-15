@@ -60,13 +60,11 @@
     background:transparent !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
     border-bottom:0 !important;box-shadow:none !important;}
   #scr-page .pg-doc{margin-top:-46px;}
-  /* капсула «назад» */
-  #scr-page .pg-back{padding:6px 12px 6px 9px;border-radius:15px;font-size:14px;
-    color:color-mix(in srgb,var(--pg-fg) 80%,transparent) !important;
-    background:color-mix(in srgb,var(--pgsheet) 58%,transparent) !important;
-    backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);
-    border:1px solid color-mix(in srgb,var(--pg-fg) 10%,transparent) !important;
-    box-shadow:0 8px 22px -14px rgba(0,0,0,.55);}
+  /* «назад» — як у Telegram (16.10.2026): акцентна стрілка з назвою, без капсули; нижнього меню в документі нема */
+  #scr-page .pg-back{padding:6px 10px 6px 2px;border-radius:12px;font-size:16px;font-weight:650;
+    color:var(--pg-acc) !important;background:transparent !important;border:0 !important;box-shadow:none !important;
+    backdrop-filter:none !important;-webkit-backdrop-filter:none !important;min-height:40px;}
+  #scr-page.pg-hascov .pg-back{color:#fff !important;text-shadow:0 1px 10px rgba(0,0,0,.55);}
   /* капсула значків (тема + повний екран) */
   #scr-page .pg-theme{margin-left:auto;display:flex;align-items:center;gap:1px;padding:3px;border-radius:16px;
     background:color-mix(in srgb,var(--pgsheet) 58%,transparent) !important;
@@ -117,8 +115,16 @@
   #scr-page .pg-cover .pgcov-menu{top:100% !important;bottom:auto !important;margin-top:6px;}
   #scr-page .pg-cover.empty .pgcov-menu{left:14px !important;right:auto !important;}
   #scr-page .pg-cover.has .pgcov-menu{right:14px !important;left:auto !important;}
-  /* «Додати обкладинку» більше не лізе на назву — живе чипом у рядку стану */
-  #scr-page .pg-cover.empty .pgcov-add{display:none !important;}
+  /* «＋ Обкладинка» — тихий чип угорі праворуч, над назвою (16.10.2026: рядка стану з чипом більше нема) */
+  #scr-page .pg-cover.empty .pgcov-add{display:inline-flex !important;align-items:center;gap:5px;
+    top:56px !important;bottom:auto !important;left:auto !important;right:14px !important;
+    min-height:32px;padding:0 12px;border-radius:16px;opacity:1;
+    font-size:12.5px;font-weight:700;color:color-mix(in srgb,var(--pg-fg) 62%,transparent);
+    background:color-mix(in srgb,var(--pg-fg) 6%,transparent);border:1px solid color-mix(in srgb,var(--pg-fg) 12%,transparent);}
+  /* підпапки й чати під назвою — над низом обкладинки, а не під її розчиненням */
+  #scr-page .pg-links{position:relative;z-index:1;}
+  #scr-page .pg-cover.empty .pgcov-add span{font-size:15px;line-height:1;color:var(--pg-acc);}
+  #scr-page .pg-cover.empty .pgcov-add:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
   .pgm-c.cov{cursor:pointer;color:var(--pg-acc) !important;
     border-style:dashed !important;border-color:color-mix(in srgb,var(--pg-acc) 32%,transparent) !important;
     background:transparent !important;}

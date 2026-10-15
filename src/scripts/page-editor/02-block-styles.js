@@ -317,6 +317,7 @@
         +'</div></div>';
     }
     if(t==='fold')return fdHTML(b);   /* «Папка» (05-fold.js) */
+    if(t==='subs')return sbHTML(b);   /* «Підпапки» — стрічка-сторіс (05-fold.js) */
     if(t==='tbl')return tbHTML(b);   /* «Таблиця» (04-table.js) */
     if(t==='db'||t==='table')return dbHTML(b);
     // будь-який інший тип Flow показуємо як текст-плейсхолдер із назвою

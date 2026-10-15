@@ -76,32 +76,31 @@
     background:transparent;color:var(--muted);font:inherit;font-size:20px;font-weight:800;line-height:1;cursor:pointer;display:grid;place-items:center;}
   .chl-more:active,.sph-more:active{background:var(--hair);}
   .chl-pin{font-size:11px;margin-right:5px;vertical-align:1px;}
-  /* ── Д3 (10.10.2026): хаб звʼязків під назвою документа — Гроші · Час · Місія · Чати ── */
-  .pg-hub{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:2px 0 12px;}
-  .pgh-c{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;padding:10px 10px 9px;border-radius:14px;cursor:pointer;
-    border:1px solid var(--pg-edge,var(--line));background:var(--pg-surface,var(--card));color:var(--pg-fg,var(--text));font:inherit;text-align:left;}
-  .pgh-c:active{transform:scale(.97);}
-  .pgh-ic{color:var(--pg-acc,var(--accent));line-height:0;margin-bottom:2px;}
-  .pgh-ic svg{width:17px;height:17px;}
-  .pgh-c small{font-size:11px;font-weight:700;color:var(--pg-mut,var(--muted));}
-  .pgh-c b{font-size:14.5px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-  .pgh-c.dim b{color:var(--pg-mut,var(--muted));font-weight:700;}
-  /* блок під назвою тепер = хаб + (за потреби) коробка «Чати папки» */
+  /* блок під назвою = запасна стрічка підпапок + (за потреби) коробка «Чати папки» */
   .pg-links{background:none;border:0;overflow:visible;}
   .pgl-box{display:flex;flex-direction:column;border-radius:18px;background:var(--pg-field,var(--card));border:1px solid var(--pg-line,var(--line));overflow:hidden;}
 
-  /* ── Підпапки в документі (10.10.2026): рядок плиток над хабом звʼязків ── */
-  .pg-subs{margin:0 0 12px;}
-  .pgs-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 8px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pg-mut,var(--muted));}
-  .pgs-new{border:0;background:none;color:var(--pg-acc,var(--accent));font:inherit;font-size:12px;font-weight:800;letter-spacing:0;text-transform:none;cursor:pointer;padding:6px 4px;}
-  .pgs-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
-  .pgs-row::-webkit-scrollbar{display:none;}
-  .pgs-t{flex:0 0 118px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px;border-radius:14px;cursor:pointer;text-align:left;font:inherit;
-    border:1px solid var(--pg-edge,var(--line));background:var(--pg-surface,var(--card));color:var(--pg-fg,var(--text));}
-  .pgs-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;margin-bottom:4px;color:#fff;background:var(--c);}
-  .pgs-ic .pgb-ic{color:#fff;}
-  .pgs-t b{font-size:13.5px;font-weight:800;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .pgs-t small{font-size:11px;color:var(--pg-mut,var(--muted));max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* ── «Підпапки» — стрічка-сторіс (16.10.2026): маленькі прямокутні картки, «＋» першим ──
+     Блок у документі (05-fold.js) і запасна стрічка під назвою (36-chats.js) — та сама розмітка. */
+  .sbs{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;min-width:0;}
+  .pg-content .sbs{margin:2px 0;}
+  .sbs-h{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--pg-mut,var(--muted));}
+  .sbs-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:3px 3px 2px;margin:0 -3px;}
+  .sbs-row::-webkit-scrollbar{display:none;}
+  .sbs-t{all:unset;box-sizing:border-box;cursor:pointer;flex:0 0 62px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;color:var(--pg-fg,var(--text));}
+  .sbs-cv{width:48px;height:64px;border-radius:11px;display:grid;place-items:center;overflow:hidden;
+    background:color-mix(in srgb,var(--c,#6a7dff) 30%,var(--pg-surface,var(--card)));background-size:cover;background-position:center;color:#fff;
+    box-shadow:0 0 0 1.5px var(--pgsheet,var(--pg-bg,#14161c)),0 0 0 2.5px color-mix(in srgb,var(--pg-fg,#888) 22%,transparent);}
+  .sbs-t.full .sbs-cv{box-shadow:0 0 0 1.5px var(--pgsheet,var(--pg-bg,#14161c)),0 0 0 2.5px var(--pg-acc,var(--accent));}
+  .sbs-cv .ico{width:18px;height:18px;opacity:.9;}
+  .sbs-n{width:64px;font-size:10.5px;font-weight:650;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sbs-t.add .sbs-cv{background:transparent;color:var(--pg-mut,var(--muted));box-shadow:none;border:1px solid var(--pg-edge,var(--line));}
+  .sbs-t.add .sbs-cv svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;}
+  .sbs-t.add .sbs-n{color:var(--pg-mut,var(--muted));}
+  .sbs-t:focus-visible .sbs-cv{outline:2px solid var(--pg-acc,var(--accent));outline-offset:3px;}
+  .sbs-t:active .sbs-cv{transform:scale(.96);}
+  .sbs-none{font-size:13px;color:var(--pg-mut,var(--muted));padding:6px 0;}
+  @media(min-width:1024px){ .sbs-t{flex-basis:70px;} .sbs-cv{width:54px;height:72px;} .sbs-n{width:72px;font-size:11px;} }
   /* ── Група «як на iPhone»: вікно з іконками поверх Огляду ── */
   .fios-ov{display:grid;place-items:center;align-items:center;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);}
   .fios-in{width:min(340px,calc(100vw - 40px));padding:18px 16px 16px;border-radius:30px;background:color-mix(in srgb,var(--card) 88%,transparent);
@@ -117,12 +116,8 @@
   .fios-add .fios-ic{background:transparent;border:1.5px dashed var(--hair-2);color:var(--muted);}
   .fios-n{font-size:12px;font-weight:700;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .fios-notes{width:100%;margin-top:16px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--hair);color:var(--text);font:inherit;font-weight:800;cursor:pointer;}
-  .pgs-ic svg{width:17px;height:17px;}
 
   /* ── «Звʼязки папки» (54-links.js): рядки з перемикачем, шторка на телефоні, права панель на ноутбуці ── */
-  .pgh-head{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 6px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--pg-mut,var(--muted));}
-  .pgh-head button{all:unset;cursor:pointer;min-height:32px;padding:0 6px;font-size:13px;font-weight:800;letter-spacing:0;text-transform:none;color:var(--pg-acc,var(--accent));}
-  .pgh-head button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px;}
   .lk{display:flex;flex-direction:column;gap:8px;}
   .lk-r{display:flex;align-items:stretch;gap:8px;}
   .lk-m{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:60px;padding:10px 12px;border-radius:16px;
@@ -186,10 +181,6 @@
     #lkAside .lkc-mis>span:not(.wd-ring) b{font-size:14px;font-weight:800;} #lkAside .lkc-mis small{font-size:12.5px;color:var(--pg-mut,var(--muted));font-weight:600;}
   }
   /* «Документ · Стрічка» */
-  .lkv-seg{display:inline-flex;gap:4px;padding:4px;margin:0 0 12px;border-radius:14px;background:color-mix(in srgb,var(--pg-fg,#888) 7%,transparent);}
-  .lkv-seg button{all:unset;box-sizing:border-box;cursor:pointer;min-height:36px;padding:0 16px;border-radius:10px;font-size:14px;font-weight:800;color:var(--pg-mut,var(--muted));}
-  .lkv-seg button.on{background:var(--pg-surface,var(--card));color:var(--pg-fg,var(--text));box-shadow:0 1px 3px rgba(0,0,0,.12);}
-  .lkv-seg button:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
   #scr-page.lk-feedmode #pgAddLink{display:none;}
   .lkf{display:flex;flex-direction:column;gap:6px;padding:0 0 120px;}
   .lkf-day{margin:12px 2px 2px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--pg-mut,var(--muted));}
@@ -200,16 +191,3 @@
   .lkf-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
   .lkf-tx b{font-size:14.5px;font-weight:800;overflow-wrap:anywhere;}
   .lkf-tx small{font-size:12.5px;font-weight:600;color:var(--pg-mut,var(--muted));overflow-wrap:anywhere;}
-  /* перемикач папок у шапці документа */
-  .lks{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;min-width:0;}
-  .lks-grp{all:unset;cursor:pointer;align-self:flex-start;min-height:28px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--pg-mut,var(--muted));}
-  .lks-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 1px 4px;}
-  .lks-row::-webkit-scrollbar{display:none;}
-  .lks-c{all:unset;box-sizing:border-box;cursor:pointer;flex:none;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px 0 8px;border-radius:14px;
-    font-size:14px;font-weight:800;white-space:nowrap;color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--pg-fg,#888) 5%,transparent);border:1.5px solid var(--pg-edge,var(--line));}
-  .lks-c.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);}
-  .lks-ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--c);color:#fff;}
-  .lks-ic .ico{width:16px;height:16px;}
-  .lks-c.add{padding:0 14px;border-style:dashed;color:var(--pg-acc,var(--accent));background:transparent;}
-  .lks-c:focus-visible,.lks-grp:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
-  .lks-row::after{content:'';flex:0 0 6px;}   /* останній чип не впирається в край смуги */

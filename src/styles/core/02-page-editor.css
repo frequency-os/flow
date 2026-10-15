@@ -40,12 +40,12 @@
   @keyframes pgMicPulse{0%,100%{box-shadow:0 0 0 0 rgba(224,69,63,.55)}50%{box-shadow:0 0 0 6px rgba(224,69,63,0)}}
   @media (prefers-reduced-motion: reduce){ .pg-micbtn.live{animation:none;} }
   .pg-doc{max-width:none;margin:0 auto;padding:16px 14px 200px;transition:max-width .25s ease;}
-  /* порожній аркуш: центруємо блок по висоті екрана, замість того щоб він
-     лишався притиснутим до верху з великою порожньою зоною знизу */
+  /* порожній аркуш: назва лишається вгорі, як у нотатці (16.10.2026; раніше весь аркуш
+     центрувався по висоті — і назва папки «пливла» на середину екрана) */
   .pg-doc:has(.pg-emptystate){
     min-height:calc(100dvh - 210px);
     min-height:calc(var(--tg-viewport-stable-height, 100dvh) - 210px);
-    display:flex;flex-direction:column;justify-content:center;padding-bottom:16px;
+    display:flex;flex-direction:column;justify-content:flex-start;padding-bottom:16px;
   }
   /* режим «на весь екран» */
   #scr-page.pg-wide .pg-doc{max-width:none;padding-left:clamp(10px,2vw,26px);padding-right:clamp(10px,2vw,26px);}
@@ -1102,3 +1102,35 @@
   .fdsheet .fds-i.on{background:rgba(106,125,255,.18);}
   .fdsheet .fds-i:focus-visible,.fdsheet .fds-new:focus-visible{outline:2px solid #6a7dff;}
   .fdsheet .fds-none{color:#8b93a3;padding:8px 4px;}
+
+  /* ══ Нижнє поле документа (16.10.2026, «папка-нотатка» етап 3) ══
+     Телефон: стоїть на місці нижнього меню (меню в документі сховане); ноутбук: по ширині колонки (JS). */
+  .pgc{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:205;display:flex;align-items:flex-end;gap:8px;}
+  .pgc[hidden]{display:none !important;}
+  .pgc-plus{flex:none;width:52px;height:52px;border-radius:26px;border:0;padding:0;cursor:pointer;display:grid;place-items:center;
+    background:var(--pg-acc);color:#0b0d12;box-shadow:0 10px 24px -12px rgba(0,0,0,.6);-webkit-tap-highlight-color:transparent;}
+  .pgc-plus svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;}
+  .pgc-plus:active{transform:scale(.95);}
+  .pgc-field{flex:1;min-width:0;display:flex;align-items:flex-end;gap:4px;min-height:52px;box-sizing:border-box;padding:6px;border-radius:26px;
+    background:color-mix(in srgb,var(--pgsheet,var(--pg-bg)) 88%,transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+    border:1px solid color-mix(in srgb,var(--pg-fg) 12%,transparent);box-shadow:0 10px 30px -14px rgba(0,0,0,.6);}
+  .pgc-chev{flex:none;width:34px;height:40px;border-radius:17px;border:0;padding:0;cursor:pointer;display:grid;place-items:center;background:transparent;color:var(--pg-acc);}
+  .pgc-chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
+  .pgc-chev.open{background:color-mix(in srgb,var(--pg-acc) 16%,transparent);}
+  .pgc-chev.open svg{transform:rotate(180deg);}
+  .pgc-modes{display:flex;gap:2px;padding:2px;align-self:center;border-radius:18px;background:color-mix(in srgb,var(--pg-fg) 6%,transparent);}
+  .pgc-modes[hidden]{display:none;}
+  .pgc-modes button{width:34px;height:34px;border-radius:17px;border:0;padding:0;cursor:pointer;display:grid;place-items:center;background:transparent;color:var(--pg-mut);}
+  .pgc-modes button.on{background:var(--pg-acc);color:#0b0d12;}
+  .pgc-modes svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .pgc-modes circle{fill:currentColor;stroke:none;}
+  .pgc-input{flex:1;min-width:0;align-self:center;box-sizing:border-box;max-height:120px;padding:9px 4px;border:0;background:transparent;resize:none;outline:none;
+    color:var(--pg-fg);font:inherit;font-size:16px;line-height:1.35;}   /* 16px — iPhone не збільшує сторінку при фокусі */
+  .pgc-input::placeholder{color:var(--pg-mut);}
+  .pgc-send{flex:none;width:40px;height:40px;border-radius:20px;border:0;padding:0;cursor:pointer;display:grid;place-items:center;background:var(--pg-acc);color:#0b0d12;}
+  .pgc-send:disabled{cursor:default;background:color-mix(in srgb,var(--pg-fg) 10%,transparent);color:var(--pg-mut);}
+  .pgc-send svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+  .pgc-plus:focus-visible,.pgc-chev:focus-visible,.pgc-modes button:focus-visible,.pgc-send:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
+  #scr-page.pgc-on .pg-addblock{display:none;}   /* «＋» тепер у нижньому полі */
+  @media (max-width:1023px){ body.pgc-live .nav{display:none !important;} }   /* у документі нижнє меню ховається — повернення стрілкою вгорі */
+  @media (min-width:1024px){ .pgc{right:auto;bottom:18px;} }
