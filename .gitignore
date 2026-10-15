@@ -11,3 +11,5 @@ release/
 original/
 # тимчасові копії репо для паралельних агентів (git worktree) — живуть локально
 .claude/worktrees/
+# особисті налаштування Claude Code на цьому Mac (стиль, дозволи) — не для репо
+.claude/settings.local.json
