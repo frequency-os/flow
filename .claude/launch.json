@@ -7,6 +7,13 @@
       "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-4173} --directory dist"],
       "port": 4173,
       "autoPort": true
+    },
+    {
+      "name": "pult",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "python3 tools/pult.py && python3 -m http.server ${PORT:-4190} --directory pult"],
+      "port": 4190,
+      "autoPort": true
     }
   ]
 }
