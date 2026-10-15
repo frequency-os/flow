@@ -11,7 +11,8 @@
     {id:'first',  grp:'Фінансові звички', em:'🐷', t:'Спершу собі',       flow:['дохід','{n}% у Подушку?'], on:true, n:10, unit:'%', min:1, max:50},
     {id:'h24',    grp:'Фінансові звички', em:'⏳', t:'Правило 24 годин',  flow:['витрата ≥ {n}','почекати добу?'], on:false, n:5000, unit:'cur', min:100, max:10000000},
     {id:'cushion',grp:'Фінансові звички', em:'🛟', t:'Подушка безпеки',   flow:['{n} міс. витрат','ціль Подушки'], on:true, n:3, unit:'міс.', min:1, max:12},
-    {id:'review', grp:'Фінансові звички', em:'📊', t:'Огляд місяця',      flow:['початок місяця','підсумок і норма 20%'], on:true}
+    {id:'review', grp:'Фінансові звички', em:'📊', t:'Огляд місяця',      flow:['початок місяця','підсумок і норма 20%'], on:true},
+    {id:'bigsum', grp:'Фінансові звички', em:'🔎', t:'Перевірка суми',    flow:['сума в {n} {d} більша за звичну','перепитати'], on:true, n:10, unit:'разів', min:3, max:100}
   );
 
   // ── спільне ──
@@ -46,6 +47,23 @@
   }
 
   // ── «Правило 24 годин»: перед записом великої витрати (46-wallet.js wlOpSheet). true — запис зупинено, чекаємо рішення ──
+  // ── «Перевірка суми» (12.10.2026): у тестовому місяці 1800 + 1800 злиплось у 18 001 800 ₴ і записалось мовчки.
+  // Порівнюємо з найбільшою операцією того ж типу за 90 днів; історії нема — перепитуємо від мільйона. Лише питає.
+  function flBigSum(amount,type,proceed,fix){
+    if(!rlOn('bigsum')) return false;
+    const n=Math.max(3,+rlN('bigsum')||10), from=(()=>{ const d=new Date(); d.setDate(d.getDate()-90); return ymdLocal(d); })();
+    let max=0; (finOps||[]).forEach(o=>{ if(!o||!opMain(o)||String(o.date||'')<from||String(o.id||'').startsWith('start_')) return;
+      if(type==='in'?_isIncAny(o):_isExpAny(o)) max=Math.max(max,+o.amount||0); });
+    const big=max>0 ? (amount>=max*n&&amount>=10000) : amount>=1000000;
+    if(!big) return false;
+    const x=max>0?Math.round(amount/max):0;
+    actionSheet({title:'🔎 Точно '+money(amount)+'?', sub:max>0
+        ?'Це в '+x+' '+pluralUk(x,'раз','рази','разів')+' більше за '+(type==='in'?'найбільший дохід':'найбільшу витрату')+' за 3 місяці ('+money(max)+'). Можливо, зайві цифри.'
+        :'Дуже велика сума для першого запису. Можливо, зайві цифри.',
+      items:[ {ic:'edit', label:'Виправити суму', onClick:()=>{ if(fix) fix(); }},
+              {ic:'plus', label:'Так, записати '+money(amount), onClick:()=>proceed()} ]});
+    return true;
+  }
   function flH24(amount,label,proceed,defer){
     if(!rlOn('h24')) return false;
     const lim=Math.max(100,+rlN('h24')||5000); if(!(+amount>=lim)) return false;

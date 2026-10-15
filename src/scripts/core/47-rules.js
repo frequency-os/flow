@@ -19,7 +19,7 @@
     return {on:typeof c.on==='boolean'?c.on:!!d.on, n:(typeof c.n==='number'&&isFinite(c.n))?c.n:d.n}; }
   function rlOn(id){ return rlCfg(id).on; }
   function rlN(id){ return rlCfg(id).n; }
-  function rlUnit(r,n){ return r.unit==='днів'?pluralUk(n,'день','дні','днів'):(r.unit||''); }
+  function rlUnit(r,n){ return r.unit==='днів'?pluralUk(n,'день','дні','днів'):r.unit==='разів'?pluralUk(n,'раз','рази','разів'):(r.unit||''); }
   function rlFlow(r){ const n=rlN(r.id); return r.flow.map(s=>s.replace('{n}', r.unit==='cur'?money(n):String(n)).replace('{d}',rlUnit(r,n))); }
   // лічильник і журнал — лише разом із дією людини (прийняла / відхилила / зробила)
   function rlMark(id,ok,sum){

@@ -33,7 +33,8 @@
     e.saved = e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0);
     // 'in' = резерв: списується з картки/балансу. 'out' = витрата ЗІ збереженого:
     // позначаємо envSpend, щоб не списувати баланс удруге (гроші вже пішли при поповненні).
-    const finLabel = t==='in' ? ('У конверт: '+e.name) : (e.name+' · '+(label||'витрата'));
+    // «Продукти · Продукти» не пишемо: коли підпис = назва конверта, лишаємо одну
+    const finLabel = t==='in' ? ('У конверт: '+e.name) : (label&&String(label).trim().toLowerCase()!==String(e.name||'').trim().toLowerCase() ? e.name+' · '+label : e.name);
     const fo={ id:finId, type:'out', amount, label:finLabel, date, env:e.name, envId:e.id };
     if(t==='in'){ try{ fo.card = cardId || e.cardId || (cards.length?mainCard().id:undefined); }catch(_){} }
     else { fo.envSpend=true; }

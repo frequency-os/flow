@@ -62,7 +62,7 @@
     if(!(out>0)||!cats.length) return '';
     const top=cats.slice(0,4), rest=cats.slice(4).reduce((s,c)=>s+c.sum,0);
     if(rest>0) top.push({label:'Інше',sum:rest});
-    const fromEnv=cats.filter(c=>c.env).reduce((s,c)=>s+c.sum,0);
+    const fromEnv=cats.reduce((s,c)=>s+(+c.envSum||0),0);   // лише справді з конверта (envSpend), не мітка категорії
     const pct=v=>Math.max(1,Math.round(v/out*100));
     return `<div class="mo-cats" role="img" aria-label="Витрати за категоріями: ${esc(top.map(c=>c.label+' '+money(c.sum)).join(', '))}">
         <span class="mo-seg">${top.map((c,i)=>`<i style="width:${pct(c.sum)}%;background:${MO_CAT_COLORS[i%MO_CAT_COLORS.length]}"></i>`).join('')}</span>

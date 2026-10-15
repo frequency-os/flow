@@ -177,7 +177,8 @@
          fd_tts, fd_tts_voice, fd26t, flow_dev, dev_translate_content,
          flowPgLastBlock, flowPgRecentBlocks, flowPageThemeChoice, __flow_snapshot__,
          __flow_wipe_idb__, __flow_wipe_np__ (мітка скидання для npHydrate), __devtest. */
-  window.FLOW_RAW_KEYS = ['lang_pref','i18n_content_cache','goals_data','fin_ops','diary_entries_v1',
+  window.FLOW_RAW_KEYS = ['envfill_ask_ym',   // лише цей пристрій: «раз на місяць» пропозиції наповнити конверти (46-wallet.js)
+    'lang_pref','i18n_content_cache','goals_data','fin_ops','diary_entries_v1',
     'space_purge_v1','legacy_widgets_purge_v1','theme_flat_default_v1',
     'ai_agent','ai_dev','ai_usage','ai_brief_ds','ai_week_ds','pet3d','pet3d_fx','pet_say_i','rit_auto',
     'rrail_cfg','pg_wide','fd_isl','fd_wake','fd_tts','fd_tts_voice','fd26t','flow_dev','dev_translate_content',
