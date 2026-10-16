@@ -328,12 +328,18 @@ def glossary():
 
 
 def progress():
-    """pult/progres.local.json — лише на цьому Mac (поза git). Нема файлу — чистий старт."""
+    """Прогрес навчання живе в базі Хабу навичок (claude.ai), пульт його не бачить —
+    тут лише порожня заготовка, щоб карта показувала слова без позначок."""
+    return {'slova': {}, 'kroky': {}, 'zrobysam': []}
+
+
+def hub_url():
+    """Адреса приватного Хабу навичок — pult/hub.local.json (поза git)."""
     try:
-        p = json.loads(read('pult/progres.local.json') or '{}')
+        u = json.loads(read('pult/hub.local.json') or '{}').get('url', '')
     except ValueError:
-        p = {}
-    return {'slova': p.get('slova') or {}, 'kroky': p.get('kroky') or {}, 'zrobysam': p.get('zrobysam') or []}
+        u = ''
+    return u if u.startswith('https://claude.ai/') else ''
 
 
 def skills_html(secs, steps, prog):
@@ -348,9 +354,10 @@ def skills_html(secs, steps, prog):
     total = sum(len(s['terms']) for s in secs)
     got = sum(1 for s in secs for t in s['terms'] if lv(t['name']))
     w('<section id="sec-skills"><div class="sec-h"><h2>Мої навички</h2>'
-      f'<p class="muted">Карта — {total} слів зі словника по 6 темах: світле — зустрів, темне — розумієш або '
-      'застосував. Під нею — стежка: один наступний крок. Прогрес лежить лише на цьому Mac.</p></div>'
-      '<div class="skmap">')
+      f'<p class="muted">Карта — {total} слів зі словника по 6 темах і стежка з кроків. Прогрес, картки англійської '
+      'й міні-тести — у Хабі навичок (відкривається і з телефона).</p>'
+      + (f'<p><a class="hub-link" href="{esc(hub_url())}" target="_blank" rel="noopener noreferrer">Відкрити Хаб навичок ↗</a></p>'
+         if hub_url() else '') + '</div><div class="skmap">')
     for s in secs:
         n = len(s['terms'])
         g = sum(1 for t in s['terms'] if lv(t['name']))
@@ -366,7 +373,7 @@ def skills_html(secs, steps, prog):
             lvl = lv(t['name'])
             mark = ['зустрів', 'розумію', 'застосував'][lvl]
             ask = (f'Я розумію слово «{t["name"]}». Постав мені одне коротке питання, щоб перевірити. '
-                   'Якщо відповідь правильна — познач його в pult/progres.local.json як «розумію» і запусти npm run pult.')
+                   'Якщо відповідь правильна — познач його в Хабі навичок як «розумію».')
             w(f'<li><span class="lv lv{lvl}" title="{mark}"></span><span class="w"><b>{esc(t["name"])}</b>'
               + (f' <span class="eng">{esc(t["eng"])}</span>' if t['eng'] else '')
               + f'<span class="d">{esc(t["desc"])}</span></span>'
@@ -396,7 +403,7 @@ def skills_html(secs, steps, prog):
             start = (f'Почнімо крок {i} «{s.get("nazva")}» зі стежки навчання (pult/stezhka.json).\n'
                      f'Поясни поняття на прикладі Frequency, дай матеріал ({url}), потім «Зроби сам»: {s.get("zrobysam")}\n'
                      f'Крок пройдено, коли: {s.get("proideno")}\n'
-                     'Після — онови pult/progres.local.json і запусти npm run pult.')
+                     'Після — відміть прогрес у Хабі навичок.')
             w(f'<li class="st-now"><span class="pd">{i}</span><div class="pn"><b>{esc(s.get("nazva"))}</b>'
               f'<p>{esc(s.get("ideia"))}</p>'
               '<p class="chips">' + ''.join(f'<span class="chip">{esc(x)}</span>' for x in s.get('slova', [])) + '</p>'
@@ -724,6 +731,8 @@ section,.dir,.file,.cand{scroll-margin-top:70px}
 .d{display:block;color:var(--mu);font-size:12.5px}
 .sk-m{font-size:13px;margin:8px 0 0}.sk-m a,.pn a{color:var(--ac)}
 .path-h{font-size:16px;margin:18px 0 6px}
+.hub-link{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;margin-top:8px;border-radius:10px;
+background:var(--ac);color:var(--bg);font-weight:600;text-decoration:none}
 .path{list-style:none;margin:0;padding:0}
 .path li{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--line);padding:9px 0;font-size:13.5px}
 .pd{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600}

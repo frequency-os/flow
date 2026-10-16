@@ -1,4 +1,7 @@
 # Пульт збирається з файлів скриптом tools/pult.py — у git не кладемо.
-index.html
+/index.html
 # Особистий прогрес навчання — лише на цьому Mac.
 *.local.json
+# Локальний перегляд хабу без сервера (tools/hub.py)
+hub/preview.html
+hub/tracks.json

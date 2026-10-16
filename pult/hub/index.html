@@ -1,0 +1,399 @@
+<title>Хаб навичок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Розкладка: одна колонка-«щоденник учня», зверху напрямки, під ними порада дня і робоча панель напрямку */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --sunk:#e9edf2; --line:#d9dfe7;
+  --ink:#16202c; --muted:#5d6878; --faint:#8a94a3;
+  --accent:#3f55c9; --accent-soft:#e3e7fb; --on-accent:#ffffff;
+  --teal:#0f7a63; --teal-soft:#dcf2ea; --blue:#2d6fc0; --blue-soft:#deeafa;
+  --amber:#9a6411; --amber-soft:#f8ebd4; --pink:#a83a66; --pink-soft:#f8e1ea;
+  --good:#1d7a45; --warn:#9a6411; --bad:#b03a3a;
+  --font:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --surface:#171e27; --sunk:#1e2731; --line:#2a3542;
+  --ink:#e8edf3; --muted:#a3adba; --faint:#7d8896;
+  --accent:#8ea0ff; --accent-soft:#232c55; --on-accent:#10162b;
+  --teal:#6fd3b4; --teal-soft:#123a31; --blue:#8bb8f2; --blue-soft:#172c47;
+  --amber:#f0c27a; --amber-soft:#3a2b12; --pink:#f2a2c1; --pink-soft:#3f1d2c;
+  --good:#7fd6a2; --warn:#f0c27a; --bad:#f09595; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --surface:#171e27; --sunk:#1e2731; --line:#2a3542;
+  --ink:#e8edf3; --muted:#a3adba; --faint:#7d8896;
+  --accent:#8ea0ff; --accent-soft:#232c55; --on-accent:#10162b;
+  --teal:#6fd3b4; --teal-soft:#123a31; --blue:#8bb8f2; --blue-soft:#172c47;
+  --amber:#f0c27a; --amber-soft:#3a2b12; --pink:#f2a2c1; --pink-soft:#3f1d2c;
+  --good:#7fd6a2; --warn:#f0c27a; --bad:#f09595; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font);padding-inline:16px;padding-block:20px 56px}
+main{max-width:780px;margin:0 auto;display:grid;gap:16px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h2{font-size:18px;font-weight:600;margin:0}
+h3{font-size:15px;font-weight:600;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.muted{color:var(--muted)}.small{font-size:13px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.pill{font-size:12px;border-radius:999px;padding:3px 10px;background:var(--sunk);color:var(--muted)}
+.pill.ok{background:var(--teal-soft);color:var(--teal)}
+/* напрямки */
+.tracks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.tracks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.trk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 6px;text-align:center;display:grid;gap:4px;justify-items:center;min-height:112px}
+.trk[aria-pressed="true"]{border:2px solid var(--accent);padding:9px 5px}
+.trk .nm{font-size:13px;font-weight:600}.trk .st{font-size:11.5px;color:var(--muted);line-height:1.3}
+.ring{width:48px;height:48px}
+.ring circle{fill:none;stroke-width:5}
+.ring .bgc{stroke:var(--sunk)}
+.trk.add{border-style:dashed;color:var(--muted);align-content:center}
+.trk.add .plus{font-size:26px;line-height:1}
+/* сьогодні */
+.today{background:var(--accent-soft);border-radius:var(--r);padding:14px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.today .tx{flex:1;min-width:220px}
+.today b{color:var(--accent);font-weight:600}
+.today p{color:var(--ink);font-size:14px;margin-top:2px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:0 16px;min-height:44px;font-weight:500}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:hover{border-color:var(--accent)}
+/* панель */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:14px}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+/* код: теми */
+.topics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.topics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tp{border:1px solid var(--line);border-radius:12px;padding:10px;min-width:0}
+.tp[open]{grid-column:1/-1}
+.tp>summary{list-style:none;cursor:pointer;display:grid;gap:5px}
+.tp>summary::-webkit-details-marker{display:none}
+.tp .tn{font-size:13.5px;font-weight:600}
+.bar{height:7px;border-radius:4px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:4px}
+.tp .tc{font-size:12px;color:var(--muted)}
+.terms{list-style:none;margin:10px 0 0;padding:0;columns:2 260px;column-gap:18px}
+.terms li{break-inside:avoid;display:flex;gap:8px;padding:5px 0;font-size:13.5px}
+.lv{flex:none;width:10px;height:10px;border-radius:50%;border:2px solid var(--teal);margin-top:5px}
+.lv.l1{background:var(--teal-soft)}.lv.l2{background:var(--teal)}
+.terms .d{display:block;color:var(--muted);font-size:12.5px}
+/* стежка */
+.path{list-style:none;margin:0;padding:0;display:grid}
+.path>li{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.num{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600}
+.done .num{background:var(--teal-soft);color:var(--teal)}
+.now .num{background:var(--accent);color:var(--on-accent)}
+.next .num{border:1.5px dashed var(--faint);color:var(--faint)}
+.next .ttl{color:var(--muted);font-weight:500}
+.body{flex:1;min-width:0;display:grid;gap:8px}
+.sec{display:grid;gap:2px;padding:8px 10px;border-radius:10px;background:var(--sunk)}
+.sec .k{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border-radius:8px;padding:2px 8px;background:var(--teal-soft);color:var(--teal)}
+code{font-family:var(--mono);font-size:12.5px}
+.quiz{display:grid;gap:10px;border:1px solid var(--line);border-radius:12px;padding:12px}
+.q p{font-weight:500;font-size:14px;margin-bottom:6px}
+.opts{display:grid;gap:6px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 12px;min-height:44px}
+.opt.right{border-color:var(--good);background:var(--teal-soft)}
+.opt.wrong{border-color:var(--bad)}
+.why{font-size:13px;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+/* картки */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--sunk);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.card{border:1px solid var(--line);border-radius:18px;padding:22px 18px;text-align:center;display:grid;gap:8px;background:var(--surface)}
+.word{font-size:32px;font-weight:700;letter-spacing:-.01em;word-break:break-word}
+.pron{color:var(--muted)}
+.speak{border:1px solid var(--line);background:var(--surface);border-radius:999px;min-height:40px;padding:0 14px;justify-self:center}
+.back{display:grid;gap:6px;border-top:1px dashed var(--line);padding-top:10px}
+.back .uk{font-size:18px;font-weight:600}
+.back .ex{font-style:italic;color:var(--muted)}
+.grade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grade .btn{padding:0 8px}
+.g0{color:var(--bad)}.g1{color:var(--warn)}.g2{color:var(--good)}
+.soon{display:grid;gap:10px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;font-size:14px;max-width:calc(100% - 32px)}
+.fb textarea{width:100%;min-height:110px;font:13px var(--mono);border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<main>
+  <header class="top">
+    <div><h1>Хаб навичок</h1><p class="muted small" id="built">Завантажую…</p></div>
+    <span class="pill" id="sync">База: підключаю…</span>
+  </header>
+
+  <section class="tracks" id="tracks" aria-label="Напрямки"></section>
+
+  <section class="today" id="today" aria-live="polite"></section>
+
+  <section class="panel" id="panel"></section>
+
+  <section class="panel fb" id="fb" hidden>
+    <h3>Скопіюй запит</h3>
+    <p class="muted small">Буфер не відповів — виділи текст і скопіюй.</p>
+    <textarea id="fbt" readonly></textarea>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const ymd = (d) => { d = d || new Date(); const p = n => String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); };
+  const addDays = (n) => { const d = new Date(); d.setDate(d.getDate()+n); return ymd(d); };
+  const TODAY = ymd();
+  const COLORS = {teal:["--teal","--teal-soft"], blue:["--blue","--blue-soft"], amber:["--amber","--amber-soft"], pink:["--pink","--pink-soft"]};
+  // Лейтнер: скриньки 0–5 і через скільки днів показати знову
+  const GAPS = [0, 1, 3, 7, 16, 35];
+  const NEW_PER_DAY = 10;
+
+  let DATA = null, db = null, canWrite = false;
+  const S = { cards:{}, words:{}, steps:{}, quiz:{} };   // прогрес з бази
+  let view = "code";
+  try { view = localStorage.getItem("hub.view") || "code"; } catch(_) {}
+  let queue = [], cur = null, shown = false, newToday = 0;
+
+  // ── копіювання запиту до Claude ──
+  let tm;
+  function say(t){ const el=$("toast"); el.textContent=t; el.hidden=false; clearTimeout(tm); tm=setTimeout(()=>{el.hidden=true},2400); }
+  function copy(text){
+    const fallback = () => { $("fbt").value = text; $("fb").hidden = false; $("fb").scrollIntoView({behavior:"smooth"}); };
+    try {
+      navigator.clipboard.writeText(text).then(() => say("Скопійовано — встав у чат із Claude"), fallback);
+    } catch(_) { fallback(); }
+  }
+
+  // ── рівні ──
+  const lv = (termId) => ({"розумію":1,"застосував":2})[(S.words[termId]||{}).riven] || 0;
+  function codeTrack(){ return DATA.tracks.find(t => t.id === "code"); }
+  function engTrack(){ return DATA.tracks.find(t => t.id === "english"); }
+  function nextStep(){ const t = codeTrack(); return t.steps.find(s => !S.steps[s.id]); }
+  function cardState(id){ return S.cards[id] || null; }
+  function dueCards(){ return engTrack().cards.filter(c => { const st = cardState(c.id); return st && st.due <= TODAY; }); }
+  function newCards(){ return engTrack().cards.filter(c => !cardState(c.id)); }
+  function knownCount(){ return Object.values(S.cards).filter(s => (s.box||0) >= 3).length; }
+
+  // ── кільце прогресу ──
+  function ring(frac, color){
+    const r = 19, C = 2*Math.PI*r, f = Math.max(0, Math.min(1, frac||0));
+    return '<svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="bgc" cx="24" cy="24" r="'+r+'"/>'+
+      '<circle cx="24" cy="24" r="'+r+'" style="stroke:var('+COLORS[color][0]+')" stroke-dasharray="'+(C*f).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 24 24)" stroke-linecap="round"/></svg>';
+  }
+
+  function renderTracks(){
+    const code = codeTrack(), eng = engTrack();
+    const doneSteps = code.steps.filter(s => S.steps[s.id]).length;
+    const items = DATA.tracks.map(t => {
+      let frac = 0, st = "";
+      if (t.id === "code") { frac = doneSteps / code.steps.length; st = "крок " + Math.min(doneSteps+1, code.steps.length) + " з " + code.steps.length; }
+      else if (t.id === "english") { frac = knownCount() / eng.cards.length; const due = dueCards().length; st = due ? due + " на повтор" : knownCount() + " з " + eng.cards.length + " знаю"; }
+      else { st = "етап 2"; }
+      return '<button class="trk" data-view="'+t.id+'" aria-pressed="'+(view===t.id)+'">'+ring(frac, t.color)+
+        '<span class="nm">'+esc(t.name)+'</span><span class="st">'+esc(st)+'</span></button>';
+    });
+    items.push('<button class="trk add" data-copy="add"><span class="plus">+</span><span class="st">новий напрямок</span></button>');
+    $("tracks").innerHTML = items.join("");
+  }
+
+  function renderToday(){
+    newToday = Object.values(S.cards).filter(x => x.first === TODAY).length;
+    const due = dueCards().length, fresh = Math.max(0, Math.min(NEW_PER_DAY - newToday, newCards().length));
+    const step = nextStep();
+    const parts = [];
+    if (due) parts.push(due + " англ. " + (due === 1 ? "картка" : "карток") + " на повтор");
+    else if (fresh) parts.push(Math.min(5, fresh) + " нових англійських слів");
+    if (step) parts.push("крок «" + step.nazva + "»");
+    $("today").innerHTML = '<div class="tx"><b>Сьогодні · 15 хвилин</b><p>'+esc(parts.join(" → ") || "Усе пройдено — можна додати новий напрямок")+'</p></div>'+
+      (due || fresh ? '<button class="btn pri" data-view="english">Картки</button>' : '')+
+      (step ? '<button class="btn" data-view="code" data-jump="now">До кроку</button>' : '');
+  }
+
+  // ── Код ──
+  function renderCode(){
+    const t = codeTrack(), step = nextStep();
+    const done = t.steps.filter(s => S.steps[s.id]).length;
+    let h = '<div class="ph"><h2>Код</h2><span class="muted small">пройдено '+done+' з '+t.steps.length+' · слів '+
+      t.topics.reduce((a,x)=>a+x.terms.length,0)+'</span></div>';
+    h += '<div class="topics">' + t.topics.map(tp => {
+      const n = tp.terms.length, g = tp.terms.filter(x => lv(x.id)).length;
+      return '<details class="tp"><summary><span class="tn">'+esc(tp.name)+'</span><span class="bar"><i style="width:'+(n? Math.round(100*g/n):0)+'%"></i></span>'+
+        '<span class="tc">'+(g ? g+" з "+n+" розумію" : n+" слів")+'</span></summary><ul class="terms">'+
+        tp.terms.map(x => '<li><span class="lv l'+lv(x.id)+'" title="'+["зустрів","розумію","застосував"][lv(x.id)]+'"></span><span><b>'+esc(x.name)+'</b> '+
+          (x.eng ? '<span class="muted small">'+esc(x.eng)+'</span>' : '')+'<span class="d">'+esc(x.desc)+'</span></span></li>').join("")+
+        '</ul></details>';
+    }).join("") + '</div>';
+    h += '<h3>Стежка</h3><ol class="path">' + t.steps.map((s, i) => {
+      if (S.steps[s.id]) return '<li class="done"><span class="num">✓</span><div class="body"><span class="ttl"><b>'+esc(s.nazva)+'</b></span>'+
+        '<span class="muted small">'+esc(S.steps[s.id].koly || "")+(S.steps[s.id].nota ? " · "+esc(S.steps[s.id].nota) : "")+'</span></div></li>';
+      if (s !== step) return '<li class="next"><span class="num">'+(i+1)+'</span><div class="body"><span class="ttl">'+esc(s.nazva)+'</span></div></li>';
+      return '<li class="now" id="now"><span class="num">'+(i+1)+'</span><div class="body">'+
+        '<h3>'+esc(s.nazva)+'</h3>'+
+        '<div class="sec"><span class="k">Головна думка</span><span>'+esc(s.ideia)+'</span></div>'+
+        '<div class="sec"><span class="k">Навіщо тобі</span><span>'+esc(s.navishcho||"")+'</span></div>'+
+        '<div class="sec"><span class="k">У Frequency</span><span>'+esc(s.u_frequency||"")+'</span></div>'+
+        '<div class="chips">'+(s.slova||[]).map(w => '<span class="chip">'+esc(w)+'</span>').join("")+'</div>'+
+        (s.material && /^https:\/\//.test(s.material.url) ? '<p>📖 <a href="'+esc(s.material.url)+'" target="_blank" rel="noopener noreferrer">'+esc(s.material.nazva)+'</a> <span class="muted small">· ~'+esc(s.material.hv)+' хв</span></p>' : '')+
+        '<div class="sec"><span class="k">Зроби сам</span><span>'+esc(s.zrobysam)+'</span></div>'+
+        '<p class="muted small">Пройдено, коли: '+esc(s.proideno)+'</p>'+
+        renderQuiz(s)+
+        '<div class="row"><button class="btn pri" data-copy="start" data-step="'+esc(s.id)+'">Почати з Claude</button>'+
+        '<button class="btn" data-copy="done" data-step="'+esc(s.id)+'">Я пройшов — перевір</button></div>'+
+        '</div></li>';
+    }).join("") + '</ol>';
+    return h;
+  }
+
+  const answers = {};
+  function renderQuiz(s){
+    if (!s.test || !s.test.length) return "";
+    const saved = S.quiz[s.id];
+    const a = answers[s.id] || {};
+    const got = s.test.filter((q, i) => a[i] === q.a).length, all = Object.keys(a).length === s.test.length;
+    return '<div class="quiz"><div class="ph"><h3>Міні-тест</h3><span class="muted small">'+
+      (all ? got+" з "+s.test.length : saved ? "минулого разу "+saved.score+" з "+saved.of : "3 питання")+'</span></div>'+
+      s.test.map((q, i) => '<div class="q"><p>'+(i+1)+'. '+esc(q.q)+'</p><div class="opts">'+
+        q.o.map((o, j) => {
+          const picked = a[i] === j, cls = a[i] == null ? "" : (j === q.a ? " right" : (picked ? " wrong" : ""));
+          return '<button class="opt'+cls+'" data-quiz="'+esc(s.id)+'" data-q="'+i+'" data-o="'+j+'"'+(a[i] != null ? " disabled" : "")+'>'+esc(o)+'</button>';
+        }).join("")+'</div>'+(a[i] != null ? '<p class="why">'+esc(q.p)+'</p>' : '')+'</div>').join("")+
+      (all ? '<p>'+(got === s.test.length ? "Усе правильно. Напиши Claude «Я пройшов — перевір», і крок буде відмічено." : "Перечитай пояснення під питаннями — і спробуй ще раз пізніше.")+'</p>'+
+        '<div class="row"><button class="btn" data-quizreset="'+esc(s.id)+'">Пройти ще раз</button></div>' : '')+
+      '</div>';
+  }
+
+  async function answer(stepId, qi, oi){
+    const s = codeTrack().steps.find(x => x.id === stepId); if (!s) return;
+    answers[stepId] = answers[stepId] || {}; answers[stepId][qi] = oi;
+    if (Object.keys(answers[stepId]).length === s.test.length && db && canWrite) {
+      const score = s.test.filter((q, i) => answers[stepId][i] === q.a).length;
+      try { await db.collection("quiz").doc(stepId).set({ score, of: s.test.length, koly: TODAY }); } catch(e) { say("Результат тесту не зберігся"); }
+    }
+    render();
+  }
+
+  // ── Англійська: картки ──
+  function buildQueue(){
+    newToday = Object.values(S.cards).filter(x => x.first === TODAY).length;   // нові за сьогодні — з бази, а не з цієї вкладки
+    const due = dueCards().sort((a,b) => (cardState(a.id).due > cardState(b.id).due ? 1 : -1));
+    const fresh = newCards().slice(0, Math.max(0, NEW_PER_DAY - newToday));
+    queue = due.concat(fresh); cur = queue.shift() || null; shown = false;
+  }
+  function renderEnglish(){
+    const eng = engTrack();
+    if (!cur && !queue.length) buildQueue();
+    let h = '<div class="ph"><h2>Англійська</h2><span class="muted small">'+eng.cards.length+' слів зі словника й уроків</span></div>'+
+      '<div class="stats"><div class="stat"><b>'+dueCards().length+'</b><span>на повтор</span></div>'+
+      '<div class="stat"><b>'+newCards().length+'</b><span>нових</span></div>'+
+      '<div class="stat"><b>'+knownCount()+'</b><span>знаю</span></div></div>';
+    if (!cur) return h + '<div class="card"><p class="word">✓</p><p>На сьогодні все. Нові слова з’являться завтра або після наступного уроку.</p></div>';
+    const st = cardState(cur.id);
+    h += '<div class="card"><p class="muted small">'+(st ? "повтор · скринька "+(st.box||0) : "нове слово")+' · '+esc(cur.src)+'</p>'+
+      '<p class="word" lang="en">'+esc(cur.en)+'</p>'+
+      (cur.pron ? '<p class="pron">«'+esc(cur.pron)+'»</p>' : '')+
+      ('speechSynthesis' in window ? '<button class="speak" data-speak="1">🔊 Озвучити</button>' : '')+
+      (shown ? '<div class="back"><p class="uk">'+esc(cur.uk)+'</p>'+(cur.desc ? '<p class="small">'+esc(cur.desc)+'</p>' : '')+
+        (cur.ex ? '<p class="ex" lang="en">'+esc(cur.ex)+'</p>' : '')+'</div>'+
+        '<div class="grade"><button class="btn g0" data-grade="0">Забув</button><button class="btn g1" data-grade="1">Вагаюсь</button><button class="btn g2" data-grade="2">Знаю</button></div>'
+        : '<button class="btn pri" data-flip="1">Показати переклад</button>')+
+      '</div><p class="muted small">Забуте повертається частіше, відоме — рідше. Нових — до '+NEW_PER_DAY+' на день.</p>';
+    if (!db || !canWrite) h += '<p class="muted small">База не підключена — оцінки діють лише до закриття сторінки.</p>';
+    return h;
+  }
+  async function grade(g){
+    if (!cur) return;
+    const st = cardState(cur.id);
+    const box0 = st ? (st.box || 0) : 0;
+    const box = g === 2 ? Math.min(5, box0 + 1) : g === 1 ? Math.max(1, box0) : 0;
+    const next = { box, due: g === 0 ? TODAY : addDays(GAPS[box] || 1), seen: (st ? st.seen || 0 : 0) + 1, last: TODAY, first: st ? (st.first || st.last || TODAY) : TODAY };
+    S.cards[cur.id] = next;
+    if (g === 0) queue.push(cur);          // ще раз у цій же сесії
+    const id = cur.id;
+    cur = queue.shift() || null; shown = false;
+    render();
+    if (db && canWrite) { try { await db.collection("cards").doc(id).set(next); } catch(e) { say("Оцінка не зберіглась у базі"); } }
+  }
+  function speak(){
+    if (!cur || !("speechSynthesis" in window)) return;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(cur.en); u.lang = "en-US"; u.rate = 0.9;
+      const v = speechSynthesis.getVoices().find(x => /^en(-|_)US/i.test(x.lang)); if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    } catch(_) { say("Озвучка недоступна в цьому браузері"); }
+  }
+
+  function renderSoon(t){
+    return '<div class="soon"><div class="ph"><h2>'+esc(t.name)+'</h2><span class="pill">етап 2</span></div><p>'+esc(t.note)+'</p>'+
+      '<p class="muted small">Кожен крок: навіщо тобі як засновнику, головна думка, де це у Frequency, «Зроби сам», матеріали і міні-тест.</p>'+
+      '<div class="row"><button class="btn pri" data-copy="soon" data-track="'+esc(t.id)+'">Попросити Claude почати</button></div></div>';
+  }
+
+  function render(){
+    if (!DATA) return;
+    renderTracks(); renderToday();
+    const t = DATA.tracks.find(x => x.id === view) || DATA.tracks[0];
+    $("panel").innerHTML = t.kind === "path" ? renderCode() : t.kind === "cards" ? renderEnglish() : renderSoon(t);
+  }
+
+  // ── події ──
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("button,[data-view]"); if (!b) return;
+    if (b.dataset.view) {
+      view = b.dataset.view; try { localStorage.setItem("hub.view", view); } catch(_) {}
+      render();
+      const target = b.dataset.jump ? $(b.dataset.jump) : $("panel");
+      if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+      return;
+    }
+    if (b.dataset.flip) { shown = true; render(); return; }
+    if (b.dataset.grade) { grade(+b.dataset.grade); return; }
+    if (b.dataset.speak) { speak(); return; }
+    if (b.dataset.quiz) { answer(b.dataset.quiz, +b.dataset.q, +b.dataset.o); return; }
+    if (b.dataset.quizreset) { delete answers[b.dataset.quizreset]; render(); return; }
+    if (b.dataset.copy) {
+      const s = codeTrack().steps.find(x => x.id === b.dataset.step);
+      const k = b.dataset.copy;
+      if (k === "start" && s) copy("Почнімо крок «"+s.nazva+"» зі стежки навчання (Хаб навичок, pult/stezhka.json).\nПоясни поняття на прикладі Frequency, дай матеріал ("+(s.material||{}).url+"), потім «Зроби сам»: "+s.zrobysam+"\nКрок пройдено, коли: "+s.proideno);
+      else if (k === "done" && s) copy("Я пройшов крок «"+s.nazva+"». Перевір мене одним-двома питаннями за умовою «"+s.proideno+"». Якщо все гаразд — відміть крок у базі Хабу навичок (steps/"+s.id+") і слова кроку як «розумію».");
+      else if (k === "add") copy("Додай у Хаб навичок новий напрямок: <назва>.\nЩо хочу вміти: <…>\nЗапропонуй 6–8 кроків (навіщо мені, головна думка, де це у Frequency чи моїй роботі, «Зроби сам», матеріал українською з перевіреним посиланням, міні-тест на 3 питання). Спершу задум — потім «так».");
+      else if (k === "soon") copy("Почнімо етап 2 Хабу навичок: напрямок «"+(DATA.tracks.find(x=>x.id===b.dataset.track)||{}).name+"». Спершу задум кроків — потім «так».");
+    }
+  });
+
+  // ── дані: зміст + база ──
+  fetch("tracks.json").then(r => r.json()).then(d => {
+    DATA = d; $("built").textContent = "Зміст оновлено " + d.built + " · прогрес — у базі цієї сторінки";
+    render();
+  }).catch(() => { $("built").textContent = "Не вдалося завантажити зміст (tracks.json)"; });
+
+  (async () => {
+    try {
+      db = window.claude && await window.claude.use("db");
+      const user = window.claude && await window.claude.use("user");
+      const c = user ? await user.can("data.write") : null;   // null = платформа не сказала: пробуємо, відмова вирішить
+      canWrite = !!db && c !== false;
+    } catch(_) { db = null; }
+    if (!db) { $("sync").textContent = "Лише перегляд — прогрес не зберігається"; return; }
+    $("sync").textContent = canWrite ? "Прогрес зберігається" : "Лише перегляд";
+    $("sync").classList.toggle("ok", canWrite);
+    ["cards","words","steps","quiz"].forEach(name => {
+      db.collection(name).onSnapshot((snap) => {
+        const m = {}; snap.docs.forEach(doc => { if (doc.exists) m[doc.id] = doc.data(); });
+        S[name] = m;
+        if (name === "cards" && !cur && !queue.length) buildQueue();
+        render();
+      }, () => { $("sync").textContent = "Зв’язок із базою втрачено"; $("sync").classList.remove("ok"); });
+    });
+  })();
+})();
+</script>

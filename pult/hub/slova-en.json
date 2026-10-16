@@ -1,0 +1,32 @@
+{
+  "_opys": "Англійські слова з блоку «Урок · 3 слова» наших сесій — колода карток хабу навичок поряд зі словами словника docs/slovnyk.md. en — слово, pron — вимова кирилицею, uk — переклад, ex — приклад, koly — коли було.",
+  "words": [
+    {"en": "worker", "pron": "во́ркер", "uk": "фоновий обробник, сервер-посередник", "ex": "The AI requests go through our Cloudflare worker.", "koly": "10.10"},
+    {"en": "deploy", "pron": "діпло́й", "uk": "викласти нову версію", "ex": "Deploy only what you checked.", "koly": "10.10"},
+    {"en": "upgrade", "pron": "апгре́йд", "uk": "покращення, перехід на кращу версію", "ex": "The upgrade block shows your progress.", "koly": "10.10"},
+    {"en": "revenue", "pron": "ре́вен'ю", "uk": "дохід, виручка", "ex": "Revenue is the money customers pay us.", "koly": "10.10"},
+    {"en": "churn", "pron": "черн", "uk": "відтік — люди, що перестали користуватись", "ex": "High churn means people leave after a month.", "koly": "10.10"},
+    {"en": "runway", "pron": "ра́нвей", "uk": "запас часу, на скільки вистачить грошей", "ex": "We have six months of runway.", "koly": "10.10"},
+    {"en": "source of truth", "pron": "сорс оф трус", "uk": "єдине джерело правди", "ex": "The dictionary is the source of truth for the pult.", "koly": "15.10"},
+    {"en": "template", "pron": "те́мплейт", "uk": "шаблон, заготовка", "ex": "The page is built from a template and data.", "koly": "15.10"},
+    {"en": "escape", "pron": "іске́йп", "uk": "екранувати — зробити текст безпечним", "ex": "Always escape user text before showing it.", "koly": "15.10"},
+    {"en": "skill", "pron": "скіл", "uk": "навичка; інструкція для Claude", "ex": "This skill checks the change on a phone screen.", "koly": "15.10"},
+    {"en": "supply chain", "pron": "сапла́й чейн", "uk": "ланцюг постачання — чужий код у проєкті", "ex": "Read every file before adding it to the supply chain.", "koly": "15.10"},
+    {"en": "scanner", "pron": "ске́нер", "uk": "програма, що щось шукає", "ex": "The scanner found no secrets.", "koly": "15.10"},
+    {"en": "pipeline", "pron": "па́йплайн", "uk": "конвеєр етапів", "ex": "Every task moves through the pipeline.", "koly": "16.10"},
+    {"en": "ahead", "pron": "еге́д", "uk": "попереду (на скільки комітів)", "ex": "This branch is three commits ahead of main.", "koly": "16.10"},
+    {"en": "stale", "pron": "стейл", "uk": "застиглий, несвіжий", "ex": "Stale branches have no activity for days.", "koly": "16.10"},
+    {"en": "executable", "pron": "ігзе́к'ютебл", "uk": "файл, який можна запустити", "ex": "Make the script executable with chmod +x.", "koly": "16.10"},
+    {"en": "launcher", "pron": "ло́нчер", "uk": "запускач, ярлик", "ex": "Double-click the launcher to open the pult.", "koly": "16.10"},
+    {"en": "policy", "pron": "по́лісі", "uk": "правило доступу; політика", "ex": "Each policy checks that the row is yours.", "koly": "16.10"},
+    {"en": "sandbox", "pron": "се́ндбокс", "uk": "пісочниця — безпечне місце для спроб", "ex": "We tested the trigger in a sandbox first.", "koly": "16.10"},
+    {"en": "trigger", "pron": "три́ґер", "uk": "дія, яку база робить сама при зміні", "ex": "The trigger saves the old version.", "koly": "16.10"},
+    {"en": "rollback", "pron": "ро́улбек", "uk": "відкат — повернути, як було", "ex": "If something breaks, run the rollback file.", "koly": "16.10"},
+    {"en": "control", "pron": "контро́л", "uk": "контрольна перевірка, що тест працює", "ex": "The control step proves the test can see data.", "koly": "16.10"},
+    {"en": "credentials", "pron": "креде́ншлз", "uk": "дані входу: пошта й пароль", "ex": "Keep credentials out of git.", "koly": "16.10"},
+    {"en": "proof", "pron": "пруф", "uk": "доказ", "ex": "Fresh output is the proof, not a promise.", "koly": "16.10"},
+    {"en": "progress", "pron": "про́ґрес", "uk": "поступ", "ex": "Your progress lives only on your devices.", "koly": "16.10"},
+    {"en": "path", "pron": "пас", "uk": "стежка; шлях до файлу", "ex": "Follow the path one step at a time.", "koly": "16.10"},
+    {"en": "step", "pron": "степ", "uk": "крок", "ex": "Start with step one.", "koly": "16.10"}
+  ]
+}

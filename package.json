@@ -22,6 +22,7 @@
     "bugs": "./tools/bugs.sh",
     "refs": "./tools/refs.sh",
     "map": "python3 tools/codemap.py",
+    "hub": "python3 tools/hub.py",
     "pult": "python3 tools/pult.py && open pult/index.html"
   },
   "build": {
