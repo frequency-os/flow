@@ -302,6 +302,118 @@ def prompt_add(kind, folder, desc):
             'npm run check і npm run pult, покажи вивід.')
 
 
+# ─────────────── Мої навички: словник → карта, стежка, особистий прогрес ───────────────
+
+SK_ICONS = {1: '⌨️', 2: '🗄️', 3: '🌿', 4: '🛠️', 5: '🔒', 6: '🖼️'}
+LEVELS = {'розумію': 1, 'застосував': 2}
+
+
+def glossary():
+    """docs/slovnyk.md → розділи «## N. Назва» зі словами «- **Слово** (*eng*) — що це»."""
+    secs, cur = [], None
+    for ln in read('docs/slovnyk.md').splitlines():
+        m = re.match(r'^## (\d+)\. (.+)$', ln)
+        if m:
+            cur = {'n': int(m.group(1)), 'name': m.group(2).strip(), 'terms': []}
+            secs.append(cur)
+            continue
+        m = re.match(r'^- \*\*([^*]+)\*\*\s*(?:\(([^)]*)\))?\s*—\s*(.*)$', ln)
+        if m and cur:
+            desc = md_plain(m.group(3)).replace('*', '')
+            desc = desc.split('У Frequency:')[0].strip()
+            cur['terms'].append({'name': m.group(1).strip(),
+                                 'eng': (m.group(2) or '').replace('*', '').strip(),
+                                 'desc': desc[:160] + ('…' if len(desc) > 160 else '')})
+    return secs
+
+
+def progress():
+    """pult/progres.local.json — лише на цьому Mac (поза git). Нема файлу — чистий старт."""
+    try:
+        p = json.loads(read('pult/progres.local.json') or '{}')
+    except ValueError:
+        p = {}
+    return {'slova': p.get('slova') or {}, 'kroky': p.get('kroky') or {}, 'zrobysam': p.get('zrobysam') or []}
+
+
+def skills_html(secs, steps, prog):
+    o = []
+    w = o.append
+    done = prog['kroky']
+    nxt = next((s for s in steps if s.get('id') not in done), None)
+
+    def lv(name):
+        return LEVELS.get((prog['slova'].get(name) or {}).get('riven'), 0)
+
+    total = sum(len(s['terms']) for s in secs)
+    got = sum(1 for s in secs for t in s['terms'] if lv(t['name']))
+    w('<section id="sec-skills"><div class="sec-h"><h2>Мої навички</h2>'
+      f'<p class="muted">Карта — {total} слів зі словника по 6 темах: світле — зустрів, темне — розумієш або '
+      'застосував. Під нею — стежка: один наступний крок. Прогрес лежить лише на цьому Mac.</p></div>'
+      '<div class="skmap">')
+    for s in secs:
+        n = len(s['terms'])
+        g = sum(1 for t in s['terms'] if lv(t['name']))
+        pct = round(100 * g / n) if n else 0
+        step = next((x for x in steps if x.get('tema') == s['n'] and x.get('id') not in done), None)
+        status = f'{g} з {n}' if g else f'{n} слів'
+        w(f'<details class="sk"><summary><span class="sk-i">{SK_ICONS.get(s["n"], "📘")}</span>'
+          f'<b>{esc(s["name"])}</b><span class="sk-bar" role="img" aria-label="{esc(status)}"><i style="width:{pct}%"></i></span>'
+          f'<span class="sk-n">{esc(status)}</span>'
+          + (f'<span class="sk-next">далі: {esc(step["nazva"])}</span>' if step else '')
+          + '</summary><div class="sk-body"><ul class="words">')
+        for t in s['terms']:
+            lvl = lv(t['name'])
+            mark = ['зустрів', 'розумію', 'застосував'][lvl]
+            ask = (f'Я розумію слово «{t["name"]}». Постав мені одне коротке питання, щоб перевірити. '
+                   'Якщо відповідь правильна — познач його в pult/progres.local.json як «розумію» і запусти npm run pult.')
+            w(f'<li><span class="lv lv{lvl}" title="{mark}"></span><span class="w"><b>{esc(t["name"])}</b>'
+              + (f' <span class="eng">{esc(t["eng"])}</span>' if t['eng'] else '')
+              + f'<span class="d">{esc(t["desc"])}</span></span>'
+              + ('' if lvl else f'<button class="ico sm" data-copy="{esc(ask)}" aria-label="Я розумію: {esc(t["name"])}">✓</button>')
+              + '</li>')
+        w('</ul>')
+        mats = [x for x in steps if x.get('tema') == s['n'] and (x.get('material') or {}).get('url', '').startswith('https://')]
+        if mats:
+            w('<p class="sk-m">Матеріали: ' + ' · '.join(
+                f'<a href="{esc(x["material"]["url"])}" target="_blank" rel="noopener noreferrer">{esc(x["material"]["nazva"])}</a>'
+                for x in mats) + '</p>')
+        w('</div></details>')
+    w('</div>')
+
+    # Стежка
+    w(f'<h3 class="path-h">Стежка <span class="muted">· пройдено {len([s for s in steps if s.get("id") in done])} з {len(steps)}</span></h3><ol class="path">')
+    for i, s in enumerate(steps, 1):
+        sid = s.get('id', '')
+        m = s.get('material') or {}
+        url = m.get('url', '') if str(m.get('url', '')).startswith('https://') else ''
+        edit = (f'Зміни крок «{s.get("nazva")}» у pult/stezhka.json:\n<що змінити>\n\nПісля — npm run pult.')
+        if sid in done:
+            koly = (done[sid] or {}).get('koly', '')
+            w(f'<li class="st-done"><span class="pd">✓</span><div><b>{esc(s.get("nazva"))}</b>'
+              f'<span class="muted"> · {esc(koly)}</span></div></li>')
+        elif s is nxt:
+            start = (f'Почнімо крок {i} «{s.get("nazva")}» зі стежки навчання (pult/stezhka.json).\n'
+                     f'Поясни поняття на прикладі Frequency, дай матеріал ({url}), потім «Зроби сам»: {s.get("zrobysam")}\n'
+                     f'Крок пройдено, коли: {s.get("proideno")}\n'
+                     'Після — онови pult/progres.local.json і запусти npm run pult.')
+            w(f'<li class="st-now"><span class="pd">{i}</span><div class="pn"><b>{esc(s.get("nazva"))}</b>'
+              f'<p>{esc(s.get("ideia"))}</p>'
+              '<p class="chips">' + ''.join(f'<span class="chip">{esc(x)}</span>' for x in s.get('slova', [])) + '</p>'
+              + (f'<p>📖 <a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(m.get("nazva"))}</a>'
+                 f'<span class="muted"> · ~{esc(m.get("hv", ""))} хв</span></p>' if url else '')
+              + f'<p>✍️ <b>Зроби сам:</b> {esc(s.get("zrobysam"))}</p>'
+              f'<p class="muted">Пройдено, коли: {esc(s.get("proideno"))}</p>'
+              f'<div class="cb"><button class="act-s" data-copy="{esc(start)}">Почати крок</button>'
+              f'<button data-copy="{esc(edit)}">✎ Змінити</button></div></div></li>')
+        else:
+            w(f'<li class="st-next"><span class="pd">{i}</span><div><b>{esc(s.get("nazva"))}</b>'
+              f'<span class="muted"> · {esc(s.get("ideia", "").split(".")[0])}.</span></div>'
+              f'<button class="ico sm" data-copy="{esc(edit)}" aria-label="Змінити крок {esc(s.get("nazva"))}">✎</button></li>')
+    w('</ol></section>')
+    return '\n'.join(o), got, total
+
+
 def chip(use, index):
     t, n = use.get('type', 'file'), use.get('name', '')
     target = index.get((t, n))
@@ -331,6 +443,8 @@ def render():
     scripts = npm_scripts()
     days, dirty = journal()
     names = json.loads(read('pult/temy.json') or '{}').get('names', {})
+    steps = json.loads(read('pult/stezhka.json') or '{}').get('steps', [])
+    skills, sk_got, sk_total = skills_html(glossary(), steps, progress())
     now_topics, brs = work_now(names), branches()
     pub, waiting = site()
     dir_id = lambda rel: 'd-' + re.sub(r'[^\w-]', '-', rel)
@@ -370,7 +484,7 @@ def render():
 
     # Навігація: блоки сторінки, липка смужка вгорі.
     nfiles = sum(len(t['files']) for t in now_topics)
-    nav = [('sec-work', 'В роботі', str(nfiles)),
+    nav = [('sec-work', 'В роботі', str(nfiles)), ('sec-skills', 'Навички', f'{sk_got}/{sk_total}'),
            ('sec-route', 'Маршрут', ''), ('sec-tree', 'Папки', ''),
            ('sec-log', 'Журнал', ''), ('sec-kand', 'Кандидати', str(counts[4][1]))]
     w('<nav class="nav" aria-label="Блоки пульта">' + ''.join(
@@ -449,6 +563,9 @@ def render():
     else:
         w('<p class="empty">Публікацій ще не було</p>')
     w('</div></div></section>')
+
+    # Мої навички: карта тем словника + стежка
+    w(skills)
 
     # 1) Карта метро
     w('<section id="sec-route"><div class="sec-h"><h2>Маршрут задачі</h2>'
@@ -585,6 +702,37 @@ margin:12px -16px 0;padding:10px 16px;background:var(--bg)}
 .nav button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:0 14px;min-height:40px;font-size:14px}
 .nav span{margin-left:6px;color:var(--mu);font-size:12.5px}
 section,.dir,.file,.cand{scroll-margin-top:70px}
+/* мої навички */
+.skmap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.skmap{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.skmap{grid-template-columns:1fr}}
+.sk{border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+.sk[open]{grid-column:1/-1}
+.sk>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center}
+.sk>summary::-webkit-details-marker{display:none}
+.sk-i{font-size:18px}.sk>summary b{font-size:14px}
+.sk-bar{grid-column:1/-1;height:8px;border-radius:4px;background:var(--ac-bg);overflow:hidden}
+.sk-bar i{display:block;height:100%;background:var(--ac);border-radius:4px}
+.sk-n{font-size:12px;color:var(--mu)}
+.sk-next{grid-column:1/-1;font-size:12px;color:var(--mu)}
+.sk-body{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}
+.words{list-style:none;margin:0;padding:0;columns:2 280px;column-gap:20px}
+.words li{display:flex;gap:8px;align-items:flex-start;padding:5px 0;break-inside:avoid;font-size:13.5px}
+.lv{flex:none;width:10px;height:10px;border-radius:50%;margin-top:5px;border:2px solid var(--ac)}
+.lv1{background:var(--ac-bg)}.lv2{background:var(--ac)}
+.w{flex:1;min-width:0}.eng{color:var(--mu);font-size:12px}
+.d{display:block;color:var(--mu);font-size:12.5px}
+.sk-m{font-size:13px;margin:8px 0 0}.sk-m a,.pn a{color:var(--ac)}
+.path-h{font-size:16px;margin:18px 0 6px}
+.path{list-style:none;margin:0;padding:0}
+.path li{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--line);padding:9px 0;font-size:13.5px}
+.pd{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600}
+.st-done .pd{background:var(--sk-bg);color:var(--sk)}
+.st-now .pd{background:var(--ac);color:var(--bg)}
+.st-next .pd{border:1px dashed var(--mu);color:var(--mu)}
+.st-next>div{flex:1;min-width:0}.st-next b{font-weight:500}
+.pn{flex:1;min-width:0}.pn p{margin:6px 0 0}.pn .chips{margin-top:4px}
+.act-s{border:1px solid var(--ac);background:var(--ac-bg);color:var(--ac);border-radius:10px;padding:0 16px;min-height:44px;font-weight:600}
 /* конвеєр */
 .conv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 @media (max-width:1000px){.conv{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -681,7 +829,7 @@ background:var(--line);color:var(--tx);white-space:nowrap;max-width:100%;overflo
 .s-2 .status{background:var(--pub-bg);color:var(--pub)}
 .s-3{opacity:.62}.s-3 .status{background:var(--line);color:var(--mu)}
 .cb{display:flex;gap:8px;margin-top:10px}
-.cb button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 14px;min-height:40px}
+.cb button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 14px;min-height:44px}
 .toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(140%);
 background:var(--tx);color:var(--bg);border-radius:12px;padding:10px 16px;font-size:14px;transition:transform .25s,opacity .25s;max-width:calc(100% - 32px);
 opacity:0;visibility:hidden;pointer-events:none}
