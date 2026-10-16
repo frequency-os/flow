@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-16-0146-efae763';
+  var BUILD='2026-10-16-0218-4a2f044';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1228,6 +1228,14 @@
     box-shadow:0 8px 24px rgba(0,0,0,.35);transition:opacity .2s;}
   .pg-zenback:active{color:#fff;background:rgba(15,17,24,.55);}
   #scr-page.pg-zen ~ .pg-zenback,body.pg-zen-on .pg-zenback{display:flex;}
+  body.pg-zen-on:not(:has(#scr-page.active)) .pg-zenback{display:none;}   /* «‹» — лише в самому документі */
+  /* ноутбук: «На весь екран» — документ на все вікно, без бокового меню і «Звʼязків»; «‹» ліворуч повертає (16.10.2026) */
+  @media (min-width:1024px){
+    body.pg-zen-on:has(#scr-page.active) #desktopSidebar,body.pg-zen-on:has(#scr-page.active) #lkAside{display:none !important;}
+    body.pg-zen-on:has(#scr-page.active) .phone{margin-left:0 !important;}
+    body.pg-zen-on #scr-page.lk-has .pg-doc{margin-right:0 !important;}
+    body.pg-zen-on:has(#scr-page.active) .pg-zenback{left:18px;top:18px;}
+  }
   /* ── вкладені сторінки/папки: рядки ── */
   .pgrow{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:12px;cursor:pointer;
     transition:background .13s;}
@@ -4421,6 +4429,13 @@
     .dsbt-ic .ico{width:16px;height:16px;}
     .dsbt-n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .dsbt-tw:focus-visible,.dsbt-b:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+    /* «⋯» біля папки (16.10.2026): видно, коли мишка на рядку, рядок відкритий або кнопка у фокусі */
+    .dsbt-more{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:28px;height:28px;margin-right:4px;border-radius:8px;
+      display:grid;place-items:center;font-size:15px;font-weight:800;line-height:1;color:var(--muted);opacity:0;transition:opacity .12s;}
+    .dsbt-r:hover .dsbt-more,.dsbt-r.on .dsbt-more,.dsbt-more:focus-visible{opacity:1;}
+    .dsbt-more:hover{background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--text);}
+    .dsbt-more:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+    @media (hover:none){ .dsbt-more{opacity:1;} }
   }
   @media (min-width:760px) and (max-width:1023.98px){ .dsb-tree{display:none!important;} }
   /* стрілка згортання дерева біля «Папки» */
@@ -6187,6 +6202,13 @@
   @media (min-width:1180px){
     /* документ звужується, щоб панель його не накривала; кольори — документа (--pg-*), не застосунку */
     #scr-page.lk-has .pg-doc{margin-right:352px!important;width:auto!important;}
+    /* «Звʼязки» сховані — кнопка біля ⋯ повертає панель (16.10.2026) */
+    .lk-show{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin-right:6px;border-radius:17px;
+      font-size:13px;font-weight:700;color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--pg-fg,#888) 7%,transparent);border:1px solid var(--pg-edge,var(--line));}
+    .lk-show[hidden]{display:none;}
+    .lk-show span{color:var(--pg-acc,var(--accent));font-size:16px;line-height:1;}
+    .lk-show:hover{background:color-mix(in srgb,var(--pg-fg,#888) 12%,transparent);}
+    .lk-show:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
     #lkAside{position:fixed;top:84px;right:24px;width:320px;max-height:calc(100vh - 110px);overflow:auto;z-index:20;padding:14px;border-radius:20px;
       background:var(--pg-surface,var(--card));border:1px solid var(--pg-edge,var(--line));color:var(--pg-fg,var(--text));box-sizing:border-box;}
     #lkAside .lk-m,#lkAside .lk-tg{background:color-mix(in srgb,var(--pg-fg,#888) 5%,transparent);border-color:var(--pg-edge,var(--line));color:var(--pg-fg,var(--text));}
@@ -34896,11 +34918,22 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     let fk=''; try{ fk=pgFolderKey(); }catch(_){}
     let a=document.getElementById('lkAside');
     const wide=window.innerWidth>=1180&&scr.classList.contains('active')&&fk&&moOwnFolder(fk);
-    if(!wide){ if(a) a.remove(); scr.classList.remove('lk-has'); return; }
+    // «Звʼязки» можна сховати (16.10.2026): ✕ у шапці панелі; кнопка «Звʼязки» біля ⋯ повертає. Памʼятає цей пристрій.
+    let hid=false; try{ hid=localStorage.getItem('lkAsideHidden')==='1'; }catch(_){}
+    let sb=document.getElementById('lkShowBtn');
+    if(wide&&hid){ if(!sb){ const more=document.getElementById('pgMoreBtn');
+        if(more){ sb=document.createElement('button'); sb.id='lkShowBtn'; sb.className='lk-show'; sb.type='button';
+          sb.setAttribute('aria-label','Показати панель «Звʼязки»'); sb.innerHTML='<span aria-hidden="true">‹</span> Звʼязки';
+          sb.onclick=()=>{ try{ localStorage.setItem('lkAsideHidden','0'); }catch(_){} lkAsideSync(); };
+          more.parentNode.insertBefore(sb,more); } }
+      if(sb) sb.hidden=false; }
+    else if(sb) sb.hidden=true;
+    if(!wide||hid){ if(a) a.remove(); scr.classList.remove('lk-has'); return; }
     if(!a){ a=document.createElement('aside'); a.id='lkAside'; a.setAttribute('aria-label','Звʼязки папки'); scr.appendChild(a); }
     scr.classList.add('lk-has');
     a.innerHTML=lkPanelHTML(fk); lkBind(a,fk,lkAsideSync);
     { const c=a.querySelector('[data-lkcfg]'); if(c) c.onclick=()=>lkSheet(fk); }
+    { const h=a.querySelector('[data-lkhide]'); if(h) h.onclick=()=>{ try{ localStorage.setItem('lkAsideHidden','1'); }catch(_){} lkAsideSync(); }; }
   }
   try{ window.addEventListener('resize',()=>{ clearTimeout(window.__lkRz); window.__lkRz=setTimeout(lkAsideSync,150); }); }catch(_){}
 
@@ -34927,7 +34960,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // Чати
     let chs=[]; try{ chs=chatsForFolder(fk).slice(0,3); }catch(_){}
     const ch=chs.length?`<span class="lkc-list">${chs.map(c=>{ let p=''; try{ const l=chatLast(c); p=l?chatPreview(l.b):''; }catch(_){} return `<span><em>${esc(c.emoji||'💬')}</em><span>${esc(String(c.name||'Чат').slice(0,30))}${p?` · <small data-i18n-skip="1">${esc(String(p).slice(0,40))}</small>`:''}</span></span>`; }).join('')}</span>`:'<small class="lkc-none">Чатів не привʼязано</small>';
-    return `<div class="lk panel"><div class="lk-h"><b>Звʼязки</b><button class="lk-cfg" data-lkcfg aria-label="Що показувати в папці">⚙</button></div>
+    return `<div class="lk panel"><div class="lk-h"><b>Звʼязки</b><button class="lk-cfg" data-lkcfg aria-label="Що показувати в папці">⚙</button><button class="lk-cfg" data-lkhide aria-label="Сховати панель «Звʼязки»" title="Сховати">✕</button></div>
       ${card('money','💳','Гроші',money,has?'':'Відкрити')}
       ${card('time','⏱','Час · сьогодні',time,'＋ блок')}
       ${card('mission','🎯','Місія',mis,g?'':'＋ Привʼязати')}
@@ -34992,7 +35025,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
       return `<div class="dsbt-r${k===cur?' on':''}" style="--lvl:${lvl}">
         ${kids.length?`<button class="dsbt-tw${open?' open':''}" data-dsbtw="${esc(k)}" aria-label="${open?'Згорнути':'Розгорнути'} «${esc(String(f.name||'Папка').slice(0,30))}»" aria-expanded="${open}">›</button>`:'<span class="dsbt-tw sp"></span>'}
-        <button class="dsbt-b" data-dsbt="${esc(k)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${prioDot(k)}${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`
+        <button class="dsbt-b" data-dsbt="${esc(k)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${prioDot(k)}${esc(String(f.name||'Папка').slice(0,40))}</span></button>
+        <button class="dsbt-more" data-dsbtmore="${esc(k)}" aria-label="Налаштування «${esc(String(f.name||'Папка').slice(0,30))}»: пріоритет, колір, видалення" title="Налаштування папки">⋯</button></div>`
         +(kids.length&&open&&lvl<2?kids.map(ck=>row(ck,lvl+1)).join(''):''); };
     tops=tops.slice(0,40);
     // є пріоритети — верхній рівень розкладаємо секціями «Високий / Середній / Низький / Без пріоритету»
@@ -35019,6 +35053,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       t.innerHTML=f?`<div class="dsbt-r on" style="--lvl:0"><span class="dsbt-tw sp"></span><button class="dsbt-b" data-dsbt="${esc(curK)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`:'';
     } else t.innerHTML=dsbTreeHTML();
     t.querySelectorAll('[data-dsbtw]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.dsbtw; dsbOpen[k]=!(b.classList.contains('open')); dsbTreeSync(); });
+    // «⋯» біля папки — те саме меню, що й усередині: пріоритет, колір, назва, група, видалення (16.10.2026)
+    t.querySelectorAll('[data-dsbtmore]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.dsbtmore; if(folders[k]) openFolderMenu(k); });
     t.querySelectorAll('[data-dsbt]').forEach(b=>b.onclick=()=>{ const k=b.dataset.dsbt; if(!folders[k]) return;
       try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ dsbOpen[k]=true; openGroupAsChosen(k); dsbTreeSync(); return; } }catch(_){}
       try{ goFolder(k); }catch(_){} });
@@ -37731,7 +37767,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       box.hidden=!on; scr.classList.toggle('pgc-on',on); document.body.classList.toggle('pgc-live',on);
       if(!on) return;
       var doc=scr.querySelector('.pg-doc'); if(!doc) return;
-      if(window.innerWidth>=1024){ var r=doc.getBoundingClientRect(); box.style.left=(r.left+12)+'px'; box.style.width=Math.max(240,r.width-24)+'px'; }
+      // по центру колонки, не ширше 760px — широке поле лізло під котика праворуч (16.10.2026)
+      if(window.innerWidth>=1024){ var r=doc.getBoundingClientRect(), w=Math.max(240,Math.min(760,r.width-24)); box.style.left=Math.round(r.left+(r.width-w)/2)+'px'; box.style.width=w+'px'; }
       else { box.style.left=''; box.style.width=''; }
     }
     try{ new MutationObserver(sync).observe(scr,{attributes:true,attributeFilter:['class']}); }catch(_){}
