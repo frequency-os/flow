@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 93 |
-| Рядків JS | 34209 |
+| Рядків JS | 34210 |
 | Файлів CSS | 48 |
 | Рядків CSS | 10659 |
 | Сутностей верхнього рівня | 2506 |
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1695 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1202 | 66 |
+| `src/scripts/core/16-dashboard.js` | 1203 | 66 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -1297,39 +1297,39 @@
 | `fgToast` | функція | `src/scripts/core/16-dashboard.js:490` |
 | `fgSheet` | функція | `src/scripts/core/16-dashboard.js:491` |
 | `openFolderGroup` | функція | `src/scripts/core/16-dashboard.js:503` |
-| `GVIEW` | обʼєкт | `src/scripts/core/16-dashboard.js:532` |
-| `gviewOf` | функція | `src/scripts/core/16-dashboard.js:533` |
-| `openGroupAsChosen` | функція | `src/scripts/core/16-dashboard.js:534` |
-| `window.openGroupAsChosen` | значення | `src/scripts/core/16-dashboard.js:540` |
-| `openFolderGroupIOS` | функція | `src/scripts/core/16-dashboard.js:541` |
-| `openGroupViewSheet` | функція | `src/scripts/core/16-dashboard.js:562` |
-| `openFolderPrioSheet` | функція | `src/scripts/core/16-dashboard.js:579` |
-| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:600` |
-| `openNewFolderChoice` | функція | `src/scripts/core/16-dashboard.js:617` |
-| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:630` |
-| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:672` |
-| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:680` |
-| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:723` |
-| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:725` |
-| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:730` |
-| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:744` |
-| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:751` |
-| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:770` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:824` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:846` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:874` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:946` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:966` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:967` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:968` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:969` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1031` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1047` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1069` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1078` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1111` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1127` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1172` |
+| `GVIEW` | обʼєкт | `src/scripts/core/16-dashboard.js:533` |
+| `gviewOf` | функція | `src/scripts/core/16-dashboard.js:534` |
+| `openGroupAsChosen` | функція | `src/scripts/core/16-dashboard.js:535` |
+| `window.openGroupAsChosen` | значення | `src/scripts/core/16-dashboard.js:541` |
+| `openFolderGroupIOS` | функція | `src/scripts/core/16-dashboard.js:542` |
+| `openGroupViewSheet` | функція | `src/scripts/core/16-dashboard.js:563` |
+| `openFolderPrioSheet` | функція | `src/scripts/core/16-dashboard.js:580` |
+| `openFolderGroupAdd` | функція | `src/scripts/core/16-dashboard.js:601` |
+| `openNewFolderChoice` | функція | `src/scripts/core/16-dashboard.js:618` |
+| `openFolderMerge` | функція | `src/scripts/core/16-dashboard.js:631` |
+| `FV_PREV` | обʼєкт | `src/scripts/core/16-dashboard.js:673` |
+| `openFolderViewSheet` | функція | `src/scripts/core/16-dashboard.js:681` |
+| `pgBarFolder` | функція | `src/scripts/core/16-dashboard.js:724` |
+| `pgBarSwitchGroup` | функція | `src/scripts/core/16-dashboard.js:726` |
+| `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:731` |
+| `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:745` |
+| `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:752` |
+| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:771` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:825` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:847` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:875` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:947` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:967` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:968` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:969` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:970` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1032` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1048` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1070` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1079` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1112` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1128` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1173` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 

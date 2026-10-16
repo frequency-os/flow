@@ -377,7 +377,7 @@
   // Блок сам не дописується (дані змінює лише людина) — щойно його поставлять, ця стрічка ховається.
   function pgSubHTML(fk){
     let kids=[]; try{ kids=typeof groupKids==='function'?groupKids(fk):[]; }catch(_){}
-    const f=folders[fk]; if(!kids.length && !(f&&f.gview==='folder')) return '';
+    if(!kids.length) return '';   // підпапок нема — і стрічки нема (з 16.10.2026 «Як папка» — типове, окремої позначки нема)
     return pgHasSubsBlock(fk)?'':pgSubStripHTML(fk);
   }
   function pgSubOpen(fk,ck){ if(!folders[ck]) return; window.__fgNext=fk; try{ goFolder(ck); }finally{ window.__fgNext=null; } }

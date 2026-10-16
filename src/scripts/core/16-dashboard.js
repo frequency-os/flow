@@ -527,10 +527,11 @@
     try{ window.platform.haptic('light'); }catch(_){}
   }
   /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
-     «Стос» — шторка зі списком (як було), «Як папка» — документ групи з підпапками зверху,
-     «Як на iPhone» — вікно з іконками підпапок поверх Огляду. Поле folders[k].gview. */
-  const GVIEW={stack:['Стос','шторка зі списком папок'],folder:['Як папка','документ, підпапки зверху'],ios:['Як на iPhone','вікно з іконками']};
-  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='ios')?v:'stack'; }
+     «Як папка» — одразу нотатка папки, підпапки — блоком «Підпапки» (типово з 16.10.2026, «папка-нотатка»),
+     «Стос» — шторка зі списком, «Як на iPhone» — вікно з іконками підпапок поверх Огляду.
+     Поле folders[k].gview: пишемо лише не-типове ('stack' | 'ios'); раніше типовим був «Стос» і він не писався. */
+  const GVIEW={folder:['Як папка','одразу нотатка, підпапки — стрічкою'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='stack'||v==='ios')?v:'folder'; }
   function openGroupAsChosen(key, from){
     const v=gviewOf(key);
     if(v==='folder'){ closeFolderMenu(); window.__fgNext=from||(folders[key]&&folders[key].parent)||''; goFolder(key); window.__fgNext=null; return; }
@@ -569,7 +570,7 @@
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
-        const v=b.dataset.gv; if(v==='stack') delete f.gview; else f.gview=v;
+        const v=b.dataset.gv; if(v==='folder') delete f.gview; else f.gview=v;   // типове — не пишемо
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
