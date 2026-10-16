@@ -257,7 +257,7 @@
       var _nbw={id:uid(),type:'note',text:''};
       _lw2.block.children.push(_nbw); _lw2.block.open=true;
       save(); render();
-      slashCtx=_nbw.id; openSlash();
+      slashCtx=_nbw.id; openSlash(); pgAddPending=_nbw.id;   /* закрив меню без вибору — порожній рядок прибирається (dropPendingAdd) */
       return;
     }
     var ad=e.target&&e.target.closest&&e.target.closest('[data-pgaddafter]');
@@ -267,7 +267,7 @@
       var nb={id:uid(),type:'note',text:''};
       lc.arr.splice(lc.idx+1,0,nb);
       save(); render();
-      slashCtx=nb.id; openSlash();
+      slashCtx=nb.id; openSlash(); pgAddPending=nb.id;   /* «＋» біля блока: без вибору порожній «Пишіть…» не лишається (16.10.2026) */
       return;
     }
     var badd=e.target&&e.target.closest&&e.target.closest('[data-pgboardadd]');
