@@ -652,6 +652,14 @@
     box-shadow:0 8px 24px rgba(0,0,0,.35);transition:opacity .2s;}
   .pg-zenback:active{color:#fff;background:rgba(15,17,24,.55);}
   #scr-page.pg-zen ~ .pg-zenback,body.pg-zen-on .pg-zenback{display:flex;}
+  body.pg-zen-on:not(:has(#scr-page.active)) .pg-zenback{display:none;}   /* «‹» — лише в самому документі */
+  /* ноутбук: «На весь екран» — документ на все вікно, без бокового меню і «Звʼязків»; «‹» ліворуч повертає (16.10.2026) */
+  @media (min-width:1024px){
+    body.pg-zen-on:has(#scr-page.active) #desktopSidebar,body.pg-zen-on:has(#scr-page.active) #lkAside{display:none !important;}
+    body.pg-zen-on:has(#scr-page.active) .phone{margin-left:0 !important;}
+    body.pg-zen-on #scr-page.lk-has .pg-doc{margin-right:0 !important;}
+    body.pg-zen-on:has(#scr-page.active) .pg-zenback{left:18px;top:18px;}
+  }
   /* ── вкладені сторінки/папки: рядки ── */
   .pgrow{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:12px;cursor:pointer;
     transition:background .13s;}

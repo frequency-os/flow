@@ -199,6 +199,13 @@
     .dsbt-ic .ico{width:16px;height:16px;}
     .dsbt-n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .dsbt-tw:focus-visible,.dsbt-b:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+    /* «⋯» біля папки (16.10.2026): видно, коли мишка на рядку, рядок відкритий або кнопка у фокусі */
+    .dsbt-more{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:28px;height:28px;margin-right:4px;border-radius:8px;
+      display:grid;place-items:center;font-size:15px;font-weight:800;line-height:1;color:var(--muted);opacity:0;transition:opacity .12s;}
+    .dsbt-r:hover .dsbt-more,.dsbt-r.on .dsbt-more,.dsbt-more:focus-visible{opacity:1;}
+    .dsbt-more:hover{background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--text);}
+    .dsbt-more:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+    @media (hover:none){ .dsbt-more{opacity:1;} }
   }
   @media (min-width:760px) and (max-width:1023.98px){ .dsb-tree{display:none!important;} }
   /* стрілка згортання дерева біля «Папки» */

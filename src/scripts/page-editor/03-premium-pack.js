@@ -800,7 +800,8 @@
       box.hidden=!on; scr.classList.toggle('pgc-on',on); document.body.classList.toggle('pgc-live',on);
       if(!on) return;
       var doc=scr.querySelector('.pg-doc'); if(!doc) return;
-      if(window.innerWidth>=1024){ var r=doc.getBoundingClientRect(); box.style.left=(r.left+12)+'px'; box.style.width=Math.max(240,r.width-24)+'px'; }
+      // по центру колонки, не ширше 760px — широке поле лізло під котика праворуч (16.10.2026)
+      if(window.innerWidth>=1024){ var r=doc.getBoundingClientRect(), w=Math.max(240,Math.min(760,r.width-24)); box.style.left=Math.round(r.left+(r.width-w)/2)+'px'; box.style.width=w+'px'; }
       else { box.style.left=''; box.style.width=''; }
     }
     try{ new MutationObserver(sync).observe(scr,{attributes:true,attributeFilter:['class']}); }catch(_){}

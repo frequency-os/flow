@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 93 |
-| Рядків JS | 34194 |
+| Рядків JS | 34209 |
 | Файлів CSS | 48 |
-| Рядків CSS | 10637 |
+| Рядків CSS | 10659 |
 | Сутностей верхнього рівня | 2506 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -90,12 +90,12 @@
 | `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
-| `src/scripts/core/54-links.js` | 278 | 31 |
+| `src/scripts/core/54-links.js` | 292 | 31 |
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 769 | 49 |
-| `src/scripts/page-editor/03-premium-pack.js` | 834 | 43 |
+| `src/scripts/page-editor/03-premium-pack.js` | 835 | 43 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
@@ -137,7 +137,7 @@
 | `src/styles/22-more-screen.css` | 181 | 0 |
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1136 | 9 |
+| `src/styles/core/02-page-editor.css` | 1144 | 9 |
 | `src/styles/core/03-folders-projects.css` | 665 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -146,13 +146,13 @@
 | `src/styles/core/08-work.css` | 202 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
-| `src/styles/core/11-spaces-desktop.css` | 212 | 0 |
+| `src/styles/core/11-spaces-desktop.css` | 219 | 0 |
 | `src/styles/core/12-pets-more-planner.css` | 1224 | 0 |
 | `src/styles/core/13-search-capture.css` | 84 | 0 |
 | `src/styles/core/16-upgrade.css` | 54 | 0 |
 | `src/styles/core/17-my-year.css` | 64 | 0 |
 | `src/styles/core/18-channel.css` | 187 | 0 |
-| `src/styles/core/19-chats.css` | 193 | 0 |
+| `src/styles/core/19-chats.css` | 200 | 0 |
 | `src/styles/core/20-world.css` | 20 | 0 |
 | `src/styles/core/21-spheres.css` | 82 | 0 |
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
@@ -2605,20 +2605,20 @@
 | `lkBind` | функція | `src/scripts/core/54-links.js:94` |
 | `lkSheet` | функція | `src/scripts/core/54-links.js:99` |
 | `lkAsideSync` | функція | `src/scripts/core/54-links.js:109` |
-| `lkPanelHTML` | функція | `src/scripts/core/54-links.js:124` |
-| `lkView` | обʼєкт | `src/scripts/core/54-links.js:156` |
-| `lkFeedItems` | функція | `src/scripts/core/54-links.js:157` |
-| `txtPlain` | функція | `src/scripts/core/54-links.js:175` |
-| `lkFeedHTML` | функція | `src/scripts/core/54-links.js:176` |
-| `lkViewApply` | функція | `src/scripts/core/54-links.js:185` |
-| `dsbOpen` | значення | `src/scripts/core/54-links.js:199` |
-| `dsbTreeHidden` | значення | `src/scripts/core/54-links.js:201` |
-| `dsbTreeHTML` | функція | `src/scripts/core/54-links.js:202` |
-| `dsbTreeSync` | функція | `src/scripts/core/54-links.js:218` |
-| `dsbDragKey` | значення | `src/scripts/core/54-links.js:244` |
-| `dsbCanDrop` | функція | `src/scripts/core/54-links.js:245` |
-| `dsbMove` | функція | `src/scripts/core/54-links.js:252` |
-| `dsbDragBind` | функція | `src/scripts/core/54-links.js:258` |
+| `lkPanelHTML` | функція | `src/scripts/core/54-links.js:135` |
+| `lkView` | обʼєкт | `src/scripts/core/54-links.js:167` |
+| `lkFeedItems` | функція | `src/scripts/core/54-links.js:168` |
+| `txtPlain` | функція | `src/scripts/core/54-links.js:186` |
+| `lkFeedHTML` | функція | `src/scripts/core/54-links.js:187` |
+| `lkViewApply` | функція | `src/scripts/core/54-links.js:196` |
+| `dsbOpen` | значення | `src/scripts/core/54-links.js:210` |
+| `dsbTreeHidden` | значення | `src/scripts/core/54-links.js:212` |
+| `dsbTreeHTML` | функція | `src/scripts/core/54-links.js:213` |
+| `dsbTreeSync` | функція | `src/scripts/core/54-links.js:230` |
+| `dsbDragKey` | значення | `src/scripts/core/54-links.js:258` |
+| `dsbCanDrop` | функція | `src/scripts/core/54-links.js:259` |
+| `dsbMove` | функція | `src/scripts/core/54-links.js:266` |
+| `dsbDragBind` | функція | `src/scripts/core/54-links.js:272` |
 
 ### `src/scripts/core/55-focus.js` — 43 сутностей
 
@@ -2843,9 +2843,9 @@
 | `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:722` |
 | `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:741` |
 | `pgAddViaMenu` | функція | `src/scripts/page-editor/03-premium-pack.js:742` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:813` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:814` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:819` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:814` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:815` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:820` |
 
 ### `src/scripts/page-editor/04-table.js` — 26 сутностей
 

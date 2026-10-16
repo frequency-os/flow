@@ -140,6 +140,13 @@
   @media (min-width:1180px){
     /* документ звужується, щоб панель його не накривала; кольори — документа (--pg-*), не застосунку */
     #scr-page.lk-has .pg-doc{margin-right:352px!important;width:auto!important;}
+    /* «Звʼязки» сховані — кнопка біля ⋯ повертає панель (16.10.2026) */
+    .lk-show{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin-right:6px;border-radius:17px;
+      font-size:13px;font-weight:700;color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--pg-fg,#888) 7%,transparent);border:1px solid var(--pg-edge,var(--line));}
+    .lk-show[hidden]{display:none;}
+    .lk-show span{color:var(--pg-acc,var(--accent));font-size:16px;line-height:1;}
+    .lk-show:hover{background:color-mix(in srgb,var(--pg-fg,#888) 12%,transparent);}
+    .lk-show:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
     #lkAside{position:fixed;top:84px;right:24px;width:320px;max-height:calc(100vh - 110px);overflow:auto;z-index:20;padding:14px;border-radius:20px;
       background:var(--pg-surface,var(--card));border:1px solid var(--pg-edge,var(--line));color:var(--pg-fg,var(--text));box-sizing:border-box;}
     #lkAside .lk-m,#lkAside .lk-tg{background:color-mix(in srgb,var(--pg-fg,#888) 5%,transparent);border-color:var(--pg-edge,var(--line));color:var(--pg-fg,var(--text));}

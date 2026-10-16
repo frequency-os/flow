@@ -111,11 +111,22 @@
     let fk=''; try{ fk=pgFolderKey(); }catch(_){}
     let a=document.getElementById('lkAside');
     const wide=window.innerWidth>=1180&&scr.classList.contains('active')&&fk&&moOwnFolder(fk);
-    if(!wide){ if(a) a.remove(); scr.classList.remove('lk-has'); return; }
+    // «Звʼязки» можна сховати (16.10.2026): ✕ у шапці панелі; кнопка «Звʼязки» біля ⋯ повертає. Памʼятає цей пристрій.
+    let hid=false; try{ hid=localStorage.getItem('lkAsideHidden')==='1'; }catch(_){}
+    let sb=document.getElementById('lkShowBtn');
+    if(wide&&hid){ if(!sb){ const more=document.getElementById('pgMoreBtn');
+        if(more){ sb=document.createElement('button'); sb.id='lkShowBtn'; sb.className='lk-show'; sb.type='button';
+          sb.setAttribute('aria-label','Показати панель «Звʼязки»'); sb.innerHTML='<span aria-hidden="true">‹</span> Звʼязки';
+          sb.onclick=()=>{ try{ localStorage.setItem('lkAsideHidden','0'); }catch(_){} lkAsideSync(); };
+          more.parentNode.insertBefore(sb,more); } }
+      if(sb) sb.hidden=false; }
+    else if(sb) sb.hidden=true;
+    if(!wide||hid){ if(a) a.remove(); scr.classList.remove('lk-has'); return; }
     if(!a){ a=document.createElement('aside'); a.id='lkAside'; a.setAttribute('aria-label','Звʼязки папки'); scr.appendChild(a); }
     scr.classList.add('lk-has');
     a.innerHTML=lkPanelHTML(fk); lkBind(a,fk,lkAsideSync);
     { const c=a.querySelector('[data-lkcfg]'); if(c) c.onclick=()=>lkSheet(fk); }
+    { const h=a.querySelector('[data-lkhide]'); if(h) h.onclick=()=>{ try{ localStorage.setItem('lkAsideHidden','1'); }catch(_){} lkAsideSync(); }; }
   }
   try{ window.addEventListener('resize',()=>{ clearTimeout(window.__lkRz); window.__lkRz=setTimeout(lkAsideSync,150); }); }catch(_){}
 
@@ -142,7 +153,7 @@
     // Чати
     let chs=[]; try{ chs=chatsForFolder(fk).slice(0,3); }catch(_){}
     const ch=chs.length?`<span class="lkc-list">${chs.map(c=>{ let p=''; try{ const l=chatLast(c); p=l?chatPreview(l.b):''; }catch(_){} return `<span><em>${esc(c.emoji||'💬')}</em><span>${esc(String(c.name||'Чат').slice(0,30))}${p?` · <small data-i18n-skip="1">${esc(String(p).slice(0,40))}</small>`:''}</span></span>`; }).join('')}</span>`:'<small class="lkc-none">Чатів не привʼязано</small>';
-    return `<div class="lk panel"><div class="lk-h"><b>Звʼязки</b><button class="lk-cfg" data-lkcfg aria-label="Що показувати в папці">⚙</button></div>
+    return `<div class="lk panel"><div class="lk-h"><b>Звʼязки</b><button class="lk-cfg" data-lkcfg aria-label="Що показувати в папці">⚙</button><button class="lk-cfg" data-lkhide aria-label="Сховати панель «Звʼязки»" title="Сховати">✕</button></div>
       ${card('money','💳','Гроші',money,has?'':'Відкрити')}
       ${card('time','⏱','Час · сьогодні',time,'＋ блок')}
       ${card('mission','🎯','Місія',mis,g?'':'＋ Привʼязати')}
@@ -207,7 +218,8 @@
     const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
       return `<div class="dsbt-r${k===cur?' on':''}" style="--lvl:${lvl}">
         ${kids.length?`<button class="dsbt-tw${open?' open':''}" data-dsbtw="${esc(k)}" aria-label="${open?'Згорнути':'Розгорнути'} «${esc(String(f.name||'Папка').slice(0,30))}»" aria-expanded="${open}">›</button>`:'<span class="dsbt-tw sp"></span>'}
-        <button class="dsbt-b" data-dsbt="${esc(k)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${prioDot(k)}${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`
+        <button class="dsbt-b" data-dsbt="${esc(k)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${prioDot(k)}${esc(String(f.name||'Папка').slice(0,40))}</span></button>
+        <button class="dsbt-more" data-dsbtmore="${esc(k)}" aria-label="Налаштування «${esc(String(f.name||'Папка').slice(0,30))}»: пріоритет, колір, видалення" title="Налаштування папки">⋯</button></div>`
         +(kids.length&&open&&lvl<2?kids.map(ck=>row(ck,lvl+1)).join(''):''); };
     tops=tops.slice(0,40);
     // є пріоритети — верхній рівень розкладаємо секціями «Високий / Середній / Низький / Без пріоритету»
@@ -234,6 +246,8 @@
       t.innerHTML=f?`<div class="dsbt-r on" style="--lvl:0"><span class="dsbt-tw sp"></span><button class="dsbt-b" data-dsbt="${esc(curK)}" style="--c:${safeColor(f.c,'#6a7dff')}"><span class="dsbt-ic"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span><span class="dsbt-n" data-i18n-skip="1">${esc(String(f.name||'Папка').slice(0,40))}</span></button></div>`:'';
     } else t.innerHTML=dsbTreeHTML();
     t.querySelectorAll('[data-dsbtw]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.dsbtw; dsbOpen[k]=!(b.classList.contains('open')); dsbTreeSync(); });
+    // «⋯» біля папки — те саме меню, що й усередині: пріоритет, колір, назва, група, видалення (16.10.2026)
+    t.querySelectorAll('[data-dsbtmore]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.dsbtmore; if(folders[k]) openFolderMenu(k); });
     t.querySelectorAll('[data-dsbt]').forEach(b=>b.onclick=()=>{ const k=b.dataset.dsbt; if(!folders[k]) return;
       try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ dsbOpen[k]=true; openGroupAsChosen(k); dsbTreeSync(); return; } }catch(_){}
       try{ goFolder(k); }catch(_){} });
