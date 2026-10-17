@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-16-0218-4a2f044';
+  var BUILD='2026-10-17-2151-30f9153';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1718,6 +1718,8 @@
   #scr-page.pgc-on .pg-addblock{display:none;}   /* «＋» тепер у нижньому полі */
   @media (max-width:1023px){ body.pgc-live .nav{display:none !important;} }   /* у документі нижнє меню ховається — повернення стрілкою вгорі */
   @media (min-width:1024px){ .pgc{right:auto;bottom:18px;} }
+  /* меню блоків відкрите — тимчасовий запас унизу, щоб новий рядок можна було підняти вгору під шапку (03-premium-pack.js positionSlash) */
+  #scr-page.pg-slash-room .pg-doc{padding-bottom:75vh !important;}
 /* ══════════════════════════════════════════════════════════════════
    ЧОМУ ТУТ СКРІЗЬ var(--c, #6a7dff), а не просто var(--c)
 
@@ -12154,7 +12156,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         // сфера (39-spheres.js): шаблон і будівля в «Моєму світі»; поле пишемо лише в сфер
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
         // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
-        if(f.gview==='folder'||f.gview==='ios') cfg[k].gview=f.gview;
+        if(f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // з 16.10.2026 типове — «Як папка»
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
         if(folderPrioOk(f.prio)) cfg[k].prio=f.prio;
       });
@@ -21861,10 +21863,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     try{ window.platform.haptic('light'); }catch(_){}
   }
   /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
-     «Стос» — шторка зі списком (як було), «Як папка» — документ групи з підпапками зверху,
-     «Як на iPhone» — вікно з іконками підпапок поверх Огляду. Поле folders[k].gview. */
-  const GVIEW={stack:['Стос','шторка зі списком папок'],folder:['Як папка','документ, підпапки зверху'],ios:['Як на iPhone','вікно з іконками']};
-  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='ios')?v:'stack'; }
+     «Як папка» — одразу нотатка папки, підпапки — блоком «Підпапки» (типово з 16.10.2026, «папка-нотатка»),
+     «Стос» — шторка зі списком, «Як на iPhone» — вікно з іконками підпапок поверх Огляду.
+     Поле folders[k].gview: пишемо лише не-типове ('stack' | 'ios'); раніше типовим був «Стос» і він не писався. */
+  const GVIEW={folder:['Як папка','одразу нотатка, підпапки — стрічкою'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='stack'||v==='ios')?v:'folder'; }
   function openGroupAsChosen(key, from){
     const v=gviewOf(key);
     if(v==='folder'){ closeFolderMenu(); window.__fgNext=from||(folders[key]&&folders[key].parent)||''; goFolder(key); window.__fgNext=null; return; }
@@ -21903,7 +21906,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
-        const v=b.dataset.gv; if(v==='stack') delete f.gview; else f.gview=v;
+        const v=b.dataset.gv; if(v==='folder') delete f.gview; else f.gview=v;   // типове — не пишемо
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
@@ -26561,7 +26564,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const ic=c.icon||folderIconFor(c.emoji);
         // сфера (39-spheres.js): лише два короткі рядки, усе інше відкидаємо
         const sph=(c.sphere&&typeof c.sphere.tpl==='string')?{tpl:c.sphere.tpl.slice(0,16),bld:String(c.sphere.bld||'').slice(0,16)}:undefined;
-        const gv=(c.gview==='folder'||c.gview==='ios')?c.gview:undefined;
+        const gv=(c.gview==='stack'||c.gview==='ios')?c.gview:undefined;   // 'folder' зі старих конфігів = типове, не тримаємо
         const pr=folderPrioOk(c.prio)?c.prio:undefined;
         if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr}); }
         // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
@@ -29296,7 +29299,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // Блок сам не дописується (дані змінює лише людина) — щойно його поставлять, ця стрічка ховається.
   function pgSubHTML(fk){
     let kids=[]; try{ kids=typeof groupKids==='function'?groupKids(fk):[]; }catch(_){}
-    const f=folders[fk]; if(!kids.length && !(f&&f.gview==='folder')) return '';
+    if(!kids.length) return '';   // підпапок нема — і стрічки нема (з 16.10.2026 «Як папка» — типове, окремої позначки нема)
     return pgHasSubsBlock(fk)?'':pgSubStripHTML(fk);
   }
   function pgSubOpen(fk,ck){ if(!folders[ck]) return; window.__fgNext=fk; try{ goFolder(ck); }finally{ window.__fgNext=null; } }
@@ -37202,6 +37205,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function unanchorSlash(){
     slash.classList.remove('anch');
     slash.style.left='';slash.style.top='';slash.style.width='';slash.style.maxHeight='';
+    scr.classList.remove('pg-slash-room');
   }
   /* якір: ставимо меню одразу ПІД блоком, який додаємо (всі екрани) */
   function positionSlash(){
@@ -37210,17 +37214,29 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     var row=null;
     try{row=editor.querySelector('.pgb[data-id="'+String(slashCtx).replace(/"/g,'\\"')+'"]');}catch(_){}
     if(!row)return;
-    var r=row.getBoundingClientRect(),
-        vw=window.innerWidth,
+    var vw=window.innerWidth,
         vh=(window.visualViewport?window.visualViewport.height:window.innerHeight);
     var topBar=document.querySelector('#scr-page .pg-top');
     var safeTop=topBar?Math.max(0,topBar.getBoundingClientRect().bottom):0; /* липка шапка — інакше меню лізе під неї */
+    /* знизу — нижнє поле документа (якщо видно): меню на нього не лягає (16.10.2026) */
+    var comp=document.getElementById('pgComposer'), cr=(comp&&!comp.hidden)?comp.getBoundingClientRect():null;
+    var floor=(cr&&cr.height)?Math.min(vh,cr.top)-8:vh-12;
     var W=Math.min(560,vw-24),
-        H=Math.min(vw<760?340:400,Math.round(vh*.52)),
-        below=vh-r.bottom-16, above=r.top-safeTop-16, top;
+        H=Math.min(vw<760?340:400,Math.round(vh*.52));
+    var r=row.getBoundingClientRect();
+    /* новий рядок не видно або під ним мало місця — прокручуємо: рядок угорі, меню під ним.
+       Тимчасовий запас унизу (pg-slash-room), щоб і останній рядок документа піднявся (16.10.2026) */
+    if(r.top<safeTop+8||r.bottom>floor-Math.min(H,220)){
+      scr.classList.add('pg-slash-room');
+      // гортається не вікно, а найближчий контейнер (у застосунку це body: html — overflow:hidden)
+      var sp=row.parentElement; while(sp&&sp!==document.documentElement){ var ov=getComputedStyle(sp).overflowY; if((ov==='auto'||ov==='scroll')&&sp.scrollHeight>sp.clientHeight) break; sp=sp.parentElement; }
+      try{ if(sp&&sp!==document.documentElement) sp.scrollTop+=r.top-(safeTop+12); else window.scrollBy(0, r.top-(safeTop+12)); }catch(_){}
+      r=row.getBoundingClientRect();
+    }
+    var below=floor-r.bottom-8, above=r.top-safeTop-16, top;
     if(below>=Math.min(H,220)){ H=Math.min(H,below); top=r.bottom+8; }      /* під блоком */
     else if(above>=220){ H=Math.min(H,above); top=Math.max(safeTop+8,r.top-H-8); }  /* над блоком, але не під шапкою */
-    else { top=Math.max(safeTop+8,vh-H-12); }                              /* fallback */
+    else { H=Math.min(H,floor-safeTop-16); top=Math.max(safeTop+8,floor-H); }      /* fallback — між шапкою і полем */
     var left=Math.max(12,Math.min(r.left,vw-W-12));
     slash.classList.add('anch');
     slash.style.left=left+'px';slash.style.top=top+'px';
@@ -38353,7 +38369,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       var _nbw={id:uid(),type:'note',text:''};
       _lw2.block.children.push(_nbw); _lw2.block.open=true;
       save(); render();
-      slashCtx=_nbw.id; openSlash();
+      slashCtx=_nbw.id; openSlash(); pgAddPending=_nbw.id;   /* закрив меню без вибору — порожній рядок прибирається (dropPendingAdd) */
       return;
     }
     var ad=e.target&&e.target.closest&&e.target.closest('[data-pgaddafter]');
@@ -38363,7 +38379,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       var nb={id:uid(),type:'note',text:''};
       lc.arr.splice(lc.idx+1,0,nb);
       save(); render();
-      slashCtx=nb.id; openSlash();
+      slashCtx=nb.id; openSlash(); pgAddPending=nb.id;   /* «＋» біля блока: без вибору порожній «Пишіть…» не лишається (16.10.2026) */
       return;
     }
     var badd=e.target&&e.target.closest&&e.target.closest('[data-pgboardadd]');
