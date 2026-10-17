@@ -235,6 +235,7 @@
   function unanchorSlash(){
     slash.classList.remove('anch');
     slash.style.left='';slash.style.top='';slash.style.width='';slash.style.maxHeight='';
+    scr.classList.remove('pg-slash-room');
   }
   /* якір: ставимо меню одразу ПІД блоком, який додаємо (всі екрани) */
   function positionSlash(){
@@ -243,17 +244,29 @@
     var row=null;
     try{row=editor.querySelector('.pgb[data-id="'+String(slashCtx).replace(/"/g,'\\"')+'"]');}catch(_){}
     if(!row)return;
-    var r=row.getBoundingClientRect(),
-        vw=window.innerWidth,
+    var vw=window.innerWidth,
         vh=(window.visualViewport?window.visualViewport.height:window.innerHeight);
     var topBar=document.querySelector('#scr-page .pg-top');
     var safeTop=topBar?Math.max(0,topBar.getBoundingClientRect().bottom):0; /* липка шапка — інакше меню лізе під неї */
+    /* знизу — нижнє поле документа (якщо видно): меню на нього не лягає (16.10.2026) */
+    var comp=document.getElementById('pgComposer'), cr=(comp&&!comp.hidden)?comp.getBoundingClientRect():null;
+    var floor=(cr&&cr.height)?Math.min(vh,cr.top)-8:vh-12;
     var W=Math.min(560,vw-24),
-        H=Math.min(vw<760?340:400,Math.round(vh*.52)),
-        below=vh-r.bottom-16, above=r.top-safeTop-16, top;
+        H=Math.min(vw<760?340:400,Math.round(vh*.52));
+    var r=row.getBoundingClientRect();
+    /* новий рядок не видно або під ним мало місця — прокручуємо: рядок угорі, меню під ним.
+       Тимчасовий запас унизу (pg-slash-room), щоб і останній рядок документа піднявся (16.10.2026) */
+    if(r.top<safeTop+8||r.bottom>floor-Math.min(H,220)){
+      scr.classList.add('pg-slash-room');
+      // гортається не вікно, а найближчий контейнер (у застосунку це body: html — overflow:hidden)
+      var sp=row.parentElement; while(sp&&sp!==document.documentElement){ var ov=getComputedStyle(sp).overflowY; if((ov==='auto'||ov==='scroll')&&sp.scrollHeight>sp.clientHeight) break; sp=sp.parentElement; }
+      try{ if(sp&&sp!==document.documentElement) sp.scrollTop+=r.top-(safeTop+12); else window.scrollBy(0, r.top-(safeTop+12)); }catch(_){}
+      r=row.getBoundingClientRect();
+    }
+    var below=floor-r.bottom-8, above=r.top-safeTop-16, top;
     if(below>=Math.min(H,220)){ H=Math.min(H,below); top=r.bottom+8; }      /* під блоком */
     else if(above>=220){ H=Math.min(H,above); top=Math.max(safeTop+8,r.top-H-8); }  /* над блоком, але не під шапкою */
-    else { top=Math.max(safeTop+8,vh-H-12); }                              /* fallback */
+    else { H=Math.min(H,floor-safeTop-16); top=Math.max(safeTop+8,floor-H); }      /* fallback — між шапкою і полем */
     var left=Math.max(12,Math.min(r.left,vw-W-12));
     slash.classList.add('anch');
     slash.style.left=left+'px';slash.style.top=top+'px';

@@ -1142,3 +1142,5 @@
   #scr-page.pgc-on .pg-addblock{display:none;}   /* «＋» тепер у нижньому полі */
   @media (max-width:1023px){ body.pgc-live .nav{display:none !important;} }   /* у документі нижнє меню ховається — повернення стрілкою вгорі */
   @media (min-width:1024px){ .pgc{right:auto;bottom:18px;} }
+  /* меню блоків відкрите — тимчасовий запас унизу, щоб новий рядок можна було підняти вгору під шапку (03-premium-pack.js positionSlash) */
+  #scr-page.pg-slash-room .pg-doc{padding-bottom:75vh !important;}
