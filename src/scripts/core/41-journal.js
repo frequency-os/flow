@@ -600,12 +600,15 @@
           // перевіряємо і без c0.reward: старша збірка на іншому пристрої могла затерти приз, а конверт із грошима лишився (знаходиться за goalId)
           if(c0&&typeof pzSaved==='function'&&pzSaved(c0)>0){ const pe=pzEnv(c0), pn=(c0.reward&&c0.reward.t)||(pe&&pe.name)||'приз';
             actionSheet({title:'Спершу поверни гроші зі скарбнички', sub:'У скарбничці «'+String(pn)+'» лежить '+money(pzSaved(c0))+'. Поверни їх у Гаманець — тоді місію можна видалити.', items:[{ic:'refresh', label:'Відкрити скарбничку', onClick:()=>{ ov.remove(); if(c0.reward&&String(c0.reward.t||'').trim()) pzJarSheet(c0); else { try{ goEnvelopes(); }catch(_){} } }}]}); return; }
+          // так само — гроші в конверті цілі («Мій рік», 57-my-plan.js): спершу повернути в Гаманець
+          if(c0&&typeof mrSaved==='function'&&mrSaved(c0)>0){ const me=mrEnv(c0);
+            actionSheet({title:'Спершу поверни гроші з конверта цілі', sub:'У конверті «'+String((me&&me.name)||c0.name||'ціль')+'» лежить '+money(mrSaved(c0))+'. Поверни їх у Гаманець — тоді місію можна видалити.', items:[{ic:'refresh', label:'Відкрити ціль', onClick:()=>{ ov.remove(); mrGoalPage(c0); }}]}); return; }
           confirmSheet({title:'Видалити місію «'+String(gl.name||'').slice(0,40)+'»?',
           sub:'Зникнуть її рівні, кроки й трекер, а з Планера — невиконані блоки місії від сьогодні. Виконані лишаться. Можна натомість перенести в архів.',
           okLabel:'Видалити', onOk:()=>{
             const cur=(goalsData.goals||[]).find(x=>x&&x.id===gl.id);
             if(!cur){ ov.remove(); jnRender(); try{ plToast('Місію вже змінили або прибрали на іншому пристрої'); }catch(_){} return; }
-            try{ if(cur.wishId){ const w=wishes.find(x=>x.id===cur.wishId); if(w){ delete w.goalId; saveWishes(); } } }catch(_){}
+            try{ mrUnlinkWishes(cur); }catch(_){}   // усі мрії цілі (і wishId, і фото з «Мого року») знову вільні
             const p=plData(), ids=['rt_m_'+cur.id].concat(jnOtherTpls(cur).filter(t=>/^rt_ai_/.test(String(t.id))).map(t=>t.id));
             p.recurring=(p.recurring||[]).filter(t=>!(t&&ids.includes(t.id))); ids.forEach(jnClearFuture);
             goalsData.goals=goalsData.goals.filter(x=>!(x&&x.id===cur.id));

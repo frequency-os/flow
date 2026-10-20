@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 94 |
-| Рядків JS | 34358 |
+| Рядків JS | 34621 |
 | Файлів CSS | 49 |
-| Рядків CSS | 10729 |
-| Сутностей верхнього рівня | 2527 |
+| Рядків CSS | 10782 |
+| Сутностей верхнього рівня | 2548 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -43,7 +43,7 @@
 | `src/scripts/core/06-wishes.js` | 1464 | 109 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 655 | 84 |
-| `src/scripts/core/09-goals.js` | 730 | 31 |
+| `src/scripts/core/09-goals.js` | 734 | 31 |
 | `src/scripts/core/10-planner.js` | 879 | 43 |
 | `src/scripts/core/11-ai-flow.js` | 336 | 36 |
 | `src/scripts/core/12-ai-agent.js` | 1860 | 98 |
@@ -74,10 +74,10 @@
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
 | `src/scripts/core/40-year-letter.js` | 294 | 30 |
-| `src/scripts/core/41-journal.js` | 820 | 71 |
+| `src/scripts/core/41-journal.js` | 823 | 71 |
 | `src/scripts/core/42-day.js` | 363 | 41 |
 | `src/scripts/core/43-month.js` | 274 | 37 |
-| `src/scripts/core/44-prizes.js` | 171 | 24 |
+| `src/scripts/core/44-prizes.js` | 172 | 24 |
 | `src/scripts/core/45-year.js` | 143 | 21 |
 | `src/scripts/core/46-wallet.js` | 511 | 43 |
 | `src/scripts/core/47-rules.js` | 351 | 29 |
@@ -93,7 +93,7 @@
 | `src/scripts/core/54-links.js` | 292 | 31 |
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
-| `src/scripts/core/57-my-plan.js` | 126 | 22 |
+| `src/scripts/core/57-my-plan.js` | 381 | 43 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 769 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 848 | 43 |
@@ -171,7 +171,7 @@
 | `src/styles/core/34-intro.css` | 106 | 0 |
 | `src/styles/core/35-focus.css` | 112 | 0 |
 | `src/styles/core/36-run.css` | 57 | 0 |
-| `src/styles/core/37-my-plan.css` | 75 | 0 |
+| `src/styles/core/37-my-plan.css` | 128 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (80)
 
@@ -2084,11 +2084,11 @@
 | `jnTplDows` | функція | `src/scripts/core/41-journal.js:502` |
 | `jnSyncRecur` | функція | `src/scripts/core/41-journal.js:509` |
 | `jnEditor` | функція | `src/scripts/core/41-journal.js:531` |
-| `jnStart` | функція | `src/scripts/core/41-journal.js:671` |
-| `jnSettings` | функція | `src/scripts/core/41-journal.js:753` |
-| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:766` |
-| `jnAskReview` | функція | `src/scripts/core/41-journal.js:802` |
-| `goJournal` | функція | `src/scripts/core/41-journal.js:813` |
+| `jnStart` | функція | `src/scripts/core/41-journal.js:674` |
+| `jnSettings` | функція | `src/scripts/core/41-journal.js:756` |
+| `jnDaySheet` | функція | `src/scripts/core/41-journal.js:769` |
+| `jnAskReview` | функція | `src/scripts/core/41-journal.js:805` |
+| `goJournal` | функція | `src/scripts/core/41-journal.js:816` |
 
 ### `src/scripts/core/42-day.js` — 41 сутностей
 
@@ -2204,8 +2204,8 @@
 | `pzJarSheet` | функція | `src/scripts/core/44-prizes.js:91` |
 | `pzAmountSheet` | функція | `src/scripts/core/44-prizes.js:99` |
 | `pzDeposit` | функція | `src/scripts/core/44-prizes.js:122` |
-| `pzWithdraw` | функція | `src/scripts/core/44-prizes.js:135` |
-| `pzCelebrate` | функція | `src/scripts/core/44-prizes.js:151` |
+| `pzWithdraw` | функція | `src/scripts/core/44-prizes.js:136` |
+| `pzCelebrate` | функція | `src/scripts/core/44-prizes.js:152` |
 
 ### `src/scripts/core/45-year.js` — 21 сутностей
 
@@ -2724,32 +2724,53 @@
 | `runOpen` | функція | `src/scripts/core/56-run.js:337` |
 | `window.runOpen` | значення | `src/scripts/core/56-run.js:347` |
 
-### `src/scripts/core/57-my-plan.js` — 22 сутностей
+### `src/scripts/core/57-my-plan.js` — 43 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `mrDetail` | значення | `src/scripts/core/57-my-plan.js:10` |
-| `MR_QN` | масив | `src/scripts/core/57-my-plan.js:11` |
-| `mrQuarters` | функція | `src/scripts/core/57-my-plan.js:14` |
-| `mrActive` | функція | `src/scripts/core/57-my-plan.js:19` |
-| `mrLvIn` | функція | `src/scripts/core/57-my-plan.js:23` |
-| `mrEn` | функція | `src/scripts/core/57-my-plan.js:25` |
-| `mrT` | функція | `src/scripts/core/57-my-plan.js:26` |
-| `mrFar` | функція | `src/scripts/core/57-my-plan.js:28` |
-| `mrDate` | функція | `src/scripts/core/57-my-plan.js:30` |
-| `mrMonth` | функція | `src/scripts/core/57-my-plan.js:37` |
-| `mrFinish` | функція | `src/scripts/core/57-my-plan.js:43` |
-| `mrUntil` | функція | `src/scripts/core/57-my-plan.js:47` |
-| `mrFirst` | функція | `src/scripts/core/57-my-plan.js:48` |
-| `mrPointB` | функція | `src/scripts/core/57-my-plan.js:52` |
-| `mrTile` | функція | `src/scripts/core/57-my-plan.js:63` |
-| `mrCalendar` | функція | `src/scripts/core/57-my-plan.js:74` |
-| `mrHTML` | функція | `src/scripts/core/57-my-plan.js:83` |
-| `mrSub` | функція | `src/scripts/core/57-my-plan.js:96` |
-| `mrOpen` | функція | `src/scripts/core/57-my-plan.js:97` |
-| `mrBind` | функція | `src/scripts/core/57-my-plan.js:99` |
-| `mrDayCard` | функція | `src/scripts/core/57-my-plan.js:109` |
-| `mrDayBind` | функція | `src/scripts/core/57-my-plan.js:122` |
+| `mrDetail` | значення | `src/scripts/core/57-my-plan.js:11` |
+| `MR_QN` | масив | `src/scripts/core/57-my-plan.js:12` |
+| `mrQuarters` | функція | `src/scripts/core/57-my-plan.js:15` |
+| `mrActive` | функція | `src/scripts/core/57-my-plan.js:20` |
+| `mrLvIn` | функція | `src/scripts/core/57-my-plan.js:24` |
+| `mrEn` | функція | `src/scripts/core/57-my-plan.js:26` |
+| `mrT` | функція | `src/scripts/core/57-my-plan.js:27` |
+| `mrFar` | функція | `src/scripts/core/57-my-plan.js:29` |
+| `mrDate` | функція | `src/scripts/core/57-my-plan.js:31` |
+| `mrMonth` | функція | `src/scripts/core/57-my-plan.js:38` |
+| `mrFinish` | функція | `src/scripts/core/57-my-plan.js:45` |
+| `mrUntil` | функція | `src/scripts/core/57-my-plan.js:50` |
+| `mrFirst` | функція | `src/scripts/core/57-my-plan.js:51` |
+| `mrPointB` | функція | `src/scripts/core/57-my-plan.js:55` |
+| `mrTile` | функція | `src/scripts/core/57-my-plan.js:66` |
+| `mrCalendar` | функція | `src/scripts/core/57-my-plan.js:77` |
+| `mrHTML` | функція | `src/scripts/core/57-my-plan.js:86` |
+| `mrSub` | функція | `src/scripts/core/57-my-plan.js:99` |
+| `mrOpen` | функція | `src/scripts/core/57-my-plan.js:100` |
+| `mrBind` | функція | `src/scripts/core/57-my-plan.js:102` |
+| `mrDayCard` | функція | `src/scripts/core/57-my-plan.js:112` |
+| `mrDayBind` | функція | `src/scripts/core/57-my-plan.js:125` |
+| `mrMoneySum` | функція | `src/scripts/core/57-my-plan.js:140` |
+| `mrEnv` | функція | `src/scripts/core/57-my-plan.js:142` |
+| `mrSaved` | функція | `src/scripts/core/57-my-plan.js:146` |
+| `mrK` | функція | `src/scripts/core/57-my-plan.js:147` |
+| `mrDueOk` | функція | `src/scripts/core/57-my-plan.js:148` |
+| `mrDueDs` | функція | `src/scripts/core/57-my-plan.js:150` |
+| `mrDaysLeft` | функція | `src/scripts/core/57-my-plan.js:155` |
+| `mrPerMonth` | функція | `src/scripts/core/57-my-plan.js:157` |
+| `mrWishesOf` | функція | `src/scripts/core/57-my-plan.js:162` |
+| `mrUnlinkWishes` | функція | `src/scripts/core/57-my-plan.js:164` |
+| `mrWishImg` | функція | `src/scripts/core/57-my-plan.js:169` |
+| `mrGoalHTML` | функція | `src/scripts/core/57-my-plan.js:171` |
+| `mrGoalPage` | функція | `src/scripts/core/57-my-plan.js:214` |
+| `mrWhySheet` | функція | `src/scripts/core/57-my-plan.js:249` |
+| `mrDueSheet` | функція | `src/scripts/core/57-my-plan.js:263` |
+| `mrSumSheet` | функція | `src/scripts/core/57-my-plan.js:272` |
+| `mrMoveSheet` | функція | `src/scripts/core/57-my-plan.js:293` |
+| `mrDeposit` | функція | `src/scripts/core/57-my-plan.js:318` |
+| `mrAddStep` | функція | `src/scripts/core/57-my-plan.js:332` |
+| `mrAddPhoto` | функція | `src/scripts/core/57-my-plan.js:345` |
+| `mrLinkWish` | функція | `src/scripts/core/57-my-plan.js:370` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
