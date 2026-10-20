@@ -8,13 +8,6 @@
   .yr-filt button{all:unset;cursor:pointer;min-height:36px;padding:0 12px;display:inline-flex;align-items:center;border-radius:999px;font-size:13px;font-weight:800;
     color:var(--muted);background:var(--card);border:1px solid var(--line);}
   .yr-filt button.on{background:var(--text);color:var(--bg,#0b0f17);border-color:var(--text);}
-  .yr-letter{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;margin-bottom:10px;padding:10px 12px;border-radius:16px;
-    background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 18%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));}
-  .yr-letter>span:first-child{font-size:20px;}
-  .yr-letter>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column;}
-  .yr-letter b{font-size:14px;font-weight:800;color:var(--text);}
-  .yr-letter small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .yr-letter i{font-style:normal;color:var(--accent);font-size:18px;}
   .yr-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px;}
   .yr-kpi div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;}
   .yr-kpi small{display:block;font-size:11.5px;color:var(--muted);font-weight:700;}
