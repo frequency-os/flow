@@ -457,20 +457,54 @@
       cell.classList.add('pg-born'); setTimeout(function(){try{cell.classList.remove('pg-born');}catch(_){}},900);
     }
   }
-  backdrop.onclick=function(){closeSlash();closeBmenu();};
+  backdrop.onclick=function(){closeSlash();closeBmenu();lmenuClose();};
 
   // ── drag & drop ──
+  /* Папка-нотатка, етап 4 (21.10.2026): затиснув блок чи ⠿ на 0,4 с — блок «піднявся», під ним
+     коротке меню. Повів пальцем — меню ховається, блок їде; відпустив на місці — меню лишається.
+     Потягнути ⠿ одразу — переносить без очікування, як і раніше. */
   var drag=null;
   editor.addEventListener('touchstart',dstart,{passive:false});
   editor.addEventListener('mousedown',dstart);
+  /* піднятий блок веде палець — сторінка не гортається. Слухач не пасивний від початку:
+     доданий посеред дотику, він міг би запізнитись — iOS уже вирішив би, що це прокрутка */
+  editor.addEventListener('touchmove',function(e){ if(drag&&drag.lifted&&drag.row.isConnected&&e.cancelable)e.preventDefault(); },{passive:false});
+  /* render() міг перемалювати сторінку, поки палець тримав блок: рядок зник, і touchend до нас
+     уже не дійде — такий «завислий» перенос скидаємо на наступному дотику */
+  function dragStale(){ if(drag&&!drag.row.isConnected)cancelDrag(); }
   function dstart(e){
-    var g=e.target.closest('[data-pggrip]');if(!g)return;e.preventDefault();
-    var id=g.dataset.pggrip,row=g.closest('.pgb');
-    drag={id:id,row:row,startY:(e.touches?e.touches[0].clientY:e.clientY),moved:false,target:null,mode:null};
-    row.classList.add('dragging');
+    dragStale();
+    var g=e.target.closest('[data-pggrip]');if(!g)return;
+    if(e.button===2||e.ctrlKey)return;   /* правий клік і Ctrl+клік на Mac — повне меню (contextmenu нижче) */
+    e.preventDefault();
+    var p=e.touches?e.touches[0]:e;
+    dragBegin(g.dataset.pggrip,g.closest('.pgb'),p.clientX,p.clientY);
+    drag.hold=setTimeout(function(){if(drag&&!drag.moved)liftOn();},400);
+  }
+  function dragBegin(id,row,x,y){
+    drag={id:id,row:row,startX:x,startY:y,moved:false,lifted:false,target:null,mode:null};
     document.addEventListener('touchmove',dmove,{passive:false});document.addEventListener('mousemove',dmove);
-    document.addEventListener('touchend',dend);document.addEventListener('mouseup',dend);
-    drag.hold=setTimeout(function(){if(drag&&!drag.moved){openBmenu(id);cancelDrag();}},400);
+    document.addEventListener('touchend',dend,{passive:false});document.addEventListener('mouseup',dend);
+    document.addEventListener('touchcancel',cancelDrag);
+  }
+  function dragOff(){
+    document.removeEventListener('touchmove',dmove);document.removeEventListener('mousemove',dmove);
+    document.removeEventListener('touchend',dend);document.removeEventListener('mouseup',dend);
+    document.removeEventListener('touchcancel',cancelDrag);
+  }
+  /* блок «піднявся»: вібрація, тінь, коротке меню; поки піднятий — текст не виділяється */
+  function liftOn(){
+    if(!drag||drag.lifted)return;
+    drag.lifted=true;
+    try{window.platform&&window.platform.haptic&&window.platform.haptic('medium');}catch(_){}
+    scr.classList.add('pg-liftmode');
+    try{var s=window.getSelection(); if(s&&!s.isCollapsed&&drag.row.contains(s.anchorNode))s.removeAllRanges();}catch(_){}
+    drag.row.classList.add('pg-lifted');
+    lmenuOpen(drag.id,drag.row);
+  }
+  function liftOff(){
+    editor.querySelectorAll('.pg-lifted').forEach(function(r){r.classList.remove('pg-lifted');});
+    scr.classList.remove('pg-liftmode');
   }
   /* «привид» блока під курсором під час перетягування (SPECblocksv2 §4.2) */
   function ghostMake(row){
@@ -478,6 +512,7 @@
       var rc=row.getBoundingClientRect();
       var g=document.createElement('div'); g.className='pg-ghost'; g.style.width=rc.width+'px';
       g.innerHTML=row.innerHTML;
+      pgMenuTheme(g);
       document.body.appendChild(g);
       return g;
     }catch(_){ return null; }
@@ -488,7 +523,12 @@
   function dmove(e){
     if(!drag)return;
     var y=e.touches?e.touches[0].clientY:e.clientY,x=e.touches?e.touches[0].clientX:e.clientX;
-    if(Math.abs(y-drag.startY)>6&&!drag.moved){drag.moved=true;clearTimeout(drag.hold);drag.ghost=ghostMake(drag.row);}
+    if(drag.lifted&&e.cancelable)e.preventDefault();
+    /* піднятий блок рушає і вбік; ⠿ без підняття — лише вгору-вниз, як було */
+    if(!drag.moved&&(Math.abs(y-drag.startY)>6||(drag.lifted&&Math.abs(x-drag.startX)>6))){
+      drag.moved=true;clearTimeout(drag.hold);lmenuHide();
+      drag.row.classList.remove('pg-lifted');drag.row.classList.add('dragging');drag.ghost=ghostMake(drag.row);
+    }
     if(!drag.moved)return;e.preventDefault();clearMarks();
     if(drag.ghost)ghostMove(drag.ghost,x,y);
     var rows=[].slice.call(editor.querySelectorAll('.pgb')).filter(function(r){return r!==drag.row;});
@@ -499,7 +539,10 @@
     var tb=locate(tgt.dataset.id);
     var canNest=tb&&(tb.block.type==='toggle'||tb.block.type==='task'||tb.block.type==='note'||tb.block.type==='bullet'||tb.block.type==='card');
     var xrel=(x-rc.left)/rc.width;
-    if(rc.width>=260&&rel>0.18&&rel<0.82&&(xrel<0.22||xrel>0.78)){
+    /* «поруч у колонки» — лише на широкому рядку (ноутбук). На телефоні ⠿ стоїть біля правого
+       краю, а піднятий блок тримають за текст ліворуч — палець завжди був у боковій зоні, і перенос
+       ставив блоки в колонки замість «нижче» (21.10.2026). Колонки на телефоні — з меню блока */
+    if(rc.width>=520&&rel>0.18&&rel<0.82&&(xrel<0.22||xrel>0.78)){
       drag.mode=xrel<0.22?'left':'right';
       tgt.classList.add(drag.mode==='left'?'drop-left':'drop-right');
     }
@@ -507,24 +550,31 @@
     else if(rel<0.5){drag.mode='before';tgt.classList.add('drop-before');}
     else{drag.mode='after';tgt.classList.add('drop-after');}
   }
-  function dend(){
+  function dend(e){
     if(!drag)return;clearTimeout(drag.hold);
-    document.removeEventListener('touchmove',dmove);document.removeEventListener('mousemove',dmove);
-    document.removeEventListener('touchend',dend);document.removeEventListener('mouseup',dend);
-    if(drag.moved&&drag.target&&drag.id!==drag.target){
-      var pos=drag.mode==='into'?'inside':drag.mode;
-      var rD=moveBlock(drag.id,drag.target,pos);
+    var d=drag; drag=null; dragOff();
+    /* відпускання піднятого блока не ставить курсор і не відкриває клавіатуру */
+    if(d.lifted&&e&&e.type==='touchend'&&e.cancelable)e.preventDefault();
+    ghostKill(d.ghost);clearMarks();if(d.row)d.row.classList.remove('dragging');
+    if(!d.moved){
+      /* не повели: піднятий лишається з меню до вибору чи тапу повз; тап по ⠿ — те саме меню */
+      if(!d.lifted){ drag=d; liftOn(); drag=null; }
+      return;
+    }
+    if(d.target&&d.id!==d.target){
+      var pos=d.mode==='into'?'inside':d.mode;
+      var rD=moveBlock(d.id,d.target,pos);
       if(rD){pushOp(function(){undoMove(rD);},function(){redoMove(rD);});save();}
     }
-    ghostKill(drag.ghost);
-    clearMarks();if(drag.row)drag.row.classList.remove('dragging');drag=null;render();
+    liftOff();render();
   }
+  /* система забрала дотик (дзвінок, жест iOS) — нічого не переносимо */
   function cancelDrag(){
     if(!drag)return;
-    document.removeEventListener('touchmove',dmove);document.removeEventListener('mousemove',dmove);
-    document.removeEventListener('touchend',dend);document.removeEventListener('mouseup',dend);
-    ghostKill(drag.ghost);
-    clearMarks();if(drag.row)drag.row.classList.remove('dragging');drag=null;
+    var d=drag; drag=null; dragOff(); clearTimeout(d.hold);
+    ghostKill(d.ghost);
+    clearMarks();if(d.row)d.row.classList.remove('dragging');
+    lmenuClose();
   }
   /* ── розтягування колонок за роздільник (SPECblocksv2 §4.1) ── */
   (function(){
@@ -619,23 +669,30 @@
   /* «⋮» на живих тайлах у документі (bindTiles, 26-blocks-render.js) відкриває це ж меню.
      false — такого блока на сторінці нема, тайл лишається зі своєю старою поведінкою */
   try{ window.__pgBlockMenu=function(id){ if(!locate(id))return false; openBmenu(id); return true; }; }catch(_){}
-  /* ── довге натискання на блок → меню (видалити / закріпити / дублювати) ── */
+  /* ── довге натискання на блок → блок «піднявся» (етап 4): меню або перенос одним жестом ── */
   (function(){
     var lp=null;
     function clearLP(){ if(lp){clearTimeout(lp.t);lp=null;} }
     function start(e){
       var tgt=e.target; if(!tgt||!tgt.closest)return;
+      dragStale();
+      if(e.button===2||e.ctrlKey)return;
       if(tgt.closest('input,textarea,select,button,a,[data-pgaddafter],[data-pggrip],.pg-addrow'))return;
       var row=tgt.closest('.pgb'); if(!row||!row.dataset.id)return;
       var ce=tgt.closest('[contenteditable="true"]');
-      /* у текстових полях довгий тап лишаємо системі (виділення тексту), КРІМ віджетів */
-      if(ce && !tgt.closest('.pgwidget'))return;
-      var p=e.touches?e.touches[0]:e;
-      lp={x:p.clientX,y:p.clientY,t:setTimeout(function(){
+      /* текст: поки в ньому курсор (клавіатура відкрита) чи це мишка — довгий тап лишаємо
+         системі (виділення). Без курсора на телефоні — піднімаємо блок. Віджети — завжди наші */
+      if(ce && !tgt.closest('.pgwidget')){
+        var act=document.activeElement;
+        if(!e.touches || act===ce || ce.contains(act))return;
+      }
+      var p=e.touches?e.touches[0]:e, x=p.clientX, y=p.clientY;
+      lp={x:x,y:y,t:setTimeout(function(){
         lp=null;
-        try{window.platform&&window.platform.haptic&&window.platform.haptic('medium');}catch(_){}
-        openBmenu(row.dataset.id);
-      },450)};
+        if(drag)return;
+        dragBegin(row.dataset.id,row,x,y);
+        liftOn();
+      },400)};
     }
     function move(e){
       if(!lp)return;
@@ -647,15 +704,49 @@
     editor.addEventListener('touchmove',move,{passive:true});
     editor.addEventListener('mousemove',move);
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(function(ev){editor.addEventListener(ev,clearLP,{passive:true});});
-    /* на віджетах контекстне меню/callout iOS не потрібне */
+    /* на віджетах і піднятому блоці контекстне меню/callout iOS не потрібне;
+       правий клік по ⠿ (ноутбук) — повне меню блока */
     editor.addEventListener('contextmenu',function(e){
-      if(e.target&&e.target.closest&&e.target.closest('.pgwidget'))e.preventDefault();
+      var t=e.target; if(!t||!t.closest)return;
+      var g=t.closest('[data-pggrip]');
+      if(g){ e.preventDefault(); cancelDrag(); lmenuClose(); openBmenu(g.dataset.pggrip); return; }
+      if(t.closest('.pgwidget')||scr.classList.contains('pg-liftmode'))e.preventDefault();
     });
   })();
+  /* ── коротке меню під піднятим блоком: 4 часті дії, «Ще…» — повне меню ── */
+  var lmenu=document.createElement('div'),lmId=null;
+  lmenu.className='pg-lmenu'; lmenu.id='pgLmenu'; lmenu.setAttribute('role','menu');
+  lmenu.innerHTML=[['dup','Дублювати'],['turn','Перетворити на…'],['more','Ще…'],['del','Видалити']].map(function(a){
+    return '<button type="button" role="menuitem" class="pg-lmi'+(a[0]==='del'?' danger':'')+'" data-pglm="'+a[0]+'">'+a[1]+'</button>';
+  }).join('');
+  document.body.appendChild(lmenu);
+  function lmenuOpen(id,row){
+    lmId=id; pgMenuTheme(lmenu);
+    lmenu.classList.add('show'); backdrop.classList.add('show');
+    /* під блоком; не влазить над нижнім полем — над блоком */
+    var rc=row.getBoundingClientRect(), mh=lmenu.offsetHeight, mw=lmenu.offsetWidth;
+    var vh=window.innerHeight, vw=window.innerWidth, low=vh-96, top=rc.bottom+8;
+    if(top+mh>low) top=rc.top-mh-8;
+    top=Math.max(64,Math.min(top,low-mh));
+    lmenu.style.top=top+'px';
+    lmenu.style.left=Math.max(12,Math.min(rc.left+16,vw-mw-12))+'px';
+  }
+  /* сховати меню, а блок лишити піднятим — його вже несуть */
+  function lmenuHide(){ lmenu.classList.remove('show'); backdrop.classList.remove('show'); lmId=null; }
+  function lmenuClose(){ lmenuHide(); liftOff(); }
+  lmenu.addEventListener('click',function(e){
+    var b=e.target.closest('[data-pglm]'); if(!b||!lmId)return;
+    var act=b.dataset.pglm, id=lmId; lmenuClose();
+    if(act==='more'){ openBmenu(id); return; }
+    bmId=id; bmRun(act);
+  });
   function closeBmenu(){bmenu.classList.remove('show');backdrop.classList.remove('show');bmId=null;}
   bmenu.addEventListener('click',function(e){
     var it=e.target.closest('[data-pgact]');if(!it||!bmId)return;
-    var act=it.dataset.pgact,loc=locate(bmId);if(!loc){closeBmenu();return;}
+    bmRun(it.dataset.pgact);
+  });
+  function bmRun(act){
+    var loc=locate(bmId);if(!loc){closeBmenu();return;}
     if(act==='del'){
       var dArr=loc.arr,dIdx=loc.idx,dBlk=loc.block;
       dArr.splice(dIdx,1);
@@ -692,7 +783,7 @@
     else if(act==='hstyle'){var hid=bmId;closeBmenu();openHeadingStyleSheet(hid);return;}
     else if(act==='layout'){var lid=bmId;closeBmenu();openLayoutSheet(lid);return;}
     save();closeBmenu();render();
-  });
+  }
 
   // ── тема ──
   /* Тема документа йде за темою застосунку (світла → «paper», темна → «ink»), поки людина
