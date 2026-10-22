@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 94 |
-| Рядків JS | 34621 |
+| Рядків JS | 34661 |
 | Файлів CSS | 49 |
-| Рядків CSS | 10782 |
-| Сутностей верхнього рівня | 2548 |
+| Рядків CSS | 10799 |
+| Сутностей верхнього рівня | 2549 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -93,7 +93,7 @@
 | `src/scripts/core/54-links.js` | 292 | 31 |
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
-| `src/scripts/core/57-my-plan.js` | 381 | 43 |
+| `src/scripts/core/57-my-plan.js` | 421 | 44 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 769 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 848 | 43 |
@@ -171,7 +171,7 @@
 | `src/styles/core/34-intro.css` | 106 | 0 |
 | `src/styles/core/35-focus.css` | 112 | 0 |
 | `src/styles/core/36-run.css` | 57 | 0 |
-| `src/styles/core/37-my-plan.css` | 128 | 0 |
+| `src/styles/core/37-my-plan.css` | 145 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (80)
 
@@ -2724,7 +2724,7 @@
 | `runOpen` | функція | `src/scripts/core/56-run.js:337` |
 | `window.runOpen` | значення | `src/scripts/core/56-run.js:347` |
 
-### `src/scripts/core/57-my-plan.js` — 43 сутностей
+### `src/scripts/core/57-my-plan.js` — 44 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2771,6 +2771,7 @@
 | `mrAddStep` | функція | `src/scripts/core/57-my-plan.js:332` |
 | `mrAddPhoto` | функція | `src/scripts/core/57-my-plan.js:345` |
 | `mrLinkWish` | функція | `src/scripts/core/57-my-plan.js:370` |
+| `mrNewGoal` | функція | `src/scripts/core/57-my-plan.js:387` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

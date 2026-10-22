@@ -102,7 +102,7 @@
   function mrBind(c){
     if(mrDetail){ const b=c.querySelector('[data-mrback]'); if(b) b.onclick=()=>{ mrDetail=false; jnRender(); jnTop(); }; yrBind(c); return; }
     { const l=c.querySelector('[data-mrletter]'); if(l) l.onclick=()=>ylEdit(()=>{ if(jnTab==='year') jnRender(); }); }
-    { const a=c.querySelector('[data-mradd]'); if(a) a.onclick=()=>jnEditor(null); }
+    { const a=c.querySelector('[data-mradd]'); if(a) a.onclick=mrNewGoal; }   // проста форма (етап 3)
     { const d=c.querySelector('[data-mrdetail]'); if(d) d.onclick=()=>{ mrDetail=true; jnRender(); jnTop(); }; }
     c.querySelectorAll('[data-mrg]').forEach(b=>b.onclick=()=>{ const g=jnGoalById(b.dataset.mrg); if(g) mrGoalPage(g); });
     c.querySelectorAll('[data-mrlv]').forEach(b=>b.onclick=()=>yrLvMenu(b.dataset.mrlv));
@@ -377,5 +377,45 @@
         if(w&&q&&!w.goalId){ w.goalId=String(q.id); saveWishes(); try{ renderWishes(); }catch(_){} }
         ov.remove(); after();
       });
+    });
+  }
+
+  /* ════════ Етап 3 (22.10.2026): проста форма нової цілі ════════
+     Обовʼязкова лише назва (+ колір і «головна»). Обʼєкт цілі — той самий, що створює редактор місії (jnEditor, 41-journal.js),
+     але без розкладу, рівнів і призу. Після «Створити» одразу відкривається сторінка цілі — решта блоків там чекають «＋».
+     «Повна форма» — для тих, кому треба все одразу (jnEditor). Запис — лише після натискання. */
+  function mrNewGoal(){
+    const act=(goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)!=='archive');
+    let color=JN_COLORS[(goalsData.goals||[]).length%JN_COLORS.length], main=!act.some(g=>jnRole(g)==='main');
+    jnOverlay(`<div class="jn-ed-h"><b>${mrT('Нова ціль','New goal')}</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <label class="jn-f"><span>${mrT('Назва','Name')}</span><input id="mrNgName" maxlength="80" autocomplete="off" placeholder="${mrT('Напр. Англійська B2','E.g. Spanish B2')}"></label>
+      <div class="jn-f"><span>${mrT('Колір','Color')}</span><div class="mr-ng-cols" role="radiogroup" aria-label="${mrT('Колір','Color')}">${JN_COLORS.map((c,i)=>`<button data-mrc="${c}" role="radio" aria-checked="${c===color}" aria-label="${mrT('Колір ','Color ')+(i+1)}" style="--c:${c}"><i></i></button>`).join('')}</div></div>
+      <button class="mr-ng-main" data-mrmain role="switch" aria-checked="${main}"><span><b>${mrT('Головна ціль року','Main goal of the year')}</b><small>${mrT('Стоїть першою; інші стають побічними','Shown first; others become side goals')}</small></span><i aria-hidden="true"></i></button>
+      <small class="mo-note">${mrT('Опис, терміни, гроші, кроки й фото — на сторінці цілі, коли захочеш.','Description, dates, money, steps and photos — on the goal page, whenever you like.')}</small>
+      <div class="jn-ed-foot"><button class="jn-btn ghost" data-mrfull>${mrT('Повна форма','Full form')}</button><button class="jn-btn" data-mrok>${mrT('Створити ціль','Create goal')}</button></div>`, ov=>{
+      const inp=ov.querySelector('#mrNgName');
+      const paint=()=>{
+        ov.querySelectorAll('[data-mrc]').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.mrc===color)));
+        ov.querySelector('[data-mrmain]').setAttribute('aria-checked',String(main));
+      };
+      ov.querySelectorAll('[data-mrc]').forEach(b=>b.onclick=()=>{ color=b.dataset.mrc; paint(); });
+      ov.querySelector('[data-mrmain]').onclick=()=>{ main=!main; paint(); };
+      ov.querySelector('[data-mrfull]').onclick=()=>{ ov.remove(); jnEditor(null); };
+      const create=()=>{
+        const name=String(inp.value||'').trim().slice(0,80);
+        if(!name){ inp.focus(); plToast(mrT('Дай цілі назву','Give the goal a name')); return; }
+        const g={ id:'g_m_'+Date.now()+'_'+Math.random().toString(36).slice(2,5), steps:[], track:{}, days:{}, open:true, ms:[],
+          name, emoji:'🎯', color:safeColor(color,JN_COLORS[0]), role:main?'main':'side', status:'active', from:'', to:'',
+          sched:{dows:[], min:45, h:18, start:ymdLocal(), end:'', plan:false}, budget:{hWeek:0, money:0}, reward:null, folderKey:null };
+        if(!Array.isArray(goalsData.goals)) goalsData.goals=[];
+        if(main) goalsData.goals.forEach(x=>{ if(x&&jnRole(x)==='main') x.role='side'; });   // головна одна — як у редакторі місії
+        goalsData.goals.push(g);
+        saveGoals(); ov.remove(); jnRender(); try{ renderGoals(); }catch(_){}
+        plToast(mrT('Ціль додано','Goal added'));
+        mrGoalPage(g);
+      };
+      ov.querySelector('[data-mrok]').onclick=create;
+      inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); create(); } };
+      setTimeout(()=>{ try{ inp.focus(); }catch(_){} },60);
     });
   }
