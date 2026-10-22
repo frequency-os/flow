@@ -91,9 +91,11 @@
     h+=`<div class="mr-sec"><b>Точка Б</b><span>ким ти будеш через рік</span></div>`+mrPointB();
     h+=`<div class="mr-sec"><b>Цілі</b><span>${goals.length?'тапни плитку — відкриється ціль':'почни з однієї'}</span></div>`;
     h+=`<div class="mr-tiles">${goals.map(mrTile).join('')}<button class="mr-tile add" data-mradd><span aria-hidden="true">＋</span><b>Нова ціль</b></button></div>`;
+    h+=`<div class="mr-sec"><b>${mrT('Гроші на цілі','Money for goals')}</b><span>${mrT('усі разом','all together')}</span></div>`+mrMoneyHTML(goals);   // етап 4
     h+=`<div class="mr-sec"><b>Календар року</b><span>${nowLv.length?mrT('цей квартал: ','this quarter: ')+nowLv.filter(m=>m.done).length+mrT(' з ',' of ')+nowLv.length:'великі кроки по чвертях'}</span></div>`;
     h+=goals.length?mrCalendar(goals)+`<button class="mr-link" data-mrdetail>Усі квартали і таблиця ›</button>`
       :`<div class="dy-empty"><b>Тут стануть кроки</b><span>Додай ціль і розбий її на 3–4 великі кроки — вони розкладуться по чвертях року.</span></div>`;
+    h+=`<div class="mr-sec"><b>${mrT('Правила року','Rules of the year')}</b><span>${mrT('нюанси, які легко забути','things easy to forget')}</span></div>`+mrRulesHTML();   // етап 4
     return h+'</div><div class="jn-pad"></div>';
   }
   function mrSub(){ return mrDetail?'рік · база цілей · '+yrYear():mrT('мій рік · до ','my year · until ')+mrUntil(); }
@@ -106,6 +108,8 @@
     { const d=c.querySelector('[data-mrdetail]'); if(d) d.onclick=()=>{ mrDetail=true; jnRender(); jnTop(); }; }
     c.querySelectorAll('[data-mrg]').forEach(b=>b.onclick=()=>{ const g=jnGoalById(b.dataset.mrg); if(g) mrGoalPage(g); });
     c.querySelectorAll('[data-mrlv]').forEach(b=>b.onclick=()=>yrLvMenu(b.dataset.mrlv));
+    { const r=c.querySelector('[data-mrruleadd]'); if(r) r.onclick=()=>mrRuleEdit(null); }
+    c.querySelectorAll('[data-mrrule]').forEach(b=>b.onclick=()=>mrRuleMenu(b.dataset.mrrule));
   }
 
   // ── картка «Мій рік» на «Дні» Журналу (замість «Почни гру») ──
@@ -418,4 +422,52 @@
       inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); create(); } };
       setTimeout(()=>{ try{ inp.focus(); }catch(_){} },60);
     });
+  }
+
+  /* ════════ Етап 4 (22.10.2026): «Гроші на цілі» і «Правила року» ════════
+     Гроші — лише показ: суми цілей (money.sum), відкладене в їхніх конвертах (mrSaved), «на місяць» до фінішу (mrPerMonth).
+       Конверти цілей створюються в головній валюті (mrDeposit), тож і зведення — в ній.
+     Правила — goalsData.yearRules=[{id, t}] (нове поле в goals_data, новий ключ не потрібен); пишеться лише після дії людини. */
+  function mrMoneyHTML(goals){
+    const L=goals.filter(g=>mrMoneySum(g)>0);
+    if(!L.length) return `<div class="dy-empty"><b>${mrT('Грошей на цілі ще не задано','No money set for goals yet')}</b><span>${mrT('Відкрий ціль і задай суму — тут зберуться всі гроші року і скільки відкладати щомісяця.','Open a goal and set an amount — all money for the year and the monthly amount gather here.')}</span></div>`;
+    const sum=L.reduce((a,g)=>a+mrMoneySum(g),0), sv=L.reduce((a,g)=>a+Math.min(mrSaved(g),mrMoneySum(g)),0), pm=L.reduce((a,g)=>a+mrPerMonth(g),0);
+    const noDue=L.filter(g=>!mrDueDs(g)&&mrSaved(g)<mrMoneySum(g)).length;
+    return `<div class="mr-money">
+      <div class="mr-gb-money"><b>${esc(moneyK(sv,''))}</b><span>${mrT('з','of')} ${esc(moneyK(sum,''))}</span></div>
+      <i class="mr-pg big"><u style="width:${sum?Math.min(100,Math.round(sv/sum*100)):0}%"></u></i>
+      <div class="mr-money-rows">${L.map(g=>{ const p=mrPerMonth(g), s=mrSaved(g), t=mrMoneySum(g);
+        return `<button class="mr-money-r" data-mrg="${esc(g.id)}" style="--c:${safeColor(g.color,'#3ec7b4')}"><i aria-hidden="true"></i><span>${esc(g.name||'Ціль')}</span>
+          <em>${s>=t?mrT('зібрано','saved'):p?esc(moneyK(p,''))+mrT('/міс','/mo'):esc(moneyK(s,''))+' / '+esc(moneyK(t,''))}</em></button>`; }).join('')}</div>
+      <div class="mr-money-f"><span>${mrT('Треба відкладати','To save monthly')}</span><b>${pm?esc(moneyK(pm,''))+mrT(' / міс',' / mo'):sv>=sum?mrT('усе зібрано','all saved'):'—'}</b></div>
+      ${noDue?`<small class="mo-note">${mrT('Без дати фінішу: ','No finish date: ')+noDue+mrT(' — їх не враховано в сумі на місяць.',' — not included in the monthly amount.')}</small>`:''}
+    </div>`;
+  }
+
+  function mrRules(){ const R=goalsData.yearRules; return Array.isArray(R)?R.filter(r=>r&&typeof r==='object'&&String(r.t||'').trim()):[]; }
+  function mrRulesHTML(){
+    const R=mrRules();
+    return `<div class="mr-rules">${R.length?R.map(r=>`<button class="mr-rule" data-mrrule="${esc(r.id)}">${esc(r.t)}</button>`).join('')
+      :`<p class="mr-gb-mut">${mrT('Що важливо памʼятати цілий рік? Напр. «Не беру нових проєктів до квітня» чи «Премія — на подушку».','What matters all year? E.g. «No new projects until April» or «Bonus goes to savings».')}</p>`}
+      ${R.length<20?`<button class="mr-link" data-mrruleadd>${mrT('＋ Правило','＋ Rule')}</button>`:''}</div>`;
+  }
+  function mrRuleEdit(id){
+    const r=id?mrRules().find(x=>String(x.id)===String(id)):null;
+    if(id&&!r) return;
+    inputModal({title:r?mrT('Змінити правило','Edit rule'):mrT('Нове правило року','New rule of the year'), value:r?r.t:'', placeholder:mrT('Напр. Неділя — без роботи','E.g. Sundays are work-free'), onOk:v=>{
+      v=String(v||'').trim().slice(0,140); if(!v) return;
+      if(!Array.isArray(goalsData.yearRules)) goalsData.yearRules=[];
+      const cur=r?goalsData.yearRules.find(x=>x&&String(x.id)===String(r.id)):null;   // поки шторка була відкрита, синк міг підмінити список
+      if(r&&!cur){ plToast(mrT('Правило змінили на іншому пристрої','The rule changed on another device')); jnRender(); return; }
+      if(cur) cur.t=v; else goalsData.yearRules.push({id:'yr_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), t:v});
+      saveGoals(); jnRender();
+    }});
+  }
+  function mrRuleMenu(id){
+    const r=mrRules().find(x=>String(x.id)===String(id)); if(!r) return;
+    actionSheet({title:r.t, items:[
+      {ic:'edit', label:mrT('Змінити','Edit'), onClick:()=>mrRuleEdit(r.id)},
+      {ic:'trash', label:mrT('Прибрати правило','Remove rule'), danger:true, onClick:()=>{
+        goalsData.yearRules=(goalsData.yearRules||[]).filter(x=>!(x&&String(x.id)===String(r.id)));
+        saveGoals(); jnRender(); plToast(mrT('Правило прибрано','Rule removed')); }} ]});
   }

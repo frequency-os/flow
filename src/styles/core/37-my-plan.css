@@ -143,3 +143,19 @@
   .mr-ng-main[aria-checked="true"] i::after{transform:translateX(18px);}
   .mr-ng-cols button:focus-visible,.mr-ng-main:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   @media (prefers-reduced-motion:reduce){ .mr-ng-main i,.mr-ng-main i::after{transition:none;} }
+
+  /* ── «Гроші на цілі» і «Правила року» (етап 4) ── */
+  .mr-money,.mr-rules{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--dp-shadow-s,none);}
+  .mr-money .mr-pg{background:color-mix(in srgb,var(--text) 10%,transparent);}
+  .mr-money .mr-pg u{background:var(--accent);}
+  .mr-money-rows{display:flex;flex-direction:column;}
+  .mr-money-r{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;color:var(--text);border-top:1px solid var(--line);}
+  .mr-money-r:first-child{border-top:0;}
+  .mr-money-r i{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none;}
+  .mr-money-r span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mr-money-r em{font-style:normal;font-size:13px;color:var(--muted);white-space:nowrap;}
+  .mr-money-f{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--line);font-size:14px;font-weight:700;color:var(--text);}
+  .mr-money-f b{font-size:16px;color:var(--accent);}
+  .mr-rule{all:unset;box-sizing:border-box;cursor:pointer;display:block;min-height:44px;padding:11px 0;font-size:15px;line-height:1.45;color:var(--text);border-top:1px solid var(--line);overflow-wrap:break-word;}
+  .mr-rule:first-child{border-top:0;}
+  .mr-money-r:focus-visible,.mr-rule:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}

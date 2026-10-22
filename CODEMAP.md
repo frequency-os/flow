@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 94 |
-| Рядків JS | 34661 |
+| Рядків JS | 34713 |
 | Файлів CSS | 49 |
-| Рядків CSS | 10799 |
-| Сутностей верхнього рівня | 2549 |
+| Рядків CSS | 10815 |
+| Сутностей верхнього рівня | 2554 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -93,7 +93,7 @@
 | `src/scripts/core/54-links.js` | 292 | 31 |
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
-| `src/scripts/core/57-my-plan.js` | 421 | 44 |
+| `src/scripts/core/57-my-plan.js` | 473 | 49 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 769 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 848 | 43 |
@@ -171,7 +171,7 @@
 | `src/styles/core/34-intro.css` | 106 | 0 |
 | `src/styles/core/35-focus.css` | 112 | 0 |
 | `src/styles/core/36-run.css` | 57 | 0 |
-| `src/styles/core/37-my-plan.css` | 145 | 0 |
+| `src/styles/core/37-my-plan.css` | 161 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (80)
 
@@ -2724,7 +2724,7 @@
 | `runOpen` | функція | `src/scripts/core/56-run.js:337` |
 | `window.runOpen` | значення | `src/scripts/core/56-run.js:347` |
 
-### `src/scripts/core/57-my-plan.js` — 44 сутностей
+### `src/scripts/core/57-my-plan.js` — 49 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2745,33 +2745,38 @@
 | `mrTile` | функція | `src/scripts/core/57-my-plan.js:66` |
 | `mrCalendar` | функція | `src/scripts/core/57-my-plan.js:77` |
 | `mrHTML` | функція | `src/scripts/core/57-my-plan.js:86` |
-| `mrSub` | функція | `src/scripts/core/57-my-plan.js:99` |
-| `mrOpen` | функція | `src/scripts/core/57-my-plan.js:100` |
-| `mrBind` | функція | `src/scripts/core/57-my-plan.js:102` |
-| `mrDayCard` | функція | `src/scripts/core/57-my-plan.js:112` |
-| `mrDayBind` | функція | `src/scripts/core/57-my-plan.js:125` |
-| `mrMoneySum` | функція | `src/scripts/core/57-my-plan.js:140` |
-| `mrEnv` | функція | `src/scripts/core/57-my-plan.js:142` |
-| `mrSaved` | функція | `src/scripts/core/57-my-plan.js:146` |
-| `mrK` | функція | `src/scripts/core/57-my-plan.js:147` |
-| `mrDueOk` | функція | `src/scripts/core/57-my-plan.js:148` |
-| `mrDueDs` | функція | `src/scripts/core/57-my-plan.js:150` |
-| `mrDaysLeft` | функція | `src/scripts/core/57-my-plan.js:155` |
-| `mrPerMonth` | функція | `src/scripts/core/57-my-plan.js:157` |
-| `mrWishesOf` | функція | `src/scripts/core/57-my-plan.js:162` |
-| `mrUnlinkWishes` | функція | `src/scripts/core/57-my-plan.js:164` |
-| `mrWishImg` | функція | `src/scripts/core/57-my-plan.js:169` |
-| `mrGoalHTML` | функція | `src/scripts/core/57-my-plan.js:171` |
-| `mrGoalPage` | функція | `src/scripts/core/57-my-plan.js:214` |
-| `mrWhySheet` | функція | `src/scripts/core/57-my-plan.js:249` |
-| `mrDueSheet` | функція | `src/scripts/core/57-my-plan.js:263` |
-| `mrSumSheet` | функція | `src/scripts/core/57-my-plan.js:272` |
-| `mrMoveSheet` | функція | `src/scripts/core/57-my-plan.js:293` |
-| `mrDeposit` | функція | `src/scripts/core/57-my-plan.js:318` |
-| `mrAddStep` | функція | `src/scripts/core/57-my-plan.js:332` |
-| `mrAddPhoto` | функція | `src/scripts/core/57-my-plan.js:345` |
-| `mrLinkWish` | функція | `src/scripts/core/57-my-plan.js:370` |
-| `mrNewGoal` | функція | `src/scripts/core/57-my-plan.js:387` |
+| `mrSub` | функція | `src/scripts/core/57-my-plan.js:101` |
+| `mrOpen` | функція | `src/scripts/core/57-my-plan.js:102` |
+| `mrBind` | функція | `src/scripts/core/57-my-plan.js:104` |
+| `mrDayCard` | функція | `src/scripts/core/57-my-plan.js:116` |
+| `mrDayBind` | функція | `src/scripts/core/57-my-plan.js:129` |
+| `mrMoneySum` | функція | `src/scripts/core/57-my-plan.js:144` |
+| `mrEnv` | функція | `src/scripts/core/57-my-plan.js:146` |
+| `mrSaved` | функція | `src/scripts/core/57-my-plan.js:150` |
+| `mrK` | функція | `src/scripts/core/57-my-plan.js:151` |
+| `mrDueOk` | функція | `src/scripts/core/57-my-plan.js:152` |
+| `mrDueDs` | функція | `src/scripts/core/57-my-plan.js:154` |
+| `mrDaysLeft` | функція | `src/scripts/core/57-my-plan.js:159` |
+| `mrPerMonth` | функція | `src/scripts/core/57-my-plan.js:161` |
+| `mrWishesOf` | функція | `src/scripts/core/57-my-plan.js:166` |
+| `mrUnlinkWishes` | функція | `src/scripts/core/57-my-plan.js:168` |
+| `mrWishImg` | функція | `src/scripts/core/57-my-plan.js:173` |
+| `mrGoalHTML` | функція | `src/scripts/core/57-my-plan.js:175` |
+| `mrGoalPage` | функція | `src/scripts/core/57-my-plan.js:218` |
+| `mrWhySheet` | функція | `src/scripts/core/57-my-plan.js:253` |
+| `mrDueSheet` | функція | `src/scripts/core/57-my-plan.js:267` |
+| `mrSumSheet` | функція | `src/scripts/core/57-my-plan.js:276` |
+| `mrMoveSheet` | функція | `src/scripts/core/57-my-plan.js:297` |
+| `mrDeposit` | функція | `src/scripts/core/57-my-plan.js:322` |
+| `mrAddStep` | функція | `src/scripts/core/57-my-plan.js:336` |
+| `mrAddPhoto` | функція | `src/scripts/core/57-my-plan.js:349` |
+| `mrLinkWish` | функція | `src/scripts/core/57-my-plan.js:374` |
+| `mrNewGoal` | функція | `src/scripts/core/57-my-plan.js:391` |
+| `mrMoneyHTML` | функція | `src/scripts/core/57-my-plan.js:431` |
+| `mrRules` | функція | `src/scripts/core/57-my-plan.js:447` |
+| `mrRulesHTML` | функція | `src/scripts/core/57-my-plan.js:448` |
+| `mrRuleEdit` | функція | `src/scripts/core/57-my-plan.js:454` |
+| `mrRuleMenu` | функція | `src/scripts/core/57-my-plan.js:466` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
