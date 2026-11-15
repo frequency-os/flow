@@ -860,13 +860,31 @@
     var wrap=document.getElementById('pgcLines'), send=document.getElementById('pgcSend'),
         modes=document.getElementById('pgcModes'), count=document.getElementById('pgcCount'),
         scr=document.getElementById('scr-page');
-    var PH={note:'Нотатка…', task:'Завдання…', bullet:'Пункт списку…'},
+    var PH={note:'Написати…', task:'Завдання…', bullet:'Пункт списку…'},
         NAME={note:'текст', task:'завдання', bullet:'пункт списку'};
     var lines=[{t:'note',text:''}], cur=0;
     function plR(n){ var m10=n%10, m100=n%100; return (m10===1&&m100!==11)?'рядок':(m10>=2&&m10<=4&&(m100<12||m100>14))?'рядки':'рядків'; }
     function filled(){ return lines.filter(function(l){ return l.text.trim(); }); }
+    /* поле як у чаті (15.11.2026): «Т · Завдання · Список» — одна кнопка зі значком поточного типу,
+       тап — коротке меню. Старі кнопки #pgcModes лишаються схованими: тип міняє їхній же обробник. */
+    var field=box.querySelector('.pgc-field'), modeBtn=document.createElement('button'), modeMenu=document.createElement('div');
+    modeBtn.type='button'; modeBtn.className='pgc-mode'; modeBtn.setAttribute('aria-haspopup','true'); modeBtn.setAttribute('aria-expanded','false');
+    modeMenu.className='pgc-mmenu'; modeMenu.hidden=true; modeMenu.setAttribute('role','menu');
+    var MIC={}; modes.querySelectorAll('[data-pgcmode]').forEach(function(b){ MIC[b.dataset.pgcmode]=b.innerHTML; });
+    modeMenu.innerHTML=['note','task','bullet'].map(function(k){ return '<button type="button" role="menuitemradio" data-pgcm="'+k+'">'+(MIC[k]||'')+'<span>'+({note:'Текст',task:'Завдання',bullet:'Список'})[k]+'</span></button>'; }).join('');
+    if(field){ field.insertBefore(modeBtn, field.firstChild); field.appendChild(send); box.appendChild(modeMenu); }
+    function menuOpen(on){ modeMenu.hidden=!on; modeBtn.setAttribute('aria-expanded',String(on)); }
+    // не забираємо фокус у рядка — інакше на iPhone ховається клавіатура
+    [modeBtn,modeMenu].forEach(function(el){ el.addEventListener('pointerdown',function(e){ e.preventDefault(); }); el.addEventListener('mousedown',function(e){ e.preventDefault(); }); });
+    modeBtn.onclick=function(){ menuOpen(modeMenu.hidden); };
+    modeMenu.addEventListener('click',function(e){ var b=e.target.closest('[data-pgcm]'); if(!b) return;
+      var o=modes.querySelector('[data-pgcmode="'+b.dataset.pgcm+'"]'); if(o) o.click(); menuOpen(false); });
+    document.addEventListener('pointerdown',function(e){ if(!modeMenu.hidden&&!modeMenu.contains(e.target)&&e.target!==modeBtn&&!modeBtn.contains(e.target)) menuOpen(false); },true);
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!modeMenu.hidden) menuOpen(false); });
     function syncBar(){
       var t=(lines[cur]||lines[0]).t, n=filled().length;
+      modeBtn.innerHTML=MIC[t]||''; modeBtn.setAttribute('aria-label','Тип рядка: '+({note:'текст',task:'завдання',bullet:'список'})[t]+' — змінити');
+      modeMenu.querySelectorAll('[data-pgcm]').forEach(function(b){ var on=b.dataset.pgcm===t; b.classList.toggle('on',on); b.setAttribute('aria-checked',String(on)); });
       modes.querySelectorAll('[data-pgcmode]').forEach(function(b){ var on=b.dataset.pgcmode===t; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); });
       count.textContent=n>1?(n+' '+plR(n)+' разом'):'';
       send.disabled=!n;
@@ -879,7 +897,7 @@
         var mk=document.createElement('span'); mk.className='pgc-mk'; mk.setAttribute('aria-hidden','true');
         var inp=document.createElement('input'); inp.className='pgc-in'; inp.type='text'; inp.value=l.text; inp.dataset.i=i;
         inp.setAttribute('enterkeyhint','enter'); inp.setAttribute('autocomplete','off');
-        inp.placeholder=(lines.length===1&&l.t==='note')?'Нотатка… Enter — новий рядок':PH[l.t];
+        inp.placeholder=PH[l.t];
         inp.setAttribute('aria-label','Рядок '+(i+1)+': '+NAME[l.t]);
         row.appendChild(mk); row.appendChild(inp); wrap.appendChild(row);
       });

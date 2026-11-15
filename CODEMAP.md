@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 93 |
-| Рядків JS | 34773 |
+| Рядків JS | 34791 |
 | Файлів CSS | 48 |
-| Рядків CSS | 10857 |
+| Рядків CSS | 10880 |
 | Сутностей верхнього рівня | 2547 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -95,7 +95,7 @@
 | `src/scripts/core/56-run.js` | 347 | 50 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 762 | 49 |
-| `src/scripts/page-editor/03-premium-pack.js` | 1007 | 53 |
+| `src/scripts/page-editor/03-premium-pack.js` | 1025 | 53 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
@@ -137,7 +137,7 @@
 | `src/styles/22-more-screen.css` | 183 | 0 |
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1182 | 9 |
+| `src/styles/core/02-page-editor.css` | 1205 | 9 |
 | `src/styles/core/03-folders-projects.css` | 665 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -2884,9 +2884,9 @@
 | `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:826` |
 | `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:845` |
 | `pgAddViaMenu` | функція | `src/scripts/page-editor/03-premium-pack.js:846` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:986` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:987` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:992` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:1004` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:1005` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:1010` |
 
 ### `src/scripts/page-editor/04-table.js` — 26 сутностей
 

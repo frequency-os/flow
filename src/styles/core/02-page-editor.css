@@ -1180,3 +1180,26 @@
     cursor:text;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;min-height:48px;}
   .pg-es-quiet:hover{color:color-mix(in srgb,var(--pg-fg,var(--text)) 45%,transparent);}
   .pg-es-quiet:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:3px;border-radius:8px;}
+
+  /* ── нижнє поле як у чаті (15.11.2026): малий «＋», поле в один рядок, одна кнопка типу з меню, ↑ ── */
+  #pgComposer .pgc-plus{width:44px;height:44px;border-radius:22px;background:color-mix(in srgb,var(--pg-fg) 8%,var(--pg-bg,#14161c)) !important;
+    color:var(--pg-fg) !important;box-shadow:none !important;border:1px solid color-mix(in srgb,var(--pg-fg) 10%,transparent);}
+  #pgComposer .pgc-plus svg{width:20px;height:20px;stroke-width:2.2;}
+  #pgComposer .pgc-field{flex-direction:row;align-items:flex-end;gap:4px;padding:4px;border-radius:22px;min-height:44px;}
+  #pgComposer .pgc-lines{flex:1;padding:0 4px;}
+  #pgComposer .pgc-bar{display:none;}
+  #pgComposer .pgc-mode{flex:none;width:36px;height:36px;border-radius:18px;border:0;padding:0;cursor:pointer;display:grid;place-items:center;
+    background:color-mix(in srgb,var(--pg-acc) 16%,transparent);color:var(--pg-acc);}
+  #pgComposer .pgc-mode svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  #pgComposer .pgc-mode circle{fill:currentColor;stroke:none;}
+  #pgComposer .pgc-send{width:36px;height:36px;border-radius:18px;}
+  #pgComposer .pgc-mode:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
+  .pgc-mmenu{position:absolute;left:56px;bottom:calc(100% + 8px);min-width:170px;padding:4px;border-radius:14px;z-index:2;
+    background:var(--pg-surface,var(--card));border:1px solid color-mix(in srgb,var(--pg-fg) 12%,transparent);box-shadow:0 14px 34px -14px rgba(0,0,0,.6);}
+  .pgc-mmenu[hidden]{display:none;}
+  .pgc-mmenu button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border-radius:10px;
+    color:var(--pg-fg);font-size:15px;font-weight:600;}
+  .pgc-mmenu button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .pgc-mmenu button circle{fill:currentColor;stroke:none;}
+  .pgc-mmenu button.on{background:color-mix(in srgb,var(--pg-acc) 16%,transparent);color:var(--pg-acc);}
+  .pgc-mmenu button:focus-visible{outline:2px solid var(--pg-acc);}
