@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-10-22-0612-a1a5ccf';
+  var BUILD='2026-11-15-1608-83d2360';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -6092,6 +6092,24 @@
   .ch-stat small{font-size:11.5px;font-weight:700;color:var(--muted);}
   .ch-stat.on{border-color:var(--fc,var(--accent));background:color-mix(in srgb,var(--fc,var(--accent)) 18%,transparent);}
   .ch-stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* папки чату кружечками-сторіс (15.11.2026): фото або іконка на кольорі папки, назва знизу */
+  .ch-chips:has(.chf-row){align-items:flex-start;flex-wrap:wrap;row-gap:4px;}
+  .ch-chips .ch-lbl{flex-basis:100%;}
+  .chf-row{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;min-width:0;flex:1 1 100%;}
+  .chf-row::-webkit-scrollbar{display:none;}
+  .chf{all:unset;box-sizing:border-box;cursor:pointer;flex:0 0 60px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;
+    color:var(--text);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .chf-cv{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;overflow:hidden;
+    background:color-mix(in srgb,var(--c,#6a7dff) 55%,var(--card)) center/cover no-repeat;color:#fff;
+    box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--c,var(--accent));}
+  .chf-cv .ico{width:22px;height:22px;}
+  .chf-n{width:64px;font-size:11px;font-weight:650;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chf.add .chf-cv{background:transparent;box-shadow:none;border:1.5px dashed var(--line);color:var(--muted);}
+  .chf.add .chf-cv svg{width:20px;height:20px;}
+  .chf.add .chf-n{color:var(--muted);}
+  .chf:active .chf-cv{transform:scale(.95);}
+  .chf:focus-visible .chf-cv{outline:2px solid var(--accent);outline-offset:3px;}
   /* ============ ЧАТИ (36-chats.js) ============
      Вкладки Огляду «Папки · Чати», список чатів, блок «Чати папки» в документі
      і дрібні доповнення екрана чату (база екрана — 18-channel.css). */
@@ -6292,6 +6310,103 @@
   .lkf-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
   .lkf-tx b{font-size:14.5px;font-weight:800;overflow-wrap:anywhere;}
   .lkf-tx small{font-size:12.5px;font-weight:600;color:var(--pg-mut,var(--muted));overflow-wrap:anywhere;}
+
+  /* ── шапка папки як у чаті (15.11.2026, 36-chats.js fhRender): та сама .ch-cover,
+     що в чаті; стара верхня смуга «‹ Папки · назва · ⋯» і «＋ Обкладинка» ховаються ── */
+  #scr-page.pg-fhero .pg-top{display:none !important;}
+  #scr-page.pg-fhero #pgCover{display:none !important;}
+  #scr-page.pg-fhero .pg-doc{margin-top:0 !important;padding-top:0 !important;}
+  #scr-page.pg-fhero #pgHero{margin:0 -13px 12px;}
+  #scr-page.pg-fhero.pg-wide #pgHero{margin-left:-7px;margin-right:-7px;}
+  #pgHero[hidden]{display:none !important;}
+  #pgHero .ch-cov-title{align-items:flex-end;}
+  .fh-avbtn{all:unset;cursor:pointer;flex:none;border-radius:15px;-webkit-tap-highlight-color:transparent;}
+  .fh-avbtn:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+  .fh-av{width:48px;height:48px;background:color-mix(in srgb,var(--c,#6a7dff) 62%,rgba(10,12,18,.5));}
+  .fh-av .ico{width:24px;height:24px;color:#fff;}
+  .fh-av-ph{background-size:cover;background-position:center;}
+  .fh-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+  #scr-page.pg-fhero #pgTitle{display:block;width:100%;margin:0 !important;padding:0 !important;border:0;background:transparent !important;
+    color:#fff !important;font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1.08;text-shadow:0 2px 14px rgba(0,0,0,.6);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit;}
+  #scr-page.pg-fhero #pgTitle::placeholder{color:rgba(255,255,255,.6);}
+  .fh-chips{display:flex;gap:5px;flex-wrap:wrap;min-height:0;}
+  .fh-chips:empty{display:none;}
+  .fh-chip{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.16);background:rgba(10,12,18,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#fff;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;}
+  .fh-chip svg{width:14px;height:14px;}
+  /* видно 28 px, а натиснути можна в смузі 44 px — палець не мишка */
+  .fh-chip{position:relative;}
+  .fh-chip::after{content:"";position:absolute;left:-3px;right:-3px;top:-8px;bottom:-8px;}
+  .fh-chip:active{transform:scale(.96);}
+  .fh-chip:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+  /* шторки значків */
+  .fh-list{display:flex;flex-direction:column;gap:2px;max-height:min(60vh,520px);overflow-y:auto;}
+  .fh-task{gap:10px;cursor:default;}
+  .fh-box{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;
+    border:2px solid color-mix(in srgb,var(--text) 30%,transparent);color:#fff;}
+  .fh-box svg{width:16px;height:16px;}
+  .fh-task.done .fh-box{background:var(--accent);border-color:var(--accent);}
+  .fh-go{all:unset;cursor:pointer;flex:1;min-width:0;font-size:16px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fh-task.done .fh-go{text-decoration:line-through;color:var(--muted);}
+  .fh-rt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fh-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:0 6px 6px;max-height:min(60vh,520px);overflow-y:auto;}
+  .fh-ph{all:unset;cursor:pointer;aspect-ratio:1;border-radius:12px;background:var(--card) center/cover no-repeat;}
+  .fh-ph:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .ch-sheet .sbs{margin:0 6px 8px;}
+  .ch-sheet .sbs-row{flex-wrap:wrap;overflow:visible;}
+  /* «Вигляд» папки: іконки й кольори */
+  .fh-ic-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;padding:6px 10px;}
+  .fh-ic{all:unset;box-sizing:border-box;cursor:pointer;height:44px;border-radius:12px;display:grid;place-items:center;
+    background:color-mix(in srgb,var(--c,var(--accent)) 14%,transparent);color:var(--c,var(--accent));}
+  .fh-ic .ico{width:20px;height:20px;}
+  .fh-ic.on{outline:2px solid var(--c,var(--accent));outline-offset:1px;}
+  .fh-colors{display:flex;flex-wrap:wrap;gap:10px;padding:8px 10px 6px;}
+  .fh-sw{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;background:var(--sw);}
+  .fh-sw.on{outline:2px solid var(--text);outline-offset:2px;}
+  /* комп'ютер: шапка в колонці документа, шторки — віконцем по центру */
+  @media (min-width:1024px){
+    #scr-page.pg-fhero #pgHero{margin:14px 0 14px;border-radius:22px;height:200px;}
+    #scr-page.pg-fhero #pgHero .ch-cov-top{top:14px;}
+    #scr-page.pg-fhero #pgTitle{font-size:34px;}
+    .ch-sheet-ov{align-items:center;}
+    .ch-sheet{border-radius:22px;border:1px solid var(--line);max-width:460px;padding-bottom:18px;}
+  }
+  /* підпапки — кружечками, як папки в чаті (15.11.2026): та сама форма скрізь */
+  .sbs-cv{width:52px !important;height:52px !important;border-radius:50% !important;}
+  .sbs-t.full .sbs-cv{box-shadow:0 0 0 2px var(--pgsheet,var(--pg-bg,#14161c)),0 0 0 4px var(--c,var(--pg-acc,var(--accent)));}
+  .sbs-cv .ico{width:22px;height:22px;}
+  .sbs-t.add .sbs-cv{border-style:dashed;}
+  @media(min-width:1024px){ .sbs-cv{width:58px !important;height:58px !important;} }
+
+  /* ── вигляд папки «Чат» і «Фото» (15.11.2026, 36-chats.js fhApplyView) ── */
+  #fhView{margin:4px 0 14px;}
+  .fhv-chat{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  .fhv-day{align-self:center;margin:8px 0 2px;padding:3px 10px;border-radius:10px;font-size:11.5px;font-weight:700;
+    color:var(--pg-mut,var(--muted));background:color-mix(in srgb,var(--pg-fg,var(--text)) 7%,transparent);}
+  .fhm{all:unset;box-sizing:border-box;cursor:pointer;max-width:84%;padding:9px 13px;border-radius:18px 18px 6px 18px;
+    background:color-mix(in srgb,var(--pg-acc,var(--accent)) 20%,var(--pg-surface,var(--card)));color:var(--pg-fg,var(--text));
+    font-size:15.5px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap;-webkit-tap-highlight-color:transparent;}
+  .fhm:active{transform:scale(.985);}
+  .fhm:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .fhm-h{font-weight:800;font-size:17px;}
+  .fhm-task{display:flex;align-items:center;gap:10px;cursor:default;}
+  .fhm-task .fh-box{width:26px;height:26px;}
+  .fhm-tx{all:unset;cursor:pointer;min-width:0;overflow-wrap:anywhere;}
+  .fhm-task.done .fhm-tx{text-decoration:line-through;color:var(--pg-mut,var(--muted));}
+  .fhm-ph{padding:4px;display:flex;flex-direction:column;gap:4px;}
+  .fhm-ph img{display:block;max-width:100%;max-height:300px;border-radius:14px;object-fit:cover;}
+  .fhm-cap{padding:2px 8px 4px;font-size:14px;}
+  .fhv-empty{align-self:stretch;text-align:center;padding:40px 16px;display:flex;flex-direction:column;gap:6px;color:var(--pg-mut,var(--muted));}
+  .fhv-empty b{color:var(--pg-fg,var(--text));font-size:17px;}
+  #scr-page.fh-v-chat #pgAddBlock{display:none !important;}
+  .fhv-wall{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+  .fhv-tile{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;border-radius:14px;background:var(--pg-surface,var(--card)) center/cover no-repeat;}
+  .fhv-tile.add{display:grid;place-items:center;border:1.5px dashed var(--pg-edge,var(--line));color:var(--pg-mut,var(--muted));background:transparent;}
+  .fhv-tile.add svg{width:22px;height:22px;}
+  .fhv-tile:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  @media (min-width:1024px){ .fhv-wall{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;} .fhm{max-width:70%;} }
 /* ════════ «Мій світ» (38-world.js): гра у рамці + чип грошей на Огляді ════════ */
 
 /* у нижній панелі й сайдбарі кнопки ховаються атрибутом hidden — display:flex його перебиває */
@@ -6535,7 +6650,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
    Лише токени тем (--card, --text, --muted, --line, --accent, --shadow) —
    тож живе у всіх темах, світлих і темних. Теми (19-themes-flat.css,
    20-depth.css) підключаються ПІСЛЯ цього файла, тому селектори тут
-   тримаються за #homeTabs / #folderGrid — інакше тема їх перебила б. */
+   тримаються за #homeTabs / :is(#folderGrid,#fspGrid) — інакше тема їх перебила б. */
 
 /* ── вкладки-капсула + ⚙ ──────────────────────────────────────────────── */
 #scr-home .sec-htabs{display:flex;align-items:center;gap:10px;margin:18px 0 14px;}
@@ -6566,115 +6681,115 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 }
 
 /* ── сітка: без лівої колонки і без від'ємних полів ──────────────────── */
-#scr-home .foh-row>#folderGrid{flex:1 1 auto;min-width:0;}
-#folderGrid{--fc3-min:148px;--fc3-row:118px;}
-#folderGrid.fsz-s{--fc3-min:96px;--fc3-row:96px;}
-#folderGrid.fsz-l{--fc3-min:240px;--fc3-row:150px;}
+#scr-home .foh-row>:is(#folderGrid,#fspGrid){flex:1 1 auto;min-width:0;}
+:is(#folderGrid,#fspGrid){--fc3-min:148px;--fc3-row:118px;}
+:is(#folderGrid,#fspGrid).fsz-s{--fc3-min:96px;--fc3-row:96px;}
+:is(#folderGrid,#fspGrid).fsz-l{--fc3-min:240px;--fc3-row:150px;}
 @media (min-width:700px){
-  #folderGrid{--fc3-min:190px;}
-  #folderGrid.fsz-s{--fc3-min:130px;}
-  #folderGrid.fsz-l{--fc3-min:320px;}
+  :is(#folderGrid,#fspGrid){--fc3-min:190px;}
+  :is(#folderGrid,#fspGrid).fsz-s{--fc3-min:130px;}
+  :is(#folderGrid,#fspGrid).fsz-l{--fc3-min:320px;}
 }
-#folderGrid.fv2-gallery,
-#folderGrid.fv2-bento{display:grid;margin:0;gap:12px;
+:is(#folderGrid,#fspGrid).fv2-gallery,
+:is(#folderGrid,#fspGrid).fv2-bento{display:grid;margin:0;gap:12px;
   grid-template-columns:repeat(auto-fill,minmax(var(--fc3-min),1fr));}
-#folderGrid.fv2-bento{grid-auto-rows:var(--fc3-row);grid-auto-flow:row dense;}
-#folderGrid.fv2-sections{display:block;margin:0;}
+:is(#folderGrid,#fspGrid).fv2-bento{grid-auto-rows:var(--fc3-row);grid-auto-flow:row dense;}
+:is(#folderGrid,#fspGrid).fv2-sections{display:block;margin:0;}
 
 /* ── плитка-обкладинка ─────────────────────────────────────────────────── */
-#folderGrid .fc3{position:relative;overflow:hidden;isolation:isolate;border-radius:24px;cursor:pointer;
+:is(#folderGrid,#fspGrid) .fc3{position:relative;overflow:hidden;isolation:isolate;border-radius:24px;cursor:pointer;
   -webkit-tap-highlight-color:transparent;transition:transform .18s;min-height:0;
   background:color-mix(in srgb,var(--c,#6a7dff) 22%,var(--card));color:var(--text);
   box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 24px -14px var(--shadow);}
-#folderGrid .fc3:active{transform:scale(.985);}
-#folderGrid.fv2-gallery .fc3{aspect-ratio:3/4;}
-#folderGrid.fv2-gallery.fsz-l .fc3{aspect-ratio:16/10;}
-#folderGrid .fc3-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;}
-#folderGrid .fc3-veil{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.42));}
-#folderGrid .fc3-wm{position:absolute;right:-14%;bottom:-10%;width:74%;height:74%;z-index:0;
+:is(#folderGrid,#fspGrid) .fc3:active{transform:scale(.985);}
+:is(#folderGrid,#fspGrid).fv2-gallery .fc3{aspect-ratio:3/4;}
+:is(#folderGrid,#fspGrid).fv2-gallery.fsz-l .fc3{aspect-ratio:16/10;}
+:is(#folderGrid,#fspGrid) .fc3-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;}
+:is(#folderGrid,#fspGrid) .fc3-veil{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.42));}
+:is(#folderGrid,#fspGrid) .fc3-wm{position:absolute;right:-14%;bottom:-10%;width:74%;height:74%;z-index:0;
   color:var(--c,#6a7dff);opacity:.17;stroke-width:1.2;}
-#folderGrid .fc3-ic{position:absolute;left:12px;top:12px;width:44px;height:44px;border-radius:14px;z-index:2;
+:is(#folderGrid,#fspGrid) .fc3-ic{position:absolute;left:12px;top:12px;width:44px;height:44px;border-radius:14px;z-index:2;
   display:grid;place-items:center;background:var(--card);color:var(--c,#6a7dff);font-size:21px;line-height:1;
   box-shadow:0 4px 12px -6px var(--shadow);}
-#folderGrid .fc3-ic .fc2-ico{width:21px;height:21px;}
-#folderGrid .fc3-photo{position:absolute;right:52px;top:12px;width:34px;height:34px;border-radius:50%;border:0;padding:0;
+:is(#folderGrid,#fspGrid) .fc3-ic .fc2-ico{width:21px;height:21px;}
+:is(#folderGrid,#fspGrid) .fc3-photo{position:absolute;right:52px;top:12px;width:34px;height:34px;border-radius:50%;border:0;padding:0;
   z-index:3;display:grid;place-items:center;cursor:pointer;
   background:color-mix(in srgb,var(--card) 74%,transparent);color:var(--text);}
-#folderGrid .fc3-svg{width:15px;height:15px;}
+:is(#folderGrid,#fspGrid) .fc3-svg{width:15px;height:15px;}
 /* ⋯ — сильніший селектор за html.t-flat .fmenu (теми ідуть після цього файла) */
-#folderGrid .fc3-menu{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:0;padding:0;
+:is(#folderGrid,#fspGrid) .fc3-menu{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:0;padding:0;
   z-index:4;display:grid;place-items:center;font-size:19px;line-height:1;cursor:pointer;
   background:color-mix(in srgb,var(--card) 74%,transparent);color:var(--text);}
-#folderGrid .fc3-has-photo .fc3-menu{background:rgba(255,255,255,.2);color:#fff;
+:is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-menu{background:rgba(255,255,255,.2);color:#fff;
   -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
-#folderGrid .fc3-label{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;}
-#folderGrid .fc3-name{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1.2;color:var(--text);
+:is(#folderGrid,#fspGrid) .fc3-label{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;}
+:is(#folderGrid,#fspGrid) .fc3-name{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1.2;color:var(--text);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto;}
-#folderGrid .fc3-meta{margin-top:3px;font-size:12px;font-weight:700;
+:is(#folderGrid,#fspGrid) .fc3-meta{margin-top:3px;font-size:12px;font-weight:700;
   color:color-mix(in srgb,var(--text) 62%,var(--c,#6a7dff));}
-#folderGrid .fc3-pin .fc3-svg{width:13px;height:13px;margin-right:4px;vertical-align:-1px;color:var(--c,var(--accent));}
+:is(#folderGrid,#fspGrid) .fc3-pin .fc3-svg{width:13px;height:13px;margin-right:4px;vertical-align:-1px;color:var(--c,var(--accent));}
 /* з фото: назва на матовому склі */
-#folderGrid .fc3-has-photo .fc3-label{left:8px;right:8px;bottom:8px;padding:9px 11px;border-radius:16px;
+:is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-label{left:8px;right:8px;bottom:8px;padding:9px 11px;border-radius:16px;
   background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);
   -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);}
-#folderGrid .fc3-has-photo .fc3-name{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.35);}
-#folderGrid .fc3-has-photo .fc3-meta{color:rgba(255,255,255,.86);}
-#folderGrid .fc3-has-photo .fc3-pin .fc3-svg{color:#fff;}
+:is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-name{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.35);}
+:is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-meta{color:rgba(255,255,255,.86);}
+:is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-pin .fc3-svg{color:#fff;}
 /* група — стос карток під плиткою */
-#folderGrid .fc3-group{box-shadow:0 6px 0 -2px color-mix(in srgb,var(--c,#6a7dff) 32%,var(--card)),
+:is(#folderGrid,#fspGrid) .fc3-group{box-shadow:0 6px 0 -2px color-mix(in srgb,var(--c,#6a7dff) 32%,var(--card)),
   0 11px 0 -4px color-mix(in srgb,var(--c,#6a7dff) 18%,var(--card));margin-bottom:6px;}
 /* дрібні плитки — лише значок і назва */
-#folderGrid.fsz-s .fc3-ic{left:8px;top:8px;width:34px;height:34px;border-radius:11px;font-size:17px;}
-#folderGrid.fsz-s .fc3-ic .fc2-ico{width:17px;height:17px;}
-#folderGrid.fsz-s .fc3-photo,#folderGrid.fsz-s .fc3-meta,#folderGrid.fsz-s .fc3-wm{display:none;}
-#folderGrid.fsz-s .fc3-name{font-size:13px;}
-#folderGrid.fsz-s .fc3-label{left:8px;right:8px;bottom:8px;}
-#folderGrid.fsz-s .fc3-has-photo .fc3-label{left:5px;right:5px;bottom:5px;padding:6px 8px;border-radius:12px;}
-#folderGrid.fsz-s .fc3-menu{top:2px;right:2px;width:36px;height:36px;font-size:16px;background:transparent;}
-#folderGrid.fsz-l .fc3-name{font-size:20px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-ic{left:8px;top:8px;width:34px;height:34px;border-radius:11px;font-size:17px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-ic .fc2-ico{width:17px;height:17px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-photo,:is(#folderGrid,#fspGrid).fsz-s .fc3-meta,:is(#folderGrid,#fspGrid).fsz-s .fc3-wm{display:none;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-name{font-size:13px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-label{left:8px;right:8px;bottom:8px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-has-photo .fc3-label{left:5px;right:5px;bottom:5px;padding:6px 8px;border-radius:12px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-menu{top:2px;right:2px;width:36px;height:36px;font-size:16px;background:transparent;}
+:is(#folderGrid,#fspGrid).fsz-l .fc3-name{font-size:20px;}
 
 /* ── Бенто ─────────────────────────────────────────────────────────────── */
-#folderGrid.fv2-bento .fc3-big{grid-column:1/-1;grid-row:span 2;}
-#folderGrid.fv2-bento .fc3-tall{grid-row:span 2;}
-#folderGrid.fv2-bento .fc3-big .fc3-name{font-size:21px;}
+:is(#folderGrid,#fspGrid).fv2-bento .fc3-big{grid-column:1/-1;grid-row:span 2;}
+:is(#folderGrid,#fspGrid).fv2-bento .fc3-tall{grid-row:span 2;}
+:is(#folderGrid,#fspGrid).fv2-bento .fc3-big .fc3-name{font-size:21px;}
 /* звичайна клітинка бенто низька: підпис ховаємо, щоб не наліз на значок */
-#folderGrid.fv2-bento .fc3:not(.fc3-big):not(.fc3-tall) .fc3-meta{display:none;}
-@media (min-width:700px){ #folderGrid.fv2-bento .fc3-big{grid-column:span 2;} }
+:is(#folderGrid,#fspGrid).fv2-bento .fc3:not(.fc3-big):not(.fc3-tall) .fc3-meta{display:none;}
+@media (min-width:700px){ :is(#folderGrid,#fspGrid).fv2-bento .fc3-big{grid-column:span 2;} }
 
 /* ── Секції ────────────────────────────────────────────────────────────── */
-#folderGrid .fsec+.fsec{margin-top:22px;}
-#folderGrid .fsec-h{display:flex;align-items:baseline;gap:6px;margin:0 2px 10px;
+:is(#folderGrid,#fspGrid) .fsec+.fsec{margin-top:22px;}
+:is(#folderGrid,#fspGrid) .fsec-h{display:flex;align-items:baseline;gap:6px;margin:0 2px 10px;
   font-size:18px;font-weight:800;letter-spacing:-.01em;color:var(--text);}
-#folderGrid .fsec-h small{font-size:13px;font-weight:700;color:var(--muted);}
-#folderGrid .fsec-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+:is(#folderGrid,#fspGrid) .fsec-h small{font-size:13px;font-weight:700;color:var(--muted);}
+:is(#folderGrid,#fspGrid) .fsec-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
   padding:2px 0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-#folderGrid .fsec-row::-webkit-scrollbar{display:none;}
-#folderGrid .fsec-row .fc3{flex:0 0 min(80%,320px);aspect-ratio:16/10;scroll-snap-align:start;}
-#folderGrid .fsec-row .fc3-name{font-size:20px;}
-#folderGrid .fsec-groups{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));}
-#folderGrid .fsec-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(var(--fc3-min),1fr));}
-#folderGrid .fsec-grid .fc3,#folderGrid .fsec-grid .fc3-add{aspect-ratio:1/1;}
-#folderGrid .fc3-grow{position:relative;display:flex;align-items:center;gap:14px;min-height:76px;box-sizing:border-box;
+:is(#folderGrid,#fspGrid) .fsec-row::-webkit-scrollbar{display:none;}
+:is(#folderGrid,#fspGrid) .fsec-row .fc3{flex:0 0 min(80%,320px);aspect-ratio:16/10;scroll-snap-align:start;}
+:is(#folderGrid,#fspGrid) .fsec-row .fc3-name{font-size:20px;}
+:is(#folderGrid,#fspGrid) .fsec-groups{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));}
+:is(#folderGrid,#fspGrid) .fsec-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(var(--fc3-min),1fr));}
+:is(#folderGrid,#fspGrid) .fsec-grid .fc3,:is(#folderGrid,#fspGrid) .fsec-grid .fc3-add{aspect-ratio:1/1;}
+:is(#folderGrid,#fspGrid) .fc3-grow{position:relative;display:flex;align-items:center;gap:14px;min-height:76px;box-sizing:border-box;
   padding:12px 52px 12px 14px;border-radius:22px;background:var(--card);border:1px solid var(--line);cursor:pointer;
   box-shadow:0 1px 2px rgba(0,0,0,.05),0 8px 20px -14px var(--shadow);}
-#folderGrid .fc3-stack{position:relative;width:78px;height:50px;flex:none;}
-#folderGrid .fc3-th{position:absolute;top:0;left:calc(var(--i) * 14px);width:46px;height:46px;border-radius:14px;
+:is(#folderGrid,#fspGrid) .fc3-stack{position:relative;width:78px;height:50px;flex:none;}
+:is(#folderGrid,#fspGrid) .fc3-th{position:absolute;top:0;left:calc(var(--i) * 14px);width:46px;height:46px;border-radius:14px;
   border:2px solid var(--card);background-color:color-mix(in srgb,var(--c,#6a7dff) 34%,var(--card));
   background-size:cover;background-position:center;}
-#folderGrid .fc3-gt{flex:1;min-width:0;}
-#folderGrid .fc3-gt b{display:block;font-size:16px;font-weight:800;color:var(--text);
+:is(#folderGrid,#fspGrid) .fc3-gt{flex:1;min-width:0;}
+:is(#folderGrid,#fspGrid) .fc3-gt b{display:block;font-size:16px;font-weight:800;color:var(--text);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#folderGrid .fc3-gt small{display:block;margin-top:2px;font-size:12.5px;font-weight:700;color:var(--muted);}
-#folderGrid .fc3-grow .fc3-menu{top:50%;right:8px;transform:translateY(-50%);background:transparent;}
+:is(#folderGrid,#fspGrid) .fc3-gt small{display:block;margin-top:2px;font-size:12.5px;font-weight:700;color:var(--muted);}
+:is(#folderGrid,#fspGrid) .fc3-grow .fc3-menu{top:50%;right:8px;transform:translateY(-50%);background:transparent;}
 
 /* ── «Нова папка» ──────────────────────────────────────────────────────── */
-#folderGrid .fc3-add{min-height:96px;border-radius:24px;border:1.5px dashed color-mix(in srgb,var(--text) 22%,transparent);
+:is(#folderGrid,#fspGrid) .fc3-add{min-height:96px;border-radius:24px;border:1.5px dashed color-mix(in srgb,var(--text) 22%,transparent);
   background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:800;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
-#folderGrid .fc3-plus{font-size:24px;line-height:1;}
-#folderGrid.fv2-gallery .fc3-add{aspect-ratio:3/4;}
-#folderGrid.fv2-gallery.fsz-l .fc3-add{aspect-ratio:16/10;}
+:is(#folderGrid,#fspGrid) .fc3-plus{font-size:24px;line-height:1;}
+:is(#folderGrid,#fspGrid).fv2-gallery .fc3-add{aspect-ratio:3/4;}
+:is(#folderGrid,#fspGrid).fv2-gallery.fsz-l .fc3-add{aspect-ratio:16/10;}
 
 /* ── шторка ⚙ «Вигляд папок» ──────────────────────────────────────────── */
 .fvs-head{display:flex;align-items:center;margin:6px 0 14px;}
@@ -6747,7 +6862,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
 /* ── «Рядки» (нічний макет №4, 10.10.2026): компактний список папок ── */
 .fvs-prev i.n{grid-column:span 2;height:7px;border-radius:3px;}
-#folderGrid.fv2-rows{display:flex!important;flex-direction:column;gap:8px;}
+:is(#folderGrid,#fspGrid).fv2-rows{display:flex!important;flex-direction:column;gap:8px;}
 .fr{position:relative;display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 6px 10px 12px;border-radius:16px;cursor:pointer;
   background:var(--card);border:1px solid var(--line);color:var(--text);box-sizing:border-box;}
 .fr:active{transform:scale(.99);}
@@ -6764,9 +6879,58 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 .fr.fr-add{justify-content:flex-start;gap:10px;min-height:52px;border-style:dashed;background:transparent;color:var(--accent);font-weight:800;font-size:14.5px;}
 /* ноутбук: «Рядки» у дві колонки — довгі смуги на всю ширину не потрібні */
 @media (min-width:1024px){
-  #folderGrid.fv2-rows{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-  #folderGrid.fv2-rows .fr-add{grid-column:1 / -1;}
+  :is(#folderGrid,#fspGrid).fv2-rows{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  :is(#folderGrid,#fspGrid).fv2-rows .fr-add{grid-column:1 / -1;}
 }
+
+/* ── група-стос з фото (15.11.2026): з-за плитки визирають фото вкладених папок ──
+   Плитка групи без власного фону й без обрізання: фон малює .fc3-face, а дві .fc3-under
+   лежать позаду (z -1 у межах isolation плитки), тож фото самої групи завжди зверху. */
+:is(#folderGrid,#fspGrid) .fc3-group{overflow:visible;background:transparent;box-shadow:none;margin-bottom:0;}
+:is(#folderGrid,#fspGrid) .fc3-group .fc3-bg,:is(#folderGrid,#fspGrid) .fc3-group .fc3-veil{border-radius:inherit;overflow:hidden;}
+:is(#folderGrid,#fspGrid) .fc3-face{position:absolute;inset:0;z-index:0;border-radius:inherit;
+  background:color-mix(in srgb,var(--c,#6a7dff) 22%,var(--card));box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 24px -14px var(--shadow);}
+:is(#folderGrid,#fspGrid) .fc3-under{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+  background:color-mix(in srgb,var(--uc,#6a7dff) 40%,var(--card)) center/cover no-repeat;
+  box-shadow:0 6px 16px -10px rgba(0,0,0,.55);border:1px solid color-mix(in srgb,var(--text) 10%,transparent);}
+:is(#folderGrid,#fspGrid) .fc3-under.u1{transform:translate(8px,-10px) rotate(4deg);}
+:is(#folderGrid,#fspGrid) .fc3-under.u2{transform:translate(15px,-17px) rotate(8deg) scale(.96);opacity:.85;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-under.u1{transform:translate(4px,-5px) rotate(3deg);}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-under.u2{transform:translate(7px,-8px) rotate(6deg) scale(.97);}
+@media (prefers-reduced-motion: reduce){ :is(#folderGrid,#fspGrid) .fc3-under{transition:none;} }
+
+/* ── простір сфери (16-dashboard.js openFolderGroupSpace): та сама сітка плиток, що й на Огляді ── */
+.fsp-ov{position:fixed;inset:0;z-index:1250;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:calc(10px + env(safe-area-inset-top)) 14px calc(30px + env(safe-area-inset-bottom));animation:fspIn .2s var(--ease-out,ease);}
+@keyframes fspIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){ .fsp-ov{animation:none;} }
+.fsp{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
+.fsp-cov{position:relative;height:168px;border-radius:24px;overflow:hidden;isolation:isolate;
+  background:color-mix(in srgb,var(--c,#6a7dff) 40%,var(--card)) center/cover no-repeat;}
+.fsp-cov::after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,0) 40%,rgba(0,0,0,.62));}
+.fsp-top{position:absolute;left:12px;right:12px;top:12px;z-index:2;display:flex;gap:8px;}
+.fsp-top .ch-sp{flex:1;}
+.fsp-t{position:absolute;left:16px;right:16px;bottom:14px;z-index:2;color:#fff;}
+.fsp-t b{display:block;font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1.05;text-shadow:0 2px 14px rgba(0,0,0,.6);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fsp-t small{font-size:13px;font-weight:700;opacity:.9;}
+#fspGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:12px;}
+#fspGrid .fc3-add{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:3/4;border-radius:24px;display:grid;place-items:center;
+  border:1.5px dashed var(--line);color:var(--muted);font-weight:700;font-size:14px;}
+.fsp-notes{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;
+  background:var(--card);border:1px solid var(--line);color:var(--text);font-weight:700;}
+.fsp-notes .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none;
+  background:color-mix(in srgb,var(--c,var(--accent)) 16%,transparent);color:var(--c,var(--accent));}
+.fsp-notes .ic svg{width:19px;height:19px;}
+.fsp-notes small{display:block;font-weight:600;color:var(--muted);font-size:12.5px;}
+.fsp-notes .go{margin-left:auto;color:var(--muted);font-size:20px;}
+@media (min-width:700px){ #fspGrid{grid-template-columns:repeat(3,minmax(0,1fr));} }
+@media (min-width:1024px){ .fsp-ov{left:248px;padding-top:28px;} #fspGrid{grid-template-columns:repeat(4,minmax(0,1fr));} .fsp-cov{height:200px;} }
+
+/* картка-прев'ю в «Налаштуваннях папки» — тепер кнопка: тап відкриває шторку «Вигляд» (15.11.2026) */
+.fmc.fmc-tap{display:block;width:100%;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.fmc.fmc-tap:active{transform:scale(.99);}
+.fmc.fmc-tap:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   /* ============ ЖУРНАЛ ГЕРОЯ (41-journal.js): герой, ресурси, тиждень, місії; редактор місії ============ */
   #jnBody{display:flex;flex-direction:column;gap:12px;}
   #jnBody button{font-family:inherit;}
@@ -9347,7 +9511,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   <section class="screen" id="scr-more">
     <div class="more-head">
       <h1>Ще</h1>
-      <p>Налаштування й інструменти</p>
+      <p>Налаштування</p>
     </div>
     <!-- список розділів ліворуч — лише на комп'ютері (29-more-screen.js, renderMoreIndex) -->
     <nav class="more-index" id="moreIndex" aria-label="Розділи"></nav>
@@ -12190,7 +12354,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         // сфера (39-spheres.js): шаблон і будівля в «Моєму світі»; поле пишемо лише в сфер
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
         // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
-        if(f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // з 16.10.2026 типове — «Як папка»
+        if(f.gview==='folder'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // з 15.11.2026 типове — «Простір» (не пишемо)
+        // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo; «Документ» — типове, не пишемо
+        if(f.view==='chat'||f.view==='photo') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
         if(folderPrioOk(f.prio)) cfg[k].prio=f.prio;
       });
@@ -12760,25 +12926,21 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <div class="mr-row">${stgIco('mode','slate')}
           <span class="mr-tx"><b>Гра</b><small>${um==='lite'?'Сховано':'На виду'}</small></span>
           ${seg('uimode',[['pro','Показати'],['lite','Сховати']],um)}</div>
-      </div>
-      <div class="mr-sl" data-sec="pet">Напарник</div>
-      <div class="mr-grp" data-sec="pet">
+        <button class="mr-row" id="stgFolderView">${stgIco('palette','blue')}
+          <span class="mr-tx"><b>Папки на Огляді</b><small>галерея, секції чи бенто · фото на плитці</small></span>
+          <span class="mr-chev">${stgSvg('chev')}</span></button>
         <div class="mr-row">${stgIco('paw','orange')}
           <span class="mr-tx"><b>Показувати котика</b><small>на Огляді й у списках</small></span>
           <button class="mr-tg ${petOn?'on':''}" id="stgPetSw" role="switch" aria-checked="${petOn}" aria-label="Показувати котика"></button></div>
       </div>
-      <div class="mr-sl" data-sec="ai">AI і приватність</div>
-      <div class="mr-grp" data-sec="ai">
-        <button class="mr-row" id="stgAiPriv">${stgIco('lock','green')}
-          <span class="mr-tx"><b>AI і приватність</b><small>що бачить AI · згода · закриті розділи</small></span>
-          <span class="mr-chev">${stgSvg('chev')}</span></button>
+      ${(showProxy||devOn)?`<div class="mr-grp" data-sec="adv">`:''}
         ${showProxy?`<div class="mr-row">${stgIco('code','slate')}
           <span class="mr-tx"><b>AI-проксі</b><small>для розробника · адреса сервера</small></span>
           <button class="mr-go" id="stgProxyBtn">Відкрити</button></div>`:''}
         ${devOn?`<div class="mr-row">${stgIco('lang','slate')}
           <span class="mr-tx"><b>Перекладати мій контент</b><small>папки, сторінки, нотатки → EN · dev</small></span>
           <button class="mr-tg ${ctOn?'on':''}" id="stgCtSw" role="switch" aria-checked="${ctOn}" aria-label="Перекладати контент"></button></div>`:''}
-      </div>
+      ${(showProxy||devOn)?`</div>`:''}
     `;
     host.querySelectorAll('#stgLangSeg button').forEach(b=>b.onclick=()=>{
       const l=b.dataset.l;
@@ -12802,7 +12964,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       try{ if(typeof window.petHiddenSet==='function') window.petHiddenSet(!window.petHidden()); }catch(_){}
       renderSettingsCard();
     };
-    const ap=document.getElementById('stgAiPriv'); if(ap) ap.onclick=()=>{ if(window.aiPrivacySheet) window.aiPrivacySheet(); };
+    // «AI і приватність» переїхало в «Дані і приватність» (29-more-screen.js, 15.11.2026)
+    const fv=document.getElementById('stgFolderView'); if(fv) fv.onclick=()=>{ try{ openFolderViewSheet(); }catch(e){ console.error('openFolderViewSheet',e); } };
     const pb=document.getElementById('stgProxyBtn'); if(pb) pb.onclick=()=>{ if(typeof aiConfig==='function') aiConfig(()=>{ renderSettingsCard(); }); };
     const cs=document.getElementById('stgCtSw'); if(cs) cs.onclick=()=>{ if(typeof devContentTranslateToggleSheet==='function') devContentTranslateToggleSheet(); setTimeout(renderSettingsCard,50); };
   }
@@ -21572,11 +21735,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const photo=!!(f.photo && folderOpts.covers);
     const el=document.createElement('div');
     el.className='fcard fc3 '+(photo?'fc3-has-photo':'fc3-color')+(isGroup?' fc3-group':'')+(shape?' fc3-'+shape:'');
+    const kids=isGroup?groupKids(k):[];
     { const sc=safeColor(f.c,''); if(sc) el.style.setProperty('--c', sc); }   // порожній/чужий колір не ставимо — спрацює запасний у CSS
     el.dataset.fkey=k;
     const meta=fc3Meta(k,f);
     const emojiShow=(f.emoji&&f.emoji.trim())?esc(f.emoji.trim()):esc((f.name||'?').trim().charAt(0).toUpperCase());
     let h='';
+    // група — стос (15.11.2026): з-за плитки визирають фото (чи колір) двох вкладених папок; фон плитки — .fc3-face
+    if(isGroup){
+      h+=kids.slice(0,2).map((ck,i)=>{ const cf=folders[ck]; let u='';
+        try{ u=(cf.photo&&folderOpts.covers)?safeImg(window.photoSrc(cf.photo)):''; }catch(_){ u=''; }
+        return `<span class="fc3-under u${i+1}" style="--uc:${safeColor(cf.c,'#6a7dff')};${u?`background-image:url('${esc(u)}')`:''}" aria-hidden="true"></span>`; }).reverse().join('');
+      h+=`<span class="fc3-face" aria-hidden="true"></span>`;   // «група · N папок» уже пише підпис плитки (fc3Meta)
+    }
     if(photo){
       const pp=f.photoPos;
       const xf=pp?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
@@ -21899,16 +22070,61 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
      «Як папка» — одразу нотатка папки, підпапки — блоком «Підпапки» (типово з 16.10.2026, «папка-нотатка»),
      «Стос» — шторка зі списком, «Як на iPhone» — вікно з іконками підпапок поверх Огляду.
-     Поле folders[k].gview: пишемо лише не-типове ('stack' | 'ios'); раніше типовим був «Стос» і він не писався. */
-  const GVIEW={folder:['Як папка','одразу нотатка, підпапки — стрічкою'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
-  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='stack'||v==='ios')?v:'folder'; }
+     Поле folders[k].gview: пишемо лише не-типове ('folder' | 'stack' | 'ios'); раніше типовим був «Стос» і він не писався.
+     З 15.11.2026 типове — «Простір»: на весь екран ті самі фото-плитки вкладених папок, що й на Огляді. */
+  const GVIEW={space:['Простір','фото-плитки папок усередині, як на Огляді'],folder:['Як папка','одразу нотатка, підпапки — стрічкою'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='stack'||v==='ios')?v:'space'; }
   function openGroupAsChosen(key, from){
     const v=gviewOf(key);
+    if(v==='space'){ openFolderGroupSpace(key); return; }
     if(v==='folder'){ closeFolderMenu(); window.__fgNext=from||(folders[key]&&folders[key].parent)||''; goFolder(key); window.__fgNext=null; return; }
     if(v==='ios'){ openFolderGroupIOS(key); return; }
     openFolderGroup(key);
   }
   window.openGroupAsChosen=openGroupAsChosen;
+  /* «Простір» групи (15.11.2026, типовий спосіб): на весь екран — шапка з фото групи, ті самі
+     фото-плитки вкладених папок (fc3Tile), «＋ Нова» і нотатки самої групи. Лише показ: нічого не пише. */
+  function openFolderGroupSpace(key){
+    const g=folders[key]; if(!g) return;
+    closeFolderMenu(); document.querySelectorAll('.fsp-ov').forEach(x=>x.remove());
+    const ov=document.createElement('div'); ov.className='fsp-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.setAttribute('aria-label','Папки в «'+String(g.name||'')+'»');
+    const close=()=>{ ov.remove(); document.removeEventListener('keydown',onKey); };
+    const onKey=e=>{ if(e.key==='Escape') close(); };
+    const draw=()=>{
+      if(!folders[key]){ close(); return; }
+      const kids=groupKids(key);
+      let u=''; try{ u=(g.photo&&folderOpts.covers)?safeImg(window.photoSrc(g.photo)):''; }catch(_){ u=''; }
+      ov.innerHTML=`<div class="fsp" style="--c:${safeColor(g.c,'#6a7dff')}">
+        <div class="fsp-cov"${u?` style="background-image:url('${esc(u)}')"`:''}>
+          <div class="fsp-top"><button class="ch-ghost" data-fsp="close" aria-label="Закрити">${chI('back')}</button><span class="ch-sp"></span>
+            <button class="ch-ghost" data-fsp="more" aria-label="Налаштування групи">${chI('dots')}</button></div>
+          <div class="fsp-t"><b data-i18n-skip="1">${esc(g.name)}</b><small>${kids.length} ${pluralUk(kids.length,'папка','папки','папок')} · простір</small></div>
+        </div>
+        <div id="fspGrid" class="fv2-gallery"></div>
+        <button class="fsp-notes" data-fsp="notes"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12.5h6M9 16h4"/></svg></span>
+          <span>Нотатки «<span data-i18n-skip="1">${esc(g.name)}</span>»<small>документ самої папки</small></span><span class="go">›</span></button>
+      </div>`;
+      const grid=ov.querySelector('#fspGrid');
+      kids.forEach(ck=>{ const t=fc3Tile(ck);
+        // вкладена папка відкривається з міткою батька — «назад» веде в цю групу (goSpaceFor читає __fgNext)
+        t.onclick=e=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
+          if(groupKids(ck).length){ close(); openGroupAsChosen(ck,key); return; }
+          close(); window.__fgNext=key; try{ goFolder(ck); }finally{ window.__fgNext=null; } };
+        grid.appendChild(t); });
+      const add=document.createElement('button'); add.type='button'; add.className='fc3-add'; add.textContent='＋ Нова'; add.setAttribute('aria-label','Нова папка в «'+String(g.name||'')+'»');
+      add.onclick=()=>{ close(); createFolder(key); };
+      grid.appendChild(add);
+      grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
+      grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); close(); pickFolderPhoto(b.dataset.fphoto); });
+      ov.querySelector('[data-fsp="close"]').onclick=close;
+      ov.querySelector('[data-fsp="more"]').onclick=()=>openFolderMenu(key);
+      ov.querySelector('[data-fsp="notes"]').onclick=()=>{ close(); window.__fgNext=g.parent||''; try{ goFolder(key); }finally{ window.__fgNext=null; } };
+    };
+    draw(); document.body.appendChild(ov); document.addEventListener('keydown',onKey);
+    try{ ov.querySelector('[data-fsp="close"]').focus({preventScroll:true}); }catch(_){}
+    try{ window.platform.haptic('light'); }catch(_){}
+  }
   function openFolderGroupIOS(key){
     const g=folders[key]; if(!g) return;
     closeFolderMenu();
@@ -21940,7 +22156,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
-        const v=b.dataset.gv; if(v==='folder') delete f.gview; else f.gview=v;   // типове — не пишемо
+        const v=b.dataset.gv; if(v==='space') delete f.gview; else f.gview=v;   // типове («Простір») — не пишемо
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
@@ -22142,12 +22358,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const fk=pgBarFolder();
     const undo=document.getElementById('pgUndoBtn'), hid=document.getElementById('pgShowHiddenBtn');
     const mic=document.getElementById('pgMicBtn'), wide=document.getElementById('pgWideBtn');
-    const theme=(window.__pgThemeIsAuto&&window.__pgThemeIsAuto())?'auto':(document.getElementById('scr-page').classList.contains('pg-paper')?'paper':'ink');
     const live=!!(mic&&mic.classList.contains('live'));
     const wideOn=document.getElementById('scr-page').classList.contains('pg-wide');
     const hasCond=pgBarHasCond(), hidOn=!!(hid&&hid.classList.contains('on'));
     const hasCov=document.getElementById('scr-page').classList.contains('pg-hascov');
-    const feed=!!fk&&lkView[fk]==='feed';   // «Документ · Стрічка» (54-links.js)
+    const feed=!!fk&&lkView[fk]==='feed';   // «Стрічка» подій папки (54-links.js) — не зберігається
+    // вигляд папки (15.11.2026, 36-chats.js fhView): Документ · Чат · Фото зберігаються в папці, «Стрічка» — як і була
+    const fv=feed?'feed':(fk&&typeof fhView==='function'?fhView(fk):'doc');
+    const vb=(v,t)=>`<button data-lkv="${v}" class="${fv===v?'on':''}" aria-pressed="${fv===v}">${t}</button>`;
     const r=(act,ic,t,sub,dis)=>`<button class="fmi pgb-row" data-pgm="${act}"${dis?' disabled':''}><span class="pgb-ic" aria-hidden="true">${ic}</span><span class="pgb-tx">${t}${sub?`<small class="fmi-sub">${sub}</small>`:''}</span></button>`;
     fgSheet(`<div class="fmenu-grip"></div>
       ${fk?`<div class="fmenu-title" data-i18n-skip="1">${esc(folders[fk].name)}</div>`:''}
@@ -22155,16 +22373,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ${r('mic','🎙',live?'Зупинити диктування':'Диктувати','у блок, де стоїть курсор')}
       ${r('wide','⛶',wideOn?'Звичайна ширина':'На весь екран','')}
       ${hasCond?r('hid','◌',hidOn?'Ховати блоки з умовою':'Показати сховані блоки','блоки з умовою показу'):''}
-      <div class="fmi-label">Тема документа</div>
-      <div class="pgb-seg" role="group" aria-label="Тема документа">
-        <button data-pgth="auto" class="${theme==='auto'?'on':''}" aria-pressed="${theme==='auto'}">Як застосунок</button>
-        <button data-pgth="ink" class="${theme==='ink'?'on':''}" aria-pressed="${theme==='ink'}">Темна</button>
-        <button data-pgth="paper" class="${theme==='paper'?'on':''}" aria-pressed="${theme==='paper'}">Світла</button></div>
       ${r('cover','🖼',hasCov?'Обкладинка':'Додати обкладинку',hasCov?'змінити, зсунути чи прибрати':'фото або колір над назвою')}
       ${fk?`<div class="fmi-label">Папка</div>
-      <div class="pgb-seg" role="group" aria-label="Вигляд папки">
-        <button data-lkv="doc" class="${feed?'':'on'}" aria-pressed="${!feed}">Документ</button>
-        <button data-lkv="feed" class="${feed?'on':''}" aria-pressed="${feed}">Стрічка</button></div>
+      <div class="pgb-seg" role="group" aria-label="Вигляд папки">${vb('doc','Документ')}${vb('chat','Чат')}${vb('photo','Фото')}${vb('feed','Стрічка')}</div>
       ${r('links','🔗','Звʼязки','місія, звичка, час, календар, гроші, чати')}
       ${r('chats','💬','Чати папки','повʼязати новий чи наявний чат','')}
       ${r('fmenu','⚙︎','Налаштування папки','назва, колір, група, видалення','')}`:''}`,
@@ -22176,19 +22387,18 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         if(a==='mic') run(()=>mic&&mic.click());
         if(a==='wide') run(()=>wide&&wide.click());
         if(a==='hid') run(()=>hid&&hid.click());
-        if(a==='cover') run(()=>{ const c=document.querySelector('#pgCover [data-covopen]'); if(c) c.click(); });
+        if(a==='cover') run(()=>{ const sp=document.getElementById('scr-page');   // шапка як у чаті ховає #pgCover — її шторка
+          if(fk&&sp&&sp.classList.contains('pg-fhero')&&window.fhCoverSheet){ window.fhCoverSheet(fk); return; }
+          const c=document.querySelector('#pgCover [data-covopen]'); if(c) c.click(); });
         if(a==='links') run(()=>lkSheet(fk));
         if(a==='chats') run(()=>{ const pa=document.getElementById('pgAddLink'); if(pa) pa.click(); });
         if(a==='fmenu') run(()=>openFolderMenu(fk));
       });
       m.querySelectorAll('[data-lkv]').forEach(b=>b.onclick=()=>{
-        lkView[fk]=b.dataset.lkv; try{ renderPgLinks(); }catch(_){}
+        const v=b.dataset.lkv; lkView[fk]=(v==='feed')?'feed':'doc';
+        if(v!=='feed'&&typeof fhView==='function'&&fhView(fk)!==v){ try{ fhSetView(fk,v); }catch(_){} }   // вибір людини — зберігається в папці
+        try{ renderPgLinks(); }catch(_){} try{ if(typeof fhApplyView==='function') fhApplyView(); }catch(_){}
         m.querySelectorAll('[data-lkv]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
-      });
-      m.querySelectorAll('[data-pgth]').forEach(b=>b.onclick=()=>{
-        if(b.dataset.pgth==='auto'){ try{ window.__pgThemeAuto&&window.__pgThemeAuto(); }catch(_){} }
-        else { const t=document.querySelector('#pgTheme [data-pgtheme="'+b.dataset.pgth+'"]'); if(t) t.click(); }
-        m.querySelectorAll('[data-pgth]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
       });
     });
   }
@@ -22197,7 +22407,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     top.__pgb=true; top.classList.add('pgb-v2');
     const up=document.getElementById('pgCrumbUp'), nm=document.getElementById('pgCrumbName'), more=document.getElementById('pgMoreBtn');
     if(up) up.onclick=()=>{ const f=folders[pgBarFolder()]; const p=f&&f.parent;
-      if(p&&folders[p]){ goFolder(p); return; }   // вгору — у документ папки-батька (16.10.2026, «папка-нотатка»)
+      // вгору — туди, звідки прийшли: простір групи (типово з 15.11.2026) або документ папки-батька
+      if(p&&folders[p]){ if(gviewOf(p)==='space'&&groupKids(p).length){ goHome(); openFolderGroupSpace(p); return; } goFolder(p); return; }
       goHome(); };
     if(nm) nm.onclick=pgBarSwitchSheet;
     if(more) more.onclick=pgBarMoreSheet;
@@ -22349,21 +22560,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     /* обкладинка — першою (06.10.2026): раніше фото ховалось у «Вигляд» → «Додати фото» */
     const ph=!!f.photo, pp=f.photoPos;
     const xf=(ph&&pp)?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
-    const curC=String(f.c||'').toLowerCase();
     fgSheet(`<div class="fmenu-grip"></div>
-      <div class="fmc${ph?' fmc-photo':''}" style="--c:${safeColor(f.c,'#6a7dff')}">
+      <button type="button" class="fmc fmc-tap${ph?' fmc-photo':''}" data-act="appearance" style="--c:${safeColor(f.c,'#6a7dff')}" aria-label="Вигляд папки: фото, іконка, колір">
         ${ph?`<div class="fmc-bg" style="background-image:url('${esc(safeImg(window.photoSrc(f.photo)))}');${xf}"></div>`
             :`<svg class="ico fmc-wm" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}
         <div class="fmc-t"><small>${f.sphere?'Сфера':'Папка'}</small><b data-i18n-skip="1">${esc(f.name)}</b>${sub?`<span data-i18n-skip="1">${sub}</span>`:''}</div>
-      </div>
-      <div class="fmc-acts">
-        <button type="button" class="fmc-btn fmc-main" data-act="photo">${fmIc('photo')}${ph?'Змінити обкладинку':'Додати обкладинку'}</button>
-        ${ph?`<button type="button" class="fmc-btn" data-act="cropphoto">Кадрувати</button><button type="button" class="fmc-btn fmc-del" data-act="rmphoto" aria-label="Прибрати фото">${fmIc('del')}</button>`:''}
-      </div>
-      <div class="fmc-colors"><span>Колір</span>${FOLDER_COLORS.map(c=>`<button type="button" class="fmc-sw${curC===c?' on':''}" data-fcolor="${c}" style="--sw:${c}" aria-label="Колір обкладинки" aria-pressed="${curC===c}"></button>`).join('')}</div>
+      </button>
+      <!-- фото, іконка, емодзі й колір — в одній шторці «Вигляд» (36-chats.js fhLookSheet, 15.11.2026) -->
       <div class="fmi-label">Вигляд</div>
       ${fmRow('rename','pen','Назва','<span data-i18n-skip="1">'+esc(f.name)+'</span>')}
-      ${fmRow('look','look','Значок','лінійна іконка чи емодзі')}
+      ${fmRow('appearance','look','Вигляд: фото, іконка, колір',ph?'фото на обкладинці':'іконка на кольорі')}
       <div class="fmi-label">Порядок</div>
       ${fmRow('pin','pin',f.pinned?'Відкріпити':'Закріпити зверху','')}
       ${fmRow('prio','flag','Пріоритет · '+(folderPrio(key)?FPRIO[folderPrio(key)][0]:'без'),'високий, середній чи низький')}
@@ -22381,15 +22587,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
       ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
       ${fmRow('subnew','plus','Нова підпапка','папка всередині «'+esc(f.name)+'»')}
-      ${kids.length?fmRow('gview','type','Як відкривати · '+GVIEW[gviewOf(key)][0],'стос, як папка чи як на iPhone'):''}
+      ${kids.length?fmRow('gview','type','Як відкривати · '+GVIEW[gviewOf(key)][0],'простір, як папка, стос чи як на iPhone'):''}
       ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));
-      m.querySelectorAll('[data-fcolor]').forEach(b=>b.onclick=()=>{
-        folders[key].c=b.dataset.fcolor; saveFolders(); renderDashboard(); openFolderMenu(key);
-        try{ window.platform.haptic('select'); }catch(_){}
-      });
       m.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{
         folders[key].status=b.dataset.status; saveFolders(); renderDashboard(); openFolderMenu(key);
         try{ window.platform.haptic('select'); }catch(_){}
@@ -22499,6 +22701,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const f=folders[key]; if(!f) return;
     if(act==='due'){ closeFolderMenu(); inputModal({title:'Дедлайн проєкту', value:f.due||'', placeholder:'РРРР-ММ-ДД, напр. 2026-08-01', onOk:(v)=>{ const m=(v||'').match(/^\d{4}-\d{2}-\d{2}$/); if(m){ f.due=v; saveFolders(); renderDashboard(); } else if(v){ flowAlert('Формат дати: РРРР-ММ-ДД'); } }}); return; }
     if(act==='look'){ openFolderLook(key); return; }
+    // єдине місце для фото, іконки, емодзі й кольору (15.11.2026); після вибору — знову меню папки
+    if(act==='appearance'){ closeFolderMenu(); if(window.fhLookSheet) window.fhLookSheet(key,{after:()=>{ try{ renderDashboard(); }catch(_){} }}); return; }
     if(act==='type'){ openFolderType(key); return; }
     if(act==='links'){ closeFolderMenu(); try{ lkSheet(key); }catch(e){ console.error('links',e); } return; }
     if(act==='chat'){ closeFolderMenu(); try{ if(typeof window.folderAddSheet==='function') window.folderAddSheet(key); }catch(e){ console.error('chat',e); } return; }
@@ -26598,11 +26802,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const ic=c.icon||folderIconFor(c.emoji);
         // сфера (39-spheres.js): лише два короткі рядки, усе інше відкидаємо
         const sph=(c.sphere&&typeof c.sphere.tpl==='string')?{tpl:c.sphere.tpl.slice(0,16),bld:String(c.sphere.bld||'').slice(0,16)}:undefined;
-        const gv=(c.gview==='stack'||c.gview==='ios')?c.gview:undefined;   // 'folder' зі старих конфігів = типове, не тримаємо
+        const gv=(c.gview==='folder'||c.gview==='stack'||c.gview==='ios')?c.gview:undefined;   // типове «Простір» не пишеться (16-dashboard.js gviewOf)
         const pr=folderPrioOk(c.prio)?c.prio:undefined;
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr}); }
+        const vw=(c.view==='chat'||c.view==='photo')?c.view:undefined;   // вигляд папки (36-chats.js fhView); решта — «Документ»
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw}); }
         // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
-        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr}; }
+        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw}; }
       });
     }
   }
@@ -26955,12 +27160,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
        05-spaces.js); «Проєкти» з «Ще» прибрано — Ярослав просив прибрати їх
        зовсім (з бічної панелі зникли 25.09); сам екран лишився за ⌘5.
        Режим Lite/Pro переїхав у розділ «Вигляд» (renderSettingsCard). */
-    const TOOLS=[
-      {k:'quick', ic:'bolt',   c:'amber',  t:'Швидкий запис', d:'витрата, нотатка чи задача'},
-      {k:'focus', ic:'timer',  c:'pink',   t:'Фокус-сесія',   d:'Pomodoro 25 хв і підсумок дня'},
-      {k:'inbox', ic:'inbox',  c:'teal',   t:'Вхідні',        d:'записи, що чекають розбору'},
-      {k:'goals', ic:'target', c:'violet', t:'План на рік',   d:'цілі, кроки й прогрес'},
-    ];
     /* Lite ховає «Огляд» з панелі — сюди ведуть двері до решти */
     const LITE_DOORS=[
       {k:'home',   ic:'folder',  c:'blue',   t:'Папки й чати',  d:'Огляд: усі папки, чати й Вхідні'},
@@ -26971,11 +27170,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       {k:'upgrade', ic:'dna',  c:'violet', t:'Апгрейд',          d:'Персонаж, сфери, заявлений шлях'},
       {k:'misto',   ic:'city', c:'blue',   t:'Гра «Місто дня»',  d:'Прототип: місто, персонаж, друзі'},
     ];
-    /* справжній лічильник «Вхідних»: записи, що чекають (виконані задачі не рахуємо);
-       нуль або помилка — жодного числа, а не вигадане «3» */
-    function inboxWaiting(){
-      try{ return (boards[chatBk(INBOX_CHAT)]||[]).filter(b=>b&&!b.done).length; }catch(_){ return 0; }
-    }
     const ico=(n,c)=>(window.stgIco?window.stgIco(n,c):'');
     const chev=()=>'<span class="mr-chev">'+(window.stgSvg?window.stgSvg('chev'):'›')+'</span>';
     function rowHTML(m){
@@ -26986,11 +27180,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     function renderMore(){
       const host=document.getElementById('moreHybrid'); if(!host) return;
       const _m=(window.uiMode||'pro');
-      const nIn=inboxWaiting();
-      const tools=TOOLS.map(m=>m.k==='inbox'&&nIn>0?Object.assign({},m,{pill:String(nIn)}):m);
+      // «Інструменти» з «Ще» прибрано (15.11.2026, варіант A): Швидкий запис — «＋», Фокус і «План на рік» — Планер, Вхідні — Чати
       host.innerHTML=
-        `<div class="mr-sl" data-sec="tools">Інструменти</div>
-         <div class="mr-grp mr-tools" data-sec="tools">${tools.map(rowHTML).join('')}</div>` +
         (_m==='lite'
           ? `<div class="mr-sl" data-sec="lite">Решта Frequency</div>
              <div class="mr-grp" data-sec="lite">${LITE_DOORS.map(rowHTML).join('')}</div>`
@@ -27008,8 +27199,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
        кожен розділ — пара .mr-sl/.mr-grp з data-sec, а що видно на широкому
        екрані, вирішує атрибут data-msec на #scr-more (22-more-screen.css).
        «Інструменти» на комп'ютері стоять завжди — це дії, а не налаштування. */
-    const MSEC=[['profile','Профіль'],['data','Дані'],['look','Вигляд'],['pet','Напарник'],
-      ['ai','AI і приватність'],['lite','Решта Frequency'],['dev','Розробка'],['about','Про застосунок'],['danger','Скидання']];
+    const MSEC=[['profile','Профіль'],['look','Вигляд'],['day','Мій день'],['data','Дані і приватність'],
+      ['about','Про застосунок'],['adv','Розширені'],['lite','Решта Frequency'],['dev','Розробка']];
     function moreIsWide(){ try{ return window.matchMedia('(min-width:1024px)').matches; }catch(_){ return false; } }
     function renderMoreIndex(){
       const ix=document.getElementById('moreIndex'), scr=document.getElementById('scr-more'); if(!ix||!scr) return;
@@ -27199,7 +27390,21 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           </div>
           ${loginExpand}`}
         </div>
-        <div class="mr-sl" data-sec="data">Дані</div>
+        <!-- Налаштування, варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені -->
+        <div class="mr-sl" data-sec="day">Мій день</div>
+        <div class="mr-grp" data-sec="day">
+          <div class="acc-row" data-acc-dayrange role="button" tabindex="0">
+            ${ico('timer','amber')}
+            <div class="acc-rtext"><div class="acc-rtitle">День з … до …</div><div class="acc-rsub">коли починається й закінчується твій день у Планері</div></div>
+            ${chev()}
+          </div>
+          <div class="acc-row" data-acc-cur role="button" tabindex="0">
+            ${ico('backup','green')}
+            <div class="acc-rtext"><div class="acc-rtitle">Головна валюта</div><div class="acc-rsub">${escA(curSym()+' '+((CUR_LIST[mainCur()]||{}).n||mainCur()))} ${curLocked()?' · зафіксована':' · у ній Гаманець, віджети, призи, План'}</div></div>
+            ${chev()}
+          </div>
+        </div>
+        <div class="mr-sl" data-sec="data">Дані і приватність</div>
         <div class="mr-grp" data-sec="data">
           <div class="acc-row" data-acc-backup-row>
             ${ico('backup','blue')}
@@ -27214,27 +27419,30 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
             <p class="acc-hint" data-acc-ph-count>Фото: рахую…</p>
             <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом: і з цього пристрою, і ті, що поки лежать лише в хмарі (їх бекап спершу докачає). Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
           </div>
-          <div class="acc-row" data-acc-cur role="button" tabindex="0">
-            ${ico('backup','green')}
-            <div class="acc-rtext"><div class="acc-rtitle">Головна валюта</div><div class="acc-rsub">${escA(curSym()+' '+((CUR_LIST[mainCur()]||{}).n||mainCur()))} ${curLocked()?' · зафіксована':' · у ній Гаманець, віджети, призи, План'}</div></div>
+          <div class="acc-row" data-acc-aipriv role="button" tabindex="0">
+            ${ico('lock','green')}
+            <div class="acc-rtext"><div class="acc-rtitle">AI і приватність</div><div class="acc-rsub">що бачить AI · згода · закриті розділи</div></div>
             ${chev()}
           </div>
-          <div class="acc-row" data-acc-finreset role="button" tabindex="0">
+          <div class="acc-row acc-zero" data-acc-reset-row role="button" tabindex="0">
+            ${ico('reset','red')}
+            <div class="acc-rtext"><div class="acc-rtitle">Почати з нуля…</div><div class="acc-rsub">фінанси, гра, цей пристрій чи весь акаунт — вибираєш, що саме</div></div>
+            ${chev()}
+          </div>
+          <div class="acc-expand acc-zero-list" data-acc-reset-expand hidden>
+            <div class="acc-row" data-acc-finreset role="button" tabindex="0">
             ${ico('reset','red')}
             <div class="acc-rtext"><div class="acc-rtitle">Почати фінанси з нуля</div><div class="acc-rsub">стерти операції, конверти, План і цілі місяця — місії, Журнал, папки, борги й години Роботи лишаються</div></div>
             ${chev()}
-          </div>
-          <div class="acc-row" data-acc-oldw role="button" tabindex="0">
-            ${ico('backup','slate')}
-            <div class="acc-rtext"><div class="acc-rtitle">Старі віджети</div><div class="acc-rsub">прибрати старі «Фінанси», «Конверт», «Проєкт», «Фестиваль», KPI зі сторінок папок</div></div>
-            ${chev()}
-          </div>
-          <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
-            ${ico('disk','slate')}
-            <div class="acc-rtext" style="flex:1;min-width:0">
-              <div class="acc-rtitle">Пам'ять пристрою</div>
-              <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
             </div>
+            <div class="acc-row" data-acc-gamereset role="button" tabindex="0">
+              ${ico('mode','violet')}
+              <div class="acc-rtext"><div class="acc-rtitle">Гра: старт і герой</div><div class="acc-rsub">пройти старт ще раз або скинути імʼя й клас героя — історія днів лишається</div></div>
+              ${chev()}
+            </div>
+            <button class="acc-mini" data-acc-reset-device>Скинути цей пристрій</button>
+            <button class="acc-mini dng" data-acc-reset-all>Стерти все з акаунта</button>
+            <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл. «Скинути пристрій» кладе в нього фото з цього пристрою (решта лишається в хмарі). «Стерти все» спершу докачує у файл і фото, що є лише в хмарі, — і нічого не стирає, якщо хоч одне взяти не вдалось. Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
           </div>
         </div>
         <div class="mr-sl" data-sec="about">Про застосунок</div>
@@ -27259,16 +27467,26 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
             <p class="acc-hint">Лише на цьому пристрої: журнал не йде ні в хмару, ні в бекап. Надішли його, коли щось зламалось.</p>
           </div>
         </div>
-        <div class="mr-grp mr-danger" data-sec="danger">
-          <div class="acc-row" data-acc-reset-row>
-            ${ico('reset','red')}
-            <div class="acc-rtext"><div class="acc-rtitle">Скидання до заводських</div><div class="acc-rsub">стерти дані на цьому пристрої або всюди</div></div>
+        <div class="mr-sl" data-sec="adv">Розширені</div>
+        <div class="mr-grp" data-sec="adv">
+          <div class="acc-row" data-acc-adv-row role="button" tabindex="0" aria-expanded="false">
+            ${ico('code','slate')}
+            <div class="acc-rtext"><div class="acc-rtitle">Розширені налаштування</div><div class="acc-rsub">памʼять пристрою, старі віджети — рідко потрібне</div></div>
             ${chev()}
           </div>
-          <div class="acc-expand" data-acc-reset-expand hidden>
-            <button class="acc-mini" data-acc-reset-device>Скинути цей пристрій</button>
-            <button class="acc-mini dng" data-acc-reset-all>Стерти все з акаунта</button>
-            <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл. «Скинути пристрій» кладе в нього фото з цього пристрою (решта лишається в хмарі). «Стерти все» спершу докачує у файл і фото, що є лише в хмарі, — і нічого не стирає, якщо хоч одне взяти не вдалось. Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
+          <div class="acc-expand acc-adv-list" data-acc-adv-expand hidden>
+          <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
+            ${ico('disk','slate')}
+            <div class="acc-rtext" style="flex:1;min-width:0">
+              <div class="acc-rtitle">Пам'ять пристрою</div>
+              <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
+            </div>
+          </div>
+          <div class="acc-row" data-acc-oldw role="button" tabindex="0">
+            ${ico('backup','slate')}
+            <div class="acc-rtext"><div class="acc-rtitle">Старі віджети</div><div class="acc-rsub">прибрати старі «Фінанси», «Конверт», «Проєкт», «Фестиваль», KPI зі сторінок папок</div></div>
+            ${chev()}
+          </div>
           </div>
         </div>
       </div>`;
@@ -27309,6 +27527,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
       const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
       { const cr=host.querySelector('[data-acc-cur]'); if(cr) cr.onclick=()=>curPickSheet(()=>{ try{ renderAccount(); }catch(_){} }); }   // 08-finance.js
+      // варіант A (15.11.2026): нові рядки ведуть у наявні шторки — своїх налаштувань у них нема
+      { const dr=host.querySelector('[data-acc-dayrange]'); if(dr) dr.onclick=()=>{ try{ plRangeSheet(); }catch(e){ console.error('plRangeSheet',e); } }; }   // 15-flow-spot.js
+      { const ap=host.querySelector('[data-acc-aipriv]'); if(ap) ap.onclick=()=>{ if(window.aiPrivacySheet) window.aiPrivacySheet(); }; }
+      { const gr=host.querySelector('[data-acc-gamereset]'); if(gr) gr.onclick=()=>{ try{ jnSettings(); }catch(e){ console.error('jnSettings',e); } }; }   // 41-journal.js
+      { const ar=host.querySelector('[data-acc-adv-row]'), ae=host.querySelector('[data-acc-adv-expand]');
+        if(ar&&ae) ar.onclick=()=>{ ae.hidden=!ae.hidden; ar.setAttribute('aria-expanded',String(!ae.hidden)); }; }
+      // Enter/пробіл на рядках-кнопках (role="button")
+      host.querySelectorAll('[data-acc-dayrange],[data-acc-aipriv],[data-acc-gamereset],[data-acc-adv-row]').forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } }));
       { const fr=host.querySelector('[data-acc-finreset]'); if(fr) fr.onclick=()=>{   // 51-money-reset.js
         if(typeof finResetScan!=='function') return;
         if(!finResetReady()){ try{ plToast('Дані ще звіряються з хмарою — спробуй за хвилину'); }catch(_){} return; }
@@ -28477,9 +28703,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         if(k==='folders'){ chatAddSheet(chKey); return; }
         chTopic=k; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); }); }
     if(chTopic!=='all') h+=`<button class="ch-chip on" data-chall>${chI('back')}Усі записи</button>`;
-    h+=`<span class="ch-lbl">Папки</span>`;
-    fl.forEach(f=>{ h+=`<button class="ch-chip fold" data-chfold="${esc(f.key)}" data-i18n-skip="1"><span class="e">${esc(f.emoji||'📁')}</span>${esc(f.name)}</button>`; });
-    h+=`<button class="ch-chip add" data-chadd aria-label="Додати папку">${chI('plus')}</button>`;
+    // папки чату — кружечками, як сторіс (15.11.2026): фото папки або її іконка на її кольорі
+    h+=`<span class="ch-lbl">Папки</span><span class="chf-row">`;
+    fl.forEach(f=>{ let img=''; try{ img=f.photo?safeImg(window.photoSrc(f.photo)):''; }catch(_){}
+      h+=`<button class="chf" data-chfold="${esc(f.key)}" style="--c:${safeColor(f.c,'#6a7dff')}" aria-label="${esc(f.name)}">`
+        +`<span class="chf-cv"${img?` style="background-image:url('${esc(img)}')"`:''}>${img?'':`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}</span>`
+        +`<span class="chf-n" data-i18n-skip="1">${esc(f.name)}</span></button>`; });
+    h+=`<button class="chf add" data-chadd aria-label="Додати папку"><span class="chf-cv">${chI('plus')}</span><span class="chf-n">Додати</span></button></span>`;
     host.innerHTML=h;
     const all=host.querySelector('[data-chall]'); if(all) all.onclick=()=>{ chTopic='all'; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); };
     host.querySelectorAll('[data-chfold]').forEach(b=>{
@@ -28499,9 +28729,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const f=folders[fkey]; if(!f) return;
     chSheet(esc(f.name),
       `<button class="ch-sheet-row" data-cf="open"><span class="ic">${chI('doc')}</span><span>Відкрити документ</span></button>
+       <button class="ch-sheet-row" data-cf="look"><span class="ic">${chI('camera')}</span><span>Вигляд: фото, іконка, колір</span></button>
        <button class="ch-sheet-row danger" data-cf="unlink"><span class="ic">${chI('close')}</span><span>Відкріпити від чату</span></button>`,
       (ov,close)=>{
         ov.querySelector('[data-cf="open"]').onclick=()=>{ close(); chOpenFolder(fkey); };
+        ov.querySelector('[data-cf="look"]').onclick=()=>{ close(); setTimeout(()=>{ if(window.fhLookSheet) window.fhLookSheet(fkey,{after:renderChChips}); },150); };
         ov.querySelector('[data-cf="unlink"]').onclick=()=>{ close(); chatUnlinkFolder(chKey,fkey); };
       });
   }
@@ -29338,6 +29570,330 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   function pgSubOpen(fk,ck){ if(!folders[ck]) return; window.__fgNext=fk; try{ goFolder(ck); }finally{ window.__fgNext=null; } }
   function pgSubNew(fk){ if(!folders[fk]) return; createFolder(fk,{onCreated:k=>pgSubOpen(fk,k)}); }
+
+  /* ── шапка папки як у чаті (15.11.2026): обкладинка · «‹ · Фото · ＋ · ⋯» · аватар · назва
+     · згорнуті значки «підпапки · завдання · фото · записи», кожен відкриває шторку.
+     Лише вигляд: блоки, назва (#pgTitle переїжджає сюди і назад) і обкладинка
+     (window.__pgCovers) — ті самі, нових ключів у сховищі нема. Розмітка й стилі —
+     від шапки чату (.ch-cover, 18-channel.css). */
+  const FH_I={
+    task:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
+    note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M5 12h14M5 18h9"/></svg>'
+  };
+  function fhBridge(){ return window.__flowPageBridge||null; }
+  function fhWalk(arr,fn){ (arr||[]).forEach(b=>{ if(!b) return; fn(b); if(Array.isArray(b.children)) fhWalk(b.children,fn); }); }
+  // що в папці: підпапки, завдання (з галочкою), фото, записи верхнього рівня
+  function fhStats(fk){
+    const s={kids:[],tasks:[],photos:[],recs:[]};
+    try{ s.kids=typeof groupKids==='function'?groupKids(fk):[]; }catch(_){}
+    let arr=[]; try{ arr=(fhBridge()&&fhBridge().getBlocks())||[]; }catch(_){}
+    // записи — усі блоки, і вкладені теж (крім службових «Підпапки» й роздільника)
+    fhWalk(arr,b=>{ if(b.type==='task') s.tasks.push(b); else if(b.type==='photo'&&b.data) s.photos.push(b);
+      if(b.type!=='subs'&&b.type!=='divider') s.recs.push(b); });
+    return s;
+  }
+  // лише справжні теги (старі дані з HTML); «ціна < 100 > 50» лишається як є
+  function fhPlain(s){ return String(s==null?'':s).replace(/<\/?[a-z][^<>]*>/gi,' ').replace(/\s+/g,' ').trim(); }
+  function fhLabel(b){
+    const t=fhPlain(b.text!=null?b.text:b.title);
+    if(t) return t;
+    const bt=(()=>{ try{ return (fhBridge()&&fhBridge().blockTypes())||{}; }catch(_){ return {}; } })();
+    return (bt[b.type]&&bt[b.type].title)||(b.type==='photo'?'Фото':'Блок');
+  }
+  function fhCoverStyle(fk,f){
+    const api=window.__pgCovers, ck=(()=>{ try{ return fhBridge().curKey(); }catch(_){ return fk; } })();
+    const cov=api?api.get(ck):null;
+    let u='';
+    if(cov&&cov.img){ try{ u=safeImg(cov.img); }catch(_){ u=''; } }
+    if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:50% ${cov.pos==null?50:(+cov.pos||0)}%;`;
+    if(cov&&!cov.img&&api.grads[cov.g||0]) return 'background:'+api.grads[cov.g||0]+';';
+    if(f.photo){ try{ u=safeImg(window.photoSrc(f.photo)); }catch(_){ u=''; }
+      if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`; }
+    const c=safeColor(f.c,'#6a7dff');
+    return `background:linear-gradient(160deg,color-mix(in srgb,${c} 60%,#0f1115),color-mix(in srgb,${c} 14%,var(--bg)));`;
+  }
+  function fhAvatar(f){
+    let u=''; try{ u=f.photo?safeImg(window.photoSrc(f.photo)):''; }catch(_){ u=''; }
+    return u?`<span class="ch-av fh-av fh-av-ph" style="background-image:url('${esc(u)}')"></span>`
+      :`<span class="ch-av fh-av" style="--c:${safeColor(f.c,'#6a7dff')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
+  }
+  function fhChipsHTML(s){
+    const n=(k,v,l,ic)=>`<button class="fh-chip" data-fhs="${k}" aria-label="${l}">${ic}<span>${v}</span></button>`;
+    const td=s.tasks.filter(b=>b.done).length;
+    return (s.kids.length?n('kids',s.kids.length,'Підпапки',chI('folder')):'')
+      +(s.tasks.length?n('tasks',td+'/'+s.tasks.length,'Завдання',FH_I.task):'')
+      +(s.photos.length?n('photos',s.photos.length,'Фото',chI('image')):'')
+      +(s.recs.length?n('recs',s.recs.length,'Записи',FH_I.note):'');
+  }
+  // повернути назву документа на старе місце (сторінка — не папка)
+  function fhTitleHome(){
+    const t=document.getElementById('pgTitle'), sp=document.getElementById('pgSphere');
+    if(t&&sp&&t.parentNode!==sp.parentNode) sp.parentNode.insertBefore(t,sp);
+  }
+  function fhRender(){
+    const scr=document.getElementById('scr-page'), doc=scr&&scr.querySelector('.pg-doc'); if(!doc) return;
+    let el=document.getElementById('pgHero');
+    const fk=pgFolderKey(), f=fk?folders[fk]:null;
+    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero'); fhTitleHome(); fhApplyView(); return; }
+    if(!el){ el=document.createElement('div'); el.id='pgHero'; el.className='ch-cover fh'; doc.insertBefore(el,doc.firstChild); }
+    el.hidden=false; scr.classList.add('pg-fhero');
+    fhTitleHome();   // спершу винести #pgTitle: innerHTML нижче інакше знищив би поле назви разом зі старою шапкою
+    const s=fhStats(fk);
+    el.innerHTML=`<div class="ch-cov-bg" style="${fhCoverStyle(fk,f)}"></div>
+      <div class="ch-cov-top">
+        <button class="ch-ghost" data-fh="back" aria-label="Назад">${chI('back')}</button>
+        <span class="ch-sp"></span>
+        <button class="ch-chip-photo" data-fh="photo">${chI('camera')}<span>Фото</span></button>
+        <button class="ch-ghost acc" data-fh="add" aria-label="Додати">${chI('plus')}</button>
+        <button class="ch-ghost" data-fh="more" aria-label="Ще дії">${chI('dots')}</button>
+      </div>
+      <div class="ch-cov-title"><button class="fh-avbtn" data-fh="look" aria-label="Вигляд папки: фото, іконка, колір">${fhAvatar(f)}</button>
+        <div class="fh-txt"><div class="fh-tslot"></div><div class="fh-chips">${fhChipsHTML(s)}</div></div></div>`;
+    const t=document.getElementById('pgTitle'); if(t) el.querySelector('.fh-tslot').appendChild(t);
+    const on=(k,fn)=>{ const b=el.querySelector('[data-fh="'+k+'"]'); if(b) b.onclick=fn; };
+    on('back',()=>{ const up=document.getElementById('pgCrumbUp'); if(up&&!up.hidden&&!(up.closest('[hidden]'))) up.click(); else { const bk=document.getElementById('pgBack'); if(bk) bk.click(); } });
+    on('photo',()=>fhCoverSheet(fk));
+    on('add',()=>fhAddSheet(fk));
+    on('more',()=>{ const m=document.getElementById('pgMoreBtn'); if(m) m.click(); });
+    on('look',()=>fhLookSheet(fk));
+    el.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs));
+    fhApplyView();
+  }
+  // лише значки — після правок у документі, без перемальовування обкладинки
+  let fhT=null;
+  function fhSoon(){ clearTimeout(fhT); fhT=setTimeout(()=>{ const el=document.getElementById('pgHero'), fk=pgFolderKey();
+    const box=el&&!el.hidden&&el.querySelector('.fh-chips'); if(!box||!fk) return;
+    box.innerHTML=fhChipsHTML(fhStats(fk)); box.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs)); try{ fhApplyView(); }catch(_){} },250); }
+  function fhFlash(id){
+    let r=null; try{ r=document.querySelector('#pgEditor .pgb[data-id="'+CSS.escape(String(id))+'"]'); }catch(_){} if(!r) return;
+    r.scrollIntoView({block:'center'}); r.classList.add('pg-flash'); setTimeout(()=>r.classList.remove('pg-flash'),900);
+  }
+  function fhStatSheet(fk,k){
+    const s=fhStats(fk);
+    if(k==='kids'){
+      chSheet('Підпапки · '+s.kids.length, pgSubStripHTML(fk).replace(/<div class="sbs-h">[^<]*<\/div>/,''),(ov,close)=>{
+        ov.querySelectorAll('[data-pgsub]').forEach(b=>b.onclick=()=>{ close(); pgSubOpen(fk,b.dataset.pgsub); });
+        const sn=ov.querySelector('[data-pgsubnew]'); if(sn) sn.onclick=()=>{ close(); pgSubNew(fk); };
+        ov.querySelectorAll('[data-pgsub]').forEach(b=>chAttachLongPress(b,()=>{ close(); fhLookSheet(b.dataset.pgsub); }));
+      }); return;
+    }
+    if(k==='tasks'){
+      const td=s.tasks.filter(b=>b.done).length;
+      chSheet('Завдання · '+td+' з '+s.tasks.length, `<div class="fh-list">${s.tasks.map(b=>
+        `<div class="ch-sheet-row fh-task${b.done?' done':''}"><button class="fh-box" data-fhdone="${esc(b.id)}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fh-go" data-fhgo="${esc(b.id)}" data-i18n-skip="1">${esc(fhLabel(b))}</button></div>`).join('')}</div>`,(ov,close)=>{
+        ov.querySelectorAll('[data-fhdone]').forEach(btn=>btn.onclick=()=>{
+          const b=s.tasks.find(x=>String(x.id)===btn.dataset.fhdone); if(!b) return;
+          b.done=!b.done; chHaptic('select');
+          try{ fhBridge().save(); }catch(_){}
+          try{ if(window.__pgRender) window.__pgRender(); }catch(_){}
+          const row=btn.closest('.fh-task'); row.classList.toggle('done',!!b.done); btn.setAttribute('aria-pressed',String(!!b.done)); btn.innerHTML=b.done?chI('check'):'';
+          const tt=ov.querySelector('.ch-sheet-t'); if(tt) tt.textContent='Завдання · '+s.tasks.filter(x=>x.done).length+' з '+s.tasks.length;
+          fhSoon();
+        });
+        ov.querySelectorAll('[data-fhgo]').forEach(b=>b.onclick=()=>{ close(); fhFlash(b.dataset.fhgo); });
+      }); return;
+    }
+    if(k==='photos'){
+      chSheet('Фото · '+s.photos.length, `<div class="fh-grid">${s.photos.map(b=>{ let u=''; try{ u=safeImg(b.data); }catch(_){}
+        return `<button class="fh-ph" data-fhgo="${esc(b.id)}" style="background-image:url('${esc(u)}')" aria-label="Фото в документі"></button>`; }).join('')}</div>`,(ov,close)=>{
+        ov.querySelectorAll('[data-fhgo]').forEach(b=>b.onclick=()=>{ close(); fhFlash(b.dataset.fhgo); });
+      }); return;
+    }
+    chSheet('Записи · '+s.recs.length, `<div class="fh-list">${s.recs.map(b=>
+      `<button class="ch-sheet-row fh-rec" data-fhgo="${esc(b.id)}"><span class="ic">${b.type==='task'?FH_I.task:(b.type==='photo'?chI('image'):FH_I.note)}</span><span class="fh-rt" data-i18n-skip="1">${esc(fhLabel(b))}</span></button>`).join('')}</div>`,(ov,close)=>{
+      ov.querySelectorAll('[data-fhgo]').forEach(b=>b.onclick=()=>{ close(); fhFlash(b.dataset.fhgo); });
+    });
+  }
+  // «Фото» в шапці — обкладинка документа (той самий механізм, що в чаті й у «＋ Обкладинка»)
+  function fhCoverSheet(fk){
+    const api=window.__pgCovers; if(!api){ chToast('⚠️ Обкладинки недоступні'); return; }
+    const ck=(()=>{ try{ return fhBridge().curKey(); }catch(_){ return fk; } })(), cov=api.get(ck);
+    const sw=api.grads.map((g,i)=>`<button class="ch-sw ${cov&&!cov.img&&(cov.g||0)===i?'on':''}" data-fhgrad="${i}" style="background:${g}" aria-label="Градієнт ${i+1}"></button>`).join('');
+    chSheet('Обкладинка папки',
+      `<button class="ch-sheet-row" data-fhc="photo"><span class="ic">${chI('camera')}</span><span>Вибрати фото</span></button>
+       <div class="ch-sw-row">${sw}</div>
+       ${cov?`<button class="ch-sheet-row danger" data-fhc="clear"><span class="ic">${chI('trash')}</span><span>Прибрати обкладинку</span></button>`:''}`,
+      (ov,close)=>{
+        ov.querySelectorAll('[data-fhgrad]').forEach(b=>b.onclick=()=>{ Promise.resolve(api.set(ck,{g:+b.dataset.fhgrad})).then(fhRender); chHaptic('select'); close(); });
+        ov.querySelector('[data-fhc="photo"]').onclick=()=>{ close(); chPickFile(file=>chShrink(file,1200,760,data=>{ const p=api.get(ck)||{};
+          Promise.resolve(api.set(ck,{img:data,pos:p.pos==null?50:p.pos,dark:p.dark==null?30:p.dark,h:p.h||176})).then(fhRender); })); };
+        const cl=ov.querySelector('[data-fhc="clear"]'); if(cl) cl.onclick=()=>{ api.clear(ck); fhRender(); close(); };
+      });
+  }
+  // «＋» у шапці: блок у кінець, нова підпапка або чат папки
+  function fhAddSheet(fk){
+    chSheet('Додати',
+      `<button class="ch-sheet-row" data-fha="block"><span class="ic">${chI('plus')}</span><span>Блок<small>Текст, фото, таблиця, картка…</small></span></button>
+       <button class="ch-sheet-row" data-fha="sub"><span class="ic">${chI('folderPlus')}</span><span>Підпапка</span></button>
+       <button class="ch-sheet-row" data-fha="chat"><span class="ic">${chI('chat')}</span><span>Чат папки</span></button>`,
+      (ov,close)=>{
+        ov.querySelector('[data-fha="block"]').onclick=()=>{ close(); const p=document.getElementById('pgcPlus')||document.getElementById('pgAddBlock'); if(p) p.click(); };
+        ov.querySelector('[data-fha="sub"]').onclick=()=>{ close(); pgSubNew(fk); };
+        ov.querySelector('[data-fha="chat"]').onclick=()=>{ close(); setTimeout(()=>folderAddSheet(fk),200); };
+      });
+  }
+  // «Вигляд» папки чи підпапки: фото, іконка, колір. Дія людини — звичайний saveFolders()
+  // o.after — що перемалювати ще (кружечки папок у чаті)
+  function fhLookSheet(key,o){
+    const f=folders[key]; if(!f) return;
+    const cur=folderIcon(f), cc=safeColor(f.c,'#6a7dff');
+    let ph=''; try{ ph=f.photo?safeImg(window.photoSrc(f.photo)):''; }catch(_){}
+    const ICONS=(typeof ICON_ALL!=='undefined'?ICON_ALL:[]).slice(0,24);
+    chSheet('Вигляд · '+esc(f.name),
+      `<button class="ch-sheet-row" data-fhl="photo"><span class="ic"${ph?` style="background-image:url('${esc(ph)}');background-size:cover"`:''}>${ph?'':chI('camera')}</span><span>${ph?'Змінити фото':'Вибрати фото'}</span></button>
+       ${ph?`<button class="ch-sheet-row" data-fhl="crop"><span class="ic">${chI('edit')}</span><span>Кадрувати фото</span></button>
+       <button class="ch-sheet-row danger" data-fhl="nophoto"><span class="ic">${chI('trash')}</span><span>Прибрати фото</span></button>`:''}
+       <div class="fh-ic-grid">${ICONS.map(([id,nm])=>`<button class="fh-ic${!ph&&cur===id?' on':''}" data-fhic="${esc(id)}" style="--c:${cc}" aria-label="${esc(nm)}" title="${esc(nm)}"><svg class="ico" aria-hidden="true"><use href="#${esc(id)}"/></svg></button>`).join('')}</div>
+       <button class="ch-sheet-row" data-fhl="emoji"><span class="ic e">${esc(f.emoji||'🙂')}</span><span>Емодзі<small>${f.emoji?'змінити чи прибрати':'нема'}</small></span></button>
+       <div class="fh-colors">${FOLDER_COLORS.map(c=>`<button class="fh-sw${f.c===c?' on':''}" data-fhcol="${c}" style="--sw:${c}" aria-label="Колір" aria-pressed="${f.c===c}"></button>`).join('')}</div>`,
+      (ov,close)=>{
+        const done=()=>{ saveFolders(); try{ renderDashboard(); }catch(_){}
+          if(document.getElementById('scr-page')?.classList.contains('active')){ fhRender(); try{ renderPgLinks(); }catch(_){} }
+          try{ if(o&&o.after) o.after(); }catch(_){} chHaptic('select'); };
+        ov.querySelector('[data-fhl="photo"]').onclick=()=>{ close(); chPickFile(file=>chShrink(file,1400,1400,du=>{
+          const prev=f.photo; f.photoPos=null;
+          Promise.resolve(window.photoPut?window.photoPut('ph_'+key,du):du).then(ref=>{ f.photo=ref; if(prev&&prev!==ref&&window.photoDel) window.photoDel(prev); done(); });
+        })); };
+        // фото стирається і з хмари — спершу питаємо (як і в меню папки)
+        const np=ov.querySelector('[data-fhl="nophoto"]'); if(np) np.onclick=()=>{ close();
+          confirmSheet({ title:'Прибрати фото обкладинки?', sub:'Знімок зітреться з цього пристрою і з хмари. Повернути його можна лише з бекапу.', okLabel:'Прибрати фото',
+            onOk:()=>{ const prev=f.photo; f.photo=''; f.photoPos=null; if(prev&&window.photoDel) window.photoDel(prev); done(); } }); };
+        const cr=ov.querySelector('[data-fhl="crop"]'); if(cr) cr.onclick=()=>{ close(); if(!f.photo||typeof openPhotoCropEditor!=='function') return;
+          openPhotoCropEditor({ img:window.photoSrc(f.photo), pos:f.photoPos, title:'Кадрувати «'+f.name+'»', onSave:(pos)=>{ f.photoPos=pos; done(); } }); };
+        // ручну іконку (iconSet) зміна емодзі не чіпає — як і в меню папки
+        ov.querySelector('[data-fhl="emoji"]').onclick=()=>{ close(); inputModal({ title:'Емодзі папки', value:f.emoji||'', placeholder:'Встав емодзі або лишай порожнім', emoji:false,
+          onOk:(v)=>{ f.emoji=String(v||'').trim().slice(0,8); if(!f.iconSet) f.icon=folderIconFor(f.emoji); done(); } }); };
+        // фото папки — ще й обкладинка плитки на Огляді, тож іконка його не стирає: її видно, коли фото нема
+        ov.querySelectorAll('[data-fhic]').forEach(b=>b.onclick=()=>{ f.icon=b.dataset.fhic; f.iconSet=1;
+          if(f.photo) chToast('Іконку видно, коли фото прибрано');
+          done(); close(); });
+        ov.querySelectorAll('[data-fhcol]').forEach(b=>b.onclick=()=>{ f.c=b.dataset.fhcol; done(); close(); });
+      });
+  }
+  try{ window.fhLookSheet=fhLookSheet; window.fhCoverSheet=fhCoverSheet; }catch(_){}
+
+  /* ── вигляд папки зсередини (15.11.2026, етап 2): Документ · Чат · Фото — для кожної папки свій.
+     Записи ТІ САМІ блоки документа, міняється лише показ. Поле folders[k].view пишеться лише
+     з вибору людини (звичайний saveFolders), і лише не-типове: chat | photo. ── */
+  function fhView(fk){ const v=folders[fk]&&folders[fk].view; return (v==='chat'||v==='photo')?v:'doc'; }
+  function fhSetView(fk,v){
+    const f=folders[fk]; if(!f) return;
+    if(v==='chat'||v==='photo') f.view=v; else delete f.view;
+    saveFolders(); fhApplyView(); chHaptic('select');
+  }
+  // блок разом із масивом, де він лежить (для видалення), — і у вкладених теж
+  function fhFind(id,arr){
+    arr=arr||((fhBridge()&&fhBridge().getBlocks())||[]);
+    for(let i=0;i<arr.length;i++){ const b=arr[i]; if(!b) continue;
+      if(String(b.id)===String(id)) return {b,arr,i};
+      if(Array.isArray(b.children)){ const r=fhFind(id,b.children); if(r) return r; } }
+    return null;
+  }
+  function fhCommit(){ try{ fhBridge().save(); }catch(_){} try{ if(window.__pgRender) window.__pgRender(); }catch(_){} fhApplyView(); fhSoon(); }
+  function fhBubble(b){
+    const t=b.type, id=esc(b.id);
+    if(t==='photo'&&b.data){ let u=''; try{ u=safeImg(b.data); }catch(_){}
+      return `<button class="fhm fhm-ph" data-fhm="${id}"><img alt="" src="${esc(u)}">${b.title?`<span class="fhm-cap" data-i18n-skip="1">${esc(fhPlain(b.title))}</span>`:''}</button>`; }
+    if(t==='task') return `<div class="fhm fhm-task${b.done?' done':''}"><button class="fh-box" data-fhdone="${id}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fhm-tx" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button></div>`;
+    const head=(t==='h1'||t==='h2'||t==='h3');
+    return `<button class="fhm${head?' fhm-h':''}" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button>`;
+  }
+  function fhChatHTML(arr){
+    // усі записи, і вкладені теж — у стрічці нічого не ховається
+    const list=[]; fhWalk(arr,b=>{ if(b.type!=='subs'&&b.type!=='divider') list.push(b); });
+    if(!list.length) return `<div class="fhv-empty"><b>Тут поки тихо</b><span>Напиши внизу — кожне повідомлення стане записом папки.</span></div>`;
+    let h='', day='';
+    list.forEach(b=>{ const at=chTimeOf(b), d=chDayLabel(at); if(d!==day){ day=d; h+=`<div class="fhv-day">${esc(d)}</div>`; } h+=fhBubble(b); });
+    return h;
+  }
+  function fhWallHTML(arr){
+    const ph=[]; fhWalk(arr,b=>{ if(b.type==='photo'&&b.data) ph.push(b); });
+    return `<div class="fhv-wall">`+ph.map(b=>{ let u=''; try{ u=safeImg(b.data); }catch(_){}
+      return `<button class="fhv-tile" data-fhgo="${esc(b.id)}" style="background-image:url('${esc(u)}')" aria-label="Фото в документі"></button>`; }).join('')
+      +`<button class="fhv-tile add" data-fhwadd aria-label="Додати фото">${chI('plus')}</button></div>`;
+  }
+  let fhWallSig='';
+  function fhApplyView(){
+    const scr=document.getElementById('scr-page'), ed=document.getElementById('pgEditor'); if(!scr||!ed) return;
+    const fk=pgFolderKey(), feed=scr.classList.contains('lk-feedmode');
+    const v=(fk&&!feed)?fhView(fk):'doc';
+    scr.classList.toggle('fh-v-chat',v==='chat'); scr.classList.toggle('fh-v-photo',v==='photo');
+    let box=document.getElementById('fhView');
+    if(v==='doc'){ if(box) box.remove(); fhWallSig=''; if(!feed) ed.hidden=false; return; }
+    if(!box){ box=document.createElement('div'); box.id='fhView'; ed.parentNode.insertBefore(box,ed); }
+    const arr=(fhBridge()&&fhBridge().getBlocks())||[];
+    if(v==='chat'){
+      ed.hidden=true; box.className='fhv fhv-chat'; box.innerHTML=fhChatHTML(arr); fhWallSig='';
+      box.querySelectorAll('[data-fhm]').forEach(el=>el.onclick=()=>fhMsgSheet(fk,el.dataset.fhm));
+      box.querySelectorAll('[data-fhdone]').forEach(el=>el.onclick=()=>{ const r=fhFind(el.dataset.fhdone); if(!r) return; r.b.done=!r.b.done; chHaptic('select'); fhCommit(); });
+      return;
+    }
+    ed.hidden=false; box.className='fhv';
+    const sig=[]; fhWalk(arr,b=>{ if(b.type==='photo'&&b.data) sig.push(b.id); }); const s=sig.join(',');
+    if(s===fhWallSig&&box.firstChild) return;   // фото ті самі — не перемальовуємо (без блимання)
+    fhWallSig=s; box.innerHTML=fhWallHTML(arr);
+    box.querySelectorAll('[data-fhgo]').forEach(el=>el.onclick=()=>fhFlash(el.dataset.fhgo));
+    const add=box.querySelector('[data-fhwadd]'); if(add) add.onclick=()=>chPickFile(file=>chShrink(file,1100,1100,data=>{
+      const a=fhBridge()&&fhBridge().getBlocks(); if(!a) return;
+      a.push({id:chUid(),type:'photo',data,at:Date.now()}); fhCommit(); }));
+  }
+  // тап по запису у вигляді «Чат» — як у чаті: в папку, переслати, завданням, редагувати, видалити
+  function fhMsgSheet(fk,id){
+    const r=fhFind(id); if(!r) return; const b=r.b;
+    const isTask=b.type==='task';
+    // контейнер (колонки, тогл, картка…) несе вкладені записи — зі стрічки його не видаляємо (рецензія даних 15.11)
+    let kids=0; if(Array.isArray(b.children)) fhWalk(b.children,()=>{ kids++; });
+    chSheet(b.type==='photo'?'Фото':(isTask?'Завдання':'Запис'),
+      `<button class="ch-sheet-row" data-fx="folder"><span class="ic">${chI('folderPlus')}</span><span>В іншу папку<small>Копія запису</small></span></button>
+       <button class="ch-sheet-row" data-fx="chat"><span class="ic">${chI('chat')}</span><span>Переслати в чат</span></button>
+       ${b.type==='note'?`<button class="ch-sheet-row" data-fx="task"><span class="ic">${chI('task')}</span><span>Зробити завданням</span></button>`:''}
+       <button class="ch-sheet-row" data-fx="edit"><span class="ic">${chI('edit')}</span><span>${b.type==='photo'?'Підпис до фото':'Редагувати'}</span></button>
+       ${kids?`<div class="ch-sheet-row static"><span class="ic">${chI('trash')}</span><span>Видалити — у «Документі»<small>Усередині ще ${kids} ${pluralUk(kids,'запис','записи','записів')}</small></span></div>`
+         :`<button class="ch-sheet-row danger" data-fx="del"><span class="ic">${chI('trash')}</span><span>Видалити</span></button>`}`,
+      (ov,close)=>{
+        const q=s=>ov.querySelector(s);
+        q('[data-fx="folder"]').onclick=()=>{ close(); setTimeout(()=>fhPickFolder(fk,b),200); };
+        q('[data-fx="chat"]').onclick=()=>{ close(); setTimeout(()=>fhPickChat(b),200); };
+        const tk=q('[data-fx="task"]'); if(tk) tk.onclick=()=>{ close(); const x=fhFind(id); if(!x) return; x.b.type='task'; x.b.done=false; fhCommit(); };
+        const ed=q('[data-fx="edit"]'); if(ed) ed.onclick=()=>{ close(); setTimeout(()=>fhEdit(id),200); };
+        const dl=q('[data-fx="del"]'); if(dl) dl.onclick=()=>{ close(); confirmSheet({ title:'Видалити запис?', onOk:()=>{ const x=fhFind(id); if(x){ x.arr.splice(x.i,1); fhCommit(); } } }); };
+      });
+  }
+  // глибока копія з новими id — і у вкладених, щоб дві копії не ділили id
+  function fhCopy(b){ const c=JSON.parse(JSON.stringify(b)); c.at=Date.now(); delete c.by; delete c.topic; delete c.pinned;
+    const re=x=>{ x.id=chUid(); if(Array.isArray(x.children)) x.children.forEach(y=>{ if(y) re(y); }); }; re(c); return c; }
+  function fhPickFolder(fk,b){
+    const ks=orderedFolderKeys().filter(k=>k!==fk&&folders[k]&&(typeof folderVisible!=='function'||folderVisible(k)));
+    if(!ks.length){ chToast('Інших папок ще нема'); return; }
+    chSheet('Скопіювати в папку',`<div class="ch-pick fh-list">${ks.map(k=>`<button class="ch-sheet-row" data-pick="${esc(k)}"><span class="ic" style="--fc:${safeColor(folders[k].c,'var(--accent)')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(folders[k]))}"/></svg></span><span data-i18n-skip="1">${esc(folders[k].name)}</span></button>`).join('')}</div>`,
+      (ov,close)=>ov.querySelectorAll('[data-pick]').forEach(x=>x.onclick=()=>{ close(); const k=x.dataset.pick;
+        if(!boards[k]) boards[k]=[]; boards[k].push(fhCopy(b)); saveBoard(); chHaptic('medium'); chToast('Скопійовано в «'+folders[k].name+'»'); }));
+  }
+  function fhPickChat(b){
+    if(!chats.length){ chToast('Чатів ще нема — створи у вкладці «Чати»'); return; }
+    chSheet('Переслати в чат',`<div class="ch-pick fh-list">${chats.map(c=>`<button class="ch-sheet-row" data-pick="${esc(c.id)}"><span class="ic e">${esc(c.emoji||'💬')}</span><span data-i18n-skip="1">${esc(c.name)}</span></button>`).join('')}</div>`,
+      (ov,close)=>ov.querySelectorAll('[data-pick]').forEach(x=>x.onclick=()=>{ close(); const c=chatById(x.dataset.pick); if(!c) return;
+        const bk=chatBk(c.id); if(!boards[bk]) boards[bk]=[]; const cp=fhCopy(b); cp.by='me'; boards[bk].push(cp); saveBoard();
+        chHaptic('medium'); chToast('Переслано в «'+c.name+'»'); }));
+  }
+  // за id, а не за обʼєктом: поки шторка відкрита, хмара могла замінити дошку — шукаємо блок заново при збереженні
+  function fhEdit(id){
+    const r0=fhFind(id); if(!r0) return; const b=r0.b;
+    const isPhoto=b.type==='photo';
+    chSheet(isPhoto?'Підпис до фото':'Редагувати запис',
+      `<textarea class="ch-edit" id="fhEditTa" rows="4" placeholder="${isPhoto?'Підпис…':'Текст запису…'}"></textarea>
+       <div class="ch-ai-acts"><button class="ch-ai-btn" data-fe="save">Зберегти</button><button class="ch-ai-btn ghost" data-fe="cancel">Скасувати</button></div>`,
+      (ov,close)=>{
+        const ta=ov.querySelector('#fhEditTa'); ta.value=String(isPhoto?(b.title||''):(b.text!=null?b.text:(b.title||'')));   // сирий текст: показ і так екранується, а fhPlain міг би щось вирізати
+        setTimeout(()=>{ try{ ta.focus(); }catch(_){} },60);
+        ov.querySelector('[data-fe="cancel"]').onclick=close;
+        ov.querySelector('[data-fe="save"]').onclick=()=>{ const v=ta.value.replace(/\s+$/,''); close();
+          const x=fhFind(id); if(!x){ chToast('⚠️ Запис уже змінився — відкрий ще раз'); return; } const t=x.b;
+          if(isPhoto) t.title=v.trim(); else if(t.text!=null||t.title==null) t.text=v; else t.title=v;
+          fhCommit(); };
+      });
+  }
+  try{ window.fhView=fhView; window.fhSetView=fhSetView; }catch(_){}
   // гроші, час, місія й чати папки — для рядка «Гроші» у «Звʼязках» (54-links.js)
   function pgHubData(fk){
     const d={money:null, time:0, mission:null, chats:0};
@@ -29381,9 +29937,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // блок «Чати папки» малюється при кожному відкритті документа
     if(typeof window.openFlowPage==='function' && !window.openFlowPage.__chats){
       const orig=window.openFlowPage;
-      const wrapped=function(opts){ orig(opts); try{ renderPgLinks(); }catch(e){ console.error('pgLinks',e); } };
+      const wrapped=function(opts){ orig(opts); try{ renderPgLinks(); }catch(e){ console.error('pgLinks',e); } try{ fhRender(); }catch(e){ console.error('pgHero',e); } };
       wrapped.__chats=true; window.openFlowPage=wrapped;
     }
+    // значки в шапці папки рахуються наново після кожного збереження документа
+    const br=window.__flowPageBridge;
+    if(br&&!br.__fh){ const sv=br.save; br.save=function(){ sv.apply(br,arguments); try{ fhSoon(); }catch(_){} }; br.__fh=true; }
   }
   try{ window.createChat=createChat; window.chatsForFolder=chatsForFolder; window.folderAddSheet=folderAddSheet; }catch(_){}
   /* ============ AI І ПРИВАТНІСТЬ: згода + що бачить AI ============
@@ -37798,9 +38357,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function applyTheme(t,persist){scr.classList.toggle('pg-paper',t==='paper');
     document.querySelectorAll('#pgTheme [data-pgtheme]').forEach(function(b){b.classList.toggle('on',b.dataset.pgtheme===t);});
     if(persist){ try{localStorage.setItem(THKEY,t);}catch(_){} }}
+  /* 15.11.2026 (налаштування, варіант A): тема одна на весь застосунок — документ ЗАВЖДИ
+     йде за нею. Старий ручний вибір (THKEY) більше не читається: дві теми сперечались. */
   function pageThemeDefault(){
-    var c=null; try{ c=localStorage.getItem(THKEY); }catch(_){}
-    if(c==='ink'||c==='paper') return c;
     var dark=true;
     try{ var r=document.documentElement, t=r.getAttribute('data-theme')||'dark';
       dark = !(r.classList.contains('t-light')||t==='light'||t==='desk-light'||t==='studio-light'); }catch(_){}
@@ -37810,11 +38369,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      Раніше перший тап «Темна/Світла» закріплював тему назавжди і лише на цьому пристрої,
      звідси різний вигляд на телефоні й ноуті (10.10.2026). */
   window.__pgThemeAuto=function(){ try{ localStorage.removeItem(THKEY); }catch(_){} applyTheme(pageThemeDefault(),false); };
-  window.__pgThemeIsAuto=function(){ var c=null; try{ c=localStorage.getItem(THKEY); }catch(_){} return !(c==='ink'||c==='paper'); };
+  window.__pgThemeIsAuto=function(){ return true; };   // окремої теми документа нема (15.11.2026)
   /* змінили тему застосунку, поки відкритий документ без ручного вибору, — документ слідом */
   try{ new MutationObserver(function(){ if(window.__pgThemeIsAuto()) applyTheme(pageThemeDefault(),false); })
     .observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class']}); }catch(_){}
-  document.getElementById('pgTheme').addEventListener('click',function(e){var b=e.target.closest('[data-pgtheme]');if(b)applyTheme(b.dataset.pgtheme,true);});
+  document.getElementById('pgTheme').addEventListener('click',function(e){var b=e.target.closest('[data-pgtheme]');if(b)applyTheme(pageThemeDefault(),false);});   /* старі кнопки капсули: тема одна — лише за застосунком */
   document.getElementById('pgUndoBtn').onclick=function(){doUndo();};
   document.getElementById('pgShowHiddenBtn').onclick=function(){
     pgShowHidden=!pgShowHidden;
@@ -43517,16 +44076,18 @@ html.t-flat.t-light #scr-home .summary:not(.has-wish) .hweek i.on b{background:v
 .more-index{display:none;}
 
 /* порядок розділів на екрані */
+/* варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені */
 #scr-more [data-sec="profile"]{order:1;}
-#scr-more [data-sec="data"]{order:2;}
-#scr-more [data-sec="look"]{order:3;}
-#scr-more [data-sec="pet"]{order:4;}
-#scr-more [data-sec="ai"]{order:5;}
-#scr-more [data-sec="tools"]{order:6;}
+#scr-more [data-sec="look"]{order:2;}
+#scr-more [data-sec="day"]{order:3;}
+#scr-more [data-sec="data"]{order:4;}
+#scr-more [data-sec="about"]{order:5;}
+#scr-more [data-sec="adv"]{order:6;}
 #scr-more [data-sec="lite"]{order:7;}
 #scr-more [data-sec="dev"]{order:8;}
-#scr-more [data-sec="about"]{order:9;}
-#scr-more [data-sec="danger"]{order:10;}
+#scr-more .acc-zero-list,#scr-more .acc-adv-list{display:flex;flex-direction:column;gap:6px;}
+#scr-more .acc-zero-list .acc-row,#scr-more .acc-adv-list .acc-row{padding-left:6px;}
+#scr-more .acc-zero-list[hidden],#scr-more .acc-adv-list[hidden]{display:none;}
 
 /* ── підпис розділу і група-картка ── */
 #scr-more .mr-sl{font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
