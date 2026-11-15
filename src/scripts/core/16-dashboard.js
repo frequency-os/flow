@@ -537,10 +537,11 @@
   /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
      «Як папка» — одразу нотатка папки, підпапки — блоком «Підпапки» (типово з 16.10.2026, «папка-нотатка»),
      «Стос» — шторка зі списком, «Як на iPhone» — вікно з іконками підпапок поверх Огляду.
-     Поле folders[k].gview: пишемо лише не-типове ('folder' | 'stack' | 'ios'); раніше типовим був «Стос» і він не писався.
-     З 15.11.2026 типове — «Простір»: на весь екран ті самі фото-плитки вкладених папок, що й на Огляді. */
-  const GVIEW={space:['Простір','фото-плитки папок усередині, як на Огляді'],folder:['Як папка','одразу нотатка, підпапки — стрічкою'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
-  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='stack'||v==='ios')?v:'space'; }
+     Поле folders[k].gview: пишемо лише не-типове ('space' | 'stack' | 'ios'); раніше типовим був «Стос» і він не писався.
+     15.11.2026: «Простір» (великі фото-плитки) був типовим кілька годин — Ярослав повернув «Як папка»:
+     всередині групи підпапки мають лишатись маленькими картками, як було. «Простір» — на вибір. */
+  const GVIEW={folder:['Як папка','одразу нотатка, підпапки — стрічкою'],space:['Простір','фото-плитки папок усередині, як на Огляді'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='space'||v==='stack'||v==='ios')?v:'folder'; }
   function openGroupAsChosen(key, from){
     const v=gviewOf(key);
     if(v==='space'){ openFolderGroupSpace(key); return; }
@@ -623,7 +624,7 @@
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
-        const v=b.dataset.gv; if(v==='space') delete f.gview; else f.gview=v;   // типове («Простір») — не пишемо
+        const v=b.dataset.gv; if(v==='folder') delete f.gview; else f.gview=v;   // типове («Як папка») — не пишемо
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });

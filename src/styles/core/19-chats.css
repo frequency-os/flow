@@ -261,12 +261,6 @@
     .ch-sheet-ov{align-items:center;}
     .ch-sheet{border-radius:22px;border:1px solid var(--line);max-width:460px;padding-bottom:18px;}
   }
-  /* підпапки — кружечками, як папки в чаті (15.11.2026): та сама форма скрізь */
-  .sbs-cv{width:52px !important;height:52px !important;border-radius:50% !important;}
-  .sbs-t.full .sbs-cv{box-shadow:0 0 0 2px var(--pgsheet,var(--pg-bg,#14161c)),0 0 0 4px var(--c,var(--pg-acc,var(--accent)));}
-  .sbs-cv .ico{width:22px;height:22px;}
-  .sbs-t.add .sbs-cv{border-style:dashed;}
-  @media(min-width:1024px){ .sbs-cv{width:58px !important;height:58px !important;} }
 
   /* ── вигляд папки «Чат» і «Фото» (15.11.2026, 36-chats.js fhApplyView) ── */
   #fhView{margin:4px 0 14px;}

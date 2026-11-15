@@ -154,7 +154,7 @@
         // сфера (39-spheres.js): шаблон і будівля в «Моєму світі»; поле пишемо лише в сфер
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
         // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
-        if(f.gview==='folder'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // з 15.11.2026 типове — «Простір» (не пишемо)
+        if(f.gview==='space'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // типове — «Як папка» (не пишемо)
         // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo; «Документ» — типове, не пишемо
         if(f.view==='chat'||f.view==='photo') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
