@@ -314,3 +314,11 @@
   }
   /* ноутбук: плитки Гаманця — 4 колонки (місія · конверти · борги×2 стають в один ряд, без дірки праворуч) */
   @media (min-width:1024px){ #scr-finance .wg-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row dense;} }
+
+  /* прогрес місії (15.11.2026): Відлік · Скарбничка · Лічильник (48-widgets.js) */
+  .wd-cnt{display:flex;align-items:baseline;gap:8px;min-width:0;flex-wrap:wrap;}
+  .wd-cnt .wd-cap{-webkit-line-clamp:1;}
+  .wg-t.wd.cnt.sz-l .wd-big.xl{font-size:56px;}
+  .wg-t.wd.sav .wd-big,.wg-t.wd.ctr .wd-big{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wg-t.wd.ctr .wd-acts button[data-n="-1"]{flex:0 0 52px;}
+  .wd-f2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
