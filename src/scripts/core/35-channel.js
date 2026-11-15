@@ -224,9 +224,13 @@
         if(k==='folders'){ chatAddSheet(chKey); return; }
         chTopic=k; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); }); }
     if(chTopic!=='all') h+=`<button class="ch-chip on" data-chall>${chI('back')}Усі записи</button>`;
-    h+=`<span class="ch-lbl">Папки</span>`;
-    fl.forEach(f=>{ h+=`<button class="ch-chip fold" data-chfold="${esc(f.key)}" data-i18n-skip="1"><span class="e">${esc(f.emoji||'📁')}</span>${esc(f.name)}</button>`; });
-    h+=`<button class="ch-chip add" data-chadd aria-label="Додати папку">${chI('plus')}</button>`;
+    // папки чату — кружечками, як сторіс (15.11.2026): фото папки або її іконка на її кольорі
+    h+=`<span class="ch-lbl">Папки</span><span class="chf-row">`;
+    fl.forEach(f=>{ let img=''; try{ img=f.photo?safeImg(window.photoSrc(f.photo)):''; }catch(_){}
+      h+=`<button class="chf" data-chfold="${esc(f.key)}" style="--c:${safeColor(f.c,'#6a7dff')}" aria-label="${esc(f.name)}">`
+        +`<span class="chf-cv"${img?` style="background-image:url('${esc(img)}')"`:''}>${img?'':`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}</span>`
+        +`<span class="chf-n" data-i18n-skip="1">${esc(f.name)}</span></button>`; });
+    h+=`<button class="chf add" data-chadd aria-label="Додати папку"><span class="chf-cv">${chI('plus')}</span><span class="chf-n">Додати</span></button></span>`;
     host.innerHTML=h;
     const all=host.querySelector('[data-chall]'); if(all) all.onclick=()=>{ chTopic='all'; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); };
     host.querySelectorAll('[data-chfold]').forEach(b=>{
@@ -246,9 +250,11 @@
     const f=folders[fkey]; if(!f) return;
     chSheet(esc(f.name),
       `<button class="ch-sheet-row" data-cf="open"><span class="ic">${chI('doc')}</span><span>Відкрити документ</span></button>
+       <button class="ch-sheet-row" data-cf="look"><span class="ic">${chI('camera')}</span><span>Вигляд: фото, іконка, колір</span></button>
        <button class="ch-sheet-row danger" data-cf="unlink"><span class="ic">${chI('close')}</span><span>Відкріпити від чату</span></button>`,
       (ov,close)=>{
         ov.querySelector('[data-cf="open"]').onclick=()=>{ close(); chOpenFolder(fkey); };
+        ov.querySelector('[data-cf="look"]').onclick=()=>{ close(); setTimeout(()=>{ if(window.fhLookSheet) window.fhLookSheet(fkey,{after:renderChChips}); },150); };
         ov.querySelector('[data-cf="unlink"]').onclick=()=>{ close(); chatUnlinkFolder(chKey,fkey); };
       });
   }

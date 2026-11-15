@@ -185,3 +185,21 @@
   .ch-stat small{font-size:11.5px;font-weight:700;color:var(--muted);}
   .ch-stat.on{border-color:var(--fc,var(--accent));background:color-mix(in srgb,var(--fc,var(--accent)) 18%,transparent);}
   .ch-stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* папки чату кружечками-сторіс (15.11.2026): фото або іконка на кольорі папки, назва знизу */
+  .ch-chips:has(.chf-row){align-items:flex-start;flex-wrap:wrap;row-gap:4px;}
+  .ch-chips .ch-lbl{flex-basis:100%;}
+  .chf-row{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;min-width:0;flex:1 1 100%;}
+  .chf-row::-webkit-scrollbar{display:none;}
+  .chf{all:unset;box-sizing:border-box;cursor:pointer;flex:0 0 60px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;
+    color:var(--text);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .chf-cv{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;overflow:hidden;
+    background:color-mix(in srgb,var(--c,#6a7dff) 55%,var(--card)) center/cover no-repeat;color:#fff;
+    box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--c,var(--accent));}
+  .chf-cv .ico{width:22px;height:22px;}
+  .chf-n{width:64px;font-size:11px;font-weight:650;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chf.add .chf-cv{background:transparent;box-shadow:none;border:1.5px dashed var(--line);color:var(--muted);}
+  .chf.add .chf-cv svg{width:20px;height:20px;}
+  .chf.add .chf-n{color:var(--muted);}
+  .chf:active .chf-cv{transform:scale(.95);}
+  .chf:focus-visible .chf-cv{outline:2px solid var(--accent);outline-offset:3px;}

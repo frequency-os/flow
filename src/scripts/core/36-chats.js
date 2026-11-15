@@ -382,6 +382,195 @@
   }
   function pgSubOpen(fk,ck){ if(!folders[ck]) return; window.__fgNext=fk; try{ goFolder(ck); }finally{ window.__fgNext=null; } }
   function pgSubNew(fk){ if(!folders[fk]) return; createFolder(fk,{onCreated:k=>pgSubOpen(fk,k)}); }
+
+  /* ── шапка папки як у чаті (15.11.2026): обкладинка · «‹ · Фото · ＋ · ⋯» · аватар · назва
+     · згорнуті значки «підпапки · завдання · фото · записи», кожен відкриває шторку.
+     Лише вигляд: блоки, назва (#pgTitle переїжджає сюди і назад) і обкладинка
+     (window.__pgCovers) — ті самі, нових ключів у сховищі нема. Розмітка й стилі —
+     від шапки чату (.ch-cover, 18-channel.css). */
+  const FH_I={
+    task:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
+    note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M5 12h14M5 18h9"/></svg>'
+  };
+  function fhBridge(){ return window.__flowPageBridge||null; }
+  function fhWalk(arr,fn){ (arr||[]).forEach(b=>{ if(!b) return; fn(b); if(Array.isArray(b.children)) fhWalk(b.children,fn); }); }
+  // що в папці: підпапки, завдання (з галочкою), фото, записи верхнього рівня
+  function fhStats(fk){
+    const s={kids:[],tasks:[],photos:[],recs:[]};
+    try{ s.kids=typeof groupKids==='function'?groupKids(fk):[]; }catch(_){}
+    let arr=[]; try{ arr=(fhBridge()&&fhBridge().getBlocks())||[]; }catch(_){}
+    // записи — усі блоки, і вкладені теж (крім службових «Підпапки» й роздільника)
+    fhWalk(arr,b=>{ if(b.type==='task') s.tasks.push(b); else if(b.type==='photo'&&b.data) s.photos.push(b);
+      if(b.type!=='subs'&&b.type!=='divider') s.recs.push(b); });
+    return s;
+  }
+  function fhPlain(s){ return String(s==null?'':s).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
+  function fhLabel(b){
+    const t=fhPlain(b.text!=null?b.text:b.title);
+    if(t) return t;
+    const bt=(()=>{ try{ return (fhBridge()&&fhBridge().blockTypes())||{}; }catch(_){ return {}; } })();
+    return (bt[b.type]&&bt[b.type].title)||(b.type==='photo'?'Фото':'Блок');
+  }
+  function fhCoverStyle(fk,f){
+    const api=window.__pgCovers, ck=(()=>{ try{ return fhBridge().curKey(); }catch(_){ return fk; } })();
+    const cov=api?api.get(ck):null;
+    let u='';
+    if(cov&&cov.img){ try{ u=safeImg(cov.img); }catch(_){ u=''; } }
+    if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:50% ${cov.pos==null?50:(+cov.pos||0)}%;`;
+    if(cov&&!cov.img&&api.grads[cov.g||0]) return 'background:'+api.grads[cov.g||0]+';';
+    if(f.photo){ try{ u=safeImg(window.photoSrc(f.photo)); }catch(_){ u=''; }
+      if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`; }
+    const c=safeColor(f.c,'#6a7dff');
+    return `background:linear-gradient(160deg,color-mix(in srgb,${c} 60%,#0f1115),color-mix(in srgb,${c} 14%,var(--bg)));`;
+  }
+  function fhAvatar(f){
+    let u=''; try{ u=f.photo?safeImg(window.photoSrc(f.photo)):''; }catch(_){ u=''; }
+    return u?`<span class="ch-av fh-av fh-av-ph" style="background-image:url('${esc(u)}')"></span>`
+      :`<span class="ch-av fh-av" style="--c:${safeColor(f.c,'#6a7dff')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
+  }
+  function fhChipsHTML(s){
+    const n=(k,v,l,ic)=>`<button class="fh-chip" data-fhs="${k}" aria-label="${l}">${ic}<span>${v}</span></button>`;
+    const td=s.tasks.filter(b=>b.done).length;
+    return (s.kids.length?n('kids',s.kids.length,'Підпапки',chI('folder')):'')
+      +(s.tasks.length?n('tasks',td+'/'+s.tasks.length,'Завдання',FH_I.task):'')
+      +(s.photos.length?n('photos',s.photos.length,'Фото',chI('image')):'')
+      +(s.recs.length?n('recs',s.recs.length,'Записи',FH_I.note):'');
+  }
+  // повернути назву документа на старе місце (сторінка — не папка)
+  function fhTitleHome(){
+    const t=document.getElementById('pgTitle'), sp=document.getElementById('pgSphere');
+    if(t&&sp&&t.parentNode!==sp.parentNode) sp.parentNode.insertBefore(t,sp);
+  }
+  function fhRender(){
+    const scr=document.getElementById('scr-page'), doc=scr&&scr.querySelector('.pg-doc'); if(!doc) return;
+    let el=document.getElementById('pgHero');
+    const fk=pgFolderKey(), f=fk?folders[fk]:null;
+    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero'); fhTitleHome(); return; }
+    if(!el){ el=document.createElement('div'); el.id='pgHero'; el.className='ch-cover fh'; doc.insertBefore(el,doc.firstChild); }
+    el.hidden=false; scr.classList.add('pg-fhero');
+    fhTitleHome();   // спершу винести #pgTitle: innerHTML нижче інакше знищив би поле назви разом зі старою шапкою
+    const s=fhStats(fk);
+    el.innerHTML=`<div class="ch-cov-bg" style="${fhCoverStyle(fk,f)}"></div>
+      <div class="ch-cov-top">
+        <button class="ch-ghost" data-fh="back" aria-label="Назад">${chI('back')}</button>
+        <span class="ch-sp"></span>
+        <button class="ch-chip-photo" data-fh="photo">${chI('camera')}<span>Фото</span></button>
+        <button class="ch-ghost acc" data-fh="add" aria-label="Додати">${chI('plus')}</button>
+        <button class="ch-ghost" data-fh="more" aria-label="Ще дії">${chI('dots')}</button>
+      </div>
+      <div class="ch-cov-title"><button class="fh-avbtn" data-fh="look" aria-label="Вигляд папки: фото, іконка, колір">${fhAvatar(f)}</button>
+        <div class="fh-txt"><div class="fh-tslot"></div><div class="fh-chips">${fhChipsHTML(s)}</div></div></div>`;
+    const t=document.getElementById('pgTitle'); if(t) el.querySelector('.fh-tslot').appendChild(t);
+    const on=(k,fn)=>{ const b=el.querySelector('[data-fh="'+k+'"]'); if(b) b.onclick=fn; };
+    on('back',()=>{ const up=document.getElementById('pgCrumbUp'); if(up&&!up.hidden&&!(up.closest('[hidden]'))) up.click(); else { const bk=document.getElementById('pgBack'); if(bk) bk.click(); } });
+    on('photo',()=>fhCoverSheet(fk));
+    on('add',()=>fhAddSheet(fk));
+    on('more',()=>{ const m=document.getElementById('pgMoreBtn'); if(m) m.click(); });
+    on('look',()=>fhLookSheet(fk));
+    el.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs));
+  }
+  // лише значки — після правок у документі, без перемальовування обкладинки
+  let fhT=null;
+  function fhSoon(){ clearTimeout(fhT); fhT=setTimeout(()=>{ const el=document.getElementById('pgHero'), fk=pgFolderKey();
+    const box=el&&!el.hidden&&el.querySelector('.fh-chips'); if(!box||!fk) return;
+    box.innerHTML=fhChipsHTML(fhStats(fk)); box.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs)); },250); }
+  function fhFlash(id){
+    let r=null; try{ r=document.querySelector('#pgEditor .pgb[data-id="'+CSS.escape(String(id))+'"]'); }catch(_){} if(!r) return;
+    r.scrollIntoView({block:'center'}); r.classList.add('pg-flash'); setTimeout(()=>r.classList.remove('pg-flash'),900);
+  }
+  function fhStatSheet(fk,k){
+    const s=fhStats(fk);
+    if(k==='kids'){
+      chSheet('Підпапки · '+s.kids.length, pgSubStripHTML(fk).replace(/<div class="sbs-h">[^<]*<\/div>/,''),(ov,close)=>{
+        ov.querySelectorAll('[data-pgsub]').forEach(b=>b.onclick=()=>{ close(); pgSubOpen(fk,b.dataset.pgsub); });
+        const sn=ov.querySelector('[data-pgsubnew]'); if(sn) sn.onclick=()=>{ close(); pgSubNew(fk); };
+        ov.querySelectorAll('[data-pgsub]').forEach(b=>chAttachLongPress(b,()=>{ close(); fhLookSheet(b.dataset.pgsub); }));
+      }); return;
+    }
+    if(k==='tasks'){
+      const td=s.tasks.filter(b=>b.done).length;
+      chSheet('Завдання · '+td+' з '+s.tasks.length, `<div class="fh-list">${s.tasks.map(b=>
+        `<div class="ch-sheet-row fh-task${b.done?' done':''}"><button class="fh-box" data-fhdone="${esc(b.id)}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fh-go" data-fhgo="${esc(b.id)}" data-i18n-skip="1">${esc(fhLabel(b))}</button></div>`).join('')}</div>`,(ov,close)=>{
+        ov.querySelectorAll('[data-fhdone]').forEach(btn=>btn.onclick=()=>{
+          const b=s.tasks.find(x=>String(x.id)===btn.dataset.fhdone); if(!b) return;
+          b.done=!b.done; chHaptic('select');
+          try{ fhBridge().save(); }catch(_){}
+          try{ if(window.__pgRender) window.__pgRender(); }catch(_){}
+          const row=btn.closest('.fh-task'); row.classList.toggle('done',!!b.done); btn.setAttribute('aria-pressed',String(!!b.done)); btn.innerHTML=b.done?chI('check'):'';
+          const tt=ov.querySelector('.ch-sheet-t'); if(tt) tt.textContent='Завдання · '+s.tasks.filter(x=>x.done).length+' з '+s.tasks.length;
+          fhSoon();
+        });
+        ov.querySelectorAll('[data-fhgo]').forEach(b=>b.onclick=()=>{ close(); fhFlash(b.dataset.fhgo); });
+      }); return;
+    }
+    if(k==='photos'){
+      chSheet('Фото · '+s.photos.length, `<div class="fh-grid">${s.photos.map(b=>{ let u=''; try{ u=safeImg(b.data); }catch(_){}
+        return `<button class="fh-ph" data-fhgo="${esc(b.id)}" style="background-image:url('${esc(u)}')" aria-label="Фото в документі"></button>`; }).join('')}</div>`,(ov,close)=>{
+        ov.querySelectorAll('[data-fhgo]').forEach(b=>b.onclick=()=>{ close(); fhFlash(b.dataset.fhgo); });
+      }); return;
+    }
+    chSheet('Записи · '+s.recs.length, `<div class="fh-list">${s.recs.map(b=>
+      `<button class="ch-sheet-row fh-rec" data-fhgo="${esc(b.id)}"><span class="ic">${b.type==='task'?FH_I.task:(b.type==='photo'?chI('image'):FH_I.note)}</span><span class="fh-rt" data-i18n-skip="1">${esc(fhLabel(b))}</span></button>`).join('')}</div>`,(ov,close)=>{
+      ov.querySelectorAll('[data-fhgo]').forEach(b=>b.onclick=()=>{ close(); fhFlash(b.dataset.fhgo); });
+    });
+  }
+  // «Фото» в шапці — обкладинка документа (той самий механізм, що в чаті й у «＋ Обкладинка»)
+  function fhCoverSheet(fk){
+    const api=window.__pgCovers; if(!api){ chToast('⚠️ Обкладинки недоступні'); return; }
+    const ck=(()=>{ try{ return fhBridge().curKey(); }catch(_){ return fk; } })(), cov=api.get(ck);
+    const sw=api.grads.map((g,i)=>`<button class="ch-sw ${cov&&!cov.img&&(cov.g||0)===i?'on':''}" data-fhgrad="${i}" style="background:${g}" aria-label="Градієнт ${i+1}"></button>`).join('');
+    chSheet('Обкладинка папки',
+      `<button class="ch-sheet-row" data-fhc="photo"><span class="ic">${chI('camera')}</span><span>Вибрати фото</span></button>
+       <div class="ch-sw-row">${sw}</div>
+       ${cov?`<button class="ch-sheet-row danger" data-fhc="clear"><span class="ic">${chI('trash')}</span><span>Прибрати обкладинку</span></button>`:''}`,
+      (ov,close)=>{
+        ov.querySelectorAll('[data-fhgrad]').forEach(b=>b.onclick=()=>{ Promise.resolve(api.set(ck,{g:+b.dataset.fhgrad})).then(fhRender); chHaptic('select'); close(); });
+        ov.querySelector('[data-fhc="photo"]').onclick=()=>{ close(); chPickFile(file=>chShrink(file,1200,760,data=>{ const p=api.get(ck)||{};
+          Promise.resolve(api.set(ck,{img:data,pos:p.pos==null?50:p.pos,dark:p.dark==null?30:p.dark,h:p.h||176})).then(fhRender); })); };
+        const cl=ov.querySelector('[data-fhc="clear"]'); if(cl) cl.onclick=()=>{ api.clear(ck); fhRender(); close(); };
+      });
+  }
+  // «＋» у шапці: блок у кінець, нова підпапка або чат папки
+  function fhAddSheet(fk){
+    chSheet('Додати',
+      `<button class="ch-sheet-row" data-fha="block"><span class="ic">${chI('plus')}</span><span>Блок<small>Текст, фото, таблиця, картка…</small></span></button>
+       <button class="ch-sheet-row" data-fha="sub"><span class="ic">${chI('folderPlus')}</span><span>Підпапка</span></button>
+       <button class="ch-sheet-row" data-fha="chat"><span class="ic">${chI('chat')}</span><span>Чат папки</span></button>`,
+      (ov,close)=>{
+        ov.querySelector('[data-fha="block"]').onclick=()=>{ close(); const p=document.getElementById('pgcPlus')||document.getElementById('pgAddBlock'); if(p) p.click(); };
+        ov.querySelector('[data-fha="sub"]').onclick=()=>{ close(); pgSubNew(fk); };
+        ov.querySelector('[data-fha="chat"]').onclick=()=>{ close(); setTimeout(()=>folderAddSheet(fk),200); };
+      });
+  }
+  // «Вигляд» папки чи підпапки: фото, іконка, колір. Дія людини — звичайний saveFolders()
+  // o.after — що перемалювати ще (кружечки папок у чаті)
+  function fhLookSheet(key,o){
+    const f=folders[key]; if(!f) return;
+    const cur=folderIcon(f), cc=safeColor(f.c,'#6a7dff');
+    let ph=''; try{ ph=f.photo?safeImg(window.photoSrc(f.photo)):''; }catch(_){}
+    const ICONS=(typeof ICON_ALL!=='undefined'?ICON_ALL:[]).slice(0,24);
+    chSheet('Вигляд · '+esc(f.name),
+      `<button class="ch-sheet-row" data-fhl="photo"><span class="ic"${ph?` style="background-image:url('${esc(ph)}');background-size:cover"`:''}>${ph?'':chI('camera')}</span><span>${ph?'Змінити фото':'Вибрати фото'}</span></button>
+       ${ph?`<button class="ch-sheet-row danger" data-fhl="nophoto"><span class="ic">${chI('trash')}</span><span>Прибрати фото</span></button>`:''}
+       <div class="fh-ic-grid">${ICONS.map(([id,nm])=>`<button class="fh-ic${!ph&&cur===id?' on':''}" data-fhic="${esc(id)}" style="--c:${cc}" aria-label="${esc(nm)}" title="${esc(nm)}"><svg class="ico" aria-hidden="true"><use href="#${esc(id)}"/></svg></button>`).join('')}</div>
+       <div class="fh-colors">${FOLDER_COLORS.map(c=>`<button class="fh-sw${f.c===c?' on':''}" data-fhcol="${c}" style="--sw:${c}" aria-label="Колір" aria-pressed="${f.c===c}"></button>`).join('')}</div>`,
+      (ov,close)=>{
+        const done=()=>{ saveFolders(); try{ renderDashboard(); }catch(_){}
+          if(document.getElementById('scr-page')?.classList.contains('active')){ fhRender(); try{ renderPgLinks(); }catch(_){} }
+          try{ if(o&&o.after) o.after(); }catch(_){} chHaptic('select'); };
+        ov.querySelector('[data-fhl="photo"]').onclick=()=>{ close(); chPickFile(file=>chShrink(file,1400,1400,du=>{
+          const prev=f.photo; f.photoPos=null;
+          Promise.resolve(window.photoPut?window.photoPut('ph_'+key,du):du).then(ref=>{ f.photo=ref; if(prev&&prev!==ref&&window.photoDel) window.photoDel(prev); done(); });
+        })); };
+        const np=ov.querySelector('[data-fhl="nophoto"]'); if(np) np.onclick=()=>{ const prev=f.photo; f.photo=''; f.photoPos=null; if(prev&&window.photoDel) window.photoDel(prev); done(); close(); };
+        // фото папки — ще й обкладинка плитки на Огляді, тож іконка його не стирає: її видно, коли фото нема
+        ov.querySelectorAll('[data-fhic]').forEach(b=>b.onclick=()=>{ f.icon=b.dataset.fhic; f.iconSet=1;
+          if(f.photo) chToast('Іконку видно, коли фото прибрано');
+          done(); close(); });
+        ov.querySelectorAll('[data-fhcol]').forEach(b=>b.onclick=()=>{ f.c=b.dataset.fhcol; done(); close(); });
+      });
+  }
+  try{ window.fhLookSheet=fhLookSheet; }catch(_){}
   // гроші, час, місія й чати папки — для рядка «Гроші» у «Звʼязках» (54-links.js)
   function pgHubData(fk){
     const d={money:null, time:0, mission:null, chats:0};
@@ -425,8 +614,11 @@
     // блок «Чати папки» малюється при кожному відкритті документа
     if(typeof window.openFlowPage==='function' && !window.openFlowPage.__chats){
       const orig=window.openFlowPage;
-      const wrapped=function(opts){ orig(opts); try{ renderPgLinks(); }catch(e){ console.error('pgLinks',e); } };
+      const wrapped=function(opts){ orig(opts); try{ renderPgLinks(); }catch(e){ console.error('pgLinks',e); } try{ fhRender(); }catch(e){ console.error('pgHero',e); } };
       wrapped.__chats=true; window.openFlowPage=wrapped;
     }
+    // значки в шапці папки рахуються наново після кожного збереження документа
+    const br=window.__flowPageBridge;
+    if(br&&!br.__fh){ const sv=br.save; br.save=function(){ sv.apply(br,arguments); try{ fhSoon(); }catch(_){} }; br.__fh=true; }
   }
   try{ window.createChat=createChat; window.chatsForFolder=chatsForFolder; window.folderAddSheet=folderAddSheet; }catch(_){}
