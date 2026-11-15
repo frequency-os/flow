@@ -1174,3 +1174,9 @@
   @media (min-width:1024px){ .pgc{right:auto;bottom:18px;} }
   /* меню блоків відкрите — тимчасовий запас унизу, щоб новий рядок можна було підняти вгору під шапку (03-premium-pack.js positionSlash) */
   #scr-page.pg-slash-room .pg-doc{padding-bottom:75vh !important;}
+
+  /* порожній документ — «чистий аркуш» (15.11.2026): бліде «Почни писати…» на місці першого рядка */
+  .pg-es-quiet{display:block;box-sizing:border-box;padding:10px 0;font-size:17px;line-height:1.5;color:color-mix(in srgb,var(--pg-fg,var(--text)) 30%,transparent);
+    cursor:text;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;min-height:48px;}
+  .pg-es-quiet:hover{color:color-mix(in srgb,var(--pg-fg,var(--text)) 45%,transparent);}
+  .pg-es-quiet:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:3px;border-radius:8px;}

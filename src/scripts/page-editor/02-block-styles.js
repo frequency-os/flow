@@ -551,21 +551,14 @@
     editor.appendChild(pgHeaStrip());
     try{ requestAnimationFrame(pgSgPlace); }catch(_){ try{ pgSgPlace(); }catch(__){} }
     if(!arr || !arr.length){
-      // порожня сторінка — видима заглушка з викликом до дії
+      /* порожня сторінка — «чистий аркуш» (15.11.2026, варіант A «Пустота»): лише бліде
+         «Почни писати…» на місці першого рядка. Рамку з «Текст · Завдання · Картка · Ще…»
+         прибрано: ті самі дії вже є в нижньому полі (＋ і перемикач типу рядка). */
       var empty=document.createElement('div');
-      empty.className='pg-emptystate';
-      var _lb=pgLastGet(), _lbT='';
-      try{ if(_lb){ var _lf=CATALOG.filter(function(c){return c.k===_lb;})[0]; if(_lf)_lbT=_lf.t; } }catch(_){}
-      empty.innerHTML='<div class="pg-es-ic"></div>'
-        +'<div class="pg-es-t">Тут поки порожньо</div>'
-        +'<div class="pg-es-d">Почни з чогось одного — решту додаси по ходу</div>'
-        +'<div class="pg-es-qk">'
-          +'<button class="pri" data-pgqk="note">Текст</button>'
-          +'<button data-pgqk="task">Завдання</button>'
-          +'<button data-pgqk="card">Картка</button>'
-          +'<button data-pgqk="_more">Ще…</button>'
-        +'</div>'
-        +(_lbT?'<div class="pg-es-last" data-pgqk="'+_lb+'">↩ Минулого разу ти починав з <b>'+esc(_lbT)+'</b></div>':'');
+      empty.className='pg-es-quiet';
+      empty.setAttribute('role','button'); empty.tabIndex=0;
+      empty.textContent='Почни писати…';
+      empty.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); empty.click(); } });
       empty.onclick=function(e){
         var q=e.target&&e.target.closest&&e.target.closest('[data-pgqk]');
         var k=(q&&q.dataset.pgqk)||'note';

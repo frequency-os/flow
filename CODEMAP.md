@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 93 |
-| Рядків JS | 34780 |
+| Рядків JS | 34773 |
 | Файлів CSS | 48 |
-| Рядків CSS | 10851 |
+| Рядків CSS | 10857 |
 | Сутностей верхнього рівня | 2547 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -94,7 +94,7 @@
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
 | `src/scripts/page-editor/01-palette.js` | 183 | 17 |
-| `src/scripts/page-editor/02-block-styles.js` | 769 | 49 |
+| `src/scripts/page-editor/02-block-styles.js` | 762 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1007 | 53 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
@@ -137,7 +137,7 @@
 | `src/styles/22-more-screen.css` | 183 | 0 |
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1176 | 9 |
+| `src/styles/core/02-page-editor.css` | 1182 | 9 |
 | `src/styles/core/03-folders-projects.css` | 665 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -2819,16 +2819,16 @@
 | `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:519` |
 | `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:529` |
 | `render` | функція | `src/scripts/page-editor/02-block-styles.js:545` |
-| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:588` |
-| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:600` |
-| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:606` |
-| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:609` |
-| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:687` |
-| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:689` |
-| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:690` |
-| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:691` |
-| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:701` |
-| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:710` |
+| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:581` |
+| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:593` |
+| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:599` |
+| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:602` |
+| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:680` |
+| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:682` |
+| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:683` |
+| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:684` |
+| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:694` |
+| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:703` |
 
 ### `src/scripts/page-editor/03-premium-pack.js` — 53 сутностей
 
