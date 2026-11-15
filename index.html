@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-15-1946-605b4fa';
+  var BUILD='2026-11-15-2014-b32fd2d';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -2444,6 +2444,25 @@
   /* «Список»/«Журнал» на всю ширину (margin 0 -18px, заокруглений верх) — заголовкам розділів потрібен свій бічний відступ */
   #folderGrid.fv2-list .fprio-h,#folderGrid.fv2-mag .fprio-h{padding:0 20px;margin:14px 0 6px;}
   #folderGrid.fv2-list .fprio-h:first-child,#folderGrid.fv2-mag .fprio-h:first-child{padding-top:14px;margin-top:0;}
+
+  /* «Куди перемістити» — деревом, з фото й шляхом (15.11.2026, 16-dashboard.js openFolderMovePicker) */
+  .fmv-list{max-height:min(62vh,560px);overflow-y:auto;}
+  .fmv{display:flex;align-items:center;gap:10px;padding-left:calc(10px + var(--d,0) * 22px) !important;}
+  .fmv-th{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;
+    background:color-mix(in srgb,var(--c,#6a7dff) 60%,var(--card)) center/cover no-repeat;}
+  .fmv-th .ico{width:18px;height:18px;}
+  .fmv-th.home{background:transparent;border:1.5px dashed var(--line);color:var(--muted);font-size:18px;}
+  .fmv-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .fmv-t b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fmv-t small{font-size:12px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fmv.on{background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:12px;}
+  .fmv-ok{font-size:12px;font-weight:700;color:var(--accent);}
+  /* ручка ⠿ на плитці Огляду: лише мишка й лише при наведенні; у «Просторі» групи перетягування нема — і ручки нема */
+  .fc3 .fc3-grip{top:8px;left:8px;bottom:auto;right:auto;opacity:0;pointer-events:none;transition:opacity .15s;}
+  @media (hover:hover) and (pointer:fine){
+    #folderGrid .fc3:hover .fc3-grip,#folderGrid .fc3:focus-within .fc3-grip{opacity:1;pointer-events:auto;}
+  }
+  #fspGrid .fc3-grip{display:none;}
   /* ===== універсальне меню дій / підтвердження ===== */
   .asheet{position:fixed;inset:0;background:rgba(8,10,16,.55);backdrop-filter:blur(5px);
     display:flex;align-items:flex-end;justify-content:center;z-index:1300;animation:fadein .2s;}
@@ -6954,6 +6973,23 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 .fmc.fmc-tap{display:block;width:100%;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .fmc.fmc-tap:active{transform:scale(.99);}
 .fmc.fmc-tap:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* ── «Простір» (15.11.2026, вечір): верхня смуга з назвою, сама папка — великою фото-карткою-кнопкою ── */
+.fsp-bar{display:flex;align-items:center;gap:10px;}
+.fsp-bar .ch-ghost{background:var(--card);border-color:var(--line);color:var(--text);backdrop-filter:none;-webkit-backdrop-filter:none;}
+.fsp-bt{flex:1;min-width:0;font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fsp-cov.fsp-open{all:unset;box-sizing:border-box;display:block;position:relative;width:100%;height:190px;border-radius:24px;overflow:hidden;isolation:isolate;cursor:pointer;
+  background:color-mix(in srgb,var(--c,#6a7dff) 40%,var(--card)) center/cover no-repeat;-webkit-tap-highlight-color:transparent;}
+.fsp-cov.fsp-open::after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.65));}
+.fsp-cov.fsp-open:active{transform:scale(.99);}
+.fsp-cov.fsp-open:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+.fsp-open .fsp-t{right:120px;}
+.fsp-go{position:absolute;right:14px;bottom:16px;z-index:2;display:inline-flex;align-items:center;gap:4px;height:34px;padding:0 12px;border-radius:17px;
+  background:rgba(10,12,18,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:13px;font-weight:700;}
+.fsp-go svg{width:14px;height:14px;}
+.fsp-lbl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+#fspGrid{padding-top:4px;}
+@media (min-width:1024px){ .fsp-cov.fsp-open{height:220px;} }
   /* ============ ЖУРНАЛ ГЕРОЯ (41-journal.js): герой, ресурси, тиждень, місії; редактор місії ============ */
   #jnBody{display:flex;flex-direction:column;gap:12px;}
   #jnBody button{font-family:inherit;}
@@ -12377,7 +12413,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         // сфера (39-spheres.js): шаблон і будівля в «Моєму світі»; поле пишемо лише в сфер
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
         // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
-        if(f.gview==='space'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // типове — «Як папка» (не пишемо)
+        if(f.gview==='folder'||f.gview==='space'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // без поля — «Простір» (типове з 15.11.2026)
         // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo; «Документ» — типове, не пишемо
         if(f.view==='chat'||f.view==='photo') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
@@ -21742,7 +21778,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // підпис під назвою: лише те, що справді щось каже («0 активних» — шум)
   function fc3Meta(k,f){
     const n=groupKids(k).length;
-    if(n) return 'група · '+n+' '+pluralUk(n,'папка','папки','папок');
+    // вкладені глибше теж рахуємо: інакше папка, покладена в підпапку, «зникала» — підпис не мінявся (15.11.2026)
+    if(n){ let all=0; const seen={}; const walk=(x,d)=>{ if(d>20) return; groupKids(x).forEach(c=>{ if(seen[c]) return; seen[c]=1; all++; walk(c,d+1); }); }; walk(k,0);   // запобіжник від циклу parent
+      return 'група · '+n+' '+pluralUk(n,'папка','папки','папок')+(all>n?' · ще '+(all-n)+' глибше':''); }
     if(f.role==='page') return 'сторінка';
     // папка-сфера з місією (12.10.2026): відсоток місії і справи цього тижня — щоб з Огляду було видно рух
     try{ const g=wgFolderMission(k); if(g){ let done=0, plan=0;
@@ -21785,8 +21823,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     }
     h+=`<div class="fc3-label"><div class="fc3-name" data-i18n-skip="1">${prioDot(k)}${f.pinned?`<span class="fc3-pin" title="Закріплена">${fc3Svg('pin')}</span>`:''}${esc(f.name)}</div>${meta?`<div class="fc3-meta">${esc(meta)}</div>`:''}</div>`;
     h+=`<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню папки «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
+    // ручка для мишки (15.11.2026): видно лише при наведенні на комп'ютері; на телефоні — затиснути плитку
+    h+=`<span class="fdrag-handle fc3-grip" aria-hidden="true" title="Тягни: на папку — всередину, між папками — переставити">⠿</span>`;
     el.innerHTML=h;
-    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
+    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')||e.target.closest('.fdrag-handle')) return;
       if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
       if(isGroup){ openGroupAsChosen(k); return; }
       goFolder(k); };
@@ -22093,11 +22133,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
      «Як папка» — одразу нотатка папки, підпапки — блоком «Підпапки» (типово з 16.10.2026, «папка-нотатка»),
      «Стос» — шторка зі списком, «Як на iPhone» — вікно з іконками підпапок поверх Огляду.
-     Поле folders[k].gview: пишемо лише не-типове ('space' | 'stack' | 'ios'); раніше типовим був «Стос» і він не писався.
+     Поле folders[k].gview: з 15.11.2026 (вечір) типовий знову «Простір» — Ярослав: зверху сама папка, знизу перенесені
+     фото-плитками. Тепер пишемо будь-який явний вибір ('folder' | 'space' | 'stack' | 'ios'); без поля — «Простір».
      15.11.2026: «Простір» (великі фото-плитки) був типовим кілька годин — Ярослав повернув «Як папка»:
      всередині групи підпапки мають лишатись маленькими картками, як було. «Простір» — на вибір. */
   const GVIEW={folder:['Як папка','одразу нотатка, підпапки — стрічкою'],space:['Простір','фото-плитки папок усередині, як на Огляді'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
-  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='space'||v==='stack'||v==='ios')?v:'folder'; }
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='stack'||v==='ios')?v:'space'; }
   function openGroupAsChosen(key, from){
     const v=gviewOf(key);
     if(v==='space'){ openFolderGroupSpace(key); return; }
@@ -22119,15 +22160,18 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       if(!folders[key]){ close(); return; }
       const kids=groupKids(key);
       let u=''; try{ u=(g.photo&&folderOpts.covers)?safeImg(window.photoSrc(g.photo)):''; }catch(_){ u=''; }
+      /* 15.11.2026 (вечір, Ярослав): зверху — САМА папка великою фото-карткою «Відкрити →» (тап — у її документ),
+         нижче — «Папки всередині · N» плитками. Окремий рядок «Нотатки» внизу прибрано: його замінює картка. */
       ov.innerHTML=`<div class="fsp" style="--c:${safeColor(g.c,'#6a7dff')}">
-        <div class="fsp-cov"${u?` style="background-image:url('${esc(u)}')"`:''}>
-          <div class="fsp-top"><button class="ch-ghost" data-fsp="close" aria-label="Закрити">${chI('back')}</button><span class="ch-sp"></span>
-            <button class="ch-ghost" data-fsp="more" aria-label="Налаштування групи">${chI('dots')}</button></div>
-          <div class="fsp-t"><b data-i18n-skip="1">${esc(g.name)}</b><small>${kids.length} ${pluralUk(kids.length,'папка','папки','папок')} · простір</small></div>
-        </div>
+        <div class="fsp-bar"><button class="ch-ghost" data-fsp="close" aria-label="Назад">${chI('back')}</button>
+          <b class="fsp-bt" data-i18n-skip="1">${esc(g.name)}</b>
+          <button class="ch-ghost" data-fsp="more" aria-label="Налаштування групи">${chI('dots')}</button></div>
+        <button class="fsp-cov fsp-open" data-fsp="open"${u?` style="background-image:url('${esc(u)}')"`:''} aria-label="Відкрити папку «${esc(g.name)}»">
+          <span class="fsp-t"><b data-i18n-skip="1">${esc(g.name)}</b><small>нотатки, завдання, фото папки</small></span>
+          <span class="fsp-go">Відкрити ${chI('chev')}</span>
+        </button>
+        <div class="fsp-lbl">Папки всередині · ${kids.length}</div>
         <div id="fspGrid" class="fv2-gallery"></div>
-        <button class="fsp-notes" data-fsp="notes"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12.5h6M9 16h4"/></svg></span>
-          <span>Нотатки «<span data-i18n-skip="1">${esc(g.name)}</span>»<small>документ самої папки</small></span><span class="go">›</span></button>
       </div>`;
       const grid=ov.querySelector('#fspGrid');
       kids.forEach(ck=>{ const t=fc3Tile(ck);
@@ -22143,7 +22187,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); close(); pickFolderPhoto(b.dataset.fphoto); });
       ov.querySelector('[data-fsp="close"]').onclick=close;
       ov.querySelector('[data-fsp="more"]').onclick=()=>openFolderMenu(key);
-      ov.querySelector('[data-fsp="notes"]').onclick=()=>{ close(); window.__fgNext=g.parent||''; try{ goFolder(key); }finally{ window.__fgNext=null; } };
+      ov.querySelector('[data-fsp="open"]').onclick=()=>{ close(); window.__fgNext=g.parent||''; try{ goFolder(key); }finally{ window.__fgNext=null; } };
     };
     draw(); document.body.appendChild(ov); document.addEventListener('keydown',onKey);
     try{ ov.querySelector('[data-fsp="close"]').focus({preventScroll:true}); }catch(_){}
@@ -22180,7 +22224,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
-        const v=b.dataset.gv; if(v==='folder') delete f.gview; else f.gview=v;   // типове («Як папка») — не пишемо
+        const v=b.dataset.gv; if(v==='space') delete f.gview; else f.gview=v;   // типове («Простір») — не пишемо; «Як папка» пишемо
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
@@ -22705,21 +22749,34 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(back) back.onclick=()=>openFolderLook(key);
   }
 
+  /* «Перемістити в папку» (15.11.2026): список ДЕРЕВОМ — вкладені з відступом і шляхом «Здоров'я › Гроші».
+     Раніше всі папки йшли одним рівнем, і папка, покладена у вкладену, «зникала» з Огляду без сліду. */
+  function folderPathName(k){ const a=[]; let cur=k, g=0; while(cur&&folders[cur]&&g++<20){ a.unshift(folders[cur].name||'Папка'); cur=folders[cur].parent||''; } return a.join(' › '); }
   function openFolderMovePicker(key){
     const f=folders[key]; if(!f) return;
     closeFolderMenu();
-    const targets=orderedFolderKeys().filter(k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k));
+    const ok=k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k);
+    const rows=[]; const walk=(k,d)=>{ if(!ok(k)) return; rows.push([k,d]); childFolderKeys(k).forEach(c=>walk(c,d+1)); };
+    topFolderKeys().forEach(k=>walk(k,0));
+    const thumb=tf=>{ let u=''; try{ u=tf.photo?safeImg(window.photoSrc(tf.photo)):''; }catch(_){ u=''; }
+      return `<span class="fmv-th" style="--c:${safeColor(tf.c,'#6a7dff')}${u?`;background-image:url('${esc(u)}')`:''}">${u?'':`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(tf))}"/></svg>`}</span>`; };
     const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='fmenuSheet';
-    const rootRow=(f.parent||'')?`<button class="fmi" data-mv="">🏠 На головну (без папки)</button>`:'';
-    const rows=targets.map(k=>{ const tf=folders[k]; const cur=(f.parent||'')===k?' ✓':'';
-      const em=(tf.emoji&&tf.emoji.trim())?esc(tf.emoji):'📁';
-      return `<button class="fmi" data-mv="${esc(k)}"><span class="gfp-em">${em}</span> ${esc(tf.name)}${cur}</button>`; }).join('');
+    const rootRow=(f.parent||'')?`<button class="fmi fmv" data-mv=""><span class="fmv-th home">⌂</span><span class="fmv-t"><b>На Огляд</b><small>без папки</small></span></button>`:'';
+    const list=rows.map(([k,d])=>{ const tf=folders[k], cur=(f.parent||'')===k;
+      return `<button class="fmi fmv${cur?' on':''}" data-mv="${esc(k)}" style="--d:${d}">${thumb(tf)}<span class="fmv-t"><b data-i18n-skip="1">${esc(tf.name)}</b>${d?`<small data-i18n-skip="1">у «${esc(folderPathName(tf.parent))}»</small>`:''}</span>${cur?'<span class="fmv-ok">тут</span>':''}</button>`; }).join('');
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
-      <div class="fmenu-title">Група для «${esc(f.name)}»</div>
-      ${rootRow}${rows||'<div class="fmi-label">Немає інших папок</div>'}</div>`;
+      <div class="fmenu-title">Куди перемістити «${esc(f.name)}»</div>
+      <div class="fmv-list">${rootRow}${list||'<div class="fmi-label">Немає інших папок</div>'}</div></div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
-    m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ moveFolderTo(key,b.dataset.mv); closeFolderMenu(); });
+    m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{
+      const to=b.dataset.mv, prev=f.parent||''; closeFolderMenu();
+      if(to===prev) return;
+      moveFolderTo(key,to);
+      try{ window.platform.haptic('success'); }catch(_){}
+      // куди саме лягла — повним шляхом, і «Скасувати» повертає на старе місце
+      try{ if(window.flowUndoToast) window.flowUndoToast(to?('Покладено в «'+folderPathName(to)+'»'):'Винесено на Огляд', ()=>moveFolderTo(key,prev), 7000); }catch(_){}
+    });
   }
   function folderAction(key,act){
     const f=folders[key]; if(!f) return;
@@ -26826,7 +26883,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const ic=c.icon||folderIconFor(c.emoji);
         // сфера (39-spheres.js): лише два короткі рядки, усе інше відкидаємо
         const sph=(c.sphere&&typeof c.sphere.tpl==='string')?{tpl:c.sphere.tpl.slice(0,16),bld:String(c.sphere.bld||'').slice(0,16)}:undefined;
-        const gv=(c.gview==='space'||c.gview==='stack'||c.gview==='ios')?c.gview:undefined;   // типове «Як папка» не пишеться ('folder' зі старих конфігів = типове)
+        const gv=(c.gview==='folder'||c.gview==='space'||c.gview==='stack'||c.gview==='ios')?c.gview:undefined;   // без поля — «Простір»; 'folder' — явний вибір «Як папка»
         const pr=folderPrioOk(c.prio)?c.prio:undefined;
         const vw=(c.view==='chat'||c.view==='photo')?c.view:undefined;   // вигляд папки (36-chats.js fhView); решта — «Документ»
         if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw}); }
