@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 93 |
-| Рядків JS | 34769 |
+| Рядків JS | 34758 |
 | Файлів CSS | 48 |
 | Рядків CSS | 10850 |
 | Сутностей верхнього рівня | 2549 |
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1695 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1262 | 67 |
+| `src/scripts/core/16-dashboard.js` | 1251 | 67 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -1316,21 +1316,21 @@
 | `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:798` |
 | `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:805` |
 | `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:824` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:883` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:906` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:934` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:1006` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:1026` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:1027` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:1028` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1029` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1091` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1107` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1129` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1138` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1171` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1187` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1232` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:872` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:895` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:923` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:995` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:1015` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:1016` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:1017` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1018` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1080` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1096` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1118` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1127` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1160` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1176` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1221` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -2879,7 +2879,7 @@
 | `bmRun` | функція | `src/scripts/page-editor/03-premium-pack.js:748` |
 | `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:793` |
 | `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:794` |
-| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:797` |
+| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:799` |
 | `window.__pgThemeAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:808` |
 | `window.__pgThemeIsAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:809` |
 | `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:823` |

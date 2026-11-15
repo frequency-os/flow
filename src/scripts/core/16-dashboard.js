@@ -825,7 +825,6 @@
     const fk=pgBarFolder();
     const undo=document.getElementById('pgUndoBtn'), hid=document.getElementById('pgShowHiddenBtn');
     const mic=document.getElementById('pgMicBtn'), wide=document.getElementById('pgWideBtn');
-    const theme=(window.__pgThemeIsAuto&&window.__pgThemeIsAuto())?'auto':(document.getElementById('scr-page').classList.contains('pg-paper')?'paper':'ink');
     const live=!!(mic&&mic.classList.contains('live'));
     const wideOn=document.getElementById('scr-page').classList.contains('pg-wide');
     const hasCond=pgBarHasCond(), hidOn=!!(hid&&hid.classList.contains('on'));
@@ -841,11 +840,6 @@
       ${r('mic','🎙',live?'Зупинити диктування':'Диктувати','у блок, де стоїть курсор')}
       ${r('wide','⛶',wideOn?'Звичайна ширина':'На весь екран','')}
       ${hasCond?r('hid','◌',hidOn?'Ховати блоки з умовою':'Показати сховані блоки','блоки з умовою показу'):''}
-      <div class="fmi-label">Тема документа</div>
-      <div class="pgb-seg" role="group" aria-label="Тема документа">
-        <button data-pgth="auto" class="${theme==='auto'?'on':''}" aria-pressed="${theme==='auto'}">Як застосунок</button>
-        <button data-pgth="ink" class="${theme==='ink'?'on':''}" aria-pressed="${theme==='ink'}">Темна</button>
-        <button data-pgth="paper" class="${theme==='paper'?'on':''}" aria-pressed="${theme==='paper'}">Світла</button></div>
       ${r('cover','🖼',hasCov?'Обкладинка':'Додати обкладинку',hasCov?'змінити, зсунути чи прибрати':'фото або колір над назвою')}
       ${fk?`<div class="fmi-label">Папка</div>
       <div class="pgb-seg" role="group" aria-label="Вигляд папки">${vb('doc','Документ')}${vb('chat','Чат')}${vb('photo','Фото')}${vb('feed','Стрічка')}</div>
@@ -872,11 +866,6 @@
         if(v!=='feed'&&typeof fhView==='function'&&fhView(fk)!==v){ try{ fhSetView(fk,v); }catch(_){} }   // вибір людини — зберігається в папці
         try{ renderPgLinks(); }catch(_){} try{ if(typeof fhApplyView==='function') fhApplyView(); }catch(_){}
         m.querySelectorAll('[data-lkv]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
-      });
-      m.querySelectorAll('[data-pgth]').forEach(b=>b.onclick=()=>{
-        if(b.dataset.pgth==='auto'){ try{ window.__pgThemeAuto&&window.__pgThemeAuto(); }catch(_){} }
-        else { const t=document.querySelector('#pgTheme [data-pgtheme="'+b.dataset.pgth+'"]'); if(t) t.click(); }
-        m.querySelectorAll('[data-pgth]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
       });
     });
   }

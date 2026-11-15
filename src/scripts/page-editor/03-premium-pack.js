@@ -794,9 +794,9 @@
   function applyTheme(t,persist){scr.classList.toggle('pg-paper',t==='paper');
     document.querySelectorAll('#pgTheme [data-pgtheme]').forEach(function(b){b.classList.toggle('on',b.dataset.pgtheme===t);});
     if(persist){ try{localStorage.setItem(THKEY,t);}catch(_){} }}
+  /* 15.11.2026 (налаштування, варіант A): тема одна на весь застосунок — документ ЗАВЖДИ
+     йде за нею. Старий ручний вибір (THKEY) більше не читається: дві теми сперечались. */
   function pageThemeDefault(){
-    var c=null; try{ c=localStorage.getItem(THKEY); }catch(_){}
-    if(c==='ink'||c==='paper') return c;
     var dark=true;
     try{ var r=document.documentElement, t=r.getAttribute('data-theme')||'dark';
       dark = !(r.classList.contains('t-light')||t==='light'||t==='desk-light'||t==='studio-light'); }catch(_){}
@@ -806,11 +806,11 @@
      Раніше перший тап «Темна/Світла» закріплював тему назавжди і лише на цьому пристрої,
      звідси різний вигляд на телефоні й ноуті (10.10.2026). */
   window.__pgThemeAuto=function(){ try{ localStorage.removeItem(THKEY); }catch(_){} applyTheme(pageThemeDefault(),false); };
-  window.__pgThemeIsAuto=function(){ var c=null; try{ c=localStorage.getItem(THKEY); }catch(_){} return !(c==='ink'||c==='paper'); };
+  window.__pgThemeIsAuto=function(){ return true; };   // окремої теми документа нема (15.11.2026)
   /* змінили тему застосунку, поки відкритий документ без ручного вибору, — документ слідом */
   try{ new MutationObserver(function(){ if(window.__pgThemeIsAuto()) applyTheme(pageThemeDefault(),false); })
     .observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class']}); }catch(_){}
-  document.getElementById('pgTheme').addEventListener('click',function(e){var b=e.target.closest('[data-pgtheme]');if(b)applyTheme(b.dataset.pgtheme,true);});
+  document.getElementById('pgTheme').addEventListener('click',function(e){var b=e.target.closest('[data-pgtheme]');if(b)applyTheme(pageThemeDefault(),false);});   /* старі кнопки капсули: тема одна — лише за застосунком */
   document.getElementById('pgUndoBtn').onclick=function(){doUndo();};
   document.getElementById('pgShowHiddenBtn').onclick=function(){
     pgShowHidden=!pgShowHidden;
