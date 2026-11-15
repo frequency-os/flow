@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-15-1833-80ec381';
+  var BUILD='2026-11-15-1946-605b4fa';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1756,6 +1756,29 @@
     cursor:text;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;min-height:48px;}
   .pg-es-quiet:hover{color:color-mix(in srgb,var(--pg-fg,var(--text)) 45%,transparent);}
   .pg-es-quiet:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:3px;border-radius:8px;}
+
+  /* ── нижнє поле як у чаті (15.11.2026): малий «＋», поле в один рядок, одна кнопка типу з меню, ↑ ── */
+  #pgComposer .pgc-plus{width:44px;height:44px;border-radius:22px;background:color-mix(in srgb,var(--pg-fg) 8%,var(--pg-bg,#14161c)) !important;
+    color:var(--pg-fg) !important;box-shadow:none !important;border:1px solid color-mix(in srgb,var(--pg-fg) 10%,transparent);}
+  #pgComposer .pgc-plus svg{width:20px;height:20px;stroke-width:2.2;}
+  #pgComposer .pgc-field{flex-direction:row;align-items:flex-end;gap:4px;padding:4px;border-radius:22px;min-height:44px;}
+  #pgComposer .pgc-lines{flex:1;padding:0 4px;}
+  #pgComposer .pgc-bar{display:none;}
+  #pgComposer .pgc-mode{flex:none;width:36px;height:36px;border-radius:18px;border:0;padding:0;cursor:pointer;display:grid;place-items:center;
+    background:color-mix(in srgb,var(--pg-acc) 16%,transparent);color:var(--pg-acc);}
+  #pgComposer .pgc-mode svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  #pgComposer .pgc-mode circle{fill:currentColor;stroke:none;}
+  #pgComposer .pgc-send{width:36px;height:36px;border-radius:18px;}
+  #pgComposer .pgc-mode:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
+  .pgc-mmenu{position:absolute;left:56px;bottom:calc(100% + 8px);min-width:170px;padding:4px;border-radius:14px;z-index:2;
+    background:var(--pg-surface,var(--card));border:1px solid color-mix(in srgb,var(--pg-fg) 12%,transparent);box-shadow:0 14px 34px -14px rgba(0,0,0,.6);}
+  .pgc-mmenu[hidden]{display:none;}
+  .pgc-mmenu button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border-radius:10px;
+    color:var(--pg-fg);font-size:15px;font-weight:600;}
+  .pgc-mmenu button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .pgc-mmenu button circle{fill:currentColor;stroke:none;}
+  .pgc-mmenu button.on{background:color-mix(in srgb,var(--pg-acc) 16%,transparent);color:var(--pg-acc);}
+  .pgc-mmenu button:focus-visible{outline:2px solid var(--pg-acc);}
 /* ══════════════════════════════════════════════════════════════════
    ЧОМУ ТУТ СКРІЗЬ var(--c, #6a7dff), а не просто var(--c)
 
@@ -38417,13 +38440,31 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     var wrap=document.getElementById('pgcLines'), send=document.getElementById('pgcSend'),
         modes=document.getElementById('pgcModes'), count=document.getElementById('pgcCount'),
         scr=document.getElementById('scr-page');
-    var PH={note:'Нотатка…', task:'Завдання…', bullet:'Пункт списку…'},
+    var PH={note:'Написати…', task:'Завдання…', bullet:'Пункт списку…'},
         NAME={note:'текст', task:'завдання', bullet:'пункт списку'};
     var lines=[{t:'note',text:''}], cur=0;
     function plR(n){ var m10=n%10, m100=n%100; return (m10===1&&m100!==11)?'рядок':(m10>=2&&m10<=4&&(m100<12||m100>14))?'рядки':'рядків'; }
     function filled(){ return lines.filter(function(l){ return l.text.trim(); }); }
+    /* поле як у чаті (15.11.2026): «Т · Завдання · Список» — одна кнопка зі значком поточного типу,
+       тап — коротке меню. Старі кнопки #pgcModes лишаються схованими: тип міняє їхній же обробник. */
+    var field=box.querySelector('.pgc-field'), modeBtn=document.createElement('button'), modeMenu=document.createElement('div');
+    modeBtn.type='button'; modeBtn.className='pgc-mode'; modeBtn.setAttribute('aria-haspopup','true'); modeBtn.setAttribute('aria-expanded','false');
+    modeMenu.className='pgc-mmenu'; modeMenu.hidden=true; modeMenu.setAttribute('role','menu');
+    var MIC={}; modes.querySelectorAll('[data-pgcmode]').forEach(function(b){ MIC[b.dataset.pgcmode]=b.innerHTML; });
+    modeMenu.innerHTML=['note','task','bullet'].map(function(k){ return '<button type="button" role="menuitemradio" data-pgcm="'+k+'">'+(MIC[k]||'')+'<span>'+({note:'Текст',task:'Завдання',bullet:'Список'})[k]+'</span></button>'; }).join('');
+    if(field){ field.insertBefore(modeBtn, field.firstChild); field.appendChild(send); box.appendChild(modeMenu); }
+    function menuOpen(on){ modeMenu.hidden=!on; modeBtn.setAttribute('aria-expanded',String(on)); }
+    // не забираємо фокус у рядка — інакше на iPhone ховається клавіатура
+    [modeBtn,modeMenu].forEach(function(el){ el.addEventListener('pointerdown',function(e){ e.preventDefault(); }); el.addEventListener('mousedown',function(e){ e.preventDefault(); }); });
+    modeBtn.onclick=function(){ menuOpen(modeMenu.hidden); };
+    modeMenu.addEventListener('click',function(e){ var b=e.target.closest('[data-pgcm]'); if(!b) return;
+      var o=modes.querySelector('[data-pgcmode="'+b.dataset.pgcm+'"]'); if(o) o.click(); menuOpen(false); });
+    document.addEventListener('pointerdown',function(e){ if(!modeMenu.hidden&&!modeMenu.contains(e.target)&&e.target!==modeBtn&&!modeBtn.contains(e.target)) menuOpen(false); },true);
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!modeMenu.hidden) menuOpen(false); });
     function syncBar(){
       var t=(lines[cur]||lines[0]).t, n=filled().length;
+      modeBtn.innerHTML=MIC[t]||''; modeBtn.setAttribute('aria-label','Тип рядка: '+({note:'текст',task:'завдання',bullet:'список'})[t]+' — змінити');
+      modeMenu.querySelectorAll('[data-pgcm]').forEach(function(b){ var on=b.dataset.pgcm===t; b.classList.toggle('on',on); b.setAttribute('aria-checked',String(on)); });
       modes.querySelectorAll('[data-pgcmode]').forEach(function(b){ var on=b.dataset.pgcmode===t; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); });
       count.textContent=n>1?(n+' '+plR(n)+' разом'):'';
       send.disabled=!n;
@@ -38436,7 +38477,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         var mk=document.createElement('span'); mk.className='pgc-mk'; mk.setAttribute('aria-hidden','true');
         var inp=document.createElement('input'); inp.className='pgc-in'; inp.type='text'; inp.value=l.text; inp.dataset.i=i;
         inp.setAttribute('enterkeyhint','enter'); inp.setAttribute('autocomplete','off');
-        inp.placeholder=(lines.length===1&&l.t==='note')?'Нотатка… Enter — новий рядок':PH[l.t];
+        inp.placeholder=PH[l.t];
         inp.setAttribute('aria-label','Рядок '+(i+1)+': '+NAME[l.t]);
         row.appendChild(mk); row.appendChild(inp); wrap.appendChild(row);
       });
