@@ -13,6 +13,9 @@ contextBridge.exposeInMainWorld('flowDesktop', {
   // його відкриє, macOS передасть його сюди, у Frequency.
   authRedirect: 'frequency://auth',
 
+  // Відкрити сторінку входу Google: where = 'safari' | 'default' (див. main.js, flow-open-auth).
+  openAuth(url, where){ return ipcRenderer.invoke('flow-open-auth', { url: String(url||''), where: where === 'safari' ? 'safari' : 'default' }); },
+
   // Підписатись на повернення з входу.
   onAuthCallback(cb){
     ipcRenderer.on('flow-auth-callback', (_e, url) => { try{ cb(url); }catch(_){} });

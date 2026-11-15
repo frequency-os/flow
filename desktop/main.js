@@ -69,6 +69,32 @@ function deliverAuth(url){
   }
 }
 
+/* ── вхід через Google: у якому браузері відкрити (16.11.2026) ──
+   shell.openExternal віддає посилання браузеру за замовчуванням, а той може
+   мовчки його проковтнути (у Ярослава Chrome не відкривав зовнішніх посилань
+   взагалі — «браузер не відкривається»). Тому сторінка дає людині вибір, а тут
+   ми відкриваємо ЛИШЕ сторінку входу Supabase і ЛИШЕ в одному з двох місць. */
+const AUTH_PREFIX = 'https://mogtitbgvrhzyhxmzvhs.supabase.co/auth/v1/authorize?';
+ipcMain.handle('flow-open-auth', async (e, payload) => {
+  // лише від нашої сторінки app://frequency/ (не від чогось, що туди потрапило б)
+  const from = String((e && e.senderFrame && e.senderFrame.url) || '');
+  if (!from.startsWith('app://frequency/')) return { ok:false, error:'bad sender' };
+  const url = String(payload && payload.url || '');
+  const where = payload && payload.where === 'safari' ? 'safari' : 'default';
+  let u = null; try{ u = new URL(url); }catch(_){ u = null; }
+  if (!u || u.origin + u.pathname !== 'https://mogtitbgvrhzyhxmzvhs.supabase.co/auth/v1/authorize'
+      || u.searchParams.get('provider') !== 'google'
+      || !url.startsWith(AUTH_PREFIX) || /[\s"'`]/.test(url)) return { ok:false, error:'bad url' };
+  try{
+    if (where === 'safari') {
+      await new Promise((res, rej) => execFile('/usr/bin/open', ['-a', 'Safari', url], err => err ? rej(err) : res()));
+    } else {
+      await shell.openExternal(url);
+    }
+    return { ok:true };
+  }catch(err){ return { ok:false, error: String(err && err.message || err) }; }
+});
+
 ipcMain.on('flow-auth-ready', () => {
   authReady = true;
   if(pendingAuthUrl){ const u = pendingAuthUrl; pendingAuthUrl = null; deliverAuth(u); }

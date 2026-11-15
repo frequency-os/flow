@@ -868,6 +868,28 @@
         const DESK = window.flowDesktop || null;
         const backTo = (DESK && DESK.authRedirect) ? DESK.authRedirect
                                                    : (location.origin + location.pathname);
+        /* Mac (16.11.2026): браузер за замовчуванням може мовчки проковтнути посилання
+           (у Ярослава Chrome не відкривав зовнішніх посилань — «браузер не відкривається»).
+           Тому не переходимо самі, а беремо адресу входу і даємо вибір, де її відкрити. */
+        if(DESK && typeof DESK.openAuth === 'function'){
+          const { data, error } = await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: backTo, skipBrowserRedirect:true } });
+          const url = data && data.url;
+          if(error || !url){ try{ (window.__flowToast||alert)('Вхід не вдався: '+((error&&error.message)||'нема адреси входу')); }catch(_){} return; }
+          const open = async (where)=>{
+            const r = await DESK.openAuth(url, where).catch(e=>({ok:false,error:String(e&&e.message||e)}));
+            try{ (window.__flowToast||function(){})(r&&r.ok ? 'Відкрито — увійди в браузері, Frequency підхопить вхід сам' : 'Не вдалося відкрити: '+((r&&r.error)||'')); }catch(_){}
+          };
+          const copy = async ()=>{ try{ await navigator.clipboard.writeText(url); (window.__flowToast||function(){})('Посилання скопійовано — встав його в будь-який браузер'); }
+            catch(_){ await open('safari'); } };   // буфер недоступний — prompt в Electron не працює, тож просто відкриваємо в Safari
+          if(typeof actionSheet === 'function'){
+            actionSheet({ title:'Вхід через Google', sub:'Де відкрити сторінку входу? Після входу Frequency підхопить його сам.', items:[
+              { ic:'target', label:'Відкрити в Safari', sub:'надійно на Mac', onClick:()=>open('safari') },
+              { ic:'up', label:'Відкрити в браузері за замовчуванням', sub:'Chrome, Arc чи інший', onClick:()=>open('default') },
+              { ic:'edit', label:'Скопіювати посилання', sub:'встав у будь-який браузер', onClick:copy }
+            ]});
+          } else { await open('safari'); }
+          return;
+        }
         await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: backTo } });
       } finally {
         setTimeout(()=>{ sbSigningIn=false; }, 8000);
