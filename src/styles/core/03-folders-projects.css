@@ -663,3 +663,22 @@
   /* «Список»/«Журнал» на всю ширину (margin 0 -18px, заокруглений верх) — заголовкам розділів потрібен свій бічний відступ */
   #folderGrid.fv2-list .fprio-h,#folderGrid.fv2-mag .fprio-h{padding:0 20px;margin:14px 0 6px;}
   #folderGrid.fv2-list .fprio-h:first-child,#folderGrid.fv2-mag .fprio-h:first-child{padding-top:14px;margin-top:0;}
+
+  /* «Куди перемістити» — деревом, з фото й шляхом (15.11.2026, 16-dashboard.js openFolderMovePicker) */
+  .fmv-list{max-height:min(62vh,560px);overflow-y:auto;}
+  .fmv{display:flex;align-items:center;gap:10px;padding-left:calc(10px + var(--d,0) * 22px) !important;}
+  .fmv-th{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;
+    background:color-mix(in srgb,var(--c,#6a7dff) 60%,var(--card)) center/cover no-repeat;}
+  .fmv-th .ico{width:18px;height:18px;}
+  .fmv-th.home{background:transparent;border:1.5px dashed var(--line);color:var(--muted);font-size:18px;}
+  .fmv-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .fmv-t b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fmv-t small{font-size:12px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fmv.on{background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:12px;}
+  .fmv-ok{font-size:12px;font-weight:700;color:var(--accent);}
+  /* ручка ⠿ на плитці Огляду: лише мишка й лише при наведенні; у «Просторі» групи перетягування нема — і ручки нема */
+  .fc3 .fc3-grip{top:8px;left:8px;bottom:auto;right:auto;opacity:0;pointer-events:none;transition:opacity .15s;}
+  @media (hover:hover) and (pointer:fine){
+    #folderGrid .fc3:hover .fc3-grip,#folderGrid .fc3:focus-within .fc3-grip{opacity:1;pointer-events:auto;}
+  }
+  #fspGrid .fc3-grip{display:none;}

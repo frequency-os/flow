@@ -186,7 +186,9 @@
   // підпис під назвою: лише те, що справді щось каже («0 активних» — шум)
   function fc3Meta(k,f){
     const n=groupKids(k).length;
-    if(n) return 'група · '+n+' '+pluralUk(n,'папка','папки','папок');
+    // вкладені глибше теж рахуємо: інакше папка, покладена в підпапку, «зникала» — підпис не мінявся (15.11.2026)
+    if(n){ let all=0; const seen={}; const walk=(x,d)=>{ if(d>20) return; groupKids(x).forEach(c=>{ if(seen[c]) return; seen[c]=1; all++; walk(c,d+1); }); }; walk(k,0);   // запобіжник від циклу parent
+      return 'група · '+n+' '+pluralUk(n,'папка','папки','папок')+(all>n?' · ще '+(all-n)+' глибше':''); }
     if(f.role==='page') return 'сторінка';
     // папка-сфера з місією (12.10.2026): відсоток місії і справи цього тижня — щоб з Огляду було видно рух
     try{ const g=wgFolderMission(k); if(g){ let done=0, plan=0;
@@ -229,8 +231,10 @@
     }
     h+=`<div class="fc3-label"><div class="fc3-name" data-i18n-skip="1">${prioDot(k)}${f.pinned?`<span class="fc3-pin" title="Закріплена">${fc3Svg('pin')}</span>`:''}${esc(f.name)}</div>${meta?`<div class="fc3-meta">${esc(meta)}</div>`:''}</div>`;
     h+=`<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню папки «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
+    // ручка для мишки (15.11.2026): видно лише при наведенні на комп'ютері; на телефоні — затиснути плитку
+    h+=`<span class="fdrag-handle fc3-grip" aria-hidden="true" title="Тягни: на папку — всередину, між папками — переставити">⠿</span>`;
     el.innerHTML=h;
-    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
+    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')||e.target.closest('.fdrag-handle')) return;
       if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
       if(isGroup){ openGroupAsChosen(k); return; }
       goFolder(k); };
@@ -537,11 +541,12 @@
   /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
      «Як папка» — одразу нотатка папки, підпапки — блоком «Підпапки» (типово з 16.10.2026, «папка-нотатка»),
      «Стос» — шторка зі списком, «Як на iPhone» — вікно з іконками підпапок поверх Огляду.
-     Поле folders[k].gview: пишемо лише не-типове ('space' | 'stack' | 'ios'); раніше типовим був «Стос» і він не писався.
+     Поле folders[k].gview: з 15.11.2026 (вечір) типовий знову «Простір» — Ярослав: зверху сама папка, знизу перенесені
+     фото-плитками. Тепер пишемо будь-який явний вибір ('folder' | 'space' | 'stack' | 'ios'); без поля — «Простір».
      15.11.2026: «Простір» (великі фото-плитки) був типовим кілька годин — Ярослав повернув «Як папка»:
      всередині групи підпапки мають лишатись маленькими картками, як було. «Простір» — на вибір. */
   const GVIEW={folder:['Як папка','одразу нотатка, підпапки — стрічкою'],space:['Простір','фото-плитки папок усередині, як на Огляді'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
-  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='space'||v==='stack'||v==='ios')?v:'folder'; }
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='stack'||v==='ios')?v:'space'; }
   function openGroupAsChosen(key, from){
     const v=gviewOf(key);
     if(v==='space'){ openFolderGroupSpace(key); return; }
@@ -624,7 +629,7 @@
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
-        const v=b.dataset.gv; if(v==='folder') delete f.gview; else f.gview=v;   // типове («Як папка») — не пишемо
+        const v=b.dataset.gv; if(v==='space') delete f.gview; else f.gview=v;   // типове («Простір») — не пишемо; «Як папка» пишемо
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
@@ -1149,21 +1154,34 @@
     if(back) back.onclick=()=>openFolderLook(key);
   }
 
+  /* «Перемістити в папку» (15.11.2026): список ДЕРЕВОМ — вкладені з відступом і шляхом «Здоров'я › Гроші».
+     Раніше всі папки йшли одним рівнем, і папка, покладена у вкладену, «зникала» з Огляду без сліду. */
+  function folderPathName(k){ const a=[]; let cur=k, g=0; while(cur&&folders[cur]&&g++<20){ a.unshift(folders[cur].name||'Папка'); cur=folders[cur].parent||''; } return a.join(' › '); }
   function openFolderMovePicker(key){
     const f=folders[key]; if(!f) return;
     closeFolderMenu();
-    const targets=orderedFolderKeys().filter(k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k));
+    const ok=k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k);
+    const rows=[]; const walk=(k,d)=>{ if(!ok(k)) return; rows.push([k,d]); childFolderKeys(k).forEach(c=>walk(c,d+1)); };
+    topFolderKeys().forEach(k=>walk(k,0));
+    const thumb=tf=>{ let u=''; try{ u=tf.photo?safeImg(window.photoSrc(tf.photo)):''; }catch(_){ u=''; }
+      return `<span class="fmv-th" style="--c:${safeColor(tf.c,'#6a7dff')}${u?`;background-image:url('${esc(u)}')`:''}">${u?'':`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(tf))}"/></svg>`}</span>`; };
     const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='fmenuSheet';
-    const rootRow=(f.parent||'')?`<button class="fmi" data-mv="">🏠 На головну (без папки)</button>`:'';
-    const rows=targets.map(k=>{ const tf=folders[k]; const cur=(f.parent||'')===k?' ✓':'';
-      const em=(tf.emoji&&tf.emoji.trim())?esc(tf.emoji):'📁';
-      return `<button class="fmi" data-mv="${esc(k)}"><span class="gfp-em">${em}</span> ${esc(tf.name)}${cur}</button>`; }).join('');
+    const rootRow=(f.parent||'')?`<button class="fmi fmv" data-mv=""><span class="fmv-th home">⌂</span><span class="fmv-t"><b>На Огляд</b><small>без папки</small></span></button>`:'';
+    const list=rows.map(([k,d])=>{ const tf=folders[k], cur=(f.parent||'')===k;
+      return `<button class="fmi fmv${cur?' on':''}" data-mv="${esc(k)}" style="--d:${d}">${thumb(tf)}<span class="fmv-t"><b data-i18n-skip="1">${esc(tf.name)}</b>${d?`<small data-i18n-skip="1">у «${esc(folderPathName(tf.parent))}»</small>`:''}</span>${cur?'<span class="fmv-ok">тут</span>':''}</button>`; }).join('');
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
-      <div class="fmenu-title">Група для «${esc(f.name)}»</div>
-      ${rootRow}${rows||'<div class="fmi-label">Немає інших папок</div>'}</div>`;
+      <div class="fmenu-title">Куди перемістити «${esc(f.name)}»</div>
+      <div class="fmv-list">${rootRow}${list||'<div class="fmi-label">Немає інших папок</div>'}</div></div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
-    m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ moveFolderTo(key,b.dataset.mv); closeFolderMenu(); });
+    m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{
+      const to=b.dataset.mv, prev=f.parent||''; closeFolderMenu();
+      if(to===prev) return;
+      moveFolderTo(key,to);
+      try{ window.platform.haptic('success'); }catch(_){}
+      // куди саме лягла — повним шляхом, і «Скасувати» повертає на старе місце
+      try{ if(window.flowUndoToast) window.flowUndoToast(to?('Покладено в «'+folderPathName(to)+'»'):'Винесено на Огляд', ()=>moveFolderTo(key,prev), 7000); }catch(_){}
+    });
   }
   function folderAction(key,act){
     const f=folders[key]; if(!f) return;
