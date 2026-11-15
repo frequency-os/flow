@@ -1027,21 +1027,16 @@
     /* обкладинка — першою (06.10.2026): раніше фото ховалось у «Вигляд» → «Додати фото» */
     const ph=!!f.photo, pp=f.photoPos;
     const xf=(ph&&pp)?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
-    const curC=String(f.c||'').toLowerCase();
     fgSheet(`<div class="fmenu-grip"></div>
-      <div class="fmc${ph?' fmc-photo':''}" style="--c:${safeColor(f.c,'#6a7dff')}">
+      <button type="button" class="fmc fmc-tap${ph?' fmc-photo':''}" data-act="appearance" style="--c:${safeColor(f.c,'#6a7dff')}" aria-label="Вигляд папки: фото, іконка, колір">
         ${ph?`<div class="fmc-bg" style="background-image:url('${esc(safeImg(window.photoSrc(f.photo)))}');${xf}"></div>`
             :`<svg class="ico fmc-wm" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg>`}
         <div class="fmc-t"><small>${f.sphere?'Сфера':'Папка'}</small><b data-i18n-skip="1">${esc(f.name)}</b>${sub?`<span data-i18n-skip="1">${sub}</span>`:''}</div>
-      </div>
-      <div class="fmc-acts">
-        <button type="button" class="fmc-btn fmc-main" data-act="photo">${fmIc('photo')}${ph?'Змінити обкладинку':'Додати обкладинку'}</button>
-        ${ph?`<button type="button" class="fmc-btn" data-act="cropphoto">Кадрувати</button><button type="button" class="fmc-btn fmc-del" data-act="rmphoto" aria-label="Прибрати фото">${fmIc('del')}</button>`:''}
-      </div>
-      <div class="fmc-colors"><span>Колір</span>${FOLDER_COLORS.map(c=>`<button type="button" class="fmc-sw${curC===c?' on':''}" data-fcolor="${c}" style="--sw:${c}" aria-label="Колір обкладинки" aria-pressed="${curC===c}"></button>`).join('')}</div>
+      </button>
+      <!-- фото, іконка, емодзі й колір — в одній шторці «Вигляд» (36-chats.js fhLookSheet, 15.11.2026) -->
       <div class="fmi-label">Вигляд</div>
       ${fmRow('rename','pen','Назва','<span data-i18n-skip="1">'+esc(f.name)+'</span>')}
-      ${fmRow('look','look','Значок','лінійна іконка чи емодзі')}
+      ${fmRow('appearance','look','Вигляд: фото, іконка, колір',ph?'фото на обкладинці':'іконка на кольорі')}
       <div class="fmi-label">Порядок</div>
       ${fmRow('pin','pin',f.pinned?'Відкріпити':'Закріпити зверху','')}
       ${fmRow('prio','flag','Пріоритет · '+(folderPrio(key)?FPRIO[folderPrio(key)][0]:'без'),'високий, середній чи низький')}
@@ -1064,10 +1059,6 @@
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));
-      m.querySelectorAll('[data-fcolor]').forEach(b=>b.onclick=()=>{
-        folders[key].c=b.dataset.fcolor; saveFolders(); renderDashboard(); openFolderMenu(key);
-        try{ window.platform.haptic('select'); }catch(_){}
-      });
       m.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{
         folders[key].status=b.dataset.status; saveFolders(); renderDashboard(); openFolderMenu(key);
         try{ window.platform.haptic('select'); }catch(_){}
@@ -1177,6 +1168,8 @@
     const f=folders[key]; if(!f) return;
     if(act==='due'){ closeFolderMenu(); inputModal({title:'Дедлайн проєкту', value:f.due||'', placeholder:'РРРР-ММ-ДД, напр. 2026-08-01', onOk:(v)=>{ const m=(v||'').match(/^\d{4}-\d{2}-\d{2}$/); if(m){ f.due=v; saveFolders(); renderDashboard(); } else if(v){ flowAlert('Формат дати: РРРР-ММ-ДД'); } }}); return; }
     if(act==='look'){ openFolderLook(key); return; }
+    // єдине місце для фото, іконки, емодзі й кольору (15.11.2026); після вибору — знову меню папки
+    if(act==='appearance'){ closeFolderMenu(); if(window.fhLookSheet) window.fhLookSheet(key,{after:()=>{ try{ renderDashboard(); }catch(_){} }}); return; }
     if(act==='type'){ openFolderType(key); return; }
     if(act==='links'){ closeFolderMenu(); try{ lkSheet(key); }catch(e){ console.error('links',e); } return; }
     if(act==='chat'){ closeFolderMenu(); try{ if(typeof window.folderAddSheet==='function') window.folderAddSheet(key); }catch(e){ console.error('chat',e); } return; }

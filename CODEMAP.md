@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 93 |
-| Рядків JS | 34776 |
+| Рядків JS | 34779 |
 | Файлів CSS | 48 |
-| Рядків CSS | 10852 |
+| Рядків CSS | 10857 |
 | Сутностей верхнього рівня | 2547 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1695 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1251 | 67 |
+| `src/scripts/core/16-dashboard.js` | 1244 | 67 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -69,7 +69,7 @@
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
 | `src/scripts/core/35-channel.js` | 709 | 65 |
-| `src/scripts/core/36-chats.js` | 749 | 80 |
+| `src/scripts/core/36-chats.js` | 759 | 80 |
 | `src/scripts/core/37-ai-privacy.js` | 202 | 20 |
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
@@ -157,7 +157,7 @@
 | `src/styles/core/21-spheres.css` | 82 | 0 |
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
-| `src/styles/core/24-home-gallery.css` | 282 | 0 |
+| `src/styles/core/24-home-gallery.css` | 287 | 0 |
 | `src/styles/core/25-journal.css` | 316 | 0 |
 | `src/styles/core/26-day.css` | 173 | 0 |
 | `src/styles/core/27-month.css` | 212 | 0 |
@@ -1324,13 +1324,13 @@
 | `fmRow` | функція | `src/scripts/core/16-dashboard.js:1016` |
 | `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:1017` |
 | `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1018` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1080` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1096` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1118` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1127` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1160` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1176` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1221` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1071` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1087` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1109` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1118` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1151` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1167` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1214` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -1929,24 +1929,24 @@
 | `fhCoverSheet` | функція | `src/scripts/core/36-chats.js:520` |
 | `fhAddSheet` | функція | `src/scripts/core/36-chats.js:536` |
 | `fhLookSheet` | функція | `src/scripts/core/36-chats.js:549` |
-| `fhView` | функція | `src/scripts/core/36-chats.js:580` |
-| `fhSetView` | функція | `src/scripts/core/36-chats.js:581` |
-| `fhFind` | функція | `src/scripts/core/36-chats.js:587` |
-| `fhCommit` | функція | `src/scripts/core/36-chats.js:594` |
-| `fhBubble` | функція | `src/scripts/core/36-chats.js:595` |
-| `fhChatHTML` | функція | `src/scripts/core/36-chats.js:603` |
-| `fhWallHTML` | функція | `src/scripts/core/36-chats.js:611` |
-| `fhWallSig` | значення | `src/scripts/core/36-chats.js:617` |
-| `fhApplyView` | функція | `src/scripts/core/36-chats.js:618` |
-| `fhMsgSheet` | функція | `src/scripts/core/36-chats.js:643` |
-| `fhCopy` | функція | `src/scripts/core/36-chats.js:665` |
-| `fhPickFolder` | функція | `src/scripts/core/36-chats.js:667` |
-| `fhPickChat` | функція | `src/scripts/core/36-chats.js:674` |
-| `fhEdit` | функція | `src/scripts/core/36-chats.js:682` |
-| `pgHubData` | функція | `src/scripts/core/36-chats.js:700` |
-| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:709` |
-| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:724` |
-| `chatsInit` | функція | `src/scripts/core/36-chats.js:734` |
+| `fhView` | функція | `src/scripts/core/36-chats.js:590` |
+| `fhSetView` | функція | `src/scripts/core/36-chats.js:591` |
+| `fhFind` | функція | `src/scripts/core/36-chats.js:597` |
+| `fhCommit` | функція | `src/scripts/core/36-chats.js:604` |
+| `fhBubble` | функція | `src/scripts/core/36-chats.js:605` |
+| `fhChatHTML` | функція | `src/scripts/core/36-chats.js:613` |
+| `fhWallHTML` | функція | `src/scripts/core/36-chats.js:621` |
+| `fhWallSig` | значення | `src/scripts/core/36-chats.js:627` |
+| `fhApplyView` | функція | `src/scripts/core/36-chats.js:628` |
+| `fhMsgSheet` | функція | `src/scripts/core/36-chats.js:653` |
+| `fhCopy` | функція | `src/scripts/core/36-chats.js:675` |
+| `fhPickFolder` | функція | `src/scripts/core/36-chats.js:677` |
+| `fhPickChat` | функція | `src/scripts/core/36-chats.js:684` |
+| `fhEdit` | функція | `src/scripts/core/36-chats.js:692` |
+| `pgHubData` | функція | `src/scripts/core/36-chats.js:710` |
+| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:719` |
+| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:734` |
+| `chatsInit` | функція | `src/scripts/core/36-chats.js:744` |
 
 ### `src/scripts/core/37-ai-privacy.js` — 20 сутностей
 

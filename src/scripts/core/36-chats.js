@@ -553,8 +553,10 @@
     const ICONS=(typeof ICON_ALL!=='undefined'?ICON_ALL:[]).slice(0,24);
     chSheet('Вигляд · '+esc(f.name),
       `<button class="ch-sheet-row" data-fhl="photo"><span class="ic"${ph?` style="background-image:url('${esc(ph)}');background-size:cover"`:''}>${ph?'':chI('camera')}</span><span>${ph?'Змінити фото':'Вибрати фото'}</span></button>
-       ${ph?`<button class="ch-sheet-row danger" data-fhl="nophoto"><span class="ic">${chI('trash')}</span><span>Прибрати фото</span></button>`:''}
+       ${ph?`<button class="ch-sheet-row" data-fhl="crop"><span class="ic">${chI('edit')}</span><span>Кадрувати фото</span></button>
+       <button class="ch-sheet-row danger" data-fhl="nophoto"><span class="ic">${chI('trash')}</span><span>Прибрати фото</span></button>`:''}
        <div class="fh-ic-grid">${ICONS.map(([id,nm])=>`<button class="fh-ic${!ph&&cur===id?' on':''}" data-fhic="${esc(id)}" style="--c:${cc}" aria-label="${esc(nm)}" title="${esc(nm)}"><svg class="ico" aria-hidden="true"><use href="#${esc(id)}"/></svg></button>`).join('')}</div>
+       <button class="ch-sheet-row" data-fhl="emoji"><span class="ic e">${esc(f.emoji||'🙂')}</span><span>Емодзі<small>${f.emoji?'змінити чи прибрати':'нема'}</small></span></button>
        <div class="fh-colors">${FOLDER_COLORS.map(c=>`<button class="fh-sw${f.c===c?' on':''}" data-fhcol="${c}" style="--sw:${c}" aria-label="Колір" aria-pressed="${f.c===c}"></button>`).join('')}</div>`,
       (ov,close)=>{
         const done=()=>{ saveFolders(); try{ renderDashboard(); }catch(_){}
@@ -564,7 +566,15 @@
           const prev=f.photo; f.photoPos=null;
           Promise.resolve(window.photoPut?window.photoPut('ph_'+key,du):du).then(ref=>{ f.photo=ref; if(prev&&prev!==ref&&window.photoDel) window.photoDel(prev); done(); });
         })); };
-        const np=ov.querySelector('[data-fhl="nophoto"]'); if(np) np.onclick=()=>{ const prev=f.photo; f.photo=''; f.photoPos=null; if(prev&&window.photoDel) window.photoDel(prev); done(); close(); };
+        // фото стирається і з хмари — спершу питаємо (як і в меню папки)
+        const np=ov.querySelector('[data-fhl="nophoto"]'); if(np) np.onclick=()=>{ close();
+          confirmSheet({ title:'Прибрати фото обкладинки?', sub:'Знімок зітреться з цього пристрою і з хмари. Повернути його можна лише з бекапу.', okLabel:'Прибрати фото',
+            onOk:()=>{ const prev=f.photo; f.photo=''; f.photoPos=null; if(prev&&window.photoDel) window.photoDel(prev); done(); } }); };
+        const cr=ov.querySelector('[data-fhl="crop"]'); if(cr) cr.onclick=()=>{ close(); if(!f.photo||typeof openPhotoCropEditor!=='function') return;
+          openPhotoCropEditor({ img:window.photoSrc(f.photo), pos:f.photoPos, title:'Кадрувати «'+f.name+'»', onSave:(pos)=>{ f.photoPos=pos; done(); } }); };
+        // ручну іконку (iconSet) зміна емодзі не чіпає — як і в меню папки
+        ov.querySelector('[data-fhl="emoji"]').onclick=()=>{ close(); inputModal({ title:'Емодзі папки', value:f.emoji||'', placeholder:'Встав емодзі або лишай порожнім', emoji:false,
+          onOk:(v)=>{ f.emoji=String(v||'').trim().slice(0,8); if(!f.iconSet) f.icon=folderIconFor(f.emoji); done(); } }); };
         // фото папки — ще й обкладинка плитки на Огляді, тож іконка його не стирає: її видно, коли фото нема
         ov.querySelectorAll('[data-fhic]').forEach(b=>b.onclick=()=>{ f.icon=b.dataset.fhic; f.iconSet=1;
           if(f.photo) chToast('Іконку видно, коли фото прибрано');
