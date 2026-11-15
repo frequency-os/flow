@@ -25,16 +25,18 @@
 .more-index{display:none;}
 
 /* порядок розділів на екрані */
+/* варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені */
 #scr-more [data-sec="profile"]{order:1;}
-#scr-more [data-sec="data"]{order:2;}
-#scr-more [data-sec="look"]{order:3;}
-#scr-more [data-sec="pet"]{order:4;}
-#scr-more [data-sec="ai"]{order:5;}
-#scr-more [data-sec="tools"]{order:6;}
+#scr-more [data-sec="look"]{order:2;}
+#scr-more [data-sec="day"]{order:3;}
+#scr-more [data-sec="data"]{order:4;}
+#scr-more [data-sec="about"]{order:5;}
+#scr-more [data-sec="adv"]{order:6;}
 #scr-more [data-sec="lite"]{order:7;}
 #scr-more [data-sec="dev"]{order:8;}
-#scr-more [data-sec="about"]{order:9;}
-#scr-more [data-sec="danger"]{order:10;}
+#scr-more .acc-zero-list,#scr-more .acc-adv-list{display:flex;flex-direction:column;gap:6px;}
+#scr-more .acc-zero-list .acc-row,#scr-more .acc-adv-list .acc-row{padding-left:6px;}
+#scr-more .acc-zero-list[hidden],#scr-more .acc-adv-list[hidden]{display:none;}
 
 /* ── підпис розділу і група-картка ── */
 #scr-more .mr-sl{font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;

@@ -285,25 +285,21 @@
         <div class="mr-row">${stgIco('mode','slate')}
           <span class="mr-tx"><b>Гра</b><small>${um==='lite'?'Сховано':'На виду'}</small></span>
           ${seg('uimode',[['pro','Показати'],['lite','Сховати']],um)}</div>
-      </div>
-      <div class="mr-sl" data-sec="pet">Напарник</div>
-      <div class="mr-grp" data-sec="pet">
+        <button class="mr-row" id="stgFolderView">${stgIco('palette','blue')}
+          <span class="mr-tx"><b>Папки на Огляді</b><small>галерея, секції чи бенто · фото на плитці</small></span>
+          <span class="mr-chev">${stgSvg('chev')}</span></button>
         <div class="mr-row">${stgIco('paw','orange')}
           <span class="mr-tx"><b>Показувати котика</b><small>на Огляді й у списках</small></span>
           <button class="mr-tg ${petOn?'on':''}" id="stgPetSw" role="switch" aria-checked="${petOn}" aria-label="Показувати котика"></button></div>
       </div>
-      <div class="mr-sl" data-sec="ai">AI і приватність</div>
-      <div class="mr-grp" data-sec="ai">
-        <button class="mr-row" id="stgAiPriv">${stgIco('lock','green')}
-          <span class="mr-tx"><b>AI і приватність</b><small>що бачить AI · згода · закриті розділи</small></span>
-          <span class="mr-chev">${stgSvg('chev')}</span></button>
+      ${(showProxy||devOn)?`<div class="mr-grp" data-sec="adv">`:''}
         ${showProxy?`<div class="mr-row">${stgIco('code','slate')}
           <span class="mr-tx"><b>AI-проксі</b><small>для розробника · адреса сервера</small></span>
           <button class="mr-go" id="stgProxyBtn">Відкрити</button></div>`:''}
         ${devOn?`<div class="mr-row">${stgIco('lang','slate')}
           <span class="mr-tx"><b>Перекладати мій контент</b><small>папки, сторінки, нотатки → EN · dev</small></span>
           <button class="mr-tg ${ctOn?'on':''}" id="stgCtSw" role="switch" aria-checked="${ctOn}" aria-label="Перекладати контент"></button></div>`:''}
-      </div>
+      ${(showProxy||devOn)?`</div>`:''}
     `;
     host.querySelectorAll('#stgLangSeg button').forEach(b=>b.onclick=()=>{
       const l=b.dataset.l;
@@ -327,7 +323,8 @@
       try{ if(typeof window.petHiddenSet==='function') window.petHiddenSet(!window.petHidden()); }catch(_){}
       renderSettingsCard();
     };
-    const ap=document.getElementById('stgAiPriv'); if(ap) ap.onclick=()=>{ if(window.aiPrivacySheet) window.aiPrivacySheet(); };
+    // «AI і приватність» переїхало в «Дані і приватність» (29-more-screen.js, 15.11.2026)
+    const fv=document.getElementById('stgFolderView'); if(fv) fv.onclick=()=>{ try{ openFolderViewSheet(); }catch(e){ console.error('openFolderViewSheet',e); } };
     const pb=document.getElementById('stgProxyBtn'); if(pb) pb.onclick=()=>{ if(typeof aiConfig==='function') aiConfig(()=>{ renderSettingsCard(); }); };
     const cs=document.getElementById('stgCtSw'); if(cs) cs.onclick=()=>{ if(typeof devContentTranslateToggleSheet==='function') devContentTranslateToggleSheet(); setTimeout(renderSettingsCard,50); };
   }

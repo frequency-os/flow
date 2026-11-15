@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 93 |
-| Рядків JS | 34758 |
+| Рядків JS | 34776 |
 | Файлів CSS | 48 |
-| Рядків CSS | 10850 |
-| Сутностей верхнього рівня | 2549 |
+| Рядків CSS | 10852 |
+| Сутностей верхнього рівня | 2547 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -39,7 +39,7 @@
 | `src/scripts/core/02-storage.js` | 2150 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 441 | 63 |
-| `src/scripts/core/05-spaces.js` | 691 | 57 |
+| `src/scripts/core/05-spaces.js` | 688 | 57 |
 | `src/scripts/core/06-wishes.js` | 1464 | 109 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 655 | 84 |
@@ -63,7 +63,7 @@
 | `src/scripts/core/26-blocks-render.js` | 1207 | 16 |
 | `src/scripts/core/27-canvas.js` | 595 | 27 |
 | `src/scripts/core/28-vision.js` | 36 | 3 |
-| `src/scripts/core/29-more-screen.js` | 597 | 32 |
+| `src/scripts/core/29-more-screen.js` | 618 | 30 |
 | `src/scripts/core/30-upgrade.js` | 303 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
@@ -134,7 +134,7 @@
 | `src/styles/19-themes-flat.css` | 408 | 3 |
 | `src/styles/20-depth.css` | 129 | 8 |
 | `src/styles/21-hero-week.css` | 133 | 2 |
-| `src/styles/22-more-screen.css` | 181 | 0 |
+| `src/styles/22-more-screen.css` | 183 | 0 |
 | `src/styles/23-doc-readable.css` | 110 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
 | `src/styles/core/02-page-editor.css` | 1176 | 9 |
@@ -622,42 +622,42 @@
 | `stgSvg` | функція | `src/scripts/core/05-spaces.js:225` |
 | `stgIco` | функція | `src/scripts/core/05-spaces.js:229` |
 | `renderSettingsCard` | функція | `src/scripts/core/05-spaces.js:244` |
-| `window.renderSettingsCard` | значення | `src/scripts/core/05-spaces.js:334` |
-| `openSettings` | функція | `src/scripts/core/05-spaces.js:339` |
-| `window.openSettingsSheet` | значення | `src/scripts/core/05-spaces.js:346` |
-| `sidebarCollapsed` | значення | `src/scripts/core/05-spaces.js:381` |
-| `applyChrome` | функція | `src/scripts/core/05-spaces.js:386` |
-| `homeWidgets` | значення | `src/scripts/core/05-spaces.js:402` |
-| `applyHomeWidgets` | функція | `src/scripts/core/05-spaces.js:405` |
-| `THEME_SETS` | обʼєкт | `src/scripts/core/05-spaces.js:425` |
-| `THEME_META` | обʼєкт | `src/scripts/core/05-spaces.js:431` |
-| `THEME_KEYS` | значення | `src/scripts/core/05-spaces.js:440` |
-| `isTheme` | функція | `src/scripts/core/05-spaces.js:441` |
-| `themeSetOf` | функція | `src/scripts/core/05-spaces.js:443` |
-| `themeIsDark` | функція | `src/scripts/core/05-spaces.js:447` |
-| `theme` | значення | `src/scripts/core/05-spaces.js:448` |
-| `applyTheme` | функція | `src/scripts/core/05-spaces.js:472` |
-| `setTheme` | функція | `src/scripts/core/05-spaces.js:497` |
-| `setThemeSet` | функція | `src/scripts/core/05-spaces.js:507` |
-| `toggleTheme` | функція | `src/scripts/core/05-spaces.js:511` |
-| `proTheme` | значення | `src/scripts/core/05-spaces.js:525` |
-| `applyProTheme` | функція | `src/scripts/core/05-spaces.js:527` |
-| `toggleProTheme` | функція | `src/scripts/core/05-spaces.js:533` |
-| `cardSkin` | значення | `src/scripts/core/05-spaces.js:543` |
-| `applyCardSkin` | функція | `src/scripts/core/05-spaces.js:545` |
-| `RR_DEFS` | обʼєкт | `src/scripts/core/05-spaces.js:566` |
-| `rrCfg` | функція | `src/scripts/core/05-spaces.js:567` |
-| `rrSave` | функція | `src/scripts/core/05-spaces.js:572` |
-| `rrCfgSheet` | функція | `src/scripts/core/05-spaces.js:573` |
-| `renderRightRail` | функція | `src/scripts/core/05-spaces.js:592` |
-| `goGoals` | функція | `src/scripts/core/05-spaces.js:620` |
-| `prjHexToRgb` | функція | `src/scripts/core/05-spaces.js:623` |
-| `prjTileHTML` | функція | `src/scripts/core/05-spaces.js:631` |
-| `renderProjects` | функція | `src/scripts/core/05-spaces.js:639` |
-| `goProjects` | функція | `src/scripts/core/05-spaces.js:672` |
-| `goPlanner` | функція | `src/scripts/core/05-spaces.js:677` |
-| `goWishes` | функція | `src/scripts/core/05-spaces.js:682` |
-| `window.goWishes` | значення | `src/scripts/core/05-spaces.js:683` |
+| `window.renderSettingsCard` | значення | `src/scripts/core/05-spaces.js:331` |
+| `openSettings` | функція | `src/scripts/core/05-spaces.js:336` |
+| `window.openSettingsSheet` | значення | `src/scripts/core/05-spaces.js:343` |
+| `sidebarCollapsed` | значення | `src/scripts/core/05-spaces.js:378` |
+| `applyChrome` | функція | `src/scripts/core/05-spaces.js:383` |
+| `homeWidgets` | значення | `src/scripts/core/05-spaces.js:399` |
+| `applyHomeWidgets` | функція | `src/scripts/core/05-spaces.js:402` |
+| `THEME_SETS` | обʼєкт | `src/scripts/core/05-spaces.js:422` |
+| `THEME_META` | обʼєкт | `src/scripts/core/05-spaces.js:428` |
+| `THEME_KEYS` | значення | `src/scripts/core/05-spaces.js:437` |
+| `isTheme` | функція | `src/scripts/core/05-spaces.js:438` |
+| `themeSetOf` | функція | `src/scripts/core/05-spaces.js:440` |
+| `themeIsDark` | функція | `src/scripts/core/05-spaces.js:444` |
+| `theme` | значення | `src/scripts/core/05-spaces.js:445` |
+| `applyTheme` | функція | `src/scripts/core/05-spaces.js:469` |
+| `setTheme` | функція | `src/scripts/core/05-spaces.js:494` |
+| `setThemeSet` | функція | `src/scripts/core/05-spaces.js:504` |
+| `toggleTheme` | функція | `src/scripts/core/05-spaces.js:508` |
+| `proTheme` | значення | `src/scripts/core/05-spaces.js:522` |
+| `applyProTheme` | функція | `src/scripts/core/05-spaces.js:524` |
+| `toggleProTheme` | функція | `src/scripts/core/05-spaces.js:530` |
+| `cardSkin` | значення | `src/scripts/core/05-spaces.js:540` |
+| `applyCardSkin` | функція | `src/scripts/core/05-spaces.js:542` |
+| `RR_DEFS` | обʼєкт | `src/scripts/core/05-spaces.js:563` |
+| `rrCfg` | функція | `src/scripts/core/05-spaces.js:564` |
+| `rrSave` | функція | `src/scripts/core/05-spaces.js:569` |
+| `rrCfgSheet` | функція | `src/scripts/core/05-spaces.js:570` |
+| `renderRightRail` | функція | `src/scripts/core/05-spaces.js:589` |
+| `goGoals` | функція | `src/scripts/core/05-spaces.js:617` |
+| `prjHexToRgb` | функція | `src/scripts/core/05-spaces.js:620` |
+| `prjTileHTML` | функція | `src/scripts/core/05-spaces.js:628` |
+| `renderProjects` | функція | `src/scripts/core/05-spaces.js:636` |
+| `goProjects` | функція | `src/scripts/core/05-spaces.js:669` |
+| `goPlanner` | функція | `src/scripts/core/05-spaces.js:674` |
+| `goWishes` | функція | `src/scripts/core/05-spaces.js:679` |
+| `window.goWishes` | значення | `src/scripts/core/05-spaces.js:680` |
 
 ### `src/scripts/core/06-wishes.js` — 109 сутностей
 
@@ -1669,42 +1669,40 @@
 | `vzData` | обʼєкт | `src/scripts/core/28-vision.js:6` |
 | `vzNorm` | функція | `src/scripts/core/28-vision.js:8` |
 
-### `src/scripts/core/29-more-screen.js` — 32 сутностей
+### `src/scripts/core/29-more-screen.js` — 30 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `TOOLS` | масив | `src/scripts/core/29-more-screen.js:11` |
-| `LITE_DOORS` | масив | `src/scripts/core/29-more-screen.js:18` |
-| `DEV_ROWS` | масив | `src/scripts/core/29-more-screen.js:23` |
-| `inboxWaiting` | функція | `src/scripts/core/29-more-screen.js:29` |
-| `ico` | функція | `src/scripts/core/29-more-screen.js:32` |
-| `chev` | функція | `src/scripts/core/29-more-screen.js:33` |
-| `rowHTML` | функція | `src/scripts/core/29-more-screen.js:34` |
-| `renderMore` | функція | `src/scripts/core/29-more-screen.js:39` |
-| `MSEC` | масив | `src/scripts/core/29-more-screen.js:64` |
-| `moreIsWide` | функція | `src/scripts/core/29-more-screen.js:66` |
-| `renderMoreIndex` | функція | `src/scripts/core/29-more-screen.js:67` |
-| `moreShowSection` | функція | `src/scripts/core/29-more-screen.js:75` |
-| `window.moreShowSection` | значення | `src/scripts/core/29-more-screen.js:84` |
-| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:86` |
-| `goMore` | функція | `src/scripts/core/29-more-screen.js:107` |
-| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:114` |
-| `escA` | функція | `src/scripts/core/29-more-screen.js:117` |
-| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:118` |
-| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:120` |
-| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:141` |
-| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:159` |
-| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:168` |
-| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:169` |
-| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:184` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:543` |
-| `maskMail` | функція | `src/scripts/core/29-more-screen.js:550` |
-| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:551` |
-| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:566` |
-| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:576` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:589` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:590` |
-| `nm` | значення | `src/scripts/core/29-more-screen.js:591` |
+| `LITE_DOORS` | масив | `src/scripts/core/29-more-screen.js:12` |
+| `DEV_ROWS` | масив | `src/scripts/core/29-more-screen.js:17` |
+| `ico` | функція | `src/scripts/core/29-more-screen.js:21` |
+| `chev` | функція | `src/scripts/core/29-more-screen.js:22` |
+| `rowHTML` | функція | `src/scripts/core/29-more-screen.js:23` |
+| `renderMore` | функція | `src/scripts/core/29-more-screen.js:28` |
+| `MSEC` | масив | `src/scripts/core/29-more-screen.js:50` |
+| `moreIsWide` | функція | `src/scripts/core/29-more-screen.js:52` |
+| `renderMoreIndex` | функція | `src/scripts/core/29-more-screen.js:53` |
+| `moreShowSection` | функція | `src/scripts/core/29-more-screen.js:61` |
+| `window.moreShowSection` | значення | `src/scripts/core/29-more-screen.js:70` |
+| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:72` |
+| `goMore` | функція | `src/scripts/core/29-more-screen.js:93` |
+| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:100` |
+| `escA` | функція | `src/scripts/core/29-more-screen.js:103` |
+| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:104` |
+| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:106` |
+| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:127` |
+| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:145` |
+| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:154` |
+| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:155` |
+| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:170` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:564` |
+| `maskMail` | функція | `src/scripts/core/29-more-screen.js:571` |
+| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:572` |
+| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:587` |
+| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:597` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:610` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:611` |
+| `nm` | значення | `src/scripts/core/29-more-screen.js:612` |
 
 ### `src/scripts/core/30-upgrade.js` — 30 сутностей
 

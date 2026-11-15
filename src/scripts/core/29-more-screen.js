@@ -8,12 +8,6 @@
        05-spaces.js); «Проєкти» з «Ще» прибрано — Ярослав просив прибрати їх
        зовсім (з бічної панелі зникли 25.09); сам екран лишився за ⌘5.
        Режим Lite/Pro переїхав у розділ «Вигляд» (renderSettingsCard). */
-    const TOOLS=[
-      {k:'quick', ic:'bolt',   c:'amber',  t:'Швидкий запис', d:'витрата, нотатка чи задача'},
-      {k:'focus', ic:'timer',  c:'pink',   t:'Фокус-сесія',   d:'Pomodoro 25 хв і підсумок дня'},
-      {k:'inbox', ic:'inbox',  c:'teal',   t:'Вхідні',        d:'записи, що чекають розбору'},
-      {k:'goals', ic:'target', c:'violet', t:'План на рік',   d:'цілі, кроки й прогрес'},
-    ];
     /* Lite ховає «Огляд» з панелі — сюди ведуть двері до решти */
     const LITE_DOORS=[
       {k:'home',   ic:'folder',  c:'blue',   t:'Папки й чати',  d:'Огляд: усі папки, чати й Вхідні'},
@@ -24,11 +18,6 @@
       {k:'upgrade', ic:'dna',  c:'violet', t:'Апгрейд',          d:'Персонаж, сфери, заявлений шлях'},
       {k:'misto',   ic:'city', c:'blue',   t:'Гра «Місто дня»',  d:'Прототип: місто, персонаж, друзі'},
     ];
-    /* справжній лічильник «Вхідних»: записи, що чекають (виконані задачі не рахуємо);
-       нуль або помилка — жодного числа, а не вигадане «3» */
-    function inboxWaiting(){
-      try{ return (boards[chatBk(INBOX_CHAT)]||[]).filter(b=>b&&!b.done).length; }catch(_){ return 0; }
-    }
     const ico=(n,c)=>(window.stgIco?window.stgIco(n,c):'');
     const chev=()=>'<span class="mr-chev">'+(window.stgSvg?window.stgSvg('chev'):'›')+'</span>';
     function rowHTML(m){
@@ -39,11 +28,8 @@
     function renderMore(){
       const host=document.getElementById('moreHybrid'); if(!host) return;
       const _m=(window.uiMode||'pro');
-      const nIn=inboxWaiting();
-      const tools=TOOLS.map(m=>m.k==='inbox'&&nIn>0?Object.assign({},m,{pill:String(nIn)}):m);
+      // «Інструменти» з «Ще» прибрано (15.11.2026, варіант A): Швидкий запис — «＋», Фокус і «План на рік» — Планер, Вхідні — Чати
       host.innerHTML=
-        `<div class="mr-sl" data-sec="tools">Інструменти</div>
-         <div class="mr-grp mr-tools" data-sec="tools">${tools.map(rowHTML).join('')}</div>` +
         (_m==='lite'
           ? `<div class="mr-sl" data-sec="lite">Решта Frequency</div>
              <div class="mr-grp" data-sec="lite">${LITE_DOORS.map(rowHTML).join('')}</div>`
@@ -61,8 +47,8 @@
        кожен розділ — пара .mr-sl/.mr-grp з data-sec, а що видно на широкому
        екрані, вирішує атрибут data-msec на #scr-more (22-more-screen.css).
        «Інструменти» на комп'ютері стоять завжди — це дії, а не налаштування. */
-    const MSEC=[['profile','Профіль'],['data','Дані'],['look','Вигляд'],['pet','Напарник'],
-      ['ai','AI і приватність'],['lite','Решта Frequency'],['dev','Розробка'],['about','Про застосунок'],['danger','Скидання']];
+    const MSEC=[['profile','Профіль'],['look','Вигляд'],['day','Мій день'],['data','Дані і приватність'],
+      ['about','Про застосунок'],['adv','Розширені'],['lite','Решта Frequency'],['dev','Розробка']];
     function moreIsWide(){ try{ return window.matchMedia('(min-width:1024px)').matches; }catch(_){ return false; } }
     function renderMoreIndex(){
       const ix=document.getElementById('moreIndex'), scr=document.getElementById('scr-more'); if(!ix||!scr) return;
@@ -252,7 +238,21 @@
           </div>
           ${loginExpand}`}
         </div>
-        <div class="mr-sl" data-sec="data">Дані</div>
+        <!-- Налаштування, варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені -->
+        <div class="mr-sl" data-sec="day">Мій день</div>
+        <div class="mr-grp" data-sec="day">
+          <div class="acc-row" data-acc-dayrange role="button" tabindex="0">
+            ${ico('timer','amber')}
+            <div class="acc-rtext"><div class="acc-rtitle">День з … до …</div><div class="acc-rsub">коли починається й закінчується твій день у Планері</div></div>
+            ${chev()}
+          </div>
+          <div class="acc-row" data-acc-cur role="button" tabindex="0">
+            ${ico('backup','green')}
+            <div class="acc-rtext"><div class="acc-rtitle">Головна валюта</div><div class="acc-rsub">${escA(curSym()+' '+((CUR_LIST[mainCur()]||{}).n||mainCur()))} ${curLocked()?' · зафіксована':' · у ній Гаманець, віджети, призи, План'}</div></div>
+            ${chev()}
+          </div>
+        </div>
+        <div class="mr-sl" data-sec="data">Дані і приватність</div>
         <div class="mr-grp" data-sec="data">
           <div class="acc-row" data-acc-backup-row>
             ${ico('backup','blue')}
@@ -267,27 +267,30 @@
             <p class="acc-hint" data-acc-ph-count>Фото: рахую…</p>
             <p class="acc-hint">«Експорт» — лише дані, файл малий. «Повний бекап з фото» — zip, де кожне фото окремим файлом: і з цього пристрою, і ті, що поки лежать лише в хмарі (їх бекап спершу докачає). Книжки з читалки в бекап не входять — їх треба буде завантажити знову. Імпорт спершу покаже, що саме відновиться, і лише тоді перезапише дані (попередній стан збережеться автоматично).</p>
           </div>
-          <div class="acc-row" data-acc-cur role="button" tabindex="0">
-            ${ico('backup','green')}
-            <div class="acc-rtext"><div class="acc-rtitle">Головна валюта</div><div class="acc-rsub">${escA(curSym()+' '+((CUR_LIST[mainCur()]||{}).n||mainCur()))} ${curLocked()?' · зафіксована':' · у ній Гаманець, віджети, призи, План'}</div></div>
+          <div class="acc-row" data-acc-aipriv role="button" tabindex="0">
+            ${ico('lock','green')}
+            <div class="acc-rtext"><div class="acc-rtitle">AI і приватність</div><div class="acc-rsub">що бачить AI · згода · закриті розділи</div></div>
             ${chev()}
           </div>
-          <div class="acc-row" data-acc-finreset role="button" tabindex="0">
+          <div class="acc-row acc-zero" data-acc-reset-row role="button" tabindex="0">
+            ${ico('reset','red')}
+            <div class="acc-rtext"><div class="acc-rtitle">Почати з нуля…</div><div class="acc-rsub">фінанси, гра, цей пристрій чи весь акаунт — вибираєш, що саме</div></div>
+            ${chev()}
+          </div>
+          <div class="acc-expand acc-zero-list" data-acc-reset-expand hidden>
+            <div class="acc-row" data-acc-finreset role="button" tabindex="0">
             ${ico('reset','red')}
             <div class="acc-rtext"><div class="acc-rtitle">Почати фінанси з нуля</div><div class="acc-rsub">стерти операції, конверти, План і цілі місяця — місії, Журнал, папки, борги й години Роботи лишаються</div></div>
             ${chev()}
-          </div>
-          <div class="acc-row" data-acc-oldw role="button" tabindex="0">
-            ${ico('backup','slate')}
-            <div class="acc-rtext"><div class="acc-rtitle">Старі віджети</div><div class="acc-rsub">прибрати старі «Фінанси», «Конверт», «Проєкт», «Фестиваль», KPI зі сторінок папок</div></div>
-            ${chev()}
-          </div>
-          <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
-            ${ico('disk','slate')}
-            <div class="acc-rtext" style="flex:1;min-width:0">
-              <div class="acc-rtitle">Пам'ять пристрою</div>
-              <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
             </div>
+            <div class="acc-row" data-acc-gamereset role="button" tabindex="0">
+              ${ico('mode','violet')}
+              <div class="acc-rtext"><div class="acc-rtitle">Гра: старт і герой</div><div class="acc-rsub">пройти старт ще раз або скинути імʼя й клас героя — історія днів лишається</div></div>
+              ${chev()}
+            </div>
+            <button class="acc-mini" data-acc-reset-device>Скинути цей пристрій</button>
+            <button class="acc-mini dng" data-acc-reset-all>Стерти все з акаунта</button>
+            <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл. «Скинути пристрій» кладе в нього фото з цього пристрою (решта лишається в хмарі). «Стерти все» спершу докачує у файл і фото, що є лише в хмарі, — і нічого не стирає, якщо хоч одне взяти не вдалось. Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
           </div>
         </div>
         <div class="mr-sl" data-sec="about">Про застосунок</div>
@@ -312,16 +315,26 @@
             <p class="acc-hint">Лише на цьому пристрої: журнал не йде ні в хмару, ні в бекап. Надішли його, коли щось зламалось.</p>
           </div>
         </div>
-        <div class="mr-grp mr-danger" data-sec="danger">
-          <div class="acc-row" data-acc-reset-row>
-            ${ico('reset','red')}
-            <div class="acc-rtext"><div class="acc-rtitle">Скидання до заводських</div><div class="acc-rsub">стерти дані на цьому пристрої або всюди</div></div>
+        <div class="mr-sl" data-sec="adv">Розширені</div>
+        <div class="mr-grp" data-sec="adv">
+          <div class="acc-row" data-acc-adv-row role="button" tabindex="0" aria-expanded="false">
+            ${ico('code','slate')}
+            <div class="acc-rtext"><div class="acc-rtitle">Розширені налаштування</div><div class="acc-rsub">памʼять пристрою, старі віджети — рідко потрібне</div></div>
             ${chev()}
           </div>
-          <div class="acc-expand" data-acc-reset-expand hidden>
-            <button class="acc-mini" data-acc-reset-device>Скинути цей пристрій</button>
-            <button class="acc-mini dng" data-acc-reset-all>Стерти все з акаунта</button>
-            <p class="acc-hint">«Скинути пристрій» чистить лише цю копію — з входом в акаунт дані повернуться з хмари. «Стерти все» видаляє і хмару: повний нуль, як після першого встановлення. Перед обома діями бекап автоматично збережеться у файл. «Скинути пристрій» кладе в нього фото з цього пристрою (решта лишається в хмарі). «Стерти все» спершу докачує у файл і фото, що є лише в хмарі, — і нічого не стирає, якщо хоч одне взяти не вдалось. Книжки з читалки в бекап не входять: після скидання їх треба буде завантажити знову.</p>
+          <div class="acc-expand acc-adv-list" data-acc-adv-expand hidden>
+          <div class="acc-row acc-mem-row" data-acc-mem style="cursor:default">
+            ${ico('disk','slate')}
+            <div class="acc-rtext" style="flex:1;min-width:0">
+              <div class="acc-rtitle">Пам'ять пристрою</div>
+              <div class="acc-mem-body"><div class="acc-rsub">рахую…</div></div>
+            </div>
+          </div>
+          <div class="acc-row" data-acc-oldw role="button" tabindex="0">
+            ${ico('backup','slate')}
+            <div class="acc-rtext"><div class="acc-rtitle">Старі віджети</div><div class="acc-rsub">прибрати старі «Фінанси», «Конверт», «Проєкт», «Фестиваль», KPI зі сторінок папок</div></div>
+            ${chev()}
+          </div>
           </div>
         </div>
       </div>`;
@@ -362,6 +375,14 @@
 
       const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
       { const cr=host.querySelector('[data-acc-cur]'); if(cr) cr.onclick=()=>curPickSheet(()=>{ try{ renderAccount(); }catch(_){} }); }   // 08-finance.js
+      // варіант A (15.11.2026): нові рядки ведуть у наявні шторки — своїх налаштувань у них нема
+      { const dr=host.querySelector('[data-acc-dayrange]'); if(dr) dr.onclick=()=>{ try{ plRangeSheet(); }catch(e){ console.error('plRangeSheet',e); } }; }   // 15-flow-spot.js
+      { const ap=host.querySelector('[data-acc-aipriv]'); if(ap) ap.onclick=()=>{ if(window.aiPrivacySheet) window.aiPrivacySheet(); }; }
+      { const gr=host.querySelector('[data-acc-gamereset]'); if(gr) gr.onclick=()=>{ try{ jnSettings(); }catch(e){ console.error('jnSettings',e); } }; }   // 41-journal.js
+      { const ar=host.querySelector('[data-acc-adv-row]'), ae=host.querySelector('[data-acc-adv-expand]');
+        if(ar&&ae) ar.onclick=()=>{ ae.hidden=!ae.hidden; ar.setAttribute('aria-expanded',String(!ae.hidden)); }; }
+      // Enter/пробіл на рядках-кнопках (role="button")
+      host.querySelectorAll('[data-acc-dayrange],[data-acc-aipriv],[data-acc-gamereset],[data-acc-adv-row]').forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } }));
       { const fr=host.querySelector('[data-acc-finreset]'); if(fr) fr.onclick=()=>{   // 51-money-reset.js
         if(typeof finResetScan!=='function') return;
         if(!finResetReady()){ try{ plToast('Дані ще звіряються з хмарою — спробуй за хвилину'); }catch(_){} return; }
