@@ -568,15 +568,18 @@
       if(!folders[key]){ close(); return; }
       const kids=groupKids(key);
       let u=''; try{ u=(g.photo&&folderOpts.covers)?safeImg(window.photoSrc(g.photo)):''; }catch(_){ u=''; }
+      /* 15.11.2026 (вечір, Ярослав): зверху — САМА папка великою фото-карткою «Відкрити →» (тап — у її документ),
+         нижче — «Папки всередині · N» плитками. Окремий рядок «Нотатки» внизу прибрано: його замінює картка. */
       ov.innerHTML=`<div class="fsp" style="--c:${safeColor(g.c,'#6a7dff')}">
-        <div class="fsp-cov"${u?` style="background-image:url('${esc(u)}')"`:''}>
-          <div class="fsp-top"><button class="ch-ghost" data-fsp="close" aria-label="Закрити">${chI('back')}</button><span class="ch-sp"></span>
-            <button class="ch-ghost" data-fsp="more" aria-label="Налаштування групи">${chI('dots')}</button></div>
-          <div class="fsp-t"><b data-i18n-skip="1">${esc(g.name)}</b><small>${kids.length} ${pluralUk(kids.length,'папка','папки','папок')} · простір</small></div>
-        </div>
+        <div class="fsp-bar"><button class="ch-ghost" data-fsp="close" aria-label="Назад">${chI('back')}</button>
+          <b class="fsp-bt" data-i18n-skip="1">${esc(g.name)}</b>
+          <button class="ch-ghost" data-fsp="more" aria-label="Налаштування групи">${chI('dots')}</button></div>
+        <button class="fsp-cov fsp-open" data-fsp="open"${u?` style="background-image:url('${esc(u)}')"`:''} aria-label="Відкрити папку «${esc(g.name)}»">
+          <span class="fsp-t"><b data-i18n-skip="1">${esc(g.name)}</b><small>нотатки, завдання, фото папки</small></span>
+          <span class="fsp-go">Відкрити ${chI('chev')}</span>
+        </button>
+        <div class="fsp-lbl">Папки всередині · ${kids.length}</div>
         <div id="fspGrid" class="fv2-gallery"></div>
-        <button class="fsp-notes" data-fsp="notes"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12.5h6M9 16h4"/></svg></span>
-          <span>Нотатки «<span data-i18n-skip="1">${esc(g.name)}</span>»<small>документ самої папки</small></span><span class="go">›</span></button>
       </div>`;
       const grid=ov.querySelector('#fspGrid');
       kids.forEach(ck=>{ const t=fc3Tile(ck);
@@ -592,7 +595,7 @@
       grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); close(); pickFolderPhoto(b.dataset.fphoto); });
       ov.querySelector('[data-fsp="close"]').onclick=close;
       ov.querySelector('[data-fsp="more"]').onclick=()=>openFolderMenu(key);
-      ov.querySelector('[data-fsp="notes"]').onclick=()=>{ close(); window.__fgNext=g.parent||''; try{ goFolder(key); }finally{ window.__fgNext=null; } };
+      ov.querySelector('[data-fsp="open"]').onclick=()=>{ close(); window.__fgNext=g.parent||''; try{ goFolder(key); }finally{ window.__fgNext=null; } };
     };
     draw(); document.body.appendChild(ov); document.addEventListener('keydown',onKey);
     try{ ov.querySelector('[data-fsp="close"]').focus({preventScroll:true}); }catch(_){}
