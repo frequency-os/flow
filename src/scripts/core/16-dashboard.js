@@ -202,11 +202,19 @@
     const photo=!!(f.photo && folderOpts.covers);
     const el=document.createElement('div');
     el.className='fcard fc3 '+(photo?'fc3-has-photo':'fc3-color')+(isGroup?' fc3-group':'')+(shape?' fc3-'+shape:'');
+    const kids=isGroup?groupKids(k):[];
     { const sc=safeColor(f.c,''); if(sc) el.style.setProperty('--c', sc); }   // порожній/чужий колір не ставимо — спрацює запасний у CSS
     el.dataset.fkey=k;
     const meta=fc3Meta(k,f);
     const emojiShow=(f.emoji&&f.emoji.trim())?esc(f.emoji.trim()):esc((f.name||'?').trim().charAt(0).toUpperCase());
     let h='';
+    // група — стос (15.11.2026): з-за плитки визирають фото (чи колір) двох вкладених папок; фон плитки — .fc3-face
+    if(isGroup){
+      h+=kids.slice(0,2).map((ck,i)=>{ const cf=folders[ck]; let u='';
+        try{ u=(cf.photo&&folderOpts.covers)?safeImg(window.photoSrc(cf.photo)):''; }catch(_){ u=''; }
+        return `<span class="fc3-under u${i+1}" style="--uc:${safeColor(cf.c,'#6a7dff')};${u?`background-image:url('${esc(u)}')`:''}" aria-hidden="true"></span>`; }).reverse().join('');
+      h+=`<span class="fc3-face" aria-hidden="true"></span>`;   // «група · N папок» уже пише підпис плитки (fc3Meta)
+    }
     if(photo){
       const pp=f.photoPos;
       const xf=pp?`transform:translate(${+pp.x||0}%,${+pp.y||0}%) scale(${+pp.scale||1});`:'';
@@ -529,16 +537,61 @@
   /* ── Як відкривається група (10.10.2026, вибір людини в налаштуваннях групи):
      «Як папка» — одразу нотатка папки, підпапки — блоком «Підпапки» (типово з 16.10.2026, «папка-нотатка»),
      «Стос» — шторка зі списком, «Як на iPhone» — вікно з іконками підпапок поверх Огляду.
-     Поле folders[k].gview: пишемо лише не-типове ('stack' | 'ios'); раніше типовим був «Стос» і він не писався. */
-  const GVIEW={folder:['Як папка','одразу нотатка, підпапки — стрічкою'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
-  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='stack'||v==='ios')?v:'folder'; }
+     Поле folders[k].gview: пишемо лише не-типове ('folder' | 'stack' | 'ios'); раніше типовим був «Стос» і він не писався.
+     З 15.11.2026 типове — «Простір»: на весь екран ті самі фото-плитки вкладених папок, що й на Огляді. */
+  const GVIEW={space:['Простір','фото-плитки папок усередині, як на Огляді'],folder:['Як папка','одразу нотатка, підпапки — стрічкою'],stack:['Стос','шторка зі списком папок'],ios:['Як на iPhone','вікно з іконками']};
+  function gviewOf(k){ const v=folders[k]&&folders[k].gview; return (v==='folder'||v==='stack'||v==='ios')?v:'space'; }
   function openGroupAsChosen(key, from){
     const v=gviewOf(key);
+    if(v==='space'){ openFolderGroupSpace(key); return; }
     if(v==='folder'){ closeFolderMenu(); window.__fgNext=from||(folders[key]&&folders[key].parent)||''; goFolder(key); window.__fgNext=null; return; }
     if(v==='ios'){ openFolderGroupIOS(key); return; }
     openFolderGroup(key);
   }
   window.openGroupAsChosen=openGroupAsChosen;
+  /* «Простір» групи (15.11.2026, типовий спосіб): на весь екран — шапка з фото групи, ті самі
+     фото-плитки вкладених папок (fc3Tile), «＋ Нова» і нотатки самої групи. Лише показ: нічого не пише. */
+  function openFolderGroupSpace(key){
+    const g=folders[key]; if(!g) return;
+    closeFolderMenu(); document.querySelectorAll('.fsp-ov').forEach(x=>x.remove());
+    const ov=document.createElement('div'); ov.className='fsp-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.setAttribute('aria-label','Папки в «'+String(g.name||'')+'»');
+    const close=()=>{ ov.remove(); document.removeEventListener('keydown',onKey); };
+    const onKey=e=>{ if(e.key==='Escape') close(); };
+    const draw=()=>{
+      if(!folders[key]){ close(); return; }
+      const kids=groupKids(key);
+      let u=''; try{ u=(g.photo&&folderOpts.covers)?safeImg(window.photoSrc(g.photo)):''; }catch(_){ u=''; }
+      ov.innerHTML=`<div class="fsp" style="--c:${safeColor(g.c,'#6a7dff')}">
+        <div class="fsp-cov"${u?` style="background-image:url('${esc(u)}')"`:''}>
+          <div class="fsp-top"><button class="ch-ghost" data-fsp="close" aria-label="Закрити">${chI('back')}</button><span class="ch-sp"></span>
+            <button class="ch-ghost" data-fsp="more" aria-label="Налаштування групи">${chI('dots')}</button></div>
+          <div class="fsp-t"><b data-i18n-skip="1">${esc(g.name)}</b><small>${kids.length} ${pluralUk(kids.length,'папка','папки','папок')} · простір</small></div>
+        </div>
+        <div id="fspGrid" class="fv2-gallery"></div>
+        <button class="fsp-notes" data-fsp="notes"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9 12.5h6M9 16h4"/></svg></span>
+          <span>Нотатки «<span data-i18n-skip="1">${esc(g.name)}</span>»<small>документ самої папки</small></span><span class="go">›</span></button>
+      </div>`;
+      const grid=ov.querySelector('#fspGrid');
+      kids.forEach(ck=>{ const t=fc3Tile(ck);
+        // вкладена папка відкривається з міткою батька — «назад» веде в цю групу (goSpaceFor читає __fgNext)
+        t.onclick=e=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
+          if(groupKids(ck).length){ close(); openGroupAsChosen(ck,key); return; }
+          close(); window.__fgNext=key; try{ goFolder(ck); }finally{ window.__fgNext=null; } };
+        grid.appendChild(t); });
+      const add=document.createElement('button'); add.type='button'; add.className='fc3-add'; add.textContent='＋ Нова'; add.setAttribute('aria-label','Нова папка в «'+String(g.name||'')+'»');
+      add.onclick=()=>{ close(); createFolder(key); };
+      grid.appendChild(add);
+      grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
+      grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); close(); pickFolderPhoto(b.dataset.fphoto); });
+      ov.querySelector('[data-fsp="close"]').onclick=close;
+      ov.querySelector('[data-fsp="more"]').onclick=()=>openFolderMenu(key);
+      ov.querySelector('[data-fsp="notes"]').onclick=()=>{ close(); window.__fgNext=g.parent||''; try{ goFolder(key); }finally{ window.__fgNext=null; } };
+    };
+    draw(); document.body.appendChild(ov); document.addEventListener('keydown',onKey);
+    try{ ov.querySelector('[data-fsp="close"]').focus({preventScroll:true}); }catch(_){}
+    try{ window.platform.haptic('light'); }catch(_){}
+  }
   function openFolderGroupIOS(key){
     const g=folders[key]; if(!g) return;
     closeFolderMenu();
@@ -570,7 +623,7 @@
       <button class="fmi" data-back>‹ Назад до меню</button>`,
     m=>{
       m.querySelectorAll('[data-gv]').forEach(b=>b.onclick=()=>{
-        const v=b.dataset.gv; if(v==='folder') delete f.gview; else f.gview=v;   // типове — не пишемо
+        const v=b.dataset.gv; if(v==='space') delete f.gview; else f.gview=v;   // типове («Простір») — не пишемо
         saveFolders(); renderDashboard(); openGroupViewSheet(key);
         try{ window.platform.haptic('select'); }catch(_){}
       });
@@ -832,7 +885,8 @@
     top.__pgb=true; top.classList.add('pgb-v2');
     const up=document.getElementById('pgCrumbUp'), nm=document.getElementById('pgCrumbName'), more=document.getElementById('pgMoreBtn');
     if(up) up.onclick=()=>{ const f=folders[pgBarFolder()]; const p=f&&f.parent;
-      if(p&&folders[p]){ goFolder(p); return; }   // вгору — у документ папки-батька (16.10.2026, «папка-нотатка»)
+      // вгору — туди, звідки прийшли: простір групи (типово з 15.11.2026) або документ папки-батька
+      if(p&&folders[p]){ if(gviewOf(p)==='space'&&groupKids(p).length){ goHome(); openFolderGroupSpace(p); return; } goFolder(p); return; }
       goHome(); };
     if(nm) nm.onclick=pgBarSwitchSheet;
     if(more) more.onclick=pgBarMoreSheet;
@@ -1016,7 +1070,7 @@
       ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
       ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
       ${fmRow('subnew','plus','Нова підпапка','папка всередині «'+esc(f.name)+'»')}
-      ${kids.length?fmRow('gview','type','Як відкривати · '+GVIEW[gviewOf(key)][0],'стос, як папка чи як на iPhone'):''}
+      ${kids.length?fmRow('gview','type','Як відкривати · '+GVIEW[gviewOf(key)][0],'простір, як папка, стос чи як на iPhone'):''}
       ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
