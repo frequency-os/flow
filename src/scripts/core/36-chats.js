@@ -404,7 +404,8 @@
       if(b.type!=='subs'&&b.type!=='divider') s.recs.push(b); });
     return s;
   }
-  function fhPlain(s){ return String(s==null?'':s).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); }
+  // лише справжні теги (старі дані з HTML); «ціна < 100 > 50» лишається як є
+  function fhPlain(s){ return String(s==null?'':s).replace(/<\/?[a-z][^<>]*>/gi,' ').replace(/\s+/g,' ').trim(); }
   function fhLabel(b){
     const t=fhPlain(b.text!=null?b.text:b.title);
     if(t) return t;
@@ -445,7 +446,7 @@
     const scr=document.getElementById('scr-page'), doc=scr&&scr.querySelector('.pg-doc'); if(!doc) return;
     let el=document.getElementById('pgHero');
     const fk=pgFolderKey(), f=fk?folders[fk]:null;
-    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero'); fhTitleHome(); return; }
+    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero'); fhTitleHome(); fhApplyView(); return; }
     if(!el){ el=document.createElement('div'); el.id='pgHero'; el.className='ch-cover fh'; doc.insertBefore(el,doc.firstChild); }
     el.hidden=false; scr.classList.add('pg-fhero');
     fhTitleHome();   // спершу винести #pgTitle: innerHTML нижче інакше знищив би поле назви разом зі старою шапкою
@@ -468,12 +469,13 @@
     on('more',()=>{ const m=document.getElementById('pgMoreBtn'); if(m) m.click(); });
     on('look',()=>fhLookSheet(fk));
     el.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs));
+    fhApplyView();
   }
   // лише значки — після правок у документі, без перемальовування обкладинки
   let fhT=null;
   function fhSoon(){ clearTimeout(fhT); fhT=setTimeout(()=>{ const el=document.getElementById('pgHero'), fk=pgFolderKey();
     const box=el&&!el.hidden&&el.querySelector('.fh-chips'); if(!box||!fk) return;
-    box.innerHTML=fhChipsHTML(fhStats(fk)); box.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs)); },250); }
+    box.innerHTML=fhChipsHTML(fhStats(fk)); box.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs)); try{ fhApplyView(); }catch(_){} },250); }
   function fhFlash(id){
     let r=null; try{ r=document.querySelector('#pgEditor .pgb[data-id="'+CSS.escape(String(id))+'"]'); }catch(_){} if(!r) return;
     r.scrollIntoView({block:'center'}); r.classList.add('pg-flash'); setTimeout(()=>r.classList.remove('pg-flash'),900);
@@ -570,7 +572,130 @@
         ov.querySelectorAll('[data-fhcol]').forEach(b=>b.onclick=()=>{ f.c=b.dataset.fhcol; done(); close(); });
       });
   }
-  try{ window.fhLookSheet=fhLookSheet; }catch(_){}
+  try{ window.fhLookSheet=fhLookSheet; window.fhCoverSheet=fhCoverSheet; }catch(_){}
+
+  /* ── вигляд папки зсередини (15.11.2026, етап 2): Документ · Чат · Фото — для кожної папки свій.
+     Записи ТІ САМІ блоки документа, міняється лише показ. Поле folders[k].view пишеться лише
+     з вибору людини (звичайний saveFolders), і лише не-типове: chat | photo. ── */
+  function fhView(fk){ const v=folders[fk]&&folders[fk].view; return (v==='chat'||v==='photo')?v:'doc'; }
+  function fhSetView(fk,v){
+    const f=folders[fk]; if(!f) return;
+    if(v==='chat'||v==='photo') f.view=v; else delete f.view;
+    saveFolders(); fhApplyView(); chHaptic('select');
+  }
+  // блок разом із масивом, де він лежить (для видалення), — і у вкладених теж
+  function fhFind(id,arr){
+    arr=arr||((fhBridge()&&fhBridge().getBlocks())||[]);
+    for(let i=0;i<arr.length;i++){ const b=arr[i]; if(!b) continue;
+      if(String(b.id)===String(id)) return {b,arr,i};
+      if(Array.isArray(b.children)){ const r=fhFind(id,b.children); if(r) return r; } }
+    return null;
+  }
+  function fhCommit(){ try{ fhBridge().save(); }catch(_){} try{ if(window.__pgRender) window.__pgRender(); }catch(_){} fhApplyView(); fhSoon(); }
+  function fhBubble(b){
+    const t=b.type, id=esc(b.id);
+    if(t==='photo'&&b.data){ let u=''; try{ u=safeImg(b.data); }catch(_){}
+      return `<button class="fhm fhm-ph" data-fhm="${id}"><img alt="" src="${esc(u)}">${b.title?`<span class="fhm-cap" data-i18n-skip="1">${esc(fhPlain(b.title))}</span>`:''}</button>`; }
+    if(t==='task') return `<div class="fhm fhm-task${b.done?' done':''}"><button class="fh-box" data-fhdone="${id}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fhm-tx" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button></div>`;
+    const head=(t==='h1'||t==='h2'||t==='h3');
+    return `<button class="fhm${head?' fhm-h':''}" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button>`;
+  }
+  function fhChatHTML(arr){
+    // усі записи, і вкладені теж — у стрічці нічого не ховається
+    const list=[]; fhWalk(arr,b=>{ if(b.type!=='subs'&&b.type!=='divider') list.push(b); });
+    if(!list.length) return `<div class="fhv-empty"><b>Тут поки тихо</b><span>Напиши внизу — кожне повідомлення стане записом папки.</span></div>`;
+    let h='', day='';
+    list.forEach(b=>{ const at=chTimeOf(b), d=chDayLabel(at); if(d!==day){ day=d; h+=`<div class="fhv-day">${esc(d)}</div>`; } h+=fhBubble(b); });
+    return h;
+  }
+  function fhWallHTML(arr){
+    const ph=[]; fhWalk(arr,b=>{ if(b.type==='photo'&&b.data) ph.push(b); });
+    return `<div class="fhv-wall">`+ph.map(b=>{ let u=''; try{ u=safeImg(b.data); }catch(_){}
+      return `<button class="fhv-tile" data-fhgo="${esc(b.id)}" style="background-image:url('${esc(u)}')" aria-label="Фото в документі"></button>`; }).join('')
+      +`<button class="fhv-tile add" data-fhwadd aria-label="Додати фото">${chI('plus')}</button></div>`;
+  }
+  let fhWallSig='';
+  function fhApplyView(){
+    const scr=document.getElementById('scr-page'), ed=document.getElementById('pgEditor'); if(!scr||!ed) return;
+    const fk=pgFolderKey(), feed=scr.classList.contains('lk-feedmode');
+    const v=(fk&&!feed)?fhView(fk):'doc';
+    scr.classList.toggle('fh-v-chat',v==='chat'); scr.classList.toggle('fh-v-photo',v==='photo');
+    let box=document.getElementById('fhView');
+    if(v==='doc'){ if(box) box.remove(); fhWallSig=''; if(!feed) ed.hidden=false; return; }
+    if(!box){ box=document.createElement('div'); box.id='fhView'; ed.parentNode.insertBefore(box,ed); }
+    const arr=(fhBridge()&&fhBridge().getBlocks())||[];
+    if(v==='chat'){
+      ed.hidden=true; box.className='fhv fhv-chat'; box.innerHTML=fhChatHTML(arr); fhWallSig='';
+      box.querySelectorAll('[data-fhm]').forEach(el=>el.onclick=()=>fhMsgSheet(fk,el.dataset.fhm));
+      box.querySelectorAll('[data-fhdone]').forEach(el=>el.onclick=()=>{ const r=fhFind(el.dataset.fhdone); if(!r) return; r.b.done=!r.b.done; chHaptic('select'); fhCommit(); });
+      return;
+    }
+    ed.hidden=false; box.className='fhv';
+    const sig=[]; fhWalk(arr,b=>{ if(b.type==='photo'&&b.data) sig.push(b.id); }); const s=sig.join(',');
+    if(s===fhWallSig&&box.firstChild) return;   // фото ті самі — не перемальовуємо (без блимання)
+    fhWallSig=s; box.innerHTML=fhWallHTML(arr);
+    box.querySelectorAll('[data-fhgo]').forEach(el=>el.onclick=()=>fhFlash(el.dataset.fhgo));
+    const add=box.querySelector('[data-fhwadd]'); if(add) add.onclick=()=>chPickFile(file=>chShrink(file,1100,1100,data=>{
+      const a=fhBridge()&&fhBridge().getBlocks(); if(!a) return;
+      a.push({id:chUid(),type:'photo',data,at:Date.now()}); fhCommit(); }));
+  }
+  // тап по запису у вигляді «Чат» — як у чаті: в папку, переслати, завданням, редагувати, видалити
+  function fhMsgSheet(fk,id){
+    const r=fhFind(id); if(!r) return; const b=r.b;
+    const isTask=b.type==='task';
+    // контейнер (колонки, тогл, картка…) несе вкладені записи — зі стрічки його не видаляємо (рецензія даних 15.11)
+    let kids=0; if(Array.isArray(b.children)) fhWalk(b.children,()=>{ kids++; });
+    chSheet(b.type==='photo'?'Фото':(isTask?'Завдання':'Запис'),
+      `<button class="ch-sheet-row" data-fx="folder"><span class="ic">${chI('folderPlus')}</span><span>В іншу папку<small>Копія запису</small></span></button>
+       <button class="ch-sheet-row" data-fx="chat"><span class="ic">${chI('chat')}</span><span>Переслати в чат</span></button>
+       ${b.type==='note'?`<button class="ch-sheet-row" data-fx="task"><span class="ic">${chI('task')}</span><span>Зробити завданням</span></button>`:''}
+       <button class="ch-sheet-row" data-fx="edit"><span class="ic">${chI('edit')}</span><span>${b.type==='photo'?'Підпис до фото':'Редагувати'}</span></button>
+       ${kids?`<div class="ch-sheet-row static"><span class="ic">${chI('trash')}</span><span>Видалити — у «Документі»<small>Усередині ще ${kids} ${pluralUk(kids,'запис','записи','записів')}</small></span></div>`
+         :`<button class="ch-sheet-row danger" data-fx="del"><span class="ic">${chI('trash')}</span><span>Видалити</span></button>`}`,
+      (ov,close)=>{
+        const q=s=>ov.querySelector(s);
+        q('[data-fx="folder"]').onclick=()=>{ close(); setTimeout(()=>fhPickFolder(fk,b),200); };
+        q('[data-fx="chat"]').onclick=()=>{ close(); setTimeout(()=>fhPickChat(b),200); };
+        const tk=q('[data-fx="task"]'); if(tk) tk.onclick=()=>{ close(); const x=fhFind(id); if(!x) return; x.b.type='task'; x.b.done=false; fhCommit(); };
+        const ed=q('[data-fx="edit"]'); if(ed) ed.onclick=()=>{ close(); setTimeout(()=>fhEdit(id),200); };
+        const dl=q('[data-fx="del"]'); if(dl) dl.onclick=()=>{ close(); confirmSheet({ title:'Видалити запис?', onOk:()=>{ const x=fhFind(id); if(x){ x.arr.splice(x.i,1); fhCommit(); } } }); };
+      });
+  }
+  // глибока копія з новими id — і у вкладених, щоб дві копії не ділили id
+  function fhCopy(b){ const c=JSON.parse(JSON.stringify(b)); c.at=Date.now(); delete c.by; delete c.topic; delete c.pinned;
+    const re=x=>{ x.id=chUid(); if(Array.isArray(x.children)) x.children.forEach(y=>{ if(y) re(y); }); }; re(c); return c; }
+  function fhPickFolder(fk,b){
+    const ks=orderedFolderKeys().filter(k=>k!==fk&&folders[k]&&(typeof folderVisible!=='function'||folderVisible(k)));
+    if(!ks.length){ chToast('Інших папок ще нема'); return; }
+    chSheet('Скопіювати в папку',`<div class="ch-pick fh-list">${ks.map(k=>`<button class="ch-sheet-row" data-pick="${esc(k)}"><span class="ic" style="--fc:${safeColor(folders[k].c,'var(--accent)')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(folders[k]))}"/></svg></span><span data-i18n-skip="1">${esc(folders[k].name)}</span></button>`).join('')}</div>`,
+      (ov,close)=>ov.querySelectorAll('[data-pick]').forEach(x=>x.onclick=()=>{ close(); const k=x.dataset.pick;
+        if(!boards[k]) boards[k]=[]; boards[k].push(fhCopy(b)); saveBoard(); chHaptic('medium'); chToast('Скопійовано в «'+folders[k].name+'»'); }));
+  }
+  function fhPickChat(b){
+    if(!chats.length){ chToast('Чатів ще нема — створи у вкладці «Чати»'); return; }
+    chSheet('Переслати в чат',`<div class="ch-pick fh-list">${chats.map(c=>`<button class="ch-sheet-row" data-pick="${esc(c.id)}"><span class="ic e">${esc(c.emoji||'💬')}</span><span data-i18n-skip="1">${esc(c.name)}</span></button>`).join('')}</div>`,
+      (ov,close)=>ov.querySelectorAll('[data-pick]').forEach(x=>x.onclick=()=>{ close(); const c=chatById(x.dataset.pick); if(!c) return;
+        const bk=chatBk(c.id); if(!boards[bk]) boards[bk]=[]; const cp=fhCopy(b); cp.by='me'; boards[bk].push(cp); saveBoard();
+        chHaptic('medium'); chToast('Переслано в «'+c.name+'»'); }));
+  }
+  // за id, а не за обʼєктом: поки шторка відкрита, хмара могла замінити дошку — шукаємо блок заново при збереженні
+  function fhEdit(id){
+    const r0=fhFind(id); if(!r0) return; const b=r0.b;
+    const isPhoto=b.type==='photo';
+    chSheet(isPhoto?'Підпис до фото':'Редагувати запис',
+      `<textarea class="ch-edit" id="fhEditTa" rows="4" placeholder="${isPhoto?'Підпис…':'Текст запису…'}"></textarea>
+       <div class="ch-ai-acts"><button class="ch-ai-btn" data-fe="save">Зберегти</button><button class="ch-ai-btn ghost" data-fe="cancel">Скасувати</button></div>`,
+      (ov,close)=>{
+        const ta=ov.querySelector('#fhEditTa'); ta.value=String(isPhoto?(b.title||''):(b.text!=null?b.text:(b.title||'')));   // сирий текст: показ і так екранується, а fhPlain міг би щось вирізати
+        setTimeout(()=>{ try{ ta.focus(); }catch(_){} },60);
+        ov.querySelector('[data-fe="cancel"]').onclick=close;
+        ov.querySelector('[data-fe="save"]').onclick=()=>{ const v=ta.value.replace(/\s+$/,''); close();
+          const x=fhFind(id); if(!x){ chToast('⚠️ Запис уже змінився — відкрий ще раз'); return; } const t=x.b;
+          if(isPhoto) t.title=v.trim(); else if(t.text!=null||t.title==null) t.text=v; else t.title=v;
+          fhCommit(); };
+      });
+  }
+  try{ window.fhView=fhView; window.fhSetView=fhSetView; }catch(_){}
   // гроші, час, місія й чати папки — для рядка «Гроші» у «Звʼязках» (54-links.js)
   function pgHubData(fk){
     const d={money:null, time:0, mission:null, chats:0};

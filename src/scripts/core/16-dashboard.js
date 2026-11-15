@@ -777,7 +777,10 @@
     const wideOn=document.getElementById('scr-page').classList.contains('pg-wide');
     const hasCond=pgBarHasCond(), hidOn=!!(hid&&hid.classList.contains('on'));
     const hasCov=document.getElementById('scr-page').classList.contains('pg-hascov');
-    const feed=!!fk&&lkView[fk]==='feed';   // «Документ · Стрічка» (54-links.js)
+    const feed=!!fk&&lkView[fk]==='feed';   // «Стрічка» подій папки (54-links.js) — не зберігається
+    // вигляд папки (15.11.2026, 36-chats.js fhView): Документ · Чат · Фото зберігаються в папці, «Стрічка» — як і була
+    const fv=feed?'feed':(fk&&typeof fhView==='function'?fhView(fk):'doc');
+    const vb=(v,t)=>`<button data-lkv="${v}" class="${fv===v?'on':''}" aria-pressed="${fv===v}">${t}</button>`;
     const r=(act,ic,t,sub,dis)=>`<button class="fmi pgb-row" data-pgm="${act}"${dis?' disabled':''}><span class="pgb-ic" aria-hidden="true">${ic}</span><span class="pgb-tx">${t}${sub?`<small class="fmi-sub">${sub}</small>`:''}</span></button>`;
     fgSheet(`<div class="fmenu-grip"></div>
       ${fk?`<div class="fmenu-title" data-i18n-skip="1">${esc(folders[fk].name)}</div>`:''}
@@ -792,9 +795,7 @@
         <button data-pgth="paper" class="${theme==='paper'?'on':''}" aria-pressed="${theme==='paper'}">Світла</button></div>
       ${r('cover','🖼',hasCov?'Обкладинка':'Додати обкладинку',hasCov?'змінити, зсунути чи прибрати':'фото або колір над назвою')}
       ${fk?`<div class="fmi-label">Папка</div>
-      <div class="pgb-seg" role="group" aria-label="Вигляд папки">
-        <button data-lkv="doc" class="${feed?'':'on'}" aria-pressed="${!feed}">Документ</button>
-        <button data-lkv="feed" class="${feed?'on':''}" aria-pressed="${feed}">Стрічка</button></div>
+      <div class="pgb-seg" role="group" aria-label="Вигляд папки">${vb('doc','Документ')}${vb('chat','Чат')}${vb('photo','Фото')}${vb('feed','Стрічка')}</div>
       ${r('links','🔗','Звʼязки','місія, звичка, час, календар, гроші, чати')}
       ${r('chats','💬','Чати папки','повʼязати новий чи наявний чат','')}
       ${r('fmenu','⚙︎','Налаштування папки','назва, колір, група, видалення','')}`:''}`,
@@ -806,13 +807,17 @@
         if(a==='mic') run(()=>mic&&mic.click());
         if(a==='wide') run(()=>wide&&wide.click());
         if(a==='hid') run(()=>hid&&hid.click());
-        if(a==='cover') run(()=>{ const c=document.querySelector('#pgCover [data-covopen]'); if(c) c.click(); });
+        if(a==='cover') run(()=>{ const sp=document.getElementById('scr-page');   // шапка як у чаті ховає #pgCover — її шторка
+          if(fk&&sp&&sp.classList.contains('pg-fhero')&&window.fhCoverSheet){ window.fhCoverSheet(fk); return; }
+          const c=document.querySelector('#pgCover [data-covopen]'); if(c) c.click(); });
         if(a==='links') run(()=>lkSheet(fk));
         if(a==='chats') run(()=>{ const pa=document.getElementById('pgAddLink'); if(pa) pa.click(); });
         if(a==='fmenu') run(()=>openFolderMenu(fk));
       });
       m.querySelectorAll('[data-lkv]').forEach(b=>b.onclick=()=>{
-        lkView[fk]=b.dataset.lkv; try{ renderPgLinks(); }catch(_){}
+        const v=b.dataset.lkv; lkView[fk]=(v==='feed')?'feed':'doc';
+        if(v!=='feed'&&typeof fhView==='function'&&fhView(fk)!==v){ try{ fhSetView(fk,v); }catch(_){} }   // вибір людини — зберігається в папці
+        try{ renderPgLinks(); }catch(_){} try{ if(typeof fhApplyView==='function') fhApplyView(); }catch(_){}
         m.querySelectorAll('[data-lkv]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
       });
       m.querySelectorAll('[data-pgth]').forEach(b=>b.onclick=()=>{

@@ -267,3 +267,31 @@
   .sbs-cv .ico{width:22px;height:22px;}
   .sbs-t.add .sbs-cv{border-style:dashed;}
   @media(min-width:1024px){ .sbs-cv{width:58px !important;height:58px !important;} }
+
+  /* ── вигляд папки «Чат» і «Фото» (15.11.2026, 36-chats.js fhApplyView) ── */
+  #fhView{margin:4px 0 14px;}
+  .fhv-chat{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  .fhv-day{align-self:center;margin:8px 0 2px;padding:3px 10px;border-radius:10px;font-size:11.5px;font-weight:700;
+    color:var(--pg-mut,var(--muted));background:color-mix(in srgb,var(--pg-fg,var(--text)) 7%,transparent);}
+  .fhm{all:unset;box-sizing:border-box;cursor:pointer;max-width:84%;padding:9px 13px;border-radius:18px 18px 6px 18px;
+    background:color-mix(in srgb,var(--pg-acc,var(--accent)) 20%,var(--pg-surface,var(--card)));color:var(--pg-fg,var(--text));
+    font-size:15.5px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap;-webkit-tap-highlight-color:transparent;}
+  .fhm:active{transform:scale(.985);}
+  .fhm:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .fhm-h{font-weight:800;font-size:17px;}
+  .fhm-task{display:flex;align-items:center;gap:10px;cursor:default;}
+  .fhm-task .fh-box{width:26px;height:26px;}
+  .fhm-tx{all:unset;cursor:pointer;min-width:0;overflow-wrap:anywhere;}
+  .fhm-task.done .fhm-tx{text-decoration:line-through;color:var(--pg-mut,var(--muted));}
+  .fhm-ph{padding:4px;display:flex;flex-direction:column;gap:4px;}
+  .fhm-ph img{display:block;max-width:100%;max-height:300px;border-radius:14px;object-fit:cover;}
+  .fhm-cap{padding:2px 8px 4px;font-size:14px;}
+  .fhv-empty{align-self:stretch;text-align:center;padding:40px 16px;display:flex;flex-direction:column;gap:6px;color:var(--pg-mut,var(--muted));}
+  .fhv-empty b{color:var(--pg-fg,var(--text));font-size:17px;}
+  #scr-page.fh-v-chat #pgAddBlock{display:none !important;}
+  .fhv-wall{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+  .fhv-tile{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;border-radius:14px;background:var(--pg-surface,var(--card)) center/cover no-repeat;}
+  .fhv-tile.add{display:grid;place-items:center;border:1.5px dashed var(--pg-edge,var(--line));color:var(--pg-mut,var(--muted));background:transparent;}
+  .fhv-tile.add svg{width:22px;height:22px;}
+  .fhv-tile:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  @media (min-width:1024px){ .fhv-wall{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;} .fhm{max-width:70%;} }
