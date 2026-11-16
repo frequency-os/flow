@@ -209,6 +209,11 @@
       'Що таке Frequency':'What is Frequency', 'коротка екскурсія: навіщо це і як допомагає рости':'a short tour: why it exists and how it helps you grow',
       // нижня навігація
       'Огляд':'Overview', 'Планер':'Planner', 'Гроші':'Money', 'Проєкти':'Projects', 'Ще':'More',
+      // Щоденник: вкладка й обкладинка щоденника (22-diary.js, 16.11.2026)
+      '📚 Щоденники':'📚 Journals', '‹ Щоденники':'‹ Journals', '+ Новий щоденник':'+ New journal', 'Створити щоденник':'Create journal',
+      'Додати запис':'Add entry', 'Усі':'All', 'Перший запис — у полі зверху.':'First entry goes in the field above.',
+      'Січень':'January', 'Лютий':'February', 'Березень':'March', 'Квітень':'April', 'Травень':'May', 'Червень':'June',
+      'Липень':'July', 'Серпень':'August', 'Вересень':'September', 'Жовтень':'October', 'Листопад':'November', 'Грудень':'December',
       // профіль / шторка налаштувань
       '✨ Відкрити Флоу':'✨ Open Flow', '⚙️ AI-проксі':'⚙️ AI proxy', '🌓 Змінити тему':'🌓 Switch theme',
       '⚙️ Всі налаштування':'⚙️ All settings', 'Гість':'Guest', 'Користувач':'User',

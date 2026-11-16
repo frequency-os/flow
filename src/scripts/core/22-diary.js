@@ -358,9 +358,34 @@
     if(diaTab==='view') renderDiaView();
   }
 
+  /* ── місток для «Моїх настроїв» (58-moods.js): полиця на Карті бажань і відповіді в щоденник ── */
+  function diaShelf(){
+    const nDay=Object.keys(diaryEntries||{}).filter(diaHasEntry).length;
+    const en=(window.flowLang&&window.flowLang())==='en';
+    return [{id:'', name:en?'Daily journal':'Щоденник дня', emoji:'📔', color:'#5b6fd6', n:nDay}]
+      .concat((diaBooks.books||[]).map(b=>({id:b.id, name:b.name, emoji:b.emoji, color:b.color, n:(diaBooks.entries[b.id]||[]).length})));
+  }
+  function diaBookName(id){ const b=(diaBooks.books||[]).find(x=>x.id===id); return b?b.name:''; }
+  function diaCreateBook(name,emoji,color){
+    name=String(name||'').trim().slice(0,24); if(!name) return '';
+    const b={id:'b'+Date.now(), name, emoji:String(emoji||'📖').slice(0,4), color:String(color||'#8b7cff')};
+    diaBooks.books.push(b); saveDiaBooks(); return b.id;
+  }
+  // один запис на день від настрою: є entryId — оновлюємо його, нема — додаємо новий; повертає id
+  function diaUpsertEntry(bookId,entryId,text){
+    if(!(diaBooks.books||[]).some(b=>b.id===bookId)) return '';
+    const arr=(diaBooks.entries[bookId]=diaBooks.entries[bookId]||[]);
+    let e=entryId?arr.find(x=>x.id===entryId):null;
+    if(e){ if(e.text===text) return e.id; e.text=text; }
+    else { e={id:'e'+Date.now(), text:String(text), ts:Date.now()}; arr.push(e); }
+    saveDiaBooks(); return e.id;
+  }
+  function goDiaryBook(id){ diaCurBook=id||''; goDiary(); diaShowTab('books'); }
+  window.goDiaryBook=goDiaryBook;
+
   /* ══════════ вкладка «Зошити»: окремі папки під свої теми ══════════ */
-  const DIA_BOOK_EMOJIS=['🙏','💡','🌙','📖','✈️','❤️'];
-  const DIA_BOOK_COLORS=['#34c77b','#e8843c','#c4a8ff','#5b8def'];
+  const DIA_BOOK_EMOJIS=['🙏','💡','🌙','📖','✈️','❤️','🌱','🎨','🧠','💼','🏃','☕'];
+  const DIA_BOOK_COLORS=['#34c77b','#e8843c','#c4a8ff','#5b8def','#e0607e','#3cb8c4','#d4a62a','#8b6cf0'];
   let diaNewEmoji=DIA_BOOK_EMOJIS[0], diaNewColor=DIA_BOOK_COLORS[0];
   function renderDiaBooks(){
     const grid=document.getElementById('diaBooksGrid'); if(!grid) return;
@@ -387,17 +412,45 @@
       co.querySelectorAll('[data-dc]').forEach(b=>{ b.onclick=()=>{ diaNewColor=b.dataset.dc; renderDiaBooks(); }; });
     }
   }
+  let diaBookMonth='';               // фільтр місяця у відкритому щоденнику: 'YYYY-MM' або '' — усі
+  let diaBookOpenId='';              // щоденник, для якого діє фільтр (інший щоденник — фільтр скидається)
   function renderDiaBook(book){
+    if(diaBookOpenId!==book.id){ diaBookOpenId=book.id; diaBookMonth=''; }
+    const view=document.getElementById('diaBookView');
+    if(view) view.style.setProperty('--bc', safeColor(book.color,'#8b7cff'));
     const t=document.getElementById('diaBookTitle'); if(t) t.textContent=book.emoji+' '+book.name;
+    const all=(diaBooks.entries[book.id]||[]).slice().sort((a,b)=>b.ts-a.ts);
+    const sub=document.getElementById('diaBookSub');
+    if(sub){
+      const first=all.length?new Date(all[all.length-1].ts):null;
+      sub.textContent=all.length+' '+diaPlural(all.length,'запис','записи','записів')
+        +(first?' · з '+first.getDate()+' '+DIA_MONTHS[first.getMonth()]:'');
+    }
+    // місяці, у яких є записи — чипами; «Усі» лише коли місяців більше одного
+    const mKey=ts=>{ const d=new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); };
+    const months=[]; all.forEach(e=>{ const k=mKey(e.ts); if(months.indexOf(k)<0) months.push(k); });
+    if(diaBookMonth&&months.indexOf(diaBookMonth)<0) diaBookMonth='';
+    const MN=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+    const mEl=document.getElementById('diaBookMonths');
+    if(mEl){
+      const cy=new Date().getFullYear();
+      mEl.innerHTML=months.length>1?['<button class="dia-bk-m'+(diaBookMonth?'':' on')+'" data-dbm="">Усі</button>']
+        .concat(months.map(k=>{ const y=+k.slice(0,4), m=+k.slice(5)-1;
+          return '<button class="dia-bk-m'+(diaBookMonth===k?' on':'')+'" data-dbm="'+k+'">'+MN[m]+(y!==cy?' '+y:'')+'</button>'; })).join(''):'';
+      mEl.querySelectorAll('[data-dbm]').forEach(b=>{ b.onclick=()=>{ diaBookMonth=b.dataset.dbm; renderDiaBook(book); }; });
+    }
     const l=document.getElementById('diaBookList'); if(!l) return;
-    const arr=(diaBooks.entries[book.id]||[]).slice().sort((a,b)=>b.ts-a.ts);
+    const arr=diaBookMonth?all.filter(e=>mKey(e.ts)===diaBookMonth):all;
+    l.className='dia-list dia-bk-grid';
     l.innerHTML=arr.length?arr.map(e=>{
       const d=new Date(e.ts);
-      const au=e.audio?'<button class="db-play" data-dbplay="'+e.id+'" style="background:none;border:0;color:'+safeColor(book.color,'#8b7cff')+';cursor:pointer;padding:0;font-size:13px">▶ 🎙 '+diaFmtDur(e.audio.dur||0)+'</button>':'';
-      return '<div class="dia-entry db-entry"><div><div class="de-date" style="color:'+safeColor(book.color,'#8b7cff')+'">'+d.getDate()+' '+DIA_MONTHS[d.getMonth()]+'</div>'
-        +'<div class="de-txt db-txt">'+diaEsc(e.text)+'</div>'+au+'</div>'
-        +'<button class="db-del" data-dbdel="'+e.id+'" title="Видалити запис">✕</button></div>';
-    }).join(''):'<div class="dia-empty">Перший запис — у полі зверху.</div>';
+      const au=e.audio?'<button class="db-play" data-dbplay="'+diaEsc(e.id)+'" style="background:none;border:0;color:var(--bc);cursor:pointer;padding:0;font-size:13px;font-weight:800">▶ 🎙 '+diaFmtDur(e.audio.dur||0)+'</button>':'';
+      return '<div class="dia-tile" data-dbtile="'+diaEsc(e.id)+'"><div class="dt-d">'+d.getDate()+' '+DIA_MONTHS[d.getMonth()]+'</div>'
+        +'<div class="dt-t">'+diaEsc(e.text)+'</div>'+au
+        +'<button class="db-del" data-dbdel="'+diaEsc(e.id)+'" title="Видалити запис" aria-label="Видалити запис">✕</button></div>';
+    }).join(''):'<div class="dia-empty" style="grid-column:1/-1">Перший запис — у полі зверху.</div>';
+    // тап по плитці — розгорнути довгий запис повністю
+    l.querySelectorAll('[data-dbtile]').forEach(el=>{ el.onclick=ev=>{ if(ev.target.closest('button')) return; el.classList.toggle('open'); }; });
     l.querySelectorAll('[data-dbplay]').forEach(b=>{
       b.onclick=()=>{
         const e=(diaBooks.entries[book.id]||[]).find(x=>x.id===b.dataset.dbplay);
@@ -423,7 +476,7 @@
     if(b) b.onclick=()=>{
       const inp=document.getElementById('diaBookName');
       const name=((inp&&inp.value)||'').trim();
-      if(!name){ try{ flowAlert('Дай зошиту назву.'); }catch(_){} return; }
+      if(!name){ try{ flowAlert('Дай щоденнику назву.'); }catch(_){} return; }
       diaBooks.books.push({id:'b'+Date.now(),name:name,emoji:diaNewEmoji,color:diaNewColor});
       if(inp) inp.value='';
       const f=document.getElementById('diaBookForm'); if(f) f.style.display='none';
@@ -445,7 +498,7 @@
   { const b=document.getElementById('diaBookMenu');
     if(b) b.onclick=()=>{
       const book=diaBooks.books.find(x=>x.id===diaCurBook); if(!book) return;
-      confirmSheet({title:'Видалити зошит «'+book.name+'»?',sub:'Разом з усіма його записами. Це незворотно.',okLabel:'Видалити зошит',onOk:()=>{
+      confirmSheet({title:'Видалити щоденник «'+book.name+'»?',sub:'Разом з усіма його записами. Це незворотно.',okLabel:'Видалити щоденник',onOk:()=>{
         diaBooks.books=diaBooks.books.filter(x=>x.id!==book.id);
         delete diaBooks.entries[book.id];
         diaCurBook=''; saveDiaBooks(); renderDiaBooks();

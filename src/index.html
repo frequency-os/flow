@@ -608,7 +608,7 @@
     <div class="dia-tabs" id="diaTabs">
       <button class="dia-tab on" data-diatab="write">✍️ Запис</button>
       <button class="dia-tab" data-diatab="view">🧠 Огляд</button>
-      <button class="dia-tab" data-diatab="books">📚 Зошити</button>
+      <button class="dia-tab" data-diatab="books">📚 Щоденники</button>
     </div>
 
     <!-- ── вкладка «Запис» ── -->
@@ -665,21 +665,26 @@
     <div id="diaPaneBooks" style="display:none">
       <div id="diaBooksHome">
         <div class="dia-books-grid" id="diaBooksGrid"></div>
-        <button class="dia-book-new" id="diaBookNewBtn">+ Новий зошит</button>
+        <button class="dia-book-new" id="diaBookNewBtn">+ Новий щоденник</button>
         <div class="dia-book-form" id="diaBookForm" style="display:none">
-          <input class="dia-input dia-book-name" id="diaBookName" maxlength="24" placeholder="Назва зошита">
+          <input class="dia-input dia-book-name" id="diaBookName" maxlength="24" placeholder="Вдячність, Ідеї, Сни…">
           <div class="dia-book-picker" id="diaBookEmojis"></div>
           <div class="dia-book-picker" id="diaBookColors"></div>
-          <button class="dia-ai-btn" id="diaBookCreate" style="margin:0">Створити зошит</button>
+          <button class="dia-ai-btn" id="diaBookCreate" style="margin:0">Створити щоденник</button>
         </div>
-        <div class="dia-empty" style="padding:14px 20px">Щоденник дня живе на вкладці «Запис» — тут окремі зошити під свої теми: вдячність, ідеї, сни…</div>
+        <div class="dia-empty" style="padding:14px 20px">Щоденник дня живе на вкладці «Запис» — тут окремі щоденники під свої теми: вдячність, ідеї, сни…</div>
       </div>
       <div id="diaBookView" style="display:none">
-        <div class="dia-book-head">
-          <button class="dia-book-back" id="diaBookBack">‹ Зошити</button>
+        <!-- обкладинка щоденника (16.11.2026): колір щоденника на всю ширину, назва, лічильник -->
+        <div class="dia-cover">
+          <div class="dia-cover-row">
+            <button class="dia-book-back" id="diaBookBack">‹ Щоденники</button>
+            <button class="dia-book-menu" id="diaBookMenu" aria-label="Дії зі щоденником">⋯</button>
+          </div>
           <div class="dia-book-title" id="diaBookTitle"></div>
-          <button class="dia-book-menu" id="diaBookMenu">⋯</button>
+          <div class="dia-cover-sub" id="diaBookSub"></div>
         </div>
+        <div class="dia-bk-months" id="diaBookMonths"></div>
         <div class="dia-today">
           <textarea class="dia-input" id="diaBookInput" rows="3" placeholder="Новий запис…"></textarea>
           <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
