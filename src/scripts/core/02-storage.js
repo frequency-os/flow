@@ -2117,6 +2117,7 @@
       try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
       try{ if(typeof updateSummaryBg==='function') updateSummaryBg(); }catch(_){}
       try{ if(typeof renderWishes==='function') renderWishes(); }catch(_){}
+      try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджет «Фото-прогрес»: знімок докачано з хмари
     },60);
   }
   window.photoSrc = function(ref){

@@ -322,3 +322,29 @@
   .wg-t.wd.sav .wd-big,.wg-t.wd.ctr .wd-big{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .wg-t.wd.ctr .wd-acts button[data-n="-1"]{flex:0 0 52px;}
   .wd-f2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+
+  /* «Фото-прогрес» (dphoto): пара «було → стало», ＋ у кутку, стрічка в L, галерея */
+  .wd-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;flex:1 1 auto;min-height:56px;}
+  .wg-t.wd.pho{gap:4px;}
+  .wd-pair.one{grid-template-columns:minmax(0,1fr);}
+  .wd-ph{all:unset;box-sizing:border-box;position:relative;display:flex;flex-direction:column;gap:3px;min-height:0;min-width:0;}
+  .wd-ph i{display:block;flex:1 1 auto;min-height:40px;border-radius:12px;background:var(--pg-track,rgba(127,127,127,.2)) center/cover no-repeat;}
+  .wd-ph s{text-decoration:none;font-size:11.5px;font-weight:700;color:var(--pg-mut,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wd-ph-new{pointer-events:auto;cursor:pointer;align-items:center;justify-content:center;border:1.5px dashed color-mix(in srgb,var(--fc) 55%,var(--pg-edge,var(--line)));border-radius:12px;}
+  .wd-ph-new span{font-size:24px;font-weight:700;color:var(--pg-fg,var(--text));}
+  .wd-ph-new:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .wd-ph-foot{display:flex;align-items:center;gap:8px;min-width:0;}
+  .wd-ph-foot .wd-sub{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wd-ph-add{all:unset;box-sizing:border-box;flex:none;pointer-events:auto;width:44px;height:44px;margin:-4px 0 -4px -6px;display:grid;place-items:center;cursor:pointer;}
+  .wd-ph-add span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-size:19px;font-weight:800;color:#fff;
+    background:color-mix(in srgb,var(--fc) 70%,#000);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+  .wd-ph-add:focus-visible span{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .wd-ph-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;}
+  .wd-ph-strip i{display:block;aspect-ratio:1;border-radius:8px;background:var(--pg-track,rgba(127,127,127,.2)) center/cover no-repeat;}
+  .wd-gal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px;}
+  .wd-gal figure{margin:0;display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .wd-gal figure i{display:block;aspect-ratio:3/4;border-radius:12px;background:color-mix(in srgb,var(--text) 10%,transparent) center/cover no-repeat;}
+  .wd-gal figcaption{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12.5px;font-weight:700;color:var(--muted);}
+  .wd-gal figcaption button{all:unset;cursor:pointer;min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:10px;}
+  .wd-gal figcaption button:focus-visible{outline:2px solid var(--accent);}
+  @media (min-width:1024px){ .wd-gal{grid-template-columns:repeat(3,minmax(0,1fr));} }

@@ -6,7 +6,7 @@
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1};   // d* — «Дані» (нижче)
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1};   // d* — «Дані» (нижче)
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -177,11 +177,12 @@
     /* прогрес місії (15.11.2026): Відлік · Скарбничка · Лічильник — так само вікна в місію, даних одна копія */
     dcount:{t:'Відлік до мети', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата'],['next','Наступна віха']]},
     dsave:{t:'Скарбничка місії', h:'Скарбничка', ic:'🐷', per:null, show:[['bar','Смужка'],['spent','Витрачено на місію'],['add','Кнопка «＋ ₴»']]},
-    dcounter:{t:'Лічильник місії', h:'Лічильник', ic:'🔢', per:null, show:[['bar','Смужка'],['minus','Кнопка «−»']]}
+    dcounter:{t:'Лічильник місії', h:'Лічильник', ic:'🔢', per:null, show:[['bar','Смужка'],['minus','Кнопка «−»']]},
+    dphoto:{t:'Фото-прогрес', h:'Фото', ic:'📸', per:null, show:[['dates','Дати під фото'],['count','Скільки фото й днів']]}
   };
   const wdCalYm={};   // місяць, який гортає віджет «Календар папки» (лише памʼять)
   function wdIs(t){ return Object.prototype.hasOwnProperty.call(WD_META,String(t||'')); }
-  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&b.type==='dtime'?'m':'s'); }
+  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
@@ -391,10 +392,79 @@
         ${sz!=='s'?`<small class="wd-sub">${pct!==null?pct+'% шляху':'без мети'} · ${esc(String(g.name||'Місія').slice(0,40))}</small>`:''}
         <span class="wd-acts">${wdOn(b,'minus')?`<button data-wga="wdcstep" data-n="-1" aria-label="Мінус ${esc(wdNumTxt(c.step))}">−</button>`:''}<button data-wga="wdcstep" data-n="1" aria-label="Плюс ${esc(wdNumTxt(c.step))}">＋${c.step!==1?esc(wdNumTxt(c.step)):'1'}</button></span>`,'ctr',col);
     }
+    if(t==='dphoto'){
+      // «було → стало»: перше фото місії поруч з останнім; усі — у галереї по тапу. Фото живуть у місії (g.photos), знімок — у сховищі фото
+      const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
+      const L=wdPhotos(g), col=wdFolder(fk)?'':g.color, gid=esc(g.id);
+      const nm=esc(String(g.name||'Місія').slice(0,40));
+      if(!L.length) return wdTile(b,fk,`${wdHead(b,fk)}<b class="wd-name">${nm}</b>
+        <small class="wd-sub">Перше фото стане точкою «було»</small>
+        <span class="wd-acts"><button data-wga="wdphadd">＋ Фото</button></span>`,'empty',col);
+      const first=L[0], last=L[L.length-1], dates=wdOn(b,'dates');
+      const fr=(p,lbl)=>`<span class="wd-ph"><i style="background-image:url('${esc(safeImg(p.ref))}')"></i>${dates?`<s>${lbl} · ${esc(jnDateTxt(p.ds))}</s>`:''}</span>`;
+      const add=`<button class="wd-ph-add" data-wga="wdphadd" aria-label="Додати фото"><span>＋</span></button>`;
+      // одне фото: «було» є, праворуч — рамка під наступне
+      const pair=sz==='s'?fr(last,L.length>1?'зараз':'було')
+        :L.length===1?fr(first,'було')+`<button class="wd-ph wd-ph-new" data-wga="wdphadd"><span>＋</span><s>Нове фото</s></button>`
+        :fr(first,'було')+fr(last,'зараз');
+      const days=Math.max(0,Math.round((new Date(last.ds+'T12:00:00')-new Date(first.ds+'T12:00:00'))/864e5));
+      const strip=sz==='l'&&L.length>2?`<span class="wd-ph-strip">${L.slice(-5,-1).reverse().map(p=>`<i style="background-image:url('${esc(safeImg(p.ref))}')"></i>`).join('')}</span>`:'';
+      return wdTile(b,fk,`<button class="wg-hit" data-wga="wdphgal" aria-label="Усі фото місії ${nm}"></button>
+        ${wdHead(b,fk,sz==='s'?'':esc(String(g.name||'').slice(0,24)))}
+        <span class="wd-pair${sz==='s'?' one':''}">${pair}</span>${strip}
+        <span class="wd-ph-foot">${sz==='s'||L.length>1?add:''}${wdOn(b,'count')?`<small class="wd-sub">${L.length} ${pluralUk(L.length,'фото','фото','фото')}${days?' · '+days+' '+pluralUk(days,'день','дні','днів')+(sz==='s'?'':' шляху'):''}</small>`:''}</span>`,'pho',col);
+    }
     return '';
   }
 
   // ── прогрес місії: допоміжне ──
+  // фото місії від найстарішого: лише посилання на сховище фото (idb:), з датою
+  function wdPhotos(g){
+    // лише СВОЇ знімки (gp_…, ref = idb:+id): підроблений імпорт не підсуне сюди обкладинку папки, яку «🗑» стер би й з хмари
+    return (Array.isArray(g.photos)?g.photos:[]).filter(p=>p&&/^gp_[\w-]+$/.test(String(p.id||''))&&p.ref==='idb:'+p.id&&/^\d{4}-\d{2}-\d{2}$/.test(p.ds||''))
+      .slice().sort((a,c)=>a.ds.localeCompare(c.ds)||(+a.t||0)-(+c.t||0));
+  }
+  const WD_PH_MAX=120;   // більше — уже архів, а не прогрес; усі фото читаються в памʼять при старті (photoWarm), тож тримаємо скромно
+  // ＋ Фото: вибір → стиснення до 1080 px → сховище фото → у місію лише посилання
+  function wdPhotoAdd(gid,after){
+    const g0=wdFreshGoal(gid); if(!g0) return;
+    if(wdPhotos(g0).length>=WD_PH_MAX){ plToast('У місії вже '+WD_PH_MAX+' фото — спершу прибери старі'); return; }
+    chPickFile(file=>chShrink(file,1080,1080,async du=>{
+      const id='gp_'+String(gid).replace(/[^\w-]/g,'').slice(0,24)+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      let ref=''; try{ ref=await window.photoPut(id,du); }catch(_){ ref=''; }
+      // сховище фото не прийняло — НЕ кладемо мегабайтний знімок у цілі (переповнило б памʼять і синк)
+      if(!window.photoIsRef(ref)){ plToast('Не вийшло зберегти фото — у телефоні замало місця'); return; }
+      const q=wdFreshGoal(gid);   // поки вибирали фото, синк міг підмінити goalsData
+      if(!q){ try{ window.photoDel(ref); }catch(_){} plToast('Місію змінили на іншому пристрої'); return; }
+      if(!Array.isArray(q.photos)) q.photos=[];
+      q.photos.push({id, ref, ds:ymdLocal(), t:Date.now()});
+      saveGoals(); try{ window.platform.haptic('light'); }catch(_){}
+      wdRedraw(); plToast('📸 Фото додано'); if(after) try{ after(); }catch(_){}
+    }));
+  }
+  // галерея: усі фото місії від нових, ＋ Фото, видалення (з хмари теж — тому питаємо)
+  function wdPhotoGallery(gid){
+    const g=wdFreshGoal(gid); if(!g) return;
+    const L=wdPhotos(g).reverse();
+    jnOverlay(`<div class="jn-ed-h"><b>📸 ${esc(String(g.name||'Місія').slice(0,30))}</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">${L.length} ${pluralUk(L.length,'фото','фото','фото')} · від нових до перших</small>
+      <div class="jn-ed-foot"><button class="jn-btn" data-wdpha>＋ Фото</button></div>
+      <div class="wd-gal">${L.map((p,i)=>`<figure><i style="background-image:url('${esc(safeImg(p.ref))}')"></i>
+        <figcaption><span>${esc(jnDateTxt(p.ds))}${i===L.length-1&&L.length>1?' · було':i===0&&L.length>1?' · зараз':''}</span>
+        <button data-wdphdel="${esc(p.id)}" aria-label="Видалити фото від ${esc(jnDateTxt(p.ds))}">🗑</button></figcaption></figure>`).join('')}</div>`, ov=>{
+      ov.classList.add('wd-ov');
+      ov.querySelector('[data-wdpha]').onclick=()=>{ ov.remove(); wdPhotoAdd(gid,()=>wdPhotoGallery(gid)); };
+      ov.querySelectorAll('[data-wdphdel]').forEach(x=>x.onclick=()=>{
+        const pid=x.dataset.wdphdel; ov.remove();
+        confirmSheet({title:'Видалити фото?', sub:'Воно зникне з місії і з хмари. Повернути не вийде.', okLabel:'Видалити', danger:true, onOk:()=>{
+          const q=wdFreshGoal(gid); if(!q||!Array.isArray(q.photos)) return;
+          const p=wdPhotos(q).find(y=>String(y.id)===pid); if(!p) return;
+          q.photos=q.photos.filter(y=>y!==p); saveGoals();
+          try{ window.photoDel(p.ref); }catch(_){}
+          wdRedraw(); plToast('Фото видалено'); wdPhotoGallery(gid); }});
+      });
+    });
+  }
   // фініш місії — найпізніша дата віх; віха лише з місяцем — останній день того місяця
   function wdFinal(g){
     const ds=ylGoalMs(g).map(m=>/^\d{4}-\d{2}-\d{2}$/.test(m.due||'')?m.due:m.ym+'-'+String(moDim(m.ym)).padStart(2,'0')).sort();
@@ -521,6 +591,8 @@
     else if(a==='wdcsheet'||a==='wdcnew'){ const q=wdGoal(b,fk); if(q) wdCounterSheet(id,q.id,a==='wdcnew'?null:String(b.cid||'')); }
     else if(a==='wdsavein'){ const q=wdGoal(b,fk); if(q) wlOpSheet('in',String(q.id),fk?{folderKey:fk}:{}); }
     else if(a==='wdsavegoal'){ const q=wdGoal(b,fk); if(q) wdSaveGoalSheet(q.id); }
+    else if(a==='wdphadd'){ const q=wdGoal(b,fk); if(q) wdPhotoAdd(q.id); }
+    else if(a==='wdphgal'){ const q=wdGoal(b,fk); if(q) wdPhotoGallery(q.id); }
     else if(a==='wdcalnav'){ const n=+el.dataset.n||0, cur=wdCalYm[b.id]||ymdLocal().slice(0,7); wdCalYm[b.id]=n?moShift(cur,n):ymdLocal().slice(0,7); wgRefresh(); }
     else if(a==='wdcalday'){ const ds=el.dataset.ds; if(fk&&/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) calDaySheet(ds,{folder:fk,onOpenDay:d=>{ try{ goJournal({tab:'day',ds:d}); }catch(_){} }}); }
   }
