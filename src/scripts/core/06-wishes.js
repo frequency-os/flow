@@ -567,7 +567,9 @@
   function ritualRerender(){ try{
     // ранок у шторці (відкрита з «Мого світу») — перемальовуємо і її
     const sh=document.getElementById('ritSheetBody');
-    if(sh){ sh.innerHTML=ritualInnerHTML(); ritualBind(sh); }
+    // шторка з гри — завжди Ранок, хоч би який настрій зараз на Карті
+    if(sh) ritWithCtx('m',()=>{ sh.innerHTML=ritualInnerHTML(); ritualBind(sh); });
+    if(typeof moodFocusRerender==='function') moodFocusRerender();
     const s=document.getElementById('scr-wishes');
     if(s&&s.classList.contains('active')) renderWishes(); }catch(_){} }
   // ранок шторкою поверх будь-якого екрана (вхід із гри); записує, як і завжди, сам Frequency
@@ -589,7 +591,8 @@
   try{ window.ritualSheet=ritualSheet; }catch(_){}
   /* Для «Мого світу» (міст 38-world.js) — лише читання. Гра отримує копії простих значень,
      не самі обʼєкти RIT, тож змінити дані ранку звідти не може. */
-  function ritForWorld(){
+  function ritForWorld(){ return ritWithCtx('m',ritForWorldM); }
+  function ritForWorldM(){
     const today=ritDs(0), steps=ritSteps(), td=RIT.days[today]||{}, days={};
     for(let i=0;i<70;i++){ const ds=ritDs(-i), r=RIT.days[ds]; if(!r) continue;
       days[ds]=i===0?{done:!!r.done, n:steps.filter(s=>ritStepDone(s,r)).length, of:steps.length}
@@ -598,7 +601,8 @@
     return {today, done:!!td.done, n:steps.filter(s=>ritStepDone(s,td)).length, of:steps.length,
       streak:st.s, best:st.best, tpl:ritTplName(), wishes:wishes.length, days};
   }
-  function ritDayForWorld(ds){
+  function ritDayForWorld(ds){ return ritWithCtx('m',()=>ritDayForWorldM(ds)); }
+  function ritDayForWorldM(ds){
     if(typeof ds!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(ds)) return null;
     const r=RIT.days[ds]; if(!r) return null;
     const own={}; ritSteps().forEach(s=>{ own[s.id]=s; });
@@ -636,17 +640,31 @@
     }catch(_){} },1200); });
   }catch(_){}
 
-  function ritDay(ds){ if(!RIT.days[ds]) RIT.days[ds]={}; return RIT.days[ds]; }
+  /* ── «Мої настрої» (16.11.2026): ранок — лише один із настроїв ──
+     ritCtx каже, чий набір зараз у роботі: 'm' — Ранок (ключі ritual_board / ritual_steps, як і було),
+     інакше id настрою з moods_v1 (58-moods.js). Усі функції нижче питають дні й кроки через нього,
+     тож картки кроків, конструктор і «День зараховано» однакові для всіх настроїв. */
+  let ritCtx='m';
+  function ritWithCtx(ctx,fn){ const was=ritCtx; ritCtx=ctx||'m'; try{ return fn(); }finally{ ritCtx=was; } }
+  /* Настрою вже нема (видалили на іншому пристрої, поки він був відкритий тут) — віддаємо
+     порожній тимчасовий обʼєкт, а НЕ дні Ранку: інакше відповідь настрою лягла б у ранок. */
+  function ritDaysObj(){
+    if(ritCtx==='m') return RIT.days;
+    const o=(typeof moodDaysOf==='function')?moodDaysOf(ritCtx):null;
+    return o||{};
+  }
+  function ritDay(ds){ const D=ritDaysObj(); if(!D[ds]) D[ds]={}; return D[ds]; }
   function ritDs(off){ const d=new Date(); d.setDate(d.getDate()+off); return ymdLocal(d); }
   function ritStreak(){
+    const D=ritDaysObj();
     let s=0; for(let i=0;i<400;i++){ const ds=ritDs(-i);
-      if(RIT.days[ds]&&RIT.days[ds].done) s++;
+      if(D[ds]&&D[ds].done) s++;
       else if(i===0) continue; else break; }
     let best=0,cur=0;
-    Object.keys(RIT.days).sort().forEach((ds,i,arr)=>{
-      if(!RIT.days[ds].done){ cur=0; return; }
+    Object.keys(D).sort().forEach((ds,i,arr)=>{
+      if(!D[ds].done){ cur=0; return; }
       if(i>0){ const prev=new Date(arr[i-1]), me=new Date(ds);
-        cur=(RIT.days[arr[i-1]].done && (me-prev)<=90000000)?cur+1:1;
+        cur=(D[arr[i-1]].done && (me-prev)<=90000000)?cur+1:1;
       } else cur=1;
       if(cur>best) best=cur;
     });
@@ -661,6 +679,7 @@
     try{ if(ritAudio){ ritAudio.pause(); ritAudio=null; } }catch(_){} ritMixOn=false; }
   async function ritRecord(slot){
     if(ritRec){ try{ ritRec.stop(); }catch(_){} return; }
+    const ctx0=ritCtx;   // голос пишеться лише в Ранку; поки йде запис, людина може тапнути інший настрій
     try{
       const stream=await navigator.mediaDevices.getUserMedia({audio:true});
       const mime=MediaRecorder.isTypeSupported('audio/mp4')?'audio/mp4':(MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'');
@@ -673,7 +692,7 @@
         const blob=new Blob(chunks,{type:mt});
         if(blob.size<1200){ try{plToast('🎙 Закоротко');}catch(_){}; ritualRerender(); return; }
         const fr=new FileReader();
-        fr.onload=()=>{ const a=fr.result;
+        fr.onload=()=>{ const a=fr.result; ritCtx=ctx0;
           if(slot==='mix') RIT.mix.push({id:'m'+Date.now(),label:'Запис · '+ritDs(0).slice(5),a,dur:sec});
           else { const d=ritDay(ritDs(0)); d[slot]={a,dur:sec}; }
           if(slot==='mix') ritDay(ritDs(0)).mix=1;
@@ -751,7 +770,7 @@
     j1:{t:'Я — людина, яка…', ty:'text', ph:'…дописуй речення про свою ідентичність', a:'a1', ic:'🪞'},
     j2:{t:'Вчорашній доказ', ty:'text', ph:'Що вчора підтвердило, що ти вже ця людина?', a:'a2', ic:'🧾'},
     j3:{t:'Намір на сьогодні', ty:'text', ph:'Одна дія, яка наближає твою дату', a:'a3', ic:'🎯'},
-    grat:{t:'Вдячність', ty:'text', ph:'За що ти вдячний(а) цього ранку?', ic:'💛'},
+    grat:{t:'Вдячність', ty:'text', ph:'За що сьогодні відчуваєш вдячність?', ic:'💛'},
     photo:{t:'Фото дня', ty:'photo', ic:'📸'},
     video:{t:'Відео-полиця', ty:'link', ic:'▶️'},
     vis:{t:'Візуалізація', ty:'timer', sec:150, sub:'на фото з Карти бажань', ic:'✨'},
@@ -778,7 +797,11 @@
     if(ty==='timer') o.sec=Math.max(30,Math.min(3600,(+s.sec|0)||180));
     return o;
   }
+  // кроки, що зберігають великі файли чи спільні полиці ранку — лише в Ранку
+  const RIT_MORNING_ONLY=['mix','photo','video'];
   function ritSteps(){
+    if(ritCtx!=='m' && typeof moodStepsOf==='function')
+      return (moodStepsOf(ritCtx)||[]).map(ritCleanStep).filter(s=>s&&RIT_MORNING_ONLY.indexOf(s.id)<0);
     const arr=Array.isArray(RIT_STEPS)?RIT_STEPS.map(ritCleanStep).filter(Boolean):[];
     return arr.length?arr:RIT_TPL[0].s.map(id=>({id}));
   }
@@ -787,7 +810,7 @@
   function ritMeta(s){ const c=ritCat(s.id); return c?Object.assign({id:s.id},c):Object.assign({ic:RIT_OWN_IC[s.ty]||'•'},s); }
   /* Голос — лише в трьох старих записах (a1..a3). Аудіо лягає в ritual_board цілим base64,
      тож голос у кожному новому кроці швидко з'їв би памʼять браузера. */
-  function ritAudioKey(s){ const c=ritCat(s.id); return (c&&c.a)||null; }
+  function ritAudioKey(s){ if(ritCtx!=='m') return null; const c=ritCat(s.id); return (c&&c.a)||null; }
   function ritStepDone(s,d){
     const m=ritMeta(s);
     if(m.ty==='text'){ const ak=ritAudioKey(s); return !!((d[s.id]&&String(d[s.id]).trim())||(ak&&d[ak])); }
@@ -796,8 +819,13 @@
   }
   // день знає, скільки кроків тоді було і скільки зроблено (для календаря, навіть коли набір зміниться)
   function ritTouch(d){ try{ const st=ritSteps(); d.of=st.length; d.n=st.filter(s=>ritStepDone(s,d)).length; }catch(_){} }
-  function ritSaveToday(){ ritTouch(ritDay(ritDs(0))); saveRitual(); }
+  function ritSaveToday(){
+    if(ritCtx!=='m'){   // настрій: пишемо лише moods_v1 і лише якщо настрій ще існує
+      if(typeof moodGet==='function' && moodGet(ritCtx)){ ritTouch(ritDay(ritDs(0))); saveMoods(); }
+      return; }
+    ritTouch(ritDay(ritDs(0))); saveRitual(); }
   function ritTplName(){
+    if(ritCtx!=='m' && typeof moodName==='function') return moodName(ritCtx);
     const ids=ritSteps().map(s=>s.id).join(',');
     const t=RIT_TPL.find(x=>x.s.join(',')===ids);
     return t?t.t:'свій набір';
@@ -853,15 +881,15 @@
       <div class="vrail">${links||'<div class="vhint">Додай відео, які повертають тебе в стан «я вже там»</div>'}</div>`;
   }
   function ritualInnerHTML(){
-    const today=ritDs(0), d=ritDay(today), st=ritStreak(), steps=ritSteps();
+    const today=ritDs(0), d=ritDay(today), st=ritStreak(), steps=ritSteps(), D=ritDaysObj();
     const DW=['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
     // місячний %
     const now=new Date(); let mDone=0,mDays=now.getDate();
     for(let i=1;i<=mDays;i++){ const ds=ymdLocal(new Date(now.getFullYear(),now.getMonth(),i));
-      if(RIT.days[ds]&&RIT.days[ds].done) mDone++; }
+      if(D[ds]&&D[ds].done) mDone++; }
     const nDone=steps.filter(s=>ritStepDone(s,d)).length;
     const cal=[]; for(let i=-10;i<=2;i++){ const dd=new Date(); dd.setDate(dd.getDate()+i);
-      const ds=ymdLocal(dd), rec=RIT.days[ds];
+      const ds=ymdLocal(dd), rec=D[ds];
       // сьогодні рахуємо наживо за поточним набором, минулі дні — за тим, що збереглось того дня
       const n=i===0?nDone:(rec&&rec.n)||0;
       const cls=rec&&rec.done?'done':(n>0?'part':(i<0?'miss':''));
@@ -871,7 +899,7 @@
       <div class="rit-cal">${cal.join('')}</div>
       <div class="rit-streak">🔥 <b>стрік ${st.s} ${st.s===1?'день':(st.s>=2&&st.s<=4?'дні':'днів')}</b> · найкращий — ${st.best} · ${mDays?Math.round(mDone/mDays*100):0}% місяця</div>
       <button type="button" class="rit-set" data-rset="1">
-        <span class="rs-t"><b>Мій ранок · ${esc(ritTplName())}</b><small>${nDone} з ${steps.length} кроків</small></span>
+        <span class="rs-t"><b>${ritCtx==='m'?'Мій ранок · ':''}${esc(ritTplName())}</b><small>${nDone} з ${steps.length} кроків</small></span>
         <span class="rs-e">Змінити</span>
         <span class="rs-bar"><i style="width:${steps.length?Math.round(nDone/steps.length*100):0}%"></i></span></button>
       ${steps.map(s=>ritStepHTML(s,d)).join('')}
@@ -880,6 +908,11 @@
   // root — контейнер ранку (у Карті бажань або в шторці поверх гри); id не вживаємо, бо ранок буває на екрані двічі
   function ritualBind(root){
     root=root||document.getElementById('ritInline'); if(!root) return;
+    /* Чий набір намальовано в цьому контейнері — того й торкаються тапи: перед будь-яким
+       обробником усередині (фаза захоплення) повертаємо ritCtx до настрою контейнера. */
+    const ctx=ritCtx;
+    if(root.__ritCap) root.removeEventListener('click',root.__ritCap,true);
+    root.__ritCap=()=>{ ritCtx=ctx; }; root.addEventListener('click',root.__ritCap,true);
     const today=ritDs(0), d=ritDay(today);
     const $q=sel=>root.querySelector(sel), $a=sel=>root.querySelectorAll(sel);
     // календар одразу відкритий на сьогодні (без анімації, щоб не смикалось)
@@ -894,12 +927,13 @@
     $a('[data-rjr]').forEach(el=>el.onclick=()=>{
       const id=el.dataset.rjr, m=ritMeta(ritSteps().find(s=>s.id===id)||{id});
       inputModal({title:m.t, value:d[id]||'', placeholder:m.ph||'',
-        onOk:v=>{ d[id]=(v||'').trim().slice(0,2000); ritSaveToday(); ritualRerender(); }}); });
+        // день беремо наново: поки відкрите вікно, дані могли перечитатись із хмари (новий обʼєкт)
+        onOk:v=>{ ritCtx=ctx; ritDay(today)[id]=(v||'').trim().slice(0,2000); ritSaveToday(); ritualRerender(); }}); });
     $a('[data-rmic]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritFieldMic(el.dataset.rmic); });
     $a('[data-rstep]').forEach(el=>el.onclick=()=>{
       const s=ritSteps().find(x=>x.id===el.dataset.rstep); if(!s) return;
       const m=ritMeta(s);
-      if(m.ty==='check'){ if(d[s.id]) delete d[s.id]; else d[s.id]=1; ritSaveToday(); ritualRerender();
+      if(m.ty==='check'){ const dc=ritDay(today); if(dc[s.id]) delete dc[s.id]; else dc[s.id]=1; ritSaveToday(); ritualRerender();
         try{ window.platform.haptic('light'); }catch(_){} return; }
       if(m.ty!=='timer') return;
       const mark=()=>{ const d2=ritDay(today); d2[s.id]=1; ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} };
@@ -923,7 +957,7 @@
       const finish=()=>{ const d2=ritDay(today); d2.done=1; ritSaveToday(); ritualRerender();
         try{ window.platform.haptic('medium'); plToast('🔥 День у стріку'); }catch(_){} };
       // у ранку вже є крок «Візуалізація» — не повторюємо її на фініші
-      if(ritSteps().some(s=>s.id==='vis')){ finish(); return; }
+      if(ritCtx!=='m' || ritSteps().some(s=>s.id==='vis')){ finish(); return; }
       try{ plToast('✨ Перейти до візуалізації мрій…'); }catch(_){}
       setTimeout(()=>{
         ritEnterMoment({
@@ -939,7 +973,10 @@
   }
   // ── Конструктор ранку: шаблон, порядок, додати/прибрати крок, своє питання ──
   function ritEditor(){
+    const ctx=ritCtx, isM=ctx==='m';
     let work=ritSteps().map(s=>Object.assign({},s));
+    // для настроїв — свої шаблони і без кроків, що живуть лише в Ранку
+    const TPLS=isM?RIT_TPL:((typeof moodTemplates==='function')?moodTemplates():[]);
     const ov=document.createElement('div'); ov.className='asheet rit-ed';
     ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
     ov.innerHTML='<div class="asheet-in"></div>';
@@ -948,17 +985,17 @@
     const close=()=>ov.remove();
     const draw=()=>{
       const ids=work.map(s=>s.id).join(',');
-      const tpls=RIT_TPL.map(t=>`<button type="button" class="red-tpl ${t.s.join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
+      const tpls=TPLS.map(t=>`<button type="button" class="red-tpl ${t.s.map(x=>x.id||x).join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
       const rows=work.map((s,i)=>{ const m=ritMeta(s);
         return `<div class="red-row"><span class="rst-ic">${esc(m.ic||'•')}</span>
           <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(m.ty==='text'&&m.a?'текст · голос':(RIT_TY[m.ty]||''))}${m.ty==='timer'?' · '+fmtDur(m.sec||180):''}</small></span>
           <button type="button" class="red-b" data-rup="${i}" aria-label="Вище" ${i?'':'disabled'}>↑</button>
           <button type="button" class="red-b" data-rdn="${i}" aria-label="Нижче" ${i<work.length-1?'':'disabled'}>↓</button>
           <button type="button" class="red-b x" data-rdel="${i}" aria-label="Прибрати">✕</button></div>`; }).join('');
-      const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)).map(k=>
+      const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)&&(isM||RIT_MORNING_ONLY.indexOf(k)<0)).map(k=>
         `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(RIT_CAT[k].t)}</button>`).join('');
       box.innerHTML=`<div class="asheet-grip"></div>
-        <div class="asheet-title">Мій ранок</div>
+        <div class="asheet-title">${isM?'Мій ранок':esc(ritWithCtx(ctx,ritTplName))}</div>
         <div class="asheet-sub">Шаблон або свій набір. Твої записи за минулі дні лишаються.</div>
         <div class="red-tpls">${tpls}</div>
         <div class="red-list">${rows||'<div class="vhint">Додай хоча б один крок</div>'}</div>
@@ -967,7 +1004,7 @@
         <button type="button" class="red-ok" data-rok="1" ${work.length?'':'disabled'}>Готово</button>
         <button type="button" class="asheet-cancel">Скасувати</button>`;
       ov.querySelector('.asheet-cancel').onclick=close;
-      ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=RIT_TPL.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(id=>({id})); draw(); } });
+      ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=TPLS.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(x=>(typeof x==='string')?{id:x}:Object.assign({},x)); draw(); } });
       ov.querySelectorAll('[data-rup]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rup; if(i>0){ const x=work[i]; work[i]=work[i-1]; work[i-1]=x; draw(); } });
       ov.querySelectorAll('[data-rdn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rdn; if(i<work.length-1){ const x=work[i]; work[i]=work[i+1]; work[i+1]=x; draw(); } });
       ov.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{ work.splice(+b.dataset.rdel,1); draw(); });
@@ -987,9 +1024,14 @@
       };
       const ok=ov.querySelector('[data-rok]'); if(ok) ok.onclick=()=>{
         if(!work.length) return;
-        RIT_STEPS=work.map(ritCleanStep).filter(Boolean); saveRitSteps();
-        ritSaveToday(); close(); ritualRerender();
-        try{ plToast('Ранок оновлено · '+RIT_STEPS.length+' кр.'); }catch(_){}
+        const clean=work.map(ritCleanStep).filter(Boolean);
+        ritWithCtx(ctx,()=>{
+          if(isM){ RIT_STEPS=clean; saveRitSteps(); }
+          else if(typeof moodSetSteps==='function') moodSetSteps(ctx,clean);
+          ritSaveToday();
+        });
+        close(); ritualRerender();
+        try{ plToast((isM?'Ранок оновлено · ':'Кроки оновлено · ')+clean.length+' кр.'); }catch(_){}
       };
     };
     draw();
@@ -1361,8 +1403,8 @@
         <div class="wdk-add" id="wdkAdd">${WICONS.photo}<span>Фото</span></div>${slides}
       </div>
       <div class="wdk-dots" id="wdkDots">${ordered.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>
-      <div class="rit-sec" style="margin-top:18px"><span>🔥 Ранковий ритуал</span></div>
-      <div id="ritInline" class="rit-wrap">${ritualInnerHTML()}</div>
+      ${(typeof moodsBlockHTML==='function')?moodsBlockHTML():`<div class="rit-sec" style="margin-top:18px"><span>🔥 Ранковий ритуал</span></div>
+      <div id="ritInline" class="rit-wrap">${ritualInnerHTML()}</div>`}
       <div class="wish-note">${wishes.length} ${wishes.length===1?'образ':'образів'} · свайпай · ⋯ — дії · тап по чипу — дата</div>`;
     body.querySelectorAll('[data-wtheme]').forEach(b=>b.onclick=()=>{ goalsData.wishTheme=b.dataset.wtheme; saveGoals(); renderWishes(); });
     const deck=body.querySelector('#wdkDeck');
@@ -1388,7 +1430,7 @@
     const add=body.querySelector('#wdkAdd'); if(add) add.onclick=()=>pickWishPhoto();
     const clg=body.querySelector('#clgOpen'); if(clg) clg.onclick=goCollage;
     bindWishPrice(body);
-    try{ ritualBind(); }catch(e){ console.error('ritual inline',e); }
+    try{ if(typeof moodsBlockBind==='function') moodsBlockBind(body); else ritualBind(); }catch(e){ console.error('ritual inline',e); }
   }
 
   function renderWishes(){
