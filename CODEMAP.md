@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 93 |
-| Рядків JS | 35032 |
+| Файлів JS | 94 |
+| Рядків JS | 35117 |
 | Файлів CSS | 48 |
 | Рядків CSS | 10924 |
-| Сутностей верхнього рівня | 2558 |
+| Сутностей верхнього рівня | 2570 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -93,6 +93,7 @@
 | `src/scripts/core/54-links.js` | 292 | 31 |
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
+| `src/scripts/core/57-core.js` | 85 | 12 |
 | `src/scripts/page-editor/01-palette.js` | 186 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 762 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1025 | 53 |
@@ -2764,6 +2765,23 @@
 | `rnAfter` | функція | `src/scripts/core/56-run.js:335` |
 | `runOpen` | функція | `src/scripts/core/56-run.js:337` |
 | `window.runOpen` | значення | `src/scripts/core/56-run.js:347` |
+
+### `src/scripts/core/57-core.js` — 12 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `CORE_VERSION` | значення | `src/scripts/core/57-core.js:18` |
+| `coreReady` | функція | `src/scripts/core/57-core.js:19` |
+| `corePart` | функція | `src/scripts/core/57-core.js:20` |
+| `coreEnvSaved` | функція | `src/scripts/core/57-core.js:24` |
+| `coreMoney` | функція | `src/scripts/core/57-core.js:28` |
+| `coreGoals` | функція | `src/scripts/core/57-core.js:39` |
+| `coreDay` | функція | `src/scripts/core/57-core.js:50` |
+| `coreWeek` | функція | `src/scripts/core/57-core.js:55` |
+| `coreDiary` | функція | `src/scripts/core/57-core.js:62` |
+| `coreNotes` | функція | `src/scripts/core/57-core.js:66` |
+| `snapshot` | функція | `src/scripts/core/57-core.js:72` |
+| `window.Core` | обʼєкт | `src/scripts/core/57-core.js:84` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
