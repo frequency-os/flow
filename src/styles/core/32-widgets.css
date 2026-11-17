@@ -387,5 +387,31 @@
   .wg-t.wg-t .cal-d.td em{color:inherit;}
   .wg-t.wg-t .cal-d.td i u{background:currentColor!important;}   /* !important — бо так само задано в базовому правилі вище */
   @media (hover:hover){ .wg-t.wg-t .cal-d:not(.td):hover{background:color-mix(in srgb,var(--gl-fg) 7%,transparent);} }
+  /* «Відлік часу» (17.11.2026, 48-widgets.js tmHTML): флип 3D · велике число · кільця */
+  .tm-live{display:flex;flex-direction:column;gap:5px;pointer-events:none;min-width:0;}
+  .tm-flip{display:flex;flex-wrap:wrap;gap:10px 12px;margin-top:4px;}
+  .tm-u{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;}
+  .tm-u small{font-size:10.5px;font-weight:700;color:var(--pg-mut,var(--muted));white-space:nowrap;}
+  .tm-ds{display:flex;gap:3px;perspective:400px;}
+  .tm-d{font-style:normal;position:relative;width:26px;height:38px;border-radius:8px;display:grid;place-items:center;
+    font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--pg-fg,var(--text));transform-style:preserve-3d;
+    background:color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 14%,transparent);}
+  .tm-d::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.22);}
+  .tm-d.go{animation:tmflip .5s cubic-bezier(.3,.7,.3,1);}
+  @keyframes tmflip{from{transform:rotateX(80deg);filter:brightness(.6);}to{transform:none;filter:none;}}
+  .wg-t.wd.sz-l .tm-d{width:34px;height:50px;font-size:30px;border-radius:10px;}
+  .wg-t.wd.sz-s .tm-flip{gap:8px;} .wg-t.wd.sz-s .tm-d{width:22px;height:32px;font-size:18px;}
+  .tm-rings{display:flex;align-items:center;gap:14px;margin-top:2px;min-width:0;}
+  .tm-rings svg{width:92px;height:92px;flex:none;transform:rotate(-90deg);}
+  .wg-t.wd.sz-l .tm-rings svg{width:136px;height:136px;}
+  .tm-rings circle{fill:none;stroke-width:3.4;stroke-linecap:round;}
+  .tm-rings circle.tr{stroke:var(--pg-track,rgba(127,127,127,.2));}
+  .tm-lg{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--pg-fg,var(--text));}
+  .tm-lg span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tm-lg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+  .tm-rest{font-variant-numeric:tabular-nums;}
+  .tm-done{font-size:26px;}
+  .tm-dtrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px;}
+  @media (prefers-reduced-motion:reduce){ .tm-d.go{animation:none;} }
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .wg-t.wg-t{background:var(--pg-surface,var(--card));} }
   @media (prefers-reduced-transparency:reduce){ .wg-t.wg-t{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--pg-surface,var(--card));} }

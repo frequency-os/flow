@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 97 |
-| Рядків JS | 36173 |
+| Рядків JS | 36329 |
 | Файлів CSS | 50 |
-| Рядків CSS | 11260 |
-| Сутностей верхнього рівня | 2677 |
+| Рядків CSS | 11286 |
+| Сутностей верхнього рівня | 2695 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -82,7 +82,7 @@
 | `src/scripts/core/46-wallet.js` | 508 | 43 |
 | `src/scripts/core/47-rules.js` | 351 | 29 |
 | `src/scripts/core/48-hero.js` | 342 | 41 |
-| `src/scripts/core/48-widgets.js` | 701 | 59 |
+| `src/scripts/core/48-widgets.js` | 856 | 77 |
 | `src/scripts/core/49-calendar.js` | 310 | 36 |
 | `src/scripts/core/49-finlit.js` | 150 | 18 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
@@ -97,7 +97,7 @@
 | `src/scripts/core/58-moods.js` | 418 | 44 |
 | `src/scripts/core/59-core-screen.js` | 173 | 19 |
 | `src/scripts/core/60-core-actions.js` | 177 | 14 |
-| `src/scripts/page-editor/01-palette.js` | 187 | 17 |
+| `src/scripts/page-editor/01-palette.js` | 188 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 762 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1025 | 53 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
@@ -169,7 +169,7 @@
 | `src/styles/core/29-year.css` | 89 | 0 |
 | `src/styles/core/30-wallet.css` | 161 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
-| `src/styles/core/32-widgets.css` | 391 | 0 |
+| `src/styles/core/32-widgets.css` | 417 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
 | `src/styles/core/34-intro.css` | 106 | 0 |
 | `src/styles/core/35-focus.css` | 112 | 0 |
@@ -2423,7 +2423,7 @@
 | `heroWardItem` | функція | `src/scripts/core/48-hero.js:286` |
 | `heroWardrobe` | функція | `src/scripts/core/48-hero.js:294` |
 
-### `src/scripts/core/48-widgets.js` — 59 сутностей
+### `src/scripts/core/48-widgets.js` — 77 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2446,46 +2446,64 @@
 | `wgMoneyCfg` | функція | `src/scripts/core/48-widgets.js:142` |
 | `WD_SZ` | обʼєкт | `src/scripts/core/48-widgets.js:171` |
 | `WD_META` | обʼєкт | `src/scripts/core/48-widgets.js:172` |
-| `wdCalYm` | обʼєкт | `src/scripts/core/48-widgets.js:183` |
-| `wdIs` | функція | `src/scripts/core/48-widgets.js:184` |
-| `wdSz` | функція | `src/scripts/core/48-widgets.js:185` |
-| `wdPer` | функція | `src/scripts/core/48-widgets.js:186` |
-| `wdOn` | функція | `src/scripts/core/48-widgets.js:187` |
-| `wdInit` | функція | `src/scripts/core/48-widgets.js:189` |
-| `wdGoal` | функція | `src/scripts/core/48-widgets.js:195` |
-| `wdNext` | функція | `src/scripts/core/48-widgets.js:201` |
-| `wdDue` | функція | `src/scripts/core/48-widgets.js:208` |
-| `wdDaysLeft` | функція | `src/scripts/core/48-widgets.js:213` |
-| `wdFolder` | функція | `src/scripts/core/48-widgets.js:214` |
-| `wdHead` | функція | `src/scripts/core/48-widgets.js:216` |
-| `wdTile` | функція | `src/scripts/core/48-widgets.js:222` |
-| `wdRing` | функція | `src/scripts/core/48-widgets.js:226` |
-| `wdHm` | функція | `src/scripts/core/48-widgets.js:228` |
-| `wdNoGoal` | функція | `src/scripts/core/48-widgets.js:230` |
-| `wdLevels` | функція | `src/scripts/core/48-widgets.js:236` |
-| `wdHabGrid` | функція | `src/scripts/core/48-widgets.js:243` |
-| `wdWeekBars` | функція | `src/scripts/core/48-widgets.js:249` |
-| `wdHTML` | функція | `src/scripts/core/48-widgets.js:253` |
-| `wdPhotos` | функція | `src/scripts/core/48-widgets.js:422` |
-| `WD_PH_MAX` | значення | `src/scripts/core/48-widgets.js:427` |
-| `wdPhotoAdd` | функція | `src/scripts/core/48-widgets.js:429` |
-| `wdPhotoGallery` | функція | `src/scripts/core/48-widgets.js:446` |
-| `wdFinal` | функція | `src/scripts/core/48-widgets.js:469` |
-| `wdSaveGoal` | функція | `src/scripts/core/48-widgets.js:473` |
-| `wdNumTxt` | функція | `src/scripts/core/48-widgets.js:474` |
-| `wdCounters` | функція | `src/scripts/core/48-widgets.js:476` |
-| `wdCntPct` | функція | `src/scripts/core/48-widgets.js:484` |
-| `wdFreshGoal` | функція | `src/scripts/core/48-widgets.js:486` |
-| `wdCounterStep` | функція | `src/scripts/core/48-widgets.js:489` |
-| `wdCounterSheet` | функція | `src/scripts/core/48-widgets.js:502` |
-| `wdSaveGoalSheet` | функція | `src/scripts/core/48-widgets.js:552` |
-| `wdRedraw` | функція | `src/scripts/core/48-widgets.js:569` |
-| `wdAct` | функція | `src/scripts/core/48-widgets.js:570` |
-| `wdCfg` | функція | `src/scripts/core/48-widgets.js:601` |
-| `wdPickMission` | функція | `src/scripts/core/48-widgets.js:654` |
-| `WG_OLD` | обʼєкт | `src/scripts/core/48-widgets.js:672` |
-| `wgOldScan` | функція | `src/scripts/core/48-widgets.js:673` |
-| `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:680` |
+| `wdCalYm` | обʼєкт | `src/scripts/core/48-widgets.js:185` |
+| `wdIs` | функція | `src/scripts/core/48-widgets.js:186` |
+| `wdSz` | функція | `src/scripts/core/48-widgets.js:187` |
+| `wdPer` | функція | `src/scripts/core/48-widgets.js:188` |
+| `wdOn` | функція | `src/scripts/core/48-widgets.js:189` |
+| `wdInit` | функція | `src/scripts/core/48-widgets.js:191` |
+| `wdGoal` | функція | `src/scripts/core/48-widgets.js:199` |
+| `wdNext` | функція | `src/scripts/core/48-widgets.js:205` |
+| `wdDue` | функція | `src/scripts/core/48-widgets.js:212` |
+| `wdDaysLeft` | функція | `src/scripts/core/48-widgets.js:217` |
+| `wdFolder` | функція | `src/scripts/core/48-widgets.js:218` |
+| `wdHead` | функція | `src/scripts/core/48-widgets.js:220` |
+| `wdTile` | функція | `src/scripts/core/48-widgets.js:226` |
+| `wdRing` | функція | `src/scripts/core/48-widgets.js:230` |
+| `wdHm` | функція | `src/scripts/core/48-widgets.js:232` |
+| `wdNoGoal` | функція | `src/scripts/core/48-widgets.js:234` |
+| `wdLevels` | функція | `src/scripts/core/48-widgets.js:240` |
+| `wdHabGrid` | функція | `src/scripts/core/48-widgets.js:247` |
+| `wdWeekBars` | функція | `src/scripts/core/48-widgets.js:253` |
+| `wdHTML` | функція | `src/scripts/core/48-widgets.js:257` |
+| `wdPhotos` | функція | `src/scripts/core/48-widgets.js:427` |
+| `WD_PH_MAX` | значення | `src/scripts/core/48-widgets.js:432` |
+| `wdPhotoAdd` | функція | `src/scripts/core/48-widgets.js:434` |
+| `wdPhotoGallery` | функція | `src/scripts/core/48-widgets.js:451` |
+| `wdFinal` | функція | `src/scripts/core/48-widgets.js:474` |
+| `wdSaveGoal` | функція | `src/scripts/core/48-widgets.js:478` |
+| `wdNumTxt` | функція | `src/scripts/core/48-widgets.js:479` |
+| `wdCounters` | функція | `src/scripts/core/48-widgets.js:481` |
+| `wdCntPct` | функція | `src/scripts/core/48-widgets.js:489` |
+| `wdFreshGoal` | функція | `src/scripts/core/48-widgets.js:491` |
+| `wdCounterStep` | функція | `src/scripts/core/48-widgets.js:494` |
+| `wdCounterSheet` | функція | `src/scripts/core/48-widgets.js:507` |
+| `wdSaveGoalSheet` | функція | `src/scripts/core/48-widgets.js:557` |
+| `wdRedraw` | функція | `src/scripts/core/48-widgets.js:574` |
+| `wdAct` | функція | `src/scripts/core/48-widgets.js:575` |
+| `wdCfg` | функція | `src/scripts/core/48-widgets.js:606` |
+| `wdPickMission` | функція | `src/scripts/core/48-widgets.js:660` |
+| `TM_U` | масив | `src/scripts/core/48-widgets.js:679` |
+| `TM_N` | обʼєкт | `src/scripts/core/48-widgets.js:680` |
+| `TM_SH` | обʼєкт | `src/scripts/core/48-widgets.js:682` |
+| `TM_MS` | обʼєкт | `src/scripts/core/48-widgets.js:683` |
+| `TM_STY` | масив | `src/scripts/core/48-widgets.js:684` |
+| `tmCfgOf` | функція | `src/scripts/core/48-widgets.js:685` |
+| `tmAt` | функція | `src/scripts/core/48-widgets.js:691` |
+| `tmAddM` | функція | `src/scripts/core/48-widgets.js:693` |
+| `tmParts` | функція | `src/scripts/core/48-widgets.js:696` |
+| `tmState` | функція | `src/scripts/core/48-widgets.js:710` |
+| `tmDateTxt` | функція | `src/scripts/core/48-widgets.js:716` |
+| `tmPad` | функція | `src/scripts/core/48-widgets.js:717` |
+| `tmInner` | функція | `src/scripts/core/48-widgets.js:719` |
+| `tmHTML` | функція | `src/scripts/core/48-widgets.js:746` |
+| `tmTimer` | значення | `src/scripts/core/48-widgets.js:756` |
+| `tmTickAll` | функція | `src/scripts/core/48-widgets.js:757` |
+| `tmStart` | функція | `src/scripts/core/48-widgets.js:767` |
+| `tmCfg` | функція | `src/scripts/core/48-widgets.js:769` |
+| `WG_OLD` | обʼєкт | `src/scripts/core/48-widgets.js:827` |
+| `wgOldScan` | функція | `src/scripts/core/48-widgets.js:828` |
+| `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:835` |
 
 ### `src/scripts/core/49-calendar.js` — 36 сутностей
 
@@ -2916,21 +2934,21 @@
 |---|---|---|
 | `PGS_CATS` | масив | `src/scripts/page-editor/01-palette.js:5` |
 | `CATALOG` | масив | `src/scripts/page-editor/01-palette.js:13` |
-| `PGS_SYN` | обʼєкт | `src/scripts/page-editor/01-palette.js:55` |
-| `PGS_ICONS` | обʼєкт | `src/scripts/page-editor/01-palette.js:86` |
-| `pgsIc` | функція | `src/scripts/page-editor/01-palette.js:140` |
-| `bridge` | функція | `src/scripts/page-editor/01-palette.js:142` |
-| `editor` | значення | `src/scripts/page-editor/01-palette.js:143` |
-| `scr` | значення | `src/scripts/page-editor/01-palette.js:144` |
-| `uid` | функція | `src/scripts/page-editor/01-palette.js:145` |
-| `esc` | функція | `src/scripts/page-editor/01-palette.js:146` |
-| `txtOf` | функція | `src/scripts/page-editor/01-palette.js:149` |
-| `setTxt` | функція | `src/scripts/page-editor/01-palette.js:150` |
-| `locate` | функція | `src/scripts/page-editor/01-palette.js:152` |
-| `save` | функція | `src/scripts/page-editor/01-palette.js:160` |
-| `moveBlock` | функція | `src/scripts/page-editor/01-palette.js:164` |
-| `snapshotArr` | функція | `src/scripts/page-editor/01-palette.js:186` |
-| `restoreArr` | функція | `src/scripts/page-editor/01-palette.js:187` |
+| `PGS_SYN` | обʼєкт | `src/scripts/page-editor/01-palette.js:56` |
+| `PGS_ICONS` | обʼєкт | `src/scripts/page-editor/01-palette.js:87` |
+| `pgsIc` | функція | `src/scripts/page-editor/01-palette.js:141` |
+| `bridge` | функція | `src/scripts/page-editor/01-palette.js:143` |
+| `editor` | значення | `src/scripts/page-editor/01-palette.js:144` |
+| `scr` | значення | `src/scripts/page-editor/01-palette.js:145` |
+| `uid` | функція | `src/scripts/page-editor/01-palette.js:146` |
+| `esc` | функція | `src/scripts/page-editor/01-palette.js:147` |
+| `txtOf` | функція | `src/scripts/page-editor/01-palette.js:150` |
+| `setTxt` | функція | `src/scripts/page-editor/01-palette.js:151` |
+| `locate` | функція | `src/scripts/page-editor/01-palette.js:153` |
+| `save` | функція | `src/scripts/page-editor/01-palette.js:161` |
+| `moveBlock` | функція | `src/scripts/page-editor/01-palette.js:165` |
+| `snapshotArr` | функція | `src/scripts/page-editor/01-palette.js:187` |
+| `restoreArr` | функція | `src/scripts/page-editor/01-palette.js:188` |
 
 ### `src/scripts/page-editor/02-block-styles.js` — 49 сутностей
 

@@ -6,7 +6,7 @@
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1};   // d* — «Дані» (нижче)
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -178,18 +178,22 @@
     dcount:{t:'Відлік до мети', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата'],['next','Наступна віха']]},
     dsave:{t:'Скарбничка місії', h:'Скарбничка', ic:'🐷', per:null, show:[['bar','Смужка'],['spent','Витрачено на місію'],['add','Кнопка «＋ ₴»']]},
     dcounter:{t:'Лічильник місії', h:'Лічильник', ic:'🔢', per:null, show:[['bar','Смужка'],['minus','Кнопка «−»']]},
-    dphoto:{t:'Фото-прогрес', h:'Фото', ic:'📸', per:null, show:[['dates','Дати під фото'],['count','Скільки фото й днів']]}
+    dphoto:{t:'Фото-прогрес', h:'Фото', ic:'📸', per:null, show:[['dates','Дати під фото'],['count','Скільки фото й днів']]},
+    /* відлік часу (17.11.2026): старий блок countdown — тепер віджет; своя дата, без місії (tmHTML нижче) */
+    countdown:{t:'Відлік часу', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата під цифрами']]}
   };
   const wdCalYm={};   // місяць, який гортає віджет «Календар папки» (лише памʼять)
   function wdIs(t){ return Object.prototype.hasOwnProperty.call(WD_META,String(t||'')); }
-  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto')?'m':'s'); }
+  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
   function wdInit(b,k){
     b.type=k; b.sz=wdSz(b); b.gw=WD_SZ[b.sz].gw; b.gh=WD_SZ[b.sz].gh;
     if(WD_META[k].per&&!b.period) b.period=k==='dtime'?'day':'week';
-    delete b.text; return b;
+    delete b.text;
+    if(k==='countdown'){ const bid=b.id; setTimeout(()=>{ try{ tmCfg(bid); }catch(_){} },450); }   // новий відлік — одразу спитати назву й дату
+    return b;
   }
   // місія віджета: обрана в налаштуваннях (не архівна) → інакше місія цієї папки
   function wdGoal(b,fk){
@@ -252,6 +256,7 @@
   }
   function wdHTML(b,fk){
     const t=b.type, sz=wdSz(b), td=ymdLocal();
+    if(t==='countdown') return tmHTML(b,fk);
     if(t==='dmission'){
       const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
       const pct=jnPct(g), nx=wdNext(g), due=wdDue(g), dl=due?wdDaysLeft(due):null;
@@ -600,6 +605,7 @@
   // ── ⚙ налаштування віджета: Розмір · Джерело · Період · Показувати · Видалити ──
   function wdCfg(id){
     let b=null; try{ b=getBlock(id); }catch(_){} if(!b||!wdIs(b.type)) return;
+    if(b.type==='countdown') return tmCfg(id);   // у відліку своя шторка: дата, напрям, одиниці, стиль
     const m=WD_META[b.type], fk=wgCtxFolder(), fm=wgFolderMission(fk), goals=(b.type==='dtime'||b.type==='dcal')?[]:wlMissions();
     let sz=wdSz(b), per=wdPer(b), gid=b.goalId&&goals.some(g=>String(g.id)===String(b.goalId))?String(b.goalId):'';
     const show={}; m.show.forEach(([k])=>{ show[k]=wdOn(b,k); });
@@ -664,6 +670,155 @@
   // дані прийшли з хмари / з іншого пристрою — віджети оновлюються самі (як колись 33-home-widgets.js)
   // лише ключі, що й так живуть сирими в localStorage (FLOW_RAW_KEYS) — prefCatchup кладе значення туди
   try{ ['fin_ops','goals_data'].forEach(k=>prefCatchup(k,()=>{ try{ wgRefresh(); }catch(_){} })); }catch(_){}
+
+  /* ════════ «Відлік часу» (17.11.2026): старий блок countdown став віджетом «Даних» ════════
+     Блок зберігає лише свої налаштування. Старі поля лишились тими самими (їх пишуть агент Флоу і шаблони сфер):
+     title — назва, target 'YYYY-MM-DD' — дата. Нові — лише після «Зберегти» в ⚙: tm 'HH:MM', dir 'up' (від дати),
+     units [y,mo,w,d,h,mi,s], sty 'huge'|'rings' (типово флип), yearly — щороку. Без нових полів відлік рахує як раніше:
+     до дати о 00:00, дні · год · хв · с. Тікання раз на секунду лише перемальовує цифри — нічого не пише. */
+  const TM_U=['y','mo','w','d','h','mi','s'], TM_DEF=['d','h','mi','s'];
+  const TM_N={y:['рік','роки','років'],mo:['місяць','місяці','місяців'],w:['тиждень','тижні','тижнів'],d:['день','дні','днів'],
+    h:['година','години','годин'],mi:['хвилина','хвилини','хвилин'],s:['секунда','секунди','секунд']};
+  const TM_SH={y:'р',mo:'міс',w:'тиж',d:'дн',h:'год',mi:'хв',s:'с'};
+  const TM_MS={w:6048e5,d:864e5,h:36e5,mi:6e4,s:1e3};
+  const TM_STY=[['flip','Флип 3D'],['huge','Велике число'],['rings','Кільця']];
+  function tmCfgOf(b){
+    const dir=b.dir==='up'?'up':'down';
+    let units=Array.isArray(b.units)?TM_U.filter(u=>b.units.includes(u)):[]; if(!units.length) units=TM_DEF.slice();
+    return { target:/^\d{4}-\d{2}-\d{2}$/.test(b.target||'')?b.target:'', tm:/^([01]\d|2[0-3]):[0-5]\d$/.test(b.tm||'')?b.tm:'00:00',
+      dir, units, sty:TM_STY.some(s=>s[0]===b.sty)?b.sty:'flip', yearly:!!b.yearly&&dir==='down', date:wdOn(b,'date') };
+  }
+  function tmAt(c){ const [y,m,d]=c.target.split('-').map(Number), [h,mi]=c.tm.split(':').map(Number); return new Date(y,m-1,d,h,mi,0,0); }
+  // +n календарних місяців; 31 січня + 1 = 28/29 лютого (не 3 березня)
+  function tmAddM(dt,n){ const r=new Date(dt.getTime()), day=r.getDate(); r.setDate(1); r.setMonth(r.getMonth()+n);
+    r.setDate(Math.min(day,new Date(r.getFullYear(),r.getMonth()+1,0).getDate())); return r; }
+  // різниця a→b (a ≤ b) у вибраних одиницях, від найбільшої: роки й місяці календарні, решта — точні мілісекунди
+  function tmParts(a,b,units){
+    const out={}; let cur=a;
+    if(units.includes('y')||units.includes('mo')){
+      let mo=Math.max(0,(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth()-1);
+      while(tmAddM(a,mo+1)<=b) mo++;
+      if(units.includes('y')){ out.y=Math.floor(mo/12); if(units.includes('mo')) out.mo=mo%12; else mo=out.y*12; }
+      else out.mo=mo;
+      cur=tmAddM(a,(out.y||0)*12+(out.mo||0));
+    }
+    let rest=Math.max(0,b-cur);
+    ['w','d','h','mi','s'].forEach(k=>{ if(units.includes(k)){ out[k]=Math.floor(rest/TM_MS[k]); rest-=out[k]*TM_MS[k]; } });
+    return out;
+  }
+  // стан на «зараз»: дата (для «щороку» — найближча майбутня), чи вже настала, і розклад
+  function tmState(c,now){
+    let at=tmAt(c);
+    if(c.dir==='down'&&c.yearly){ let n=0; while(at<=now&&n<300){ at=new Date(at.getTime()); at.setFullYear(at.getFullYear()+1); n++; } }
+    const off=c.dir==='down'?at<=now:at>now;   // «до»: уже настала · «від»: ще не почалась
+    return {at, off, p:off?null:(c.dir==='down'?tmParts(now,at,c.units):tmParts(at,now,c.units))};
+  }
+  function tmDateTxt(at,c){ const ds=ymdLocal(at); return jnDateTxt(ds)+(ds.slice(0,4)!==ymdLocal().slice(0,4)?' '+ds.slice(0,4):'')+(c.tm!=='00:00'?', '+c.tm:''); }
+  const tmPad=(k,v)=>(k==='h'||k==='mi'||k==='s')?String(v).padStart(2,'0'):String(v);
+  // вміст живої частини віджета; el — щоб флип знав, які цифри змінились з минулої секунди
+  function tmInner(c,sz,el){
+    const st=tmState(c,new Date());
+    const dt=c.date?`<small class="wd-sub tm-dt">${c.dir==='down'?'':'з '}${esc(tmDateTxt(st.at,c))}${c.yearly?' · щороку':''}</small>`:'';
+    if(st.off) return c.dir==='down'?`<b class="wd-big tm-done">Настав! 🎉</b>${dt}`:`<b class="wd-big sm">Ще не почалось</b><small class="wd-sub">Старт ${esc(tmDateTxt(st.at,c))}</small>`;
+    let us=c.units.slice(); while(us.length>1&&!st.p[us[0]]) us.shift();   // нулі попереду не показуємо: «0 років 1 місяць» → «1 місяць»
+    if(sz==='s') us=us.slice(0,2);
+    const pl=k=>pluralUk(st.p[k],...TM_N[k]);
+    let sty=c.sty; if(sty==='rings'&&sz==='s') sty='huge';
+    if(sty==='huge'){
+      const k0=us[0], rest=us.slice(1).map(k=>tmPad(k,st.p[k])+' '+TM_SH[k]).join(' · ');
+      return `<span class="wd-cnt"><b class="wd-big xl">${st.p[k0]}</b><small class="wd-cap">${pl(k0)}</small></span>${rest?`<small class="wd-sub tm-rest">${rest}</small>`:''}${dt}`;
+    }
+    if(sty==='rings'){
+      const rk=us.slice(-3), cols=['var(--fc)','#ff7a9a','#5ee0cf'];
+      const max={y:100,mo:12,w:52,d:us.includes('w')?7:us.includes('mo')?31:365,h:24,mi:60,s:60};
+      const svg=rk.map((k,i)=>{ const r=16-i*4.5, f=Math.min(1,(st.p[k]%max[k])/max[k]);
+        return `<circle class="tr" cx="18" cy="18" r="${r}"/><circle cx="18" cy="18" r="${r}" pathLength="100" stroke="${cols[i]}" stroke-dasharray="${(f*100).toFixed(1)} 100"/>`; }).join('');
+      return `<span class="tm-rings"><svg viewBox="0 0 36 36" aria-hidden="true">${svg}</svg><span class="tm-lg">${us.map(k=>{ const i=rk.indexOf(k);
+        return `<span><i style="background:${i>=0?cols[i]:'var(--pg-track,rgba(127,127,127,.3))'}"></i>${tmPad(k,st.p[k])} ${pl(k)}</span>`; }).join('')}</span></span>${dt}`;
+    }
+    const prev=(el&&el.__tmPrev)||{}, now={};
+    const h=us.map(k=>{ const s=tmPad(k,st.p[k]);
+      return `<span class="tm-u"><span class="tm-ds">${s.split('').map((ch,i)=>{ const key=k+(s.length-i); now[key]=ch;
+        return `<i class="tm-d${prev[key]!==undefined&&prev[key]!==ch?' go':''}">${ch}</i>`; }).join('')}</span><small>${pl(k)}</small></span>`; }).join('');
+    if(el) el.__tmPrev=now;
+    return `<span class="tm-flip" role="timer" aria-label="${us.map(k=>st.p[k]+' '+pl(k)).join(', ')}">${h}</span>${dt}`;
+  }
+  function tmHTML(b,fk){
+    const c=tmCfgOf(b), sz=wdSz(b), nm=esc(String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60));
+    const hit=`<button class="wg-hit" data-wga="wdcfg" aria-label="Налаштувати відлік${nm?' «'+nm+'»':''}"></button>`;
+    if(!c.target) return wdTile(b,fk,`${hit}${wdHead(b,fk)}<b class="wd-name">${nm||'Новий відлік'}</b>
+      <small class="wd-sub">Вибери дату, і відлік почнеться</small><span class="wd-acts"><button data-wga="wdcfg">Вибрати дату</button></span>`,'empty');
+    tmStart();
+    const live=`<span class="tm-live" data-tg="${esc(c.target)}" data-tm="${esc(c.tm)}" data-dir="${c.dir}" data-u="${esc(c.units.join(','))}" data-sty="${c.sty}" data-sz="${sz}" data-yr="${c.yearly?1:''}" data-dt="${c.date?1:''}">${tmInner(c,sz,null)}</span>`;
+    return wdTile(b,fk,`${hit}${wdHead(b,fk,c.dir==='up'?'від дати':'')}${nm?`<b class="wd-name">${nm}</b>`:''}${live}`,'tmw');
+  }
+  // один таймер на весь застосунок: оновлює цифри всіх видимих відліків; налаштування — з data-* самої плитки
+  let tmTimer=0;
+  function tmTickAll(){
+    if(document.hidden) return;
+    document.querySelectorAll('.tm-live').forEach(el=>{
+      const d=el.dataset; if(!/^\d{4}-\d{2}-\d{2}$/.test(d.tg||'')) return;
+      const c={target:d.tg, tm:/^([01]\d|2[0-3]):[0-5]\d$/.test(d.tm||'')?d.tm:'00:00', dir:d.dir==='up'?'up':'down',
+        units:String(d.u||'').split(',').filter(u=>TM_U.includes(u)), sty:d.sty, yearly:d.yr==='1', date:d.dt==='1'};
+      if(!c.units.length) c.units=TM_DEF.slice();
+      const h=tmInner(c,d.sz,el); if(h!==el.__tmH){ el.__tmH=h; el.innerHTML=h; }
+    });
+  }
+  function tmStart(){ if(!tmTimer) tmTimer=setInterval(tmTickAll,1000); }
+  // ⚙ відліку: назва, дата й час, напрям, одиниці, стиль, розмір, «щороку»
+  function tmCfg(id){
+    let b=null; try{ b=getBlock(id); }catch(_){} if(!b||b.type!=='countdown') return;
+    const c=tmCfgOf(b), units=new Set(c.units); let sz=wdSz(b), dir=c.dir, sty=c.sty, yearly=c.yearly, date=c.date;
+    const nm=String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
+    jnOverlay(`<div class="jn-ed-h"><b>⏳ Відлік часу</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <label class="jn-f"><span>Назва</span><input id="tmName" type="text" maxlength="60" value="${esc(nm)}" placeholder="Новий рік, відпустка, без цукру…"></label>
+      <div class="tm-dtrow"><label class="jn-f"><span>Дата</span><input id="tmDate" type="date" value="${esc(c.target)}"></label>
+        <label class="jn-f"><span>Час</span><input id="tmTime" type="time" value="${esc(c.tm)}"></label></div>
+      <div class="jn-f"><span>Напрям</span><div class="wl-chips"><button data-tmdir="down" class="${dir==='down'?'on':''}">⏳ До дати</button><button data-tmdir="up" class="${dir==='up'?'on':''}">⏱ Від дати</button></div></div>
+      <div class="jn-f"><span>Що показувати</span><div class="wl-chips">${TM_U.map(u=>`<button data-tmu="${u}" class="${units.has(u)?'on':''}" aria-pressed="${units.has(u)}">${TM_N[u][2][0].toUpperCase()+TM_N[u][2].slice(1)}</button>`).join('')}</div></div>
+      <div class="jn-f"><span>Стиль</span><div class="wl-chips">${TM_STY.map(([k,l])=>`<button data-tmsty="${k}" class="${k===sty?'on':''}">${l}</button>`).join('')}</div></div>
+      <div class="jn-f"><span>Розмір</span><div class="wd-szs">${Object.keys(WD_SZ).map(k=>`<button data-wdsz="${k}" class="${k===sz?'on':''}" aria-pressed="${k===sz}"><i class="wd-szi ${k}"></i><b>${WD_SZ[k].t}</b><small>${WD_SZ[k].d}</small></button>`).join('')}</div></div>
+      <div class="jn-f"><div class="wd-tg">
+        <button data-tmyr role="switch" aria-checked="${yearly}" class="${yearly?'on':''}"><span>Щороку (день народження, річниця)</span><i></i></button>
+        <button data-tmdt role="switch" aria-checked="${date}" class="${date?'on':''}"><span>Дата під цифрами</span><i></i></button></div></div>
+      <div class="jn-ed-foot"><button class="jn-btn" data-tmok>Зберегти</button></div>
+      <button class="wd-del" data-tmdel>Видалити відлік</button>`, ov=>{
+      ov.classList.add('wd-ov');
+      const one=(sel,fn)=>ov.querySelectorAll(sel).forEach(x=>x.onclick=()=>{ fn(x); ov.querySelectorAll(sel).forEach(y=>{ y.classList.toggle('on',y===x); if(y.hasAttribute('aria-pressed')) y.setAttribute('aria-pressed',String(y===x)); }); });
+      one('[data-tmdir]',x=>{ dir=x.dataset.tmdir; });
+      one('[data-tmsty]',x=>{ sty=x.dataset.tmsty; });
+      one('[data-wdsz]',x=>{ sz=x.dataset.wdsz; });
+      ov.querySelectorAll('[data-tmu]').forEach(x=>x.onclick=()=>{ const u=x.dataset.tmu;
+        if(units.has(u)){ if(units.size===1){ plToast('Хоча б одна одиниця'); return; } units.delete(u); } else units.add(u);
+        x.classList.toggle('on',units.has(u)); x.setAttribute('aria-pressed',String(units.has(u))); });
+      const sw=(sel,get,set)=>{ const x=ov.querySelector(sel); x.onclick=()=>{ set(!get()); x.classList.toggle('on',get()); x.setAttribute('aria-checked',String(get())); }; };
+      sw('[data-tmyr]',()=>yearly,v=>{ yearly=v; });
+      sw('[data-tmdt]',()=>date,v=>{ date=v; });
+      ov.querySelector('[data-tmok]').onclick=()=>{
+        const ds=String(ov.querySelector('#tmDate').value||''), tm=String(ov.querySelector('#tmTime').value||'').slice(0,5);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)){ plToast('Вибери дату'); return; }
+        const q=getBlock(id); if(!q||q.type!=='countdown'){ ov.remove(); return; }
+        const name=String(ov.querySelector('#tmName').value||'').replace(/\s+/g,' ').trim().slice(0,60);
+        q.title=name; q.label=name; q.target=ds;   // label — старе поле підпису, тримаємо разом із назвою
+        if(/^([01]\d|2[0-3]):[0-5]\d$/.test(tm)&&tm!=='00:00') q.tm=tm; else delete q.tm;
+        if(dir==='up') q.dir='up'; else delete q.dir;
+        const us=TM_U.filter(u=>units.has(u)); if(us.join()===TM_DEF.join()) delete q.units; else q.units=us;
+        if(sty!=='flip') q.sty=sty; else delete q.sty;
+        if(yearly&&dir==='down') q.yearly=true; else delete q.yearly;
+        if(date) delete q.show; else q.show={date:false};
+        q.sz=sz; q.gw=WD_SZ[sz].gw; q.gh=WD_SZ[sz].gh;
+        saveBoard(); ov.remove(); wdRedraw();
+      };
+      // відлік сам і є своїми даними (назва + дата), тож видалення — з «Скасувати»
+      ov.querySelector('[data-tmdel]').onclick=()=>{
+        const arr=findParentArr(curBoard(),id), i=arr?arr.findIndex(x=>x&&String(x.id)===String(id)):-1;
+        if(i>=0){ const was=arr.splice(i,1)[0]; saveBoard();
+          flowUndoToast('Відлік прибрано',()=>{ if(arr.some(x=>x&&String(x.id)===String(was.id))) return; arr.splice(Math.min(i,arr.length),0,was); saveBoard(); wdRedraw(); }); }
+        ov.remove(); wdRedraw();
+      };
+      if(!c.target) setTimeout(()=>{ try{ ov.querySelector('#tmName').focus(); }catch(_){} },80);
+    });
+  }
 
   /* ── «Ще → Дані → Старі віджети»: прибрати старі фінансові блоки й проєкти Кабінету ──
      Лише рукою людини і лише коли сховище довірене (дані з хмари прочитано). Нічого не робить при старті.
