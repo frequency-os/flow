@@ -867,6 +867,7 @@
       });
       m.querySelectorAll('[data-lkv]').forEach(b=>b.onclick=()=>{
         const v=b.dataset.lkv; lkView[fk]=(v==='feed')?'feed':'doc';
+        try{ if(typeof fhPeekEnd==='function') fhPeekEnd(); }catch(_){}   // свідомий вибір вигляду закінчує «Відкрити в документі»
         if(v!=='feed'&&typeof fhView==='function'&&fhView(fk)!==v){ try{ fhSetView(fk,v); }catch(_){} }   // вибір людини — зберігається в папці
         try{ renderPgLinks(); }catch(_){} try{ if(typeof fhApplyView==='function') fhApplyView(); }catch(_){}
         m.querySelectorAll('[data-lkv]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
