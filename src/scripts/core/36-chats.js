@@ -446,7 +446,7 @@
     const scr=document.getElementById('scr-page'), doc=scr&&scr.querySelector('.pg-doc'); if(!doc) return;
     let el=document.getElementById('pgHero');
     const fk=pgFolderKey(), f=fk?folders[fk]:null;
-    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero'); fhTitleHome(); fhApplyView(); return; }
+    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero','fh-bar'); const ob=document.getElementById('fhBar'); if(ob) ob.remove(); fhTitleHome(); fhApplyView(); return; }
     if(!el){ el=document.createElement('div'); el.id='pgHero'; el.className='ch-cover fh'; doc.insertBefore(el,doc.firstChild); }
     el.hidden=false; scr.classList.add('pg-fhero');
     fhTitleHome();   // спершу винести #pgTitle: innerHTML нижче інакше знищив би поле назви разом зі старою шапкою
@@ -469,8 +469,34 @@
     on('more',()=>{ const m=document.getElementById('pgMoreBtn'); if(m) m.click(); });
     on('look',()=>fhLookSheet(fk));
     el.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs));
+    // скляна смуга вгорі: зʼявляється, коли обкладинка сховалась; кнопки — ті самі, що на обкладинці
+    let bar=document.getElementById('fhBar');
+    if(!bar){ bar=document.createElement('div'); bar.id='fhBar'; bar.className='fh-topbar'; scr.appendChild(bar); }
+    bar.innerHTML=`<button class="ch-ghost" data-fhb="back" aria-label="Назад">${chI('back')}</button><b data-i18n-skip="1">${esc(f.name||'')}</b>`
+      +`<button class="ch-ghost acc" data-fhb="add" aria-label="Додати">${chI('plus')}</button><button class="ch-ghost" data-fhb="more" aria-label="Ще дії">${chI('dots')}</button>`;
+    bar.querySelectorAll('[data-fhb]').forEach(b=>b.onclick=()=>{ const t=el.querySelector('[data-fh="'+b.dataset.fhb+'"]'); if(t) t.click(); });
     fhApplyView();
+    fhMelt();
   }
+  /* «Обкладинка, що тане» (17.11.2026, макет «Папка в склі», варіант A): коли гортаєш, фото розмивається й темніє,
+     а щойно шапка пішла за край — вгорі скляна смуга з назвою. Рахуємо від місця шапки на екрані, не від scrollTop:
+     гортає body, а на комп'ютері — інший контейнер, і так працює в обох. Лише вигляд, нічого не пише. */
+  let fhMeltRaf=0;
+  function fhMelt(){
+    fhMeltRaf=0;
+    const scr=document.getElementById('scr-page'), el=document.getElementById('pgHero');
+    if(!scr||!el||el.hidden||!scr.classList.contains('active')) return;
+    const h=el.offsetHeight||1, top=el.getBoundingClientRect().top;
+    el.style.setProperty('--melt',Math.max(0,Math.min(1,-top/(h*.75))).toFixed(3));
+    scr.classList.toggle('fh-bar',-top>h-72);
+    // комп'ютер: смуга лише над колонкою документа, не поверх бічної панелі
+    const bar=document.getElementById('fhBar');
+    if(bar){ if(innerWidth>=1024){ const r=el.parentElement.getBoundingClientRect(); bar.style.left=r.left+'px'; bar.style.width=r.width+'px'; bar.style.right='auto'; }
+      else { bar.style.left=''; bar.style.width=''; bar.style.right=''; } }
+  }
+  const fhMeltSoon=()=>{ if(!fhMeltRaf) fhMeltRaf=requestAnimationFrame(fhMelt); };
+  document.addEventListener('scroll',fhMeltSoon,{capture:true,passive:true});
+  window.addEventListener('resize',fhMeltSoon,{passive:true});
   // лише значки — після правок у документі, без перемальовування обкладинки
   let fhT=null;
   function fhSoon(){ clearTimeout(fhT); fhT=setTimeout(()=>{ const el=document.getElementById('pgHero'), fk=pgFolderKey();

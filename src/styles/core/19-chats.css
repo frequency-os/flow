@@ -310,6 +310,41 @@
     background:var(--pg-acc,var(--accent));color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.35);}
   .fh-peek svg{width:18px;height:18px;}
   .fh-peek:focus-visible{outline:2px solid var(--pg-fg,var(--text));outline-offset:2px;}
+
+  /* ── «Обкладинка, що тане» (17.11.2026, 36-chats.js fhMelt; макет «Папка в склі», A) ──
+     --melt від 0 до 1 ставить скрипт, поки шапка йде за край екрана. */
+  #scr-page.pg-fhero #pgHero{height:calc(300px + env(safe-area-inset-top));}
+  #pgHero .ch-cov-bg{transform:translateY(calc(var(--melt,0) * 28%)) scale(calc(1 + var(--melt,0) * .08));
+    filter:blur(calc(var(--melt,0) * 12px)) brightness(calc(1 - var(--melt,0) * .35));will-change:transform,filter;}
+  #pgHero .ch-cov-title{opacity:calc(1 - var(--melt,0) * 1.4);}
+  #pgHero .ch-cov-top{opacity:calc(1 - var(--melt,0) * 2);}
+  #scr-page.fh-bar #pgHero .ch-cov-top{visibility:hidden;}
+  /* кнопки й лічильники на фото — рідке скло */
+  #pgHero .ch-ghost,#pgHero .ch-chip-photo,#pgHero .fh-chip{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.24);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.3);}
+  #pgHero .ch-ghost.acc{background:color-mix(in srgb,var(--accent) 85%,transparent);border-color:transparent;}
+  /* скляна смуга вгорі */
+  .fh-topbar{position:fixed;z-index:55;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;
+    padding:calc(8px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left));
+    background:color-mix(in srgb,var(--pg-surface,var(--card)) 72%,transparent);color:var(--pg-fg,var(--text));
+    -webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
+    box-shadow:inset 0 -1px 0 color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);
+    opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .2s,transform .2s;}
+  #scr-page.fh-bar .fh-topbar{opacity:1;transform:none;pointer-events:auto;}
+  .fh-topbar b{flex:1;min-width:0;text-align:center;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fh-topbar .ch-ghost{border:0;background:color-mix(in srgb,var(--pg-fg,var(--text)) 8%,transparent);color:var(--pg-fg,var(--text));
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+  .fh-topbar .ch-ghost.acc{background:var(--accent);color:#fff;}
+  .fh-topbar .ch-ghost:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  #scr-page.fh-bar .fh-peek{top:calc(env(safe-area-inset-top,0px) + 66px);}
+  @media (min-width:1024px){
+    #scr-page.pg-fhero #pgHero{height:260px;}
+    .fh-topbar{border-radius:0 0 18px 18px;}   /* left/width — над колонкою документа, ставить fhMelt */
+  }
+  @media (prefers-reduced-motion:reduce){
+    #pgHero .ch-cov-bg{transform:none;filter:none;}
+    .fh-topbar{transition:none;}
+  }
   .fhv-wall{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
   .fhv-tile{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;border-radius:14px;background:var(--pg-surface,var(--card)) center/cover no-repeat;}
   .fhv-tile.add{display:grid;place-items:center;border:1.5px dashed var(--pg-edge,var(--line));color:var(--pg-mut,var(--muted));background:transparent;}
