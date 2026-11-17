@@ -348,3 +348,44 @@
   .wd-gal figcaption button{all:unset;cursor:pointer;min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:10px;}
   .wd-gal figcaption button:focus-visible{outline:2px solid var(--accent);}
   @media (min-width:1024px){ .wd-gal{grid-template-columns:repeat(3,minmax(0,1fr));} }
+
+  /* ════════ «Тихе скло» (17.11.2026, макет «Віджети в склі», варіант B) ════════
+     Лише вигляд: одна скляна поверхня для «Даних» і «Грошей». Колір віджета тепер акцент (--wc у «Грошей», --fc у «Даних»),
+     а не заливка на весь віджет. Подвійний клас .wg-t.wg-t — щоб перекрити кольорові .c-* без !important.
+     Без розмиття (старий рушій чи «Зменшити прозорість» в iOS) — звичайна суцільна поверхня. */
+  .wg-t.c-wallet{--wc:#7f8cff;} .wg-t.c-mission{--wc:var(--mc,#34c77b);} .wg-t.c-env{--wc:#f0a020;} .wg-t.c-debt{--wc:#ff4d6d;}
+  .wg-t.c-in{--wc:#22b573;} .wg-t.c-out{--wc:#ff6a3d;} .wg-t.c-work{--wc:#3aa6c9;}
+  .wg-t.wg-t{--gl-fg:var(--pg-fg,var(--text));--gl-mut:var(--pg-mut,var(--muted));color:var(--gl-fg);border:0;border-radius:26px;
+    background:linear-gradient(180deg,color-mix(in srgb,#fff 6%,transparent),transparent 42%),color-mix(in srgb,var(--pg-surface,var(--card)) 74%,transparent);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 16%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--gl-fg) 9%,transparent),0 10px 26px -16px rgba(0,0,0,.5);}
+  .wg-t.wg-t::after{display:none;}
+  .wg-t.wg-t .wg-hit:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:-2px;}
+  /* «Гроші»: назва кольором віджета, одне велике число, решта тихо */
+  .wg-t.wg-t .wg-h{color:var(--wc,var(--gl-mut));opacity:1;text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:700;}
+  .wg-t.wg-t .wg-big{font-size:30px;letter-spacing:-.02em;} .wg-t.wg-t .wg-big.sm{font-size:18px;}
+  .wg-t.wg-t small{color:var(--gl-mut);opacity:1;} .wg-t.wg-t small.wg-pz{color:var(--gl-fg);}
+  .wg-t.wg-t .wg-bar{background:var(--pg-track,rgba(127,127,127,.2));}
+  .wg-t.wg-t .wg-bar i{background:var(--wc,var(--pg-acc,var(--accent)));opacity:1;}
+  .wg-t.wg-t .wg-bar i.over{background:var(--pg-danger,#ff4d6d);box-shadow:none;}
+  .wg-t.wg-t .wg-r::before{background:conic-gradient(var(--wc,var(--accent)) calc(var(--p)*1%),var(--pg-track,rgba(127,127,127,.2)) 0);}
+  .wg-t.wg-t .wg-acts button{background:color-mix(in srgb,var(--wc,var(--accent)) 18%,transparent);color:var(--gl-fg);}
+  .wg-t.wg-t .wg-li{background:color-mix(in srgb,var(--gl-fg) 6%,transparent);}
+  .wg-t.wg-t .wg-li i{color:var(--pg-danger,#d1483f);}
+  .wg-t.wg-t>.wg-cfg,.wg-t.wg-t .wg-rules{background:color-mix(in srgb,var(--gl-fg) 8%,transparent);}
+  /* «Дані»: заголовок без великих літер, число більше, ⚙ і кнопки без рамок */
+  .wg-t.wg-t.wd{padding:13px 13px 11px;}
+  .wg-t.wg-t .wd-h{font-size:12.5px;font-weight:700;letter-spacing:0;text-transform:none;}
+  .wg-t.wg-t .wd-big{font-size:32px;letter-spacing:-.02em;} .wg-t.wg-t .wd-big.sm{font-size:18px;}
+  .wg-t.wg-t .wd-cfg span{background:transparent;border:0;color:var(--gl-mut);}
+  .wg-t.wg-t .wd-acts button{border:0;background:color-mix(in srgb,var(--fc,var(--accent)) 16%,transparent);}
+  .wg-t.wg-t .wd-acts button.on{background:color-mix(in srgb,var(--fc,var(--accent)) 32%,transparent);}
+  /* календар як в Apple: дні без квадратиків, сьогодні — світла таблетка, навігація прозора */
+  .wg-t.wg-t .cal-nav button{border:0;min-height:32px;font-size:12.5px;background:color-mix(in srgb,var(--gl-fg) 7%,transparent);}
+  .wg-t.wg-t .cal-d{background:transparent;border-radius:12px;}
+  .wg-t.wg-t .cal-d.td{background:var(--gl-fg);color:var(--pg-surface,var(--card));}
+  .wg-t.wg-t .cal-d.td em{color:inherit;}
+  .wg-t.wg-t .cal-d.td i u{background:currentColor!important;}   /* !important — бо так само задано в базовому правилі вище */
+  @media (hover:hover){ .wg-t.wg-t .cal-d:not(.td):hover{background:color-mix(in srgb,var(--gl-fg) 7%,transparent);} }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .wg-t.wg-t{background:var(--pg-surface,var(--card));} }
+  @media (prefers-reduced-transparency:reduce){ .wg-t.wg-t{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--pg-surface,var(--card));} }

@@ -16,7 +16,7 @@
 | Файлів JS | 97 |
 | Рядків JS | 36147 |
 | Файлів CSS | 50 |
-| Рядків CSS | 11192 |
+| Рядків CSS | 11225 |
 | Сутностей верхнього рівня | 2674 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
@@ -139,7 +139,7 @@
 | `src/styles/20-depth.css` | 129 | 8 |
 | `src/styles/21-hero-week.css` | 133 | 2 |
 | `src/styles/22-more-screen.css` | 183 | 0 |
-| `src/styles/23-doc-readable.css` | 110 | 4 |
+| `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
 | `src/styles/core/02-page-editor.css` | 1205 | 9 |
 | `src/styles/core/03-folders-projects.css` | 684 | 0 |
@@ -169,7 +169,7 @@
 | `src/styles/core/29-year.css` | 89 | 0 |
 | `src/styles/core/30-wallet.css` | 161 | 0 |
 | `src/styles/core/31-rules.css` | 76 | 0 |
-| `src/styles/core/32-widgets.css` | 350 | 0 |
+| `src/styles/core/32-widgets.css` | 391 | 0 |
 | `src/styles/core/33-starter.css` | 63 | 0 |
 | `src/styles/core/34-intro.css` | 106 | 0 |
 | `src/styles/core/35-focus.css` | 112 | 0 |

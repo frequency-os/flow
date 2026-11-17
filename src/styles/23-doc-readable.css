@@ -80,16 +80,8 @@
   .pgcal{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0) 40%),rgba(19,23,34,.95);}
   .pgcal-wd{color:#9aa2b5;}
 
-  /* ── 8. Віджети «Гроші»: білий текст на світлих кінцях градієнтів мав 2.2–3.0:1.
-     Відтінки ті самі, на крок темніші; кожен кінець ≥ 4.7:1 під білим текстом. ── */
-  .wg-t.c-wallet{background:linear-gradient(135deg,#3343f0,#4f58e8 50%,#7f45d8);}
-  .wg-t.c-mission{background:linear-gradient(135deg,color-mix(in srgb,var(--mc,#34c77b) 52%,#000),color-mix(in srgb,var(--mc,#34c77b) 66%,#000));}
-  .wg-t.c-debt{background:linear-gradient(135deg,#b81d3e,#d1284b);}
-  .wg-t.c-in{background:linear-gradient(135deg,#0a6a47,#0e8455);}
-  .wg-t.c-out{background:linear-gradient(135deg,#a8340a,#c2410c);}
-  /* кнопки й «Книга правил» — темна підкладка: біле скло на кольорі знову з'їдало контраст */
-  .wg-acts button,.wg-rules{background:rgba(0,0,0,.2);}
-  .wg-t.c-env .wg-acts button{background:rgba(0,0,0,.12);}
+  /* ── 8. Віджети «Гроші»: тут були темніші градієнти під білий текст. З 17.11.2026 віджети в «Тихому склі»
+     (32-widgets.css, кінець): текст кольору сторінки на поверхні сторінки, заливок нема — правила прибрано. ── */
 
   /* плитка «План на день»: кнопка на світлому акценті темної теми мала білий текст 2.8:1 */
   html:not(.t-light) #scr-page .pw-btn.go{color:#0c0e16;}
