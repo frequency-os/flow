@@ -68,6 +68,37 @@
         folders: Object.keys(folders||{}).length, chats: (chats||[]).length};
     }
 
+    /* ── Граф (етап 1, 17.11.2026): ціль — центр, до неї привʼязане все інше ──
+       Звʼязки беруться з наявних полів, формат даних не змінюється:
+         кроки — goal.steps (без авто-кроків, як jnPct); гроші — op.goalId (wlAgg з gid);
+         час — block.link.goalId за 7 днів; папка — goal.folderKey (moOwnFolder); чати — chat.folders. */
+    function coreGoalLinks(g){
+      const gid=String(g.id||''), ym=ymLocal();
+      const st=(g.steps||[]).filter(s=>s&&!s.auto);
+      const next=st.find(s=>!s.done&&s.name);
+      const m=wlAgg(wlMonthOps(ym), gid);
+      const p=plData(); let blocks=0, done=0;
+      for(let i=0;i<7;i++){ const d=new Date(); d.setDate(d.getDate()-i);
+        const l=Array.isArray(p.blocksByDay[ymdLocal(d)])?p.blocksByDay[ymdLocal(d)]:[];
+        l.forEach(b=>{ if(b&&b.link&&String(b.link.goalId||'')===gid){ blocks++; if(b.done) done++; } }); }
+      const fk=(g.folderKey&&moOwnFolder(g.folderKey))?String(g.folderKey):'';
+      let ch=[]; try{ if(fk) ch=chatsForFolder(fk).map(c=>({id:String(c.id), name:String(c.name||'')})); }catch(_){}
+      return {
+        steps:{done:st.filter(s=>s.done).length, total:st.length, next:next?String(next.name):''},
+        money:{ready:coreReady('fin_ops'), ym, inc:m.inc, out:m.out, net:m.inc-m.out},
+        time:{blocks, done},
+        folder:fk?{key:fk, name:String((folders[fk]&&folders[fk].name)||''), emoji:String((folders[fk]&&folders[fk].emoji)||'')}:null,
+        chats:ch
+      };
+    }
+    function graph(){
+      const goals=(goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)!=='archive')
+        .sort((a,b)=>(jnRole(a)==='main'?0:1)-(jnRole(b)==='main'?0:1)||(jnStatus(a)==='active'?0:1)-(jnStatus(b)==='active'?0:1))
+        .map(g=>({id:String(g.id), name:String(g.name||''), emoji:g.emoji||'', color:safeColor(g.color,''),
+          role:jnRole(g), status:jnStatus(g), pct:corePart(()=>jnPct(g))||0, links:corePart(()=>coreGoalLinks(g))}));
+      return {v:CORE_VERSION, ready:coreReady('goals_data'), goals};
+    }
+
     /* Один знімок на зараз. Нічого не кешує: дешевий, кличте коли треба. */
     function snapshot(){
       return {
@@ -81,5 +112,5 @@
         notes: corePart(coreNotes)
       };
     }
-    window.Core={ version:CORE_VERSION, snapshot };
+    window.Core={ version:CORE_VERSION, snapshot, graph };
   })();

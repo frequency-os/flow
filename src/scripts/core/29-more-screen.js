@@ -17,6 +17,7 @@
     const DEV_ROWS=[
       {k:'upgrade', ic:'dna',  c:'violet', t:'Апгрейд',          d:'Персонаж, сфери, заявлений шлях'},
       {k:'misto',   ic:'city', c:'blue',   t:'Гра «Місто дня»',  d:'Прототип: місто, персонаж, друзі'},
+      {k:'core',    ic:'compass', c:'violet', t:'Ядро',          d:'Сузірʼя: цілі й усе, що до них веде'},
     ];
     const ico=(n,c)=>(window.stgIco?window.stgIco(n,c):'');
     const chev=()=>'<span class="mr-chev">'+(window.stgSvg?window.stgSvg('chev'):'›')+'</span>';
@@ -72,6 +73,7 @@
     function openMoreSheet(key){
       try{ window.platform.haptic('light'); }catch(_){}
       if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
+      if(key==='core'){ if(window.goCore) window.goCore(); return; }   // Ядро (59-core-screen.js), поки лише для розробника
       // гра — окрема сторінка поруч (src/web/misto.html), свої дані, назад — кнопкою з іконкою Frequency
       // без мережі не переходимо: воркер її не кешує, а в застосунку з екрана «Додому» на iPhone
       // зі сторінки «немає інтернету» нема кнопки «назад» — вийти можна лише закривши застосунок

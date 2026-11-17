@@ -13,11 +13,11 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 95 |
-| Рядків JS | 35710 |
-| Файлів CSS | 49 |
-| Рядків CSS | 11077 |
-| Сутностей верхнього рівня | 2632 |
+| Файлів JS | 96 |
+| Рядків JS | 35903 |
+| Файлів CSS | 50 |
+| Рядків CSS | 11164 |
+| Сутностей верхнього рівня | 2653 |
 | Ключів сховища (FLOW_KEYS) | 80 |
 
 ## Файли JS
@@ -63,7 +63,7 @@
 | `src/scripts/core/26-blocks-render.js` | 1207 | 16 |
 | `src/scripts/core/27-canvas.js` | 596 | 27 |
 | `src/scripts/core/28-vision.js` | 36 | 3 |
-| `src/scripts/core/29-more-screen.js` | 618 | 30 |
+| `src/scripts/core/29-more-screen.js` | 620 | 30 |
 | `src/scripts/core/30-upgrade.js` | 303 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
@@ -93,8 +93,9 @@
 | `src/scripts/core/54-links.js` | 292 | 31 |
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
-| `src/scripts/core/57-core.js` | 85 | 12 |
+| `src/scripts/core/57-core.js` | 116 | 14 |
 | `src/scripts/core/58-moods.js` | 418 | 44 |
+| `src/scripts/core/59-core-screen.js` | 160 | 19 |
 | `src/scripts/page-editor/01-palette.js` | 187 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 762 | 49 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1025 | 53 |
@@ -173,6 +174,7 @@
 | `src/styles/core/35-focus.css` | 112 | 0 |
 | `src/styles/core/36-run.css` | 57 | 0 |
 | `src/styles/core/37-moods.css` | 99 | 0 |
+| `src/styles/core/38-core.css` | 87 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (80)
 
@@ -1694,34 +1696,34 @@
 |---|---|---|
 | `LITE_DOORS` | масив | `src/scripts/core/29-more-screen.js:12` |
 | `DEV_ROWS` | масив | `src/scripts/core/29-more-screen.js:17` |
-| `ico` | функція | `src/scripts/core/29-more-screen.js:21` |
-| `chev` | функція | `src/scripts/core/29-more-screen.js:22` |
-| `rowHTML` | функція | `src/scripts/core/29-more-screen.js:23` |
-| `renderMore` | функція | `src/scripts/core/29-more-screen.js:28` |
-| `MSEC` | масив | `src/scripts/core/29-more-screen.js:50` |
-| `moreIsWide` | функція | `src/scripts/core/29-more-screen.js:52` |
-| `renderMoreIndex` | функція | `src/scripts/core/29-more-screen.js:53` |
-| `moreShowSection` | функція | `src/scripts/core/29-more-screen.js:61` |
-| `window.moreShowSection` | значення | `src/scripts/core/29-more-screen.js:70` |
-| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:72` |
-| `goMore` | функція | `src/scripts/core/29-more-screen.js:93` |
-| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:100` |
-| `escA` | функція | `src/scripts/core/29-more-screen.js:103` |
-| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:104` |
-| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:106` |
-| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:127` |
-| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:145` |
-| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:154` |
-| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:155` |
-| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:170` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:564` |
-| `maskMail` | функція | `src/scripts/core/29-more-screen.js:571` |
-| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:572` |
-| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:587` |
-| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:597` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:610` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:611` |
-| `nm` | значення | `src/scripts/core/29-more-screen.js:612` |
+| `ico` | функція | `src/scripts/core/29-more-screen.js:22` |
+| `chev` | функція | `src/scripts/core/29-more-screen.js:23` |
+| `rowHTML` | функція | `src/scripts/core/29-more-screen.js:24` |
+| `renderMore` | функція | `src/scripts/core/29-more-screen.js:29` |
+| `MSEC` | масив | `src/scripts/core/29-more-screen.js:51` |
+| `moreIsWide` | функція | `src/scripts/core/29-more-screen.js:53` |
+| `renderMoreIndex` | функція | `src/scripts/core/29-more-screen.js:54` |
+| `moreShowSection` | функція | `src/scripts/core/29-more-screen.js:62` |
+| `window.moreShowSection` | значення | `src/scripts/core/29-more-screen.js:71` |
+| `openMoreSheet` | функція | `src/scripts/core/29-more-screen.js:73` |
+| `goMore` | функція | `src/scripts/core/29-more-screen.js:95` |
+| `window.goMore` | значення | `src/scripts/core/29-more-screen.js:102` |
+| `escA` | функція | `src/scripts/core/29-more-screen.js:105` |
+| `safeImgA` | функція | `src/scripts/core/29-more-screen.js:106` |
+| `readAvatarFile` | функція | `src/scripts/core/29-more-screen.js:108` |
+| `syncLabel` | функція | `src/scripts/core/29-more-screen.js:129` |
+| `flowStorageInfo` | функція | `src/scripts/core/29-more-screen.js:147` |
+| `fmtMem` | функція | `src/scripts/core/29-more-screen.js:156` |
+| `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:157` |
+| `renderAccount` | функція | `src/scripts/core/29-more-screen.js:172` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:566` |
+| `maskMail` | функція | `src/scripts/core/29-more-screen.js:573` |
+| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:574` |
+| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:589` |
+| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:599` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:612` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:613` |
+| `nm` | значення | `src/scripts/core/29-more-screen.js:614` |
 
 ### `src/scripts/core/30-upgrade.js` — 30 сутностей
 
@@ -2786,7 +2788,7 @@
 | `runOpen` | функція | `src/scripts/core/56-run.js:337` |
 | `window.runOpen` | значення | `src/scripts/core/56-run.js:347` |
 
-### `src/scripts/core/57-core.js` — 12 сутностей
+### `src/scripts/core/57-core.js` — 14 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2800,8 +2802,10 @@
 | `coreWeek` | функція | `src/scripts/core/57-core.js:55` |
 | `coreDiary` | функція | `src/scripts/core/57-core.js:62` |
 | `coreNotes` | функція | `src/scripts/core/57-core.js:66` |
-| `snapshot` | функція | `src/scripts/core/57-core.js:72` |
-| `window.Core` | обʼєкт | `src/scripts/core/57-core.js:84` |
+| `coreGoalLinks` | функція | `src/scripts/core/57-core.js:75` |
+| `graph` | функція | `src/scripts/core/57-core.js:94` |
+| `snapshot` | функція | `src/scripts/core/57-core.js:103` |
+| `window.Core` | обʼєкт | `src/scripts/core/57-core.js:115` |
 
 ### `src/scripts/core/58-moods.js` — 44 сутностей
 
@@ -2851,6 +2855,30 @@
 | `mdShelfHTML` | функція | `src/scripts/core/58-moods.js:367` |
 | `mdShelfBind` | функція | `src/scripts/core/58-moods.js:377` |
 | `mdBookNew` | функція | `src/scripts/core/58-moods.js:385` |
+
+### `src/scripts/core/59-core-screen.js` — 19 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `crLang` | функція | `src/scripts/core/59-core-screen.js:10` |
+| `CR_T` | обʼєкт | `src/scripts/core/59-core-screen.js:11` |
+| `crT` | функція | `src/scripts/core/59-core-screen.js:33` |
+| `crGoalId` | значення | `src/scripts/core/59-core-screen.js:34` |
+| `CR_MAX` | значення | `src/scripts/core/59-core-screen.js:35` |
+| `crGoalObj` | функція | `src/scripts/core/59-core-screen.js:37` |
+| `crMoney` | функція | `src/scripts/core/59-core-screen.js:38` |
+| `crAt` | функція | `src/scripts/core/59-core-screen.js:40` |
+| `crLine` | функція | `src/scripts/core/59-core-screen.js:42` |
+| `crStar` | функція | `src/scripts/core/59-core-screen.js:43` |
+| `crLifeHTML` | функція | `src/scripts/core/59-core-screen.js:50` |
+| `crGoalHTML` | функція | `src/scripts/core/59-core-screen.js:68` |
+| `crRender` | функція | `src/scripts/core/59-core-screen.js:90` |
+| `crAct` | функція | `src/scripts/core/59-core-screen.js:103` |
+| `crGo` | функція | `src/scripts/core/59-core-screen.js:113` |
+| `crSheet` | функція | `src/scripts/core/59-core-screen.js:116` |
+| `goCore` | функція | `src/scripts/core/59-core-screen.js:152` |
+| `crLive` | функція | `src/scripts/core/59-core-screen.js:157` |
+| `window.goCore` | значення | `src/scripts/core/59-core-screen.js:159` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
