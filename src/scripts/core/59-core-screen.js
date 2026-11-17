@@ -18,7 +18,9 @@
         openWallet:'Відкрити Гаманець', timeH:'Час за 7 днів', timeV:(b,d)=>d+' з '+b+' справ зроблено', timeNone:'Справ місії за тиждень нема',
         openJournal:'Відкрити тиждень у Журналі', stepsH:'Кроки місії', stepsV:(d,t)=>d+' з '+t,
         folderH:'Папка місії', folderNone:'не привʼязано', folderHow:'Папку привʼязують на сторінці місії.', openFolder:'Відкрити папку',
-        chatsH:'Чати папки', openChat:n=>'Відкрити «'+n+'»', close:'Закрити', pct:'%', toGoal:'до мети'},
+        chatsH:'Чати папки', openChat:n=>'Відкрити «'+n+'»', close:'Закрити', pct:'%', toGoal:'до мети',
+        markDone:n=>'Позначити «'+n+'» зробленим', addOut:'＋ Витрата для мети', addIn:'＋ Дохід для мети',
+        newFolder:'Створити папку для мети', folderPh:'Назва папки'},
       en:{title:'Core', life:'Whole life', back:'More', backLife:'Whole life', me:'me', wait:'Syncing with the cloud…',
         emptyH:'Your constellation will appear here', emptyP:'Each goal becomes a star, surrounded by the money, steps, folders and time that lead to it.',
         emptyGo:'Set a goal', hint:'Tap a star to zoom in', more:'More goals',
@@ -28,7 +30,9 @@
         openWallet:'Open Wallet', timeH:'Time over 7 days', timeV:(b,d)=>d+' of '+b+' tasks done', timeNone:'No mission tasks this week',
         openJournal:'Open the week in Journal', stepsH:'Mission steps', stepsV:(d,t)=>d+' of '+t,
         folderH:'Mission folder', folderNone:'not linked', folderHow:'Link a folder on the mission page.', openFolder:'Open folder',
-        chatsH:'Folder chats', openChat:n=>'Open “'+n+'”', close:'Close', pct:'%', toGoal:'of the goal'}
+        chatsH:'Folder chats', openChat:n=>'Open “'+n+'”', close:'Close', pct:'%', toGoal:'of the goal',
+        markDone:n=>'Mark “'+n+'” done', addOut:'＋ Expense for this goal', addIn:'＋ Income for this goal',
+        newFolder:'Create a folder for this goal', folderPh:'Folder name'}
     };
     const crT=k=>CR_T[crLang()][k];
     let crGoalId='';                       // '' — рівень «Усе життя», інакше — відкрита мета
@@ -116,15 +120,21 @@
     function crSheet(kind,g,raw,from){
       const L=g.links||{}; let h='', v='', sub='', acts=[];
       if(kind==='steps'){ const s=L.steps||{}; h=crT('stepsH'); v=s.total?crT('stepsV')(s.done,s.total):'—'; sub=s.next||crT('noNext');
-        acts=[[crT('openGoal'),()=>moMissionPage(raw)]]; }
+        acts=[[crT('openGoal'),()=>moMissionPage(raw)]];
+        // дії з даними — лише через реєстр (60-core-actions.js): ready → перевірка → запис → «Скасувати»
+        if(s.nextId) acts.unshift([crT('markDone')(s.next),()=>window.Core.run('step.done',{goalId:g.id, stepId:s.nextId}),'do']); }
       else if(kind==='money'){ const m=L.money||{}; h=crT('moneyH');
         v=m.ready?crMoney(m.net):'…'; sub=m.ready?crT('moneySub')(crMoney(m.inc),crMoney(m.out)):crT('moneyWait');
-        acts=[[crT('openWallet'),()=>goFinance()]]; }
+        // шторка Гаманця з уже вибраною місією; її запис іде через Core.run (46-wallet.js)
+        acts=[[crT('addOut'),()=>wlOpSheet('out',g.id),'do'],[crT('addIn'),()=>wlOpSheet('in',g.id),'do'],[crT('openWallet'),()=>goFinance()]]; }
       else if(kind==='time'){ const t=L.time||{}; h=crT('timeH'); v=t.blocks?crT('timeV')(t.blocks,t.done):crT('timeNone');
         acts=[[crT('openJournal'),()=>goJournal({tab:'week'})]]; }
       else if(kind==='folder'){ h=crT('folderH');
         if(L.folder){ v=L.folder.name||'—'; const fk=L.folder.key; acts=[[crT('openFolder'),()=>goFolder(fk)]]; }
-        else { v=crT('folderNone'); sub=crT('folderHow'); acts=[[crT('openGoal'),()=>moMissionPage(raw)]]; } }
+        else { v=crT('folderNone'); sub=crT('folderHow');
+          acts=[[crT('newFolder'),()=>inputModal({title:crT('newFolder'), value:String(g.name||'').slice(0,60), placeholder:crT('folderPh'), emoji:true,
+              emojiVal:String(raw.emoji||''), emojiPh:'📁', onOk:(name,em)=>window.Core.run('folder.create',{name, emoji:em, goalId:g.id})}),'do'],
+            [crT('openGoal'),()=>moMissionPage(raw)]]; } }
       else if(kind==='chats'){ h=crT('chatsH'); v=String((L.chats||[]).length);
         acts=(L.chats||[]).slice(0,4).map(c=>[crT('openChat')(c.name||'—'),()=>goChat(c.id)]); }
       else return;
@@ -135,7 +145,7 @@
       ov.innerHTML='<div class="cr-sheet"><div class="cr-grip"></div>'
         +'<div class="cr-sh-top"><h2>'+esc(h)+'</h2><button class="cr-x" aria-label="'+esc(crT('close'))+'">✕</button></div>'
         +'<div class="cr-sh-v">'+esc(v)+'</div>'+(sub?'<p class="cr-sh-sub">'+esc(sub)+'</p>':'')
-        +acts.map((a,i)=>'<button class="cr-act" data-i="'+i+'">'+esc(a[0])+'<span aria-hidden="true">›</span></button>').join('')
+        +acts.map((a,i)=>'<button class="cr-act'+(a[2]==='do'?' do':'')+'" data-i="'+i+'">'+esc(a[0])+(a[2]==='do'?'':'<span aria-hidden="true">›</span>')+'</button>').join('')
         +'</div>';
       document.body.appendChild(ov);
       let done=false;
@@ -156,5 +166,8 @@
     // дані підтягнулись з хмари чи змінилась мова — якщо Ядро відкрите, перемальовуємо
     const crLive=()=>{ const s=document.getElementById('scr-core'); if(s&&s.classList.contains('active')) crRender(); };
     try{ document.addEventListener('flowsync',crLive); document.addEventListener('flowlangchange',crLive); }catch(_){}
+    // записали чи скасували через реєстр — небо одразу інше. Подією, а не Core.onChange:
+    // реєстр (60-…) виконується ПІСЛЯ цього файла, тож у цю мить Core.onChange ще нема
+    try{ document.addEventListener('flowcorechange',crLive); }catch(_){}
     window.goCore=goCore;
   })();

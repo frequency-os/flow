@@ -235,19 +235,16 @@
           }
           if(sv>0) plToast('У «'+env.name+'» лише '+money(sv,cur)+' — записано як «'+env.name+'» з вільних грошей');
         }
-        const op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type, amount, label, date:ymdLocal(), card:mainCard().id };
-        // конверт вибрано, але грошей у ньому мало: гроші йдуть з вільних, а категорія лишається (12.10.2026).
-        // Лише env БЕЗ envId — це не рух конверта, баланс списує як звичайну витрату; wlMonthCats бачить «Продукти»
-        if(env) op.env=String(env.name||'').slice(0,60);
-        if(cur!==mainCur()) op.cur=cur;
-        else if(gid&&wlGoal(gid)) op.goalId=String(gid);
-        if(fk&&wlFolderName(fk)) op.folderKey=fk;
-        if(type==='in'&&src!=='main') op.src=src;
-        finOps.push(op); saveFinOps(); ov.remove(); renderFinance();
-        try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджети в папці й на Огляді
-        try{ flowReact(type==='in'?'income':'spend',{amount}); }catch(_){}
-        try{ if(typeof rlOnOp==='function') rlOnOp(op); }catch(err){ console.error('rlOnOp',err); }   // правила: скарбничка / зарплата / бюджет
-        if(env&&envSaved(env)<=0) setTimeout(()=>{ try{ wlEnvEmptyOffer(env,cur); }catch(err){ console.error('wlEnvEmptyOffer',err); } },350);
+        /* Запис — через реєстр дій Ядра (60-core-actions.js, 17.11.2026): той самий обʼєкт операції,
+           ті самі правила (rlOnOp), віджети й реакція, плюс перевірка «дані прочитано». Ту саму дію кличе Ядро
+           і (етап 3) Флоу. Конверт без envId — лише категорія: баланс списує як звичайну витрату. */
+        if(ov.__busy) return; ov.__busy=true;
+        window.Core.run(type==='in'?'money.income':'money.expense',
+          {amount, label, env:env?String(env.name||''):'', cur, goalId:gid, folderKey:fk, src}, {undo:false}).then(r=>{
+          ov.__busy=false; if(!r.ok) return;
+          ov.remove();
+          if(env&&envSaved(env)<=0) setTimeout(()=>{ try{ wlEnvEmptyOffer(env,cur); }catch(err){ console.error('wlEnvEmptyOffer',err); } },350);
+        }).catch(err=>{ ov.__busy=false; console.error('Core.run money',err); });   // кнопка «Записати» не має завмерти
       };
     });
   }

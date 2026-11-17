@@ -84,7 +84,7 @@
       const fk=(g.folderKey&&moOwnFolder(g.folderKey))?String(g.folderKey):'';
       let ch=[]; try{ if(fk) ch=chatsForFolder(fk).map(c=>({id:String(c.id), name:String(c.name||'')})); }catch(_){}
       return {
-        steps:{done:st.filter(s=>s.done).length, total:st.length, next:next?String(next.name):''},
+        steps:{done:st.filter(s=>s.done).length, total:st.length, next:next?String(next.name):'', nextId:next&&next.id!=null?String(next.id):''},
         money:{ready:coreReady('fin_ops'), ym, inc:m.inc, out:m.out, net:m.inc-m.out},
         time:{blocks, done},
         folder:fk?{key:fk, name:String((folders[fk]&&folders[fk].name)||''), emoji:String((folders[fk]&&folders[fk].emoji)||'')}:null,

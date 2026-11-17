@@ -464,17 +464,12 @@
     const par=(typeof parent==='string' && folders[parent]) ? parent : '';
     inputModal({ title:par?('Нова папка в «'+folders[par].name+'»'):'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'', emojiPh:'📁',
       emojiPicks:['📁','🇬🇧','✨','📱','🛍','💰','🎨','📚','💪','🎯','🏡','🎬'],
-      onOk:(name, emojiVal)=>{
-        const used=order.length;
-        const nm = name || ('Папка '+(used+1));
-        const key='f_'+Date.now();
-        const em=(emojiVal!==undefined?(emojiVal||'📁'):FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]);   // порожнє поле — 📁 (як підказка)
-        folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
-          emoji:em, icon:folderIconFor(em),
-          name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
-        if(par) folders[key].parent=par;
-        order.push(key);
-        saveFolders(); renderDashboard();
+      onOk:async (name, emojiVal)=>{
+        // створення — через реєстр дій Ядра (60-core-actions.js, 17.11.2026): та сама папка (назва за замовч.,
+        // 📁 для порожнього поля, колір по колу), плюс перевірка «папки цієї сесії прочитано»
+        const r=await window.Core.run('folder.create',{name, emoji:emojiVal, parent:par},{undo:false});
+        if(!r.ok) return;
+        const key=r.key;
         if(opts&&typeof opts.onCreated==='function'){ try{ opts.onCreated(key); }catch(_){} return; }
         if(par){ const act=document.querySelector('.screen.active');
           if(act&&act.id==='scr-page'&&pgBarFolder()===par){ try{ renderPgLinks(); }catch(_){} }
