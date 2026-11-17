@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-15-2014-b32fd2d';
+  var BUILD='2026-11-17-1850-d04eb2c';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -8376,6 +8376,40 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   /* ноутбук: плитки Гаманця — 4 колонки (місія · конверти · борги×2 стають в один ряд, без дірки праворуч) */
   @media (min-width:1024px){ #scr-finance .wg-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row dense;} }
+
+  /* прогрес місії (15.11.2026): Відлік · Скарбничка · Лічильник (48-widgets.js) */
+  .wd-cnt{display:flex;align-items:baseline;gap:8px;min-width:0;flex-wrap:wrap;}
+  .wd-cnt .wd-cap{-webkit-line-clamp:1;}
+  .wg-t.wd.cnt.sz-l .wd-big.xl{font-size:56px;}
+  .wg-t.wd.sav .wd-big,.wg-t.wd.ctr .wd-big{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wg-t.wd.ctr .wd-acts button[data-n="-1"]{flex:0 0 52px;}
+  .wd-f2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+
+  /* «Фото-прогрес» (dphoto): пара «було → стало», ＋ у кутку, стрічка в L, галерея */
+  .wd-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;flex:1 1 auto;min-height:56px;}
+  .wg-t.wd.pho{gap:4px;}
+  .wd-pair.one{grid-template-columns:minmax(0,1fr);}
+  .wd-ph{all:unset;box-sizing:border-box;position:relative;display:flex;flex-direction:column;gap:3px;min-height:0;min-width:0;}
+  .wd-ph i{display:block;flex:1 1 auto;min-height:40px;border-radius:12px;background:var(--pg-track,rgba(127,127,127,.2)) center/cover no-repeat;}
+  .wd-ph s{text-decoration:none;font-size:11.5px;font-weight:700;color:var(--pg-mut,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wd-ph-new{pointer-events:auto;cursor:pointer;align-items:center;justify-content:center;border:1.5px dashed color-mix(in srgb,var(--fc) 55%,var(--pg-edge,var(--line)));border-radius:12px;}
+  .wd-ph-new span{font-size:24px;font-weight:700;color:var(--pg-fg,var(--text));}
+  .wd-ph-new:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .wd-ph-foot{display:flex;align-items:center;gap:8px;min-width:0;}
+  .wd-ph-foot .wd-sub{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wd-ph-add{all:unset;box-sizing:border-box;flex:none;pointer-events:auto;width:44px;height:44px;margin:-4px 0 -4px -6px;display:grid;place-items:center;cursor:pointer;}
+  .wd-ph-add span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-size:19px;font-weight:800;color:#fff;
+    background:color-mix(in srgb,var(--fc) 70%,#000);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+  .wd-ph-add:focus-visible span{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .wd-ph-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;}
+  .wd-ph-strip i{display:block;aspect-ratio:1;border-radius:8px;background:var(--pg-track,rgba(127,127,127,.2)) center/cover no-repeat;}
+  .wd-gal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px;}
+  .wd-gal figure{margin:0;display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .wd-gal figure i{display:block;aspect-ratio:3/4;border-radius:12px;background:color-mix(in srgb,var(--text) 10%,transparent) center/cover no-repeat;}
+  .wd-gal figcaption{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12.5px;font-weight:700;color:var(--muted);}
+  .wd-gal figcaption button{all:unset;cursor:pointer;min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:10px;}
+  .wd-gal figcaption button:focus-visible{outline:2px solid var(--accent);}
+  @media (min-width:1024px){ .wd-gal{grid-template-columns:repeat(3,minmax(0,1fr));} }
   /* ════════ «Стартовий набір» — порожній Огляд нової людини (53-starter.js, 10.10.2026) ════════
      Банер Карти бажань → колаж мрій; сітка папок → 4 приклади + Журнал + «Зробити своїм».
      Кольори лише з токенів теми; текст на фото — білий під затемненням знизу. */
@@ -8714,6 +8748,105 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     background:color-mix(in srgb,var(--accent) 12%,var(--card));border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));}
   .rn-patch span{font-size:20px;}
   .rn-sure{flex:1 1 100%;font-size:14px;color:var(--text);}
+  /* ============ «МОЇ НАСТРОЇ» (58-moods.js, 16.11.2026): «Зараз», «Мій день», покроковий режим, полиця щоденників ============ */
+  .md-wrap{margin-bottom:6px;}
+  .md-hero{position:relative;border-radius:22px;padding:15px 15px 13px;overflow:hidden;
+    background:color-mix(in srgb,var(--mc) 22%,var(--card,#151a24));border:1px solid color-mix(in srgb,var(--mc) 45%,transparent);}
+  .md-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .md-hero-tx{min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .md-hero-tx small{font-size:11.5px;font-weight:700;color:color-mix(in srgb,var(--mc) 55%,var(--text));}
+  .md-hero-tx b{font-size:20px;font-weight:800;color:var(--text);line-height:1.2;overflow-wrap:anywhere;}
+  .md-ring{width:48px;height:48px;flex:none;}
+  .md-ring circle{fill:none;stroke-width:4;stroke:color-mix(in srgb,var(--mc) 25%,transparent);}
+  .md-ring circle.pv{stroke:var(--mc);stroke-linecap:round;transition:stroke-dashoffset .4s;}
+  .md-hero-act{display:flex;gap:8px;margin-top:13px;}
+  .md-go{all:unset;box-sizing:border-box;cursor:pointer;flex:1;text-align:center;padding:12px;border-radius:14px;min-height:44px;
+    background:var(--mc);color:#14101f;font-size:14px;font-weight:800;}
+  .md-more{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+    background:color-mix(in srgb,var(--mc) 18%,transparent);color:var(--text);font-size:18px;font-weight:800;}
+  .md-go:active,.md-more:active{transform:scale(.97);}
+  .md-go:focus-visible,.md-more:focus-visible,.md-row:focus-visible,.md-spine:focus-visible,.md-add:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .md-day-h{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 6px;font-size:13px;font-weight:800;color:var(--text);}
+  .md-add{all:unset;cursor:pointer;font-size:12.5px;font-weight:800;color:var(--accent);padding:8px 4px;}
+  .md-day{border-radius:16px;background:var(--field);border:1px solid var(--line);overflow:hidden;}
+  .md-row{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:10px 14px;}
+  .md-row+.md-row{border-top:1px solid var(--line);}
+  .md-row.on{background:color-mix(in srgb,var(--mc) 10%,transparent);}
+  .md-dot{width:10px;height:10px;border-radius:50%;background:var(--mc);flex:none;}
+  .md-rn{flex:1;min-width:0;font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .md-row small{flex:none;font-size:11.5px;font-weight:700;color:var(--muted);}
+
+  /* полиця: корінці різної висоти (більше записів — вищий корінець) */
+  .md-shelf{display:flex;align-items:flex-end;gap:6px;min-height:164px;padding:0 6px;overflow-x:auto;scrollbar-width:none;
+    border-bottom:4px solid var(--line);border-radius:0 0 4px 4px;}
+  .md-shelf::-webkit-scrollbar{display:none;}
+  .md-spine{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:40px;border-radius:5px 5px 2px 2px;position:relative;
+    background:var(--bc);display:flex;flex-direction:column;align-items:center;gap:6px;padding:7px 0 8px;overflow:hidden;
+    box-shadow:inset 4px 0 0 rgba(0,0,0,.22), inset -1px 0 0 rgba(255,255,255,.12);}
+  .md-spine:active{transform:translateY(-3px);}
+  .md-sp-ic{font-size:13px;line-height:1;}
+  .md-sp-t{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;font-weight:800;color:#fff;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;max-height:calc(100% - 22px);text-shadow:0 1px 2px rgba(0,0,0,.35);}
+  .md-shelf-hint{align-self:center;flex:1;min-width:120px;font-size:12px;font-weight:700;color:var(--muted);line-height:1.4;padding-left:6px;}
+  .md-spine.new{height:138px;background:transparent;border:1.5px dashed var(--line);box-shadow:none;justify-content:center;color:var(--muted);}
+
+  /* покроковий режим — поверх усього, але під шторками (1300) і «Моментом» (1400) */
+  .md-focus{position:fixed;inset:0;z-index:1250;display:flex;justify-content:center;animation:fadein .2s;
+    background:color-mix(in srgb,var(--mc) 14%,#0b0912);}
+  .md-f-in{width:100%;max-width:560px;display:flex;flex-direction:column;
+    padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));}
+  .md-f-top{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:800;color:color-mix(in srgb,var(--mc) 60%,#fff);}
+  .md-x{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;color:#fff;font-size:17px;
+    background:rgba(255,255,255,.08);}
+  .md-segs{display:flex;gap:5px;margin:12px 0 22px;}
+  .md-seg{all:unset;cursor:pointer;flex:1;height:5px;border-radius:4px;background:rgba(255,255,255,.14);padding:8px 0;background-clip:content-box;}
+  .md-seg.on{background-color:var(--mc);}
+  .md-seg.cur{background-color:color-mix(in srgb,var(--mc) 55%,#fff);}
+  .md-seg.fin{flex:.45;}
+  .md-f-step{font-size:12px;font-weight:800;color:color-mix(in srgb,var(--mc) 55%,#fff);min-height:16px;}
+  .md-f-mid{flex:1;overflow-y:auto;padding:6px 0 10px;}
+  .md-q{font-family:Georgia,'Times New Roman',serif;font-size:27px;line-height:1.25;color:#fff;margin:4px 0 16px;overflow-wrap:anywhere;}
+  .md-q.sm{font-size:21px;}
+  /* назва кроку вже стоїть великим заголовком — у картці лишаємо підпис і кнопку */
+  .md-card .rstep .rst-tx b{display:none;}
+  .md-card .rstep{min-height:68px;}
+  .md-ta{width:100%;box-sizing:border-box;min-height:170px;resize:vertical;border-radius:16px;border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:16px;line-height:1.55;padding:14px;}
+  .md-ta:focus{outline:2px solid color-mix(in srgb,var(--mc) 70%,#fff);outline-offset:1px;}
+  .md-mic-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .md-mic-row .mic{position:static;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;}
+  .md-mic-row .mic svg{width:20px;height:20px;}
+  .md-mic-row .mic.has{background:var(--mc);color:#14101f;}
+  .md-mic-row .adur,.md-mic-row .rit-rectm{position:static;font-size:12px;font-weight:800;color:#fff;}
+  .md-fin-sub{font-size:14px;font-weight:700;color:color-mix(in srgb,var(--mc) 50%,#fff);margin:-6px 0 18px;}
+  .md-f-bot{display:flex;gap:10px;padding-top:8px;}
+  .md-back{all:unset;cursor:pointer;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:#fff;background:rgba(255,255,255,.08);flex:none;}
+  .md-next{all:unset;box-sizing:border-box;cursor:pointer;flex:1;height:50px;border-radius:25px;text-align:center;line-height:50px;
+    background:var(--mc);color:#14101f;font-size:15px;font-weight:800;}
+  .md-next:active,.md-back:active{transform:scale(.97);}
+  .md-x:focus-visible,.md-next:focus-visible,.md-back:focus-visible,.md-seg:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+
+  /* шторка настрою / нового щоденника */
+  .md-sheet .asheet-in{max-height:88vh;overflow-y:auto;}
+  .md-lbl{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:12px 2px 7px;}
+  .md-in{width:100%;box-sizing:border-box;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--text);
+    font:inherit;font-size:16px;padding:12px 14px;}
+  .md-chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .md-chip{all:unset;box-sizing:border-box;cursor:pointer;min-height:38px;min-width:38px;padding:8px 12px;border-radius:12px;text-align:center;
+    background:var(--field);border:1px solid var(--line);font-size:13.5px;font-weight:700;color:var(--text);}
+  .md-chip.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 20%,transparent);}
+  .md-chip.dot{width:38px;padding:0;border-radius:50%;background:var(--cc);border:2px solid transparent;}
+  .md-chip.dot.on{border-color:#fff;box-shadow:0 0 0 2px var(--cc);}
+  .md-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .md-check{display:flex;align-items:center;gap:10px;margin:16px 2px 4px;font-size:13.5px;font-weight:700;color:var(--text);cursor:pointer;}
+  .md-check input{width:20px;height:20px;accent-color:var(--accent);}
+  .md-sheet .red-ok{margin-top:18px;}
+
+  @media (min-width:1024px){
+    .md-hero{padding:18px 20px 16px;}
+    .md-q{font-size:32px;}
+  }
 </style>
 <style id="diary-css">
 /* ===== ЩОДЕННИК ===== */
@@ -8825,6 +8958,34 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 .db-entry>div{flex:1;min-width:0;}
 .db-entry .db-txt{-webkit-line-clamp:6;}
 .db-del{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px 4px;flex:none;}
+
+/* ── Щоденник-обкладинка (16.11.2026): колір щоденника на всю ширину, місяці, записи плитками ── */
+#diaBookView{--bc:#7c8cff;}
+.dia-cover{border-radius:22px;padding:12px 14px 18px;margin:0 0 12px;
+  background:color-mix(in srgb,var(--bc) 78%,#0b0912);box-shadow:inset 6px 0 0 rgba(0,0,0,.22);}
+.dia-cover-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.dia-cover .dia-book-back,.dia-cover .dia-book-menu{background:rgba(0,0,0,.18);border:0;color:#fff;}
+.dia-cover .dia-book-back{min-height:36px;}
+.dia-cover .dia-book-title{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.15;}
+.dia-cover-sub{font-size:12.5px;font-weight:700;color:rgba(255,255,255,.82);margin-top:4px;}
+.dia-bk-months{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 10px;}
+.dia-bk-months::-webkit-scrollbar{display:none;}
+.dia-bk-months:empty{display:none;}
+.dia-bk-m{flex:none;border:0;cursor:pointer;font:inherit;font-size:12.5px;font-weight:800;padding:8px 12px;border-radius:999px;
+  background:transparent;color:var(--muted);min-height:34px;}
+.dia-bk-m.on{background:color-mix(in srgb,var(--bc) 22%,transparent);color:var(--text);}
+.dia-bk-m:focus-visible{outline:2px solid var(--bc);outline-offset:2px;}
+#diaBookView .dia-today{border-color:color-mix(in srgb,var(--bc) 30%,var(--line));}
+#diaBookView .dia-ai-btn#diaBookAdd{background:var(--bc);color:#fff;}
+.dia-bk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px;}
+.dia-tile{position:relative;border-radius:16px;padding:11px 12px 12px;background:var(--card);border:1px solid var(--line);min-width:0;}
+.dia-tile .dt-d{font-size:12px;font-weight:800;color:color-mix(in srgb,var(--bc) 70%,#fff);margin-bottom:5px;padding-right:22px;}
+.dia-tile .dt-t{font-size:13.5px;line-height:1.45;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;
+  display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden;}
+.dia-tile.open .dt-t{-webkit-line-clamp:unset;display:block;}
+.dia-tile .db-play{margin-top:6px;}
+.dia-tile .db-del{position:absolute;top:6px;right:4px;width:30px;height:30px;}
+@media (min-width:1024px){ .dia-bk-grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
 </style>
 </head>
 <body>
@@ -9400,7 +9561,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     <div class="dia-tabs" id="diaTabs">
       <button class="dia-tab on" data-diatab="write">✍️ Запис</button>
       <button class="dia-tab" data-diatab="view">🧠 Огляд</button>
-      <button class="dia-tab" data-diatab="books">📚 Зошити</button>
+      <button class="dia-tab" data-diatab="books">📚 Щоденники</button>
     </div>
 
     <!-- ── вкладка «Запис» ── -->
@@ -9457,21 +9618,26 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     <div id="diaPaneBooks" style="display:none">
       <div id="diaBooksHome">
         <div class="dia-books-grid" id="diaBooksGrid"></div>
-        <button class="dia-book-new" id="diaBookNewBtn">+ Новий зошит</button>
+        <button class="dia-book-new" id="diaBookNewBtn">+ Новий щоденник</button>
         <div class="dia-book-form" id="diaBookForm" style="display:none">
-          <input class="dia-input dia-book-name" id="diaBookName" maxlength="24" placeholder="Назва зошита">
+          <input class="dia-input dia-book-name" id="diaBookName" maxlength="24" placeholder="Вдячність, Ідеї, Сни…">
           <div class="dia-book-picker" id="diaBookEmojis"></div>
           <div class="dia-book-picker" id="diaBookColors"></div>
-          <button class="dia-ai-btn" id="diaBookCreate" style="margin:0">Створити зошит</button>
+          <button class="dia-ai-btn" id="diaBookCreate" style="margin:0">Створити щоденник</button>
         </div>
-        <div class="dia-empty" style="padding:14px 20px">Щоденник дня живе на вкладці «Запис» — тут окремі зошити під свої теми: вдячність, ідеї, сни…</div>
+        <div class="dia-empty" style="padding:14px 20px">Щоденник дня живе на вкладці «Запис» — тут окремі щоденники під свої теми: вдячність, ідеї, сни…</div>
       </div>
       <div id="diaBookView" style="display:none">
-        <div class="dia-book-head">
-          <button class="dia-book-back" id="diaBookBack">‹ Зошити</button>
+        <!-- обкладинка щоденника (16.11.2026): колір щоденника на всю ширину, назва, лічильник -->
+        <div class="dia-cover">
+          <div class="dia-cover-row">
+            <button class="dia-book-back" id="diaBookBack">‹ Щоденники</button>
+            <button class="dia-book-menu" id="diaBookMenu" aria-label="Дії зі щоденником">⋯</button>
+          </div>
           <div class="dia-book-title" id="diaBookTitle"></div>
-          <button class="dia-book-menu" id="diaBookMenu">⋯</button>
+          <div class="dia-cover-sub" id="diaBookSub"></div>
         </div>
+        <div class="dia-bk-months" id="diaBookMonths"></div>
         <div class="dia-today">
           <textarea class="dia-input" id="diaBookInput" rows="3" placeholder="Новий запис…"></textarea>
           <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
@@ -9840,6 +10006,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       'Що таке Frequency':'What is Frequency', 'коротка екскурсія: навіщо це і як допомагає рости':'a short tour: why it exists and how it helps you grow',
       // нижня навігація
       'Огляд':'Overview', 'Планер':'Planner', 'Гроші':'Money', 'Проєкти':'Projects', 'Ще':'More',
+      // Щоденник: вкладка й обкладинка щоденника (22-diary.js, 16.11.2026)
+      '📚 Щоденники':'📚 Journals', '‹ Щоденники':'‹ Journals', '+ Новий щоденник':'+ New journal', 'Створити щоденник':'Create journal',
+      'Додати запис':'Add entry', 'Усі':'All', 'Перший запис — у полі зверху.':'First entry goes in the field above.',
+      'Січень':'January', 'Лютий':'February', 'Березень':'March', 'Квітень':'April', 'Травень':'May', 'Червень':'June',
+      'Липень':'July', 'Серпень':'August', 'Вересень':'September', 'Жовтень':'October', 'Листопад':'November', 'Грудень':'December',
       // профіль / шторка налаштувань
       '✨ Відкрити Флоу':'✨ Open Flow', '⚙️ AI-проксі':'⚙️ AI proxy', '🌓 Змінити тему':'🌓 Switch theme',
       '⚙️ Всі налаштування':'⚙️ All settings', 'Гість':'Guest', 'Користувач':'User',
@@ -10916,6 +11087,28 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const DESK = window.flowDesktop || null;
         const backTo = (DESK && DESK.authRedirect) ? DESK.authRedirect
                                                    : (location.origin + location.pathname);
+        /* Mac (16.11.2026): браузер за замовчуванням може мовчки проковтнути посилання
+           (у Ярослава Chrome не відкривав зовнішніх посилань — «браузер не відкривається»).
+           Тому не переходимо самі, а беремо адресу входу і даємо вибір, де її відкрити. */
+        if(DESK && typeof DESK.openAuth === 'function'){
+          const { data, error } = await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: backTo, skipBrowserRedirect:true } });
+          const url = data && data.url;
+          if(error || !url){ try{ (window.__flowToast||alert)('Вхід не вдався: '+((error&&error.message)||'нема адреси входу')); }catch(_){} return; }
+          const open = async (where)=>{
+            const r = await DESK.openAuth(url, where).catch(e=>({ok:false,error:String(e&&e.message||e)}));
+            try{ (window.__flowToast||function(){})(r&&r.ok ? 'Відкрито — увійди в браузері, Frequency підхопить вхід сам' : 'Не вдалося відкрити: '+((r&&r.error)||'')); }catch(_){}
+          };
+          const copy = async ()=>{ try{ await navigator.clipboard.writeText(url); (window.__flowToast||function(){})('Посилання скопійовано — встав його в будь-який браузер'); }
+            catch(_){ await open('safari'); } };   // буфер недоступний — prompt в Electron не працює, тож просто відкриваємо в Safari
+          if(typeof actionSheet === 'function'){
+            actionSheet({ title:'Вхід через Google', sub:'Де відкрити сторінку входу? Після входу Frequency підхопить його сам.', items:[
+              { ic:'target', label:'Відкрити в Safari', sub:'надійно на Mac', onClick:()=>open('safari') },
+              { ic:'up', label:'Відкрити в браузері за замовчуванням', sub:'Chrome, Arc чи інший', onClick:()=>open('default') },
+              { ic:'edit', label:'Скопіювати посилання', sub:'встав у будь-який браузер', onClick:copy }
+            ]});
+          } else { await open('safari'); }
+          return;
+        }
         await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: backTo } });
       } finally {
         setTimeout(()=>{ sbSigningIn=false; }, 8000);
@@ -12143,6 +12336,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       try{ if(typeof renderDashboard==='function') renderDashboard(); }catch(_){}
       try{ if(typeof updateSummaryBg==='function') updateSummaryBg(); }catch(_){}
       try{ if(typeof renderWishes==='function') renderWishes(); }catch(_){}
+      try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджет «Фото-прогрес»: знімок докачано з хмари
     },60);
   }
   window.photoSrc = function(ref){
@@ -13955,7 +14149,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function ritualRerender(){ try{
     // ранок у шторці (відкрита з «Мого світу») — перемальовуємо і її
     const sh=document.getElementById('ritSheetBody');
-    if(sh){ sh.innerHTML=ritualInnerHTML(); ritualBind(sh); }
+    // шторка з гри — завжди Ранок, хоч би який настрій зараз на Карті
+    if(sh) ritWithCtx('m',()=>{ sh.innerHTML=ritualInnerHTML(); ritualBind(sh); });
+    if(typeof moodFocusRerender==='function') moodFocusRerender();
     const s=document.getElementById('scr-wishes');
     if(s&&s.classList.contains('active')) renderWishes(); }catch(_){} }
   // ранок шторкою поверх будь-якого екрана (вхід із гри); записує, як і завжди, сам Frequency
@@ -13977,7 +14173,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   try{ window.ritualSheet=ritualSheet; }catch(_){}
   /* Для «Мого світу» (міст 38-world.js) — лише читання. Гра отримує копії простих значень,
      не самі обʼєкти RIT, тож змінити дані ранку звідти не може. */
-  function ritForWorld(){
+  function ritForWorld(){ return ritWithCtx('m',ritForWorldM); }
+  function ritForWorldM(){
     const today=ritDs(0), steps=ritSteps(), td=RIT.days[today]||{}, days={};
     for(let i=0;i<70;i++){ const ds=ritDs(-i), r=RIT.days[ds]; if(!r) continue;
       days[ds]=i===0?{done:!!r.done, n:steps.filter(s=>ritStepDone(s,r)).length, of:steps.length}
@@ -13986,7 +14183,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     return {today, done:!!td.done, n:steps.filter(s=>ritStepDone(s,td)).length, of:steps.length,
       streak:st.s, best:st.best, tpl:ritTplName(), wishes:wishes.length, days};
   }
-  function ritDayForWorld(ds){
+  function ritDayForWorld(ds){ return ritWithCtx('m',()=>ritDayForWorldM(ds)); }
+  function ritDayForWorldM(ds){
     if(typeof ds!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(ds)) return null;
     const r=RIT.days[ds]; if(!r) return null;
     const own={}; ritSteps().forEach(s=>{ own[s.id]=s; });
@@ -14024,17 +14222,31 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     }catch(_){} },1200); });
   }catch(_){}
 
-  function ritDay(ds){ if(!RIT.days[ds]) RIT.days[ds]={}; return RIT.days[ds]; }
+  /* ── «Мої настрої» (16.11.2026): ранок — лише один із настроїв ──
+     ritCtx каже, чий набір зараз у роботі: 'm' — Ранок (ключі ritual_board / ritual_steps, як і було),
+     інакше id настрою з moods_v1 (58-moods.js). Усі функції нижче питають дні й кроки через нього,
+     тож картки кроків, конструктор і «День зараховано» однакові для всіх настроїв. */
+  let ritCtx='m';
+  function ritWithCtx(ctx,fn){ const was=ritCtx; ritCtx=ctx||'m'; try{ return fn(); }finally{ ritCtx=was; } }
+  /* Настрою вже нема (видалили на іншому пристрої, поки він був відкритий тут) — віддаємо
+     порожній тимчасовий обʼєкт, а НЕ дні Ранку: інакше відповідь настрою лягла б у ранок. */
+  function ritDaysObj(){
+    if(ritCtx==='m') return RIT.days;
+    const o=(typeof moodDaysOf==='function')?moodDaysOf(ritCtx):null;
+    return o||{};
+  }
+  function ritDay(ds){ const D=ritDaysObj(); if(!D[ds]) D[ds]={}; return D[ds]; }
   function ritDs(off){ const d=new Date(); d.setDate(d.getDate()+off); return ymdLocal(d); }
   function ritStreak(){
+    const D=ritDaysObj();
     let s=0; for(let i=0;i<400;i++){ const ds=ritDs(-i);
-      if(RIT.days[ds]&&RIT.days[ds].done) s++;
+      if(D[ds]&&D[ds].done) s++;
       else if(i===0) continue; else break; }
     let best=0,cur=0;
-    Object.keys(RIT.days).sort().forEach((ds,i,arr)=>{
-      if(!RIT.days[ds].done){ cur=0; return; }
+    Object.keys(D).sort().forEach((ds,i,arr)=>{
+      if(!D[ds].done){ cur=0; return; }
       if(i>0){ const prev=new Date(arr[i-1]), me=new Date(ds);
-        cur=(RIT.days[arr[i-1]].done && (me-prev)<=90000000)?cur+1:1;
+        cur=(D[arr[i-1]].done && (me-prev)<=90000000)?cur+1:1;
       } else cur=1;
       if(cur>best) best=cur;
     });
@@ -14049,6 +14261,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     try{ if(ritAudio){ ritAudio.pause(); ritAudio=null; } }catch(_){} ritMixOn=false; }
   async function ritRecord(slot){
     if(ritRec){ try{ ritRec.stop(); }catch(_){} return; }
+    const ctx0=ritCtx;   // голос пишеться лише в Ранку; поки йде запис, людина може тапнути інший настрій
     try{
       const stream=await navigator.mediaDevices.getUserMedia({audio:true});
       const mime=MediaRecorder.isTypeSupported('audio/mp4')?'audio/mp4':(MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'');
@@ -14061,7 +14274,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const blob=new Blob(chunks,{type:mt});
         if(blob.size<1200){ try{plToast('🎙 Закоротко');}catch(_){}; ritualRerender(); return; }
         const fr=new FileReader();
-        fr.onload=()=>{ const a=fr.result;
+        fr.onload=()=>{ const a=fr.result; ritCtx=ctx0;
           if(slot==='mix') RIT.mix.push({id:'m'+Date.now(),label:'Запис · '+ritDs(0).slice(5),a,dur:sec});
           else { const d=ritDay(ritDs(0)); d[slot]={a,dur:sec}; }
           if(slot==='mix') ritDay(ritDs(0)).mix=1;
@@ -14139,7 +14352,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     j1:{t:'Я — людина, яка…', ty:'text', ph:'…дописуй речення про свою ідентичність', a:'a1', ic:'🪞'},
     j2:{t:'Вчорашній доказ', ty:'text', ph:'Що вчора підтвердило, що ти вже ця людина?', a:'a2', ic:'🧾'},
     j3:{t:'Намір на сьогодні', ty:'text', ph:'Одна дія, яка наближає твою дату', a:'a3', ic:'🎯'},
-    grat:{t:'Вдячність', ty:'text', ph:'За що ти вдячний(а) цього ранку?', ic:'💛'},
+    grat:{t:'Вдячність', ty:'text', ph:'За що сьогодні відчуваєш вдячність?', ic:'💛'},
     photo:{t:'Фото дня', ty:'photo', ic:'📸'},
     video:{t:'Відео-полиця', ty:'link', ic:'▶️'},
     vis:{t:'Візуалізація', ty:'timer', sec:150, sub:'на фото з Карти бажань', ic:'✨'},
@@ -14166,7 +14379,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(ty==='timer') o.sec=Math.max(30,Math.min(3600,(+s.sec|0)||180));
     return o;
   }
+  // кроки, що зберігають великі файли чи спільні полиці ранку — лише в Ранку
+  const RIT_MORNING_ONLY=['mix','photo','video'];
   function ritSteps(){
+    if(ritCtx!=='m' && typeof moodStepsOf==='function')
+      return (moodStepsOf(ritCtx)||[]).map(ritCleanStep).filter(s=>s&&RIT_MORNING_ONLY.indexOf(s.id)<0);
     const arr=Array.isArray(RIT_STEPS)?RIT_STEPS.map(ritCleanStep).filter(Boolean):[];
     return arr.length?arr:RIT_TPL[0].s.map(id=>({id}));
   }
@@ -14175,7 +14392,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function ritMeta(s){ const c=ritCat(s.id); return c?Object.assign({id:s.id},c):Object.assign({ic:RIT_OWN_IC[s.ty]||'•'},s); }
   /* Голос — лише в трьох старих записах (a1..a3). Аудіо лягає в ritual_board цілим base64,
      тож голос у кожному новому кроці швидко з'їв би памʼять браузера. */
-  function ritAudioKey(s){ const c=ritCat(s.id); return (c&&c.a)||null; }
+  function ritAudioKey(s){ if(ritCtx!=='m') return null; const c=ritCat(s.id); return (c&&c.a)||null; }
   function ritStepDone(s,d){
     const m=ritMeta(s);
     if(m.ty==='text'){ const ak=ritAudioKey(s); return !!((d[s.id]&&String(d[s.id]).trim())||(ak&&d[ak])); }
@@ -14184,8 +14401,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   // день знає, скільки кроків тоді було і скільки зроблено (для календаря, навіть коли набір зміниться)
   function ritTouch(d){ try{ const st=ritSteps(); d.of=st.length; d.n=st.filter(s=>ritStepDone(s,d)).length; }catch(_){} }
-  function ritSaveToday(){ ritTouch(ritDay(ritDs(0))); saveRitual(); }
+  function ritSaveToday(){
+    if(ritCtx!=='m'){   // настрій: пишемо лише moods_v1 і лише якщо настрій ще існує
+      if(typeof moodGet==='function' && moodGet(ritCtx)){ ritTouch(ritDay(ritDs(0))); saveMoods(); }
+      return; }
+    ritTouch(ritDay(ritDs(0))); saveRitual(); }
   function ritTplName(){
+    if(ritCtx!=='m' && typeof moodName==='function') return moodName(ritCtx);
     const ids=ritSteps().map(s=>s.id).join(',');
     const t=RIT_TPL.find(x=>x.s.join(',')===ids);
     return t?t.t:'свій набір';
@@ -14241,15 +14463,15 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <div class="vrail">${links||'<div class="vhint">Додай відео, які повертають тебе в стан «я вже там»</div>'}</div>`;
   }
   function ritualInnerHTML(){
-    const today=ritDs(0), d=ritDay(today), st=ritStreak(), steps=ritSteps();
+    const today=ritDs(0), d=ritDay(today), st=ritStreak(), steps=ritSteps(), D=ritDaysObj();
     const DW=['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
     // місячний %
     const now=new Date(); let mDone=0,mDays=now.getDate();
     for(let i=1;i<=mDays;i++){ const ds=ymdLocal(new Date(now.getFullYear(),now.getMonth(),i));
-      if(RIT.days[ds]&&RIT.days[ds].done) mDone++; }
+      if(D[ds]&&D[ds].done) mDone++; }
     const nDone=steps.filter(s=>ritStepDone(s,d)).length;
     const cal=[]; for(let i=-10;i<=2;i++){ const dd=new Date(); dd.setDate(dd.getDate()+i);
-      const ds=ymdLocal(dd), rec=RIT.days[ds];
+      const ds=ymdLocal(dd), rec=D[ds];
       // сьогодні рахуємо наживо за поточним набором, минулі дні — за тим, що збереглось того дня
       const n=i===0?nDone:(rec&&rec.n)||0;
       const cls=rec&&rec.done?'done':(n>0?'part':(i<0?'miss':''));
@@ -14259,7 +14481,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <div class="rit-cal">${cal.join('')}</div>
       <div class="rit-streak">🔥 <b>стрік ${st.s} ${st.s===1?'день':(st.s>=2&&st.s<=4?'дні':'днів')}</b> · найкращий — ${st.best} · ${mDays?Math.round(mDone/mDays*100):0}% місяця</div>
       <button type="button" class="rit-set" data-rset="1">
-        <span class="rs-t"><b>Мій ранок · ${esc(ritTplName())}</b><small>${nDone} з ${steps.length} кроків</small></span>
+        <span class="rs-t"><b>${ritCtx==='m'?'Мій ранок · ':''}${esc(ritTplName())}</b><small>${nDone} з ${steps.length} кроків</small></span>
         <span class="rs-e">Змінити</span>
         <span class="rs-bar"><i style="width:${steps.length?Math.round(nDone/steps.length*100):0}%"></i></span></button>
       ${steps.map(s=>ritStepHTML(s,d)).join('')}
@@ -14268,6 +14490,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // root — контейнер ранку (у Карті бажань або в шторці поверх гри); id не вживаємо, бо ранок буває на екрані двічі
   function ritualBind(root){
     root=root||document.getElementById('ritInline'); if(!root) return;
+    /* Чий набір намальовано в цьому контейнері — того й торкаються тапи: перед будь-яким
+       обробником усередині (фаза захоплення) повертаємо ritCtx до настрою контейнера. */
+    const ctx=ritCtx;
+    if(root.__ritCap) root.removeEventListener('click',root.__ritCap,true);
+    root.__ritCap=()=>{ ritCtx=ctx; }; root.addEventListener('click',root.__ritCap,true);
     const today=ritDs(0), d=ritDay(today);
     const $q=sel=>root.querySelector(sel), $a=sel=>root.querySelectorAll(sel);
     // календар одразу відкритий на сьогодні (без анімації, щоб не смикалось)
@@ -14282,12 +14509,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     $a('[data-rjr]').forEach(el=>el.onclick=()=>{
       const id=el.dataset.rjr, m=ritMeta(ritSteps().find(s=>s.id===id)||{id});
       inputModal({title:m.t, value:d[id]||'', placeholder:m.ph||'',
-        onOk:v=>{ d[id]=(v||'').trim().slice(0,2000); ritSaveToday(); ritualRerender(); }}); });
+        // день беремо наново: поки відкрите вікно, дані могли перечитатись із хмари (новий обʼєкт)
+        onOk:v=>{ ritCtx=ctx; ritDay(today)[id]=(v||'').trim().slice(0,2000); ritSaveToday(); ritualRerender(); }}); });
     $a('[data-rmic]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); ritFieldMic(el.dataset.rmic); });
     $a('[data-rstep]').forEach(el=>el.onclick=()=>{
       const s=ritSteps().find(x=>x.id===el.dataset.rstep); if(!s) return;
       const m=ritMeta(s);
-      if(m.ty==='check'){ if(d[s.id]) delete d[s.id]; else d[s.id]=1; ritSaveToday(); ritualRerender();
+      if(m.ty==='check'){ const dc=ritDay(today); if(dc[s.id]) delete dc[s.id]; else dc[s.id]=1; ritSaveToday(); ritualRerender();
         try{ window.platform.haptic('light'); }catch(_){} return; }
       if(m.ty!=='timer') return;
       const mark=()=>{ const d2=ritDay(today); d2[s.id]=1; ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} };
@@ -14311,7 +14539,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const finish=()=>{ const d2=ritDay(today); d2.done=1; ritSaveToday(); ritualRerender();
         try{ window.platform.haptic('medium'); plToast('🔥 День у стріку'); }catch(_){} };
       // у ранку вже є крок «Візуалізація» — не повторюємо її на фініші
-      if(ritSteps().some(s=>s.id==='vis')){ finish(); return; }
+      if(ritCtx!=='m' || ritSteps().some(s=>s.id==='vis')){ finish(); return; }
       try{ plToast('✨ Перейти до візуалізації мрій…'); }catch(_){}
       setTimeout(()=>{
         ritEnterMoment({
@@ -14327,7 +14555,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   // ── Конструктор ранку: шаблон, порядок, додати/прибрати крок, своє питання ──
   function ritEditor(){
+    const ctx=ritCtx, isM=ctx==='m';
     let work=ritSteps().map(s=>Object.assign({},s));
+    // для настроїв — свої шаблони і без кроків, що живуть лише в Ранку
+    const TPLS=isM?RIT_TPL:((typeof moodTemplates==='function')?moodTemplates():[]);
     const ov=document.createElement('div'); ov.className='asheet rit-ed';
     ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
     ov.innerHTML='<div class="asheet-in"></div>';
@@ -14336,17 +14567,17 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const close=()=>ov.remove();
     const draw=()=>{
       const ids=work.map(s=>s.id).join(',');
-      const tpls=RIT_TPL.map(t=>`<button type="button" class="red-tpl ${t.s.join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
+      const tpls=TPLS.map(t=>`<button type="button" class="red-tpl ${t.s.map(x=>x.id||x).join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
       const rows=work.map((s,i)=>{ const m=ritMeta(s);
         return `<div class="red-row"><span class="rst-ic">${esc(m.ic||'•')}</span>
           <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(m.ty==='text'&&m.a?'текст · голос':(RIT_TY[m.ty]||''))}${m.ty==='timer'?' · '+fmtDur(m.sec||180):''}</small></span>
           <button type="button" class="red-b" data-rup="${i}" aria-label="Вище" ${i?'':'disabled'}>↑</button>
           <button type="button" class="red-b" data-rdn="${i}" aria-label="Нижче" ${i<work.length-1?'':'disabled'}>↓</button>
           <button type="button" class="red-b x" data-rdel="${i}" aria-label="Прибрати">✕</button></div>`; }).join('');
-      const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)).map(k=>
+      const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)&&(isM||RIT_MORNING_ONLY.indexOf(k)<0)).map(k=>
         `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(RIT_CAT[k].t)}</button>`).join('');
       box.innerHTML=`<div class="asheet-grip"></div>
-        <div class="asheet-title">Мій ранок</div>
+        <div class="asheet-title">${isM?'Мій ранок':esc(ritWithCtx(ctx,ritTplName))}</div>
         <div class="asheet-sub">Шаблон або свій набір. Твої записи за минулі дні лишаються.</div>
         <div class="red-tpls">${tpls}</div>
         <div class="red-list">${rows||'<div class="vhint">Додай хоча б один крок</div>'}</div>
@@ -14355,7 +14586,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <button type="button" class="red-ok" data-rok="1" ${work.length?'':'disabled'}>Готово</button>
         <button type="button" class="asheet-cancel">Скасувати</button>`;
       ov.querySelector('.asheet-cancel').onclick=close;
-      ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=RIT_TPL.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(id=>({id})); draw(); } });
+      ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=TPLS.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(x=>(typeof x==='string')?{id:x}:Object.assign({},x)); draw(); } });
       ov.querySelectorAll('[data-rup]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rup; if(i>0){ const x=work[i]; work[i]=work[i-1]; work[i-1]=x; draw(); } });
       ov.querySelectorAll('[data-rdn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rdn; if(i<work.length-1){ const x=work[i]; work[i]=work[i+1]; work[i+1]=x; draw(); } });
       ov.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{ work.splice(+b.dataset.rdel,1); draw(); });
@@ -14375,9 +14606,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       };
       const ok=ov.querySelector('[data-rok]'); if(ok) ok.onclick=()=>{
         if(!work.length) return;
-        RIT_STEPS=work.map(ritCleanStep).filter(Boolean); saveRitSteps();
-        ritSaveToday(); close(); ritualRerender();
-        try{ plToast('Ранок оновлено · '+RIT_STEPS.length+' кр.'); }catch(_){}
+        const clean=work.map(ritCleanStep).filter(Boolean);
+        ritWithCtx(ctx,()=>{
+          if(isM){ RIT_STEPS=clean; saveRitSteps(); }
+          else if(typeof moodSetSteps==='function') moodSetSteps(ctx,clean);
+          ritSaveToday();
+        });
+        close(); ritualRerender();
+        try{ plToast((isM?'Ранок оновлено · ':'Кроки оновлено · ')+clean.length+' кр.'); }catch(_){}
       };
     };
     draw();
@@ -14749,8 +14985,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <div class="wdk-add" id="wdkAdd">${WICONS.photo}<span>Фото</span></div>${slides}
       </div>
       <div class="wdk-dots" id="wdkDots">${ordered.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>
-      <div class="rit-sec" style="margin-top:18px"><span>🔥 Ранковий ритуал</span></div>
-      <div id="ritInline" class="rit-wrap">${ritualInnerHTML()}</div>
+      ${(typeof moodsBlockHTML==='function')?moodsBlockHTML():`<div class="rit-sec" style="margin-top:18px"><span>🔥 Ранковий ритуал</span></div>
+      <div id="ritInline" class="rit-wrap">${ritualInnerHTML()}</div>`}
       <div class="wish-note">${wishes.length} ${wishes.length===1?'образ':'образів'} · свайпай · ⋯ — дії · тап по чипу — дата</div>`;
     body.querySelectorAll('[data-wtheme]').forEach(b=>b.onclick=()=>{ goalsData.wishTheme=b.dataset.wtheme; saveGoals(); renderWishes(); });
     const deck=body.querySelector('#wdkDeck');
@@ -14776,7 +15012,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const add=body.querySelector('#wdkAdd'); if(add) add.onclick=()=>pickWishPhoto();
     const clg=body.querySelector('#clgOpen'); if(clg) clg.onclick=goCollage;
     bindWishPrice(body);
-    try{ ritualBind(); }catch(e){ console.error('ritual inline',e); }
+    try{ if(typeof moodsBlockBind==='function') moodsBlockBind(body); else ritualBind(); }catch(e){ console.error('ritual inline',e); }
   }
 
   function renderWishes(){
@@ -24175,9 +24411,34 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(diaTab==='view') renderDiaView();
   }
 
+  /* ── місток для «Моїх настроїв» (58-moods.js): полиця на Карті бажань і відповіді в щоденник ── */
+  function diaShelf(){
+    const nDay=Object.keys(diaryEntries||{}).filter(diaHasEntry).length;
+    const en=(window.flowLang&&window.flowLang())==='en';
+    return [{id:'', name:en?'Daily journal':'Щоденник дня', emoji:'📔', color:'#5b6fd6', n:nDay}]
+      .concat((diaBooks.books||[]).map(b=>({id:b.id, name:b.name, emoji:b.emoji, color:b.color, n:(diaBooks.entries[b.id]||[]).length})));
+  }
+  function diaBookName(id){ const b=(diaBooks.books||[]).find(x=>x.id===id); return b?b.name:''; }
+  function diaCreateBook(name,emoji,color){
+    name=String(name||'').trim().slice(0,24); if(!name) return '';
+    const b={id:'b'+Date.now(), name, emoji:String(emoji||'📖').slice(0,4), color:String(color||'#8b7cff')};
+    diaBooks.books.push(b); saveDiaBooks(); return b.id;
+  }
+  // один запис на день від настрою: є entryId — оновлюємо його, нема — додаємо новий; повертає id
+  function diaUpsertEntry(bookId,entryId,text){
+    if(!(diaBooks.books||[]).some(b=>b.id===bookId)) return '';
+    const arr=(diaBooks.entries[bookId]=diaBooks.entries[bookId]||[]);
+    let e=entryId?arr.find(x=>x.id===entryId):null;
+    if(e){ if(e.text===text) return e.id; e.text=text; }
+    else { e={id:'e'+Date.now(), text:String(text), ts:Date.now()}; arr.push(e); }
+    saveDiaBooks(); return e.id;
+  }
+  function goDiaryBook(id){ diaCurBook=id||''; goDiary(); diaShowTab('books'); }
+  window.goDiaryBook=goDiaryBook;
+
   /* ══════════ вкладка «Зошити»: окремі папки під свої теми ══════════ */
-  const DIA_BOOK_EMOJIS=['🙏','💡','🌙','📖','✈️','❤️'];
-  const DIA_BOOK_COLORS=['#34c77b','#e8843c','#c4a8ff','#5b8def'];
+  const DIA_BOOK_EMOJIS=['🙏','💡','🌙','📖','✈️','❤️','🌱','🎨','🧠','💼','🏃','☕'];
+  const DIA_BOOK_COLORS=['#34c77b','#e8843c','#c4a8ff','#5b8def','#e0607e','#3cb8c4','#d4a62a','#8b6cf0'];
   let diaNewEmoji=DIA_BOOK_EMOJIS[0], diaNewColor=DIA_BOOK_COLORS[0];
   function renderDiaBooks(){
     const grid=document.getElementById('diaBooksGrid'); if(!grid) return;
@@ -24204,17 +24465,45 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       co.querySelectorAll('[data-dc]').forEach(b=>{ b.onclick=()=>{ diaNewColor=b.dataset.dc; renderDiaBooks(); }; });
     }
   }
+  let diaBookMonth='';               // фільтр місяця у відкритому щоденнику: 'YYYY-MM' або '' — усі
+  let diaBookOpenId='';              // щоденник, для якого діє фільтр (інший щоденник — фільтр скидається)
   function renderDiaBook(book){
+    if(diaBookOpenId!==book.id){ diaBookOpenId=book.id; diaBookMonth=''; }
+    const view=document.getElementById('diaBookView');
+    if(view) view.style.setProperty('--bc', safeColor(book.color,'#8b7cff'));
     const t=document.getElementById('diaBookTitle'); if(t) t.textContent=book.emoji+' '+book.name;
+    const all=(diaBooks.entries[book.id]||[]).slice().sort((a,b)=>b.ts-a.ts);
+    const sub=document.getElementById('diaBookSub');
+    if(sub){
+      const first=all.length?new Date(all[all.length-1].ts):null;
+      sub.textContent=all.length+' '+diaPlural(all.length,'запис','записи','записів')
+        +(first?' · з '+first.getDate()+' '+DIA_MONTHS[first.getMonth()]:'');
+    }
+    // місяці, у яких є записи — чипами; «Усі» лише коли місяців більше одного
+    const mKey=ts=>{ const d=new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); };
+    const months=[]; all.forEach(e=>{ const k=mKey(e.ts); if(months.indexOf(k)<0) months.push(k); });
+    if(diaBookMonth&&months.indexOf(diaBookMonth)<0) diaBookMonth='';
+    const MN=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+    const mEl=document.getElementById('diaBookMonths');
+    if(mEl){
+      const cy=new Date().getFullYear();
+      mEl.innerHTML=months.length>1?['<button class="dia-bk-m'+(diaBookMonth?'':' on')+'" data-dbm="">Усі</button>']
+        .concat(months.map(k=>{ const y=+k.slice(0,4), m=+k.slice(5)-1;
+          return '<button class="dia-bk-m'+(diaBookMonth===k?' on':'')+'" data-dbm="'+k+'">'+MN[m]+(y!==cy?' '+y:'')+'</button>'; })).join(''):'';
+      mEl.querySelectorAll('[data-dbm]').forEach(b=>{ b.onclick=()=>{ diaBookMonth=b.dataset.dbm; renderDiaBook(book); }; });
+    }
     const l=document.getElementById('diaBookList'); if(!l) return;
-    const arr=(diaBooks.entries[book.id]||[]).slice().sort((a,b)=>b.ts-a.ts);
+    const arr=diaBookMonth?all.filter(e=>mKey(e.ts)===diaBookMonth):all;
+    l.className='dia-list dia-bk-grid';
     l.innerHTML=arr.length?arr.map(e=>{
       const d=new Date(e.ts);
-      const au=e.audio?'<button class="db-play" data-dbplay="'+e.id+'" style="background:none;border:0;color:'+safeColor(book.color,'#8b7cff')+';cursor:pointer;padding:0;font-size:13px">▶ 🎙 '+diaFmtDur(e.audio.dur||0)+'</button>':'';
-      return '<div class="dia-entry db-entry"><div><div class="de-date" style="color:'+safeColor(book.color,'#8b7cff')+'">'+d.getDate()+' '+DIA_MONTHS[d.getMonth()]+'</div>'
-        +'<div class="de-txt db-txt">'+diaEsc(e.text)+'</div>'+au+'</div>'
-        +'<button class="db-del" data-dbdel="'+e.id+'" title="Видалити запис">✕</button></div>';
-    }).join(''):'<div class="dia-empty">Перший запис — у полі зверху.</div>';
+      const au=e.audio?'<button class="db-play" data-dbplay="'+diaEsc(e.id)+'" style="background:none;border:0;color:var(--bc);cursor:pointer;padding:0;font-size:13px;font-weight:800">▶ 🎙 '+diaFmtDur(e.audio.dur||0)+'</button>':'';
+      return '<div class="dia-tile" data-dbtile="'+diaEsc(e.id)+'"><div class="dt-d">'+d.getDate()+' '+DIA_MONTHS[d.getMonth()]+'</div>'
+        +'<div class="dt-t">'+diaEsc(e.text)+'</div>'+au
+        +'<button class="db-del" data-dbdel="'+diaEsc(e.id)+'" title="Видалити запис" aria-label="Видалити запис">✕</button></div>';
+    }).join(''):'<div class="dia-empty" style="grid-column:1/-1">Перший запис — у полі зверху.</div>';
+    // тап по плитці — розгорнути довгий запис повністю
+    l.querySelectorAll('[data-dbtile]').forEach(el=>{ el.onclick=ev=>{ if(ev.target.closest('button')) return; el.classList.toggle('open'); }; });
     l.querySelectorAll('[data-dbplay]').forEach(b=>{
       b.onclick=()=>{
         const e=(diaBooks.entries[book.id]||[]).find(x=>x.id===b.dataset.dbplay);
@@ -24240,7 +24529,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(b) b.onclick=()=>{
       const inp=document.getElementById('diaBookName');
       const name=((inp&&inp.value)||'').trim();
-      if(!name){ try{ flowAlert('Дай зошиту назву.'); }catch(_){} return; }
+      if(!name){ try{ flowAlert('Дай щоденнику назву.'); }catch(_){} return; }
       diaBooks.books.push({id:'b'+Date.now(),name:name,emoji:diaNewEmoji,color:diaNewColor});
       if(inp) inp.value='';
       const f=document.getElementById('diaBookForm'); if(f) f.style.display='none';
@@ -24262,7 +24551,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   { const b=document.getElementById('diaBookMenu');
     if(b) b.onclick=()=>{
       const book=diaBooks.books.find(x=>x.id===diaCurBook); if(!book) return;
-      confirmSheet({title:'Видалити зошит «'+book.name+'»?',sub:'Разом з усіма його записами. Це незворотно.',okLabel:'Видалити зошит',onOk:()=>{
+      confirmSheet({title:'Видалити щоденник «'+book.name+'»?',sub:'Разом з усіма його записами. Це незворотно.',okLabel:'Видалити щоденник',onOk:()=>{
         diaBooks.books=diaBooks.books.filter(x=>x.id!==book.id);
         delete diaBooks.entries[book.id];
         diaCurBook=''; saveDiaBooks(); renderDiaBooks();
@@ -26956,12 +27245,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // ці читання незалежні одне від одного — теж ідуть паралельно, а не по черзі
     // aiPrivLoad — згода й закриті від AI розділи (37-ai-privacy.js): так вони синкаються між пристроями
     // loadRitual — ранок і його кроки (06-wishes.js): без цього ранок жив лише з локальної копії й затирав хмару
-    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass(), aiPrivLoad(), loadRitual()]); applyHomeGlass(); }catch(_){}
+    // loadMoods — «Мої настрої» (58-moods.js, ключ moods_v1); window.* — бо файл виконується пізніше за цей
+    try{ await Promise.all([loadValues(), loadWishes(), loadWishPrice(), loadHomeGlass(), aiPrivLoad(), loadRitual(), (typeof window.loadMoods==='function'?window.loadMoods():null)]); applyHomeGlass(); }catch(_){}
     /* SYNC-2: запамʼятати, які ключі справді прочитано — автозаписи в решту не підуть,
        а ручні правки в них чекатимуть звірки з хмарою (02-storage.js, storeMarkRead).
        Саме тут, після останнього await: далі прочитане синхронно лягає в памʼять.
        Разом із __RAW — ключі, які дочитують loadValues/loadWishes/loadWishPrice/loadHomeGlass. */
-    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY, 'ai_privacy_v1', RIT_KEY, RIT_STEPS_KEY]); }catch(_){}
+    try{ if(window.storeMarkRead) window.storeMarkRead(__RAW, [VAL_KEY, WISH_KEY, WISH_ACT_KEY, WPRICE_KEY, HOMEGLASS_KEY, 'ai_privacy_v1', RIT_KEY, RIT_STEPS_KEY, 'moods_v1']); }catch(_){}
     /* Усе нижче до кінця load() — синхронне застосування прочитаного разом з
        міграціями й прибираннями. Їхні записи — автоматичні: у ключ, який не
        прочитався (сховище мовчало), вони не підуть (SYNC-2, storeAuto). */
@@ -33847,7 +34137,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1};   // d* — «Дані» (нижче)
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1};   // d* — «Дані» (нижче)
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -34014,11 +34304,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     dmission:{t:'Місія папки', h:'Місія', ic:'🎯', per:null, show:[['next','Наступний крок'],['due','Дедлайн'],['ring','Кільце прогресу']]},
     dhabit:{t:'Звичка папки', h:'Звичка', ic:'🔥', per:[['week','Тиждень'],['month','Місяць']], show:[['streak','Серія'],['count','Скільки днів'],['days','Дні періоду']]},
     dtime:{t:'Час папки', h:'Час', ic:'⏱', per:[['day','День'],['week','Тиждень'],['month','Місяць']], show:[['hours','Години'],['done','Виконані блоки'],['add','Кнопка «＋ блок»']]},
-    dcal:{t:'Календар папки', h:'Календар', ic:'📅', per:null, show:[['hint','Підказка «тап по дню»']]}
+    dcal:{t:'Календар папки', h:'Календар', ic:'📅', per:null, show:[['hint','Підказка «тап по дню»']]},
+    /* прогрес місії (15.11.2026): Відлік · Скарбничка · Лічильник — так само вікна в місію, даних одна копія */
+    dcount:{t:'Відлік до мети', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата'],['next','Наступна віха']]},
+    dsave:{t:'Скарбничка місії', h:'Скарбничка', ic:'🐷', per:null, show:[['bar','Смужка'],['spent','Витрачено на місію'],['add','Кнопка «＋ ₴»']]},
+    dcounter:{t:'Лічильник місії', h:'Лічильник', ic:'🔢', per:null, show:[['bar','Смужка'],['minus','Кнопка «−»']]},
+    dphoto:{t:'Фото-прогрес', h:'Фото', ic:'📸', per:null, show:[['dates','Дати під фото'],['count','Скільки фото й днів']]}
   };
   const wdCalYm={};   // місяць, який гортає віджет «Календар папки» (лише памʼять)
   function wdIs(t){ return Object.prototype.hasOwnProperty.call(WD_META,String(t||'')); }
-  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&b.type==='dtime'?'m':'s'); }
+  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
@@ -34178,7 +34473,227 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <b class="wd-big">${n} <span>${pluralUk(n,'блок','блоки','блоків')}${wdOn(b,'hours')?' · '+wdHm(h)+' год':''}</span></b>
         ${bars}${up}${add}`);
     }
+    if(t==='dcount'){
+      // відлік до фінішу місії: остання дата її віх (віха без дня — кінець її місяця)
+      const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
+      const fin=wdFinal(g), nm=esc(String(g.name||'Місія').slice(0,60)), col=wdFolder(fk)?'':g.color;
+      const hit=`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" aria-label="Відкрити місію ${esc(g.name||'')}"></button>`;
+      if(!fin) return wdTile(b,fk,`${hit}${wdHead(b,fk)}<b class="wd-name">${nm}</b>
+        <small class="wd-sub">У місії ще нема дати фінішу</small>
+        <span class="wd-acts"><button data-wga="wdpage" data-wgg="${esc(g.id)}">Задати дату</button></span>`,'empty',col);
+      const dl=wdDaysLeft(fin);
+      const big=dl>0?`<b class="wd-big xl">${dl}</b><small class="wd-cap">${pluralUk(dl,'день','дні','днів')} лишилось</small>`
+        :dl===0?`<b class="wd-big">Сьогодні</b><small class="wd-cap">день фінішу</small>`
+        :`<b class="wd-big sm">Час вийшов</b><small class="wd-sub late">${-dl} ${pluralUk(-dl,'день','дні','днів')} тому</small>`;
+      const nx=wdNext(g), nxd=nx&&nx.due&&nx.due!==fin?wdDaysLeft(nx.due):null;
+      const next=wdOn(b,'next')&&nxd!==null&&sz!=='s'?`<small class="wd-sub"><em>Далі:</em> ${esc(nx.t.slice(0,50))} · ${nxd<0?'прострочено':nxd===0?'сьогодні':'за '+nxd+' '+pluralUk(nxd,'день','дні','днів')}</small>`:'';
+      return wdTile(b,fk,`${hit}${wdHead(b,fk,sz==='s'?'':'🔗 місія')}${sz!=='s'?`<b class="wd-name">${nm}</b>`:''}
+        <span class="wd-cnt">${big}</span>
+        ${wdOn(b,'date')?`<small class="wd-sub">${sz==='s'?nm+' · ':'Фініш: '}${esc(jnDateTxt(fin))}</small>`:''}${next}
+        ${sz==='l'?wdLevels(g):''}`,'cnt',col);
+    }
+    if(t==='dsave'){
+      // скарбничка: доходи Гаманця з міткою місії за весь час (головна валюта), ціль — поле місії saveGoal
+      const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
+      const a=wlAgg((finOps||[]).filter(o=>o&&!String(o.id||'').startsWith('start_')),g.id), goal=wdSaveGoal(g);
+      const pct=goal?Math.max(0,Math.min(100,Math.round(a.inc/goal*100))):0, col=wdFolder(fk)?'':g.color;
+      const sum=sz==='s'?wgK(a.inc):wgMoney(a.inc);
+      const add=wdOn(b,'add')?`<button data-wga="wdsavein">＋ ${esc(curSym())}</button>`:'';
+      return wdTile(b,fk,`<button class="wg-hit" data-wga="mission" data-wgg="${esc(g.id)}" aria-label="Гроші місії ${esc(g.name||'')}"></button>
+        ${wdHead(b,fk,sz==='s'?'':'🔗 Гаманець')}${sz==='l'?`<b class="wd-name">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,60))}</b>`:''}
+        <b class="wd-big">${esc(sum)}${goal?` <span>${pct}%</span>`:''}</b>
+        ${goal&&wdOn(b,'bar')?`<span class="wd-bar"><i style="width:${pct}%"></i></span>`:''}
+        ${goal?`<small class="wd-sub">з ${esc(sz==='s'?wgK(goal):wgMoney(goal))}${a.inc>=goal?' · зібрано ✓':''}${sz==='m'?' · '+esc(String(g.name||'Місія').slice(0,30)):''}</small>`:''}
+        ${wdOn(b,'spent')&&a.out>0&&sz!=='s'?`<small class="wd-sub">Витрачено на місію: ${esc(wgMoney(a.out))}</small>`:''}
+        <span class="wd-acts">${add}${goal?'':`<button data-wga="wdsavegoal">Ціль</button>`}</span>`,'sav',col);
+    }
+    if(t==='dcounter'){
+      // лічильник: «число місії» (від → до) або власні лічильники місії (g.counters)
+      const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
+      const L=wdCounters(g), c=L.find(x=>x.id===String(b.cid||''))||L[0], col=wdFolder(fk)?'':g.color;
+      if(!c) return wdTile(b,fk,`${wdHead(b,fk)}<b class="wd-name">${esc(String(g.name||'Місія').slice(0,60))}</b>
+        <small class="wd-sub">Рахуй будь-що: слова, сторінки, кілограми, пробіжки</small>
+        <span class="wd-acts"><button data-wga="wdcnew">＋ Лічильник</button></span>`,'empty',col);
+      const pct=wdCntPct(c), u=c.unit?' '+esc(c.unit):'';
+      return wdTile(b,fk,`<button class="wg-hit" data-wga="wdcsheet" aria-label="Лічильник «${esc(c.t)}»: змінити"></button>
+        ${wdHead(b,fk,sz==='s'?'':esc(c.t.slice(0,24)))}
+        <b class="wd-big">${esc(wdNumTxt(c.v))}${c.to!==null?` <span>з ${esc(wdNumTxt(c.to))}${u}</span>`:u?` <span>${u}</span>`:''}</b>
+        ${pct!==null&&wdOn(b,'bar')?`<span class="wd-bar"><i style="width:${pct}%"></i></span>`:''}
+        ${sz==='s'?`<small class="wd-cap">${esc(c.t)}</small>`:''}
+        ${sz!=='s'?`<small class="wd-sub">${pct!==null?pct+'% шляху':'без мети'} · ${esc(String(g.name||'Місія').slice(0,40))}</small>`:''}
+        <span class="wd-acts">${wdOn(b,'minus')?`<button data-wga="wdcstep" data-n="-1" aria-label="Мінус ${esc(wdNumTxt(c.step))}">−</button>`:''}<button data-wga="wdcstep" data-n="1" aria-label="Плюс ${esc(wdNumTxt(c.step))}">＋${c.step!==1?esc(wdNumTxt(c.step)):'1'}</button></span>`,'ctr',col);
+    }
+    if(t==='dphoto'){
+      // «було → стало»: перше фото місії поруч з останнім; усі — у галереї по тапу. Фото живуть у місії (g.photos), знімок — у сховищі фото
+      const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
+      const L=wdPhotos(g), col=wdFolder(fk)?'':g.color, gid=esc(g.id);
+      const nm=esc(String(g.name||'Місія').slice(0,40));
+      if(!L.length) return wdTile(b,fk,`${wdHead(b,fk)}<b class="wd-name">${nm}</b>
+        <small class="wd-sub">Перше фото стане точкою «було»</small>
+        <span class="wd-acts"><button data-wga="wdphadd">＋ Фото</button></span>`,'empty',col);
+      const first=L[0], last=L[L.length-1], dates=wdOn(b,'dates');
+      const fr=(p,lbl)=>`<span class="wd-ph"><i style="background-image:url('${esc(safeImg(p.ref))}')"></i>${dates?`<s>${lbl} · ${esc(jnDateTxt(p.ds))}</s>`:''}</span>`;
+      const add=`<button class="wd-ph-add" data-wga="wdphadd" aria-label="Додати фото"><span>＋</span></button>`;
+      // одне фото: «було» є, праворуч — рамка під наступне
+      const pair=sz==='s'?fr(last,L.length>1?'зараз':'було')
+        :L.length===1?fr(first,'було')+`<button class="wd-ph wd-ph-new" data-wga="wdphadd"><span>＋</span><s>Нове фото</s></button>`
+        :fr(first,'було')+fr(last,'зараз');
+      const days=Math.max(0,Math.round((new Date(last.ds+'T12:00:00')-new Date(first.ds+'T12:00:00'))/864e5));
+      const strip=sz==='l'&&L.length>2?`<span class="wd-ph-strip">${L.slice(-5,-1).reverse().map(p=>`<i style="background-image:url('${esc(safeImg(p.ref))}')"></i>`).join('')}</span>`:'';
+      return wdTile(b,fk,`<button class="wg-hit" data-wga="wdphgal" aria-label="Усі фото місії ${nm}"></button>
+        ${wdHead(b,fk,sz==='s'?'':esc(String(g.name||'').slice(0,24)))}
+        <span class="wd-pair${sz==='s'?' one':''}">${pair}</span>${strip}
+        <span class="wd-ph-foot">${sz==='s'||L.length>1?add:''}${wdOn(b,'count')?`<small class="wd-sub">${L.length} ${pluralUk(L.length,'фото','фото','фото')}${days?' · '+days+' '+pluralUk(days,'день','дні','днів')+(sz==='s'?'':' шляху'):''}</small>`:''}</span>`,'pho',col);
+    }
     return '';
+  }
+
+  // ── прогрес місії: допоміжне ──
+  // фото місії від найстарішого: лише посилання на сховище фото (idb:), з датою
+  function wdPhotos(g){
+    // лише СВОЇ знімки (gp_…, ref = idb:+id): підроблений імпорт не підсуне сюди обкладинку папки, яку «🗑» стер би й з хмари
+    return (Array.isArray(g.photos)?g.photos:[]).filter(p=>p&&/^gp_[\w-]+$/.test(String(p.id||''))&&p.ref==='idb:'+p.id&&/^\d{4}-\d{2}-\d{2}$/.test(p.ds||''))
+      .slice().sort((a,c)=>a.ds.localeCompare(c.ds)||(+a.t||0)-(+c.t||0));
+  }
+  const WD_PH_MAX=120;   // більше — уже архів, а не прогрес; усі фото читаються в памʼять при старті (photoWarm), тож тримаємо скромно
+  // ＋ Фото: вибір → стиснення до 1080 px → сховище фото → у місію лише посилання
+  function wdPhotoAdd(gid,after){
+    const g0=wdFreshGoal(gid); if(!g0) return;
+    if(wdPhotos(g0).length>=WD_PH_MAX){ plToast('У місії вже '+WD_PH_MAX+' фото — спершу прибери старі'); return; }
+    chPickFile(file=>chShrink(file,1080,1080,async du=>{
+      const id='gp_'+String(gid).replace(/[^\w-]/g,'').slice(0,24)+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      let ref=''; try{ ref=await window.photoPut(id,du); }catch(_){ ref=''; }
+      // сховище фото не прийняло — НЕ кладемо мегабайтний знімок у цілі (переповнило б памʼять і синк)
+      if(!window.photoIsRef(ref)){ plToast('Не вийшло зберегти фото — у телефоні замало місця'); return; }
+      const q=wdFreshGoal(gid);   // поки вибирали фото, синк міг підмінити goalsData
+      if(!q){ try{ window.photoDel(ref); }catch(_){} plToast('Місію змінили на іншому пристрої'); return; }
+      if(!Array.isArray(q.photos)) q.photos=[];
+      q.photos.push({id, ref, ds:ymdLocal(), t:Date.now()});
+      saveGoals(); try{ window.platform.haptic('light'); }catch(_){}
+      wdRedraw(); plToast('📸 Фото додано'); if(after) try{ after(); }catch(_){}
+    }));
+  }
+  // галерея: усі фото місії від нових, ＋ Фото, видалення (з хмари теж — тому питаємо)
+  function wdPhotoGallery(gid){
+    const g=wdFreshGoal(gid); if(!g) return;
+    const L=wdPhotos(g).reverse();
+    jnOverlay(`<div class="jn-ed-h"><b>📸 ${esc(String(g.name||'Місія').slice(0,30))}</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">${L.length} ${pluralUk(L.length,'фото','фото','фото')} · від нових до перших</small>
+      <div class="jn-ed-foot"><button class="jn-btn" data-wdpha>＋ Фото</button></div>
+      <div class="wd-gal">${L.map((p,i)=>`<figure><i style="background-image:url('${esc(safeImg(p.ref))}')"></i>
+        <figcaption><span>${esc(jnDateTxt(p.ds))}${i===L.length-1&&L.length>1?' · було':i===0&&L.length>1?' · зараз':''}</span>
+        <button data-wdphdel="${esc(p.id)}" aria-label="Видалити фото від ${esc(jnDateTxt(p.ds))}">🗑</button></figcaption></figure>`).join('')}</div>`, ov=>{
+      ov.classList.add('wd-ov');
+      ov.querySelector('[data-wdpha]').onclick=()=>{ ov.remove(); wdPhotoAdd(gid,()=>wdPhotoGallery(gid)); };
+      ov.querySelectorAll('[data-wdphdel]').forEach(x=>x.onclick=()=>{
+        const pid=x.dataset.wdphdel; ov.remove();
+        confirmSheet({title:'Видалити фото?', sub:'Воно зникне з місії і з хмари. Повернути не вийде.', okLabel:'Видалити', danger:true, onOk:()=>{
+          const q=wdFreshGoal(gid); if(!q||!Array.isArray(q.photos)) return;
+          const p=wdPhotos(q).find(y=>String(y.id)===pid); if(!p) return;
+          q.photos=q.photos.filter(y=>y!==p); saveGoals();
+          try{ window.photoDel(p.ref); }catch(_){}
+          wdRedraw(); plToast('Фото видалено'); wdPhotoGallery(gid); }});
+      });
+    });
+  }
+  // фініш місії — найпізніша дата віх; віха лише з місяцем — останній день того місяця
+  function wdFinal(g){
+    const ds=ylGoalMs(g).map(m=>/^\d{4}-\d{2}-\d{2}$/.test(m.due||'')?m.due:m.ym+'-'+String(moDim(m.ym)).padStart(2,'0')).sort();
+    return ds.length?ds[ds.length-1]:'';
+  }
+  function wdSaveGoal(g){ const v=Math.round(+g.saveGoal||0); return v>0?v:0; }
+  function wdNumTxt(v){ return String(Math.round((+v||0)*100)/100).replace('.',','); }
+  // список лічильників місії: «число місії» (якщо воно ручне, не з доходів) + власні g.counters
+  function wdCounters(g){
+    const out=[], n=jnNum(g);
+    if(n&&!jnNumIncome(g)) out.push({id:'main', t:'Число місії', v:n.cur, to:n.to, st:n.start, step:1, unit:''});
+    (Array.isArray(g.counters)?g.counters:[]).forEach(c=>{ if(!c||!c.id) return;
+      const to=jnNumOf(c.to), st=jnNumOf(c.st);
+      out.push({id:String(c.id), t:String(c.t||'Лічильник').slice(0,40), v:jnNumOf(c.v)||0, to, st:st===null?0:st, step:jnNumOf(c.step)>0?jnNumOf(c.step):1, unit:String(c.unit||'').slice(0,12)}); });
+    return out;
+  }
+  function wdCntPct(c){ if(c.to===null||c.to===c.st) return null; return Math.max(0,Math.min(100,Math.round((c.v-c.st)/(c.to-c.st)*100))); }
+  // свіжа місія за id — поки шторка відкрита, синк міг підмінити goalsData
+  function wdFreshGoal(id){ return (goalsData.goals||[]).find(x=>x&&String(x.id)===String(id))||null; }
+
+  // ＋ / − на плитці: пише лише тапом людини, тим самим saveGoals, що й сторінка місії
+  function wdCounterStep(b,fk,dir){
+    const g0=wdGoal(b,fk), g=g0&&wdFreshGoal(g0.id); if(!g) return;
+    const c=wdCounters(g).find(x=>x.id===String(b.cid||''))||wdCounters(g)[0]; if(!c) return;
+    const nv=Math.round((c.v+dir*c.step)*100)/100;
+    if(c.id==='main') g.from=String(nv).slice(0,30);
+    else { const r=(g.counters||[]).find(x=>x&&String(x.id)===c.id); if(!r) return; r.v=nv; }
+    saveGoals();
+    try{ window.platform.haptic('light'); }catch(_){}
+    // мету щойно взято — кажемо один раз (саме на цьому кроці)
+    if(c.to!==null&&c.to!==c.st){ const was=(c.v-c.st)/(c.to-c.st), now=(nv-c.st)/(c.to-c.st); if(was<1&&now>=1) plToast('🎉 Мету взято: '+c.t); }
+    wdRedraw();
+  }
+  // шторка лічильника: вибрати, який показує плитка · змінити · додати новий · видалити
+  function wdCounterSheet(blockId,gid,cid){
+    const g=wdFreshGoal(gid); if(!g) return;
+    const L=wdCounters(g), isNew=cid===null, c=isNew?null:(L.find(x=>x.id===String(cid||''))||L[0]||null);
+    if(!isNew&&!c) return wdCounterSheet(blockId,gid,null);
+    const chips=L.map(x=>`<button data-wdcp="${esc(x.id)}" class="${c&&x.id===c.id?'on':''}">${esc(x.t)}</button>`).join('')+`<button data-wdcp="" class="${isNew?'on':''}">＋ Новий</button>`;
+    const f=(id,lbl,val,ty,ph)=>`<label class="jn-f"><span>${lbl}</span><input id="${id}" ${ty==='n'?'type="number" inputmode="decimal"':'maxlength="40"'} value="${esc(val==null?'':String(val))}" placeholder="${esc(ph)}"></label>`;
+    const form=c&&c.id==='main'
+      ?`<small class="dy-fm-sub">Це число з самої місії: ${esc(wdNumTxt(c.v))} з ${esc(wdNumTxt(c.to))}. Змінюється там же, де й на сторінці місії.</small>
+        <div class="jn-ed-foot"><button class="jn-btn" data-wdcnum>Змінити число</button></div>`
+      :`${f('wdcT','Назва',c?c.t:'','t','Напр. Японські слова')}
+        <div class="wd-f2">${f('wdcV','Зараз',c?c.v:0,'n','0')}${f('wdcTo','Мета',c&&c.to!==null?c.to:'','n','1000')}</div>
+        <div class="wd-f2">${f('wdcSt','Крок «＋»',c?c.step:1,'n','1')}${f('wdcU','Одиниця',c?c.unit:'','t','слів, кг, стор.')}</div>
+        <div class="jn-ed-foot"><button class="jn-btn" data-wdcok>${isNew?'Додати':'Зберегти'}</button></div>
+        ${!isNew?'<button class="wd-del" data-wdcdel>Видалити лічильник</button>':''}`;
+    jnOverlay(`<div class="jn-ed-h"><b>🔢 Лічильник місії</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">${esc(String(g.name||'Місія').slice(0,40))} · плитка показує вибраний</small>
+      <div class="jn-f"><span>Лічильники</span><div class="wl-chips">${chips}</div></div>${form}`, ov=>{
+      // вибір лічильника пише в блок лише cid (вигляд плитки), саму місію не чіпає
+      ov.querySelectorAll('[data-wdcp]').forEach(x=>x.onclick=()=>{
+        const id=x.dataset.wdcp; if(!id){ wdCounterSheet(blockId,gid,null); return; }
+        const q=getBlock(blockId); if(q&&String(q.cid||'')!==id){ q.cid=id; saveBoard(); wdRedraw(); }
+        wdCounterSheet(blockId,gid,id);
+      });
+      const nb=ov.querySelector('[data-wdcnum]'); if(nb) nb.onclick=()=>{ ov.remove(); jnNumSheet(g,wdRedraw); };
+      const ok=ov.querySelector('[data-wdcok]'); if(ok) ok.onclick=()=>{
+        const v=id=>String(ov.querySelector('#'+id).value||'').trim();
+        const name=v('wdcT').slice(0,40); if(!name){ plToast('Дай лічильнику назву'); return; }
+        const now=jnNumOf(v('wdcV')), to=v('wdcTo')===''?null:jnNumOf(v('wdcTo')), st=jnNumOf(v('wdcSt'));
+        if(now===null){ plToast('«Зараз» — це число'); return; }
+        if(v('wdcTo')!==''&&to===null){ plToast('Мета — це число або порожньо'); return; }
+        const q=wdFreshGoal(gid); if(!q){ ov.remove(); plToast('Місію змінили на іншому пристрої'); return; }
+        if(!Array.isArray(q.counters)) q.counters=[];
+        let r=isNew?null:q.counters.find(x=>x&&String(x.id)===c.id);
+        if(!isNew&&!r){ ov.remove(); plToast('Лічильник змінили на іншому пристрої'); return; }
+        if(isNew){ r={id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), st:now}; q.counters.push(r); }
+        r.t=name; r.v=now; r.step=st>0?st:1; r.unit=v('wdcU').slice(0,12);
+        if(to===null) delete r.to; else r.to=to;
+        saveGoals();
+        if(isNew){ const bk=getBlock(blockId); if(bk){ bk.cid=r.id; saveBoard(); } }
+        ov.remove(); wdRedraw(); plToast(isNew?'✓ Лічильник додано':'✓ Збережено');
+      };
+      const del=ov.querySelector('[data-wdcdel]'); if(del) del.onclick=()=>{
+        ov.remove();
+        confirmSheet({title:'Видалити «'+c.t+'»?', sub:'Число зникне з місії й з усіх плиток, що його показують.', okLabel:'Видалити', danger:true, onOk:()=>{
+          const q=wdFreshGoal(gid); if(!q||!Array.isArray(q.counters)) return;
+          q.counters=q.counters.filter(x=>!(x&&String(x.id)===c.id)); saveGoals(); wdRedraw(); plToast('Лічильник видалено'); }});
+      };
+    });
+  }
+  // ціль скарбнички — поле місії saveGoal (головна валюта); 0 або порожньо — без цілі
+  function wdSaveGoalSheet(gid){
+    const g=wdFreshGoal(gid); if(!g) return; const cur=wdSaveGoal(g);
+    jnOverlay(`<div class="jn-ed-h"><b>🐷 Ціль скарбнички</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">${esc(String(g.name||'Місія').slice(0,40))} · рахуються доходи з міткою цієї місії</small>
+      <label class="jn-f"><span>Скільки хочеш зібрати, ${esc(curSym())}</span><input id="wdSG" type="number" min="0" step="100" inputmode="decimal" value="${cur||''}" placeholder="Напр. 90000"></label>
+      <div class="jn-ed-foot"><button class="jn-btn" data-wdsgok>Зберегти</button></div>`, ov=>{
+      ov.querySelector('[data-wdsgok]').onclick=()=>{
+        const raw=String(ov.querySelector('#wdSG').value||'').trim(), v=raw===''?0:jnNumOf(raw);
+        if(v===null||v<0){ plToast('Вкажи суму числом'); return; }
+        const q=wdFreshGoal(gid); if(!q){ ov.remove(); plToast('Місію змінили на іншому пристрої'); return; }
+        if(v>0) q.saveGoal=Math.round(v); else delete q.saveGoal;
+        saveGoals(); ov.remove(); wdRedraw(); plToast(v>0?'✓ Ціль: '+wgMoney(v):'Ціль прибрано');
+      };
+    });
   }
 
   // перемалювати після дії: сторінка (розмір клітинки міг змінитись) + усі видимі віджети
@@ -34202,6 +34717,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // день — з плитки (коли її намалювали), а не з моменту тапу: після півночі не шукаємо блок у новому дні
     else if(a==='wdsub'){ const bid=el.dataset.bid, ds=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(); if(bid) subSheet(ds,bid); }
     else if(a==='wdsubck'){ const bid=el.dataset.bid, sid=el.dataset.sid, ds=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(); if(bid&&sid){ const r=subToggle(ds,bid,sid); if(r!==null) try{ window.platform.haptic('light'); }catch(_){} } }
+    // прогрес місії: Лічильник · Скарбничка
+    else if(a==='wdcstep'){ wdCounterStep(b,fk,+el.dataset.n<0?-1:1); }
+    else if(a==='wdcsheet'||a==='wdcnew'){ const q=wdGoal(b,fk); if(q) wdCounterSheet(id,q.id,a==='wdcnew'?null:String(b.cid||'')); }
+    else if(a==='wdsavein'){ const q=wdGoal(b,fk); if(q) wlOpSheet('in',String(q.id),fk?{folderKey:fk}:{}); }
+    else if(a==='wdsavegoal'){ const q=wdGoal(b,fk); if(q) wdSaveGoalSheet(q.id); }
+    else if(a==='wdphadd'){ const q=wdGoal(b,fk); if(q) wdPhotoAdd(q.id); }
+    else if(a==='wdphgal'){ const q=wdGoal(b,fk); if(q) wdPhotoGallery(q.id); }
     else if(a==='wdcalnav'){ const n=+el.dataset.n||0, cur=wdCalYm[b.id]||ymdLocal().slice(0,7); wdCalYm[b.id]=n?moShift(cur,n):ymdLocal().slice(0,7); wgRefresh(); }
     else if(a==='wdcalday'){ const ds=el.dataset.ds; if(fk&&/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) calDaySheet(ds,{folder:fk,onOpenDay:d=>{ try{ goJournal({tab:'day',ds:d}); }catch(_){} }}); }
   }
@@ -34219,6 +34741,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <button data-wdg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
         ${goals.map(g=>`<button data-wdg="${esc(g.id)}" class="${String(g.id)===gid?'on':''}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,24))}</button>`).join('')}</div></div>`:''}
       ${m.per?`<div class="jn-f"><span>Період</span><div class="wl-chips">${m.per.map(([k,l])=>`<button data-wdper="${k}" class="${k===per?'on':''}">${l}</button>`).join('')}</div></div>`:''}
+      ${b.type==='dsave'?`<div class="jn-f"><span>Ціль</span><div class="wl-chips"><button data-wdsgo>🐷 Ціль скарбнички…</button></div></div>`:''}
+      ${b.type==='dcounter'?`<div class="jn-f"><span>Лічильник</span><div class="wl-chips"><button data-wdcgo>🔢 Вибрати чи змінити…</button></div></div>`:''}
       <div class="jn-f"><span>Показувати</span><div class="wd-tg">${m.show.map(([k,l])=>`<button data-wdsh="${k}" role="switch" aria-checked="${show[k]}" class="${show[k]?'on':''}"><span>${l}</span><i></i></button>`).join('')}</div></div>
       <div class="jn-ed-foot"><button class="jn-btn" data-wdok>Зберегти</button></div>
       <button class="wd-del" data-wddel>Видалити віджет</button>`, ov=>{
@@ -34228,6 +34752,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       pick('[data-wdsz]',x=>{ sz=x.dataset.wdsz; });
       pick('[data-wdg]',x=>{ gid=x.dataset.wdg; });
       pick('[data-wdper]',x=>{ per=x.dataset.wdper; });
+      // ціль / лічильник живуть у місії — шторка для місії, яку плитка показує зараз (збережене «Джерело»)
+      const cfgGoal=()=>{ const q=wdGoal(b,fk); return q&&q.id?q:null; };
+      const sg=ov.querySelector('[data-wdsgo]'); if(sg) sg.onclick=()=>{ const q=cfgGoal(); if(!q){ plToast('Спершу вибери місію'); return; } ov.remove(); wdSaveGoalSheet(q.id); };
+      const cg=ov.querySelector('[data-wdcgo]'); if(cg) cg.onclick=()=>{ const q=cfgGoal(); if(!q){ plToast('Спершу вибери місію'); return; } ov.remove(); wdCounterSheet(id,q.id,String(b.cid||'')); };
       ov.querySelectorAll('[data-wdsh]').forEach(x=>x.onclick=()=>{ const k=x.dataset.wdsh; show[k]=!show[k]; x.classList.toggle('on',show[k]); x.setAttribute('aria-checked',String(show[k])); });
       ov.querySelector('[data-wdok]').onclick=()=>{
         const q=getBlock(id); if(!q){ ov.remove(); return; }
@@ -36512,6 +37040,509 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     jnOverlay(rnOver(r)?rnFinHTML(r):rnCardHTML(r), ov=>rnCardBind(ov,r));
   }
   window.runOpen=runOpen;
+  /* ════════ Frequency Core (57-core.js, 16.11.2026) — «знімок життя» ════════
+     Задум погоджено 16.11.2026, варіант В, етап 0 (схема — у чаті сесії):
+       модулі (Гаманець, Цілі, Фокус, Журнал, Папки) → Core.snapshot() → відчуття
+       «відстань до мети» (етап 1), «ранок з Коучем» (етап 2), «записав → розійшлося» (етап 3).
+     Правила ядра:
+       • Лише ЧИТАЄ. Жодного storage.set, save*() чи зміни глобальних масивів — тому
+         нових ключів у FLOW_KEYS нема і даним нічого не загрожує.
+       • «Не прочитано» ≠ «порожньо» (урок зникання папок 24.09): кожен розділ має
+         ready — чи справді його ключ прочитано зі сховища (storeKeyReady). Поки
+         ready:false, числам розділу вірити не можна — показуй «ще звіряється».
+       • Розділ, що впав із помилкою, стає null, а не нулями: нуль — це відповідь,
+         null — «не знаю».
+       • Правило грошей те саме, що в Гаманці й Журналі (wlAgg / wlMonthOps), щоб
+         ядро й екрани ніколи не показували різні суми.
+     Файл останній за номером, хоча його читатимуть інші: Core.snapshot() кличуть
+     уже після завантаження всіх файлів, тож порядок виконання не ламається. */
+  (function(){
+    const CORE_VERSION=1;
+    function coreReady(key){ try{ return typeof window.storeKeyReady!=='function'||window.storeKeyReady(key)===true; }catch(_){ return false; } }
+    function corePart(fn){ try{ return fn(); }catch(err){ try{ console.warn('Core: розділ не зібрано', err); }catch(_){} return null; } }
+
+    /* Сума конверта без побічних дій. envSaved() (08-finance.js:18) не годиться:
+       вона мігрує старий конверт (додає запис «Старт» з новим id) і пише e.saved. */
+    function coreEnvSaved(e){
+      if(!Array.isArray(e.ops)) return +e.saved||0;
+      return e.ops.reduce((s,o)=>s+(o&&o.t==='in'?+o.amount||0:-(+(o&&o.amount)||0)),0);
+    }
+    function coreMoney(){
+      const ym=ymLocal(), m=wlAgg(wlMonthOps(ym)), d=wlDebtTotals();
+      return {
+        ready: coreReady('fin_ops'),
+        cur: mainCur(),
+        month: {ym, inc:m.inc, out:m.out, net:m.inc-m.out},
+        balance: walletBalance(),
+        debts: {owe:d.owe, owed:d.owed, otherCur:d.other},
+        envelopes: (envelopes||[]).filter(Boolean).map(e=>({name:String(e.name||''), saved:coreEnvSaved(e), goal:+e.goal||0}))
+      };
+    }
+    function coreGoals(){
+      const list=(goalsData.goals||[]).filter(g=>g&&jnStatus(g)!=='archive').map(g=>{
+        const st=(g.steps||[]).filter(Boolean);
+        return {id:String(g.id||''), name:String(g.name||''), emoji:g.emoji||'🎯', role:jnRole(g), status:jnStatus(g),
+          steps:st.length, done:st.filter(s=>s.done).length};
+      });
+      let pointB=false;
+      try{ pointB=!!(ylLetter().text||'').trim(); }catch(_){}
+      if(!pointB) pointB=!!String(goalsData.pointB||'').trim();
+      return {ready: coreReady('goals_data'), pointB, list};
+    }
+    function coreDay(){
+      const ds=ymdLocal(), bl=jnDayBlocks(ds);
+      return {ready: coreReady('goals_data'), ds, blocks:bl.length, done:bl.filter(b=>b&&b.done).length,
+        streak: plStreak(), focusToday: fcHadToday()};
+    }
+    function coreWeek(){
+      const p=plData(); let blocks=0, done=0;
+      for(let i=0;i<7;i++){ const d=new Date(); d.setDate(d.getDate()-i);
+        const l=Array.isArray(p.blocksByDay[ymdLocal(d)])?p.blocksByDay[ymdLocal(d)]:[];
+        blocks+=l.length; done+=l.filter(b=>b&&b.done).length; }
+      return {ready: coreReady('goals_data'), blocks, done};
+    }
+    function coreDiary(){
+      const st=diaStreakCalc();
+      return {ready: coreReady('diary_entries_v1'), today: diaHasEntry(ymdLocal()), streak: st.s};
+    }
+    function coreNotes(){
+      return {ready: coreReady('folders_cfg')&&coreReady('chats_v1'),
+        folders: Object.keys(folders||{}).length, chats: (chats||[]).length};
+    }
+
+    /* Один знімок на зараз. Нічого не кешує: дешевий, кличте коли треба. */
+    function snapshot(){
+      return {
+        v: CORE_VERSION,
+        at: new Date().toISOString(),
+        money: corePart(coreMoney),
+        goals: corePart(coreGoals),
+        day:   corePart(coreDay),
+        week:  corePart(coreWeek),
+        diary: corePart(coreDiary),
+        notes: corePart(coreNotes)
+      };
+    }
+    window.Core={ version:CORE_VERSION, snapshot };
+  })();
+  /* ════════ «Мої настрої» (58-moods.js, 16.11.2026) — кілька ритуалів замість одного ранку ════════
+     Задум погоджено 16.11.2026, вигляд — другий варіант: на Карті бажань велика картка
+     «Зараз» (настрій, якому зараз час) + стрічка «Мій день» + полиця щоденників корінцями;
+     «Продовжити» відкриває покроковий режим на весь екран.
+     • Ранок — це той самий ранковий ритуал (06-wishes.js): його дні й кроки лишаються
+       в ritual_board / ritual_steps, тут лише його назва, значок і колір (MOODS.m).
+     • Інші настрої — у новому ключі moods_v1: {list:[настрій], days:{id:{'YYYY-MM-DD':{…}}}, m:{…}}.
+       Пишемо його лише після дії людини; читаємо при старті разом з усім (27-canvas.js load).
+     • Кроки, картки й «День зараховано» — спільні з ранком: 06-wishes.js малює їх для того
+       настрою, що стоїть у ritCtx (ritWithCtx). */
+  const MOODS_KEY='moods_v1';
+  let MOODS={list:[], days:{}, m:{}};
+  try{ if(Array.isArray(window.FLOW_KEYS)&&window.FLOW_KEYS.indexOf(MOODS_KEY)<0) window.FLOW_KEYS.push(MOODS_KEY); }catch(_){}
+  const mdLang=()=>{ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } };
+  const MD_T={
+    uk:{sec:'Мої настрої', now:'Зараз', day:'Мій день', add:'＋ настрій', start:'Почати', cont:'Продовжити', again:'✓ Зараховано · відкрити',
+      of:' з ', steps:' кроків', streak:'стрік ', close:'Закрити', more:'Ще',
+      morning:'Ранок', slot:{morning:'ранок', day:'день', evening:'вечір', any:'будь-коли'},
+      slotH:{morning:'Ранок', day:'День', evening:'Вечір', any:'Будь-коли'},
+      step:'Крок ', fin:'Готово на сьогодні', finSub:'Кроків зроблено: ', next:'Далі', back:'Назад', finish:'Завершити', write:'Напиши тут…',
+      mSteps:'Кроки', mStepsSub:'порядок, шаблони, свої питання', mList:'Список і календар', mListSub:'усі кроки одразу',
+      mEdit:'Назва, значок, час', mBook:'Відповіді у щоденник', mDel:'Видалити настрій',
+      delQ:'Видалити настрій «', delSub:'Разом з його календарем. Це незворотно.', delOk:'Видалити',
+      newT:'Новий настрій', editT:'Настрій', name:'Назва', namePh:'Вечір, Перед тренуванням…', icon:'Значок', color:'Колір',
+      when:'Коли показувати першим', tpl:'Почати з шаблону', book:'Записувати відповіді в окремий щоденник', create:'Створити', save:'Зберегти', cancel:'Скасувати',
+      needName:'Дай настрою назву', bookPick:'Куди записувати відповіді?', bookNone:'Нікуди', bookNoneSub:'відповіді лишаються лише в настрої',
+      bookNew:'＋ Новий щоденник', bookOn:'📔 Відповіді йдуть у «', shelf:'Щоденники', dayDiary:'Щоденник дня', shelfHint:'＋ — свій щоденник: вдячність, ідеї, сни…',
+      newBook:'Новий щоденник', bookNamePh:'Вдячність, Ідеї, Сни…', needBook:'Дай щоденнику назву',
+      tplEve:'Підсумок дня', tplBefore:'Перед важливим', tplSport:'Спорт', tplCalm:'Тиха голова', tplEmpty:'Порожньо',
+      qWin:'Що сьогодні вдалось?', qOther:'Що завтра зробити інакше?', qResult:'Який результат мені потрібен?', qBody:'Як почувається тіло?',
+      dEve:'Вечір', dBefore:'Перед важливим'},
+    en:{sec:'My tunings', now:'Now', day:'My day', add:'＋ tuning', start:'Start', cont:'Continue', again:'✓ Counted · open',
+      of:' of ', steps:' steps', streak:'streak ', close:'Close', more:'More',
+      morning:'Morning', slot:{morning:'morning', day:'day', evening:'evening', any:'anytime'},
+      slotH:{morning:'Morning', day:'Day', evening:'Evening', any:'Anytime'},
+      step:'Step ', fin:'Done for today', finSub:'Steps done: ', next:'Next', back:'Back', finish:'Finish', write:'Write here…',
+      mSteps:'Steps', mStepsSub:'order, templates, your own questions', mList:'List and calendar', mListSub:'all steps at once',
+      mEdit:'Name, icon, time', mBook:'Answers to a journal', mDel:'Delete tuning',
+      delQ:'Delete tuning «', delSub:'Together with its calendar. This cannot be undone.', delOk:'Delete',
+      newT:'New tuning', editT:'Tuning', name:'Name', namePh:'Evening, Before training…', icon:'Icon', color:'Color',
+      when:'When to show it first', tpl:'Start from a template', book:'Save answers to a separate journal', create:'Create', save:'Save', cancel:'Cancel',
+      needName:'Give the tuning a name', bookPick:'Where should answers go?', bookNone:'Nowhere', bookNoneSub:'answers stay in the tuning only',
+      bookNew:'＋ New journal', bookOn:'📔 Answers go to «', shelf:'Journals', dayDiary:'Daily journal', shelfHint:'＋ — your own journal: gratitude, ideas, dreams…',
+      newBook:'New journal', bookNamePh:'Gratitude, Ideas, Dreams…', needBook:'Give the journal a name',
+      tplEve:'Day review', tplBefore:'Before something big', tplSport:'Sport', tplCalm:'Quiet mind', tplEmpty:'Empty',
+      qWin:'What went well today?', qOther:'What to do differently tomorrow?', qResult:'What result do I need?', qBody:'How does my body feel?',
+      dEve:'Evening', dBefore:'Before something big'}
+  };
+  const mdT=()=>MD_T[mdLang()];
+  const MD_ICONS=['🌅','🌙','☀️','🏋️','🧘','💼','📚','🎯','💛','🌿','🔥','✨'];
+  const MD_COLORS=['#e8a33c','#8b6cf0','#34c77b','#5b8def','#e0607e','#3cb8c4'];
+  const MD_SLOTS=['morning','day','evening','any'];
+  let mdSel='';            // настрій, який людина сама тапнула (до кінця сесії); '' — вибір за часом
+  let mdF=null;            // відкритий покроковий режим: {id, i}
+  let mdListId='';         // відкрита шторка «Список і календар»
+
+  /* ── дані ── */
+  function mdClean(o){
+    const out={list:[], days:{}, m:{}};
+    if(!o||typeof o!=='object') return out;
+    if(Array.isArray(o.list)) o.list.forEach(x=>{
+      if(!x||typeof x!=='object'||typeof x.id!=='string'||!/^md_[a-z0-9]{2,20}$/.test(x.id)) return;
+      out.list.push({id:x.id, name:String(x.name||'').slice(0,40)||'…', ic:String(x.ic||'✨').slice(0,4),
+        color:typeof x.color==='string'?x.color:MD_COLORS[1], at:MD_SLOTS.indexOf(x.at)>=0?x.at:'any',
+        book:typeof x.book==='string'?x.book:'', steps:Array.isArray(x.steps)?x.steps:[]});
+    });
+    // лише ключі настроїв: «__proto__» з чужих даних не підмінить прототип
+    if(o.days&&typeof o.days==='object') Object.keys(o.days).forEach(k=>{ if(/^md_[a-z0-9]{2,20}$/.test(k)&&o.days[k]&&typeof o.days[k]==='object') out.days[k]=o.days[k]; });
+    if(o.m&&typeof o.m==='object') out.m=o.m;
+    return out;
+  }
+  async function loadMoods(){
+    try{ const r=await window.storage.get(MOODS_KEY,false);
+      if(r&&r.value){ MOODS=mdClean(JSON.parse(r.value)); } }catch(_){}
+    try{ ritualRerender(); }catch(_){}
+  }
+  window.loadMoods=loadMoods;
+  function saveMoods(){ try{ const p=window.storage.set(MOODS_KEY,JSON.stringify(MOODS),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){} }
+  function moodGet(id){ return MOODS.list.find(x=>x.id===id)||null; }
+  function moodDaysOf(id){ if(!moodGet(id)) return null; if(!MOODS.days[id]||typeof MOODS.days[id]!=='object') MOODS.days[id]={}; return MOODS.days[id]; }
+  function moodStepsOf(id){ const m=moodGet(id); return m?m.steps:[]; }
+  function moodSetSteps(id,steps){ const m=moodGet(id); if(m){ m.steps=steps; saveMoods(); } }
+  function moodName(id){ if(id==='m') return MOODS.m.name||mdT().morning; const m=moodGet(id); return m?m.name:''; }
+  // усі настрої одним списком; Ранок — завжди перший
+  function moodAll(){
+    const m=MOODS.m||{};
+    return [{id:'m', name:moodName('m'), ic:m.ic||'🌅', color:m.color||MD_COLORS[0], at:MD_SLOTS.indexOf(m.at)>=0?m.at:'morning', book:m.book||''}]
+      .concat(MOODS.list);
+  }
+  function mdNewStepId(){ return 'c_'+(Date.now().toString(36)+Math.random().toString(36).slice(2,6)).slice(-12); }
+  function moodTemplates(){
+    const t=mdT(), own=(ty,q)=>({id:mdNewStepId(), ty, t:q});
+    return [
+      {k:'eve',    t:t.tplEve,    s:['grat', own('text',t.qWin), own('text',t.qOther), 'breath']},
+      {k:'before', t:t.tplBefore, s:['breath', own('text',t.qResult), 'vis']},
+      {k:'sport',  t:t.tplSport,  s:['water','move', own('text',t.qBody)]},
+      {k:'calm',   t:t.tplCalm,   s:['breath','grat','med']}
+    ];
+  }
+  function mdSlotNow(){ const h=new Date().getHours(); return (h>=4&&h<12)?'morning':(h<17&&h>=12?'day':'evening'); }
+  // стан настрою на сьогодні — без створення порожнього дня
+  function moodStat(id){
+    return ritWithCtx(id,()=>{
+      const steps=ritSteps(), d=ritDaysObj()[ritDs(0)]||{};
+      return {of:steps.length, n:steps.filter(s=>ritStepDone(s,d)).length, done:!!d.done, streak:ritStreak().s};
+    });
+  }
+  function moodCurrent(){
+    const all=moodAll();
+    if(mdSel&&all.some(x=>x.id===mdSel)) return mdSel;
+    const slot=mdSlotNow(), open=x=>!moodStat(x.id).done;
+    const pick=all.find(x=>x.at===slot&&open(x))||all.find(x=>x.at==='any'&&open(x))||all.find(x=>x.at===slot);
+    return pick?pick.id:'m';
+  }
+
+  /* ── блок на Карті бажань ── */
+  function moodsBlockHTML(){
+    const t=mdT(), all=moodAll(), cur=moodCurrent(), c=all.find(x=>x.id===cur)||all[0], st=moodStat(c.id);
+    const now=new Date(), hm=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+    const C=113.1, pct=st.of?st.n/st.of:0;
+    const goLbl=st.done?t.again:(st.n?t.cont:t.start);
+    const rows=all.map(x=>{ const s=moodStat(x.id);
+      return `<button type="button" class="md-row ${x.id===c.id?'on':''}" data-mdpick="${esc(x.id)}" style="--mc:${safeColor(x.color,'#8b6cf0')}">
+        <i class="md-dot"></i><span class="md-rn">${esc(x.ic)} ${esc(x.name)}</span>
+        <small>${esc(t.slot[x.at]||'')} · ${s.done?'✓ ':''}${s.n}/${s.of}</small></button>`; }).join('');
+    return `<div class="rit-sec md-sec" style="margin-top:18px"><span>${esc(t.sec)}</span></div>
+      <div id="ritInline" class="md-wrap">
+        <div class="md-hero" style="--mc:${safeColor(c.color,'#8b6cf0')}">
+          <div class="md-hero-top">
+            <div class="md-hero-tx"><small>${esc(t.now)} · ${hm}</small><b>${esc(c.ic)} ${esc(c.name)}</b>
+              <small>${st.n}${t.of}${st.of}${t.steps}${st.streak?' · 🔥 '+t.streak+st.streak:''}</small></div>
+            <svg class="md-ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18"/><circle cx="22" cy="22" r="18" class="pv"
+              stroke-dasharray="${C}" stroke-dashoffset="${(C*(1-pct)).toFixed(1)}" transform="rotate(-90 22 22)"/></svg>
+          </div>
+          <div class="md-hero-act">
+            <button type="button" class="md-go" data-mdgo="${esc(c.id)}">${esc(goLbl)}</button>
+            <button type="button" class="md-more" data-mdmore="${esc(c.id)}" aria-label="${esc(t.more)}">⋯</button>
+          </div>
+        </div>
+        <div class="md-day-h"><span>${esc(t.day)}</span><button type="button" class="md-add" data-mdnew="1">${esc(t.add)}</button></div>
+        <div class="md-day">${rows}</div>
+        ${(typeof mdShelfHTML==='function')?mdShelfHTML():''}
+      </div>`;
+  }
+  function moodsBlockBind(body){
+    const root=(body||document).querySelector('#ritInline'); if(!root) return;
+    root.querySelectorAll('[data-mdgo]').forEach(b=>b.onclick=()=>moodFocus(b.dataset.mdgo));
+    root.querySelectorAll('[data-mdmore]').forEach(b=>b.onclick=()=>moodMenu(b.dataset.mdmore));
+    // тап по рядку стрічки — цей настрій стає «Зараз» і одразу відкривається
+    root.querySelectorAll('[data-mdpick]').forEach(b=>b.onclick=()=>{ mdSel=b.dataset.mdpick; mdRerender(); moodFocus(mdSel); });
+    const nb=root.querySelector('[data-mdnew]'); if(nb) nb.onclick=()=>moodSheet('');
+    if(typeof mdShelfBind==='function') mdShelfBind(root);
+  }
+  function mdRerender(){ try{ const s=document.getElementById('scr-wishes'); if(s&&s.classList.contains('active')) renderWishes(); }catch(_){} }
+
+  /* ── покроковий режим на весь екран ── */
+  let mdTaTimer=null;
+  function moodFocus(id,at){
+    if(!moodAll().some(x=>x.id===id)) return;
+    const old=document.getElementById('mdFocus'); if(old) old.remove();
+    const steps=ritWithCtx(id,ritSteps);
+    let i=typeof at==='number'?at:-1;
+    if(i<0){ // перший незроблений крок; усе зроблено — фініш
+      i=ritWithCtx(id,()=>{ const d=ritDaysObj()[ritDs(0)]||{}; const k=steps.findIndex(s=>!ritStepDone(s,d)); return k<0?steps.length:k; });
+    }
+    mdF={id, i:Math.max(0,Math.min(i,steps.length))};
+    const ov=document.createElement('div'); ov.className='md-focus'; ov.id='mdFocus';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    document.body.appendChild(ov);
+    mdFocusRender();
+  }
+  function mdTaFlush(){
+    const ta=document.querySelector('#mdFocus .md-ta'); if(!ta||!mdF) return;
+    clearTimeout(mdTaTimer); mdTaTimer=null;
+    const sid=ta.dataset.sid, v=ta.value.trim().slice(0,2000), id=mdF.id;
+    ritWithCtx(id,()=>{ const d=ritDay(ritDs(0)); if((d[sid]||'')===v) return; if(v) d[sid]=v; else delete d[sid]; ritSaveToday(); });
+  }
+  function mdFocusClose(){
+    mdTaFlush();
+    try{ if(mdF) moodToDiary(mdF.id); }catch(_){}
+    try{ ritStopAll(); }catch(_){}
+    const ov=document.getElementById('mdFocus'); if(ov) ov.remove();
+    mdF=null; ritCtx='m'; mdRerender();
+  }
+  function mdFocusRender(){
+    const ov=document.getElementById('mdFocus'); if(!ov||!mdF) return;
+    const t=mdT(), id=mdF.id, mood=moodAll().find(x=>x.id===id); if(!mood){ mdFocusClose(); return; }
+    ritWithCtx(id,()=>{
+      const steps=ritSteps(), d=ritDay(ritDs(0)), i=Math.min(mdF.i,steps.length); mdF.i=i;
+      const segs=steps.map((s,k)=>`<button type="button" class="md-seg ${ritStepDone(s,d)?'on':''} ${k===i?'cur':''}" data-mdseg="${k}" aria-label="${esc(t.step+(k+1))}"></button>`).join('')
+        +`<button type="button" class="md-seg fin ${d.done?'on':''} ${i===steps.length?'cur':''}" data-mdseg="${steps.length}" aria-label="${esc(t.fin)}"></button>`;
+      let mid='';
+      if(i<steps.length){
+        const s=steps[i], m=ritMeta(s);
+        if(m.ty==='text'){
+          const ak=ritAudioKey(s), au=ak?d[ak]:null;
+          mid=`<div class="md-q">${esc(m.t)}</div>
+            <textarea class="md-ta" data-sid="${esc(s.id)}" rows="6" maxlength="2000" placeholder="${esc(m.ph||t.write)}">${esc(d[s.id]||'')}</textarea>
+            ${ak?`<div class="md-mic-row"><span class="mic ${au?'has':''}" data-rmic="${esc(ak)}" role="button" tabindex="0" aria-label="🎙">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg></span>
+              ${au?`<span class="adur">${fmtDur(au.dur||0)}</span>`:''}<b class="rit-rectm"></b></div>`:''}`;
+        } else {
+          mid=`<div class="md-q sm">${esc(m.ic||'')} ${esc(m.t)}</div><div class="rit-wrap md-card">${ritStepHTML(s,d)}</div>`;
+        }
+      } else {
+        const n=steps.filter(s=>ritStepDone(s,d)).length;
+        mid=`<div class="md-q">${esc(t.fin)}</div><div class="md-fin-sub">${esc(t.finSub)}${n}${t.of}${steps.length}</div>
+          <div class="rit-wrap md-card"><button class="rit-done ${d.done?'ok':''}" data-rdone="1">${d.done?'✓ День зараховано':'🔥 День зараховано'}</button></div>`;
+      }
+      const last=i>=steps.length;
+      ov.style.setProperty('--mc', safeColor(mood.color,'#8b6cf0'));
+      ov.innerHTML=`<div class="md-f-in">
+        <div class="md-f-top"><span>${esc(mood.ic)} ${esc(mood.name)}</span><button type="button" class="md-x" aria-label="${esc(t.close)}">✕</button></div>
+        <div class="md-segs">${segs}</div>
+        <div class="md-f-step">${last?'':esc(t.step+(i+1)+t.of+steps.length)}</div>
+        <div class="md-f-mid">${mid}</div>
+        <div class="md-f-bot">
+          ${i>0?`<button type="button" class="md-back" aria-label="${esc(t.back)}">‹</button>`:''}
+          <button type="button" class="md-next">${esc(last?t.close:(i===steps.length-1?t.finish:t.next))}</button>
+        </div></div>`;
+      // картки кроків (галочка, таймер, мікс, фото, відео, «День зараховано») — тим самим кодом, що й у ранку
+      ritualBind(ov.querySelector('.md-f-mid'));
+    });
+    ov.querySelector('.md-x').onclick=mdFocusClose;
+    const ta=ov.querySelector('.md-ta');
+    if(ta){ ta.oninput=()=>{ clearTimeout(mdTaTimer); mdTaTimer=setTimeout(mdTaFlush,600); }; ta.onblur=mdTaFlush; }
+    const go=k=>{ mdTaFlush(); if(mdF){ mdF.i=k; mdFocusRender(); } };
+    ov.querySelectorAll('[data-mdseg]').forEach(b=>b.onclick=()=>go(+b.dataset.mdseg));
+    const bk=ov.querySelector('.md-back'); if(bk) bk.onclick=()=>go(mdF.i-1);
+    ov.querySelector('.md-next').onclick=()=>{
+      const n=ritWithCtx(mdF.id,ritSteps).length;
+      if(mdF.i>=n){ mdFocusClose(); return; }
+      mdTaFlush(); try{ moodToDiary(mdF.id); }catch(_){}
+      go(mdF.i+1);
+    };
+  }
+  // застосунок згортають посеред набору — зберегти останні символи, не чекаючи таймера
+  try{ window.addEventListener('pagehide',mdTaFlush);
+    document.addEventListener('visibilitychange',()=>{ if(document.hidden) mdTaFlush(); }); }catch(_){}
+  // 06-wishes.js кличе після будь-якої зміни ранку (галочка, таймер, запис голосу)
+  function moodFocusRerender(){
+    if(mdF && document.getElementById('mdFocus') && !document.activeElement?.classList?.contains('md-ta')) mdFocusRender();
+    const lb=document.getElementById('mdListBody');
+    if(lb&&mdListId) ritWithCtx(mdListId,()=>{ lb.innerHTML=ritualInnerHTML(); ritualBind(lb); });
+  }
+
+  /* ── «Список і календар»: увесь набір одразу, як колись ранок на Карті ── */
+  function moodListSheet(id){
+    const old=document.getElementById('mdList'); if(old) old.remove();
+    const mood=moodAll().find(x=>x.id===id); if(!mood) return;
+    mdListId=id;
+    const ov=document.createElement('div'); ov.className='asheet rit-sheet'; ov.id='mdList';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML=`<div class="asheet-in"><div class="asheet-grip"></div>
+      <div class="rsh-h"><span><b>${esc(mood.ic)} ${esc(mood.name)}</b></span><button type="button" class="rsh-x" aria-label="${esc(mdT().close)}">✕</button></div>
+      <div class="rit-wrap rsh-body" id="mdListBody"></div></div>`;
+    document.body.appendChild(ov);
+    const close=()=>{ try{ ritStopAll(); }catch(_){} ov.remove(); mdListId=''; ritCtx='m'; mdRerender(); };
+    ov.querySelector('.rsh-x').onclick=close;
+    ov.onclick=e=>{ if(e.target===ov) close(); };
+    moodFocusRerender();
+  }
+
+  /* ── меню настрою ── */
+  function moodMenu(id){
+    const t=mdT(), mood=moodAll().find(x=>x.id===id); if(!mood) return;
+    const bk=(typeof diaBookName==='function'&&mood.book)?diaBookName(mood.book):'';
+    const items=[
+      {ic:'✓', label:t.mSteps, sub:t.mStepsSub, onClick:()=>ritWithCtx(id,ritEditor)},
+      {ic:'☰', label:t.mList, sub:t.mListSub, onClick:()=>moodListSheet(id)},
+      {ic:'edit', label:t.mEdit, onClick:()=>moodSheet(id)},
+      {ic:'📔', label:t.mBook, sub:bk||t.bookNone, onClick:()=>moodBookPick(id)}
+    ];
+    if(id!=='m') items.push({ic:'trash', label:t.mDel, danger:true, onClick:()=>confirmSheet({
+      title:t.delQ+mood.name+'»?', sub:t.delSub, okLabel:t.delOk, onOk:()=>{
+        MOODS.list=MOODS.list.filter(x=>x.id!==id); delete MOODS.days[id];
+        if(mdSel===id) mdSel=''; saveMoods(); mdRerender(); }})});
+    actionSheet({title:mood.ic+' '+mood.name, items});
+  }
+  function moodSetBook(id,bookId){
+    if(id==='m'){ MOODS.m=Object.assign({},MOODS.m,{book:bookId}); }
+    else { const m=moodGet(id); if(!m) return; m.book=bookId; }
+    saveMoods();
+    if(bookId){ try{ plToast(mdT().bookOn+((typeof diaBookName==='function'&&diaBookName(bookId))||'')+'»'); }catch(_){} }
+  }
+  function moodBookPick(id){
+    const t=mdT(), mood=moodAll().find(x=>x.id===id); if(!mood) return;
+    const books=(typeof diaShelf==='function')?diaShelf().filter(b=>b.id):[];
+    const items=[{ic:'✕', label:t.bookNone, sub:t.bookNoneSub, onClick:()=>moodSetBook(id,'')}]
+      .concat(books.map(b=>({ic:esc(b.emoji), label:b.name, sub:b.id===mood.book?'✓':'', onClick:()=>moodSetBook(id,b.id)})));
+    items.push({ic:'＋', label:t.bookNew.replace('＋ ',''), sub:mood.name, onClick:()=>{
+      if(typeof diaCreateBook!=='function') return;
+      const bid=diaCreateBook(mood.name, mood.ic, mood.color); if(bid) moodSetBook(id,bid); mdRerender(); }});
+    actionSheet({title:t.bookPick, items});
+  }
+  /* Відповіді настрою за сьогодні — одним записом у його щоденник. Запис один на день:
+     id запису лежить у дні (_de), повторні «Далі» його оновлюють, а не плодять копії. */
+  function moodToDiary(id){
+    const mood=moodAll().find(x=>x.id===id); if(!mood||!mood.book||typeof diaUpsertEntry!=='function') return;
+    ritWithCtx(id,()=>{
+      const d=ritDaysObj()[ritDs(0)]; if(!d) return;
+      const parts=ritSteps().map(s=>({s, m:ritMeta(s)})).filter(x=>x.m.ty==='text'&&d[x.s.id]&&String(d[x.s.id]).trim())
+        .map(x=>x.m.t+'\n'+String(d[x.s.id]).trim());
+      if(!parts.length) return;
+      const eid=diaUpsertEntry(mood.book, d._de||'', mood.ic+' '+mood.name+'\n\n'+parts.join('\n\n'));
+      if(eid&&eid!==d._de){ d._de=eid; ritSaveToday(); }
+    });
+  }
+
+  /* ── шторка «Новий настрій» / «Настрій» ── */
+  function moodSheet(id){
+    const t=mdT(), isNew=!id, cur=isNew?null:moodAll().find(x=>x.id===id);
+    if(!isNew&&!cur) return;
+    const st={name:cur?cur.name:'', ic:cur?cur.ic:MD_ICONS[1], color:cur?cur.color:MD_COLORS[1],
+      at:cur?cur.at:'evening', tpl:'eve', book:false};
+    const tpls=moodTemplates();
+    const ov=document.createElement('div'); ov.className='asheet md-sheet';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML='<div class="asheet-in"></div>';
+    document.body.appendChild(ov);
+    const box=ov.firstChild, close=()=>ov.remove();
+    const chip=(on,attr,val,label,style)=>`<button type="button" class="md-chip ${on?'on':''}" ${attr}="${esc(val)}"${style?` style="${style}"`:''}>${label}</button>`;
+    const draw=()=>{
+      box.innerHTML=`<div class="asheet-grip"></div>
+        <div class="asheet-title">${esc(isNew?t.newT:t.editT)}</div>
+        <label class="md-lbl" for="mdName">${esc(t.name)}</label>
+        <input class="md-in" id="mdName" maxlength="40" placeholder="${esc(t.namePh)}" value="${esc(st.name)}">
+        <div class="md-lbl">${esc(t.icon)}</div>
+        <div class="md-chips">${MD_ICONS.map(e=>chip(e===st.ic,'data-mdic',e,esc(e))).join('')}</div>
+        <div class="md-lbl">${esc(t.color)}</div>
+        <div class="md-chips">${MD_COLORS.map(c=>chip(c===st.color,'data-mdcol',c,'','--cc:'+c).replace('md-chip','md-chip dot')).join('')}</div>
+        <div class="md-lbl">${esc(t.when)}</div>
+        <div class="md-chips">${MD_SLOTS.map(k=>chip(k===st.at,'data-mdat',k,esc(t.slotH[k]))).join('')}</div>
+        ${isNew?`<div class="md-lbl">${esc(t.tpl)}</div>
+        <div class="md-chips">${tpls.map(x=>chip(x.k===st.tpl,'data-mdtpl',x.k,esc(x.t))).join('')}${chip(st.tpl==='empty','data-mdtpl','empty',esc(t.tplEmpty))}</div>
+        <label class="md-check"><input type="checkbox" id="mdBook" ${st.book?'checked':''}> <span>${esc(t.book)}</span></label>`:''}
+        <button type="button" class="red-ok" data-mdok="1">${esc(isNew?t.create:t.save)}</button>
+        <button type="button" class="asheet-cancel">${esc(t.cancel)}</button>`;
+      const nm=box.querySelector('#mdName'); nm.oninput=()=>{ st.name=nm.value; };
+      const keep=fn=>()=>{ st.name=nm.value; fn(); draw(); };
+      box.querySelectorAll('[data-mdic]').forEach(b=>b.onclick=keep(()=>{ st.ic=b.dataset.mdic; }));
+      box.querySelectorAll('[data-mdcol]').forEach(b=>b.onclick=keep(()=>{ st.color=b.dataset.mdcol; }));
+      box.querySelectorAll('[data-mdat]').forEach(b=>b.onclick=keep(()=>{ st.at=b.dataset.mdat; }));
+      box.querySelectorAll('[data-mdtpl]').forEach(b=>b.onclick=keep(()=>{ st.tpl=b.dataset.mdtpl; }));
+      const bk=box.querySelector('#mdBook'); if(bk) bk.onchange=()=>{ st.book=bk.checked; };
+      box.querySelector('.asheet-cancel').onclick=close;
+      box.querySelector('[data-mdok]').onclick=()=>{
+        const name=String(nm.value||'').trim().slice(0,40);
+        if(!name){ try{ plToast(t.needName); }catch(_){} nm.focus(); return; }
+        if(id==='m'){ MOODS.m=Object.assign({},MOODS.m,{name, ic:st.ic, color:st.color, at:st.at}); saveMoods(); close(); mdRerender(); return; }
+        if(!isNew){ const m=moodGet(id); if(m){ Object.assign(m,{name, ic:st.ic, color:st.color, at:st.at}); saveMoods(); } close(); mdRerender(); return; }
+        const tp=tpls.find(x=>x.k===st.tpl);
+        const steps=tp?tp.s.map(x=>typeof x==='string'?{id:x}:x).map(ritCleanStep).filter(Boolean):[];
+        const nid='md_'+Date.now().toString(36);
+        const mood={id:nid, name, ic:st.ic, color:st.color, at:st.at, book:'', steps};
+        if(st.book&&typeof diaCreateBook==='function') mood.book=diaCreateBook(name, st.ic, st.color)||'';
+        MOODS.list.push(mood); MOODS.days[nid]={}; saveMoods();
+        close(); mdSel=nid; mdRerender();
+        if(!steps.length) ritWithCtx(nid,ritEditor);   // «Порожньо» — одразу до кроків
+      };
+    };
+    draw();
+    ov.onclick=e=>{ if(e.target===ov) close(); };
+  }
+
+  /* ── полиця «Щоденники» корінцями (дані — 22-diary.js) ── */
+  function mdShelfHTML(){
+    if(typeof diaShelf!=='function') return '';
+    const t=mdT(), books=diaShelf(), max=Math.max(1,...books.map(b=>b.n));
+    const sp=books.map(b=>{ const h=Math.round(138+22*Math.min(1,b.n/max));
+      return `<button type="button" class="md-spine" data-mdbook="${esc(b.id||'@day')}" style="--bc:${safeColor(b.color,'#5b6fd6')};height:${h}px" aria-label="${esc(b.name)}">
+        <span class="md-sp-ic">${esc(b.emoji)}</span><span class="md-sp-t">${esc(b.name)}</span></button>`; }).join('');
+    const hint=books.length<2?`<div class="md-shelf-hint">${esc(t.shelfHint)}</div>`:'';
+    return `<div class="md-day-h md-shelf-h"><span>${esc(t.shelf)}</span></div>
+      <div class="md-shelf">${sp}<button type="button" class="md-spine new" data-mdbooknew="1" aria-label="${esc(t.newBook)}"><span class="md-sp-ic">＋</span></button>${hint}</div>`;
+  }
+  function mdShelfBind(root){
+    root.querySelectorAll('[data-mdbook]').forEach(b=>b.onclick=()=>{
+      const id=b.dataset.mdbook;
+      if(id==='@day'){ try{ goDiary(); }catch(_){} return; }
+      if(typeof goDiaryBook==='function') goDiaryBook(id);
+    });
+    root.querySelectorAll('[data-mdbooknew]').forEach(b=>b.onclick=()=>mdBookNew());
+  }
+  function mdBookNew(){
+    const t=mdT(), em=(typeof DIA_BOOK_EMOJIS!=='undefined')?DIA_BOOK_EMOJIS:['📖'], co=(typeof DIA_BOOK_COLORS!=='undefined')?DIA_BOOK_COLORS:['#5b8def'];
+    const st={name:'', ic:em[0], color:co[0]};
+    const ov=document.createElement('div'); ov.className='asheet md-sheet';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.innerHTML='<div class="asheet-in"></div>';
+    document.body.appendChild(ov);
+    const box=ov.firstChild, close=()=>ov.remove();
+    const draw=()=>{
+      box.innerHTML=`<div class="asheet-grip"></div>
+        <div class="asheet-title">${esc(t.newBook)}</div>
+        <label class="md-lbl" for="mdBkName">${esc(t.name)}</label>
+        <input class="md-in" id="mdBkName" maxlength="24" placeholder="${esc(t.bookNamePh)}" value="${esc(st.name)}">
+        <div class="md-lbl">${esc(t.icon)}</div>
+        <div class="md-chips">${em.map(e=>`<button type="button" class="md-chip ${e===st.ic?'on':''}" data-bkic="${esc(e)}">${esc(e)}</button>`).join('')}</div>
+        <div class="md-lbl">${esc(t.color)}</div>
+        <div class="md-chips">${co.map(c=>`<button type="button" class="md-chip dot ${c===st.color?'on':''}" data-bkcol="${esc(c)}" style="--cc:${safeColor(c,'#5b8def')}"></button>`).join('')}</div>
+        <button type="button" class="red-ok" data-bkok="1">${esc(t.create)}</button>
+        <button type="button" class="asheet-cancel">${esc(t.cancel)}</button>`;
+      const nm=box.querySelector('#mdBkName'); nm.oninput=()=>{ st.name=nm.value; };
+      box.querySelectorAll('[data-bkic]').forEach(b=>b.onclick=()=>{ st.name=nm.value; st.ic=b.dataset.bkic; draw(); });
+      box.querySelectorAll('[data-bkcol]').forEach(b=>b.onclick=()=>{ st.name=nm.value; st.color=b.dataset.bkcol; draw(); });
+      box.querySelector('.asheet-cancel').onclick=close;
+      box.querySelector('[data-bkok]').onclick=()=>{
+        const name=String(nm.value||'').trim();
+        if(!name){ try{ plToast(t.needBook); }catch(_){} nm.focus(); return; }
+        const id=(typeof diaCreateBook==='function')?diaCreateBook(name, st.ic, st.color):'';
+        close(); mdRerender();
+        if(id&&typeof goDiaryBook==='function') goDiaryBook(id);
+      };
+    };
+    draw();
+    ov.onclick=e=>{ if(e.target===ov) close(); };
+  }
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
@@ -36729,6 +37760,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     {cat:'data',k:'dcal',     t:'Календар папки', d:'Місяць: блоки й події папки, тап — день у Планері', c:'#ff9a4d', ic:'calendar'},
     {cat:'data',k:'dmission', t:'Місія папки', d:'Прогрес місії, наступний крок, дедлайн',        c:'#34c77b', ic:'target'},
     {cat:'data',k:'dhabit',   t:'Звичка папки', d:'Позначки місії за тиждень, серія, ✓ сьогодні',  c:'#e8843c', ic:'habits'},
+    {cat:'data',k:'dcount',   t:'Відлік до мети', d:'Скільки днів до фінішу місії',               c:'#9b8cff', ic:'calendar'},
+    {cat:'data',k:'dsave',    t:'Скарбничка місії', d:'Скільки зібрано на місію з цілі, ＋ ₴',      c:'#34c77b', ic:'envelope'},
+    {cat:'data',k:'dcounter', t:'Лічильник місії', d:'Будь-яке число з метою: слова, кг, сторінки', c:'#f0b429', ic:'num'},
+    {cat:'data',k:'dphoto',   t:'Фото-прогрес',   d:'Було → стало: перше і останнє фото місії',  c:'#ff7a9c', ic:'photo'},
     /* гроші цієї папки — вікна в Гаманець (48-widgets.js) */
     {cat:'data',  k:'wgin',     t:'Доходи',        d:'Дохід цієї папки: тип (основний/додатковий/пасивний), ціль', c:'#34c77b', ic:'envelope'},
     {cat:'data',  k:'wgout',    t:'Витрати',       d:'Витрати цієї папки з лімітом на місяць',  c:'#ff7a59', ic:'envelope'},
