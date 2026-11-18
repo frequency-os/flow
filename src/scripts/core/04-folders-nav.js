@@ -155,8 +155,8 @@
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
         // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
         if(f.gview==='folder'||f.gview==='space'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // без поля — «Простір» (типове з 15.11.2026)
-        // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo; «Документ» — типове, не пишемо
-        if(f.view==='chat'||f.view==='photo') cfg[k].view=f.view;
+        // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo/canvas («Полотно», 18.11.2026); «Документ» — типове, не пишемо
+        if(f.view==='chat'||f.view==='photo'||f.view==='canvas') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
         if(folderPrioOk(f.prio)) cfg[k].prio=f.prio;
       });

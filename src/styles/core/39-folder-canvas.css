@@ -1,0 +1,43 @@
+  /* ════════ Полотно папки (18.11.2026, 61-folder-canvas.js) — «Тихе скло» ════════ */
+  #scr-page.fh-v-canvas #pgAddBlock{display:none !important;}
+  .fh-v-canvas .fhp-row{display:none;}            /* фільтри «Усе · Завдання…» — для чату; на полотні видно все */
+  .fcv{position:relative;}
+  .fc-bar{display:flex;align-items:center;gap:8px;margin:2px 0 10px;min-height:36px;}
+  .fc-hint{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--pg-mut,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fc-btn{all:unset;box-sizing:border-box;cursor:pointer;min-height:36px;padding:0 14px;border-radius:999px;display:grid;place-items:center;font-size:13px;font-weight:800;
+    color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);-webkit-tap-highlight-color:transparent;}
+  .fc-btn.acc{background:var(--pg-acc,var(--accent));color:#fff;}
+  .fc-btn:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .fc-desk{position:relative;border-radius:18px;}
+  .fc-editing .fc-desk{background-image:radial-gradient(color-mix(in srgb,var(--pg-fg,var(--text)) 16%,transparent) 1px,transparent 1px);background-size:16px 16px;}
+  .fc-c{position:absolute;box-sizing:border-box;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;min-width:0;color:var(--pg-fg,var(--text));
+    background:linear-gradient(180deg,color-mix(in srgb,#fff 6%,transparent),transparent 42%),color-mix(in srgb,var(--pg-surface,var(--card)) 74%,transparent);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 16%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent),0 10px 26px -16px rgba(0,0,0,.5);}
+  /* віджет має своє скло — картка лише рамка */
+  .fc-c.wg{background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;overflow:visible;}
+  .fc-c .fc-wg{padding:0;flex:1;min-height:0;display:flex;}
+  .fc-c .fc-wg>.wg-t{flex:1;min-height:0;max-width:none;height:auto;overflow:hidden;}
+  .fc-in{all:unset;box-sizing:border-box;display:block;flex:1;min-height:0;overflow:hidden;padding:12px 14px;cursor:pointer;}
+  .fc-text{font-size:14.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;}
+  .fc-h{font-size:19px;font-weight:800;line-height:1.2;display:flex;align-items:center;}
+  .fc-task{display:flex;align-items:center;gap:10px;cursor:default;}
+  .fc-task .fh-box{width:26px;height:26px;flex:none;}
+  .fc-tx{all:unset;cursor:pointer;min-width:0;flex:1;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fc-task.done .fc-tx{text-decoration:line-through;color:var(--pg-mut,var(--muted));}
+  .fc-tbl{cursor:default;padding:8px 6px 0;}
+  .fc-gen{display:flex;align-items:center;font-size:15px;cursor:default;}
+  .fc-open{all:unset;box-sizing:border-box;cursor:pointer;flex:none;min-height:36px;padding:0 14px;display:flex;align-items:center;font-size:13px;font-weight:700;color:var(--pg-acc,var(--accent));}
+  .fc-open:focus-visible,.fc-in:focus-visible,.fc-tx:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:-2px;}
+  .fc-ph{flex:1;min-height:0;background:center/cover no-repeat;}
+  .fc-cap{padding:6px 12px 8px;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* режим «Змінити»: усе всередині мовчить, тягнеться сама картка */
+  .fc-editing .fc-c{cursor:grab;touch-action:none;outline:1.5px dashed color-mix(in srgb,var(--pg-acc,var(--accent)) 55%,transparent);outline-offset:2px;}
+  .fc-editing .fc-c>*:not(.fc-rs){pointer-events:none;}
+  .fc-c.fc-drag{cursor:grabbing;z-index:5;box-shadow:0 22px 44px -14px rgba(0,0,0,.7);opacity:.96;}
+  .fc-rs{position:absolute;right:2px;bottom:2px;width:30px;height:30px;cursor:nwse-resize;z-index:3;touch-action:none;
+    background:linear-gradient(135deg,transparent 55%,var(--pg-acc,var(--accent)) 55%);border-radius:0 0 20px 0;}
+  .fc-g{position:absolute;background:#ff6b9a;pointer-events:none;z-index:6;}
+  .fc-g.v{top:0;bottom:0;width:1px;} .fc-g.h{left:0;right:0;height:1px;}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .fc-c:not(.wg){background:var(--pg-surface,var(--card));} }
+  @media (prefers-reduced-transparency:reduce){ .fc-c:not(.wg){-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--pg-surface,var(--card));} }

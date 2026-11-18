@@ -764,10 +764,11 @@
   /* ── вигляд папки зсередини (15.11.2026, етап 2): Документ · Чат · Фото — для кожної папки свій.
      Записи ТІ САМІ блоки документа, міняється лише показ. Поле folders[k].view пишеться лише
      з вибору людини (звичайний saveFolders), і лише не-типове: chat | photo. ── */
-  function fhView(fk){ const v=folders[fk]&&folders[fk].view; return (v==='chat'||v==='photo')?v:'doc'; }
+  function fhView(fk){ const v=folders[fk]&&folders[fk].view; return (v==='chat'||v==='photo'||v==='canvas')?v:'doc'; }   // canvas — «Полотно» (61-folder-canvas.js)
   function fhSetView(fk,v){
     const f=folders[fk]; if(!f) return;
-    if(v==='chat'||v==='photo') f.view=v; else delete f.view;
+    if(v==='chat'||v==='photo'||v==='canvas') f.view=v; else delete f.view;
+    if(v!=='canvas') fcEdit='';
     fhPeek=''; fhPeekId='';
     saveFolders(); fhApplyView(); chHaptic('select');
   }
@@ -854,17 +855,18 @@
     const scr=document.getElementById('scr-page'), ed=document.getElementById('pgEditor'); if(!scr||!ed) return;
     const fk=pgFolderKey(), feed=scr.classList.contains('lk-feedmode');
     if(fhPeek&&fhPeek!==fk){ fhPeek=''; fhPeekId=''; }   // інша папка — «підгляд» документа скінчився
-    const peeking=!!(fk&&!feed&&fhPeek===fk&&fhView(fk)==='chat');
+    const peeking=!!(fk&&!feed&&fhPeek===fk&&(fhView(fk)==='chat'||fhView(fk)==='canvas'));
     const v=(fk&&!feed)?(peeking?'doc':fhView(fk)):'doc';
-    scr.classList.toggle('fh-v-chat',v==='chat'); scr.classList.toggle('fh-v-photo',v==='photo');
+    scr.classList.toggle('fh-v-chat',v==='chat'); scr.classList.toggle('fh-v-photo',v==='photo'); scr.classList.toggle('fh-v-canvas',v==='canvas');
     let chip=document.getElementById('fhPeekBack');
     if(peeking&&!chip){ chip=document.createElement('button'); chip.id='fhPeekBack'; chip.type='button'; chip.className='fh-peek';
-      chip.innerHTML=chI('back')+'<span>До чату</span>'; chip.onclick=fhPeekEnd; scr.appendChild(chip); }
+      chip.innerHTML=chI('back')+'<span>'+(fhView(fk)==='canvas'?'До полотна':'До чату')+'</span>'; chip.onclick=fhPeekEnd; scr.appendChild(chip); }
     if(!peeking&&chip) chip.remove();
     let box=document.getElementById('fhView');
     if(v==='doc'){ if(box) box.remove(); fhWallSig=''; if(!feed) ed.hidden=false; return; }
     if(!box){ box=document.createElement('div'); box.id='fhView'; ed.parentNode.insertBefore(box,ed); }
     const arr=(fhBridge()&&fhBridge().getBlocks())||[];
+    if(v==='canvas'){ ed.hidden=true; box.className='fhv fcv'; fhWallSig=''; fcRender(box,arr,fk); return; }
     if(v==='chat'){
       ed.hidden=true; box.className='fhv fhv-chat'; box.innerHTML=fhChatHTML(arr); fhWallSig='';
       box.querySelectorAll('[data-fhm]').forEach(el=>el.onclick=()=>fhMsgSheet(fk,el.dataset.fhm));
@@ -906,7 +908,7 @@
   }
   // глибока копія з новими id — і у вкладених, щоб дві копії не ділили id
   function fhCopy(b){ const c=JSON.parse(JSON.stringify(b)); c.at=Date.now(); delete c.by; delete c.topic; delete c.pinned;
-    const re=x=>{ x.id=chUid(); if(Array.isArray(x.children)) x.children.forEach(y=>{ if(y) re(y); }); }; re(c); return c; }
+    const re=x=>{ x.id=chUid(); delete x.cv; if(Array.isArray(x.children)) x.children.forEach(y=>{ if(y) re(y); }); }; re(c); return c; }   // cv — місце на чужому полотні (61-folder-canvas.js): копія ляже сама
   function fhPickFolder(fk,b){
     const ks=orderedFolderKeys().filter(k=>k!==fk&&folders[k]&&(typeof folderVisible!=='function'||folderVisible(k)));
     if(!ks.length){ chToast('Інших папок ще нема'); return; }

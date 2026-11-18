@@ -754,7 +754,7 @@
              function(){var i=dArr.indexOf(dBlk);if(i>-1)dArr.splice(i,1);});
     }
     else if(act==='dup'){
-      var cp=JSON.parse(JSON.stringify(loc.block));(function reid(x){x.id=uid();(x.children||[]).forEach(function(c){if(c&&typeof c==='object')reid(c);});})(cp);   /* нові id і вкладеним — інакше ⚙ копії міг змінити оригінал */
+      var cp=JSON.parse(JSON.stringify(loc.block));(function reid(x){x.id=uid();delete x.cv;/* місце на полотні (61-folder-canvas.js) — дубль ляже сам, а не під оригінал */(x.children||[]).forEach(function(c){if(c&&typeof c==='object')reid(c);});})(cp);   /* нові id і вкладеним — інакше ⚙ копії міг змінити оригінал */
       var uArr=loc.arr,origBlk=loc.block;
       uArr.splice(loc.idx+1,0,cp);
       pushOp(function(){var i=uArr.indexOf(cp);if(i>-1)uArr.splice(i,1);},
