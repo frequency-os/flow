@@ -13,12 +13,12 @@
 
 | Метрика | Значення |
 |---|---|
-| Файлів JS | 98 |
-| Рядків JS | 36637 |
-| Файлів CSS | 51 |
-| Рядків CSS | 11382 |
-| Сутностей верхнього рівня | 2724 |
-| Ключів сховища (FLOW_KEYS) | 80 |
+| Файлів JS | 99 |
+| Рядків JS | 36868 |
+| Файлів CSS | 52 |
+| Рядків CSS | 11511 |
+| Сутностей верхнього рівня | 2753 |
+| Ключів сховища (FLOW_KEYS) | 81 |
 
 ## Файли JS
 
@@ -35,7 +35,7 @@
 | `src/scripts/43-planner.js` | 137 | 0 |
 | `src/scripts/45-month.js` | 662 | 0 |
 | `src/scripts/46-mx.js` | 220 | 0 |
-| `src/scripts/core/01-base.js` | 427 | 39 |
+| `src/scripts/core/01-base.js` | 428 | 39 |
 | `src/scripts/core/02-storage.js` | 2173 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 441 | 63 |
@@ -63,7 +63,7 @@
 | `src/scripts/core/26-blocks-render.js` | 1207 | 16 |
 | `src/scripts/core/27-canvas.js` | 596 | 27 |
 | `src/scripts/core/28-vision.js` | 36 | 3 |
-| `src/scripts/core/29-more-screen.js` | 620 | 30 |
+| `src/scripts/core/29-more-screen.js` | 629 | 30 |
 | `src/scripts/core/30-upgrade.js` | 303 | 30 |
 | `src/scripts/core/31-my-year.js` | 200 | 21 |
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
@@ -98,8 +98,9 @@
 | `src/scripts/core/59-core-screen.js` | 173 | 19 |
 | `src/scripts/core/60-core-actions.js` | 177 | 14 |
 | `src/scripts/core/61-folder-canvas.js` | 150 | 15 |
+| `src/scripts/core/62-block-store.js` | 205 | 25 |
 | `src/scripts/page-editor/01-palette.js` | 188 | 17 |
-| `src/scripts/page-editor/02-block-styles.js` | 762 | 49 |
+| `src/scripts/page-editor/02-block-styles.js` | 778 | 53 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1025 | 53 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
@@ -139,7 +140,7 @@
 | `src/styles/19-themes-flat.css` | 408 | 3 |
 | `src/styles/20-depth.css` | 129 | 8 |
 | `src/styles/21-hero-week.css` | 133 | 2 |
-| `src/styles/22-more-screen.css` | 183 | 0 |
+| `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
 | `src/styles/core/02-page-editor.css` | 1205 | 9 |
@@ -178,38 +179,39 @@
 | `src/styles/core/37-moods.css` | 99 | 0 |
 | `src/styles/core/38-core.css` | 88 | 0 |
 | `src/styles/core/39-folder-canvas.css` | 43 | 0 |
+| `src/styles/core/40-block-store.css` | 126 | 0 |
 
-## Ключі сховища — FLOW_KEYS (80)
+## Ключі сховища — FLOW_KEYS (81)
 
 `src/scripts/core/01-base.js`
 
 `0` · `active_space_map_v2` · `ai_chat` · `ai_endpoint` · `ai_memory` · `ai_pet`
 
-`ai_privacy_v1` · `ai_prompts` · `ai_voice` · `blockusage` · `board` · `chats_v1`
+`ai_privacy_v1` · `ai_prompts` · `ai_voice` · `blocks_got` · `blockusage` · `board`
 
-`collage_board` · `custom_avatar_v1` · `customboards` · `debts` · `diary_books_v1` · `diary_entries_v1`
+`chats_v1` · `collage_board` · `custom_avatar_v1` · `customboards` · `debts` · `diary_books_v1`
 
-`diary_insights_v1` · `envelopes` · `fin_curs` · `fin_fs` · `fin_ops` · `fin_projects`
+`diary_entries_v1` · `diary_insights_v1` · `envelopes` · `fin_curs` · `fin_fs` · `fin_ops`
 
-`fin_recurring` · `fin_tomb` · `flowPgCovers` · `flowcardskin` · `flowprotheme` · `flowtheme`
+`fin_projects` · `fin_recurring` · `fin_tomb` · `flowPgCovers` · `flowcardskin` · `flowprotheme`
 
-`folder_widgets` · `folderopts` · `folders_cfg` · `folders_deleted_v1` · `folders_order` · `folderview`
+`flowtheme` · `folder_widgets` · `folderopts` · `folders_cfg` · `folders_deleted_v1` · `folders_order`
 
-`forcedesktop` · `forcemobile` · `fx_cfg` · `fx_mode` · `fx_say` · `goals_data`
+`folderview` · `forcedesktop` · `forcemobile` · `fx_cfg` · `fx_mode` · `fx_say`
 
-`hero_look` · `home_glass_on` · `homeov` · `hometab` · `homewidgets` · `i18n_content_cache`
+`goals_data` · `hero_look` · `home_glass_on` · `homeov` · `hometab` · `homewidgets`
 
-`income_cards` · `lang_pref` · `main_cur` · `patterns_chains` · `patterns_score` · `patterns_transform`
+`i18n_content_cache` · `income_cards` · `lang_pref` · `main_cur` · `patterns_chains` · `patterns_score`
 
-`pet_hidden` · `pet_pos` · `pet_sleep` · `readerCfg` · `ritual_board` · `sidebarcol`
+`patterns_transform` · `pet_hidden` · `pet_pos` · `pet_sleep` · `readerCfg` · `ritual_board`
 
-`spacecanvas` · `spacecanvaszoom` · `spacefull` · `spaces_map_v2` · `spaceview` · `spacewide`
+`sidebarcol` · `spacecanvas` · `spacecanvaszoom` · `spacefull` · `spaces_map_v2` · `spaceview`
 
-`spend` · `switcher_style` · `ui_mode` · `upgrade_profile_v1` · `values_state` · `vision_v1`
+`spacewide` · `spend` · `switcher_style` · `ui_mode` · `upgrade_profile_v1` · `values_state`
 
-`wish_active_days_v1` · `wish_price` · `wishes_board` · `work_blocks` · `work_cfg` · `work_extras`
+`vision_v1` · `wish_active_days_v1` · `wish_price` · `wishes_board` · `work_blocks` · `work_cfg`
 
-`work_sessions` · `world_game`
+`work_extras` · `work_sessions` · `world_game`
 
 ## Сутності по файлах
 
@@ -311,31 +313,31 @@
 | `safeColor` | функція | `src/scripts/core/01-base.js:106` |
 | `window.safeColor` | значення | `src/scripts/core/01-base.js:111` |
 | `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:120` |
-| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:180` |
-| `getLang` | функція | `src/scripts/core/01-base.js:198` |
-| `setLang` | функція | `src/scripts/core/01-base.js:199` |
-| `window.__flowLang` | значення | `src/scripts/core/01-base.js:200` |
-| `window.flowLang` | значення | `src/scripts/core/01-base.js:201` |
-| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:202` |
-| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:207` |
-| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:273` |
-| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:301` |
-| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:316` |
-| `translateNode` | функція | `src/scripts/core/01-base.js:319` |
-| `i18nApply` | функція | `src/scripts/core/01-base.js:342` |
-| `window.i18nApply` | значення | `src/scripts/core/01-base.js:346` |
-| `i18nBlocked` | функція | `src/scripts/core/01-base.js:350` |
-| `raf` | значення | `src/scripts/core/01-base.js:360` |
-| `flush` | функція | `src/scripts/core/01-base.js:361` |
-| `mo` | функція | `src/scripts/core/01-base.js:368` |
-| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:389` |
-| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:392` |
-| `hash` | функція | `src/scripts/core/01-base.js:393` |
-| `cacheGet` | функція | `src/scripts/core/01-base.js:394` |
-| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:399` |
-| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:415` |
-| `push` | функція | `src/scripts/core/01-base.js:416` |
-| `window.flowErrors` | функція | `src/scripts/core/01-base.js:425` |
+| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:181` |
+| `getLang` | функція | `src/scripts/core/01-base.js:199` |
+| `setLang` | функція | `src/scripts/core/01-base.js:200` |
+| `window.__flowLang` | значення | `src/scripts/core/01-base.js:201` |
+| `window.flowLang` | значення | `src/scripts/core/01-base.js:202` |
+| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:203` |
+| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:208` |
+| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:274` |
+| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:302` |
+| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:317` |
+| `translateNode` | функція | `src/scripts/core/01-base.js:320` |
+| `i18nApply` | функція | `src/scripts/core/01-base.js:343` |
+| `window.i18nApply` | значення | `src/scripts/core/01-base.js:347` |
+| `i18nBlocked` | функція | `src/scripts/core/01-base.js:351` |
+| `raf` | значення | `src/scripts/core/01-base.js:361` |
+| `flush` | функція | `src/scripts/core/01-base.js:362` |
+| `mo` | функція | `src/scripts/core/01-base.js:369` |
+| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:390` |
+| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:393` |
+| `hash` | функція | `src/scripts/core/01-base.js:394` |
+| `cacheGet` | функція | `src/scripts/core/01-base.js:395` |
+| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:400` |
+| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:416` |
+| `push` | функція | `src/scripts/core/01-base.js:417` |
+| `window.flowErrors` | функція | `src/scripts/core/01-base.js:426` |
 
 ### `src/scripts/core/02-storage.js` — 177 сутностей
 
@@ -1719,14 +1721,14 @@
 | `fmtMem` | функція | `src/scripts/core/29-more-screen.js:156` |
 | `fillMemRow` | функція | `src/scripts/core/29-more-screen.js:157` |
 | `renderAccount` | функція | `src/scripts/core/29-more-screen.js:172` |
-| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:566` |
-| `maskMail` | функція | `src/scripts/core/29-more-screen.js:573` |
-| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:574` |
-| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:589` |
-| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:599` |
-| `hm` | значення | `src/scripts/core/29-more-screen.js:612` |
-| `na` | функція | `src/scripts/core/29-more-screen.js:613` |
-| `nm` | значення | `src/scripts/core/29-more-screen.js:614` |
+| `window.renderAccount` | значення | `src/scripts/core/29-more-screen.js:575` |
+| `maskMail` | функція | `src/scripts/core/29-more-screen.js:582` |
+| `foreignWipe` | функція | `src/scripts/core/29-more-screen.js:583` |
+| `foreignAsk` | функція | `src/scripts/core/29-more-screen.js:598` |
+| `window.flowForeignAsk` | значення | `src/scripts/core/29-more-screen.js:608` |
+| `hm` | значення | `src/scripts/core/29-more-screen.js:621` |
+| `na` | функція | `src/scripts/core/29-more-screen.js:622` |
+| `nm` | значення | `src/scripts/core/29-more-screen.js:623` |
 
 ### `src/scripts/core/30-upgrade.js` — 30 сутностей
 
@@ -2964,6 +2966,36 @@
 | `fcBindDrag` | функція | `src/scripts/core/61-folder-canvas.js:109` |
 | `fcRz` | значення | `src/scripts/core/61-folder-canvas.js:149` |
 
+### `src/scripts/core/62-block-store.js` — 25 сутностей
+
+| Імʼя | Вид | Де |
+|---|---|---|
+| `BS_KEY` | значення | `src/scripts/core/62-block-store.js:9` |
+| `BS_SPH` | масив | `src/scripts/core/62-block-store.js:10` |
+| `BS_ITEMS` | обʼєкт | `src/scripts/core/62-block-store.js:14` |
+| `BS_REL` | обʼєкт | `src/scripts/core/62-block-store.js:70` |
+| `bsLang` | функція | `src/scripts/core/62-block-store.js:71` |
+| `bsT` | функція | `src/scripts/core/62-block-store.js:72` |
+| `bsReady` | функція | `src/scripts/core/62-block-store.js:75` |
+| `bsInStore` | функція | `src/scripts/core/62-block-store.js:76` |
+| `bsIsNew` | функція | `src/scripts/core/62-block-store.js:77` |
+| `bsRaw` | функція | `src/scripts/core/62-block-store.js:79` |
+| `bsGot` | функція | `src/scripts/core/62-block-store.js:80` |
+| `bsNewCount` | функція | `src/scripts/core/62-block-store.js:81` |
+| `bsSet` | функція | `src/scripts/core/62-block-store.js:82` |
+| `bsCatchAt` | значення | `src/scripts/core/62-block-store.js:95` |
+| `bsCatchup` | функція | `src/scripts/core/62-block-store.js:96` |
+| `bsTrusted` | функція | `src/scripts/core/62-block-store.js:100` |
+| `bsPv` | функція | `src/scripts/core/62-block-store.js:103` |
+| `bsState` | обʼєкт | `src/scripts/core/62-block-store.js:134` |
+| `bsBtn` | функція | `src/scripts/core/62-block-store.js:135` |
+| `bsRow` | функція | `src/scripts/core/62-block-store.js:139` |
+| `bsHomeHTML` | функція | `src/scripts/core/62-block-store.js:141` |
+| `bsPageHTML` | функція | `src/scripts/core/62-block-store.js:158` |
+| `bsRedraw` | функція | `src/scripts/core/62-block-store.js:170` |
+| `bsToast` | функція | `src/scripts/core/62-block-store.js:180` |
+| `bsOpen` | функція | `src/scripts/core/62-block-store.js:181` |
+
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
 | Імʼя | Вид | Де |
@@ -2986,7 +3018,7 @@
 | `snapshotArr` | функція | `src/scripts/page-editor/01-palette.js:187` |
 | `restoreArr` | функція | `src/scripts/page-editor/01-palette.js:188` |
 
-### `src/scripts/page-editor/02-block-styles.js` — 49 сутностей
+### `src/scripts/page-editor/02-block-styles.js` — 53 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3036,9 +3068,13 @@
 | `slash` | значення | `src/scripts/page-editor/02-block-styles.js:680` |
 | `srail` | значення | `src/scripts/page-editor/02-block-styles.js:682` |
 | `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:683` |
-| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:684` |
-| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:694` |
-| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:703` |
+| `pgsGotOk` | функція | `src/scripts/page-editor/02-block-styles.js:685` |
+| `pgsMatch` | функція | `src/scripts/page-editor/02-block-styles.js:686` |
+| `pgsHiddenN` | функція | `src/scripts/page-editor/02-block-styles.js:693` |
+| `pgsShopOpen` | функція | `src/scripts/page-editor/02-block-styles.js:695` |
+| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:696` |
+| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:701` |
+| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:715` |
 
 ### `src/scripts/page-editor/03-premium-pack.js` — 53 сутностей
 

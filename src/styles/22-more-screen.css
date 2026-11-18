@@ -28,12 +28,13 @@
 /* варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені */
 #scr-more [data-sec="profile"]{order:1;}
 #scr-more [data-sec="look"]{order:2;}
-#scr-more [data-sec="day"]{order:3;}
-#scr-more [data-sec="data"]{order:4;}
-#scr-more [data-sec="about"]{order:5;}
-#scr-more [data-sec="adv"]{order:6;}
-#scr-more [data-sec="lite"]{order:7;}
-#scr-more [data-sec="dev"]{order:8;}
+#scr-more [data-sec="blocks"]{order:3;}   /* «Блоки» — магазин блоків (62-block-store.js, 18.11.2026) */
+#scr-more [data-sec="day"]{order:4;}
+#scr-more [data-sec="data"]{order:5;}
+#scr-more [data-sec="about"]{order:6;}
+#scr-more [data-sec="adv"]{order:7;}
+#scr-more [data-sec="lite"]{order:8;}
+#scr-more [data-sec="dev"]{order:9;}
 #scr-more .acc-zero-list,#scr-more .acc-adv-list{display:flex;flex-direction:column;gap:6px;}
 #scr-more .acc-zero-list .acc-row,#scr-more .acc-adv-list .acc-row{padding-left:6px;}
 #scr-more .acc-zero-list[hidden],#scr-more .acc-adv-list[hidden]{display:none;}
@@ -143,6 +144,8 @@
   #scr-more[data-msec="data"] .mr-grp[data-sec="data"],
   #scr-more[data-msec="look"] .mr-sl[data-sec="look"],
   #scr-more[data-msec="look"] .mr-grp[data-sec="look"],
+  #scr-more[data-msec="blocks"] .mr-sl[data-sec="blocks"],
+  #scr-more[data-msec="blocks"] .mr-grp[data-sec="blocks"],
   #scr-more[data-msec="pet"] .mr-sl[data-sec="pet"],
   #scr-more[data-msec="pet"] .mr-grp[data-sec="pet"],
   #scr-more[data-msec="ai"] .mr-sl[data-sec="ai"],

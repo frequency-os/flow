@@ -681,15 +681,22 @@
       ssearch=document.getElementById('pgSlashSearch'),backdrop=document.getElementById('pgBackdrop');
   var srail=document.getElementById('pgstRail');
   var pgsCat='base', pgsSel=0, pgsShown=[];
+  /* магазин блоків (core/62-block-store.js): у меню лише взяті; базові блоки поза магазином — завжди */
+  function pgsGotOk(i){ try{ return typeof window.bsGot!=='function'||window.bsGot(i.k); }catch(_){ return true; } }
+  function pgsMatch(i,f){
+    if(i.t.toLowerCase().includes(f)||i.d.toLowerCase().includes(f)) return true;
+    var syn=PGS_SYN[i.k];
+    if(syn) for(var s=0;s<syn.length;s++){ if(syn[s].toLowerCase().includes(f)) return true; }
+    return false;
+  }
+  // скільки невзятих блоків цього розділу (чи пошуку) лежить у магазині — для рядка «Ще … в Магазині»
+  function pgsHiddenN(f){ f=(f||'').toLowerCase().trim();
+    return CATALOG.filter(function(i){ return !pgsGotOk(i)&&(f?pgsMatch(i,f):i.cat===pgsCat); }).length; }
+  function pgsShopOpen(){ try{ closeSlash(); }catch(_){} try{ if(typeof window.bsOpen==='function') window.bsOpen({}); }catch(_){} }
   function pgsFiltered(f){
     f=(f||'').toLowerCase().trim();
-    if(f) return CATALOG.filter(function(i){
-      if(i.t.toLowerCase().includes(f)||i.d.toLowerCase().includes(f)) return true;
-      var syn=PGS_SYN[i.k];
-      if(syn) for(var s=0;s<syn.length;s++){ if(syn[s].toLowerCase().includes(f)) return true; }
-      return false;
-    });
-    return CATALOG.filter(function(i){return i.cat===pgsCat;});
+    if(f) return CATALOG.filter(function(i){ return pgsGotOk(i)&&pgsMatch(i,f); });
+    return CATALOG.filter(function(i){return i.cat===pgsCat&&pgsGotOk(i);});
   }
   function buildRail(){
     srail.innerHTML='';
@@ -699,13 +706,18 @@
       el.onclick=function(){pgsCat=c.id;ssearch.value='';buildSlash('');};
       srail.appendChild(el);
     });
+    var shop=document.createElement('div'); shop.className='pgst-cat pgs-shop';
+    var nn=0; try{ nn=typeof window.bsNewCount==='function'?window.bsNewCount():0; }catch(_){}
+    shop.innerHTML='🛍 Магазин'+(nn?'<b>'+nn+'</b>':''); shop.setAttribute('role','button'); shop.tabIndex=0;
+    shop.onclick=pgsShopOpen; shop.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pgsShopOpen(); } };
+    srail.appendChild(shop);
   }
   function buildSlash(f){
     pgsShown=pgsFiltered(f); pgsSel=0;
     buildRail(); slist.innerHTML='';
     if(!f&&pgsCat==='base'){
       var rk=pgRecentGet();
-      var recentItems=rk.map(function(k){return CATALOG.filter(function(c){return c.k===k;})[0];}).filter(Boolean);
+      var recentItems=rk.map(function(k){return CATALOG.filter(function(c){return c.k===k;})[0];}).filter(function(i){ return i&&pgsGotOk(i); });
       if(recentItems.length){
         var rhead=document.createElement('div'); rhead.className='pg-ssec'; rhead.textContent='Нещодавні';
         slist.appendChild(rhead);
@@ -729,6 +741,10 @@
       };
       slist.appendChild(el);
     });
+    var hid=pgsHiddenN(f);
+    if(hid){ var more=document.createElement('div'); more.className='pg-sitem pgs-more'; more.setAttribute('role','button'); more.tabIndex=0;
+      more.textContent='＋ Ще '+hid+' '+(typeof pluralUk==='function'?pluralUk(hid,'блок','блоки','блоків'):'блоків')+' в Магазині ›';
+      more.onclick=function(e){ e.stopPropagation(); pgsShopOpen(); }; slist.appendChild(more); }
   }
   /* один тап — одразу вставка (делегування: стабільно працює на iOS); працює й для «Нещодавні» — той самий data-k */
   slist.addEventListener('click',function(e){

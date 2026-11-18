@@ -48,7 +48,7 @@
        кожен розділ — пара .mr-sl/.mr-grp з data-sec, а що видно на широкому
        екрані, вирішує атрибут data-msec на #scr-more (22-more-screen.css).
        «Інструменти» на комп'ютері стоять завжди — це дії, а не налаштування. */
-    const MSEC=[['profile','Профіль'],['look','Вигляд'],['day','Мій день'],['data','Дані і приватність'],
+    const MSEC=[['profile','Профіль'],['look','Вигляд'],['blocks','Блоки'],['day','Мій день'],['data','Дані і приватність'],
       ['about','Про застосунок'],['adv','Розширені'],['lite','Решта Frequency'],['dev','Розробка']];
     function moreIsWide(){ try{ return window.matchMedia('(min-width:1024px)').matches; }catch(_){ return false; } }
     function renderMoreIndex(){
@@ -241,6 +241,14 @@
           ${loginExpand}`}
         </div>
         <!-- Налаштування, варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені -->
+        <div class="mr-sl" data-sec="blocks">Блоки</div>
+        <div class="mr-grp" data-sec="blocks">
+          <div class="acc-row" data-acc-store role="button" tabindex="0">
+            ${ico('mode','violet')}
+            <div class="acc-rtext"><div class="acc-rtitle">Магазин блоків</div><div class="acc-rsub">що є в меню «＋ Блок»: календар, відлік, таблиця, гроші…</div></div>
+            ${(typeof window.bsNewCount==='function'&&window.bsNewCount())?`<span class="bs-badge">${window.bsNewCount()} нове</span>`:''}${chev()}
+          </div>
+        </div>
         <div class="mr-sl" data-sec="day">Мій день</div>
         <div class="mr-grp" data-sec="day">
           <div class="acc-row" data-acc-dayrange role="button" tabindex="0">
@@ -378,13 +386,14 @@
       const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
       { const cr=host.querySelector('[data-acc-cur]'); if(cr) cr.onclick=()=>curPickSheet(()=>{ try{ renderAccount(); }catch(_){} }); }   // 08-finance.js
       // варіант A (15.11.2026): нові рядки ведуть у наявні шторки — своїх налаштувань у них нема
+      { const st=host.querySelector('[data-acc-store]'); if(st) st.onclick=()=>{ try{ window.bsOpen&&window.bsOpen({}); }catch(e){ console.error('bsOpen',e); } }; }   // 62-block-store.js
       { const dr=host.querySelector('[data-acc-dayrange]'); if(dr) dr.onclick=()=>{ try{ plRangeSheet(); }catch(e){ console.error('plRangeSheet',e); } }; }   // 15-flow-spot.js
       { const ap=host.querySelector('[data-acc-aipriv]'); if(ap) ap.onclick=()=>{ if(window.aiPrivacySheet) window.aiPrivacySheet(); }; }
       { const gr=host.querySelector('[data-acc-gamereset]'); if(gr) gr.onclick=()=>{ try{ jnSettings(); }catch(e){ console.error('jnSettings',e); } }; }   // 41-journal.js
       { const ar=host.querySelector('[data-acc-adv-row]'), ae=host.querySelector('[data-acc-adv-expand]');
         if(ar&&ae) ar.onclick=()=>{ ae.hidden=!ae.hidden; ar.setAttribute('aria-expanded',String(!ae.hidden)); }; }
       // Enter/пробіл на рядках-кнопках (role="button")
-      host.querySelectorAll('[data-acc-dayrange],[data-acc-aipriv],[data-acc-gamereset],[data-acc-adv-row]').forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } }));
+      host.querySelectorAll('[data-acc-store],[data-acc-dayrange],[data-acc-aipriv],[data-acc-gamereset],[data-acc-adv-row]').forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } }));
       { const fr=host.querySelector('[data-acc-finreset]'); if(fr) fr.onclick=()=>{   // 51-money-reset.js
         if(typeof finResetScan!=='function') return;
         if(!finResetReady()){ try{ plToast('Дані ще звіряються з хмарою — спробуй за хвилину'); }catch(_){} return; }
