@@ -378,6 +378,7 @@
   function pgSubHTML(fk){
     let kids=[]; try{ kids=typeof groupKids==='function'?groupKids(fk):[]; }catch(_){}
     if(!kids.length) return '';   // підпапок нема — і стрічки нема (з 16.10.2026 «Як папка» — типове, окремої позначки нема)
+    if(folders[fk]) return '';    // з 18.11.2026 папка має кружечки під обкладинкою (fhKidsHTML) — друга стрічка не потрібна
     return pgHasSubsBlock(fk)?'':pgSubStripHTML(fk);
   }
   function pgSubOpen(fk,ck){ if(!folders[ck]) return; window.__fgNext=fk; try{ goFolder(ck); }finally{ window.__fgNext=null; } }
@@ -446,7 +447,7 @@
     const scr=document.getElementById('scr-page'), doc=scr&&scr.querySelector('.pg-doc'); if(!doc) return;
     let el=document.getElementById('pgHero');
     const fk=pgFolderKey(), f=fk?folders[fk]:null;
-    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero','fh-bar'); const ob=document.getElementById('fhBar'); if(ob) ob.remove(); fhTitleHome(); fhApplyView(); return; }
+    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero','fh-bar'); const ob=document.getElementById('fhBar'); if(ob) ob.remove(); const fb=document.getElementById('fhBelow'); if(fb) fb.remove(); fhTitleHome(); fhApplyView(); return; }
     if(!el){ el=document.createElement('div'); el.id='pgHero'; el.className='ch-cover fh'; doc.insertBefore(el,doc.firstChild); }
     el.hidden=false; scr.classList.add('pg-fhero');
     fhTitleHome();   // спершу винести #pgTitle: innerHTML нижче інакше знищив би поле назви разом зі старою шапкою
@@ -476,7 +477,73 @@
       +`<button class="ch-ghost acc" data-fhb="add" aria-label="Додати">${chI('plus')}</button><button class="ch-ghost" data-fhb="more" aria-label="Ще дії">${chI('dots')}</button>`;
     bar.querySelectorAll('[data-fhb]').forEach(b=>b.onclick=()=>{ const t=el.querySelector('[data-fh="'+b.dataset.fhb+'"]'); if(t) t.click(); });
     fhApplyView();
+    fhBelowRender(fk,s);
     fhMelt();
+  }
+  /* ── під обкладинкою (18.11.2026, макет «Папки · новий дизайн», варіант A):
+     кружечки підпапок + «＋ Підпапка» і пігулки «Усе · Завдання · Нотатки · Фото».
+     Фільтр лише ховає записи на екрані — нічого не пише; живе в памʼяті й скидається в іншій папці. */
+  const FH_NOTE={note:1,h1:1,h2:1,h3:1,bullet:1,num:1,quote:1,code:1};
+  const FH_FILT={tasks:b=>b.type==='task', notes:b=>!!FH_NOTE[b.type], photos:b=>b.type==='photo'&&!!b.data};
+  let fhFilt={fk:'',k:''};
+  function fhFiltKey(fk){ return fhFilt.fk===fk?fhFilt.k:''; }
+  function fhKidsHTML(fk,kids){
+    if(!kids.length||pgHasSubsBlock(fk)) return '';   // блок «Підпапки» вже стоїть у документі — там, куди його поставили
+    const t=ck=>{ const k=folders[ck]; if(!k) return '';
+      let img=''; try{ img=k.photo?safeImg(window.photoSrc(k.photo)):''; }catch(_){}
+      const full=(Array.isArray(boards[ck])&&boards[ck].length>0)||groupKids(ck).length>0;
+      return `<button class="fhk${full?' full':''}" data-fhk="${esc(ck)}" style="--c:${safeColor(k.c,'#6a7dff')}">`
+        +`<span class="fhk-cv"${img?` style="background-image:url('${esc(img)}')"`:''}>${img?'':`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(k))}"/></svg>`}</span>`
+        +`<span class="fhk-n" data-i18n-skip="1">${esc(k.name)}</span></button>`; };
+    return `<div class="fhk-row" role="group" aria-label="Підпапки">${kids.map(t).join('')}`
+      +`<button class="fhk add" data-fhknew><span class="fhk-cv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span class="fhk-n">Підпапка</span></button></div>`;
+  }
+  function fhPillsHTML(fk,s){
+    const n={tasks:s.tasks.length, notes:s.recs.filter(FH_FILT.notes).length, photos:s.photos.length};
+    const have=Object.keys(n).filter(k=>n[k]>0);
+    if(have.length<2) return '';   // лише один вид записів — фільтрувати нема чого
+    const cur=fhFiltKey(fk), L={tasks:'Завдання',notes:'Нотатки',photos:'Фото'};
+    const p=(k,t)=>`<button class="fhp${cur===k?' on':''}" data-fhp="${k}" aria-pressed="${cur===k}">${t}</button>`;
+    return `<div class="fhp-row" role="group" aria-label="Показати">${p('','Усе')}${have.map(k=>p(k,L[k])).join('')}</div>`;
+  }
+  function fhBelowRender(fk,s){
+    const hero=document.getElementById('pgHero'); if(!hero||hero.hidden||!fk) return;
+    s=s||fhStats(fk);
+    if(fhFilt.fk!==fk) fhFilt={fk,k:''};
+    // вид записів зник (видалили останнє фото) — фільтр знімаємо, щоб не лишився порожній екран
+    if(fhFilt.k&&!s.recs.some(FH_FILT[fhFilt.k])) fhFilt.k='';
+    let box=document.getElementById('fhBelow');
+    if(!box){ box=document.createElement('div'); box.id='fhBelow'; box.className='fhb'; }
+    if(box.previousElementSibling!==hero) hero.after(box);
+    box.innerHTML=fhKidsHTML(fk,s.kids)+fhPillsHTML(fk,s);
+    box.hidden=!box.innerHTML;
+    box.querySelectorAll('[data-fhk]').forEach(b=>{ b.onclick=()=>pgSubOpen(fk,b.dataset.fhk);
+      chAttachLongPress(b,()=>fhLookSheet(b.dataset.fhk)); });
+    const nw=box.querySelector('[data-fhknew]'); if(nw) nw.onclick=()=>pgSubNew(fk);
+    box.querySelectorAll('[data-fhp]').forEach(b=>b.onclick=()=>{ fhFilt={fk,k:b.dataset.fhp}; chHaptic('select'); fhBelowRender(fk); });
+    fhFilterApply(fk);
+  }
+  // сховати записи, що не підходять. Контейнер лишається, якщо всередині є потрібне
+  function fhFilterApply(fk){
+    const k=fhFiltKey(fk), ok=FH_FILT[k];
+    const scr=document.getElementById('scr-page'); if(scr) scr.classList.toggle('fh-filt',!!ok);
+    document.querySelectorAll('.fh-off').forEach(x=>x.classList.remove('fh-off'));
+    if(!ok) return;
+    const keep={};
+    const walk=(arr)=>{ let any=false; (arr||[]).forEach(b=>{ if(!b) return; const inner=Array.isArray(b.children)?walk(b.children):false;
+      const y=ok(b)||inner; if(y) keep[b.id]=1; any=any||y; }); return any; };
+    try{ walk((fhBridge()&&fhBridge().getBlocks())||[]); }catch(_){}
+    document.querySelectorAll('#pgEditor .pgb[data-id]').forEach(r=>{ if(!keep[r.dataset.id]) r.classList.add('fh-off'); });
+    // вигляд «Чат»: бульбашки, а день ховаємо, якщо під ним нічого не лишилось
+    const box=document.getElementById('fhView'); if(!box||!box.classList.contains('fhv-chat')) return;
+    let day=null, seen=false;
+    Array.from(box.children).forEach(c=>{
+      if(c.classList.contains('fhv-day')){ if(day&&!seen) day.classList.add('fh-off'); day=c; seen=false; return; }
+      const m=c.matches('[data-fhm]')?c:c.querySelector('[data-fhm],[data-fhdone]');
+      const id=m&&(m.dataset.fhm||m.dataset.fhdone);
+      if(id&&keep[id]) seen=true; else c.classList.add('fh-off');
+    });
+    if(day&&!seen) day.classList.add('fh-off');
   }
   /* «Обкладинка, що тане» (17.11.2026, макет «Папка в склі», варіант A): коли гортаєш, фото розмивається й темніє,
      а щойно шапка пішла за край — вгорі скляна смуга з назвою. Рахуємо від місця шапки на екрані, не від scrollTop:
@@ -501,7 +568,8 @@
   let fhT=null;
   function fhSoon(){ clearTimeout(fhT); fhT=setTimeout(()=>{ const el=document.getElementById('pgHero'), fk=pgFolderKey();
     const box=el&&!el.hidden&&el.querySelector('.fh-chips'); if(!box||!fk) return;
-    box.innerHTML=fhChipsHTML(fhStats(fk)); box.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs)); try{ fhApplyView(); }catch(_){} },250); }
+    const s=fhStats(fk);
+    box.innerHTML=fhChipsHTML(s); box.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs)); try{ fhApplyView(); }catch(_){} try{ fhBelowRender(fk,s); }catch(_){} },250); }
   function fhFlash(id){
     let r=null; try{ r=document.querySelector('#pgEditor .pgb[data-id="'+CSS.escape(String(id))+'"]'); }catch(_){} if(!r) return;
     r.scrollIntoView({block:'center'}); r.classList.add('pg-flash'); setTimeout(()=>r.classList.remove('pg-flash'),900);

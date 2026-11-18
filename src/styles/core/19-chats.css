@@ -351,3 +351,29 @@
   .fhv-tile.add svg{width:22px;height:22px;}
   .fhv-tile:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
   @media (min-width:1024px){ .fhv-wall{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;} .fhm{max-width:70%;} }
+  /* ── під обкладинкою (18.11.2026, 36-chats.js fhBelowRender; макет «Папки · новий дизайн», A):
+     кружечки підпапок і пігулки-фільтри. Фільтр лише ховає записи (.fh-off). */
+  .fhb{display:flex;flex-direction:column;gap:14px;padding:4px 0 14px;}
+  .fhb[hidden]{display:none;}
+  .fhk-row{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:4px 2px;margin:0 -2px;}
+  .fhk-row::-webkit-scrollbar{display:none;}
+  .fhk{all:unset;box-sizing:border-box;cursor:pointer;flex:0 0 64px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;color:var(--pg-fg,var(--text));}
+  .fhk-cv{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;
+    background:color-mix(in srgb,var(--c,var(--accent)) 30%,var(--pg-surface,var(--card))) center/cover no-repeat;color:var(--c,var(--accent));}
+  .fhk-cv .ico{width:22px;height:22px;}
+  .fhk.full .fhk-cv{box-shadow:0 0 0 2px var(--pg-bg,var(--bg)),0 0 0 4px var(--c,var(--accent));}
+  .fhk-n{width:68px;font-size:12px;line-height:1.25;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--pg-mut,var(--muted));}
+  .fhk.add .fhk-cv{background:transparent;border:1.5px dashed var(--pg-edge,var(--line));color:var(--pg-mut,var(--muted));}
+  .fhk.add .fhk-cv svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;}
+  .fhk:focus-visible .fhk-cv{outline:2px solid var(--pg-acc,var(--accent));outline-offset:3px;}
+  .fhk:active .fhk-cv{transform:scale(.95);}
+  .fhp-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
+  .fhp-row::-webkit-scrollbar{display:none;}
+  .fhp{all:unset;box-sizing:border-box;cursor:pointer;flex:0 0 auto;height:36px;padding:0 15px;border-radius:18px;display:inline-flex;align-items:center;
+    font-size:14px;font-weight:600;color:var(--pg-fg,var(--text));border:1px solid var(--pg-edge,var(--line));position:relative;}
+  .fhp::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px;}   /* тап-зона 44px */
+  .fhp.on{background:var(--pg-fg,var(--text));color:var(--pg-bg,var(--bg));border-color:transparent;}
+  .fhp:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .fh-v-photo .fhp-row{display:none;}
+  #scr-page .fh-off{display:none !important;}
+  @media (min-width:1024px){ .fhk{flex-basis:72px;} .fhk-cv{width:60px;height:60px;} }
