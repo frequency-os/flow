@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-18-1905-1f8a385';
+  var BUILD='2026-11-19-0024-7c62942';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -9117,6 +9117,175 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   @media (prefers-reduced-motion:reduce){
     .cr-ov,.cr-sheet,.cr-dot{transition:none;}
   }
+  /* ════════ Полотно папки (18.11.2026, 61-folder-canvas.js) — «Тихе скло» ════════ */
+  #scr-page.fh-v-canvas #pgAddBlock{display:none !important;}
+  .fh-v-canvas .fhp-row{display:none;}            /* фільтри «Усе · Завдання…» — для чату; на полотні видно все */
+  .fcv{position:relative;}
+  .fc-bar{display:flex;align-items:center;gap:8px;margin:2px 0 10px;min-height:36px;}
+  .fc-hint{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--pg-mut,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fc-btn{all:unset;box-sizing:border-box;cursor:pointer;min-height:36px;padding:0 14px;border-radius:999px;display:grid;place-items:center;font-size:13px;font-weight:800;
+    color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);-webkit-tap-highlight-color:transparent;}
+  .fc-btn.acc{background:var(--pg-acc,var(--accent));color:#fff;}
+  .fc-btn:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .fc-desk{position:relative;border-radius:18px;}
+  .fc-editing .fc-desk{background-image:radial-gradient(color-mix(in srgb,var(--pg-fg,var(--text)) 16%,transparent) 1px,transparent 1px);background-size:16px 16px;}
+  .fc-c{position:absolute;box-sizing:border-box;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;min-width:0;color:var(--pg-fg,var(--text));
+    background:linear-gradient(180deg,color-mix(in srgb,#fff 6%,transparent),transparent 42%),color-mix(in srgb,var(--pg-surface,var(--card)) 74%,transparent);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 16%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent),0 10px 26px -16px rgba(0,0,0,.5);}
+  /* віджет має своє скло — картка лише рамка */
+  .fc-c.wg{background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;overflow:visible;}
+  .fc-c .fc-wg{padding:0;flex:1;min-height:0;display:flex;}
+  .fc-c .fc-wg>.wg-t{flex:1;min-height:0;max-width:none;height:auto;overflow:hidden;}
+  .fc-in{all:unset;box-sizing:border-box;display:block;flex:1;min-height:0;overflow:hidden;padding:12px 14px;cursor:pointer;}
+  .fc-text{font-size:14.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;}
+  .fc-h{font-size:19px;font-weight:800;line-height:1.2;display:flex;align-items:center;}
+  .fc-task{display:flex;align-items:center;gap:10px;cursor:default;}
+  .fc-task .fh-box{width:26px;height:26px;flex:none;}
+  .fc-tx{all:unset;cursor:pointer;min-width:0;flex:1;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fc-task.done .fc-tx{text-decoration:line-through;color:var(--pg-mut,var(--muted));}
+  .fc-tbl{cursor:default;padding:8px 6px 0;}
+  .fc-gen{display:flex;align-items:center;font-size:15px;cursor:default;}
+  .fc-open{all:unset;box-sizing:border-box;cursor:pointer;flex:none;min-height:36px;padding:0 14px;display:flex;align-items:center;font-size:13px;font-weight:700;color:var(--pg-acc,var(--accent));}
+  .fc-open:focus-visible,.fc-in:focus-visible,.fc-tx:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:-2px;}
+  .fc-ph{flex:1;min-height:0;background:center/cover no-repeat;}
+  .fc-cap{padding:6px 12px 8px;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* режим «Змінити»: усе всередині мовчить, тягнеться сама картка */
+  .fc-editing .fc-c{cursor:grab;touch-action:none;outline:1.5px dashed color-mix(in srgb,var(--pg-acc,var(--accent)) 55%,transparent);outline-offset:2px;}
+  .fc-editing .fc-c>*:not(.fc-rs){pointer-events:none;}
+  .fc-c.fc-drag{cursor:grabbing;z-index:5;box-shadow:0 22px 44px -14px rgba(0,0,0,.7);opacity:.96;}
+  .fc-rs{position:absolute;right:2px;bottom:2px;width:30px;height:30px;cursor:nwse-resize;z-index:3;touch-action:none;
+    background:linear-gradient(135deg,transparent 55%,var(--pg-acc,var(--accent)) 55%);border-radius:0 0 20px 0;}
+  .fc-g{position:absolute;background:#ff6b9a;pointer-events:none;z-index:6;}
+  .fc-g.v{top:0;bottom:0;width:1px;} .fc-g.h{left:0;right:0;height:1px;}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .fc-c:not(.wg){background:var(--pg-surface,var(--card));} }
+  @media (prefers-reduced-transparency:reduce){ .fc-c:not(.wg){-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--pg-surface,var(--card));} }
+  /* ════════ Магазин блоків (18.11.2026, 62-block-store.js) — «Полиця Pro», тихе скло ════════ */
+  .bs-ov{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;background:var(--bg);color:var(--text);
+    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+  @media (min-width:1024px){ .bs-ov{inset:4vh 50% 4vh auto;transform:translateX(50%);width:min(560px,92vw);border-radius:24px;overflow:hidden;
+    box-shadow:0 0 0 100vmax rgba(0,0,0,.45),0 30px 80px -20px rgba(0,0,0,.6),0 0 0 1px var(--line);} }   /* перша тінь — затемнення сторінки за віконцем */
+  .bs-top{display:flex;align-items:center;gap:8px;padding:10px max(14px,env(safe-area-inset-right,0px)) 6px max(14px,env(safe-area-inset-left,0px));flex:none;}
+  .bs-back,.bs-x{all:unset;box-sizing:border-box;cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:700;font-size:15px;color:var(--accent);padding:0 4px;}
+  .bs-x{width:40px;justify-content:center;border-radius:50%;color:var(--muted);background:color-mix(in srgb,var(--text) 8%,transparent);font-size:14px;}
+  .bs-back:focus-visible,.bs-x:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .bs-title{font-weight:800;font-size:16px;}
+  .bs-sp{flex:1;}
+  .bs-search{padding:2px 16px 8px;flex:none;}
+  .bs-search input{width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:11px 12px;font:inherit;font-size:15px;color:var(--text);background:color-mix(in srgb,var(--text) 8%,transparent);}
+  .bs-search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+  .bs-body{flex:1;min-height:0;overflow-y:auto;padding:0 0 28px;-webkit-overflow-scrolling:touch;}
+  .bs-chips{display:flex;gap:6px;overflow-x:auto;padding:2px 16px 6px;scrollbar-width:none;}
+  .bs-chips::-webkit-scrollbar{display:none;}
+  .bs-chip{all:unset;box-sizing:border-box;cursor:pointer;flex:none;min-height:34px;padding:0 13px;border-radius:999px;display:flex;align-items:center;font-size:13px;font-weight:800;color:var(--muted);background:color-mix(in srgb,var(--text) 8%,transparent);}
+  .bs-chip.on{background:var(--text);color:var(--bg);}
+  .bs-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .bs-feat{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:6px;margin:8px 16px 4px;padding:16px;border-radius:24px;color:#fff;width:calc(100% - 32px);
+    background:radial-gradient(90% 70% at 85% 10%,#4b6bff,transparent 60%),radial-gradient(80% 70% at 10% 100%,#c04d8f,transparent 60%),#1b1534;}
+  .bs-feat:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .bs-eyebrow{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.8;}
+  .bs-feat>b{font-size:21px;font-weight:800;line-height:1.15;}
+  .bs-feat>small{font-size:13px;opacity:.85;line-height:1.4;}
+  .bs-sh{display:flex;justify-content:space-between;align-items:baseline;padding:18px 16px 4px;}
+  .bs-sh b{font-size:18px;font-weight:800;}
+  .bs-sh button{all:unset;cursor:pointer;color:var(--accent);font-weight:700;font-size:13.5px;min-height:32px;display:flex;align-items:center;}
+  .bs-shelf{display:grid;grid-template-columns:minmax(0,1fr);}   /* інакше довгий підпис розтягує рядок ширше за екран */
+  .bs-app{display:flex;align-items:center;gap:12px;padding:8px 16px;cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent;}
+  .bs-app:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:14px;}
+  .bs-app+.bs-app .bs-tx{box-shadow:0 -1px 0 color-mix(in srgb,var(--text) 8%,transparent);}
+  .bs-ico{width:52px;height:52px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:24px;
+    background:linear-gradient(150deg,color-mix(in srgb,var(--c) 85%,#fff),color-mix(in srgb,var(--c) 70%,#000));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 14px -8px var(--c);}
+  .bs-ico.lg{width:96px;height:96px;border-radius:24px;font-size:44px;}
+  .bs-tx{flex:1;min-width:0;padding:6px 0;}
+  .bs-tx b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bs-tx small{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bs-new{font-size:9.5px;font-weight:800;background:#ff6b9a;color:#fff;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:2px;}
+  .bs-get{all:unset;box-sizing:border-box;cursor:pointer;flex:none;min-width:82px;min-height:34px;padding:0 14px;border-radius:999px;display:grid;place-items:center;
+    font-size:13.5px;font-weight:800;color:var(--accent);background:color-mix(in srgb,var(--text) 9%,transparent);}
+  .bs-get.got{color:#1ea566;background:color-mix(in srgb,#34c77b 16%,transparent);}
+  .bs-get.big{min-height:38px;font-size:14.5px;background:var(--accent);color:#fff;}
+  .bs-get.big.got{background:color-mix(in srgb,#34c77b 18%,transparent);color:#1ea566;}
+  .bs-get:focus-visible,.bs-rm:focus-visible,.bs-rel button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .bs-empty{padding:30px 16px;text-align:center;color:var(--muted);}
+  .bs-dh{display:flex;gap:16px;padding:6px 16px 4px;align-items:flex-start;}
+  .bs-dtx{flex:1;min-width:0;display:grid;gap:3px;}
+  .bs-dtx h3{margin:0;font-size:22px;font-weight:800;line-height:1.15;}
+  .bs-dtx small{color:var(--muted);font-size:13.5px;}
+  .bs-acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px;}
+  .bs-rm{all:unset;cursor:pointer;color:#e0454a;font-weight:700;font-size:13px;min-height:34px;display:flex;align-items:center;}
+  .bs-info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:16px 16px 0;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .bs-info div{display:grid;justify-items:center;gap:2px;text-align:center;padding:0 4px;min-width:0;}
+  .bs-info div+div{border-left:1px solid var(--line);}
+  .bs-info small{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .bs-info b{font-size:13.5px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bs-sec{display:flex;align-items:baseline;gap:8px;padding:20px 16px 8px;}
+  .bs-sec b{font-size:17px;font-weight:800;}
+  .bs-sec small{color:var(--muted);font-size:12px;}
+  .bs-shots{display:flex;align-items:flex-start;gap:10px;overflow-x:auto;padding:0 16px 4px;scroll-padding:0 16px;scroll-snap-type:x mandatory;scrollbar-width:none;}   /* flex-start — картки своєї висоти; scroll-padding — відступ не зʼїдається прилипанням */
+  .bs-shots::-webkit-scrollbar{display:none;}
+  .bs-shot{flex:0 0 auto;scroll-snap-align:start;width:150px;display:grid;gap:6px;align-content:start;}
+  .bs-shot.m{width:260px;}
+  .bs-shot>small{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .bs-desc{margin:0;padding:0 16px;font-size:14.5px;line-height:1.55;}
+  .bs-steps{display:grid;gap:8px;padding:0 16px;}
+  .bs-steps div{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:color-mix(in srgb,var(--text) 5%,transparent);font-size:14px;}
+  .bs-steps i{font-style:normal;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:12.5px;flex:none;background:color-mix(in srgb,var(--c) 28%,transparent);}
+  .bs-rel{display:flex;gap:12px;overflow-x:auto;padding:0 16px;scrollbar-width:none;}
+  .bs-rel::-webkit-scrollbar{display:none;}
+  .bs-rel button{all:unset;cursor:pointer;flex:0 0 86px;display:grid;justify-items:center;gap:6px;font-size:12px;font-weight:700;text-align:center;}
+  .bs-rel .bs-ico{width:60px;height:60px;border-radius:16px;font-size:26px;}
+  .bs-note{margin:18px 16px 0;padding:12px 14px;border-radius:14px;font-size:13px;color:var(--muted);background:color-mix(in srgb,var(--text) 5%,transparent);line-height:1.45;}
+  /* прев'ю-віджет: те саме тихе скло */
+  .bsw{box-sizing:border-box;border-radius:20px;padding:11px;display:grid;gap:5px;align-content:start;min-height:120px;color:var(--text);
+    background:linear-gradient(180deg,color-mix(in srgb,#fff 6%,transparent),transparent 42%),color-mix(in srgb,var(--card) 80%,transparent);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 16%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--text) 9%,transparent),0 8px 22px -16px rgba(0,0,0,.5);}
+  .bs-feat .bsw{margin-top:6px;color:#fff;background:rgba(255,255,255,.08);}
+  .bsw-l{min-height:200px;}
+  .bsw-h{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--muted);}
+  .bs-feat .bsw-h{color:rgba(255,255,255,.7);}
+  .bsw-h i{width:7px;height:7px;border-radius:50%;flex:none;}
+  .bsw-n{font-size:13px;font-weight:800;}
+  .bsw-big{font-size:26px;font-weight:800;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+  .bsw-big small{font-size:11.5px;font-weight:700;color:var(--muted);margin-left:4px;letter-spacing:0;}
+  .bsw-sub{font-size:11.5px;font-weight:600;color:var(--muted);}
+  .bsw-bar{display:block;height:6px;border-radius:4px;background:color-mix(in srgb,var(--text) 12%,transparent);overflow:hidden;}
+  .bsw-bar i{display:block;height:100%;border-radius:4px;}
+  .bsw-flip{display:flex;gap:7px;flex-wrap:wrap;}
+  .bsw-flip>span{display:grid;justify-items:center;gap:2px;}
+  .bsw-flip small{font-size:9.5px;font-weight:700;color:var(--muted);}
+  .bs-feat .bsw-flip small{color:rgba(255,255,255,.7);}
+  .bsw-fd{display:flex;gap:2px;}
+  .bsw-fd i{font-style:normal;width:19px;height:28px;border-radius:6px;display:grid;place-items:center;font-weight:800;font-size:16px;background:color-mix(in srgb,var(--text) 10%,transparent);}
+  .bs-feat .bsw-fd i{background:rgba(255,255,255,.14);}
+  .bsw-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center;font-size:10.5px;font-weight:700;}
+  .bsw-cal span{padding:3px 0;border-radius:8px;position:relative;}
+  .bsw-cal span.f{color:var(--muted);}
+  .bsw-cal span.td{background:var(--text);color:var(--bg);}
+  .bsw-cal u{position:absolute;left:50%;bottom:0;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#7fb0ff;}
+  .bsw-tl{position:relative;display:block;height:10px;border-radius:5px;background:color-mix(in srgb,var(--text) 9%,transparent);}
+  .bsw-tl i{position:absolute;top:0;bottom:0;border-radius:5px;}
+  .bsw-tl b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);}
+  .bsw-ring{display:flex;align-items:center;gap:10px;}
+  .bsw-ring svg{width:56px;height:56px;transform:rotate(-90deg);}
+  .bsw-ring circle{fill:none;stroke-width:4;stroke-linecap:round;}
+  .bsw-ring .tr{stroke:color-mix(in srgb,var(--text) 12%,transparent);}
+  .bsw-ring b{font-size:20px;font-weight:800;}
+  .bsw-d7{display:flex;gap:4px;}
+  .bsw-d7 i{flex:1;height:6px;border-radius:3px;background:color-mix(in srgb,var(--text) 12%,transparent);}
+  .bsw-ba{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .bsw-ba i{aspect-ratio:3/4;border-radius:10px;max-height:90px;}
+  .bsw-row{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;padding:5px 7px;border-radius:9px;background:color-mix(in srgb,var(--text) 6%,transparent);}
+  .bsw-row span{color:var(--muted);}
+  .bsw-tbl{display:grid;gap:2px;font-size:11.5px;}
+  .bsw-tbl span{display:grid;grid-template-columns:1fr auto 34px;gap:6px;padding:4px 2px;border-bottom:1px solid color-mix(in srgb,var(--text) 8%,transparent);}
+  .bsw-tbl i{font-style:normal;color:var(--muted);} .bsw-tbl em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums;}
+  .bsw-ai{font-size:12px;line-height:1.45;}
+  /* вкладка «Магазин» у меню «＋ Блок» і рядок «Ще блоки в Магазині» (page-editor/02-block-styles.js) */
+  .pgst-cat.pgs-shop{margin-top:6px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,transparent),color-mix(in srgb,#5ec8ff 20%,transparent));position:relative;}
+  .pgst-cat.pgs-shop b{position:absolute;top:-5px;right:4px;font-size:9px;background:#ff6b9a;color:#fff;border-radius:6px;padding:0 5px;}
+  .pg-sitem.pgs-more{justify-content:center;border:1.5px dashed color-mix(in srgb,var(--accent) 50%,transparent);border-radius:12px;margin-top:6px;font-weight:800;color:var(--accent);}
+  /* Ще → Магазин блоків */
+  .acc-row .bs-badge{margin-left:auto;margin-right:6px;font-size:10px;font-weight:800;background:#ff6b9a;color:#fff;border-radius:7px;padding:2px 7px;}
 </style>
 <style id="diary-css">
 /* ===== ЩОДЕННИК ===== */
@@ -10224,6 +10393,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // легкі налаштування (prefSet у 02-storage.js — сирий ключ + копія тут)
     'flowtheme','flowprotheme','flowcardskin','folderview','homewidgets','hometab','homeov',
     'folderopts',                                        // розмір/порядок/фото плиток папок (16-dashboard.js, 06.10.2026)
+    'blocks_got',                                        // магазин блоків: які блоки взято в меню «＋ Блок» (62-block-store.js, 18.11.2026)
     'sidebarcol','spacefull','fx_mode','fx_say','ai_pet','hero_look','ai_voice','pet_hidden','pet_pos','pet_sleep',
     'forcedesktop','forcemobile'                         // фічу видалено; у сховищі лишається '0'
   ];
@@ -12892,8 +13062,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         if(f.sphere&&typeof f.sphere.tpl==='string') cfg[k].sphere={tpl:f.sphere.tpl,bld:String(f.sphere.bld||'')};
         // як відкривається група (16-dashboard.js openGroupAsChosen): пишемо лише не-типове
         if(f.gview==='folder'||f.gview==='space'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // без поля — «Простір» (типове з 15.11.2026)
-        // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo; «Документ» — типове, не пишемо
-        if(f.view==='chat'||f.view==='photo') cfg[k].view=f.view;
+        // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo/canvas («Полотно», 18.11.2026); «Документ» — типове, не пишемо
+        if(f.view==='chat'||f.view==='photo'||f.view==='canvas') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
         if(folderPrioOk(f.prio)) cfg[k].prio=f.prio;
       });
@@ -22958,7 +23128,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ${hasCond?r('hid','◌',hidOn?'Ховати блоки з умовою':'Показати сховані блоки','блоки з умовою показу'):''}
       ${r('cover','🖼',hasCov?'Обкладинка':'Додати обкладинку',hasCov?'змінити, зсунути чи прибрати':'фото або колір над назвою')}
       ${fk?`<div class="fmi-label">Папка</div>
-      <div class="pgb-seg" role="group" aria-label="Вигляд папки">${vb('doc','Документ')}${vb('chat','Чат')}${vb('photo','Фото')}${vb('feed','Стрічка')}</div>
+      <div class="pgb-seg" role="group" aria-label="Вигляд папки">${vb('doc','Документ')}${vb('chat','Чат')}${vb('photo','Фото')}${vb('canvas','Полотно')}${vb('feed','Стрічка')}</div>
       ${r('links','🔗','Звʼязки','місія, звичка, час, календар, гроші, чати')}
       ${r('chats','💬','Чати папки','повʼязати новий чи наявний чат','')}
       ${r('fmenu','⚙︎','Налаштування папки','назва, колір, група, видалення','')}`:''}`,
@@ -27454,7 +27624,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const sph=(c.sphere&&typeof c.sphere.tpl==='string')?{tpl:c.sphere.tpl.slice(0,16),bld:String(c.sphere.bld||'').slice(0,16)}:undefined;
         const gv=(c.gview==='folder'||c.gview==='space'||c.gview==='stack'||c.gview==='ios')?c.gview:undefined;   // без поля — «Простір»; 'folder' — явний вибір «Як папка»
         const pr=folderPrioOk(c.prio)?c.prio:undefined;
-        const vw=(c.view==='chat'||c.view==='photo')?c.view:undefined;   // вигляд папки (36-chats.js fhView); решта — «Документ»
+        const vw=(c.view==='chat'||c.view==='photo'||c.view==='canvas')?c.view:undefined;   // вигляд папки (36-chats.js fhView); canvas — «Полотно»; решта — «Документ»
         if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw}); }
         // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
         else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw}; }
@@ -27851,7 +28021,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
        кожен розділ — пара .mr-sl/.mr-grp з data-sec, а що видно на широкому
        екрані, вирішує атрибут data-msec на #scr-more (22-more-screen.css).
        «Інструменти» на комп'ютері стоять завжди — це дії, а не налаштування. */
-    const MSEC=[['profile','Профіль'],['look','Вигляд'],['day','Мій день'],['data','Дані і приватність'],
+    const MSEC=[['profile','Профіль'],['look','Вигляд'],['blocks','Блоки'],['day','Мій день'],['data','Дані і приватність'],
       ['about','Про застосунок'],['adv','Розширені'],['lite','Решта Frequency'],['dev','Розробка']];
     function moreIsWide(){ try{ return window.matchMedia('(min-width:1024px)').matches; }catch(_){ return false; } }
     function renderMoreIndex(){
@@ -28044,6 +28214,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           ${loginExpand}`}
         </div>
         <!-- Налаштування, варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені -->
+        <div class="mr-sl" data-sec="blocks">Блоки</div>
+        <div class="mr-grp" data-sec="blocks">
+          <div class="acc-row" data-acc-store role="button" tabindex="0">
+            ${ico('mode','violet')}
+            <div class="acc-rtext"><div class="acc-rtitle">Магазин блоків</div><div class="acc-rsub">що є в меню «＋ Блок»: календар, відлік, таблиця, гроші…</div></div>
+            ${(typeof window.bsNewCount==='function'&&window.bsNewCount())?`<span class="bs-badge">${window.bsNewCount()} нове</span>`:''}${chev()}
+          </div>
+        </div>
         <div class="mr-sl" data-sec="day">Мій день</div>
         <div class="mr-grp" data-sec="day">
           <div class="acc-row" data-acc-dayrange role="button" tabindex="0">
@@ -28181,13 +28359,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const bkRow=host.querySelector('[data-acc-backup-row]');   // onclick — біля лічильника фото нижче
       { const cr=host.querySelector('[data-acc-cur]'); if(cr) cr.onclick=()=>curPickSheet(()=>{ try{ renderAccount(); }catch(_){} }); }   // 08-finance.js
       // варіант A (15.11.2026): нові рядки ведуть у наявні шторки — своїх налаштувань у них нема
+      { const st=host.querySelector('[data-acc-store]'); if(st) st.onclick=()=>{ try{ window.bsOpen&&window.bsOpen({}); }catch(e){ console.error('bsOpen',e); } }; }   // 62-block-store.js
       { const dr=host.querySelector('[data-acc-dayrange]'); if(dr) dr.onclick=()=>{ try{ plRangeSheet(); }catch(e){ console.error('plRangeSheet',e); } }; }   // 15-flow-spot.js
       { const ap=host.querySelector('[data-acc-aipriv]'); if(ap) ap.onclick=()=>{ if(window.aiPrivacySheet) window.aiPrivacySheet(); }; }
       { const gr=host.querySelector('[data-acc-gamereset]'); if(gr) gr.onclick=()=>{ try{ jnSettings(); }catch(e){ console.error('jnSettings',e); } }; }   // 41-journal.js
       { const ar=host.querySelector('[data-acc-adv-row]'), ae=host.querySelector('[data-acc-adv-expand]');
         if(ar&&ae) ar.onclick=()=>{ ae.hidden=!ae.hidden; ar.setAttribute('aria-expanded',String(!ae.hidden)); }; }
       // Enter/пробіл на рядках-кнопках (role="button")
-      host.querySelectorAll('[data-acc-dayrange],[data-acc-aipriv],[data-acc-gamereset],[data-acc-adv-row]').forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } }));
+      host.querySelectorAll('[data-acc-store],[data-acc-dayrange],[data-acc-aipriv],[data-acc-gamereset],[data-acc-adv-row]').forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } }));
       { const fr=host.querySelector('[data-acc-finreset]'); if(fr) fr.onclick=()=>{   // 51-money-reset.js
         if(typeof finResetScan!=='function') return;
         if(!finResetReady()){ try{ plToast('Дані ще звіряються з хмарою — спробуй за хвилину'); }catch(_){} return; }
@@ -30605,10 +30784,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* ── вигляд папки зсередини (15.11.2026, етап 2): Документ · Чат · Фото — для кожної папки свій.
      Записи ТІ САМІ блоки документа, міняється лише показ. Поле folders[k].view пишеться лише
      з вибору людини (звичайний saveFolders), і лише не-типове: chat | photo. ── */
-  function fhView(fk){ const v=folders[fk]&&folders[fk].view; return (v==='chat'||v==='photo')?v:'doc'; }
+  function fhView(fk){ const v=folders[fk]&&folders[fk].view; return (v==='chat'||v==='photo'||v==='canvas')?v:'doc'; }   // canvas — «Полотно» (61-folder-canvas.js)
   function fhSetView(fk,v){
     const f=folders[fk]; if(!f) return;
-    if(v==='chat'||v==='photo') f.view=v; else delete f.view;
+    if(v==='chat'||v==='photo'||v==='canvas') f.view=v; else delete f.view;
+    if(v!=='canvas') fcEdit='';
     fhPeek=''; fhPeekId='';
     saveFolders(); fhApplyView(); chHaptic('select');
   }
@@ -30695,17 +30875,18 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const scr=document.getElementById('scr-page'), ed=document.getElementById('pgEditor'); if(!scr||!ed) return;
     const fk=pgFolderKey(), feed=scr.classList.contains('lk-feedmode');
     if(fhPeek&&fhPeek!==fk){ fhPeek=''; fhPeekId=''; }   // інша папка — «підгляд» документа скінчився
-    const peeking=!!(fk&&!feed&&fhPeek===fk&&fhView(fk)==='chat');
+    const peeking=!!(fk&&!feed&&fhPeek===fk&&(fhView(fk)==='chat'||fhView(fk)==='canvas'));
     const v=(fk&&!feed)?(peeking?'doc':fhView(fk)):'doc';
-    scr.classList.toggle('fh-v-chat',v==='chat'); scr.classList.toggle('fh-v-photo',v==='photo');
+    scr.classList.toggle('fh-v-chat',v==='chat'); scr.classList.toggle('fh-v-photo',v==='photo'); scr.classList.toggle('fh-v-canvas',v==='canvas');
     let chip=document.getElementById('fhPeekBack');
     if(peeking&&!chip){ chip=document.createElement('button'); chip.id='fhPeekBack'; chip.type='button'; chip.className='fh-peek';
-      chip.innerHTML=chI('back')+'<span>До чату</span>'; chip.onclick=fhPeekEnd; scr.appendChild(chip); }
+      chip.innerHTML=chI('back')+'<span>'+(fhView(fk)==='canvas'?'До полотна':'До чату')+'</span>'; chip.onclick=fhPeekEnd; scr.appendChild(chip); }
     if(!peeking&&chip) chip.remove();
     let box=document.getElementById('fhView');
     if(v==='doc'){ if(box) box.remove(); fhWallSig=''; if(!feed) ed.hidden=false; return; }
     if(!box){ box=document.createElement('div'); box.id='fhView'; ed.parentNode.insertBefore(box,ed); }
     const arr=(fhBridge()&&fhBridge().getBlocks())||[];
+    if(v==='canvas'){ ed.hidden=true; box.className='fhv fcv'; fhWallSig=''; fcRender(box,arr,fk); return; }
     if(v==='chat'){
       ed.hidden=true; box.className='fhv fhv-chat'; box.innerHTML=fhChatHTML(arr); fhWallSig='';
       box.querySelectorAll('[data-fhm]').forEach(el=>el.onclick=()=>fhMsgSheet(fk,el.dataset.fhm));
@@ -30747,7 +30928,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   // глибока копія з новими id — і у вкладених, щоб дві копії не ділили id
   function fhCopy(b){ const c=JSON.parse(JSON.stringify(b)); c.at=Date.now(); delete c.by; delete c.topic; delete c.pinned;
-    const re=x=>{ x.id=chUid(); if(Array.isArray(x.children)) x.children.forEach(y=>{ if(y) re(y); }); }; re(c); return c; }
+    const re=x=>{ x.id=chUid(); delete x.cv; if(Array.isArray(x.children)) x.children.forEach(y=>{ if(y) re(y); }); }; re(c); return c; }   // cv — місце на чужому полотні (61-folder-canvas.js): копія ляже сама
   function fhPickFolder(fk,b){
     const ks=orderedFolderKeys().filter(k=>k!==fk&&folders[k]&&(typeof folderVisible!=='function'||folderVisible(k)));
     if(!ks.length){ chToast('Інших папок ще нема'); return; }
@@ -38596,6 +38777,361 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     C.actions={ list:()=>Object.keys(ACTIONS), get:id=>ACTIONS[id]?{id, fields:ACTIONS[id].fields, keys:ACTIONS[id].keys.slice()}:null };
     C.onChange=fn=>{ if(typeof fn==='function') listeners.push(fn); };
   })();
+  /* ════════ Полотно папки (61-folder-canvas.js, 18.11.2026) ════════
+     Вигляд папки «Полотно» поруч із Документ · Чат · Фото (36-chats.js → fhApplyView кличе fcRender).
+     На полотні ті самі блоки, що в документі: віджети живі (wgFill), текст / завдання / таблиця — картками.
+     «Змінити»: блок тягнеш куди завгодно, розмір — за кут, прилипання до сітки 8px і напрямні; «Вирівняти» — акуратні рядки.
+     Свій стіл на кожному пристрої: місце зберігається в самому блоці, b.cv = {m:{x,y,w,h}, d:{x,y,w,h}}
+     (m — телефон, вужче 1024px; d — компʼютер). Нового ключа сховища нема — блок синкається разом із документом папки.
+     Пишеться ЛИШЕ тапом людини: коли відпустила блок (тоді фіксується весь стіл цього пристрою) або натиснула «Вирівняти».
+     Поки на пристрої нічого не рухали — стіл розкладається сам (рахується, нічого не пише): телефон бере порядок
+     із компʼютера, нова папка — порядок документа. Старі версії застосунку поле cv просто не бачать. */
+  var FC_GAP=12, FC_SNAP=8;   // var, не const: 36-chats.js (раніше в збірці) може покликати fcRender ще до цього рядка
+  var fcEdit='';   // папка, у якій зараз режим «Змінити» (лише в памʼяті)
+  function fcDev(){ return innerWidth>=1024?'d':'m'; }
+  function fcCols(){ return fcDev()==='d'?4:2; }
+  function fcRectOk(r){ return r&&typeof r==='object'&&[r.x,r.y,r.w,r.h].every(v=>typeof v==='number'&&isFinite(v)); }
+  function fcSaved(b,dev){ const r=b&&b.cv&&b.cv[dev]; return fcRectOk(r)?r:null; }
+  // ті самі записи, що бачить чат: усе, і вкладене теж, крім службових і порожніх контейнерів
+  function fcList(arr){
+    const shell=b=>Array.isArray(b.children)&&b.children.length&&!fhPlain(b.text!=null?b.text:b.title);
+    const out=[]; fhWalk(arr,b=>{ if(b&&b.id&&b.type!=='subs'&&b.type!=='divider'&&!shell(b)) out.push(b); });
+    return out;
+  }
+  // типовий розмір картки: скільки колонок і яка висота
+  function fcDefSize(b,C,cw){
+    const t=b.type, span=n=>Math.min(C,n), H=(t==='h1'||t==='h2'||t==='h3');
+    if(typeof wgIs==='function'&&wgIs(t)){
+      const sz=typeof wdIs==='function'&&wdIs(t)?wdSz(b):'m';
+      if(sz==='s') return {c:1,h:156};
+      if(sz==='l') return {c:span(2),h:t==='dcal'?330:300};
+      return {c:span(2),h:t==='countdown'?176:156};
+    }
+    if(t==='tbl') return {c:span(3),h:220};
+    if(H) return {c:C,h:58};
+    if(t==='task') return {c:span(2),h:54};
+    if(t==='photo') return {c:1,h:176};
+    if(FH_TEXTY[t]){ const len=fhPlain(b.text!=null?b.text:b.title).length, per=Math.max(20,Math.floor(cw*2/7.6));
+      return {c:span(2),h:Math.max(64,Math.min(260,46+Math.ceil(len/per)*19))}; }
+    return {c:1,h:104};
+  }
+  // розклад: збережені картки стоять, де поставили; решта — щільно в колонки (як цеглини), нижче або замість
+  function fcLayout(list,W){
+    const dev=fcDev(), C=fcCols(), cw=(W-(C-1)*FC_GAP)/C, pos={};
+    let bottom=0; const free=[];
+    list.forEach(b=>{ const r=fcSaved(b,dev);
+      // межі — на випадок збитих чисел із хмари (y=1e9 дав би безкінечний порожній скрол)
+      if(r){ const w=Math.max(80,Math.min(W,r.w)); pos[b.id]={x:Math.max(0,Math.min(W-w,r.x)),y:Math.max(0,Math.min(20000,r.y)),w,h:Math.max(48,Math.min(3000,r.h))}; bottom=Math.max(bottom,pos[b.id].y+pos[b.id].h); }
+      else free.push(b); });
+    // телефон без свого стола бере порядок компʼютера (зверху вниз, зліва направо); інакше — порядок документа
+    const other=dev==='m'?'d':'m';
+    if(free.length&&free.every(b=>fcSaved(b,other))) free.sort((a,c)=>{ const p=fcSaved(a,other), q=fcSaved(c,other); return (p.y-q.y)||(p.x-q.x); });
+    const colH=new Array(C).fill(bottom?bottom+FC_GAP:0);
+    free.forEach(b=>{ const s=fcDefSize(b,C,cw); let best=0, by=Infinity;
+      for(let i=0;i+s.c<=C;i++){ const y=Math.max(...colH.slice(i,i+s.c)); if(y<by){ by=y; best=i; } }
+      pos[b.id]={x:Math.round(best*(cw+FC_GAP)),y:by,w:Math.round(s.c*cw+(s.c-1)*FC_GAP),h:s.h};
+      for(let i=best;i<best+s.c;i++) colH[i]=by+s.h+FC_GAP; });
+    return pos;
+  }
+  // вміст картки (лише показ; дії — тими самими функціями, що й чат)
+  function fcCardHTML(b){
+    const t=b.type, id=esc(b.id);
+    if(typeof wgIs==='function'&&wgIs(t)) return `<div class="pgwg fc-wg" data-wghost="${id}"></div>`;
+    if(t==='tbl') return `<div class="fc-in fc-tbl">${fhTblHTML(b)}</div><button class="fc-open" data-fcopen="${id}">Відкрити ›</button>`;
+    if(t==='task') return `<div class="fc-in fc-task${b.done?' done':''}"><button class="fh-box" data-fcdone="${id}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fc-tx" data-fcedit="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button></div>`;
+    if(t==='photo'&&b.data){ let u=''; try{ u=safeImg(b.data); }catch(_){} return `<div class="fc-ph" style="background-image:url('${esc(u)}')"></div>${b.title?`<span class="fc-cap" data-i18n-skip="1">${esc(fhPlain(b.title))}</span>`:''}`; }
+    if(FH_TEXTY[t]) return `<button class="fc-in fc-text${(t==='h1'||t==='h2'||t==='h3')?' fc-h':''}" data-fcedit="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button>`;
+    return `<div class="fc-in fc-gen"><b data-i18n-skip="1">${esc(fhLabel(b))}</b></div><button class="fc-open" data-fcopen="${id}">Відкрити ›</button>`;
+  }
+  function fcRender(box,arr,fk){
+    const list=fcList(arr), edit=fcEdit===fk;
+    box.classList.toggle('fc-editing',edit);
+    if(!list.length){ box.innerHTML=`<div class="fhv-empty"><b>Полотно порожнє</b><span>Додай блок через «＋» або напиши внизу — він ляже на стіл.</span></div>`; return; }
+    const W=Math.max(240,Math.round(box.clientWidth||((box.parentNode&&box.parentNode.clientWidth)||320)));
+    const pos=fcLayout(list,W); let H=0; list.forEach(b=>{ const p=pos[b.id]; H=Math.max(H,p.y+p.h); });
+    box.innerHTML=`<div class="fc-bar">${edit
+        ?`<span class="fc-hint">Тягни блок · кут ◢ — розмір</span><button class="fc-btn" data-fcalign>Вирівняти</button><button class="fc-btn acc" data-fcdone-edit>Готово</button>`
+        :`<span class="fc-hint">${fcDev()==='d'?'Стіл компʼютера':'Стіл телефона'}</span><button class="fc-btn" data-fcedit-mode>✎ Змінити</button>`}</div>`
+      +`<div class="fc-desk" style="height:${Math.round(H+40)}px">`
+      +list.map(b=>{ const p=pos[b.id], wg=typeof wgIs==='function'&&wgIs(b.type);
+        return `<div class="fc-c${wg?' wg':''}" data-fc="${esc(b.id)}" style="left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px">${fcCardHTML(b)}`
+          +(edit?`<span class="fc-rs" data-fcrs="${esc(b.id)}" aria-hidden="true"></span>`:'')+`</div>`; }).join('')+`</div>`;
+    box._fcPos=pos; box._fcW=W; box._fcFk=fk;
+    if(typeof wgFill==='function') box.querySelectorAll('[data-wghost]').forEach(h=>{ const r=fhFind(h.dataset.wghost); if(r) wgFill(h,r.b,fk); });
+    const on=(sel,fn)=>box.querySelectorAll(sel).forEach(el=>el.onclick=e=>{ if(box._fcMoved){ box._fcMoved=false; return; } fn(el,e); });
+    on('[data-fcdone]',el=>{ const r=fhFind(el.dataset.fcdone); if(!r) return; r.b.done=!r.b.done; chHaptic('select'); fhCommit(); });
+    on('[data-fcedit]',el=>{ if(!edit) fhEdit(el.dataset.fcedit); });
+    on('[data-fcopen]',el=>{ if(!edit) fhPeekOpen(fk,el.dataset.fcopen); });
+    on('[data-fcedit-mode]',()=>{ fcEdit=fk; chHaptic('select'); fhApplyView(); });
+    on('[data-fcdone-edit]',()=>{ fcEdit=''; chHaptic('select'); fhApplyView(); });
+    on('[data-fcalign]',()=>fcAlign(box,list));
+    if(edit) fcBindDrag(box,list);
+  }
+  // стіл цього пристрою фіксується повністю: інакше нові блоки, що лягають «самі», наїжджали б на поставлені руками
+  // keep — id картки, яку щойно рухали: вона пишеться завжди; уже поставлені інші не переписуємо
+  // (у звуженому вікні їхні місця підрізані під ширину — записати їх означало б загубити широкий розклад)
+  function fcFreeze(list,pos,dev,keep){ list.forEach(b=>{ const p=pos[b.id]; if(!p) return;
+    if(keep&&b.id!==keep&&fcSaved(b,dev)) return;
+    if(!b.cv||typeof b.cv!=='object'||Array.isArray(b.cv)) b.cv={};
+    b.cv[dev]={x:Math.round(p.x),y:Math.round(p.y),w:Math.round(p.w),h:Math.round(p.h)}; }); }
+  function fcAlign(box,list){
+    const dev=fcDev(), was=list.map(b=>[String(b.id),b.cv&&b.cv[dev]?Object.assign({},b.cv[dev]):null]);
+    list.forEach(b=>{ if(b.cv&&b.cv[dev]) delete b.cv[dev]; });
+    const W=box._fcW||box.clientWidth, order=list.slice().sort((a,c)=>{ const p=box._fcPos[a.id], q=box._fcPos[c.id]; return (p.y-q.y)||(p.x-q.x); });
+    fcFreeze(order,fcLayout(order,W),dev); chHaptic('medium'); fhCommit();
+    // «Скасувати» повертає кожному блоку його попереднє місце на цьому пристрої. Шукаємо блок за id заново:
+    // після збереження редактор перебудовує обʼєкти, старі посилання вже нікуди не ведуть
+    try{ flowUndoToast('Вирівняно',()=>{ was.forEach(([id,r])=>{ const f=fhFind(id); if(!f) return; const b=f.b;
+      if(!b.cv||typeof b.cv!=='object'||Array.isArray(b.cv)) b.cv={}; if(r) b.cv[dev]=r; else delete b.cv[dev]; }); fhCommit(); }); }catch(_){}
+  }
+  // «Змінити»: тягнути картку, розмір — за кут; прилипання до сітки й до країв сусідів
+  function fcBindDrag(box,list){
+    const desk=box.querySelector('.fc-desk'); if(!desk) return;
+    const pos=box._fcPos, W=box._fcW, snap=v=>Math.round(v/FC_SNAP)*FC_SNAP;
+    let d=null;
+    const guides=(id,p)=>{ desk.querySelectorAll('.fc-g').forEach(g=>g.remove());
+      const ex=[], ey=[]; Object.keys(pos).forEach(k=>{ if(k===id) return; const q=pos[k]; ex.push(q.x,q.x+q.w); ey.push(q.y,q.y+q.h); });
+      [['x',p.x],['x',p.x+p.w]].forEach(([_,v])=>{ if(ex.some(e=>Math.abs(e-v)<1)){ const g=document.createElement('i'); g.className='fc-g v'; g.style.left=v+'px'; desk.appendChild(g); } });
+      [['y',p.y],['y',p.y+p.h]].forEach(([_,v])=>{ if(ey.some(e=>Math.abs(e-v)<1)){ const g=document.createElement('i'); g.className='fc-g h'; g.style.top=v+'px'; desk.appendChild(g); } }); };
+    // прилипнути до краю сусіда, якщо ближче за 10px
+    const stick=(v,list2)=>{ let best=v, bd=10; list2.forEach(e=>{ const dd=Math.abs(e-v); if(dd<bd){ bd=dd; best=e; } }); return best; };
+    desk.addEventListener('pointerdown',e=>{
+      const card=e.target.closest('.fc-c'); if(!card) return;
+      const id=card.dataset.fc, p=pos[id]; if(!p) return;
+      d={id,card,rs:!!e.target.closest('[data-fcrs]'),sx:e.clientX,sy:e.clientY,p0:Object.assign({},p),moved:false};
+      card.classList.add('fc-drag'); try{ card.setPointerCapture(e.pointerId); }catch(_){}
+      e.preventDefault();
+    });
+    desk.addEventListener('pointermove',e=>{
+      if(!d) return; const dx=e.clientX-d.sx, dy=e.clientY-d.sy; if(Math.abs(dx)+Math.abs(dy)>3) d.moved=true;
+      const p=pos[d.id], ex=[], ey=[]; Object.keys(pos).forEach(k=>{ if(k===d.id) return; const q=pos[k]; ex.push(q.x,q.x+q.w+FC_GAP,q.x-FC_GAP); ey.push(q.y,q.y+q.h+FC_GAP,q.y-FC_GAP); });
+      if(d.rs){
+        p.w=Math.max(96,Math.min(W-p.x,snap(d.p0.w+dx))); p.h=Math.max(52,snap(d.p0.h+dy));
+        p.w=stick(p.x+p.w,ex)-p.x; p.h=stick(p.y+p.h,ey)-p.y;
+        d.card.style.width=p.w+'px'; d.card.style.height=p.h+'px';
+      } else {
+        p.x=Math.max(0,Math.min(W-p.w,snap(d.p0.x+dx))); p.y=Math.max(0,snap(d.p0.y+dy));
+        p.x=stick(p.x,ex); p.y=stick(p.y,ey);
+        d.card.style.left=p.x+'px'; d.card.style.top=p.y+'px';
+      }
+      guides(d.id,p);
+      const need=p.y+p.h+40; if(need>desk.offsetHeight) desk.style.height=need+'px';
+    });
+    const end=()=>{ if(!d) return; const was=d; d=null;
+      was.card.classList.remove('fc-drag'); desk.querySelectorAll('.fc-g').forEach(g=>g.remove());
+      if(!was.moved) return;
+      box._fcMoved=true; setTimeout(()=>{ box._fcMoved=false; },0);
+      fcFreeze(list,pos,fcDev(),was.id); fhCommit(); };
+    desk.addEventListener('pointerup',end); desk.addEventListener('pointercancel',end);
+  }
+  // ширина вікна змінилась (Mac тягнуть мишею, телефон повернули) — перемалювати полотно під нову ширину
+  var fcRz=0;
+  window.addEventListener('resize',()=>{ clearTimeout(fcRz); fcRz=setTimeout(()=>{ try{ const s=document.getElementById('scr-page'); if(s&&s.classList.contains('fh-v-canvas')) fhApplyView(); }catch(_){} },200); },{passive:true});
+  /* ════════ Магазин блоків (62-block-store.js, 18.11.2026) — вітрина «Полиця Pro», будова 3 «без міграції» ════════
+     Блоки вже вшиті в застосунок (page-editor/01-palette.js, CATALOG). «Отримати» лише кладе блок у меню «＋ Блок»,
+     «Прибрати» — ховає з меню; у папках, де блок уже стоїть, він працює далі (App Store забороняє докачувати код).
+     Ключ blocks_got = {v:1, got:[k…], at} — легке налаштування (prefSet: сирий ключ + синк), є у FLOW_KEYS.
+     Поки ключа нема — взятими вважаються ВСІ нинішні блоки магазину: це лише рахується, при старті нічого не пишеться.
+     Пишеться тільки тапом людини «Отримати»/«Прибрати». Невідомі ключі в got (з новіших версій) не викидаємо.
+     Блок із полем since новіше за BS_BASE — «Нове»: у меню нема, поки людина його не візьме. Агент Флоу і шаблони
+     створюють блоки як раніше — магазин керує лише меню. Тексти — двома мовами (flowLang). */
+  var BS_KEY='blocks_got', BS_BASE='2026-11-18';
+  var BS_SPH=[['all','Усе','All'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
+  /* k → сфери, значок, колір, звʼязок, прев'ю; тексти uk/en: n назва, s одне речення, d опис, st три кроки.
+     ПРАВИЛО: кожен НОВИЙ запис тут — з since:'РРРР-ММ-ДД' пізніше за BS_BASE. Без since блок у людей, що вже
+     тапали «Отримати/Прибрати», мовчки зник би з меню (у їхньому збереженому списку його нема). */
+  var BS_ITEMS={
+    countdown:{sp:['goals','health','home'],ic:'⏳',c:'#5ec8ff',pv:'cd',ln:['Сам по собі','Standalone'],
+      uk:{n:'Відлік часу',s:'До дати чи від дати — роки … секунди',d:'Рахує час до події або від неї: Новий рік, відпустка, «скільки не палю». Цифри тікають щосекунди, три стилі: флип 3D, велике число, кільця.',st:['Назви й обери дату (з часом, «щороку»)','Вибери одиниці: роки … секунди','Дивись, як тікає — у документі й у чаті']},
+      en:{n:'Countdown',s:'To a date or since a date — years … seconds',d:'Counts time to an event or since it: New Year, a trip, days without smoking. Digits tick every second, three styles: 3D flip, big number, rings.',st:['Name it and pick a date (time, yearly)','Choose units: years … seconds','Watch it tick — in documents and chats']}},
+    dcal:{sp:['work','study','home'],ic:'📅',c:'#7fb0ff',pv:'cal',ln:['Планер','Planner'],
+      uk:{n:'Календар папки',s:'Місяць справ цієї папки з Планера',d:'Показує місяць: у які дні в папці є справи з Планера й події. Тап по дню — що заплановано.',st:['Додай у папку','Плануй як завжди — справи з міткою папки стають крапками','Тап по дню — список і перехід у День']},
+      en:{n:'Folder calendar',s:'This folder’s month from the Planner',d:'A month view: which days have this folder’s Planner blocks and events. Tap a day to see the plan.',st:['Add it to a folder','Plan as usual — tagged blocks become dots','Tap a day for its list']}},
+    dtime:{sp:['work','study'],ic:'⏱',c:'#ffd27a',pv:'time',ln:['Планер','Planner'],
+      uk:{n:'Час папки',s:'Скільки годин папки сьогодні',d:'Смуга дня з блоками Планера цієї папки й рискою «зараз». Скільки заплановано й зроблено — за день, тиждень чи місяць.',st:['Додай у папку','«＋ блок» прямо з віджета','Тиждень — стовпчики по днях']},
+      en:{n:'Folder time',s:'Hours of this folder today',d:'A day strip with this folder’s Planner blocks and a “now” line. Planned and done — per day, week or month.',st:['Add it to a folder','“+ block” right from the widget','Week view — bars by day']}},
+    dmission:{sp:['goals','work'],ic:'🎯',c:'#a99cff',pv:'mis',ln:['Місія','Mission'],
+      uk:{n:'Місія папки',s:'Прогрес, наступний крок, дедлайн',d:'Кільце прогресу місії, наступний крок і скільки днів до дедлайну. Тап — сторінка місії.',st:['Повʼяжи місію','Відмічай віхи — кільце росте','Наступний крок завжди зверху']},
+      en:{n:'Folder mission',s:'Progress, next step, deadline',d:'Mission progress ring, the next step and days to the deadline. Tap to open the mission.',st:['Link a mission','Tick milestones — the ring grows','The next step is always on top']}},
+    dhabit:{sp:['health','goals','study'],ic:'🔥',c:'#ff8a4c',pv:'hab',ln:['Місія','Mission'],
+      uk:{n:'Звичка папки',s:'Серія днів і ✓ сьогодні',d:'Трекер звички місії: позначай день одним тапом, дивись серію і тиждень.',st:['Повʼяжи з місією','Тапни «✓ Сьогодні»','Тримай серію']},
+      en:{n:'Folder habit',s:'Streak and ✓ today',d:'A mission habit tracker: mark the day with one tap, see the streak and the week.',st:['Link a mission','Tap “✓ Today”','Keep the streak']}},
+    dcount:{sp:['goals'],ic:'🏁',c:'#9b8cff',pv:'dcount',ln:['Місія','Mission'],
+      uk:{n:'Відлік до мети',s:'Скільки днів до фінішу місії',d:'Дні до останньої віхи місії і найближчий крок.',st:['Повʼяжи місію з датою фінішу','Дивись, скільки лишилось','Наступна віха — під числом']},
+      en:{n:'Days to goal',s:'Days until the mission finish',d:'Days to the mission’s last milestone and the next step.',st:['Link a mission with a finish date','See what’s left','Next milestone under the number']}},
+    dsave:{sp:['money','goals'],ic:'🐷',c:'#ffc261',pv:'save',ln:['Гаманець','Wallet'],
+      uk:{n:'Скарбничка',s:'Скільки зібрано на мету',d:'Доходи з міткою місії складаються в суму, смужка — скільки лишилось до цілі. «＋ ₴» — відкласти з віджета.',st:['Задай ціль','«＋ ₴» — дохід у Гаманець','«Зібрано ✓», коли дійшов']},
+      en:{n:'Savings jar',s:'How much is saved for the goal',d:'Mission-tagged income adds up, the bar shows what’s left. “+ ₴” saves right from the widget.',st:['Set a target','“+ ₴” records income in the Wallet','“Saved ✓” when you get there']}},
+    dcounter:{sp:['health','study','goals'],ic:'🔢',c:'#f0b429',pv:'cnt',ln:['Місія','Mission'],
+      uk:{n:'Лічильник',s:'Будь-яке число з метою',d:'Слова, кілограми, сторінки, кілометри: число, мета й смужка, «−» і «＋» на віджеті.',st:['Назви лічильник і мету','Тисни «＋» або впиши число','Відсоток і смужка']},
+      en:{n:'Counter',s:'Any number with a target',d:'Words, kilos, pages, kilometres: a number, a target and a bar, “−” and “+” on the widget.',st:['Name it and set a target','Tap “+” or type a value','Percent and bar']}},
+    dphoto:{sp:['health','home','goals'],ic:'📸',c:'#ff7a9a',pv:'photo',ln:['Місія','Mission'],
+      uk:{n:'Фото-прогрес',s:'Було → стало',d:'Перше й останнє фото місії поруч — видно зміну, якої не помічаєш щодня.',st:['Додай перше фото','Фотографуй час від часу','Порівнюй «було → стало»']},
+      en:{n:'Photo progress',s:'Before → after',d:'The first and latest mission photos side by side — change you don’t notice day to day.',st:['Add the first photo','Take photos now and then','Compare before → after']}},
+    wgin:{sp:['money','work'],ic:'💚',c:'#22b573',pv:'in',ln:['Гаманець','Wallet'],
+      uk:{n:'Доходи',s:'Гроші цієї папки з ціллю',d:'Доходи з міткою папки цього місяця: основний, додатковий чи пасивний. Ціль місяця і «＋».',st:['Вибери тип доходу','«＋» — дохід у Гаманці з міткою','Смужка до цілі місяця']},
+      en:{n:'Income',s:'This folder’s money with a target',d:'This month’s folder-tagged income: main, side or passive. Monthly target and “+”.',st:['Choose the income type','“+” adds tagged income','Bar to the monthly target']}},
+    wgout:{sp:['money','home'],ic:'🧾',c:'#ff6a3d',pv:'out',ln:['Гаманець','Wallet'],
+      uk:{n:'Витрати',s:'Скільки пішло, з лімітом',d:'Витрати папки за місяць і ліміт. Біля межі смужка попереджає.',st:['Задай ліміт','«＋ витрата» — у Гаманець з міткою','Тримай межу']},
+      en:{n:'Spending',s:'What went out, with a limit',d:'The folder’s spending this month and a limit. Near the limit the bar warns you.',st:['Set a limit','“+ expense” goes to the Wallet','Stay under the line']}},
+    wgwallet:{sp:['money'],ic:'👛',c:'#7f8cff',pv:'wallet',ln:['Гаманець','Wallet'],
+      uk:{n:'Гаманець',s:'Баланс і прогноз місяця',d:'Баланс, прогноз місяця і кільця, «−» і «＋» прямо з віджета.',st:['Додай на сторінку','«−» витрата, «＋» дохід','Кільця — як іде місяць']},
+      en:{n:'Wallet',s:'Balance and month forecast',d:'Balance, month forecast and rings, “−” and “+” right from the widget.',st:['Add it to a page','“−” expense, “+” income','Rings show the month']}},
+    wgmission:{sp:['money','goals'],ic:'🎯',c:'#34c77b',pv:'mmoney',ln:['Гаманець','Wallet'],
+      uk:{n:'Гроші місії',s:'Дохід, бюджет і приз місії',d:'Скільки місія заробила і витратила, бюджет і приз.',st:['Повʼяжи місію','Мітка місії на операціях','Бюджет і приз — одним поглядом']},
+      en:{n:'Mission money',s:'Income, budget and prize of a mission',d:'What the mission earned and spent, its budget and prize.',st:['Link a mission','Tag operations with it','Budget and prize at a glance']}},
+    wgenv:{sp:['money','home'],ic:'✉️',c:'#f0a020',pv:'env',ln:['Гаманець','Wallet'],
+      uk:{n:'Конверти й платежі',s:'Оренда, звʼязок, підписки',d:'Сума в конвертах і найближчі платежі з Плану місяця.',st:['Розклади гроші по конвертах','Додай платежі','Найближчі — зверху']},
+      en:{n:'Envelopes & bills',s:'Rent, phone, subscriptions',d:'Money in envelopes and the next bills from the month plan.',st:['Split money into envelopes','Add bills','The nearest are on top']}},
+    wgdebt:{sp:['money'],ic:'⚖️',c:'#ff4d6d',pv:'debt',ln:['Гаманець','Wallet'],
+      uk:{n:'Борги й правила',s:'Хто кому винен',d:'Хто кому винен, скільки повернуто, і серія «без нових боргів».',st:['Запиши борг','Повертай частинами','Тримай серію правил']},
+      en:{n:'Debts & rules',s:'Who owes whom',d:'Who owes whom, what’s been repaid, and your “no new debt” streak.',st:['Record a debt','Repay in parts','Keep the rules streak']}},
+    tbl:{sp:['work','study','health'],ic:'▦',c:'#34c3b0',pv:'tbl',ln:['Планер (колонка)','Planner (column)'],
+      uk:{n:'Таблиця',s:'Колонки, статуси, дати, графік',d:'Колонки: текст, число, галочка, дата, статус. Перемикається на Дошку й Календар, рахує «Разом».',st:['Додай — одразу Назва, Статус, Дата','Статус тапом, дата з календаря','Таблиця · Дошка · Календар']},
+      en:{n:'Table',s:'Columns, statuses, dates, chart',d:'Columns: text, number, checkbox, date, status. Switches to Board and Calendar, sums totals.',st:['Add — Name, Status, Date are ready','Status by tap, date from a calendar','Table · Board · Calendar']}},
+    weekreview:{sp:['study','work','goals'],ic:'✨',c:'#9b8cff',pv:'ai',ln:['Флоу AI','Flow AI'],
+      uk:{n:'Огляд тижня',s:'Флоу підсумовує сторінку',d:'Флоу читає записи сторінки і пише короткий підсумок. Оновлюється лише за натисканням.',st:['Додай огляд','Натисни «Оновити»','Читай і дій']},
+      en:{n:'Week review',s:'Flow sums up the page',d:'Flow reads the page and writes a short summary. Refreshes only when you tap.',st:['Add the review','Tap “Refresh”','Read and act']}},
+    ai:{sp:['study','work'],ic:'🤖',c:'#9b8cff',pv:'ai',ln:['Флоу AI','Flow AI'],
+      uk:{n:'Флоу AI',s:'AI-дія з цією сторінкою',d:'Попроси Флоу щось зробити з цією сторінкою: підсумувати, розбити на кроки, переписати.',st:['Додай блок','Напиши, що зробити','Прийми або відкинь результат']},
+      en:{n:'Flow AI',s:'An AI action on this page',d:'Ask Flow to do something with this page: summarise, split into steps, rewrite.',st:['Add the block','Say what to do','Accept or discard']}}
+  };
+  var BS_REL={countdown:['dcount','dmission','dcal'],dcal:['dtime','tbl','countdown'],dtime:['dcal','tbl','dmission'],dmission:['dhabit','dsave','countdown'],dhabit:['dmission','dcounter','dphoto'],dcount:['countdown','dmission'],dsave:['wgin','dmission','wgenv'],dcounter:['dhabit','tbl','dphoto'],dphoto:['dhabit','dcounter','dmission'],wgin:['wgout','dsave','wgwallet'],wgout:['wgin','wgenv','wgdebt'],wgwallet:['wgin','wgout','wgenv'],wgmission:['dsave','dmission','wgin'],wgenv:['wgout','wgdebt','wgwallet'],wgdebt:['wgenv','wgout'],tbl:['dcal','dcounter','weekreview'],weekreview:['tbl','dmission'],ai:['weekreview','tbl']};
+  function bsLang(){ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } }
+  function bsT(it){ return it[bsLang()]||it.uk; }
+  /* «Ще» (29-more-screen.js) і меню блоків малюються ще ДО цього файлу, а функції в збірці «спливають» раніше за var —
+     тож поки BS_ITEMS не присвоєно, усе поводиться як «магазину ще нема»: усе взято, нових 0 */
+  function bsReady(){ return typeof BS_ITEMS==='object'&&BS_ITEMS!==null; }
+  function bsInStore(k){ return bsReady()&&Object.prototype.hasOwnProperty.call(BS_ITEMS,String(k||'')); }
+  function bsIsNew(k){ const it=bsReady()?BS_ITEMS[k]:null; return !!(it&&it.since&&String(it.since)>BS_BASE); }
+  // збережений вибір; null — людина ще не тапала (тоді все нинішнє взято)
+  function bsRaw(){ try{ const v=JSON.parse(localStorage.getItem(BS_KEY)||'null'); return v&&typeof v==='object'&&Array.isArray(v.got)?v:null; }catch(_){ return null; } }
+  function bsGot(k){ if(!bsInStore(k)) return true; const r=bsRaw(); return r?r.got.indexOf(k)>=0:!bsIsNew(k); }
+  function bsNewCount(){ if(!bsReady()) return 0; return Object.keys(BS_ITEMS).filter(k=>bsIsNew(k)&&!bsGot(k)).length; }
+  function bsSet(k,on){
+    if(!bsInStore(k)) return;
+    if(!bsTrusted()){ bsToast(bsLang()==='en'?'Syncing with the cloud — try again in a moment':'Звіряюсь із хмарою — спробуй за мить'); return false; }
+    const r=bsRaw(); let got=r?r.got.filter(x=>typeof x==='string'):Object.keys(BS_ITEMS).filter(x=>!bsIsNew(x));
+    got=got.filter(x=>x!==k); if(on) got.push(k);
+    try{ prefSet(BS_KEY,JSON.stringify({v:1,got,at:Date.now()})); }catch(_){}
+    try{ chHaptic(on?'medium':'select'); }catch(_){}
+    bsRedraw();
+  }
+  // bsGot / bsNewCount / bsOpen — функції верхнього рівня збірки, тож уже доступні як window.* для page-editor і «Ще».
+  // НЕ обгортати (window.bsOpen=o=>bsOpen(o)): у глобальній області це той самий запис — вийде безкінечний виклик.
+  // значення з хмари прийшло після старту — перемалювати відкриту вітрину
+  // на холодному старті сесії ще нема (prefCatchup бачить лише локальне) — доганяємо, коли вона зʼявилась і після звірок
+  var bsCatchAt=0;
+  function bsCatchup(){ const t=Date.now(); if(t-bsCatchAt<15000) return; bsCatchAt=t; try{ prefCatchup(BS_KEY,()=>bsRedraw()); }catch(_){} }
+  bsCatchup();
+  try{ document.addEventListener('flowsbready',()=>{ bsCatchAt=0; bsCatchup(); }); document.addEventListener('flowsync',bsCatchup); }catch(_){}
+  // поки хмара не звірена (є вхід, а дані ще не довірені) — не пишемо: список цілком затер би вибір з іншого пристрою
+  function bsTrusted(){ try{ return typeof window.sbDataTrusted!=='function'||window.sbDataTrusted(); }catch(_){ return true; } }
+
+  /* ── прев'ю з прикладними даними (не дані людини) ── */
+  function bsPv(k,sz){
+    const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en', c=it.c, s=sz==='s';
+    const h=(a)=>`<span class="bsw-h"><i style="background:${c}"></i>${a||esc(t.n)}</span>`;
+    const big=(v,u)=>`<b class="bsw-big">${v}<small>${u||''}</small></b>`, sub=v=>`<small class="bsw-sub">${v}</small>`;
+    const bar=p=>`<span class="bsw-bar"><i style="width:${p}%;background:${c}"></i></span>`;
+    let x='';
+    switch(it.pv){
+      case 'cd': x=h()+`<b class="bsw-n">${en?'New Year':'Новий рік'}</b>`+(s?big(44,en?'days':'днів')+sub('02:10:05'):`<span class="bsw-flip">${[['44',en?'days':'дні'],['02',en?'hours':'год'],['10',en?'min':'хв'],['05',en?'sec':'с']].map(u=>`<span><span class="bsw-fd">${u[0].split('').map(d=>`<i>${d}</i>`).join('')}</span><small>${u[1]}</small></span>`).join('')}</span>`); break;
+      case 'cal': { let g=''; for(let d=1;d<=30;d++) g+=`<span class="${d===17?'td':d>17?'f':''}">${d}${[3,5,8,13,15,19,21].includes(d)?'<u></u>':''}</span>`;
+        x=s?h()+big(17,en?'Nov':'лист')+sub(en?'2 plans · run 18:00':'2 справи · біг 18:00'):h(en?'November':'Листопад')+`<span class="bsw-cal">${g}</span>`; break; }
+      case 'time': x=h()+big('2,5',en?'h':'год')+`<span class="bsw-tl"><i style="left:6%;width:12%;background:${c}"></i><i style="left:60%;width:14%;background:${c};opacity:.6"></i><b style="left:48%"></b></span>`+(s?'':sub(en?'18:00 · Easy run 6 km':'18:00 · Легкий біг 6 км')); break;
+      case 'mis': x=h()+`<span class="bsw-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="tr"/><circle cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="62 100" style="stroke:${c}"/></svg><b>62%</b></span>`+(s?'':sub(en?'Next: sign up for the race':'Далі: зареєструватись на забіг')); break;
+      case 'hab': x=h()+big(12,en?'days':'днів')+`<span class="bsw-d7">${[1,1,1,1,1,0,0].map(o=>`<i style="${o?'background:'+c:''}"></i>`).join('')}</span>`; break;
+      case 'dcount': x=h()+big(31,en?'days left':'день лишилось')+(s?'':sub(en?'Half marathon · Dec 19':'Півмарафон · 19 грудня')); break;
+      case 'save': x=h()+big('8 400',en?'of 12 000 ₴':'з 12 000 ₴')+bar(70)+(s?'':sub(en?'Sneakers · 70%':'Кросівки · 70%')); break;
+      case 'cnt': x=h()+`<b class="bsw-n">${en?'Pages in English':'Сторінок англійською'}</b>`+big('214','/ 300')+bar(71); break;
+      case 'photo': x=h()+`<span class="bsw-ba"><i style="background:linear-gradient(160deg,#5b4a3a,#2b2420)"></i><i style="background:linear-gradient(160deg,#ffb36b,#c04d8f)"></i></span>`+(s?'':sub(en?'12 photos · 78 days':'12 фото · 78 днів')); break;
+      case 'in': x=h()+big('18 500','₴')+bar(74)+sub(en?'target 25 000':'ціль 25 000'); break;
+      case 'out': x=h()+big('3 920',en?'of 5 000 ₴':'з 5 000 ₴')+bar(78)+sub(en?'1 080 ₴ left':'лишилось 1 080 ₴'); break;
+      case 'wallet': x=h()+big('12 340','₴')+sub(en?'forecast +4 100 by month end':'прогноз +4 100 до кінця місяця'); break;
+      case 'mmoney': x=h()+big('+6 200','₴')+bar(55)+sub(en?'budget 11 000 · prize: trip':'бюджет 11 000 · приз: подорож'); break;
+      case 'env': x=h()+big('9 600',en?'₴ in envelopes':'₴ у конвертах')+(s?'':`<span class="bsw-row"><b>${en?'Rent':'Оренда'}</b><span>${en?'Dec 1 · 8 000':'1 груд · 8 000'}</span></span>`); break;
+      case 'debt': x=h()+big('−1 200',en?'₴ net':'₴ нетто')+bar(40)+(s?'':sub(en?'🔥 12 days without new debt':'🔥 12 днів без нових боргів')); break;
+      case 'tbl': x=s?h()+`<b class="bsw-n">${en?'Workouts':'Тренування'}</b>`+big('44,2','km')+sub(en?'8 rows · 5 done':'8 рядків · 5 готово')
+        :h(en?'Workouts':'Тренування')+`<span class="bsw-tbl">${[[en?'Intervals':'Інтервали','17.11','5,2'],[en?'Easy run':'Легкий біг','15.11','7'],[en?'Long run':'Довга','13.11','12']].map(r=>`<span><b>${r[0]}</b><i>${r[1]}</i><em>${r[2]}</em></span>`).join('')}</span>`; break;
+      case 'ai': x=h()+`<span class="bsw-ai">${en?'<b>Week:</b> 3 of 4 runs, longest 12 km. Not ticked: “Buy gels”.':'<b>Тиждень:</b> 3 пробіжки з 4, найдовша — 12 км. Не відмічено «Купити гелі».'}</span>`; break;
+    }
+    return `<div class="bsw bsw-${sz}" aria-hidden="true">${x}</div>`;
+  }
+
+  /* ── вітрина ── */
+  var bsState={sph:'all',q:'',open:''};
+  function bsBtn(k,big){
+    const g=bsGot(k), en=bsLang()==='en';
+    return `<button class="bs-get${big?' big':''}${g?' got':''}" data-bsget="${esc(k)}" aria-pressed="${g}">${g?(big?(en?'In menu ✓':'У меню ✓'):'✓'):(en?'Get':'Отримати')}</button>`;
+  }
+  function bsRow(k){ const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en';
+    return `<div class="bs-app" role="button" tabindex="0" data-bsopen="${esc(k)}"><span class="bs-ico" style="--c:${it.c}">${it.ic}</span><span class="bs-tx"><b>${esc(t.n)}${bsIsNew(k)?`<span class="bs-new">${en?'NEW':'НОВЕ'}</span>`:''}</b><small>${esc(t.s)}</small></span>${bsBtn(k)}</div>`; }
+  function bsHomeHTML(){
+    const en=bsLang()==='en', q=bsState.q.trim().toLowerCase(), keys=Object.keys(BS_ITEMS);
+    const match=k=>{ const t=bsT(BS_ITEMS[k]); return !q||(t.n+' '+t.s+' '+(BS_ITEMS[k].uk.n)).toLowerCase().includes(q); };
+    const sp=bsState.sph, inSp=k=>sp==='all'||BS_ITEMS[k].sp.includes(sp);
+    let h=`<div class="bs-chips" role="group">${BS_SPH.map(s=>`<button class="bs-chip${sp===s[0]?' on':''}" data-bssph="${s[0]}">${en?s[2]:s[1]}</button>`).join('')}</div>`;
+    if(q||sp!=='all'){ const L=keys.filter(k=>match(k)&&inSp(k));
+      return h+(L.length?`<div class="bs-shelf">${L.map(bsRow).join('')}</div>`:`<p class="bs-empty">${en?'Nothing found':'Нічого не знайшлось'}</p>`); }
+    // прибрані людиною (не нові) — одразу зверху: сюди веде рядок «Ще N блоків у Магазині» з меню «＋ Блок»
+    const off=keys.filter(k=>!bsGot(k)&&!bsIsNew(k));
+    if(off.length) h+=`<div class="bs-sh"><b>${en?'Removed from the menu':'Прибрані з меню'}</b></div><div class="bs-shelf">${off.map(bsRow).join('')}</div>`;
+    const f=keys.find(k=>bsIsNew(k)&&!bsGot(k))||'countdown', ft=bsT(BS_ITEMS[f]);
+    h+=`<button class="bs-feat" data-bsopen="${f}"><span class="bs-eyebrow">${bsIsNew(f)?(en?'New':'Нове'):(en?'Pick of the week':'Вибір тижня')}</span><b>${esc(ft.n)}</b><small>${esc(ft.d)}</small>${bsPv(f,'m')}</button>`;
+    [['health',en?'For health':'Для здоровʼя'],['money',en?'Money under control':'Гроші під контролем'],['work',en?'Work & study':'Робота й навчання'],['goals',en?'Goals':'Цілі']].forEach(([s,title])=>{
+      const L=keys.filter(k=>BS_ITEMS[k].sp.includes(s)).slice(0,5);
+      h+=`<div class="bs-sh"><b>${title}</b><button data-bssph="${s}">${en?'All ›':'Усі ›'}</button></div><div class="bs-shelf">${L.map(bsRow).join('')}</div>`; });
+    return h;
+  }
+  function bsPageHTML(k){
+    const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en', g=bsGot(k), sp=BS_SPH.find(s=>s[0]===it.sp[0])||BS_SPH[0];
+    return `<div class="bs-dh"><span class="bs-ico lg" style="--c:${it.c}">${it.ic}</span><div class="bs-dtx"><h3>${esc(t.n)}</h3><small>${esc(t.s)}</small>
+        <div class="bs-acts">${bsBtn(k,true)}${g?`<button class="bs-rm" data-bsrm="${esc(k)}">${en?'Remove from menu':'Прибрати з меню'}</button>`:''}</div></div></div>
+      <div class="bs-info"><div><small>${en?'Area':'Сфера'}</small><b>${en?sp[2]:sp[1]}</b></div><div><small>${en?'Linked to':'Звʼязок'}</small><b>${esc(it.ln[en?1:0])}</b></div><div><small>${en?'Sizes':'Розміри'}</small><b>S·M·L</b></div><div><small>${en?'Offline':'Офлайн'}</small><b>✓</b></div></div>
+      <div class="bs-sec"><b>${en?'How it looks':'Як виглядає'}</b><small>${en?'Example data':'Приклад, не твої дані'}</small></div>
+      <div class="bs-shots"><div class="bs-shot"><small>${en?'Small':'Малий'}</small>${bsPv(k,'s')}</div><div class="bs-shot m"><small>${en?'Wide':'Широкий'}</small>${bsPv(k,'m')}</div><div class="bs-shot m"><small>${en?'Large':'Великий'}</small>${bsPv(k,'l')}</div></div>
+      <div class="bs-sec"><b>${en?'What it does':'Що робить'}</b></div><p class="bs-desc">${esc(t.d)}</p>
+      <div class="bs-sec"><b>${en?'How it works':'Як працює'}</b></div><div class="bs-steps">${t.st.map((s,i)=>`<div><i style="--c:${it.c}">${i+1}</i><span>${esc(s)}</span></div>`).join('')}</div>
+      <div class="bs-sec"><b>${en?'Goes well with':'Поєднується з'}</b></div><div class="bs-rel">${(BS_REL[k]||[]).filter(bsInStore).map(r=>`<button data-bsopen="${r}"><span class="bs-ico" style="--c:${BS_ITEMS[r].c}">${BS_ITEMS[r].ic}</span>${esc(bsT(BS_ITEMS[r]).n)}</button>`).join('')}</div>
+      <p class="bs-note">${en?'“Get” adds the block to the “+ Block” menu. “Remove” hides it from the menu — where it already stands, it keeps working.':'«Отримати» кладе блок у меню «＋ Блок». «Прибрати» ховає з меню — там, де блок уже стоїть, він працює далі.'}</p>`;
+  }
+  function bsRedraw(){
+    const ov=document.getElementById('bsOv'); if(!ov) return;
+    const en=bsLang()==='en', body=ov.querySelector('.bs-body'), y=body.scrollTop;
+    const k=bsState.open, page=k&&bsInStore(k);
+    ov.querySelector('.bs-title').textContent=page?'':(en?'Block store':'Магазин блоків');
+    ov.querySelector('[data-bsback]').textContent=page?(en?'‹ Store':'‹ Магазин'):(en?'‹ Back':'‹ Назад');
+    ov.querySelector('.bs-search').hidden=!!page;
+    body.innerHTML=page?bsPageHTML(k):bsHomeHTML();
+    body.scrollTop=y;
+  }
+  function bsToast(t){ try{ plToast(t); }catch(_){} }
+  function bsOpen(o){
+    if(!bsReady()) return;
+    o=o||{}; bsState={sph:o.sph||'all',q:'',open:o.k&&bsInStore(o.k)?o.k:''};
+    let ov=document.getElementById('bsOv'); if(ov) ov.remove();
+    const en=bsLang()==='en';
+    ov=document.createElement('div'); ov.id='bsOv'; ov.className='bs-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('data-i18n-skip','1');
+    ov.innerHTML=`<div class="bs-top"><button class="bs-back" data-bsback></button><b class="bs-title"></b><span class="bs-sp"></span><button class="bs-x" data-bsx aria-label="${en?'Close':'Закрити'}">✕</button></div>
+      <div class="bs-search"><input type="search" id="bsQ" placeholder="${en?'Blocks, areas, “timer”…':'Блоки, сфери, «таймер»…'}" aria-label="${en?'Search blocks':'Пошук блоків'}"></div>
+      <div class="bs-body"></div>`;
+    document.body.appendChild(ov);
+    const close=()=>{ ov.remove(); };
+    ov.addEventListener('click',e=>{
+      const t=e.target;
+      if(t.closest('[data-bsx]')){ close(); return; }
+      if(t.closest('[data-bsback]')){ if(bsState.open){ bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); } else close(); return; }
+      const g=t.closest('[data-bsget]'); if(g){ e.stopPropagation(); const k=g.dataset.bsget, on=!bsGot(k); if(bsSet(k,on)===false) return; if(on) bsToast(en?'In the “+ Block” menu ✓':'Є в меню «＋ Блок» ✓'); return; }
+      const rm=t.closest('[data-bsrm]'); if(rm){ if(bsSet(rm.dataset.bsrm,false)===false) return; bsToast(en?'Removed from the menu — still works in folders':'Прибрано з меню — у папках працює далі'); return; }
+      const s=t.closest('[data-bssph]'); if(s){ bsState.sph=s.dataset.bssph; bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
+      const op=t.closest('[data-bsopen]'); if(op){ bsState.open=op.dataset.bsopen; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
+    });
+    ov.addEventListener('keydown',e=>{ if(e.key==='Escape'){ close(); return; } if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-bsopen]')&&e.target.tagName!=='BUTTON'){ e.preventDefault(); e.target.click(); } });
+    ov.querySelector('#bsQ').addEventListener('input',e=>{ bsState.q=e.target.value.slice(0,60); bsRedraw(); });
+    bsRedraw();
+    setTimeout(()=>{ try{ ov.querySelector('[data-bsback]').focus(); }catch(_){} },30);
+  }
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
@@ -39645,15 +40181,22 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ssearch=document.getElementById('pgSlashSearch'),backdrop=document.getElementById('pgBackdrop');
   var srail=document.getElementById('pgstRail');
   var pgsCat='base', pgsSel=0, pgsShown=[];
+  /* магазин блоків (core/62-block-store.js): у меню лише взяті; базові блоки поза магазином — завжди */
+  function pgsGotOk(i){ try{ return typeof window.bsGot!=='function'||window.bsGot(i.k); }catch(_){ return true; } }
+  function pgsMatch(i,f){
+    if(i.t.toLowerCase().includes(f)||i.d.toLowerCase().includes(f)) return true;
+    var syn=PGS_SYN[i.k];
+    if(syn) for(var s=0;s<syn.length;s++){ if(syn[s].toLowerCase().includes(f)) return true; }
+    return false;
+  }
+  // скільки невзятих блоків цього розділу (чи пошуку) лежить у магазині — для рядка «Ще … в Магазині»
+  function pgsHiddenN(f){ f=(f||'').toLowerCase().trim();
+    return CATALOG.filter(function(i){ return !pgsGotOk(i)&&(f?pgsMatch(i,f):i.cat===pgsCat); }).length; }
+  function pgsShopOpen(){ try{ closeSlash(); }catch(_){} try{ if(typeof window.bsOpen==='function') window.bsOpen({}); }catch(_){} }
   function pgsFiltered(f){
     f=(f||'').toLowerCase().trim();
-    if(f) return CATALOG.filter(function(i){
-      if(i.t.toLowerCase().includes(f)||i.d.toLowerCase().includes(f)) return true;
-      var syn=PGS_SYN[i.k];
-      if(syn) for(var s=0;s<syn.length;s++){ if(syn[s].toLowerCase().includes(f)) return true; }
-      return false;
-    });
-    return CATALOG.filter(function(i){return i.cat===pgsCat;});
+    if(f) return CATALOG.filter(function(i){ return pgsGotOk(i)&&pgsMatch(i,f); });
+    return CATALOG.filter(function(i){return i.cat===pgsCat&&pgsGotOk(i);});
   }
   function buildRail(){
     srail.innerHTML='';
@@ -39663,13 +40206,18 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       el.onclick=function(){pgsCat=c.id;ssearch.value='';buildSlash('');};
       srail.appendChild(el);
     });
+    var shop=document.createElement('div'); shop.className='pgst-cat pgs-shop';
+    var nn=0; try{ nn=typeof window.bsNewCount==='function'?window.bsNewCount():0; }catch(_){}
+    shop.innerHTML='🛍 Магазин'+(nn?'<b>'+nn+'</b>':''); shop.setAttribute('role','button'); shop.tabIndex=0;
+    shop.onclick=pgsShopOpen; shop.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pgsShopOpen(); } };
+    srail.appendChild(shop);
   }
   function buildSlash(f){
     pgsShown=pgsFiltered(f); pgsSel=0;
     buildRail(); slist.innerHTML='';
     if(!f&&pgsCat==='base'){
       var rk=pgRecentGet();
-      var recentItems=rk.map(function(k){return CATALOG.filter(function(c){return c.k===k;})[0];}).filter(Boolean);
+      var recentItems=rk.map(function(k){return CATALOG.filter(function(c){return c.k===k;})[0];}).filter(function(i){ return i&&pgsGotOk(i); });
       if(recentItems.length){
         var rhead=document.createElement('div'); rhead.className='pg-ssec'; rhead.textContent='Нещодавні';
         slist.appendChild(rhead);
@@ -39693,6 +40241,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       };
       slist.appendChild(el);
     });
+    var hid=pgsHiddenN(f);
+    if(hid){ var more=document.createElement('div'); more.className='pg-sitem pgs-more'; more.setAttribute('role','button'); more.tabIndex=0;
+      more.textContent='＋ Ще '+hid+' '+(typeof pluralUk==='function'?pluralUk(hid,'блок','блоки','блоків'):'блоків')+' в Магазині ›';
+      more.onclick=function(e){ e.stopPropagation(); pgsShopOpen(); }; slist.appendChild(more); }
   }
   /* один тап — одразу вставка (делегування: стабільно працює на iOS); працює й для «Нещодавні» — той самий data-k */
   slist.addEventListener('click',function(e){
@@ -40480,7 +41032,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
              function(){var i=dArr.indexOf(dBlk);if(i>-1)dArr.splice(i,1);});
     }
     else if(act==='dup'){
-      var cp=JSON.parse(JSON.stringify(loc.block));(function reid(x){x.id=uid();(x.children||[]).forEach(function(c){if(c&&typeof c==='object')reid(c);});})(cp);   /* нові id і вкладеним — інакше ⚙ копії міг змінити оригінал */
+      var cp=JSON.parse(JSON.stringify(loc.block));(function reid(x){x.id=uid();delete x.cv;/* місце на полотні (61-folder-canvas.js) — дубль ляже сам, а не під оригінал */(x.children||[]).forEach(function(c){if(c&&typeof c==='object')reid(c);});})(cp);   /* нові id і вкладеним — інакше ⚙ копії міг змінити оригінал */
       var uArr=loc.arr,origBlk=loc.block;
       uArr.splice(loc.idx+1,0,cp);
       pushOp(function(){var i=uArr.indexOf(cp);if(i>-1)uArr.splice(i,1);},
@@ -46260,12 +46812,13 @@ html.t-flat.t-light #scr-home .summary:not(.has-wish) .hweek i.on b{background:v
 /* варіант A (15.11.2026): Профіль · Вигляд · Мій день · Дані і приватність · Про застосунок · Розширені */
 #scr-more [data-sec="profile"]{order:1;}
 #scr-more [data-sec="look"]{order:2;}
-#scr-more [data-sec="day"]{order:3;}
-#scr-more [data-sec="data"]{order:4;}
-#scr-more [data-sec="about"]{order:5;}
-#scr-more [data-sec="adv"]{order:6;}
-#scr-more [data-sec="lite"]{order:7;}
-#scr-more [data-sec="dev"]{order:8;}
+#scr-more [data-sec="blocks"]{order:3;}   /* «Блоки» — магазин блоків (62-block-store.js, 18.11.2026) */
+#scr-more [data-sec="day"]{order:4;}
+#scr-more [data-sec="data"]{order:5;}
+#scr-more [data-sec="about"]{order:6;}
+#scr-more [data-sec="adv"]{order:7;}
+#scr-more [data-sec="lite"]{order:8;}
+#scr-more [data-sec="dev"]{order:9;}
 #scr-more .acc-zero-list,#scr-more .acc-adv-list{display:flex;flex-direction:column;gap:6px;}
 #scr-more .acc-zero-list .acc-row,#scr-more .acc-adv-list .acc-row{padding-left:6px;}
 #scr-more .acc-zero-list[hidden],#scr-more .acc-adv-list[hidden]{display:none;}
@@ -46375,6 +46928,8 @@ html.t-flat.t-light #scr-home .summary:not(.has-wish) .hweek i.on b{background:v
   #scr-more[data-msec="data"] .mr-grp[data-sec="data"],
   #scr-more[data-msec="look"] .mr-sl[data-sec="look"],
   #scr-more[data-msec="look"] .mr-grp[data-sec="look"],
+  #scr-more[data-msec="blocks"] .mr-sl[data-sec="blocks"],
+  #scr-more[data-msec="blocks"] .mr-grp[data-sec="blocks"],
   #scr-more[data-msec="pet"] .mr-sl[data-sec="pet"],
   #scr-more[data-msec="pet"] .mr-grp[data-sec="pet"],
   #scr-more[data-msec="ai"] .mr-sl[data-sec="ai"],
