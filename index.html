@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-17-1850-d04eb2c';
+  var BUILD='2026-11-18-0614-2b8c5ae';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -6443,6 +6443,68 @@
   .fhv-empty{align-self:stretch;text-align:center;padding:40px 16px;display:flex;flex-direction:column;gap:6px;color:var(--pg-mut,var(--muted));}
   .fhv-empty b{color:var(--pg-fg,var(--text));font-size:17px;}
   #scr-page.fh-v-chat #pgAddBlock{display:none !important;}
+  /* записи-картки в стрічці: живі віджети, прев'ю таблиці (17.11.2026, 36-chats.js fhRich) */
+  .fhm-rich{align-self:stretch;margin-left:auto;width:100%;max-width:520px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;padding:8px;
+    border-radius:20px 20px 6px 20px;background:color-mix(in srgb,var(--pg-acc,var(--accent)) 10%,var(--pg-surface,var(--card)));color:var(--pg-fg,var(--text));}
+  .fhm-rich .pgwg{padding:0;}
+  .fhm-rich .pgwg .wg-t{max-width:none;}
+  .fhr-bar{display:flex;align-items:center;gap:6px;}
+  .fhr-open{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-height:36px;display:flex;align-items:center;padding:0 8px;border-radius:10px;
+    font-size:13.5px;font-weight:700;color:var(--pg-acc,var(--accent));-webkit-tap-highlight-color:transparent;}
+  .fhr-more{all:unset;box-sizing:border-box;cursor:pointer;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;color:var(--pg-mut,var(--muted));}
+  .fhr-more svg{width:18px;height:18px;}
+  .fhr-open:focus-visible,.fhr-more:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:1px;}
+  .fhr-h{display:flex;align-items:baseline;gap:8px;padding:4px 6px 0;min-width:0;}
+  .fhr-h b{font-size:15.5px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fhr-h small{margin-left:auto;font-size:12px;color:var(--pg-mut,var(--muted));white-space:nowrap;}
+  .fhr-ic{color:var(--pg-acc,var(--accent));}
+  .fhr-tw{overflow-x:auto;}
+  .fhr-t{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .fhr-t th{text-align:left;font-size:11.5px;font-weight:700;color:var(--pg-mut,var(--muted));padding:6px;border-bottom:1px solid var(--pg-edge,var(--line));white-space:nowrap;}
+  .fhr-t td{padding:8px 6px;border-bottom:1px solid var(--pg-edge,var(--line));max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fhr-t tr:last-child td{border-bottom:0;}
+  .fhr-empty{padding:6px 8px;font-size:13.5px;color:var(--pg-mut,var(--muted));}
+  .fhr-gen{padding:8px 8px 2px;font-size:15.5px;font-weight:800;}
+  .fh-peek{position:fixed;z-index:60;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;align-items:center;gap:6px;
+    border:0;border-radius:999px;padding:9px 16px 9px 11px;font:inherit;font-size:14px;font-weight:800;cursor:pointer;
+    background:var(--pg-acc,var(--accent));color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.35);}
+  .fh-peek svg{width:18px;height:18px;}
+  .fh-peek:focus-visible{outline:2px solid var(--pg-fg,var(--text));outline-offset:2px;}
+
+  /* ── «Обкладинка, що тане» (17.11.2026, 36-chats.js fhMelt; макет «Папка в склі», A) ──
+     --melt від 0 до 1 ставить скрипт, поки шапка йде за край екрана. */
+  #scr-page.pg-fhero #pgHero{height:calc(300px + env(safe-area-inset-top));}
+  #pgHero .ch-cov-bg{transform:translateY(calc(var(--melt,0) * 28%)) scale(calc(1 + var(--melt,0) * .08));
+    filter:blur(calc(var(--melt,0) * 12px)) brightness(calc(1 - var(--melt,0) * .35));will-change:transform,filter;}
+  #pgHero .ch-cov-title{opacity:calc(1 - var(--melt,0) * 1.4);}
+  #pgHero .ch-cov-top{opacity:calc(1 - var(--melt,0) * 2);}
+  #scr-page.fh-bar #pgHero .ch-cov-top{visibility:hidden;}
+  /* кнопки й лічильники на фото — рідке скло */
+  #pgHero .ch-ghost,#pgHero .ch-chip-photo,#pgHero .fh-chip{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.24);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.3);}
+  #pgHero .ch-ghost.acc{background:color-mix(in srgb,var(--accent) 85%,transparent);border-color:transparent;}
+  /* скляна смуга вгорі */
+  .fh-topbar{position:fixed;z-index:55;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;
+    padding:calc(8px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left));
+    background:color-mix(in srgb,var(--pg-surface,var(--card)) 72%,transparent);color:var(--pg-fg,var(--text));
+    -webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
+    box-shadow:inset 0 -1px 0 color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);
+    opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .2s,transform .2s;}
+  #scr-page.fh-bar .fh-topbar{opacity:1;transform:none;pointer-events:auto;}
+  .fh-topbar b{flex:1;min-width:0;text-align:center;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fh-topbar .ch-ghost{border:0;background:color-mix(in srgb,var(--pg-fg,var(--text)) 8%,transparent);color:var(--pg-fg,var(--text));
+    -webkit-backdrop-filter:none;backdrop-filter:none;}
+  .fh-topbar .ch-ghost.acc{background:var(--accent);color:#fff;}
+  .fh-topbar .ch-ghost:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  #scr-page.fh-bar .fh-peek{top:calc(env(safe-area-inset-top,0px) + 66px);}
+  @media (min-width:1024px){
+    #scr-page.pg-fhero #pgHero{height:260px;}
+    .fh-topbar{border-radius:0 0 18px 18px;}   /* left/width — над колонкою документа, ставить fhMelt */
+  }
+  @media (prefers-reduced-motion:reduce){
+    #pgHero .ch-cov-bg{transform:none;filter:none;}
+    .fh-topbar{transition:none;}
+  }
   .fhv-wall{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
   .fhv-tile{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;border-radius:14px;background:var(--pg-surface,var(--card)) center/cover no-repeat;}
   .fhv-tile.add{display:grid;place-items:center;border:1.5px dashed var(--pg-edge,var(--line));color:var(--pg-mut,var(--muted));background:transparent;}
@@ -8410,6 +8472,73 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .wd-gal figcaption button{all:unset;cursor:pointer;min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:10px;}
   .wd-gal figcaption button:focus-visible{outline:2px solid var(--accent);}
   @media (min-width:1024px){ .wd-gal{grid-template-columns:repeat(3,minmax(0,1fr));} }
+
+  /* ════════ «Тихе скло» (17.11.2026, макет «Віджети в склі», варіант B) ════════
+     Лише вигляд: одна скляна поверхня для «Даних» і «Грошей». Колір віджета тепер акцент (--wc у «Грошей», --fc у «Даних»),
+     а не заливка на весь віджет. Подвійний клас .wg-t.wg-t — щоб перекрити кольорові .c-* без !important.
+     Без розмиття (старий рушій чи «Зменшити прозорість» в iOS) — звичайна суцільна поверхня. */
+  .wg-t.c-wallet{--wc:#7f8cff;} .wg-t.c-mission{--wc:var(--mc,#34c77b);} .wg-t.c-env{--wc:#f0a020;} .wg-t.c-debt{--wc:#ff4d6d;}
+  .wg-t.c-in{--wc:#22b573;} .wg-t.c-out{--wc:#ff6a3d;} .wg-t.c-work{--wc:#3aa6c9;}
+  .wg-t.wg-t{--gl-fg:var(--pg-fg,var(--text));--gl-mut:var(--pg-mut,var(--muted));color:var(--gl-fg);border:0;border-radius:26px;
+    background:linear-gradient(180deg,color-mix(in srgb,#fff 6%,transparent),transparent 42%),color-mix(in srgb,var(--pg-surface,var(--card)) 74%,transparent);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 16%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--gl-fg) 9%,transparent),0 10px 26px -16px rgba(0,0,0,.5);}
+  .wg-t.wg-t::after{display:none;}
+  .wg-t.wg-t .wg-hit:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:-2px;}
+  /* «Гроші»: назва кольором віджета, одне велике число, решта тихо */
+  .wg-t.wg-t .wg-h{color:var(--wc,var(--gl-mut));opacity:1;text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:700;}
+  .wg-t.wg-t .wg-big{font-size:30px;letter-spacing:-.02em;} .wg-t.wg-t .wg-big.sm{font-size:18px;}
+  .wg-t.wg-t small{color:var(--gl-mut);opacity:1;} .wg-t.wg-t small.wg-pz{color:var(--gl-fg);}
+  .wg-t.wg-t .wg-bar{background:var(--pg-track,rgba(127,127,127,.2));}
+  .wg-t.wg-t .wg-bar i{background:var(--wc,var(--pg-acc,var(--accent)));opacity:1;}
+  .wg-t.wg-t .wg-bar i.over{background:var(--pg-danger,#ff4d6d);box-shadow:none;}
+  .wg-t.wg-t .wg-r::before{background:conic-gradient(var(--wc,var(--accent)) calc(var(--p)*1%),var(--pg-track,rgba(127,127,127,.2)) 0);}
+  .wg-t.wg-t .wg-acts button{background:color-mix(in srgb,var(--wc,var(--accent)) 18%,transparent);color:var(--gl-fg);}
+  .wg-t.wg-t .wg-li{background:color-mix(in srgb,var(--gl-fg) 6%,transparent);}
+  .wg-t.wg-t .wg-li i{color:var(--pg-danger,#d1483f);}
+  .wg-t.wg-t>.wg-cfg,.wg-t.wg-t .wg-rules{background:color-mix(in srgb,var(--gl-fg) 8%,transparent);}
+  /* «Дані»: заголовок без великих літер, число більше, ⚙ і кнопки без рамок */
+  .wg-t.wg-t.wd{padding:13px 13px 11px;}
+  .wg-t.wg-t .wd-h{font-size:12.5px;font-weight:700;letter-spacing:0;text-transform:none;}
+  .wg-t.wg-t .wd-big{font-size:32px;letter-spacing:-.02em;} .wg-t.wg-t .wd-big.sm{font-size:18px;}
+  .wg-t.wg-t .wd-cfg span{background:transparent;border:0;color:var(--gl-mut);}
+  .wg-t.wg-t .wd-acts button{border:0;background:color-mix(in srgb,var(--fc,var(--accent)) 16%,transparent);}
+  .wg-t.wg-t .wd-acts button.on{background:color-mix(in srgb,var(--fc,var(--accent)) 32%,transparent);}
+  /* календар як в Apple: дні без квадратиків, сьогодні — світла таблетка, навігація прозора */
+  .wg-t.wg-t .cal-nav button{border:0;min-height:32px;font-size:12.5px;background:color-mix(in srgb,var(--gl-fg) 7%,transparent);}
+  .wg-t.wg-t .cal-d{background:transparent;border-radius:12px;}
+  .wg-t.wg-t .cal-d.td{background:var(--gl-fg);color:var(--pg-surface,var(--card));}
+  .wg-t.wg-t .cal-d.td em{color:inherit;}
+  .wg-t.wg-t .cal-d.td i u{background:currentColor!important;}   /* !important — бо так само задано в базовому правилі вище */
+  @media (hover:hover){ .wg-t.wg-t .cal-d:not(.td):hover{background:color-mix(in srgb,var(--gl-fg) 7%,transparent);} }
+  /* «Відлік часу» (17.11.2026, 48-widgets.js tmHTML): флип 3D · велике число · кільця */
+  .tm-live{display:flex;flex-direction:column;gap:5px;pointer-events:none;min-width:0;}
+  .tm-flip{display:flex;flex-wrap:wrap;gap:10px 12px;margin-top:4px;}
+  .tm-u{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;}
+  .tm-u small{font-size:10.5px;font-weight:700;color:var(--pg-mut,var(--muted));white-space:nowrap;}
+  .tm-ds{display:flex;gap:3px;perspective:400px;}
+  .tm-d{font-style:normal;position:relative;width:26px;height:38px;border-radius:8px;display:grid;place-items:center;
+    font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--pg-fg,var(--text));transform-style:preserve-3d;
+    background:color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 14%,transparent);}
+  .tm-d::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.22);}
+  .tm-d.go{animation:tmflip .5s cubic-bezier(.3,.7,.3,1);}
+  @keyframes tmflip{from{transform:rotateX(80deg);filter:brightness(.6);}to{transform:none;filter:none;}}
+  .wg-t.wd.sz-l .tm-d{width:34px;height:50px;font-size:30px;border-radius:10px;}
+  .wg-t.wd.sz-s .tm-flip{gap:8px;} .wg-t.wd.sz-s .tm-d{width:22px;height:32px;font-size:18px;}
+  .tm-rings{display:flex;align-items:center;gap:14px;margin-top:2px;min-width:0;}
+  .tm-rings svg{width:92px;height:92px;flex:none;transform:rotate(-90deg);}
+  .wg-t.wd.sz-l .tm-rings svg{width:136px;height:136px;}
+  .tm-rings circle{fill:none;stroke-width:3.4;stroke-linecap:round;}
+  .tm-rings circle.tr{stroke:var(--pg-track,rgba(127,127,127,.2));}
+  .tm-lg{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--pg-fg,var(--text));}
+  .tm-lg span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tm-lg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+  .tm-rest{font-variant-numeric:tabular-nums;}
+  .tm-done{font-size:26px;}
+  .tm-dtrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px;}
+  @media (prefers-reduced-motion:reduce){ .tm-d.go{animation:none;} }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .wg-t.wg-t{background:var(--pg-surface,var(--card));} }
+  @media (prefers-reduced-transparency:reduce){ .wg-t.wg-t{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--pg-surface,var(--card));} }
   /* ════════ «Стартовий набір» — порожній Огляд нової людини (53-starter.js, 10.10.2026) ════════
      Банер Карти бажань → колаж мрій; сітка папок → 4 приклади + Журнал + «Зробити своїм».
      Кольори лише з токенів теми; текст на фото — білий під затемненням знизу. */
@@ -8846,6 +8975,94 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   @media (min-width:1024px){
     .md-hero{padding:18px 20px 16px;}
     .md-q{font-size:32px;}
+  }
+  /* ════════ Ядро — Сузір'я (59-core-screen.js, 17.11.2026) ════════
+     Одна смілива річ — саме небо: зірки-цілі й лінії до всього, що до них веде.
+     Усе довкола тихе: заголовок, одна картка «Наступний крок», шторка вузла.
+     Кольори — лише токени теми; підйом карток — токени «Глибини» (20-depth.css) з запасом на старі теми. */
+  #scr-core{max-width:560px;}
+  .cr-top{display:flex;align-items:center;justify-content:space-between;min-height:44px;}
+  .cr-h1{margin:10px 0 4px;font-size:28px;font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere;}
+  .cr-mu{color:var(--muted);}
+  .cr-wait{color:var(--muted);padding:40px 0;text-align:center;}
+
+  .cr-sky{position:relative;width:100%;max-width:460px;margin:6px auto 30px;aspect-ratio:1/1.08;}
+  .cr-sky svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+  .cr-sky line{stroke:color-mix(in srgb,var(--text) 14%,transparent);stroke-width:1.2;vector-effect:non-scaling-stroke;}
+  .cr-sky line.dash{stroke-dasharray:3 4;stroke:color-mix(in srgb,var(--text) 10%,transparent);}
+
+  .cr-me{position:absolute;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;
+    display:grid;place-items:center;font-size:12px;color:var(--muted);background:var(--card-2);border:1px solid var(--line);}
+
+  .cr-star{all:unset;box-sizing:border-box;position:absolute;transform:translate(-50%,-50%);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent;--c:var(--accent);}
+  .cr-dot{box-sizing:border-box;width:var(--s,64px);height:var(--s,64px);border-radius:50%;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:1px;text-align:center;padding:6px;
+    background:var(--dp-card,var(--card));border:1.5px solid var(--c);box-shadow:var(--dp-shadow,none);transition:transform .15s ease-out;}
+  .cr-dot b{font-size:15px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;}
+  .cr-dot small{font-size:11px;color:var(--muted);line-height:1.15;max-width:100%;overflow:hidden;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere;}
+  .cr-lab{position:absolute;top:100%;margin-top:6px;width:104px;text-align:center;font-size:12px;line-height:1.25;color:var(--text);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;}
+  .cr-star.lg{--s:84px;} .cr-star.lg .cr-dot b{font-size:18px;}
+  .cr-star.md{--s:66px;}
+  .cr-star.sm{--s:58px;} .cr-star.sm .cr-lab{color:var(--muted);}
+  .cr-star.xl{--s:116px;} .cr-star.xl .cr-dot{background:var(--dp-hero,var(--card-2));border-width:2px;}
+  .cr-star.xl .cr-dot b{font-size:26px;letter-spacing:-.02em;}
+  .cr-star.k-steps{--c:var(--accent);}
+  .cr-star.k-money{--c:var(--owed);}
+  .cr-star.k-time{--c:color-mix(in srgb,var(--accent) 55%,var(--text));}
+  .cr-star.k-folder,.cr-star.k-chats{--c:color-mix(in srgb,var(--text) 28%,transparent);}
+  .cr-star.empty .cr-dot{background:transparent;box-shadow:none;border-style:dashed;border-color:color-mix(in srgb,var(--text) 22%,transparent);}
+  .cr-star.empty .cr-dot b{color:var(--muted);font-weight:600;}
+  .cr-star:active .cr-dot{transform:scale(.94);}
+  .cr-star:focus-visible .cr-dot{outline:2px solid var(--accent);outline-offset:3px;}
+
+  .cr-hint{margin:-8px 0 14px;text-align:center;font-size:13px;color:var(--muted);}
+  .cr-rest{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:18px;}
+  .cr-rest .cr-mu{font-size:13px;width:100%;}
+  .cr-chip{all:unset;box-sizing:border-box;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border-radius:14px;
+    font-size:13px;background:var(--card-2);border:1px solid var(--line);}
+  .cr-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .cr-card{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:18px;margin-bottom:18px;
+    background:var(--dp-card,var(--card));border:1px solid var(--line);box-shadow:var(--dp-shadow,none);}
+  .cr-card small{font-size:12px;color:var(--muted);}
+  .cr-card b{font-size:17px;font-weight:700;overflow-wrap:anywhere;}
+  .cr-sec,.cr-pri{all:unset;box-sizing:border-box;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;
+    align-self:flex-start;padding:0 16px;border-radius:14px;font-size:14px;font-weight:700;}
+  .cr-sec{background:var(--card-2);color:var(--text);}
+  .cr-pri{background:var(--accent);color:#fff;}
+  .cr-sec:focus-visible,.cr-pri:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .cr-empty{display:flex;flex-direction:column;gap:10px;padding:36px 4px;}
+  .cr-empty h2{margin:0;font-size:22px;font-weight:800;}
+  .cr-empty p{margin:0 0 6px;color:var(--muted);line-height:1.5;}
+
+  /* шторка вузла: над нижньою панеллю, під safe-area */
+  .cr-ov{position:fixed;inset:0;z-index:9500;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0);transition:background .2s;}
+  .cr-ov.show{background:rgba(0,0,0,.5);}
+  .cr-sheet{box-sizing:border-box;width:100%;max-width:560px;max-height:calc(100% - env(safe-area-inset-top) - 24px);overflow:auto;
+    background:var(--dp-card,var(--card));color:var(--text);border-radius:24px 24px 0 0;border:1px solid var(--line);border-bottom:0;
+    padding:10px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(100%);transition:transform .22s ease-out;}
+  .cr-ov.show .cr-sheet{transform:none;}
+  .cr-grip{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 6px;}
+  .cr-sh-top{display:flex;align-items:center;justify-content:space-between;min-height:44px;}
+  .cr-sh-top h2{margin:0;font-size:15px;font-weight:600;color:var(--muted);}
+  .cr-x{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--muted);}
+  .cr-sh-v{font-size:26px;font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere;}
+  .cr-sh-sub{margin:4px 0 0;color:var(--muted);line-height:1.45;overflow-wrap:anywhere;}
+  .cr-act{all:unset;box-sizing:border-box;cursor:pointer;width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;
+    gap:10px;padding:0 2px;border-top:1px solid var(--line);margin-top:10px;font-size:15px;}
+  .cr-act span{color:var(--muted);font-size:20px;}
+  .cr-act.do{color:var(--accent);font-weight:700;}   /* дія з даними (через реєстр) — акцентом; перехід — з › */
+  .cr-x:focus-visible,.cr-act:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (min-width:1024px){
+    .cr-ov{align-items:center;}
+    .cr-sheet{border-radius:24px;border-bottom:1px solid var(--line);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .cr-ov,.cr-sheet,.cr-dot{transition:none;}
   }
 </style>
 <style id="diary-css">
@@ -9731,6 +9948,15 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <button class="my-add" id="myAdd">＋ Ціль</button>
     </div>
     <div id="myYearBody"></div>
+  </section>
+
+  <!-- Ядро — Сузір'я (59-core-screen.js, 38-core.css): цілі зірками, довкола все, що до них привʼязане -->
+  <section class="screen" id="scr-core">
+    <div class="cr-top">
+      <button class="back" id="crBack">‹ Ще</button>
+    </div>
+    <h1 class="cr-h1" id="crTitle">Ядро</h1>
+    <div id="crBody"></div>
   </section>
 
   <section class="screen" id="scr-more">
@@ -22292,17 +22518,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const par=(typeof parent==='string' && folders[parent]) ? parent : '';
     inputModal({ title:par?('Нова папка в «'+folders[par].name+'»'):'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'', emojiPh:'📁',
       emojiPicks:['📁','🇬🇧','✨','📱','🛍','💰','🎨','📚','💪','🎯','🏡','🎬'],
-      onOk:(name, emojiVal)=>{
-        const used=order.length;
-        const nm = name || ('Папка '+(used+1));
-        const key='f_'+Date.now();
-        const em=(emojiVal!==undefined?(emojiVal||'📁'):FOLDER_EMOJIS[used%FOLDER_EMOJIS.length]);   // порожнє поле — 📁 (як підказка)
-        folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length],
-          emoji:em, icon:folderIconFor(em),
-          name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
-        if(par) folders[key].parent=par;
-        order.push(key);
-        saveFolders(); renderDashboard();
+      onOk:async (name, emojiVal)=>{
+        // створення — через реєстр дій Ядра (60-core-actions.js, 17.11.2026): та сама папка (назва за замовч.,
+        // 📁 для порожнього поля, колір по колу), плюс перевірка «папки цієї сесії прочитано»
+        const r=await window.Core.run('folder.create',{name, emoji:emojiVal, parent:par},{undo:false});
+        if(!r.ok) return;
+        const key=r.key;
         if(opts&&typeof opts.onCreated==='function'){ try{ opts.onCreated(key); }catch(_){} return; }
         if(par){ const act=document.querySelector('.screen.active');
           if(act&&act.id==='scr-page'&&pgBarFolder()===par){ try{ renderPgLinks(); }catch(_){} }
@@ -22700,6 +22921,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       });
       m.querySelectorAll('[data-lkv]').forEach(b=>b.onclick=()=>{
         const v=b.dataset.lkv; lkView[fk]=(v==='feed')?'feed':'doc';
+        try{ if(typeof fhPeekEnd==='function') fhPeekEnd(); }catch(_){}   // свідомий вибір вигляду закінчує «Відкрити в документі»
         if(v!=='feed'&&typeof fhView==='function'&&fhView(fk)!==v){ try{ fhSetView(fk,v); }catch(_){} }   // вибір людини — зберігається в папці
         try{ renderPgLinks(); }catch(_){} try{ if(typeof fhApplyView==='function') fhApplyView(); }catch(_){}
         m.querySelectorAll('[data-lkv]').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on); });
@@ -27540,6 +27762,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const DEV_ROWS=[
       {k:'upgrade', ic:'dna',  c:'violet', t:'Апгрейд',          d:'Персонаж, сфери, заявлений шлях'},
       {k:'misto',   ic:'city', c:'blue',   t:'Гра «Місто дня»',  d:'Прототип: місто, персонаж, друзі'},
+      {k:'core',    ic:'compass', c:'violet', t:'Ядро',          d:'Сузірʼя: цілі й усе, що до них веде'},
     ];
     const ico=(n,c)=>(window.stgIco?window.stgIco(n,c):'');
     const chev=()=>'<span class="mr-chev">'+(window.stgSvg?window.stgSvg('chev'):'›')+'</span>';
@@ -27595,6 +27818,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     function openMoreSheet(key){
       try{ window.platform.haptic('light'); }catch(_){}
       if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
+      if(key==='core'){ if(window.goCore) window.goCore(); return; }   // Ядро (59-core-screen.js), поки лише для розробника
       // гра — окрема сторінка поруч (src/web/misto.html), свої дані, назад — кнопкою з іконкою Frequency
       // без мережі не переходимо: воркер її не кешує, а в застосунку з екрана «Додому» на iPhone
       // зі сторінки «немає інтернету» нема кнопки «назад» — вийти можна лише закривши застосунок
@@ -30005,7 +30229,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const scr=document.getElementById('scr-page'), doc=scr&&scr.querySelector('.pg-doc'); if(!doc) return;
     let el=document.getElementById('pgHero');
     const fk=pgFolderKey(), f=fk?folders[fk]:null;
-    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero'); fhTitleHome(); fhApplyView(); return; }
+    if(!f){ if(el) el.hidden=true; scr.classList.remove('pg-fhero','fh-bar'); const ob=document.getElementById('fhBar'); if(ob) ob.remove(); fhTitleHome(); fhApplyView(); return; }
     if(!el){ el=document.createElement('div'); el.id='pgHero'; el.className='ch-cover fh'; doc.insertBefore(el,doc.firstChild); }
     el.hidden=false; scr.classList.add('pg-fhero');
     fhTitleHome();   // спершу винести #pgTitle: innerHTML нижче інакше знищив би поле назви разом зі старою шапкою
@@ -30028,8 +30252,34 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     on('more',()=>{ const m=document.getElementById('pgMoreBtn'); if(m) m.click(); });
     on('look',()=>fhLookSheet(fk));
     el.querySelectorAll('[data-fhs]').forEach(b=>b.onclick=()=>fhStatSheet(fk,b.dataset.fhs));
+    // скляна смуга вгорі: зʼявляється, коли обкладинка сховалась; кнопки — ті самі, що на обкладинці
+    let bar=document.getElementById('fhBar');
+    if(!bar){ bar=document.createElement('div'); bar.id='fhBar'; bar.className='fh-topbar'; scr.appendChild(bar); }
+    bar.innerHTML=`<button class="ch-ghost" data-fhb="back" aria-label="Назад">${chI('back')}</button><b data-i18n-skip="1">${esc(f.name||'')}</b>`
+      +`<button class="ch-ghost acc" data-fhb="add" aria-label="Додати">${chI('plus')}</button><button class="ch-ghost" data-fhb="more" aria-label="Ще дії">${chI('dots')}</button>`;
+    bar.querySelectorAll('[data-fhb]').forEach(b=>b.onclick=()=>{ const t=el.querySelector('[data-fh="'+b.dataset.fhb+'"]'); if(t) t.click(); });
     fhApplyView();
+    fhMelt();
   }
+  /* «Обкладинка, що тане» (17.11.2026, макет «Папка в склі», варіант A): коли гортаєш, фото розмивається й темніє,
+     а щойно шапка пішла за край — вгорі скляна смуга з назвою. Рахуємо від місця шапки на екрані, не від scrollTop:
+     гортає body, а на комп'ютері — інший контейнер, і так працює в обох. Лише вигляд, нічого не пише. */
+  let fhMeltRaf=0;
+  function fhMelt(){
+    fhMeltRaf=0;
+    const scr=document.getElementById('scr-page'), el=document.getElementById('pgHero');
+    if(!scr||!el||el.hidden||!scr.classList.contains('active')) return;
+    const h=el.offsetHeight||1, top=el.getBoundingClientRect().top;
+    el.style.setProperty('--melt',Math.max(0,Math.min(1,-top/(h*.75))).toFixed(3));
+    scr.classList.toggle('fh-bar',-top>h-72);
+    // комп'ютер: смуга лише над колонкою документа, не поверх бічної панелі
+    const bar=document.getElementById('fhBar');
+    if(bar){ if(innerWidth>=1024){ const r=el.parentElement.getBoundingClientRect(); bar.style.left=r.left+'px'; bar.style.width=r.width+'px'; bar.style.right='auto'; }
+      else { bar.style.left=''; bar.style.width=''; bar.style.right=''; } }
+  }
+  const fhMeltSoon=()=>{ if(!fhMeltRaf) fhMeltRaf=requestAnimationFrame(fhMelt); };
+  document.addEventListener('scroll',fhMeltSoon,{capture:true,passive:true});
+  window.addEventListener('resize',fhMeltSoon,{passive:true});
   // лише значки — після правок у документі, без перемальовування обкладинки
   let fhT=null;
   function fhSoon(){ clearTimeout(fhT); fhT=setTimeout(()=>{ const el=document.getElementById('pgHero'), fk=pgFolderKey();
@@ -30150,6 +30400,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function fhSetView(fk,v){
     const f=folders[fk]; if(!f) return;
     if(v==='chat'||v==='photo') f.view=v; else delete f.view;
+    fhPeek=''; fhPeekId='';
     saveFolders(); fhApplyView(); chHaptic('select');
   }
   // блок разом із масивом, де він лежить (для видалення), — і у вкладених теж
@@ -30161,17 +30412,64 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     return null;
   }
   function fhCommit(){ try{ fhBridge().save(); }catch(_){} try{ if(window.__pgRender) window.__pgRender(); }catch(_){} fhApplyView(); fhSoon(); }
+  /* ── записи-картки в стрічці (17.11.2026): живі віджети, прев'ю таблиці, «Відкрити в документі» ──
+     Картка лише показує: таблицю читає з b.cols/b.rows, нічого не пише. Пишуть тільки тапи у віджеті — його ж функціями. */
+  const FH_TEXTY={note:1,h1:1,h2:1,h3:1,bullet:1,num:1,quote:1,code:1,task:1};
+  function fhRich(b,inner){ const id=esc(b.id);
+    return `<div class="fhm-rich">${inner}<div class="fhr-bar"><button class="fhr-open" data-fhopen="${id}">Відкрити в документі ›</button>`
+      +`<button class="fhr-more" data-fhm="${id}" aria-label="Дії із записом">${chI('dots')}</button></div></div>`; }
+  function fhTblVal(c,v){
+    if(v==null||v==='') return '';
+    if(c.ty==='check') return v?'☑':'☐';
+    if(c.ty==='date'){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)); return m?m[3]+'.'+m[2]:fhPlain(v); }
+    if(c.ty==='num'){ const n=Number(v); return isFinite(n)?String(n).replace('.',','):''; }
+    return fhPlain(v);
+  }
+  function fhTblHTML(b){
+    const days=b.mode==='days';
+    const cols=(Array.isArray(b.cols)?b.cols:[]).filter(c=>c&&c.id&&c.ty!=='plan').slice(0,days?2:3);   // «🔗 з Планера» не зберігається — пропускаємо
+    let rows=[], meta='';
+    if(days){
+      const d=b.days&&typeof b.days==='object'?b.days:{};
+      const ks=Object.keys(d).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)&&d[k]&&typeof d[k]==='object').sort().reverse();
+      rows=ks.slice(0,3).map(k=>({c:d[k],day:k})); meta='рядки-дні';
+    } else {
+      const all=Array.isArray(b.rows)?b.rows.filter(r=>r&&r.c&&typeof r.c==='object'):[];
+      rows=all.filter(r=>cols.some(c=>fhTblVal(c,r.c[c.id])!=='')).slice(0,3);
+      meta=all.length+' '+pluralUk(all.length,'рядок','рядки','рядків');
+    }
+    const head=`<div class="fhr-h"><span class="fhr-ic" aria-hidden="true">▦</span><b data-i18n-skip="1">${esc(fhPlain(b.title)||'Таблиця')}</b><small>${meta}</small></div>`;
+    if(!rows.length) return head+`<div class="fhr-empty">Поки порожньо. Заповни в документі.</div>`;
+    const th=(days?'<th>День</th>':'')+cols.map(c=>`<th data-i18n-skip="1">${esc(fhPlain(c.t))}</th>`).join('');
+    const tr=rows.map(r=>'<tr>'+(days?`<td>${fhTblVal({ty:'date'},r.day)}</td>`:'')+cols.map(c=>`<td data-i18n-skip="1">${esc(fhTblVal(c,r.c[c.id]))}</td>`).join('')+'</tr>').join('');
+    return head+`<div class="fhr-tw"><table class="fhr-t"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`;
+  }
+  // «Відкрити в документі»: папка-чат тимчасово стає документом — лише в памʼяті, вибір «Чат» у папці не змінюється
+  let fhPeek='', fhPeekId='';
+  function fhPeekOpen(fk,id){ fhPeek=fk; fhPeekId=id; fhApplyView(); setTimeout(()=>fhFlash(id),60); }
+  function fhPeekEnd(){
+    if(!fhPeek) return; const id=fhPeekId; fhPeek=''; fhPeekId=''; fhApplyView();
+    let el=null; try{ el=document.querySelector('#fhView [data-fhopen="'+CSS.escape(String(id))+'"]'); }catch(_){}
+    if(el) el.closest('.fhm-rich').scrollIntoView({block:'center'});
+  }
   function fhBubble(b){
     const t=b.type, id=esc(b.id);
     if(t==='photo'&&b.data){ let u=''; try{ u=safeImg(b.data); }catch(_){}
       return `<button class="fhm fhm-ph" data-fhm="${id}"><img alt="" src="${esc(u)}">${b.title?`<span class="fhm-cap" data-i18n-skip="1">${esc(fhPlain(b.title))}</span>`:''}</button>`; }
     if(t==='task') return `<div class="fhm fhm-task${b.done?' done':''}"><button class="fh-box" data-fhdone="${id}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fhm-tx" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button></div>`;
+    // віджет — живий, тим самим wgFill, що й у документі (хост заповнює fhApplyView)
+    if(typeof wgIs==='function'&&wgIs(t)) return fhRich(b,`<div class="pgwg fhr-wg" data-wghost="${id}"></div>`);
+    if(t==='tbl') return fhRich(b,fhTblHTML(b));
+    // інший блок без власного тексту (дошка, тогл, вкладення…) — картка з назвою типу замість голого «Блок»
+    if(t!=='photo'&&!FH_TEXTY[t]&&!fhPlain(b.text!=null?b.text:b.title)) return fhRich(b,`<div class="fhr-gen" data-i18n-skip="1">${esc(fhLabel(b))}</div>`);
     const head=(t==='h1'||t==='h2'||t==='h3');
     return `<button class="fhm${head?' fhm-h':''}" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button>`;
   }
   function fhChatHTML(arr){
     // усі записи, і вкладені теж — у стрічці нічого не ховається
-    const list=[]; fhWalk(arr,b=>{ if(b.type!=='subs'&&b.type!=='divider') list.push(b); });
+    // контейнер без власного тексту (дошка віджетів, колонки) не показуємо — його вміст і так іде окремими записами
+    const shell=b=>Array.isArray(b.children)&&b.children.length&&!fhPlain(b.text!=null?b.text:b.title);
+    const list=[]; fhWalk(arr,b=>{ if(b.type!=='subs'&&b.type!=='divider'&&!shell(b)) list.push(b); });
     if(!list.length) return `<div class="fhv-empty"><b>Тут поки тихо</b><span>Напиши внизу — кожне повідомлення стане записом папки.</span></div>`;
     let h='', day='';
     list.forEach(b=>{ const at=chTimeOf(b), d=chDayLabel(at); if(d!==day){ day=d; h+=`<div class="fhv-day">${esc(d)}</div>`; } h+=fhBubble(b); });
@@ -30187,8 +30485,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function fhApplyView(){
     const scr=document.getElementById('scr-page'), ed=document.getElementById('pgEditor'); if(!scr||!ed) return;
     const fk=pgFolderKey(), feed=scr.classList.contains('lk-feedmode');
-    const v=(fk&&!feed)?fhView(fk):'doc';
+    if(fhPeek&&fhPeek!==fk){ fhPeek=''; fhPeekId=''; }   // інша папка — «підгляд» документа скінчився
+    const peeking=!!(fk&&!feed&&fhPeek===fk&&fhView(fk)==='chat');
+    const v=(fk&&!feed)?(peeking?'doc':fhView(fk)):'doc';
     scr.classList.toggle('fh-v-chat',v==='chat'); scr.classList.toggle('fh-v-photo',v==='photo');
+    let chip=document.getElementById('fhPeekBack');
+    if(peeking&&!chip){ chip=document.createElement('button'); chip.id='fhPeekBack'; chip.type='button'; chip.className='fh-peek';
+      chip.innerHTML=chI('back')+'<span>До чату</span>'; chip.onclick=fhPeekEnd; scr.appendChild(chip); }
+    if(!peeking&&chip) chip.remove();
     let box=document.getElementById('fhView');
     if(v==='doc'){ if(box) box.remove(); fhWallSig=''; if(!feed) ed.hidden=false; return; }
     if(!box){ box=document.createElement('div'); box.id='fhView'; ed.parentNode.insertBefore(box,ed); }
@@ -30197,6 +30501,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       ed.hidden=true; box.className='fhv fhv-chat'; box.innerHTML=fhChatHTML(arr); fhWallSig='';
       box.querySelectorAll('[data-fhm]').forEach(el=>el.onclick=()=>fhMsgSheet(fk,el.dataset.fhm));
       box.querySelectorAll('[data-fhdone]').forEach(el=>el.onclick=()=>{ const r=fhFind(el.dataset.fhdone); if(!r) return; r.b.done=!r.b.done; chHaptic('select'); fhCommit(); });
+      box.querySelectorAll('[data-fhopen]').forEach(el=>el.onclick=()=>fhPeekOpen(fk,el.dataset.fhopen));
+      if(typeof wgFill==='function') box.querySelectorAll('[data-wghost]').forEach(h=>{ const r=fhFind(h.dataset.wghost); if(r) wgFill(h,r.b,fk); });
       return;
     }
     ed.hidden=false; box.className='fhv';
@@ -30218,7 +30524,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       `<button class="ch-sheet-row" data-fx="folder"><span class="ic">${chI('folderPlus')}</span><span>В іншу папку<small>Копія запису</small></span></button>
        <button class="ch-sheet-row" data-fx="chat"><span class="ic">${chI('chat')}</span><span>Переслати в чат</span></button>
        ${b.type==='note'?`<button class="ch-sheet-row" data-fx="task"><span class="ic">${chI('task')}</span><span>Зробити завданням</span></button>`:''}
-       <button class="ch-sheet-row" data-fx="edit"><span class="ic">${chI('edit')}</span><span>${b.type==='photo'?'Підпис до фото':'Редагувати'}</span></button>
+       ${(b.type==='photo'||FH_TEXTY[b.type])?`<button class="ch-sheet-row" data-fx="edit"><span class="ic">${chI('edit')}</span><span>${b.type==='photo'?'Підпис до фото':'Редагувати'}</span></button>`:''}
        ${kids?`<div class="ch-sheet-row static"><span class="ic">${chI('trash')}</span><span>Видалити — у «Документі»<small>Усередині ще ${kids} ${pluralUk(kids,'запис','записи','записів')}</small></span></div>`
          :`<button class="ch-sheet-row danger" data-fx="del"><span class="ic">${chI('trash')}</span><span>Видалити</span></button>`}`,
       (ov,close)=>{
@@ -30308,7 +30614,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // блок «Чати папки» малюється при кожному відкритті документа
     if(typeof window.openFlowPage==='function' && !window.openFlowPage.__chats){
       const orig=window.openFlowPage;
-      const wrapped=function(opts){ orig(opts); try{ renderPgLinks(); }catch(e){ console.error('pgLinks',e); } try{ fhRender(); }catch(e){ console.error('pgHero',e); } };
+      const wrapped=function(opts){
+        // «підгляд» документа живе, поки папка відкрита: нове відкриття (інша папка чи повернення) — знову чат
+        let was=null; try{ const s=document.getElementById('scr-page'); was=s&&s.classList.contains('active')?pgFolderKey():null; }catch(_){}
+        orig(opts);
+        try{ if(pgFolderKey()!==was){ fhPeek=''; fhPeekId=''; } }catch(_){}
+        try{ renderPgLinks(); }catch(e){ console.error('pgLinks',e); } try{ fhRender(); }catch(e){ console.error('pgHero',e); } };
       wrapped.__chats=true; window.openFlowPage=wrapped;
     }
     // значки в шапці папки рахуються наново після кожного збереження документа
@@ -33162,19 +33473,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           }
           if(sv>0) plToast('У «'+env.name+'» лише '+money(sv,cur)+' — записано як «'+env.name+'» з вільних грошей');
         }
-        const op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type, amount, label, date:ymdLocal(), card:mainCard().id };
-        // конверт вибрано, але грошей у ньому мало: гроші йдуть з вільних, а категорія лишається (12.10.2026).
-        // Лише env БЕЗ envId — це не рух конверта, баланс списує як звичайну витрату; wlMonthCats бачить «Продукти»
-        if(env) op.env=String(env.name||'').slice(0,60);
-        if(cur!==mainCur()) op.cur=cur;
-        else if(gid&&wlGoal(gid)) op.goalId=String(gid);
-        if(fk&&wlFolderName(fk)) op.folderKey=fk;
-        if(type==='in'&&src!=='main') op.src=src;
-        finOps.push(op); saveFinOps(); ov.remove(); renderFinance();
-        try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджети в папці й на Огляді
-        try{ flowReact(type==='in'?'income':'spend',{amount}); }catch(_){}
-        try{ if(typeof rlOnOp==='function') rlOnOp(op); }catch(err){ console.error('rlOnOp',err); }   // правила: скарбничка / зарплата / бюджет
-        if(env&&envSaved(env)<=0) setTimeout(()=>{ try{ wlEnvEmptyOffer(env,cur); }catch(err){ console.error('wlEnvEmptyOffer',err); } },350);
+        /* Запис — через реєстр дій Ядра (60-core-actions.js, 17.11.2026): той самий обʼєкт операції,
+           ті самі правила (rlOnOp), віджети й реакція, плюс перевірка «дані прочитано». Ту саму дію кличе Ядро
+           і (етап 3) Флоу. Конверт без envId — лише категорія: баланс списує як звичайну витрату. */
+        if(ov.__busy) return; ov.__busy=true;
+        window.Core.run(type==='in'?'money.income':'money.expense',
+          {amount, label, env:env?String(env.name||''):'', cur, goalId:gid, folderKey:fk, src}, {undo:false}).then(r=>{
+          ov.__busy=false; if(!r.ok) return;
+          ov.remove();
+          if(env&&envSaved(env)<=0) setTimeout(()=>{ try{ wlEnvEmptyOffer(env,cur); }catch(err){ console.error('wlEnvEmptyOffer',err); } },350);
+        }).catch(err=>{ ov.__busy=false; console.error('Core.run money',err); });   // кнопка «Записати» не має завмерти
       };
     });
   }
@@ -34137,7 +34445,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1};   // d* — «Дані» (нижче)
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -34309,18 +34617,22 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     dcount:{t:'Відлік до мети', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата'],['next','Наступна віха']]},
     dsave:{t:'Скарбничка місії', h:'Скарбничка', ic:'🐷', per:null, show:[['bar','Смужка'],['spent','Витрачено на місію'],['add','Кнопка «＋ ₴»']]},
     dcounter:{t:'Лічильник місії', h:'Лічильник', ic:'🔢', per:null, show:[['bar','Смужка'],['minus','Кнопка «−»']]},
-    dphoto:{t:'Фото-прогрес', h:'Фото', ic:'📸', per:null, show:[['dates','Дати під фото'],['count','Скільки фото й днів']]}
+    dphoto:{t:'Фото-прогрес', h:'Фото', ic:'📸', per:null, show:[['dates','Дати під фото'],['count','Скільки фото й днів']]},
+    /* відлік часу (17.11.2026): старий блок countdown — тепер віджет; своя дата, без місії (tmHTML нижче) */
+    countdown:{t:'Відлік часу', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата під цифрами']]}
   };
   const wdCalYm={};   // місяць, який гортає віджет «Календар папки» (лише памʼять)
   function wdIs(t){ return Object.prototype.hasOwnProperty.call(WD_META,String(t||'')); }
-  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto')?'m':'s'); }
+  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
   function wdInit(b,k){
     b.type=k; b.sz=wdSz(b); b.gw=WD_SZ[b.sz].gw; b.gh=WD_SZ[b.sz].gh;
     if(WD_META[k].per&&!b.period) b.period=k==='dtime'?'day':'week';
-    delete b.text; return b;
+    delete b.text;
+    if(k==='countdown'){ const bid=b.id; setTimeout(()=>{ try{ tmCfg(bid); }catch(_){} },450); }   // новий відлік — одразу спитати назву й дату
+    return b;
   }
   // місія віджета: обрана в налаштуваннях (не архівна) → інакше місія цієї папки
   function wdGoal(b,fk){
@@ -34383,6 +34695,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   function wdHTML(b,fk){
     const t=b.type, sz=wdSz(b), td=ymdLocal();
+    if(t==='countdown') return tmHTML(b,fk);
     if(t==='dmission'){
       const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
       const pct=jnPct(g), nx=wdNext(g), due=wdDue(g), dl=due?wdDaysLeft(due):null;
@@ -34731,6 +35044,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // ── ⚙ налаштування віджета: Розмір · Джерело · Період · Показувати · Видалити ──
   function wdCfg(id){
     let b=null; try{ b=getBlock(id); }catch(_){} if(!b||!wdIs(b.type)) return;
+    if(b.type==='countdown') return tmCfg(id);   // у відліку своя шторка: дата, напрям, одиниці, стиль
     const m=WD_META[b.type], fk=wgCtxFolder(), fm=wgFolderMission(fk), goals=(b.type==='dtime'||b.type==='dcal')?[]:wlMissions();
     let sz=wdSz(b), per=wdPer(b), gid=b.goalId&&goals.some(g=>String(g.id)===String(b.goalId))?String(b.goalId):'';
     const show={}; m.show.forEach(([k])=>{ show[k]=wdOn(b,k); });
@@ -34795,6 +35109,155 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // дані прийшли з хмари / з іншого пристрою — віджети оновлюються самі (як колись 33-home-widgets.js)
   // лише ключі, що й так живуть сирими в localStorage (FLOW_RAW_KEYS) — prefCatchup кладе значення туди
   try{ ['fin_ops','goals_data'].forEach(k=>prefCatchup(k,()=>{ try{ wgRefresh(); }catch(_){} })); }catch(_){}
+
+  /* ════════ «Відлік часу» (17.11.2026): старий блок countdown став віджетом «Даних» ════════
+     Блок зберігає лише свої налаштування. Старі поля лишились тими самими (їх пишуть агент Флоу і шаблони сфер):
+     title — назва, target 'YYYY-MM-DD' — дата. Нові — лише після «Зберегти» в ⚙: tm 'HH:MM', dir 'up' (від дати),
+     units [y,mo,w,d,h,mi,s], sty 'huge'|'rings' (типово флип), yearly — щороку. Без нових полів відлік рахує як раніше:
+     до дати о 00:00, дні · год · хв · с. Тікання раз на секунду лише перемальовує цифри — нічого не пише. */
+  const TM_U=['y','mo','w','d','h','mi','s'], TM_DEF=['d','h','mi','s'];
+  const TM_N={y:['рік','роки','років'],mo:['місяць','місяці','місяців'],w:['тиждень','тижні','тижнів'],d:['день','дні','днів'],
+    h:['година','години','годин'],mi:['хвилина','хвилини','хвилин'],s:['секунда','секунди','секунд']};
+  const TM_SH={y:'р',mo:'міс',w:'тиж',d:'дн',h:'год',mi:'хв',s:'с'};
+  const TM_MS={w:6048e5,d:864e5,h:36e5,mi:6e4,s:1e3};
+  const TM_STY=[['flip','Флип 3D'],['huge','Велике число'],['rings','Кільця']];
+  function tmCfgOf(b){
+    const dir=b.dir==='up'?'up':'down';
+    let units=Array.isArray(b.units)?TM_U.filter(u=>b.units.includes(u)):[]; if(!units.length) units=TM_DEF.slice();
+    return { target:/^\d{4}-\d{2}-\d{2}$/.test(b.target||'')?b.target:'', tm:/^([01]\d|2[0-3]):[0-5]\d$/.test(b.tm||'')?b.tm:'00:00',
+      dir, units, sty:TM_STY.some(s=>s[0]===b.sty)?b.sty:'flip', yearly:!!b.yearly&&dir==='down', date:wdOn(b,'date') };
+  }
+  function tmAt(c){ const [y,m,d]=c.target.split('-').map(Number), [h,mi]=c.tm.split(':').map(Number); return new Date(y,m-1,d,h,mi,0,0); }
+  // +n календарних місяців; 31 січня + 1 = 28/29 лютого (не 3 березня)
+  function tmAddM(dt,n){ const r=new Date(dt.getTime()), day=r.getDate(); r.setDate(1); r.setMonth(r.getMonth()+n);
+    r.setDate(Math.min(day,new Date(r.getFullYear(),r.getMonth()+1,0).getDate())); return r; }
+  // різниця a→b (a ≤ b) у вибраних одиницях, від найбільшої: роки й місяці календарні, решта — точні мілісекунди
+  function tmParts(a,b,units){
+    const out={}; let cur=a;
+    if(units.includes('y')||units.includes('mo')){
+      let mo=Math.max(0,(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth()-1);
+      while(tmAddM(a,mo+1)<=b) mo++;
+      if(units.includes('y')){ out.y=Math.floor(mo/12); if(units.includes('mo')) out.mo=mo%12; else mo=out.y*12; }
+      else out.mo=mo;
+      cur=tmAddM(a,(out.y||0)*12+(out.mo||0));
+    }
+    let rest=Math.max(0,b-cur);
+    ['w','d','h','mi','s'].forEach(k=>{ if(units.includes(k)){ out[k]=Math.floor(rest/TM_MS[k]); rest-=out[k]*TM_MS[k]; } });
+    return out;
+  }
+  // стан на «зараз»: дата (для «щороку» — найближча майбутня), чи вже настала, і розклад
+  function tmState(c,now){
+    let at=tmAt(c);
+    if(c.dir==='down'&&c.yearly){ let n=0; while(at<=now&&n<300){ at=new Date(at.getTime()); at.setFullYear(at.getFullYear()+1); n++; } }
+    const off=c.dir==='down'?at<=now:at>now;   // «до»: уже настала · «від»: ще не почалась
+    return {at, off, p:off?null:(c.dir==='down'?tmParts(now,at,c.units):tmParts(at,now,c.units))};
+  }
+  function tmDateTxt(at,c){ const ds=ymdLocal(at); return jnDateTxt(ds)+(ds.slice(0,4)!==ymdLocal().slice(0,4)?' '+ds.slice(0,4):'')+(c.tm!=='00:00'?', '+c.tm:''); }
+  const tmPad=(k,v)=>(k==='h'||k==='mi'||k==='s')?String(v).padStart(2,'0'):String(v);
+  // вміст живої частини віджета; el — щоб флип знав, які цифри змінились з минулої секунди
+  function tmInner(c,sz,el){
+    const st=tmState(c,new Date());
+    const dt=c.date?`<small class="wd-sub tm-dt">${c.dir==='down'?'':'з '}${esc(tmDateTxt(st.at,c))}${c.yearly?' · щороку':''}</small>`:'';
+    if(st.off) return c.dir==='down'?`<b class="wd-big tm-done">Настав! 🎉</b>${dt}`:`<b class="wd-big sm">Ще не почалось</b><small class="wd-sub">Старт ${esc(tmDateTxt(st.at,c))}</small>`;
+    let us=c.units.slice(); while(us.length>1&&!st.p[us[0]]) us.shift();   // нулі попереду не показуємо: «0 років 1 місяць» → «1 місяць»
+    if(sz==='s') us=us.slice(0,2);
+    const pl=k=>pluralUk(st.p[k],...TM_N[k]);
+    let sty=c.sty; if(sty==='rings'&&sz==='s') sty='huge';
+    if(sty==='huge'){
+      const k0=us[0], rest=us.slice(1).map(k=>tmPad(k,st.p[k])+' '+TM_SH[k]).join(' · ');
+      return `<span class="wd-cnt"><b class="wd-big xl">${st.p[k0]}</b><small class="wd-cap">${pl(k0)}</small></span>${rest?`<small class="wd-sub tm-rest">${rest}</small>`:''}${dt}`;
+    }
+    if(sty==='rings'){
+      const rk=us.slice(-3), cols=['var(--fc)','#ff7a9a','#5ee0cf'];
+      const max={y:100,mo:12,w:52,d:us.includes('w')?7:us.includes('mo')?31:365,h:24,mi:60,s:60};
+      const svg=rk.map((k,i)=>{ const r=16-i*4.5, f=Math.min(1,(st.p[k]%max[k])/max[k]);
+        return `<circle class="tr" cx="18" cy="18" r="${r}"/><circle cx="18" cy="18" r="${r}" pathLength="100" stroke="${cols[i]}" stroke-dasharray="${(f*100).toFixed(1)} 100"/>`; }).join('');
+      return `<span class="tm-rings"><svg viewBox="0 0 36 36" aria-hidden="true">${svg}</svg><span class="tm-lg">${us.map(k=>{ const i=rk.indexOf(k);
+        return `<span><i style="background:${i>=0?cols[i]:'var(--pg-track,rgba(127,127,127,.3))'}"></i>${tmPad(k,st.p[k])} ${pl(k)}</span>`; }).join('')}</span></span>${dt}`;
+    }
+    const prev=(el&&el.__tmPrev)||{}, now={};
+    const h=us.map(k=>{ const s=tmPad(k,st.p[k]);
+      return `<span class="tm-u"><span class="tm-ds">${s.split('').map((ch,i)=>{ const key=k+(s.length-i); now[key]=ch;
+        return `<i class="tm-d${prev[key]!==undefined&&prev[key]!==ch?' go':''}">${ch}</i>`; }).join('')}</span><small>${pl(k)}</small></span>`; }).join('');
+    if(el) el.__tmPrev=now;
+    return `<span class="tm-flip" role="timer" aria-label="${us.map(k=>st.p[k]+' '+pl(k)).join(', ')}">${h}</span>${dt}`;
+  }
+  function tmHTML(b,fk){
+    const c=tmCfgOf(b), sz=wdSz(b), nm=esc(String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60));
+    const hit=`<button class="wg-hit" data-wga="wdcfg" aria-label="Налаштувати відлік${nm?' «'+nm+'»':''}"></button>`;
+    if(!c.target) return wdTile(b,fk,`${hit}${wdHead(b,fk)}<b class="wd-name">${nm||'Новий відлік'}</b>
+      <small class="wd-sub">Вибери дату, і відлік почнеться</small><span class="wd-acts"><button data-wga="wdcfg">Вибрати дату</button></span>`,'empty');
+    tmStart();
+    const live=`<span class="tm-live" data-tg="${esc(c.target)}" data-tm="${esc(c.tm)}" data-dir="${c.dir}" data-u="${esc(c.units.join(','))}" data-sty="${c.sty}" data-sz="${sz}" data-yr="${c.yearly?1:''}" data-dt="${c.date?1:''}">${tmInner(c,sz,null)}</span>`;
+    return wdTile(b,fk,`${hit}${wdHead(b,fk,c.dir==='up'?'від дати':'')}${nm?`<b class="wd-name">${nm}</b>`:''}${live}`,'tmw');
+  }
+  // один таймер на весь застосунок: оновлює цифри всіх видимих відліків; налаштування — з data-* самої плитки
+  let tmTimer=0;
+  function tmTickAll(){
+    if(document.hidden) return;
+    document.querySelectorAll('.tm-live').forEach(el=>{
+      const d=el.dataset; if(!/^\d{4}-\d{2}-\d{2}$/.test(d.tg||'')) return;
+      const c={target:d.tg, tm:/^([01]\d|2[0-3]):[0-5]\d$/.test(d.tm||'')?d.tm:'00:00', dir:d.dir==='up'?'up':'down',
+        units:String(d.u||'').split(',').filter(u=>TM_U.includes(u)), sty:d.sty, yearly:d.yr==='1', date:d.dt==='1'};
+      if(!c.units.length) c.units=TM_DEF.slice();
+      const h=tmInner(c,d.sz,el); if(h!==el.__tmH){ el.__tmH=h; el.innerHTML=h; }
+    });
+  }
+  function tmStart(){ if(!tmTimer) tmTimer=setInterval(tmTickAll,1000); }
+  // ⚙ відліку: назва, дата й час, напрям, одиниці, стиль, розмір, «щороку»
+  function tmCfg(id){
+    let b=null; try{ b=getBlock(id); }catch(_){} if(!b||b.type!=='countdown') return;
+    const c=tmCfgOf(b), units=new Set(c.units); let sz=wdSz(b), dir=c.dir, sty=c.sty, yearly=c.yearly, date=c.date;
+    const nm=String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
+    jnOverlay(`<div class="jn-ed-h"><b>⏳ Відлік часу</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <label class="jn-f"><span>Назва</span><input id="tmName" type="text" maxlength="60" value="${esc(nm)}" placeholder="Новий рік, відпустка, без цукру…"></label>
+      <div class="tm-dtrow"><label class="jn-f"><span>Дата</span><input id="tmDate" type="date" value="${esc(c.target)}"></label>
+        <label class="jn-f"><span>Час</span><input id="tmTime" type="time" value="${esc(c.tm)}"></label></div>
+      <div class="jn-f"><span>Напрям</span><div class="wl-chips"><button data-tmdir="down" class="${dir==='down'?'on':''}">⏳ До дати</button><button data-tmdir="up" class="${dir==='up'?'on':''}">⏱ Від дати</button></div></div>
+      <div class="jn-f"><span>Що показувати</span><div class="wl-chips">${TM_U.map(u=>`<button data-tmu="${u}" class="${units.has(u)?'on':''}" aria-pressed="${units.has(u)}">${TM_N[u][2][0].toUpperCase()+TM_N[u][2].slice(1)}</button>`).join('')}</div></div>
+      <div class="jn-f"><span>Стиль</span><div class="wl-chips">${TM_STY.map(([k,l])=>`<button data-tmsty="${k}" class="${k===sty?'on':''}">${l}</button>`).join('')}</div></div>
+      <div class="jn-f"><span>Розмір</span><div class="wd-szs">${Object.keys(WD_SZ).map(k=>`<button data-wdsz="${k}" class="${k===sz?'on':''}" aria-pressed="${k===sz}"><i class="wd-szi ${k}"></i><b>${WD_SZ[k].t}</b><small>${WD_SZ[k].d}</small></button>`).join('')}</div></div>
+      <div class="jn-f"><div class="wd-tg">
+        <button data-tmyr role="switch" aria-checked="${yearly}" class="${yearly?'on':''}"><span>Щороку (день народження, річниця)</span><i></i></button>
+        <button data-tmdt role="switch" aria-checked="${date}" class="${date?'on':''}"><span>Дата під цифрами</span><i></i></button></div></div>
+      <div class="jn-ed-foot"><button class="jn-btn" data-tmok>Зберегти</button></div>
+      <button class="wd-del" data-tmdel>Видалити відлік</button>`, ov=>{
+      ov.classList.add('wd-ov');
+      const one=(sel,fn)=>ov.querySelectorAll(sel).forEach(x=>x.onclick=()=>{ fn(x); ov.querySelectorAll(sel).forEach(y=>{ y.classList.toggle('on',y===x); if(y.hasAttribute('aria-pressed')) y.setAttribute('aria-pressed',String(y===x)); }); });
+      one('[data-tmdir]',x=>{ dir=x.dataset.tmdir; });
+      one('[data-tmsty]',x=>{ sty=x.dataset.tmsty; });
+      one('[data-wdsz]',x=>{ sz=x.dataset.wdsz; });
+      ov.querySelectorAll('[data-tmu]').forEach(x=>x.onclick=()=>{ const u=x.dataset.tmu;
+        if(units.has(u)){ if(units.size===1){ plToast('Хоча б одна одиниця'); return; } units.delete(u); } else units.add(u);
+        x.classList.toggle('on',units.has(u)); x.setAttribute('aria-pressed',String(units.has(u))); });
+      const sw=(sel,get,set)=>{ const x=ov.querySelector(sel); x.onclick=()=>{ set(!get()); x.classList.toggle('on',get()); x.setAttribute('aria-checked',String(get())); }; };
+      sw('[data-tmyr]',()=>yearly,v=>{ yearly=v; });
+      sw('[data-tmdt]',()=>date,v=>{ date=v; });
+      ov.querySelector('[data-tmok]').onclick=()=>{
+        const ds=String(ov.querySelector('#tmDate').value||''), tm=String(ov.querySelector('#tmTime').value||'').slice(0,5);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)){ plToast('Вибери дату'); return; }
+        const q=getBlock(id); if(!q||q.type!=='countdown'){ ov.remove(); return; }
+        const name=String(ov.querySelector('#tmName').value||'').replace(/\s+/g,' ').trim().slice(0,60);
+        q.title=name; q.label=name; q.target=ds;   // label — старе поле підпису, тримаємо разом із назвою
+        if(/^([01]\d|2[0-3]):[0-5]\d$/.test(tm)&&tm!=='00:00') q.tm=tm; else delete q.tm;
+        if(dir==='up') q.dir='up'; else delete q.dir;
+        const us=TM_U.filter(u=>units.has(u)); if(us.join()===TM_DEF.join()) delete q.units; else q.units=us;
+        if(sty!=='flip') q.sty=sty; else delete q.sty;
+        if(yearly&&dir==='down') q.yearly=true; else delete q.yearly;
+        if(date) delete q.show; else q.show={date:false};
+        q.sz=sz; q.gw=WD_SZ[sz].gw; q.gh=WD_SZ[sz].gh;
+        saveBoard(); ov.remove(); wdRedraw();
+      };
+      // відлік сам і є своїми даними (назва + дата), тож видалення — з «Скасувати»
+      ov.querySelector('[data-tmdel]').onclick=()=>{
+        const arr=findParentArr(curBoard(),id), i=arr?arr.findIndex(x=>x&&String(x.id)===String(id)):-1;
+        if(i>=0){ const was=arr.splice(i,1)[0]; saveBoard();
+          flowUndoToast('Відлік прибрано',()=>{ if(arr.some(x=>x&&String(x.id)===String(was.id))) return; arr.splice(Math.min(i,arr.length),0,was); saveBoard(); wdRedraw(); }); }
+        ov.remove(); wdRedraw();
+      };
+      if(!c.target) setTimeout(()=>{ try{ ov.querySelector('#tmName').focus(); }catch(_){} },80);
+    });
+  }
 
   /* ── «Ще → Дані → Старі віджети»: прибрати старі фінансові блоки й проєкти Кабінету ──
      Лише рукою людини і лише коли сховище довірене (дані з хмари прочитано). Нічого не робить при старті.
@@ -37110,6 +37573,37 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         folders: Object.keys(folders||{}).length, chats: (chats||[]).length};
     }
 
+    /* ── Граф (етап 1, 17.11.2026): ціль — центр, до неї привʼязане все інше ──
+       Звʼязки беруться з наявних полів, формат даних не змінюється:
+         кроки — goal.steps (без авто-кроків, як jnPct); гроші — op.goalId (wlAgg з gid);
+         час — block.link.goalId за 7 днів; папка — goal.folderKey (moOwnFolder); чати — chat.folders. */
+    function coreGoalLinks(g){
+      const gid=String(g.id||''), ym=ymLocal();
+      const st=(g.steps||[]).filter(s=>s&&!s.auto);
+      const next=st.find(s=>!s.done&&s.name);
+      const m=wlAgg(wlMonthOps(ym), gid);
+      const p=plData(); let blocks=0, done=0;
+      for(let i=0;i<7;i++){ const d=new Date(); d.setDate(d.getDate()-i);
+        const l=Array.isArray(p.blocksByDay[ymdLocal(d)])?p.blocksByDay[ymdLocal(d)]:[];
+        l.forEach(b=>{ if(b&&b.link&&String(b.link.goalId||'')===gid){ blocks++; if(b.done) done++; } }); }
+      const fk=(g.folderKey&&moOwnFolder(g.folderKey))?String(g.folderKey):'';
+      let ch=[]; try{ if(fk) ch=chatsForFolder(fk).map(c=>({id:String(c.id), name:String(c.name||'')})); }catch(_){}
+      return {
+        steps:{done:st.filter(s=>s.done).length, total:st.length, next:next?String(next.name):'', nextId:next&&next.id!=null?String(next.id):''},
+        money:{ready:coreReady('fin_ops'), ym, inc:m.inc, out:m.out, net:m.inc-m.out},
+        time:{blocks, done},
+        folder:fk?{key:fk, name:String((folders[fk]&&folders[fk].name)||''), emoji:String((folders[fk]&&folders[fk].emoji)||'')}:null,
+        chats:ch
+      };
+    }
+    function graph(){
+      const goals=(goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)!=='archive')
+        .sort((a,b)=>(jnRole(a)==='main'?0:1)-(jnRole(b)==='main'?0:1)||(jnStatus(a)==='active'?0:1)-(jnStatus(b)==='active'?0:1))
+        .map(g=>({id:String(g.id), name:String(g.name||''), emoji:g.emoji||'', color:safeColor(g.color,''),
+          role:jnRole(g), status:jnStatus(g), pct:corePart(()=>jnPct(g))||0, links:corePart(()=>coreGoalLinks(g))}));
+      return {v:CORE_VERSION, ready:coreReady('goals_data'), goals};
+    }
+
     /* Один знімок на зараз. Нічого не кешує: дешевий, кличте коли треба. */
     function snapshot(){
       return {
@@ -37123,7 +37617,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         notes: corePart(coreNotes)
       };
     }
-    window.Core={ version:CORE_VERSION, snapshot };
+    window.Core={ version:CORE_VERSION, snapshot, graph };
   })();
   /* ════════ «Мої настрої» (58-moods.js, 16.11.2026) — кілька ритуалів замість одного ранку ════════
      Задум погоджено 16.11.2026, вигляд — другий варіант: на Карті бажань велика картка
@@ -37543,6 +38037,356 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     draw();
     ov.onclick=e=>{ if(e.target===ov) close(); };
   }
+  /* ════════ Екран «Ядро» — Сузір'я (59-core-screen.js, 17.11.2026) ════════
+     Задум погоджено 17.11.2026 (prompts/frequency-core.md, етап 1; макети — у чаті):
+       рівень 1 «Усе життя» — великі зірки = цілі (не архівні), головні більші;
+       рівень 2 «Мета»      — ціль у центрі, довкола все привʼязане: кроки, гроші, час, папка, чати;
+       рівень 3 «Вузол»     — шторка: значення + переходи в наявні екрани.
+     Дані — лише з Core.graph() (57-core.js), який тільки читає. Цей екран НІЧОГО не записує:
+     дії з даними (поповнити, повʼязати, створити) прийдуть з реєстром дій, етап 2.
+     Поки за воротами розробника: вхід — «Ще → Розробка → Ядро» (29-more-screen.js). */
+  (function(){
+    const crLang=()=>{ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } };
+    const CR_T={
+      uk:{title:'Ядро', life:'Усе життя', back:'Ще', backLife:'Усе життя', me:'я', wait:'Звіряємо з хмарою…',
+        emptyH:'Тут зʼявиться твоє сузірʼя', emptyP:'Кожна мета стане зіркою, а довкола неї — гроші, кроки, папки й час, що до неї ведуть.',
+        emptyGo:'Поставити мету', hint:'Торкнись зірки, щоб наблизитись', more:'Ще цілі',
+        steps:'кроки', money:'гроші', time:'час', folder:'папка', chats:'чати', link:'＋',
+        nextH:'Наступний крок', noNext:'Кроків ще нема — додай перший на сторінці місії.', openGoal:'Відкрити місію',
+        moneyH:'Гроші місії за місяць', moneySub:(i,o)=>'надійшло '+i+' · витрачено '+o, moneyWait:'Гаманець ще звіряється',
+        openWallet:'Відкрити Гаманець', timeH:'Час за 7 днів', timeV:(b,d)=>d+' з '+b+' справ зроблено', timeNone:'Справ місії за тиждень нема',
+        openJournal:'Відкрити тиждень у Журналі', stepsH:'Кроки місії', stepsV:(d,t)=>d+' з '+t,
+        folderH:'Папка місії', folderNone:'не привʼязано', folderHow:'Папку привʼязують на сторінці місії.', openFolder:'Відкрити папку',
+        chatsH:'Чати папки', openChat:n=>'Відкрити «'+n+'»', close:'Закрити', pct:'%', toGoal:'до мети',
+        markDone:n=>'Позначити «'+n+'» зробленим', addOut:'＋ Витрата для мети', addIn:'＋ Дохід для мети',
+        newFolder:'Створити папку для мети', folderPh:'Назва папки'},
+      en:{title:'Core', life:'Whole life', back:'More', backLife:'Whole life', me:'me', wait:'Syncing with the cloud…',
+        emptyH:'Your constellation will appear here', emptyP:'Each goal becomes a star, surrounded by the money, steps, folders and time that lead to it.',
+        emptyGo:'Set a goal', hint:'Tap a star to zoom in', more:'More goals',
+        steps:'steps', money:'money', time:'time', folder:'folder', chats:'chats', link:'＋',
+        nextH:'Next step', noNext:'No steps yet — add the first one on the mission page.', openGoal:'Open mission',
+        moneyH:'Mission money this month', moneySub:(i,o)=>'in '+i+' · out '+o, moneyWait:'Wallet is still syncing',
+        openWallet:'Open Wallet', timeH:'Time over 7 days', timeV:(b,d)=>d+' of '+b+' tasks done', timeNone:'No mission tasks this week',
+        openJournal:'Open the week in Journal', stepsH:'Mission steps', stepsV:(d,t)=>d+' of '+t,
+        folderH:'Mission folder', folderNone:'not linked', folderHow:'Link a folder on the mission page.', openFolder:'Open folder',
+        chatsH:'Folder chats', openChat:n=>'Open “'+n+'”', close:'Close', pct:'%', toGoal:'of the goal',
+        markDone:n=>'Mark “'+n+'” done', addOut:'＋ Expense for this goal', addIn:'＋ Income for this goal',
+        newFolder:'Create a folder for this goal', folderPh:'Folder name'}
+    };
+    const crT=k=>CR_T[crLang()][k];
+    let crGoalId='';                       // '' — рівень «Усе життя», інакше — відкрита мета
+    const CR_MAX=8;                        // більше зірок на 375 px — каша; решта — рядком нижче
+
+    function crGoalObj(id){ return (goalsData.goals||[]).find(g=>g&&String(g.id)===String(id))||null; }
+    function crMoney(n){ try{ return money(n); }catch(_){ return String(Math.round(n)); } }
+    /* точка на колі навколо центру (50,50) у відсотках «неба» */
+    function crAt(i,n,r,start){ const a=(start==null?-90:start)+360*i/Math.max(1,n); const rad=a*Math.PI/180;
+      return {x:50+r*Math.cos(rad), y:50+r*Math.sin(rad)}; }
+    function crLine(a,b,dash){ return '<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"'+(dash?' class="dash"':'')+'/>'; }
+    function crStar(o){   // o: {x,y,cls,act,id,c,big,small,label,aria}
+      return '<button class="cr-star '+(o.cls||'')+'" style="left:'+o.x.toFixed(1)+'%;top:'+o.y.toFixed(1)+'%'+(o.c?';--c:'+o.c:'')+'"'
+        +' data-cr="'+o.act+'"'+(o.id!=null?' data-id="'+esc(o.id)+'"':'')+' aria-label="'+esc(o.aria||'')+'">'
+        +'<span class="cr-dot"><b>'+o.big+'</b>'+(o.small?'<small>'+o.small+'</small>':'')+'</span>'
+        +(o.label?'<span class="cr-lab">'+o.label+'</span>':'')+'</button>';
+    }
+
+    function crLifeHTML(G){
+      if(!G.goals.length) return '<div class="cr-empty"><h2>'+esc(crT('emptyH'))+'</h2><p>'+esc(crT('emptyP'))+'</p>'
+        +'<button class="cr-pri" data-cr="newgoal">'+esc(crT('emptyGo'))+'</button></div>';
+      const shown=G.goals.slice(0,CR_MAX), rest=G.goals.slice(CR_MAX), C={x:50,y:50};
+      let lines='', stars='';
+      shown.forEach((g,i)=>{
+        const p=crAt(i,shown.length, i%2?36:31);
+        lines+=crLine(C,p);
+        stars+=crStar({x:p.x,y:p.y,cls:g.role==='main'?'lg':'md',act:'goal',id:g.id,c:g.color||'',
+          big:esc(String(g.pct))+crT('pct'), label:esc(g.name||'—'), aria:g.name+' — '+g.pct+'%'});
+      });
+      const restHTML=rest.length?'<div class="cr-rest"><span class="cr-mu">'+esc(crT('more'))+'</span>'
+        +rest.map(g=>'<button class="cr-chip" data-cr="goal" data-id="'+esc(g.id)+'">'+esc(g.name||'—')+' · '+g.pct+'%</button>').join('')+'</div>':'';
+      return '<div class="cr-sky"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'+lines+'</svg>'
+        +'<div class="cr-me" style="left:50%;top:50%">'+esc(crT('me'))+'</div>'+stars+'</div>'
+        +'<p class="cr-hint">'+esc(crT('hint'))+'</p>'+restHTML;
+    }
+
+    function crGoalHTML(g){
+      const L=g.links||{}, C={x:50,y:50}, nodes=[];
+      const st=L.steps||{done:0,total:0};
+      nodes.push({act:'steps', cls:'k-steps', big:st.total?st.done+'/'+st.total:crT('link'), label:crT('steps'), empty:!st.total});
+      const m=L.money;
+      if(m) nodes.push({act:'money', cls:'k-money', big:m.ready?esc(crMoney(m.net)):'…', label:crT('money'), empty:!(m.inc||m.out),
+        aria:crT('money')+': '+(m.ready?crMoney(m.net):'…')});
+      const t=L.time||{blocks:0,done:0};
+      nodes.push({act:'time', cls:'k-time', big:t.blocks?t.done+'/'+t.blocks:'0', label:crT('time'), empty:!t.blocks});
+      nodes.push({act:'folder', cls:'k-folder', big:L.folder?(esc(L.folder.emoji.slice(0,4))||'▢'):crT('link'), label:L.folder?esc(L.folder.name||crT('folder')):crT('folder'), empty:!L.folder,
+        aria:crT('folder')+': '+(L.folder?(L.folder.name||'—'):crT('folderNone'))});
+      if(L.folder) nodes.push({act:'chats', cls:'k-chats', big:String((L.chats||[]).length), label:crT('chats'), empty:!(L.chats||[]).length});
+      let lines='', stars='';
+      nodes.forEach((n,i)=>{ const p=crAt(i,nodes.length, 36, -126); lines+=crLine(C,p,n.empty);
+        stars+=crStar({x:p.x,y:p.y,cls:'sm '+n.cls+(n.empty?' empty':''),act:n.act,big:n.big,label:n.label,aria:n.aria||(n.label+': '+n.big)}); });   // aria — сирий текст: crStar сам екранує (інакше «&amp;» вголос)
+      stars+=crStar({x:50,y:50,cls:'xl',act:'mission',c:g.color||'',big:esc(String(g.pct))+crT('pct'),small:esc(crT('toGoal')),aria:g.name+' — '+g.pct+'%'});
+      const nx=st.next?'<b>'+esc(st.next)+'</b>':'<span class="cr-mu">'+esc(crT('noNext'))+'</span>';
+      return '<div class="cr-sky"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'+lines+'</svg>'+stars+'</div>'
+        +'<div class="cr-card"><small>'+esc(crT('nextH'))+'</small>'+nx
+        +'<button class="cr-sec" data-cr="mission">'+esc(crT('openGoal'))+'</button></div>';
+    }
+
+    function crRender(){
+      const body=document.getElementById('crBody'), ttl=document.getElementById('crTitle'), bk=document.getElementById('crBack');
+      if(!body) return;
+      let G=null; try{ G=window.Core.graph(); }catch(e){ console.error('Core.graph',e); }
+      const g=crGoalId&&G?G.goals.find(x=>x.id===crGoalId):null;
+      if(crGoalId&&!g) crGoalId='';        // мету видалили чи заархівували — назад до неба
+      if(ttl) ttl.textContent=g?(g.name||'—'):crT('title');
+      if(bk) bk.textContent='‹ '+(g?crT('backLife'):crT('back'));
+      if(!G||!G.ready){ body.innerHTML='<p class="cr-wait">'+esc(crT('wait'))+'</p>'; return; }
+      body.innerHTML=g?crGoalHTML(g):crLifeHTML(G);
+      body.querySelectorAll('[data-cr]').forEach(b=>b.addEventListener('click',()=>crAct(b.dataset.cr,b.dataset.id,b)));
+    }
+
+    function crAct(act,id,btn){
+      try{ window.platform.haptic('light'); }catch(_){}
+      if(act==='goal'){ crGoalId=String(id||''); crRender(); try{ document.body.scrollTop=0; }catch(_){} return; }
+      if(act==='newgoal'){ crGo(()=>goJournal({tab:'year'})); return; }
+      const raw=crGoalObj(crGoalId); if(!raw) return;
+      if(act==='mission'){ crGo(()=>moMissionPage(raw)); return; }
+      let G=null; try{ G=window.Core.graph(); }catch(_){}
+      const g=G&&G.goals.find(x=>x.id===crGoalId); if(!g) return;
+      crSheet(act,g,raw,btn);
+    }
+    function crGo(fn){ try{ fn(); }catch(e){ console.error('core: перехід',e); } }
+
+    /* ── рівень 3: шторка вузла. Лише показ і переходи — записів нема ── */
+    function crSheet(kind,g,raw,from){
+      const L=g.links||{}; let h='', v='', sub='', acts=[];
+      if(kind==='steps'){ const s=L.steps||{}; h=crT('stepsH'); v=s.total?crT('stepsV')(s.done,s.total):'—'; sub=s.next||crT('noNext');
+        acts=[[crT('openGoal'),()=>moMissionPage(raw)]];
+        // дії з даними — лише через реєстр (60-core-actions.js): ready → перевірка → запис → «Скасувати»
+        if(s.nextId) acts.unshift([crT('markDone')(s.next),()=>window.Core.run('step.done',{goalId:g.id, stepId:s.nextId}),'do']); }
+      else if(kind==='money'){ const m=L.money||{}; h=crT('moneyH');
+        v=m.ready?crMoney(m.net):'…'; sub=m.ready?crT('moneySub')(crMoney(m.inc),crMoney(m.out)):crT('moneyWait');
+        // шторка Гаманця з уже вибраною місією; її запис іде через Core.run (46-wallet.js)
+        acts=[[crT('addOut'),()=>wlOpSheet('out',g.id),'do'],[crT('addIn'),()=>wlOpSheet('in',g.id),'do'],[crT('openWallet'),()=>goFinance()]]; }
+      else if(kind==='time'){ const t=L.time||{}; h=crT('timeH'); v=t.blocks?crT('timeV')(t.blocks,t.done):crT('timeNone');
+        acts=[[crT('openJournal'),()=>goJournal({tab:'week'})]]; }
+      else if(kind==='folder'){ h=crT('folderH');
+        if(L.folder){ v=L.folder.name||'—'; const fk=L.folder.key; acts=[[crT('openFolder'),()=>goFolder(fk)]]; }
+        else { v=crT('folderNone'); sub=crT('folderHow');
+          acts=[[crT('newFolder'),()=>inputModal({title:crT('newFolder'), value:String(g.name||'').slice(0,60), placeholder:crT('folderPh'), emoji:true,
+              emojiVal:String(raw.emoji||''), emojiPh:'📁', onOk:(name,em)=>window.Core.run('folder.create',{name, emoji:em, goalId:g.id})}),'do'],
+            [crT('openGoal'),()=>moMissionPage(raw)]]; } }
+      else if(kind==='chats'){ h=crT('chatsH'); v=String((L.chats||[]).length);
+        acts=(L.chats||[]).slice(0,4).map(c=>[crT('openChat')(c.name||'—'),()=>goChat(c.id)]); }
+      else return;
+
+      const old=document.querySelector('.cr-ov'); if(old) old.remove();
+      const ov=document.createElement('div'); ov.className='cr-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+      ov.setAttribute('aria-label',h);
+      ov.innerHTML='<div class="cr-sheet"><div class="cr-grip"></div>'
+        +'<div class="cr-sh-top"><h2>'+esc(h)+'</h2><button class="cr-x" aria-label="'+esc(crT('close'))+'">✕</button></div>'
+        +'<div class="cr-sh-v">'+esc(v)+'</div>'+(sub?'<p class="cr-sh-sub">'+esc(sub)+'</p>':'')
+        +acts.map((a,i)=>'<button class="cr-act'+(a[2]==='do'?' do':'')+'" data-i="'+i+'">'+esc(a[0])+(a[2]==='do'?'':'<span aria-hidden="true">›</span>')+'</button>').join('')
+        +'</div>';
+      document.body.appendChild(ov);
+      let done=false;
+      const close=()=>{ if(done) return; done=true; document.removeEventListener('keydown',key); ov.classList.remove('show');
+        setTimeout(()=>{ try{ ov.remove(); }catch(_){} },200); try{ if(from&&from.isConnected) from.focus(); }catch(_){} };
+      const key=e=>{ if(e.key==='Escape') close(); };
+      document.addEventListener('keydown',key);
+      ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
+      ov.querySelector('.cr-x').onclick=close;
+      ov.querySelectorAll('.cr-act').forEach(b=>b.onclick=()=>{ const a=acts[+b.dataset.i]; close(); if(a) crGo(a[1]); });
+      requestAnimationFrame(()=>{ ov.classList.add('show'); const f=ov.querySelector('.cr-act')||ov.querySelector('.cr-x'); try{ f.focus(); }catch(_){} });
+    }
+
+    function goCore(){ crGoalId=''; crRender(); show('scr-core'); try{ document.body.scrollTop=0; }catch(_){} }
+    { const bk=document.getElementById('crBack'); if(bk) bk.onclick=()=>{
+        if(crGoalId){ crGoalId=''; crRender(); return; }
+        if(window.goMore) window.goMore(); else show('scr-home'); }; }
+    // дані підтягнулись з хмари чи змінилась мова — якщо Ядро відкрите, перемальовуємо
+    const crLive=()=>{ const s=document.getElementById('scr-core'); if(s&&s.classList.contains('active')) crRender(); };
+    try{ document.addEventListener('flowsync',crLive); document.addEventListener('flowlangchange',crLive); }catch(_){}
+    // записали чи скасували через реєстр — небо одразу інше. Подією, а не Core.onChange:
+    // реєстр (60-…) виконується ПІСЛЯ цього файла, тож у цю мить Core.onChange ще нема
+    try{ document.addEventListener('flowcorechange',crLive); }catch(_){}
+    window.goCore=goCore;
+  })();
+  /* ════════ Frequency Core — реєстр дій (60-core-actions.js, 17.11.2026) ════════
+     Етап 2 задуму (prompts/frequency-core.md). Кожна дія, що ЗАПИСУЄ дані, описана
+     тут один раз, і її однаково кличе кнопка людини і (з етапу 3) агент Флоу:
+         Core.run('money.expense', {amount:300, label:'Кава', goalId:'g1'}, {by:'human'})
+     Один шлях для всіх:
+       1. ready  — ключі дії справді прочитано зі сховища (storeKeyReady). Ні → нічого не пишемо,
+                   кажемо «ще звіряється». «Не прочитано» ≠ «порожньо» (урок 24.09).
+       2. check  — поля перевірено й приведено до формату, який пишуть наявні екрани.
+       3. by:'flow' → шторка «Так / Ні» (aiToolConfirm, 12-ai-agent.js) — без «Так» запису нема.
+       4. run    — запис НАЯВНИМИ save-функціями (saveFinOps, saveFolders, saveGoals, envAddOp):
+                   формат даних той самий, нових ключів сховища нема.
+       5. undo   — «Скасувати» 5 с (flowUndoToast, 23-board.js); журнал у сховищі — етап 3 (рішення А).
+     Усі записи — з дії людини (тап) або після її «Так»: автоматичних записів тут нема,
+     тож saveFolders() без {auto:true} — правильно. 57-core.js лишається «лише читає». */
+  (function(){
+    const caLang=()=>{ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } };
+    const CA_T={
+      uk:{wait:'Дані ще звіряються з хмарою — спробуй за хвилину', amount:'Вкажи суму', noGoal:'Мету не знайдено',
+        noStep:'Цей крок уже зроблено або його нема', noEnv:'Конверт не знайдено', hasFolder:'У мети вже є папка',
+        unknown:'Невідома дія', cancelled:'Скасовано', in:'Дохід', out:'Витрата', folder:n=>'Папка '+n, top:'Поповнення',
+        doneIn:(m)=>'Записано +'+m, doneOut:(m)=>'Записано −'+m, doneEnv:(m,n)=>'+'+m+' у «'+n+'»', doneStep:n=>'Крок «'+n+'» зроблено',
+        doneFolder:n=>'Папку «'+n+'» створено', flowTitle:'Флоу хоче зробити дію',
+        sayIn:(m,l)=>'Дохід '+m+' — «'+l+'»', sayOut:(m,l)=>'Витрата '+m+' — «'+l+'»', sayEnv:(m,n)=>'Покласти '+m+' у конверт «'+n+'»',
+        sayStep:(s,g)=>'Відмітити зробленим крок «'+s+'» у меті «'+g+'»', sayFolder:n=>'Створити папку «'+n+'»'},
+      en:{wait:'Still syncing with the cloud — try again in a minute', amount:'Enter an amount', noGoal:'Goal not found',
+        noStep:'This step is already done or missing', noEnv:'Envelope not found', hasFolder:'This goal already has a folder',
+        unknown:'Unknown action', cancelled:'Cancelled', in:'Income', out:'Expense', folder:n=>'Folder '+n, top:'Top-up',
+        doneIn:(m)=>'Saved +'+m, doneOut:(m)=>'Saved −'+m, doneEnv:(m,n)=>'+'+m+' to “'+n+'”', doneStep:n=>'Step “'+n+'” done',
+        doneFolder:n=>'Folder “'+n+'” created', flowTitle:'Flow wants to act',
+        sayIn:(m,l)=>'Income '+m+' — “'+l+'”', sayOut:(m,l)=>'Expense '+m+' — “'+l+'”', sayEnv:(m,n)=>'Put '+m+' into envelope “'+n+'”',
+        sayStep:(s,g)=>'Mark step “'+s+'” done in goal “'+g+'”', sayFolder:n=>'Create folder “'+n+'”'}
+    };
+    const caT=k=>CA_T[caLang()][k];
+    function caReady(keys){ try{ return typeof window.storeKeyReady!=='function'||keys.every(k=>window.storeKeyReady(k)===true); }catch(_){ return false; } }
+    const caStr=(v,n)=>String(v==null?'':v).replace(/[\r\n]+/g,' ').trim().slice(0,n);
+    const caAmt=v=>Math.round(parseFloat(String(v==null?'':v).replace(',','.'))*100)/100;
+    const caGoal=id=>id?(goalsData.goals||[]).find(g=>g&&String(g.id)===String(id))||null:null;
+    const caFresh=()=>{ try{ renderFinance(); }catch(_){} try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){} };
+
+    /* ── дії ── поля описані й тут (fields), щоб на етапі 3 з них вийшов опис інструмента для Флоу */
+    const ACTIONS={};
+    function caMoney(type){
+      return {
+        id: type==='in'?'money.income':'money.expense',
+        fields:{amount:'number>0', label:'text≤80', goalId:'id?', folderKey:'id?', cur:'code?', src:'code?', env:'text?'},
+        keys:['fin_ops','envelopes'],
+        check(inp){
+          const amount=caAmt(inp.amount); if(!(amount>0&&amount<1e9)) return {why:caT('amount')};
+          const label=caStr(inp.label,80)||caStr(inp.env,60)||caT(type);
+          const cur=(inp.cur&&curOk(inp.cur)&&inp.cur!==mainCur())?String(inp.cur):'';
+          const goalId=(!cur&&inp.goalId&&wlGoal(inp.goalId))?String(inp.goalId):'';
+          const folderKey=(inp.folderKey&&wlFolderName(inp.folderKey))?String(inp.folderKey):'';
+          const src=(type==='in'&&inp.src&&WL_SRC[inp.src]&&inp.src!=='main')?String(inp.src):'';
+          // env — дослівно як назва конверта (без trim): за нею wlMonthCats збирає категорію місяця
+          return {val:{amount, label, cur, goalId, folderKey, src, env:String(inp.env==null?'':inp.env).slice(0,60)}};
+        },
+        say(v){ const m=money(v.amount,v.cur||undefined); return type==='in'?caT('sayIn')(m,v.label):caT('sayOut')(m,v.label); },
+        run(v,by){
+          // той самий обʼєкт, що й шторка Гаманця (46-wallet.js, wlOpSheet) — порядок полів теж
+          const op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type, amount:v.amount, label:v.label, date:ymdLocal(), card:mainCard().id };
+          if(v.env) op.env=v.env;
+          if(v.cur) op.cur=v.cur; else if(v.goalId) op.goalId=v.goalId;
+          if(v.folderKey) op.folderKey=v.folderKey;
+          if(v.src) op.src=v.src;
+          if(by==='flow') op._src='ai';
+          finOps.push(op); saveFinOps(); caFresh();
+          try{ flowReact(type==='in'?'income':'spend',{amount:v.amount}); }catch(_){}
+          try{ if(typeof rlOnOp==='function') rlOnOp(op); }catch(err){ console.error('rlOnOp',err); }   // правила: скарбничка / зарплата / бюджет
+          const m=money(v.amount,v.cur||undefined);
+          return { msg: type==='in'?caT('doneIn')(m):caT('doneOut')(m), op,
+            undo(){ const i=finOps.indexOf(op); if(i>=0){ finOps.splice(i,1); saveFinOps(); } caFresh(); } };   // саме цей обʼєкт
+        }
+      };
+    }
+    ACTIONS['money.income']=caMoney('in');
+    ACTIONS['money.expense']=caMoney('out');
+
+    ACTIONS['envelope.add']={
+      id:'envelope.add', fields:{envId:'id', amount:'number>0', label:'text≤60'}, keys:['fin_ops','envelopes'],
+      check(inp){
+        const e=(envelopes||[]).find(x=>x&&String(x.id)===String(inp.envId)); if(!e) return {why:caT('noEnv')};
+        const amount=caAmt(inp.amount); if(!(amount>0&&amount<1e9)) return {why:caT('amount')};
+        return {val:{e, amount, label:caStr(inp.label,60)||caT('top')}};
+      },
+      say(v){ return caT('sayEnv')(money(v.amount,envCur(v.e)||undefined),v.e.name||''); },
+      run(v){
+        envAddOp(v.e,'in',v.amount,v.label); caFresh();   // envAddOp сам пише конверт і finOps (08-finance.js:27)
+        const eop=v.e.ops[0];
+        return { msg:caT('doneEnv')(money(v.amount,envCur(v.e)||undefined),v.e.name||''),
+          undo(){ if(eop&&eop.id) envDelOp(v.e,eop.id); caFresh(); } };
+      }
+    };
+
+    ACTIONS['step.done']={
+      id:'step.done', fields:{goalId:'id', stepId:'id'}, keys:['goals_data'],
+      check(inp){
+        const g=caGoal(inp.goalId); if(!g) return {why:caT('noGoal')};
+        const st=(g.steps||[]).find(s=>s&&String(s.id)===String(inp.stepId)&&!s.done); if(!st) return {why:caT('noStep')};
+        return {val:{g, st}};
+      },
+      say(v){ return caT('sayStep')(v.st.name||v.st.t||'',v.g.name||''); },
+      run(v){
+        v.st.done=true; saveGoals();
+        const fresh=()=>{ try{ renderGoals(); }catch(_){} try{ if(typeof jnRender==='function') jnRender(); }catch(_){} };
+        fresh();
+        return { msg:caT('doneStep')(v.st.name||v.st.t||''), undo(){ v.st.done=false; saveGoals(); fresh(); } };
+      }
+    };
+
+    ACTIONS['folder.create']={
+      id:'folder.create', fields:{name:'text≤60', emoji:'emoji?', parent:'id?', goalId:'id?'}, keys:['folders_cfg'],
+      ready(inp){ return foldersLoaded===true&&(!inp.goalId||caReady(['goals_data'])); },   // папки цієї сесії прочитано
+      check(inp){
+        const used=order.length;
+        const parent=(typeof inp.parent==='string'&&folders[inp.parent])?inp.parent:'';
+        const g=inp.goalId?caGoal(inp.goalId):null;
+        if(inp.goalId&&!g) return {why:caT('noGoal')};
+        if(g&&g.folderKey&&folders[g.folderKey]) return {why:caT('hasFolder')};
+        const name=caStr(inp.name,120)||caT('folder')(used+1);
+        // як «＋ Папка» (16-dashboard.js, createFolder): порожнє поле — 📁, не передали — по колу;
+        // 16 — як maxlength поля емодзі в inputModal (прапор чи «родина» — кілька символів)
+        const emoji=inp.emoji!==undefined?(caStr(inp.emoji,16)||'📁'):FOLDER_EMOJIS[used%FOLDER_EMOJIS.length];
+        return {val:{name, emoji, parent, g, used}};
+      },
+      say(v){ return caT('sayFolder')(v.name); },
+      run(v){
+        const key='f_'+Date.now();
+        folders[key]={ key, c:FOLDER_COLORS[v.used%FOLDER_COLORS.length], emoji:v.emoji, icon:folderIconFor(v.emoji),
+          name:v.name, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
+        if(v.parent) folders[key].parent=v.parent;
+        order.push(key);
+        saveFolders();
+        let prev;
+        if(v.g){ prev=v.g.folderKey; v.g.folderKey=key; saveGoals(); }   // «привʼязати місію» = folderKey (54-links.js)
+        try{ renderDashboard(); }catch(_){}
+        return { msg:caT('doneFolder')(v.name), key,
+          undo(){
+            if(v.g&&v.g.folderKey===key){ if(prev) v.g.folderKey=prev; else delete v.g.folderKey; saveGoals(); }
+            folderDelete(key);   // надгробок + прибирання + запис — як видалення з меню папки
+            try{ renderDashboard(); }catch(_){}
+          } };
+      }
+    };
+
+    /* ── один шлях для всіх ── */
+    const listeners=[];
+    // і подія на document (як flowsync): файли з меншим номером не можуть кликати Core.onChange при старті
+    const notify=()=>{ listeners.slice().forEach(fn=>{ try{ fn(); }catch(_){} });
+      try{ document.dispatchEvent(new CustomEvent('flowcorechange')); }catch(_){} };
+    async function run(id, inp, opts){
+      opts=opts||{}; inp=inp||{};
+      const by=opts.by==='flow'?'flow':'human';
+      const a=ACTIONS[id]; if(!a) return {ok:false, why:caT('unknown')};
+      const ready=a.ready?a.ready(inp):true;
+      if(!ready||!caReady(a.keys)){ if(!opts.quiet) try{ plToast(caT('wait')); }catch(_){} return {ok:false, why:caT('wait')}; }
+      const c=a.check(inp);
+      if(!c||!c.val){ const why=(c&&c.why)||caT('unknown'); if(!opts.quiet) try{ plToast(why); }catch(_){} return {ok:false, why}; }
+      if(by==='flow'){
+        // без «Так» людини Флоу нічого не пише (етап 3 підключить сюди інструменти агента)
+        let ok=false; try{ ok=await aiToolConfirm(a.say(c.val),{title:caT('flowTitle')}); }catch(_){ ok=false; }
+        if(!ok) return {ok:false, why:caT('cancelled'), cancelled:true};
+        if(!(a.ready?a.ready(inp):true)||!caReady(a.keys)) return {ok:false, why:caT('wait')};   // поки людина думала — дані могли перечитатись
+      }
+      let r;
+      try{ r=a.run(c.val,by)||{}; }catch(err){ console.error('Core.run '+id,err); return {ok:false, why:String(err&&err.message||err)}; }
+      notify();
+      if(opts.undo!==false&&typeof r.undo==='function'&&typeof flowUndoToast==='function'){
+        flowUndoToast(r.msg||'', ()=>{ r.undo(); notify(); }, 5000);
+      }
+      try{ window.platform.haptic('light'); }catch(_){}
+      return {ok:true, msg:r.msg||'', key:r.key, op:r.op};
+    }
+    const C=window.Core||(window.Core={});
+    C.run=run;
+    C.actions={ list:()=>Object.keys(ACTIONS), get:id=>ACTIONS[id]?{id, fields:ACTIONS[id].fields, keys:ACTIONS[id].keys.slice()}:null };
+    C.onChange=fn=>{ if(typeof fn==='function') listeners.push(fn); };
+  })();
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
@@ -37761,6 +38605,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     {cat:'data',k:'dmission', t:'Місія папки', d:'Прогрес місії, наступний крок, дедлайн',        c:'#34c77b', ic:'target'},
     {cat:'data',k:'dhabit',   t:'Звичка папки', d:'Позначки місії за тиждень, серія, ✓ сьогодні',  c:'#e8843c', ic:'habits'},
     {cat:'data',k:'dcount',   t:'Відлік до мети', d:'Скільки днів до фінішу місії',               c:'#9b8cff', ic:'calendar'},
+    {cat:'data',k:'countdown',t:'Відлік часу',    d:'До дати чи від дати: роки … секунди',          c:'#5ec8ff', ic:'countdown'},   /* 17.11.2026: старий блок «Відлік» — тепер віджет (48-widgets.js tmHTML) */
     {cat:'data',k:'dsave',    t:'Скарбничка місії', d:'Скільки зібрано на місію з цілі, ＋ ₴',      c:'#34c77b', ic:'envelope'},
     {cat:'data',k:'dcounter', t:'Лічильник місії', d:'Будь-яке число з метою: слова, кг, сторінки', c:'#f0b429', ic:'num'},
     {cat:'data',k:'dphoto',   t:'Фото-прогрес',   d:'Було → стало: перше і останнє фото місії',  c:'#ff7a9c', ic:'photo'},
@@ -45442,16 +46287,8 @@ body:has(#scr-more.active) #fcSay{display:none!important;}
   .pgcal{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0) 40%),rgba(19,23,34,.95);}
   .pgcal-wd{color:#9aa2b5;}
 
-  /* ── 8. Віджети «Гроші»: білий текст на світлих кінцях градієнтів мав 2.2–3.0:1.
-     Відтінки ті самі, на крок темніші; кожен кінець ≥ 4.7:1 під білим текстом. ── */
-  .wg-t.c-wallet{background:linear-gradient(135deg,#3343f0,#4f58e8 50%,#7f45d8);}
-  .wg-t.c-mission{background:linear-gradient(135deg,color-mix(in srgb,var(--mc,#34c77b) 52%,#000),color-mix(in srgb,var(--mc,#34c77b) 66%,#000));}
-  .wg-t.c-debt{background:linear-gradient(135deg,#b81d3e,#d1284b);}
-  .wg-t.c-in{background:linear-gradient(135deg,#0a6a47,#0e8455);}
-  .wg-t.c-out{background:linear-gradient(135deg,#a8340a,#c2410c);}
-  /* кнопки й «Книга правил» — темна підкладка: біле скло на кольорі знову з'їдало контраст */
-  .wg-acts button,.wg-rules{background:rgba(0,0,0,.2);}
-  .wg-t.c-env .wg-acts button{background:rgba(0,0,0,.12);}
+  /* ── 8. Віджети «Гроші»: тут були темніші градієнти під білий текст. З 17.11.2026 віджети в «Тихому склі»
+     (32-widgets.css, кінець): текст кольору сторінки на поверхні сторінки, заливок нема — правила прибрано. ── */
 
   /* плитка «План на день»: кнопка на світлому акценті темної теми мала білий текст 2.8:1 */
   html:not(.t-light) #scr-page .pw-btn.go{color:#0c0e16;}
