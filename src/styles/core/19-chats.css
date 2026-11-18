@@ -377,3 +377,30 @@
   .fh-v-photo .fhp-row{display:none;}
   #scr-page .fh-off{display:none !important;}
   @media (min-width:1024px){ .fhk{flex-basis:72px;} .fhk-cv{width:60px;height:60px;} }
+  /* ── Флоу в папці (18.11.2026, 36-chats.js fhAiHTML): кнопка «Підсумок від Флоу» і картка з пропозиціями ── */
+  .fhai-go{all:unset;box-sizing:border-box;cursor:pointer;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;
+    border-radius:22px;font-size:14px;font-weight:600;color:var(--pg-acc,var(--accent));
+    background:color-mix(in srgb,var(--pg-acc,var(--accent)) 12%,transparent);}
+  .fhai-go svg,.fhai-h svg{width:18px;height:18px;flex:0 0 auto;}
+  .fhai-go:focus-visible,.fhai button:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .fhai{border-radius:20px;padding:14px 16px;background:var(--pg-surface,var(--card));
+    border:1px solid color-mix(in srgb,var(--pg-acc,var(--accent)) 45%,transparent);color:var(--pg-fg,var(--text));}
+  .fhai-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--pg-acc,var(--accent));}
+  .fhai-h span{flex:1;}
+  .fhai-x{all:unset;cursor:pointer;width:44px;height:44px;margin:-12px -12px -12px 0;display:grid;place-items:center;color:var(--pg-mut,var(--muted));}
+  .fhai-x svg{width:16px;height:16px;}
+  .fhai-t{margin:8px 0 0;font-size:15px;line-height:1.5;}
+  .fhai.busy .fhai-t{color:var(--pg-mut,var(--muted));}
+  .fhai-sub{margin:14px 0 4px;font-size:13px;font-weight:600;color:var(--pg-mut,var(--muted));}
+  .fhai-mv{display:flex;align-items:center;gap:8px;padding:4px 0;}
+  .fhai-mt{flex:1;min-width:0;font-size:14px;line-height:1.35;}
+  .fhai-mt b{font-weight:700;}
+  .fhai-ok,.fhai-no{all:unset;box-sizing:border-box;cursor:pointer;flex:0 0 44px;width:44px;height:44px;border-radius:22px;display:grid;place-items:center;}
+  .fhai-ok{color:var(--owed,#34c77b);background:color-mix(in srgb,var(--owed,#34c77b) 14%,transparent);}
+  .fhai-no{color:var(--pg-mut,var(--muted));background:color-mix(in srgb,var(--pg-fg,var(--text)) 7%,transparent);}
+  .fhai-ok svg,.fhai-no svg{width:16px;height:16px;}
+  .fhai-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+  .fhai-b{all:unset;box-sizing:border-box;cursor:pointer;min-height:40px;padding:0 14px;border-radius:20px;display:inline-flex;align-items:center;
+    font-size:13px;font-weight:600;border:1px solid var(--pg-edge,var(--line));color:var(--pg-fg,var(--text));}
+  .fhai-b.acc{background:var(--pg-acc,var(--accent));border-color:transparent;color:#fff;}
+  .fh-v-photo .fhai,.fh-v-photo .fhai-go{display:none;}

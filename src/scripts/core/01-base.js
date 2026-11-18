@@ -255,6 +255,11 @@
       'Конверти':'Envelopes', 'КОНВЕРТИ':'ENVELOPES', 'ПЛАН МІСЯЦЯ':'MONTH PLAN', 'план місяця':'month plan',
       'Картка':'Card', 'головна':'main', 'ГОЛОВНА':'MAIN', 'Робота · ЗП':'Work · Salary',
       'Загальний баланс':'Total balance', 'Новий':'New', '‹ Папки':'‹ Folders',
+      // папка: кружечки, фільтри і Флоу під обкладинкою (36-chats.js, 18.11.2026)
+      'Усе':'All', 'Завдання':'Tasks', 'Нотатки':'Notes', 'Фото':'Photos', 'Підпапка':'Subfolder',
+      'Підсумок від Флоу':'Summary from Flow', 'Флоу · підсумок папки':'Flow · folder summary', 'Флоу читає папку…':'Flow is reading the folder…',
+      'Флоу пропонує — ти вирішуєш':'Flow suggests — you decide', 'Спитати Флоу про папку':'Ask Flow about this folder',
+      'Оновити':'Refresh', 'Спробувати ще':'Try again',
     };
 
     // ---- другий рівень: окремі слова (дні тижня, місяці) --------------
