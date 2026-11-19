@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-19-2204-d901824';
+  var BUILD='2026-11-19-2219-2b8d064';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -9617,6 +9617,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .pn-big .pn-t{font-size:16px;font-weight:650;letter-spacing:-.01em;}
   .done .pn-t{text-decoration:line-through;color:var(--pn-tx3);}
   .pn-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--pn-tx2);font-variant-numeric:tabular-nums;}
+  .pn-from{font-size:11.5px;font-weight:650;color:#ff9f0a;}
   .pn-fchip{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;padding:0;font-size:12px;font-weight:650;color:var(--pn-tx2);cursor:pointer;}
   .pn-fchip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--fc);}
   .pn-star{flex:none;width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;color:var(--pn-tx3);}
@@ -9727,7 +9728,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .wd-tk.done .wd-tk-t span{text-decoration:line-through;color:var(--pg-mut,var(--muted));}
   .wd-tk-s{all:unset;cursor:pointer;flex:none;width:40px;height:44px;display:grid;place-items:center;font-size:18px;color:var(--pg-mut,var(--muted));margin-right:-8px;}
   .wd-tk-s.on{color:#ffb800;}
-  .wd-tk-more{all:unset;cursor:pointer;min-height:36px;font-size:12.5px;font-weight:700;color:var(--pg-mut,var(--muted));}
+  .wd-tk-more{all:unset;cursor:pointer;min-height:30px;font-size:12.5px;font-weight:700;color:var(--pg-mut,var(--muted));}
   .wd-tk-c:focus-visible,.wd-tk-t:focus-visible,.wd-tk-s:focus-visible,.wd-tk-big:focus-visible,.wd-tk-more:focus-visible{outline:2px solid var(--fc);outline-offset:2px;border-radius:8px;}
   /* прев'ю в Магазині блоків */
   .bsw-tks{display:flex;flex-direction:column;gap:5px;margin-top:6px;font-size:11.5px;font-weight:650;}
@@ -35466,7 +35467,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     dhabit:{t:'Звичка папки', h:'Звичка', ic:'🔥', per:[['week','Тиждень'],['month','Місяць']], show:[['streak','Серія'],['count','Скільки днів'],['days','Дні періоду']]},
     dtime:{t:'Час папки', h:'Час', ic:'⏱', per:[['day','День'],['week','Тиждень'],['month','Місяць']], show:[['hours','Години'],['done','Виконані блоки'],['add','Кнопка «＋ блок»']]},
     /* «Справи папки» (19.11.2026, етап 2 нового Плану, 65-plan.js): справи сьогодні з міткою папки — і з часом, і без */
-    dtasks:{t:'Справи папки', h:'Справи', ic:'✅', per:null, show:[['done','Виконані справи'],['add','Кнопка «＋ справа»'],['star','Зірочки «Головне»']]},
+    dtasks:{t:'Справи папки', h:'Справи', ic:'✅', per:[['day','Сьогодні'],['week','Тиждень']], show:[['done','Виконані справи'],['add','Кнопка «＋ справа»'],['star','Зірочки «Головне»']]},
     dcal:{t:'Календар папки', h:'Календар', ic:'📅', per:null, show:[['hint','Підказка «тап по дню»']]},
     /* прогрес місії (15.11.2026): Відлік · Скарбничка · Лічильник — так само вікна в місію, даних одна копія */
     dcount:{t:'Відлік до мети', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата'],['next','Наступна віха']]},
@@ -35486,7 +35487,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // новий блок із меню «Дані»: лише налаштування, без копії даних
   function wdInit(b,k){
     b.type=k; b.sz=wdSz(b); b.gw=WD_SZ[b.sz].gw; b.gh=WD_SZ[b.sz].gh;
-    if(WD_META[k].per&&!b.period) b.period=k==='dtime'?'day':'week';
+    if(WD_META[k].per&&!b.period) b.period=(k==='dtime'||k==='dtasks')?'day':'week';
     delete b.text;
     if(k==='countdown'){ const bid=b.id; setTimeout(()=>{ try{ tmCfg(bid); }catch(_){} },450); }   // новий відлік — одразу спитати назву й дату
     return b;
@@ -35888,10 +35889,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      Вікно в План: блоки Планера цієї папки (folder або місія папки) + справи без часу з folder=папка.
      Даних віджет не має — лише налаштування блоку; галочка/☆/«＋ справа» пишуть у plData() тапом людини. */
   function wdTT(uk,en){ try{ return (window.flowLang&&window.flowLang())==='en'?en:uk; }catch(_){ return uk; } }
-  function wdTasksItems(fk,td){
-    const out=[];
-    plBlocksDisplay(td).forEach(x=>{ if(x&&inFolderBlock(x,fk)) out.push({k:'b',id:String(x.id),t:String(x.t||''),done:!!x.done,h:+x.h||0,star:!!x.star}); });
-    (plData().tasks||[]).forEach(x=>{ if(x&&x.scope==='day'&&!x.slotted&&x.folder===fk) out.push({k:'t',id:String(x.id),t:String(x.t||''),done:!!x.done,h:null,star:!!x.star}); });
+  // справи папки на день ds; справи без часу — за тим самим правилом дати, що й у Плані (pnTaskOn, 65-plan.js)
+  function wdTasksItems(fk,ds){
+    const out=[], td=ymdLocal();
+    plBlocksDisplay(ds).forEach(x=>{ if(x&&inFolderBlock(x,fk)) out.push({k:'b',id:String(x.id),t:String(x.t||''),done:!!x.done,h:+x.h||0,star:!!x.star,ds}); });
+    (plData().tasks||[]).forEach(x=>{ if(!x||x.folder!==fk) return;
+      const on=typeof pnTaskOn==='function'?pnTaskOn(x,ds):(x.scope==='day'&&!x.slotted&&ds===td?{}:null);
+      if(on) out.push({k:'t',id:String(x.id),t:String(x.t||''),done:!!x.done,h:null,star:!!x.star,ds}); });
     return out.sort((a,c)=>(a.done-c.done)||((a.h==null?99:a.h)-(c.h==null?99:c.h)));
   }
   // блок дня за id; повторюваний із показу (disp_/v_) — шукаємо створений за шаблоном (як dyBind у 42-day.js)
@@ -35902,26 +35906,32 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   function wdTasksHTML(b,fk,sz,td){
     if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">${wdTT('Лише в папці','Folders only')}</b><small class="wd-sub">${wdTT('Показує справи з міткою цієї папки','Shows tasks tagged with this folder')}</small>`,'empty');
-    const all=wdTasksItems(fk,td), shown=all.filter(x=>wdOn(b,'done')||!x.done), dn=all.filter(x=>x.done).length;
-    // M — одна найближча невиконана (як «Час папки»: висоти плитки вистачає на один рядок 44px), L — до 6
-    const rows=sz==='l'?shown.slice(0,6):sz==='m'?all.filter(x=>!x.done).slice(0,1):[], more=sz==='l'?shown.length-rows.length:0;
-    const ck=x=>`<button class="wd-tk-c" data-wga="wdtck" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${td}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.t)}"><i>✓</i></button>`;
-    const st=x=>sz==='l'&&wdOn(b,'star')?`<button class="wd-tk-s${x.star?' on':''}" data-wga="wdtstar" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${td}" aria-label="${esc(wdTT(x.star?'Прибрати з головного':'У головне',x.star?'Remove from focus':'Add to focus'))}">${x.star?'★':'☆'}</button>`:'';
+    // Тиждень — 7 днів від сьогодні; рядок каже день («Пт 21»), галочка пише в свій день
+    const wk=wdPer(b)==='week', days=wk?[0,1,2,3,4,5,6].map(i=>{ const d=new Date(td+'T12:00:00'); d.setDate(d.getDate()+i); return ymdLocal(d); }):[td];
+    const all=[].concat(...days.map(ds=>{ const L=wdTasksItems(fk,ds); return wk?L.sort((a,c)=>(a.h==null?99:a.h)-(c.h==null?99:c.h)):L; }));
+    if(wk) all.sort((a,c)=>a.done-c.done);   // стабільне сортування: дні лишаються по порядку, виконані — вниз
+    const shown=all.filter(x=>wdOn(b,'done')||!x.done), dn=all.filter(x=>x.done).length;
+    const dayLbl=ds=>ds===td?wdTT('сьогодні','today'):DY_DOW[(new Date(ds+'T12:00:00').getDay()+6)%7]+' '+(+ds.slice(8));
+    // M — одна найближча невиконана (як «Час папки»: висоти плитки вистачає на один рядок 44px), L — до 5 (6-й на ноутбуці виходив за край)
+    const rows=sz==='l'?shown.slice(0,5):sz==='m'?all.filter(x=>!x.done).slice(0,1):[], more=sz==='l'?shown.length-rows.length:0;
+    const ck=x=>`<button class="wd-tk-c" data-wga="wdtck" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${x.ds}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.t)}"><i>✓</i></button>`;
+    const st=x=>sz==='l'&&wdOn(b,'star')?`<button class="wd-tk-s${x.star?' on':''}" data-wga="wdtstar" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${x.ds}" aria-label="${esc(wdTT(x.star?'Прибрати з головного':'У головне',x.star?'Remove from focus':'Add to focus'))}">${x.star?'★':'☆'}</button>`:'';
     // div, а не span: .wg-t>span вимикає натиски (32-widgets.css:25), а тут галочки
-    const list=rows.length?`<div class="wd-tks">${rows.map(x=>`<span class="wd-tk${x.done?' done':''}">${ck(x)}<button class="wd-tk-t" data-wga="wdtgo">${x.h!=null?`<em>${plHM(x.h)}</em>`:''}<span>${esc(x.t.slice(0,60))}</span></button>${st(x)}</span>`).join('')}${more>0?`<button class="wd-tk-more" data-wga="wdtgo">${wdTT('ще','more')} ${more} ›</button>`:''}</div>`:'';
+    const list=rows.length?`<div class="wd-tks">${rows.map(x=>`<span class="wd-tk${x.done?' done':''}">${ck(x)}<button class="wd-tk-t" data-wga="wdtgo" data-ds="${x.ds}">${wk?`<em>${esc(dayLbl(x.ds))}${x.h!=null?' · '+plHM(x.h):''}</em>`:x.h!=null?`<em>${plHM(x.h)}</em>`:''}<span>${esc(x.t.slice(0,60))}</span></button>${st(x)}</span>`).join('')}${more>0?`<button class="wd-tk-more" data-wga="wdtgo">${wdTT('ще','more')} ${more} ›</button>`:''}</div>`:'';
     const next=all.find(x=>!x.done);
-    const empty=!all.length?`<small class="wd-sub">${wdTT('Сьогодні справ папки нема','No tasks for this folder today')}</small>`
+    const empty=!all.length?`<small class="wd-sub">${wk?wdTT('Цього тижня справ папки нема','No tasks for this folder this week'):wdTT('Сьогодні справ папки нема','No tasks for this folder today')}</small>`
       :!rows.length&&sz==='m'?`<small class="wd-sub">${wdTT('на сьогодні все ✓','all done for today ✓')}</small>`
-      :sz==='s'?`<small class="wd-sub">${next?esc(next.t.slice(0,40)):wdTT('на сьогодні все ✓','all done for today ✓')}</small>`:'';
+      :sz==='s'?`<small class="wd-sub">${next?(wk?esc(dayLbl(next.ds))+' · ':'')+esc(next.t.slice(0,40)):wdTT('на сьогодні все ✓','all done for today ✓')}</small>`:'';
     // «＋» — кругла кнопка поруч із числом: у M дві справи вже заповнюють плитку, окремий рядок кнопки обрізався
     const add=wdOn(b,'add')&&sz!=='s'?`<button class="wd-tk-add" data-wga="wdtadd" aria-label="${esc(wdTT('Додати справу на сьогодні','Add a task for today'))}">＋</button>`:'';
     const cnt=wdTT(pluralUk(all.length,'справа','справи','справ'),all.length===1?'task':'tasks');
-    return wdTile(b,fk,`${wdHead(b,fk,wdTT('сьогодні','today'))}
+    const moreM=sz==='m'&&wk?all.filter(x=>!x.done).length-rows.length:0;
+    return wdTile(b,fk,`${wdHead(b,fk,wk?wdTT('тиждень','week'):wdTT('сьогодні','today'))}
       <div class="wd-tk-top"><button class="wd-tk-big" data-wga="wdtgo"><b class="wd-big">${all.length} <span>${cnt}${dn?' · '+dn+' ✓':''}</span></b></button>${add}</div>
-      ${empty}${list}`,'tsk');
+      ${empty}${list}${moreM>0?`<button class="wd-tk-more" data-wga="wdtgo">${wdTT('ще','more')} ${moreM} ${wdTT('цього тижня','this week')} ›</button>`:''}`,'tsk');
   }
   function wdTasksAct(a,el,fk){
-    if(a==='wdtgo'){ try{ goPlan(); }catch(e){ console.error('wdtgo',e); } return; }
+    if(a==='wdtgo'){ try{ const d=el.dataset.ds; if(/^\d{4}-\d{2}-\d{2}$/.test(d||'')&&d!==ymdLocal()){ plData().selDate=d; goPlan(true); } else goPlan(); }catch(e){ console.error('wdtgo',e); } return; }
     if(!fk) return;
     const td=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(), id=el.dataset.id, k=el.dataset.k;
     if(a==='wdtadd'){ wdTasksAddSheet(fk); return; }
@@ -40048,7 +40058,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       flow:'Скажи Флоу…',flowDay:'Розпиши мені день',flowQuad:'Розклади мої справи по квадратах',flowWeek:'Сплануй мені тиждень',flowMonth:'Що головне цього місяця?',
       starOn:'У головне',starOff:'Прибрати з головного',starMax:'Головних уже три — спершу прибери одну',putQ:'Покласти в квадрат',qNone:'Прибрати з квадрата',
       folder:'Папка',noFolder:'Без папки',toHour:'Поставити на час',details:'Час і деталі',del:'Видалити',deleted:'Справу видалено',
-      old:'зі старого квадрата',of:'з',wk:'Тиждень'},
+      old:'зі старого квадрата',of:'з',wk:'Тиждень',from:'з',move:'Перенести на інший день',moveQ:'На який день?'},
     en:{day:'Day',week:'Week',month:'Month',year:'Year',main:'Focus',hours:'Hours',quad:'Matrix',
       today:'Today',top:'Today’s focus',topDay:'Focus',rest:'Everything else',noTop:'Mark up to three key tasks — tap ☆ next to a task.',
       suggest:'Suggested',empty:'Nothing planned for this day.',add:'New task…',free:'Not scheduled',freeNone:'Everything has a time.',
@@ -40059,7 +40069,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       flow:'Ask Flow…',flowDay:'Plan my day',flowQuad:'Sort my tasks into the matrix',flowWeek:'Plan my week',flowMonth:'What matters most this month?',
       starOn:'Add to focus',starOff:'Remove from focus',starMax:'You already have three — remove one first',putQ:'Put in the matrix',qNone:'Remove from matrix',
       folder:'Folder',noFolder:'No folder',toHour:'Give it a time',details:'Time and details',del:'Delete',deleted:'Task deleted',
-      old:'from the old matrix',of:'of',wk:'Week'}
+      old:'from the old matrix',of:'of',wk:'Week',from:'since',move:'Move to another day',moveQ:'Which day?'}
   };
   const PN_DOW={uk:['Пн','Вт','Ср','Чт','Пт','Сб','Нд'],en:['Mo','Tu','We','Th','Fr','Sa','Su']};
   const PN_DOWL={uk:['Понеділок','Вівторок','Середа','Четвер','Пʼятниця','Субота','Неділя'],en:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']};
@@ -40074,6 +40084,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     grid:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
     folder:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M3 7l2-3h5l2 3h9v11a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>',
     clock:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+    cal:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
     trash:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
     tick:'<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>',
     spark:'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/></svg>',
@@ -40110,10 +40121,29 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
   /* Усі справи дня одним списком: блоки з часом + (лише сьогодні) справи без часу.
      kind 'b' — блок з blocksByDay, 't' — справа з tasks (scope 'day', ще не поставлена на час). */
+  /* Етап 3 (19.11.2026): у справи без часу є необовʼязкова дата t.date.
+     Нема дати — «на сьогодні», як було (старі справи не чіпаємо). Невиконана з минулого дня
+     показується на сьогодні з позначкою «з …» — лише показ, дата в даних лишається. */
+  function pnTaskDate(t){ return t&&/^\d{4}-\d{2}-\d{2}$/.test(t.date||'')?t.date:''; }
+  function pnTaskOn(t,ds){
+    if(!t||t.scope!=='day'||t.slotted) return null;
+    const d=pnTaskDate(t), td=pnToday();
+    if(d===ds) return {from:''};
+    if(ds===td&&!d) return {from:''};
+    if(ds===td&&d&&d<td&&!t.done) return {from:d};
+    return null;
+  }
   function pnItems(ds){
     const p=plData(), out=[];
     plBlocksFor(ds).forEach(b=>{ if(b) out.push({kind:'b',ref:b,id:String(b.id),t:b.t||'',done:!!b.done,folder:b.folder||'',h:+b.h||0,end:pnEnd(b)}); });
-    if(ds===pnToday()) (p.tasks||[]).forEach(t=>{ if(t&&t.scope==='day'&&!t.slotted) out.push({kind:'t',ref:t,id:String(t.id),t:t.t||'',done:!!t.done,folder:t.folder||'',h:null,prio:+t.p||2}); });
+    (p.tasks||[]).forEach(t=>{ const on=pnTaskOn(t,ds); if(on) out.push({kind:'t',ref:t,id:String(t.id),t:t.t||'',done:!!t.done,folder:t.folder||'',h:null,prio:+t.p||2,from:on.from}); });
+    return out;
+  }
+  // лише читання (Тиждень, Місяць, Рік): блоки дня без створення масиву + справи з цією датою
+  function pnDayRead(ds){
+    if(ds===pnToday()) return pnItems(ds);
+    const out=pnRaw(ds).map(b=>({done:!!b.done,folder:b.folder||''}));
+    (plData().tasks||[]).forEach(t=>{ if(pnTaskOn(t,ds)) out.push({done:!!t.done,folder:t.folder||''}); });
     return out;
   }
   function pnFind(ds,kind,id){ return pnItems(ds).find(x=>x.kind===kind&&x.id===String(id)); }
@@ -40126,7 +40156,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function pnStarBtn(it){ return `<button class="pn-star${it.ref.star?' on':''}" data-pnstar="${it.kind}:${esc(it.id)}" aria-label="${esc(it.ref.star?pnT('starOff'):pnT('starOn'))}">${it.ref.star?PN_ICO.starF:PN_ICO.star}</button>`; }
   function pnMeta(it){
     const tm=it.h!=null?`<span>${pnHM(it.h)}–${pnHM(Math.min(it.end,24))}</span>`:'';
-    const ch=pnChip(it); return (ch||tm)?`<span class="pn-meta">${ch}${tm}</span>`:'';
+    const fr=it.from?`<span class="pn-from">${esc(pnT('from'))} ${esc(pnShort(it.from))}</span>`:'';
+    const ch=pnChip(it); return (ch||tm||fr)?`<span class="pn-meta">${ch}${tm}${fr}</span>`:'';
   }
   function pnRow(it,big){
     return `<div class="pn-row${big?' pn-big pn-glass':''}${it.done?' done':''}">${pnCheck(it)}
@@ -40150,8 +40181,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(rest.length) html+=`<div class="pn-lbl"><span>${esc(pnT('rest'))}</span><span>${rest.length}</span></div><div class="pn-list pn-glass">${rest.map(x=>pnRow(x,false)).join('')}</div>`;
     return html+pnAddHTML(ds);
   }
+  function pnShort(ds){ const d=new Date(ds+'T12:00:00'), L=pnLang(); return L==='en'?PN_MON.en[d.getMonth()].slice(0,3)+' '+d.getDate():d.getDate()+' '+PN_MONG.uk[d.getMonth()].slice(0,4)+'.'; }
   function pnAddHTML(ds){
-    if(ds!==pnToday()) return '';
     return `<div class="pn-add pn-glass"><span>＋</span><input id="pnAddIn" type="text" enterkeyhint="done" maxlength="200" placeholder="${esc(pnT('add'))}" aria-label="${esc(pnT('add'))}"></div>`;
   }
   function pnHoursHTML(ds){
@@ -40192,7 +40223,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <div class="pn-list pn-glass">${wt.map(t=>{ const it={kind:'w',ref:t,id:String(t.id),t:t.t||'',done:!!t.done,folder:t.folder||'',h:null};
         return `<div class="pn-row${it.done?' done':''}">${pnCheck(it)}<span class="pn-tx"><span class="pn-t">${esc(it.t)}</span>${pnMeta(it)}</span></div>`; }).join('')}</div>`;
     const rows=[0,1,2,3,4,5,6].map(i=>{
-      const ds=pnAdd(mon,i), bl=ds===td?pnItems(ds):pnRaw(ds).map(b=>({done:!!b.done,folder:b.folder||''}));
+      const ds=pnAdd(mon,i), bl=pnDayRead(ds);
       const dn=bl.filter(b=>b.done).length;
       const bars=bl.slice(0,12).map(b=>`<i style="background:${pnFolderColor(b.folder)||'var(--pn-acc)'};opacity:${b.done?1:.4}"></i>`).join('');
       return `<button class="pn-wd${ds===td?' today':''}" data-pngo="${ds}"><span class="pn-dn">${PN_DOW[L][i]}<b>${+ds.slice(8)}</b></span><span class="pn-bars">${bars}</span><span class="pn-ct">${bl.length?dn+'/'+bl.length:'—'}</span></button>`;
@@ -40205,7 +40236,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     let cells='', all=0, done=0;
     for(let i=0;i<lead;i++) cells+='<span></span>';
     for(let d=1;d<=days;d++){
-      const ds=ym+'-'+String(d).padStart(2,'0'), bl=ds===td?pnItems(ds):pnRaw(ds);
+      const ds=ym+'-'+String(d).padStart(2,'0'), bl=pnDayRead(ds);
       all+=bl.length; done+=bl.filter(b=>b.done).length;
       const dots=bl.slice(0,3).map(b=>`<i style="background:${pnFolderColor(b.folder)||'var(--pn-acc)'}"></i>`).join('');
       cells+=`<button class="${ds===td?'td':''}" data-pngo="${ds}"><span>${d}</span><em>${dots}</em></button>`;
@@ -40216,8 +40247,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
   function pnYearHTML(){
     const p=plData(), y=+(pnYm||pnToday()).slice(0,4), cur=pnToday().slice(0,7), L=pnLang();
-    const stat={}; Object.keys(p.blocksByDay||{}).forEach(ds=>{ if(ds.slice(0,4)!==String(y)) return; const k=ds.slice(0,7), bl=pnRaw(ds);
-      stat[k]=stat[k]||[0,0]; stat[k][0]+=bl.filter(b=>b.done).length; stat[k][1]+=bl.length; });
+    const stat={}, add=(k,done)=>{ stat[k]=stat[k]||[0,0]; if(done) stat[k][0]++; stat[k][1]++; };
+    Object.keys(p.blocksByDay||{}).forEach(ds=>{ if(ds.slice(0,4)!==String(y)) return; pnRaw(ds).forEach(b=>add(ds.slice(0,7),!!b.done)); });
+    (p.tasks||[]).forEach(t=>{ const d=pnTaskDate(t); if(t&&t.scope==='day'&&!t.slotted&&d.slice(0,4)===String(y)) add(d.slice(0,7),!!t.done); });
     const tiles=PN_MON[L].map((nm,i)=>{ const k=y+'-'+String(i+1).padStart(2,'0'), s=stat[k]||[0,0];
       return `<button class="pn-glass${k===cur?' on':''}" data-pnym="${k}"><span>${esc(nm.slice(0,3))}</span><span class="pn-yb"><i style="width:${s[1]?Math.round(s[0]/s[1]*100):0}%"></i></span><small>${s[1]?s[0]+'/'+s[1]:''}</small></button>`; }).join('');
     return `<div class="pn-yr">${tiles}</div><div class="pn-soon pn-glass"><b>${esc(pnT('yearSoon'))}</b>${esc(pnT('yearSoonTx'))}</div>`;
@@ -40308,6 +40340,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     ];
     if(kind==='b') items.push({ic:PN_ICO.clock,label:pnT('details'),onClick:()=>{ try{ dyMenu(it.ref,ds); }catch(e){ console.error('pnOpen',e); } }});
     else {
+      if(!it.done) items.push({ic:PN_ICO.cal,label:pnT('move'),sub:pnTaskDate(it.ref)?pnShort(pnTaskDate(it.ref)):pnT('today'),onClick:()=>{
+        try{ dyDayPicker(pnT('moveQ'),it.t,ds,pnTaskDate(it.ref)||pnToday(),target=>{ it.ref.date=target; pnSave(); pnRender(); try{ plToast('📅 '+pnShort(target)); }catch(_){} }); }catch(e){ console.error('pnMove',e); } }});
       if(!it.done) items.push({ic:PN_ICO.clock,label:pnT('toHour'),onClick:()=>{ dyTaskToDay(it.id,ds);
         const b=plBlocksFor(ds).find(x=>x&&String(x.fromTask)===it.id); if(b){ if(it.ref.folder) b.folder=it.ref.folder; if(it.ref.star) b.star=true; if(it.ref.q) b.q=it.ref.q; pnSave(); } pnRender(); }});
       items.push({ic:PN_ICO.trash,label:pnT('del'),danger:true,onClick:()=>{ const p=plData(); p.tasks=(p.tasks||[]).filter(x=>!(x&&String(x.id)===it.id)); pnSave(); pnRender(); try{ plToast(pnT('deleted')); }catch(_){} }});
@@ -40317,7 +40351,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function pnAddTask(v){
     v=String(v||'').trim().slice(0,200); if(!v) return;
     const p=plData();
-    p.tasks.push({id:'t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),scope:'day',t:v,c:'val',p:2,tag:'',done:false,open:false,subs:[]});
+    p.tasks.push({id:'t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),scope:'day',t:v,date:pnDay(),c:'val',p:2,tag:'',done:false,open:false,subs:[]});
     pnSave(); pnRender();
     // фокус одразу, у тому ж обробнику: інакше швидко надруковане зникає, а iPhone ховає клавіатуру
     const i=document.getElementById('pnAddIn'); if(i) try{ i.focus({preventScroll:true}); }catch(_){}
