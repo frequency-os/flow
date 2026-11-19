@@ -165,7 +165,7 @@
           fname=f.name||base; femo=f.emoji||'📁'; }
         const all=[]; collectBlocks(boards[bk]||[],[],all);
         all.forEach(it=>{ const b=it.block;
-          out.push({bk, id:b.id, folder:fname, emoji:femo, title:b.title||'', text:blockSearchText(b)}); });
+          out.push({bk, id:b.id, folder:fname, emoji:femo, title:b.title||'', text:typeof txPlain==='function'?txPlain(blockSearchText(b)):blockSearchText(b)/* без позначок оформлення, 64-rich-text.js */}); });
       });
     }catch(e){ console.error('flowSearchBoards',e); }
     return out;

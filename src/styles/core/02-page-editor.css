@@ -1229,3 +1229,38 @@
   .pgc-mmenu button circle{fill:currentColor;stroke:none;}
   .pgc-mmenu button.on{background:color-mix(in srgb,var(--pg-acc) 16%,transparent);color:var(--pg-acc);}
   .pgc-mmenu button:focus-visible{outline:2px solid var(--pg-acc);}
+
+  /* ════ Оформлений текст (19.11.2026, page-editor/08b-rich-text.js, core/64-rich-text.js) ════ */
+  #scr-page .pgb [data-edit]{white-space:pre-wrap;word-break:break-word;}
+  #scr-page .pgb [data-edit] mark,.fhm mark{background:color-mix(in srgb,#ffd84d 55%,transparent);color:inherit;border-radius:3px;padding:0 2px;}
+  #scr-page .pgb [data-edit] .tx-a,.fhm .tx-a{color:var(--pg-acc,var(--accent));text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;}
+  #scr-page .pgb [data-edit] b{font-weight:800;}
+  /* панель над клавіатурою (телефон) / бульбашка над виділенням (компʼютер) */
+  .pg-rbar{position:fixed;left:8px;right:8px;z-index:240;display:flex;align-items:center;gap:2px;padding:5px;border-radius:16px;overflow-x:auto;scrollbar-width:none;
+    color:#eef0f4;background:rgba(28,26,40,.78);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+    box-shadow:0 10px 28px -10px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.1);
+    opacity:0;pointer-events:none;transform:translateY(8px);}
+  .pg-rbar::-webkit-scrollbar{display:none;}
+  @media (prefers-reduced-motion:no-preference){.pg-rbar{transition:opacity .16s,transform .16s;}}
+  .pg-rbar.on{opacity:1;pointer-events:auto;transform:none;}
+  .pg-rbar.bub{right:auto;width:max-content;max-width:calc(100vw - 16px);}
+  .pg-rbar.pg-paper{color:#1d1a24;background:rgba(252,251,255,.82);box-shadow:0 10px 28px -10px rgba(28,26,23,.35),inset 0 0 0 1px rgba(0,0,0,.07);}
+  .pg-rbar button{flex:none;min-width:40px;height:40px;border:0;border-radius:11px;background:transparent;color:inherit;font:inherit;font-size:16px;font-weight:700;
+    display:grid;place-items:center;padding:0 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .pg-rbar button[hidden]{display:none;}
+  .pg-rbar button:hover{background:rgba(127,127,127,.14);}
+  .pg-rbar button.on{background:color-mix(in srgb,#7c8cff 26%,transparent);color:#9aa6ff;}
+  .pg-rbar.pg-paper button.on{color:#5b5ee8;}
+  .pg-rbar button:focus-visible{outline:2px solid #7c8cff;outline-offset:-2px;}
+  .pg-rbar .rb-aa{font-weight:800;} .pg-rbar .rb-hl{background:#ffd84d;color:#1d1a24;border-radius:4px;padding:0 4px;}
+  .pg-rbar .rb-sep{flex:none;width:1px;height:22px;margin:0 3px;background:rgba(127,127,127,.3);}
+  .pg-rbar .rb-sep[hidden]{display:none;}
+  /* поки панель над клавіатурою — нижнє поле документа не просвічує під нею */
+  body.pg-rb-on .pgc{opacity:0;pointer-events:none;}
+  .pg-rbaa{position:fixed;z-index:241;display:flex;flex-direction:column;min-width:190px;padding:5px;border-radius:16px;
+    color:#eef0f4;background:rgba(28,26,40,.84);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:0 14px 34px -12px rgba(0,0,0,.55);}
+  .pg-rbaa.pg-paper{color:#1d1a24;background:rgba(252,251,255,.88);}
+  .pg-rbaa button{border:0;background:transparent;color:inherit;font:inherit;font-size:15px;text-align:left;min-height:42px;padding:0 12px;border-radius:10px;cursor:pointer;}
+  .pg-rbaa button.on{background:color-mix(in srgb,#7c8cff 22%,transparent);font-weight:800;}
+  @media (prefers-reduced-transparency:reduce){ .pg-rbar,.pg-rbaa{background:#1c1a28;} .pg-rbar.pg-paper,.pg-rbaa.pg-paper{background:#fff;} }
+  .pgask-b .rb-unlink{margin-right:auto;color:#d4405a;}

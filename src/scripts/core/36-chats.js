@@ -406,9 +406,14 @@
     return s;
   }
   // лише справжні теги (старі дані з HTML); «ціна < 100 > 50» лишається як є
+  // текст без позначок оформлення (**жирний**, ==маркер==…, 64-rich-text.js) — для назв, Флоу, пошуку
+  function fhTx(s){ try{ return typeof txPlain==='function'?txPlain(s):s; }catch(_){ return s; } }
+  // текст бульбашки з оформленням; посилань усередині кнопки бути не може — вони як підкреслений текст
+  function fhRichTx(b){ const raw=fhPlain(b.text!=null?b.text:b.title); if(!raw) return esc(fhLabel(b));
+    try{ return typeof txHTML==='function'?txHTML(raw,{links:false}):esc(raw); }catch(_){ return esc(raw); } }
   function fhPlain(s){ return String(s==null?'':s).replace(/<\/?[a-z][^<>]*>/gi,' ').replace(/\s+/g,' ').trim(); }
   function fhLabel(b){
-    const t=fhPlain(b.text!=null?b.text:b.title);
+    const t=fhTx(fhPlain(b.text!=null?b.text:b.title));
     if(t) return t;
     const bt=(()=>{ try{ return (fhBridge()&&fhBridge().blockTypes())||{}; }catch(_){ return {}; } })();
     return (bt[b.type]&&bt[b.type].title)||(b.type==='photo'?'Фото':'Блок');
@@ -556,7 +561,7 @@
     const f=folders[fk]; if(!f||fhAi.st==='busy') return;
     const blocks=(fhBridge()&&fhBridge().getBlocks())||[];
     const recs=[]; fhWalk(blocks,b=>{ if(b.type==='subs'||b.type==='divider'||(b.type==='photo')) return;
-      const t=fhPlain(b.text!=null?b.text:b.title); if(t) recs.push({id:String(b.id),type:b.type,text:t.slice(0,200),done:b.type==='task'?!!b.done:undefined}); });
+      const t=fhTx(fhPlain(b.text!=null?b.text:b.title)); if(t) recs.push({id:String(b.id),type:b.type,text:t.slice(0,200),done:b.type==='task'?!!b.done:undefined}); });
     let kids=[]; try{ kids=groupKids(fk).filter(k=>folders[k]); }catch(_){}
     fhAi={fk,st:'busy',text:'',moves:[],err:''}; fhBelowRender(fk);
     try{
@@ -825,14 +830,14 @@
     const t=b.type, id=esc(b.id);
     if(t==='photo'&&b.data){ let u=''; try{ u=safeImg(b.data); }catch(_){}
       return `<button class="fhm fhm-ph" data-fhm="${id}"><img alt="" src="${esc(u)}">${b.title?`<span class="fhm-cap" data-i18n-skip="1">${esc(fhPlain(b.title))}</span>`:''}</button>`; }
-    if(t==='task') return `<div class="fhm fhm-task${b.done?' done':''}"><button class="fh-box" data-fhdone="${id}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fhm-tx" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button></div>`;
+    if(t==='task') return `<div class="fhm fhm-task${b.done?' done':''}"><button class="fh-box" data-fhdone="${id}" aria-pressed="${!!b.done}" aria-label="Готово">${b.done?chI('check'):''}</button><button class="fhm-tx" data-fhm="${id}" data-i18n-skip="1">${fhRichTx(b)}</button></div>`;
     // віджет — живий, тим самим wgFill, що й у документі (хост заповнює fhApplyView)
     if(typeof wgIs==='function'&&wgIs(t)) return fhRich(b,`<div class="pgwg fhr-wg" data-wghost="${id}"></div>`);
     if(t==='tbl') return fhRich(b,fhTblHTML(b));
     // інший блок без власного тексту (дошка, тогл, вкладення…) — картка з назвою типу замість голого «Блок»
     if(t!=='photo'&&!FH_TEXTY[t]&&!fhPlain(b.text!=null?b.text:b.title)) return fhRich(b,`<div class="fhr-gen" data-i18n-skip="1">${esc(fhLabel(b))}</div>`);
     const head=(t==='h1'||t==='h2'||t==='h3');
-    return `<button class="fhm${head?' fhm-h':''}" data-fhm="${id}" data-i18n-skip="1">${esc(fhLabel(b))}</button>`;
+    return `<button class="fhm${head?' fhm-h':''}" data-fhm="${id}" data-i18n-skip="1">${head?esc(fhLabel(b)):fhRichTx(b)}</button>`;
   }
   function fhChatHTML(arr){
     // усі записи, і вкладені теж — у стрічці нічого не ховається

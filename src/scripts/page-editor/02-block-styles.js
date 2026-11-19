@@ -1,3 +1,6 @@
+  /* оформлений текст у полі (19.11.2026): позначки → <b> <i> <s> <mark> <a>, усе інше екрановано (core/64-rich-text.js) */
+  function txRich(b){ try{ if(typeof txHTML==='function') return txHTML(txtOf(b)); }catch(_){} return esc(txtOf(b)); }
+  function txIsRich(b){ return !!(b&&typeof TX_RICH!=='undefined'&&TX_RICH[b.type]); }
   function equalizeWidths(cols){ var n=cols.length||1; cols.forEach(function(c){ c.width=1/n; }); }
 
   /* ── стиль заголовка: колір / шрифт / контур / виділення, як в Instagram-текстах ── */
@@ -128,13 +131,13 @@
     /* прибрані 10.10.2026 ізольовані блоки — у старих документах лишається плашка з «Прибрати» */
     if(Object.prototype.hasOwnProperty.call(PG_GONE,t)) return '<div class="pg-content"><div class="pg-oldw">Старий блок «'+PG_GONE[t]+'» — більше не підтримується. <button type="button" class="pg-oldw-rm" data-pgoldrm="'+id+'">Прибрати</button></div></div>';
     /* нотатка = суцільний абзац на аркуші, без рамок */
-    if(t==='note'||t==='quick')return '<div class="pg-content pg-empty" contenteditable="true" data-ph="Пишіть…" data-edit="'+id+'">'+esc(txtOf(b))+'</div>';
+    if(t==='note'||t==='quick')return '<div class="pg-content pg-empty" contenteditable="true" data-ph="Пишіть…" data-edit="'+id+'">'+(t==='quick'?esc(txtOf(b)):txRich(b))+'</div>';   /* quick пишеться як простий текст — без оформлення */
     if(t==='h1'){var hs1=headingStyle(b);return '<div class="pg-content pgc-h1'+hs1.cls+' pg-empty" style="'+hs1.style+'" contenteditable="true" data-ph="Заголовок 1" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
     if(t==='h2'){var hs2=headingStyle(b);return '<div class="pg-content pgc-h2'+hs2.cls+' pg-empty" style="'+hs2.style+'" contenteditable="true" data-ph="Заголовок 2" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
     if(t==='h3'){var hs3=headingStyle(b);return '<div class="pg-content pgc-h3'+hs3.cls+' pg-empty" style="'+hs3.style+'" contenteditable="true" data-ph="Заголовок 3" data-edit="'+id+'">'+esc(b.text||b.title||'')+'</div>';}
-    if(t==='quote')return '<div class="pg-content pgc-quote pg-empty" contenteditable="true" data-ph="Цитата…" data-edit="'+id+'">'+esc(txtOf(b))+'</div>';
-    if(t==='glass')return '<div class="pg-content"><div class="pgc-glass"><div class="pg-empty" contenteditable="true" data-ph="Напиши щось — зʼявиться на склі…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div></div>';
-    if(t==='callout')return '<div class="pg-content pgc-callout"><span class="clx">'+esc(b.emo||'💡')+'</span><div class="cltx pg-empty" contenteditable="true" data-ph="Виноска…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div>';
+    if(t==='quote')return '<div class="pg-content pgc-quote pg-empty" contenteditable="true" data-ph="Цитата…" data-edit="'+id+'">'+txRich(b)+'</div>';
+    if(t==='glass')return '<div class="pg-content"><div class="pgc-glass"><div class="pg-empty" contenteditable="true" data-ph="Напиши щось — зʼявиться на склі…" data-edit="'+id+'">'+txRich(b)+'</div></div></div>';
+    if(t==='callout')return '<div class="pg-content pgc-callout"><span class="clx">'+esc(b.emo||'💡')+'</span><div class="cltx pg-empty" contenteditable="true" data-ph="Виноска…" data-edit="'+id+'">'+txRich(b)+'</div></div>';
     if(t==='divider'||t==='head')return '<div class="pg-content pg-div"><hr></div>';
     if(t==='code'){
       var lang=b.lang||'';
@@ -254,10 +257,10 @@
         +'<span class="pgfc-c">'+(new Array(Math.min(b.done||0,8)+1).join('●')||'—')+' сьогодні</span>'
         +'<span class="pgfc-h">'+(fcRun?'тап — стоп':'тап — старт '+(b.mode==='rest'?'5':'25')+' хв')+'</span></div></div></div>';
     }
-    if(t==='task')return '<div class="pg-content"><div class="pg-todo '+(b.done?'done':'')+'"><div class="box" data-pgtodo="'+id+'">'+(b.done?'✓':'')+'</div><div class="tx pg-empty" contenteditable="true" data-ph="Завдання…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div></div>';
-    if(t==='bullet')return '<div class="pg-content"><div class="pg-bul"><span class="dot"></span><div class="tx pg-empty" contenteditable="true" data-ph="Пункт…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div></div>';
-    if(t==='num')return '<div class="pg-content"><div class="pg-num"><span class="n" data-pgnum>1.</span><div class="tx pg-empty" contenteditable="true" data-ph="Пункт…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div></div>';
-    if(t==='toggle')return '<div class="pg-content pg-tg '+(b.open?'open':'')+'"><div class="tgh"><span class="tga" data-pgtoggle="'+id+'">▸</span><div class="tgt pg-empty" contenteditable="true" data-ph="Тогл…" data-edit="'+id+'">'+esc(txtOf(b))+'</div></div><div class="tgb"><div data-pgchild="'+id+'"></div></div></div>';
+    if(t==='task')return '<div class="pg-content"><div class="pg-todo '+(b.done?'done':'')+'"><div class="box" data-pgtodo="'+id+'">'+(b.done?'✓':'')+'</div><div class="tx pg-empty" contenteditable="true" data-ph="Завдання…" data-edit="'+id+'">'+txRich(b)+'</div></div></div>';
+    if(t==='bullet')return '<div class="pg-content"><div class="pg-bul"><span class="dot"></span><div class="tx pg-empty" contenteditable="true" data-ph="Пункт…" data-edit="'+id+'">'+txRich(b)+'</div></div></div>';
+    if(t==='num')return '<div class="pg-content"><div class="pg-num"><span class="n" data-pgnum>1.</span><div class="tx pg-empty" contenteditable="true" data-ph="Пункт…" data-edit="'+id+'">'+txRich(b)+'</div></div></div>';
+    if(t==='toggle')return '<div class="pg-content pg-tg '+(b.open?'open':'')+'"><div class="tgh"><span class="tga" data-pgtoggle="'+id+'">▸</span><div class="tgt pg-empty" contenteditable="true" data-ph="Тогл…" data-edit="'+id+'">'+txRich(b)+'</div></div><div class="tgb"><div data-pgchild="'+id+'"></div></div></div>';
     if(t==='win'){
       var _wh=b.h||140;
       return '<div class="pg-content pgwin'+(b.open===false?' closed':'')+'" style="--wh:'+_wh+'px">'
@@ -623,7 +626,7 @@
     if(nm){var l2=locate(nm.dataset.pgdbname);if(l2){l2.block.dbName=nm.value;l2.block.title=nm.value;save();}return;}
     var el=e.target.closest('[data-edit]');if(!el)return;
     var id=el.dataset.edit,loc=locate(id);if(!loc)return;
-    var txt=el.textContent;
+    var txt=txIsRich(loc.block)&&typeof txFromDom==='function'?txFromDom(el):el.textContent;
     if(txt==='/'&&(loc.block.type==='note')&&!txtOf(loc.block).replace('/','').trim()){
       el.textContent='';setTxt(loc.block,'');slashCtx=id;openSlash();return;
     }
