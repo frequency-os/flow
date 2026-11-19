@@ -476,7 +476,7 @@
   /* ── дошка: сітка 12 колонок, авто-укладання нативним CSS Grid (SPECblocksv2 §4.3) ── */
   function renderBoardBlock(rb,host){
     /* wboard — дошка віджетів «Дані»: на телефоні 2 колонки, як віджети iPhone (CSS 32-widgets.css) */
-    var wrap=document.createElement('div'); wrap.className='pg-board'+(rb.wboard?' wboard':''); wrap.dataset.id=rb.id;
+    var wrap=document.createElement('div'); wrap.className='pg-board'+(rb.wboard?' wboard':'')+(rb.wboard&&window.__wbEdit===rb.id?' wb-edit':''); wrap.dataset.id=rb.id;
     var items=Array.isArray(rb.children)?rb.children:[];
     items.forEach(function(it){
       if(!condMet(it)&&!pgShowHidden) return;
@@ -484,14 +484,26 @@
       cell.style.setProperty('--gw',it.gw||4); cell.style.setProperty('--gh',it.gh||2);
       /* віджети «Дані» мають розміри S/M/L — ширину на телефоні й ноуті задає CSS за data-sz */
       if(typeof wdIs==='function'&&wdIs(it.type)) cell.dataset.sz=wdSz(it);
+      /* дошка віджетів (19.11.2026): розмір — клітинки, свій на телефоні (4 колонки) і компʼютері (8), CSS 41-widget-sheet.css */
+      if(rb.wboard&&typeof wdCell==='function'&&wdIs(it.type)){
+        var cm=wdCell(it,'m'), cd=wdCell(it,'d');
+        cell.style.setProperty('--wcm',cm[0]); cell.style.setProperty('--whm',cm[1]); cell.style.setProperty('--wcd',cd[0]); cell.style.setProperty('--whd',cd[1]);
+        cell.classList.add('wb-cell');
+      }
       renderList([it],cell);
+      if(cell.classList.contains('wb-cell')){
+        var wx=document.createElement('button'); wx.className='wb-x'; wx.dataset.wbx=it.id; wx.setAttribute('aria-label','Прибрати віджет');
+        wx.innerHTML='<span>✕</span>'; cell.appendChild(wx);
+      }
       var rz=document.createElement('span'); rz.className='pg-brz'; rz.dataset.pgboardrz=it.id; rz.textContent='◢';
       cell.appendChild(rz);
       wrap.appendChild(cell);
     });
     host.appendChild(wrap);
     var foot=document.createElement('div'); foot.className='pg-bfoot';
+    var ed=rb.wboard&&window.__wbEdit===rb.id;
     foot.innerHTML='<button class="pg-badd" data-pgboardadd="'+esc(rb.id)+'">'+(rb.wboard?'＋ Віджет':'＋ Віджет у дошку')+'</button>'
+      +(rb.wboard&&items.length?'<button class="wb-ed'+(ed?' on':'')+'" data-wbed="'+esc(rb.id)+'" aria-pressed="'+ed+'">'+(ed?'Готово':'Змінити')+'</button>':'')
       +'<button class="pg-rowdel" data-pgrowdel="'+esc(rb.id)+'" title="Видалити дошку">✕</button>';
     host.appendChild(foot);
   }

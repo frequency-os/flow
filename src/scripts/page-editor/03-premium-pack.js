@@ -626,7 +626,17 @@
           colW:boardEl.getBoundingClientRect().width/12,
           startX:(e.touches?e.touches[0].clientX:e.clientX),startY:(e.touches?e.touches[0].clientY:e.clientY),
           w0:loc.block.gw||4,h0:loc.block.gh||2};
-      if(typeof wdIs==='function'&&wdIs(loc.block.type)){
+      /* дошка віджетів (19.11.2026): тягнемо по клітинках пристрою — 4 колонки на телефоні, 8 на компʼютері */
+      if(boardEl.classList.contains('wboard')&&typeof wdCell==='function'&&wdIs(loc.block.type)){
+        var cs=getComputedStyle(boardEl), g=parseFloat(cs.columnGap)||12;
+        bz.cellMode=true; bz.dev=wdDev(); bz.cols=wdCols(bz.dev);
+        bz.colW=(boardEl.getBoundingClientRect().width-g*(bz.cols-1))/bz.cols+g;
+        bz.rowH=(parseFloat(cs.gridAutoRows)||76)+(parseFloat(cs.rowGap)||g);
+        bz.c0=wdCell(loc.block,bz.dev); bz.cur=bz.c0.slice();
+        cell.classList.add('wb-drag'); cell.dataset.dim=bz.cur[0]+' × '+bz.cur[1];
+        try{ window.platform.haptic('light'); }catch(_){}
+      }
+      else if(typeof wdIs==='function'&&wdIs(loc.block.type)){
         var sz0=wdSz(loc.block); bz.wd=true; bz.h0=WD_SZ[sz0].gh;
         bz.w0eff=window.innerWidth>=760?WD_SZ[sz0].gw/2:WD_SZ[sz0].gw;
       }
@@ -637,6 +647,17 @@
       if(!bz)return; e.preventDefault();
       var x=e.touches?e.touches[0].clientX:e.clientX,y=e.touches?e.touches[0].clientY:e.clientY;
       var dW=Math.round((x-bz.startX)/Math.max(1,bz.colW)), dH=Math.round((y-bz.startY)/ROWH);
+      if(bz.cellMode){
+        var w=Math.max(1,Math.min(bz.cols,bz.c0[0]+dW)), h=Math.max(1,Math.min(5,bz.c0[1]+Math.round((y-bz.startY)/bz.rowH)));
+        if(w!==bz.cur[0]||h!==bz.cur[1]){
+          bz.cur=[w,h]; wdSetCell(bz.block,bz.dev,w,h); bz.changed=true;
+          var k=bz.dev==='d'?'d':'m';
+          bz.cell.style.setProperty('--wc'+k,w); bz.cell.style.setProperty('--wh'+k,h); bz.cell.dataset.dim=w+' × '+h; bz.cell.dataset.sz=bz.block.sz;
+          var hst=bz.cell.querySelector('[data-wghost]'); if(hst){ try{ wgFill(hst,bz.block,hst.dataset.wgfk||''); }catch(_){} }   /* вміст перебудовується під площу одразу */
+          try{ window.platform.haptic('light'); }catch(_){}
+        }
+        return;
+      }
       if(bz.wd){
         /* віджет «Дані»: лише S / M / L. На ширині ≥760 S=3, M=L=6 колонок (CSS), тож рахуємо в частках ширини M */
         var full=window.innerWidth>=760?6:12, ew=(bz.w0eff+dW)/full, eh=bz.h0+dH;
@@ -655,12 +676,27 @@
       if(!bz)return;
       document.removeEventListener('touchmove',bzMove);document.removeEventListener('mousemove',bzMove);
       document.removeEventListener('touchend',bzEnd);document.removeEventListener('mouseup',bzEnd);
-      var redraw=bz.wd&&bz.changed;
-      save(); bz=null;
+      var redraw=(bz.wd||bz.cellMode)&&bz.changed;
+      if(bz.cellMode){ bz.cell.classList.remove('wb-drag'); delete bz.cell.dataset.dim; }
+      if(!bz.cellMode||bz.changed) save();
+      bz=null;
       if(redraw) render();   /* S/M/L показують різний вміст — перемалювати віджет */
     }
     editor.addEventListener('touchstart',bzStart,{passive:false});
     editor.addEventListener('mousedown',bzStart);
+    /* «Змінити» на дошці віджетів: хитання, ✕ і ручка ↘; тап по віджету — його налаштування (63-widget-sheet.js) */
+    editor.addEventListener('click',function(e){
+      var t=e.target; if(!t.closest) return;
+      var eb=t.closest('[data-wbed]');
+      if(eb){ e.preventDefault(); e.stopPropagation(); window.__wbEdit=window.__wbEdit===eb.dataset.wbed?'':eb.dataset.wbed; render(); return; }
+      var x=t.closest('[data-wbx]');
+      if(x){ e.preventDefault(); e.stopPropagation(); if(typeof wdRemove==='function') wdRemove(x.dataset.wbx); return; }
+      var cl=t.closest('.wb-edit .wb-cell');
+      if(cl&&!t.closest('[data-pgboardrz]')&&!t.closest('[data-pggrip]')){
+        var hs=cl.querySelector('[data-wghost]'); e.preventDefault(); e.stopPropagation();
+        if(hs&&typeof wdSheet==='function') wdSheet(hs.dataset.wghost);
+      }
+    },true);
   })();
 
   // ── block menu ──
