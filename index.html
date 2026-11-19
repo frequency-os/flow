@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-19-0024-7c62942';
+  var BUILD='2026-11-19-0516-eb94fcd';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -9286,6 +9286,183 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .pg-sitem.pgs-more{justify-content:center;border:1.5px dashed color-mix(in srgb,var(--accent) 50%,transparent);border-radius:12px;margin-top:6px;font-weight:800;color:var(--accent);}
   /* Ще → Магазин блоків */
   .acc-row .bs-badge{margin-left:auto;margin-right:6px;font-size:10px;font-weight:800;background:#ff6b9a;color:#fff;border-radius:7px;padding:2px 7px;}
+  /* ════════ Налаштування віджетів і розмір клітинками (19.11.2026, 63-widget-sheet.js) ════════
+     Дошка віджетів: телефон 4 колонки, компʼютер (≥760) 8 колонок; розмір клітинки — --wcm/--whm і --wcd/--whd з блоку.
+     «Змінити»: хитання, ✕ і ручка ↘. Шторка: скло на токенах теми (--card, --text, --muted), тож живе і в світлій, і в темній. */
+
+  /* ── сітка ── */
+  #scr-page .pg-board.wboard{grid-template-columns:repeat(8,minmax(0,1fr));grid-auto-rows:80px;gap:10px;}
+  #scr-page .pg-board.wboard .pg-bitem.wb-cell{grid-column:span var(--wcd,4)!important;grid-row:span var(--whd,2)!important;min-height:0;}
+  @media (max-width:759px){
+    #scr-page .pg-board.wboard{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:76px;gap:12px;}
+    #scr-page .pg-board.wboard .pg-bitem.wb-cell{grid-column:span var(--wcm,2)!important;grid-row:span var(--whm,2)!important;}
+  }
+  /* ручка й «тягни» — лише в «Змінити»; поза ним нічого не стирчить */
+  #scr-page .pg-board.wboard .wb-cell .pg-brz,#scr-page .pg-board.wboard .wb-cell>.pgb>.pg-grip{display:none;}
+  .wb-x{display:none;}
+
+  /* ── «Змінити» (селектори з .pg-board.wboard.wb-edit — сильніші за правило, що ховає ручку поза режимом) ── */
+  .pg-bfoot .wb-ed{margin-left:auto;margin-right:8px;border:0;border-radius:999px;padding:8px 15px;min-height:36px;cursor:pointer;
+    font:inherit;font-size:12.5px;font-weight:800;color:var(--pg-fg,var(--text));background:color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);}
+  .pg-bfoot .wb-ed.on{background:var(--pg-acc,var(--accent));color:#fff;}
+  .pg-bfoot .wb-ed:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  #scr-page .wb-edit .wb-cell{animation:wbjig .34s ease-in-out infinite alternate;cursor:pointer;overflow:visible;}
+  #scr-page .wb-edit .wb-cell:nth-child(2n){animation-delay:-.17s;}
+  @keyframes wbjig{from{transform:rotate(-.55deg);}to{transform:rotate(.55deg);}}
+  #scr-page .wb-edit .wb-cell .pgwg{pointer-events:none;}
+  #scr-page .wb-edit .wb-cell .wb-x{display:grid;position:absolute;top:-8px;left:-8px;width:44px;height:44px;place-items:center;z-index:6;
+    border:0;background:transparent;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .wb-x span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;
+    background:rgba(38,34,54,.92);box-shadow:0 0 0 1px rgba(255,255,255,.22),0 4px 10px rgba(0,0,0,.3);}
+  .wb-x:focus-visible span{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  #scr-page .pg-board.wboard.wb-edit .wb-cell .pg-brz{display:block;position:absolute;right:-4px;bottom:-4px;width:44px;height:44px;opacity:1;font-size:0;z-index:6;cursor:nwse-resize;touch-action:none;}
+  #scr-page .pg-board.wboard.wb-edit .wb-cell .pg-brz::after{content:"";position:absolute;right:11px;bottom:11px;width:15px;height:15px;
+    border-right:3.5px solid var(--pg-fg,var(--text));border-bottom:3.5px solid var(--pg-fg,var(--text));border-radius:0 0 7px 0;opacity:.85;}
+  #scr-page .pg-board.wboard.wb-edit .wb-cell>.pgb>.pg-grip{display:flex;top:4px;right:4px;width:36px;min-height:36px;opacity:.6;}
+  #scr-page .wb-cell.wb-drag{animation:none;z-index:5;}
+  #scr-page .wb-cell.wb-drag .wg-t{box-shadow:inset 0 0 0 2px var(--pg-acc,var(--accent)),0 18px 40px -12px rgba(0,0,0,.55);}
+  #scr-page .wb-cell.wb-drag::after{content:attr(data-dim);position:absolute;inset:0;display:grid;place-items:center;z-index:5;border-radius:26px;pointer-events:none;
+    font-family:var(--f-disp,inherit);font-size:20px;font-weight:800;color:#fff;background:rgba(18,14,32,.5);}
+  @media (prefers-reduced-motion:reduce){ #scr-page .wb-edit .wb-cell{animation:none;} }
+
+  /* ── шапка віджета — кнопка налаштувань (⚙ прибрано) ── */
+  .wg-t.wd button.wd-h{background:none;border:0;margin:0;padding:0;font-family:inherit;text-align:left;cursor:pointer;width:100%;
+    min-height:24px;position:relative;z-index:2;-webkit-tap-highlight-color:transparent;}
+  .wg-t.wd .wd-h{padding-right:34px;}
+  .wg-t.wd button.wd-h:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;border-radius:8px;}
+  .wg-t.wd{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  .wg-t.wd .wd-big.cal-today{display:none;}
+
+  /* ── фон віджета: Матове · Колір ── */
+  .wg-t.wg-t.wd.bg-frost{background:linear-gradient(180deg,color-mix(in srgb,#fff 16%,transparent),color-mix(in srgb,#fff 6%,transparent)),color-mix(in srgb,var(--pg-surface,var(--card)) 52%,transparent);
+    -webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%);}
+  .wg-t.wg-t.wd.bg-solid{--pg-fg:#fff;--pg-mut:rgba(255,255,255,.84);--pg-track:rgba(255,255,255,.26);--gl-fg:#fff;--gl-mut:rgba(255,255,255,.84);color:#fff;
+    background:linear-gradient(150deg,color-mix(in srgb,var(--fc) 90%,#fff),color-mix(in srgb,var(--fc) 58%,#140f24));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 12px 26px -16px color-mix(in srgb,var(--fc) 80%,#000);}
+  .wg-t.wd.bg-solid .wd-dot,.wg-t.wd.bg-solid .wd-bar i,.wg-t.wd.bg-solid .wd-days i.on u{background:#fff;}
+  .wg-t.wd.bg-solid .wd-ring .vl{stroke:#fff;}
+  .wg-t.wg-t.wd.bg-solid .wd-acts button{background:rgba(255,255,255,.22);color:#fff;}
+  .wg-t.wd.bg-solid .tm-d{background:rgba(255,255,255,.2);color:#fff;}
+
+  /* ── площа 1 клітинка: значок і число ── */
+  .pg-board.wboard .wg-t.wd.tx-xs{padding:8px 6px;justify-content:center;align-items:center;text-align:center;gap:2px;}
+  .pg-board.wboard .wg-t.wd.tx-xs>*:not(.wg-hit):not(.wd-big):not(.wd-cnt):not(.wd-ringc):not(.wd-strk):not(.tm-live):not(.wd-pair){display:none!important;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-big{font-size:24px;margin:0;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-big.xl{font-size:28px;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-big>span{display:none;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-strk .wd-cap,.pg-board.wboard .wg-t.wd.tx-xs .tm-live>small{display:none;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-cnt .wd-cap{font-size:10.5px;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-ring{width:52px;height:52px;} .pg-board.wboard .wg-t.wd.tx-xs .wd-ring b{font-size:13px;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-cnt,.pg-board.wboard .wg-t.wd.tx-xs .wd-strk{flex-direction:column;align-items:center;gap:0;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-pair{width:100%;height:100%;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-big.cal-today{display:flex;flex-direction:column;align-items:center;line-height:1;}
+  .pg-board.wboard .wg-t.wd.tx-xs .wd-big.cal-today span{display:block;font-size:10.5px;font-weight:800;color:#ff5d5d;letter-spacing:.04em;margin-bottom:3px;}
+  /* ── один ряд: назва ліворуч, число праворуч ── */
+  .pg-board.wboard .wg-t.wd.tx-row{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;}
+  .pg-board.wboard .wg-t.wd.tx-row>*:not(.wg-hit):not(.wd-h):not(.wd-big):not(.wd-cnt):not(.wd-ringc):not(.wd-strk):not(.tm-live){display:none!important;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-h{width:auto;flex:1 1 auto;min-width:0;padding-right:0;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-big{font-size:26px;margin:0;white-space:nowrap;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-big>span{font-size:12px;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-ring{width:44px;height:44px;} .pg-board.wboard .wg-t.wd.tx-row .wd-ring b{font-size:12px;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-cnt,.pg-board.wboard .wg-t.wd.tx-row .wd-strk{flex-direction:row;align-items:baseline;gap:6px;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-strk .wd-cap br{display:none;}
+  .pg-board.wboard .wg-t.wd.tx-row .tm-live>small{display:none;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-big.cal-today{display:block;}
+  .pg-board.wboard .wg-t.wd.tx-row .wd-big.cal-today span{font-size:13px;color:#ff5d5d;font-weight:800;}
+  .wg-t.wd small.wd-sub.ok{color:var(--pg-ok,#1ea566);}
+
+  /* ════════ шторка ════════ */
+  .ws-ov{position:fixed;inset:0;z-index:1250;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,5,14,0);transition:background .25s;}
+  .ws-ov.on{background:rgba(6,5,14,.4);}
+  .ws-ov.out{background:rgba(6,5,14,0);}
+  .ws-sh{box-sizing:border-box;width:100%;max-width:560px;max-height:min(90vh,880px);overflow-y:auto;overscroll-behavior:contain;
+    border-radius:28px 28px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;align-content:start;
+    color:var(--text);background:color-mix(in srgb,var(--card) 82%,transparent);
+    -webkit-backdrop-filter:blur(28px) saturate(170%);backdrop-filter:blur(28px) saturate(170%);
+    box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 18%,transparent),0 -20px 44px -12px rgba(0,0,0,.45);
+    transform:translateY(105%);transition:transform .32s cubic-bezier(.3,.7,.2,1);}
+  .ws-ov.on .ws-sh{transform:none;} .ws-ov.out .ws-sh{transform:translateY(105%);}
+  @media (min-width:1024px){
+    .ws-ov{justify-content:flex-end;align-items:stretch;padding:16px;}
+    .ws-sh{width:392px;max-width:none;max-height:none;border-radius:24px;padding-bottom:20px;transform:translateX(110%);}
+    .ws-ov.out .ws-sh{transform:translateX(110%);}
+    .ws-grab{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){ .ws-sh,.ws-ov{transition:none;} }
+  @media (prefers-reduced-transparency:reduce){ .ws-sh{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--card);} }
+  .ws-grab{width:40px;height:5px;border-radius:3px;margin:0 auto;background:color-mix(in srgb,var(--text) 22%,transparent);}
+  .ws-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:16px;}
+  .ws-hd b{font-weight:800;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ws-done{flex:none;border:0;border-radius:999px;padding:8px 16px;min-height:36px;cursor:pointer;font:inherit;font-size:13px;font-weight:800;
+    color:var(--text);background:color-mix(in srgb,var(--text) 12%,transparent);}
+  .ws-pv{display:flex;justify-content:center;padding:2px 0 4px;}
+  .ws-pvc{display:flex;max-width:100%;transition:width .2s,height .2s;}
+  .ws-pvh{flex:1;display:flex;min-width:0;pointer-events:none;}
+  .ws-pvh>.wg-t{flex:1;max-width:none;min-height:0;overflow:hidden;}
+  .ws-tabs{display:flex;padding:3px;border-radius:12px;background:color-mix(in srgb,var(--text) 9%,transparent);}
+  .ws-tabs button{flex:1;border:0;background:transparent;border-radius:10px;padding:8px 6px;min-height:36px;cursor:pointer;font:inherit;font-size:13px;font-weight:800;color:var(--muted);}
+  .ws-tabs button.on{background:color-mix(in srgb,var(--card) 70%,color-mix(in srgb,var(--text) 14%,transparent));color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.12);}
+  .ws-body{display:grid;gap:12px;}
+  .ws-grp{border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--text) 6%,transparent);}
+  .ws-gt{padding:10px 14px 0;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
+  .ws-it{display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:48px;box-sizing:border-box;font-size:14px;font-weight:600;color:var(--text);}
+  .ws-it.wrap{flex-wrap:wrap;row-gap:8px;}
+  .ws-it.wrap>span:first-child{flex:1 0 100%;}
+  .ws-it+.ws-it{box-shadow:inset 0 1px 0 color-mix(in srgb,var(--text) 8%,transparent);}
+  .ws-it>span:first-child{flex:1;min-width:0;}
+  button.ws-it{width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font-family:inherit;}
+  .ws-sw i{flex:none;width:44px;height:26px;border-radius:13px;position:relative;background:color-mix(in srgb,var(--text) 22%,transparent);transition:background .18s;}
+  .ws-sw i::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .18s;}
+  .ws-sw i.on{background:#34c77b;} .ws-sw i.on::after{transform:translateX(18px);}
+  .ws-go em{font-style:normal;color:var(--muted);font-size:18px;}
+  .ws-in{flex:1 1 140px;min-width:0;border:0;border-radius:10px;padding:8px 10px;font:inherit;font-size:14px;font-weight:700;color:var(--text);
+    background:color-mix(in srgb,var(--text) 8%,transparent);}
+  .ws-in.sm{flex:0 1 auto;}
+  .ws-in::placeholder{color:var(--muted);}
+  .ws-seg{display:flex;flex-wrap:wrap;padding:2px;border-radius:10px;background:color-mix(in srgb,var(--text) 9%,transparent);}
+  .ws-seg button{border:0;background:transparent;border-radius:8px;padding:6px 10px;min-height:32px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:800;color:var(--muted);}
+  .ws-seg button.on{background:color-mix(in srgb,var(--card) 60%,color-mix(in srgb,var(--text) 16%,transparent));color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12);}
+  .ws-it>.ws-seg:only-child{flex:1;justify-content:space-between;}
+  .ws-chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 12px;}
+  .ws-chips button{border:0;border-radius:999px;padding:7px 12px;min-height:34px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;color:var(--text);
+    background:color-mix(in srgb,var(--text) 8%,transparent);}
+  .ws-chips button.on{background:color-mix(in srgb,var(--accent) 26%,transparent);box-shadow:inset 0 0 0 1.5px var(--accent);}
+  .ws-cc{display:flex;flex-wrap:wrap;gap:8px;}
+  .ws-cc button{width:30px;height:30px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--s);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);}
+  .ws-cc button.fold{background:conic-gradient(#ff9a62,#c04d8f,#6d5cf0,#ff9a62);}
+  .ws-cc button.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--text);}
+  .ws-step{display:flex;align-items:center;gap:8px;}
+  .ws-step button{width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;font:inherit;font-size:16px;font-weight:800;color:var(--text);background:color-mix(in srgb,var(--text) 12%,transparent);}
+  .ws-step b{min-width:24px;text-align:center;font-variant-numeric:tabular-nums;}
+  .ws-pk{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:5px;padding:10px 14px 6px;}
+  .ws-pk button{border:0;padding:0;cursor:pointer;height:30px;border-radius:7px;background:color-mix(in srgb,var(--text) 10%,transparent);transition:background .12s;}
+  .ws-pk button.in{background:var(--accent);}
+  .ws-pk button.hov{background:color-mix(in srgb,var(--accent) 45%,transparent);}
+  .ws-pkl{display:flex;justify-content:space-between;gap:10px;padding:0 14px 12px;font-size:12px;font-weight:700;color:var(--muted);}
+  .ws-pkl b{color:var(--text);font-variant-numeric:tabular-nums;}
+  .ws-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .ws-acts button{border:0;border-radius:14px;padding:12px;min-height:46px;cursor:pointer;font:inherit;font-size:14px;font-weight:800;color:var(--text);
+    background:color-mix(in srgb,var(--text) 9%,transparent);}
+  .ws-acts .red{color:#e8455f;background:rgba(255,77,109,.13);}
+  .ws-sh button:focus-visible,.ws-sh input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* малий календар: число дня + тиждень (48-widgets.js wdCalWeek) */
+  .wg-t.wd.calw.sz-s .cal-nav,.wg-t.wd.calw.sz-s .cal-hint{display:none;}
+  .wg-t.wd.calw.sz-s .wd-big.cal-today{display:flex;align-items:baseline;gap:6px;font-size:30px;margin:2px 0 0;}
+  .wg-t.wd.calw.sz-s .wd-big.cal-today span{font-size:13px;font-weight:800;color:#ff5d5d;}
+  .cal-wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin-top:auto;}
+  .cal-wk .cal-d{display:flex;flex-direction:column;align-items:center;gap:1px;min-height:36px;padding:2px 0;font-size:12px;font-weight:700;}
+  .cal-wk .cal-d s{text-decoration:none;font-size:9px;color:var(--pg-mut,var(--muted));}
+  .cal-wk .cal-d.td s{color:inherit;}
+  .wg-t.wd .cal-wk .cal-d{pointer-events:auto;}
+  /* кольоровий фон: сьогодні — біла таблетка з кольоровою цифрою, день тижня білий */
+  .wg-t.wg-t.wd.bg-solid .cal-d.td{background:#fff;color:color-mix(in srgb,var(--fc) 70%,#140f24);}
+  .wg-t.wd.bg-solid .wd-big.cal-today span{color:rgba(255,255,255,.85);}
+  /* день тижня на кольоровому фоні — сильніший селектор, ніж у малого календаря й тиру xs/row вище */
+  .pg-board.wboard .wg-t.wd.bg-solid.calw .wd-big.cal-today span,.wg-t.wd.bg-solid.calw.sz-s .wd-big.cal-today span{color:rgba(255,255,255,.88);}
+  /* рядки з полем (Назва, Дата, Час): підпис не стискається до нуля, поле — праворуч */
+  .ws-it:has(.ws-in)>span:first-child{flex:0 0 auto;}
+  .ws-in.sm{margin-left:auto;max-width:62%;}
 </style>
 <style id="diary-css">
 /* ===== ЩОДЕННИК ===== */
@@ -35013,7 +35190,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   };
   const wdCalYm={};   // місяць, який гортає віджет «Календар папки» (лише памʼять)
   function wdIs(t){ return Object.prototype.hasOwnProperty.call(WD_META,String(t||'')); }
-  function wdSz(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
+  // розмір S/M/L: з клітинок пристрою (63-widget-sheet.js wdCell), а для віджетів без b.ws — як раніше
+  function wdSz(b){ if(b&&b.ws){ const t=wdTier(b); return t==='l'?'l':t==='m'?'m':'s'; } return wdSzOld(b); }
+  function wdSzOld(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
@@ -35048,13 +35227,15 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // мітка папки в шапці — віджет завжди каже, з якої папки дані
   function wdHead(b,fk,extra){
     // віджет стоїть у своїй папці — назва папки в шапці зайва (вона вже в заголовку сторінки)
-    const m=WD_META[b.type];
-    return `<span class="wd-h"><i class="wd-dot"></i><b>${esc(m.h)}</b>${extra?`<span>${extra}</span>`:''}</span>`
-      +`<button class="wd-cfg" data-wga="wdcfg" aria-label="Налаштувати віджет «${esc(m.t)}»"><span>⚙</span></button>`;
+    // ⚙ прибрано (19.11.2026): шапка сама — кнопка налаштувань; ще — утримати віджет або «Змінити» на дошці
+    const m=WD_META[b.type], nm=b.type==='countdown'?'':String(b.hd||'').slice(0,40);
+    if(b.nohd) return '';
+    return `<button class="wd-h" data-wga="wdcfg" aria-label="Налаштувати віджет «${esc(nm||m.t)}»"><i class="wd-dot"></i><b>${esc(nm||m.h)}</b>${extra&&!nm?`<span>${extra}</span>`:''}</button>`;
   }
   function wdTile(b,fk,inner,cls,color){
-    const f=wdFolder(fk), c=safeColor(color||(f&&f.c)||'','#7c8cff');
-    return `<div class="wg-t wd sz-${wdSz(b)}${cls?' '+cls:''}" style="--fc:${c}">${inner}</div>`;
+    const f=wdFolder(fk), c=safeColor(wdCcOf(b)||color||(f&&f.c)||'','#7c8cff'), tx=wdTier(b);
+    const bg=b.bg==='frost'||b.bg==='solid'?' bg-'+b.bg:'';
+    return `<div class="wg-t wd sz-${wdSz(b)}${tx==='xs'||tx==='row'?' tx-'+tx:''}${bg}${cls?' '+cls:''}" style="--fc:${c}">${inner}</div>`;
   }
   function wdRing(p){ p=Math.max(0,Math.min(100,Math.round(+p||0)));
     return `<span class="wd-ring" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" class="tr"/><circle cx="18" cy="18" r="15.5" class="vl" pathLength="100" stroke-dasharray="${p} 100"/></svg><b>${p}%</b></span>`; }
@@ -35083,6 +35264,11 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const by=jnWeek().map(ds=>({ds,h:mine(ds).reduce((s,x)=>s+hrs(x),0)})), mx=Math.max(1,...by.map(x=>x.h));
     return `<span class="wd-bars week">${by.map(x=>`<i class="${x.ds===td?'td':''}"><u style="height:${x.h?Math.max(10,Math.round(x.h/mx*100)):0}%"></u><s>${DY_DOW[(new Date(x.ds+'T12:00:00').getDay()+6)%7]}</s></i>`).join('')}</span>`;
   }
+  // малий календар (S і менше): місяць не влазить — число дня і цей тиждень із позначками папки
+  function wdCalWeek(td,fk){
+    return `<span class="cal-wk">${jnWeek().map(ds=>{ const m=calMarks(ds,fk), d=+ds.slice(8);
+      return `<button class="cal-d${ds===td?' td':''}${ds>td?' fut':''}" data-wga="wdcalday" data-ds="${ds}" aria-label="${d} ${JN_MON[+ds.slice(5,7)-1]}${m.n?', блоків: '+m.n:''}${m.ev?', є подія':''}"><s>${DY_DOW[(new Date(ds+'T12:00:00').getDay()+6)%7]}</s>${d}<i>${m.cols.map(c=>`<u style="background:${c}"></u>`).join('')}</i></button>`; }).join('')}</span>`;
+  }
   function wdHTML(b,fk){
     const t=b.type, sz=wdSz(b), td=ymdLocal();
     if(t==='countdown') return tmHTML(b,fk);
@@ -35090,15 +35276,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const g=wdGoal(b,fk); if(!g) return wdNoGoal(b,fk);
       const pct=jnPct(g), nx=wdNext(g), due=wdDue(g), dl=due?wdDaysLeft(due):null;
       const dueTxt=due?jnDateTxt(due)+(dl<0?' · прострочено':dl===0?' · сьогодні':' · за '+dl+' '+pluralUk(dl,'день','дні','днів')):'';
-      const ring=wdOn(b,'ring'), nm=esc(String(g.name||'Місія').slice(0,60)), em=safeEmoji(g.emoji,'🎯');
+      const nm=esc(String(g.name||'Місія').slice(0,60)), em=safeEmoji(g.emoji,'🎯');
+      // «Головне число» (19.11.2026): % (кільце) · кроки (рівні місії) · дні до дедлайну
+      const lvA=jnLevels(g), mn=b.main==='steps'&&lvA.length?'steps':b.main==='days'&&due?'days':'pct';
+      const ring=mn==='pct'&&wdOn(b,'ring');
+      const bigTxt=mn==='steps'?`${lvA.filter(x=>x.done).length}<span>/${lvA.length} кроків</span>`:mn==='days'?`${Math.abs(dl)}<span> ${pluralUk(Math.abs(dl),'день','дні','днів')}${dl<0?' тому':''}</span>`:`${pct}%`;
       const hit=`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" aria-label="Відкрити місію ${esc(g.name||'')}"></button>`;
       const col=wdFolder(fk)?'':g.color;
       // S — макет «кільце по центру + назва під ним»; M/L — кільце ліворуч, праворуч назва, наступний крок і дедлайн
       if(sz==='s') return wdTile(b,fk,`${hit}${wdHead(b,fk)}
-        ${ring?`<span class="wd-ringc">${wdRing(pct)}</span>`:`<b class="wd-big">${pct}%</b><span class="wd-bar"><i style="width:${pct}%"></i></span>`}
+        ${ring?`<span class="wd-ringc">${wdRing(pct)}</span>`:`<b class="wd-big">${bigTxt}</b><span class="wd-bar"><i style="width:${pct}%"></i></span>`}
         <small class="wd-cap">${nm}</small>`,'mis',col);
       return wdTile(b,fk,`${hit}${wdHead(b,fk,'🔗 місія')}
-        <span class="wd-row">${ring?wdRing(pct):`<b class="wd-big">${pct}%</b>`}<span class="wd-col"><b class="wd-name">${em} ${nm}</b>
+        <span class="wd-row">${ring?wdRing(pct):`<b class="wd-big">${bigTxt}</b>`}<span class="wd-col"><b class="wd-name">${em} ${nm}</b>
           ${wdOn(b,'next')?`<small class="wd-sub"><em>Далі:</em> ${nx?esc(nx.t.slice(0,80)):'усі кроки зроблено ✓'}</small>`:''}
           ${wdOn(b,'due')&&dueTxt?`<small class="wd-sub${dl<0?' late':''}"><em>Дедлайн:</em> ${esc(dueTxt)}</small>`:''}</span></span>
         ${ring?'':`<span class="wd-bar"><i style="width:${pct}%"></i></span>`}
@@ -35116,22 +35306,27 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const days=per==='month'?Array.from({length:moDim(td.slice(0,7))},(_,i)=>td.slice(0,8)+String(i+1).padStart(2,'0')):jnWeek();
       const past=days.filter(ds=>ds<=td), n=past.filter(mk).length;
       let st=0; { const d=new Date(); if(!mk(ymdLocal(d))) d.setDate(d.getDate()-1); for(let i=0;i<400&&mk(ymdLocal(d));i++){ st++; d.setDate(d.getDate()-1); } }
-      const on=mk(td);
+      const on=mk(td), gl=per==='week'?wsGoal(b):0;   // ціль днів на тиждень (19.11.2026)
       // макет: велике число серії, підпис, 7 крапок тижня (місяць — сітка), обведена кнопка «✓ Сьогодні»
       const big=wdOn(b,'streak')?`<span class="wd-strk"><b class="wd-big xl">${st}</b><small class="wd-cap">${pluralUk(st,'день','дні','днів')}<br>поспіль</small></span>`:'';
-      const cnt=wdOn(b,'count')&&(sz==='l'||!wdOn(b,'streak'))?`<small class="wd-sub"><em>${n} з ${past.length}</em> ${per==='month'?'цього місяця':'цього тижня'}</small>`:'';
+      const cnt=gl?`<small class="wd-sub${n>=gl?' ok':''}"><em>${n} з ${gl}</em> ${n>=gl?'ціль тижня взято ✓':'до цілі тижня'}</small>`
+        :wdOn(b,'count')&&(sz==='l'||!wdOn(b,'streak'))?`<small class="wd-sub"><em>${n} з ${past.length}</em> ${per==='month'?'цього місяця':'цього тижня'}</small>`:'';
       const dots=wdOn(b,'days')?`<span class="wd-days ${per}">${days.map(ds=>`<i class="${mk(ds)?'on':''}${ds===td?' td':''}${ds>td?' fut':''}"><u></u>${per==='week'?`<s>${DY_DOW[(new Date(ds+'T12:00:00').getDay()+6)%7]}</s>`:''}</i>`).join('')}</span>`:'';
-      return wdTile(b,fk,`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" data-wgtab="folder" aria-label="Трекер місії ${esc(g.name||'')}"></button>
+      const hitH=b.tapmk?`<button class="wg-hit" data-wga="wdmark" aria-pressed="${on}" aria-label="${on?'Зняти позначку за сьогодні':'Позначити сьогодні'}"></button>`
+        :`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" data-wgtab="folder" aria-label="Трекер місії ${esc(g.name||'')}"></button>`;
+      return wdTile(b,fk,`${hitH}
         ${wdHead(b,fk,sz==='s'?'':'🔗 трекер місії')}${sz==='l'?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td):''}
         <span class="wd-acts c"><button data-wga="wdmark" class="pill${on?' on':''}" aria-pressed="${on}">✓ Сьогодні${on?' є':''}</button></span>`,'hab',folders[gk].c);
     }
     if(t==='dcal'){
       // календар Планера, але лише ця папка: її блоки (смужки кольору) і події (★); місяць гортається в памʼяті, не пишеться
       if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">Лише в папці</b><small class="wd-sub">Показує блоки й події з міткою папки</small>`,'empty');
-      const ym=wdCalYm[b.id]||td.slice(0,7);
-      return wdTile(b,fk,`${wdHead(b,fk,'🔗 Планер · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())+(ym.slice(0,4)!==td.slice(0,4)?' '+ym.slice(0,4):''))}
+      const ym=wdCalYm[b.id]||td.slice(0,7), cfk=b.ev==='all'?'':fk;   // «Весь Планер» (19.11.2026) — без фільтра папки
+      const dow=['Нд','Пн','Вт','Ср','Чт','Пт','Сб'][new Date(td+'T12:00:00').getDay()];
+      return wdTile(b,fk,`${wdHead(b,fk,wdSz(b)==='s'?'':'🔗 Планер · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())+(ym.slice(0,4)!==td.slice(0,4)?' '+ym.slice(0,4):''))}
         <span class="cal-nav"><button data-wga="wdcalnav" data-n="-1" aria-label="Попередній місяць">‹</button><button data-wga="wdcalnav" data-n="0">Сьогодні</button><button data-wga="wdcalnav" data-n="1" aria-label="Наступний місяць">›</button></span>
-        ${calMonthGridHTML(ym,fk)}
+        <b class="wd-big cal-today"><span>${dow}</span> ${+td.slice(8)}</b>
+        ${wdSz(b)==='s'?wdCalWeek(td,cfk):calMonthGridHTML(ym,cfk)}
         ${wdOn(b,'hint')?'<small class="wd-sub cal-hint">Тап по дню — події й блоки папки</small>':''}`,'calw');
     }
     if(t==='dtime'){
@@ -35174,6 +35369,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       return wdTile(b,fk,`<button class="wg-hit" data-wga="wdmonth" aria-label="Календар папки"></button>
         ${wdHead(b,fk,(sz==='s'?'':'🔗 Планер · ')+(per==='month'?esc(MO_NAMES[+td.slice(5,7)-1].toLowerCase()):'тиждень'))}
         <b class="wd-big">${n} <span>${pluralUk(n,'блок','блоки','блоків')}${wdOn(b,'hours')?' · '+wdHm(h)+' год':''}</span></b>
+        ${wsGoal(b)?`<span class="wd-bar"><i style="width:${Math.min(100,Math.round(h/wsGoal(b)*100))}%"></i></span><small class="wd-sub${h>=wsGoal(b)?' ok':''}">${wdHm(h)} з ${wsGoal(b)} год${h>=wsGoal(b)?' · ціль взято ✓':''}</small>`:''}
         ${bars}${up}${add}`);
     }
     if(t==='dcount'){
@@ -35201,7 +35397,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const a=wlAgg((finOps||[]).filter(o=>o&&!String(o.id||'').startsWith('start_')),g.id), goal=wdSaveGoal(g);
       const pct=goal?Math.max(0,Math.min(100,Math.round(a.inc/goal*100))):0, col=wdFolder(fk)?'':g.color;
       const sum=sz==='s'?wgK(a.inc):wgMoney(a.inc);
-      const add=wdOn(b,'add')?`<button data-wga="wdsavein">＋ ${esc(curSym())}</button>`:'';
+      const add=wdOn(b,'add')?`<button data-wga="wdsavein">＋ ${wsQ(b)?esc(wgMoney(wsQ(b))):esc(curSym())}</button>`:'';
       return wdTile(b,fk,`<button class="wg-hit" data-wga="mission" data-wgg="${esc(g.id)}" aria-label="Гроші місії ${esc(g.name||'')}"></button>
         ${wdHead(b,fk,sz==='s'?'':'🔗 Гаманець')}${sz==='l'?`<b class="wd-name">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,60))}</b>`:''}
         <b class="wd-big">${esc(sum)}${goal?` <span>${pct}%</span>`:''}</b>
@@ -35423,68 +35619,17 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // прогрес місії: Лічильник · Скарбничка
     else if(a==='wdcstep'){ wdCounterStep(b,fk,+el.dataset.n<0?-1:1); }
     else if(a==='wdcsheet'||a==='wdcnew'){ const q=wdGoal(b,fk); if(q) wdCounterSheet(id,q.id,a==='wdcnew'?null:String(b.cid||'')); }
-    else if(a==='wdsavein'){ const q=wdGoal(b,fk); if(q) wlOpSheet('in',String(q.id),fk?{folderKey:fk}:{}); }
+    // швидка сума лише заповнює поле — запис, як і раніше, кнопкою в шторці Гаманця
+    else if(a==='wdsavein'){ const q=wdGoal(b,fk); if(q){ const o=fk?{folderKey:fk}:{}; if(wsQ(b)) o.amount=wsQ(b); wlOpSheet('in',String(q.id),o); } }
     else if(a==='wdsavegoal'){ const q=wdGoal(b,fk); if(q) wdSaveGoalSheet(q.id); }
     else if(a==='wdphadd'){ const q=wdGoal(b,fk); if(q) wdPhotoAdd(q.id); }
     else if(a==='wdphgal'){ const q=wdGoal(b,fk); if(q) wdPhotoGallery(q.id); }
     else if(a==='wdcalnav'){ const n=+el.dataset.n||0, cur=wdCalYm[b.id]||ymdLocal().slice(0,7); wdCalYm[b.id]=n?moShift(cur,n):ymdLocal().slice(0,7); wgRefresh(); }
-    else if(a==='wdcalday'){ const ds=el.dataset.ds; if(fk&&/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) calDaySheet(ds,{folder:fk,onOpenDay:d=>{ try{ goJournal({tab:'day',ds:d}); }catch(_){} }}); }
+    else if(a==='wdcalday'){ const ds=el.dataset.ds; if(fk&&/^\d{4}-\d{2}-\d{2}$/.test(ds||'')) calDaySheet(ds,{folder:b.ev==='all'?'':fk,onOpenDay:d=>{ try{ goJournal({tab:'day',ds:d}); }catch(_){} }}); }
   }
 
-  // ── ⚙ налаштування віджета: Розмір · Джерело · Період · Показувати · Видалити ──
-  function wdCfg(id){
-    let b=null; try{ b=getBlock(id); }catch(_){} if(!b||!wdIs(b.type)) return;
-    if(b.type==='countdown') return tmCfg(id);   // у відліку своя шторка: дата, напрям, одиниці, стиль
-    const m=WD_META[b.type], fk=wgCtxFolder(), fm=wgFolderMission(fk), goals=(b.type==='dtime'||b.type==='dcal')?[]:wlMissions();
-    let sz=wdSz(b), per=wdPer(b), gid=b.goalId&&goals.some(g=>String(g.id)===String(b.goalId))?String(b.goalId):'';
-    const show={}; m.show.forEach(([k])=>{ show[k]=wdOn(b,k); });
-    jnOverlay(`<div class="jn-ed-h"><b>${m.ic} ${esc(m.t)}</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <small class="dy-fm-sub">Віджет — вікно в ${(b.type==='dtime'||b.type==='dcal')?'Планер':'місію'}: дані не копіюються, тут лише його вигляд.</small>
-      <div class="jn-f"><span>Розмір</span><div class="wd-szs">${Object.keys(WD_SZ).map(k=>`<button data-wdsz="${k}" class="${k===sz?'on':''}" aria-pressed="${k===sz}"><i class="wd-szi ${k}"></i><b>${WD_SZ[k].t}</b><small>${WD_SZ[k].d}</small></button>`).join('')}</div></div>
-      ${(b.type!=='dtime'&&b.type!=='dcal')?`<div class="jn-f"><span>Джерело</span><div class="wl-chips">
-        <button data-wdg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
-        ${goals.map(g=>`<button data-wdg="${esc(g.id)}" class="${String(g.id)===gid?'on':''}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,24))}</button>`).join('')}</div></div>`:''}
-      ${m.per?`<div class="jn-f"><span>Період</span><div class="wl-chips">${m.per.map(([k,l])=>`<button data-wdper="${k}" class="${k===per?'on':''}">${l}</button>`).join('')}</div></div>`:''}
-      ${b.type==='dsave'?`<div class="jn-f"><span>Ціль</span><div class="wl-chips"><button data-wdsgo>🐷 Ціль скарбнички…</button></div></div>`:''}
-      ${b.type==='dcounter'?`<div class="jn-f"><span>Лічильник</span><div class="wl-chips"><button data-wdcgo>🔢 Вибрати чи змінити…</button></div></div>`:''}
-      <div class="jn-f"><span>Показувати</span><div class="wd-tg">${m.show.map(([k,l])=>`<button data-wdsh="${k}" role="switch" aria-checked="${show[k]}" class="${show[k]?'on':''}"><span>${l}</span><i></i></button>`).join('')}</div></div>
-      <div class="jn-ed-foot"><button class="jn-btn" data-wdok>Зберегти</button></div>
-      <button class="wd-del" data-wddel>Видалити віджет</button>`, ov=>{
-      ov.classList.add('wd-ov');
-      const pick=(sel,fn)=>ov.querySelectorAll(sel).forEach(x=>x.onclick=()=>{ fn(x);
-        ov.querySelectorAll(sel).forEach(y=>{ y.classList.toggle('on',y===x); if(y.hasAttribute('aria-pressed')) y.setAttribute('aria-pressed',String(y===x)); }); });
-      pick('[data-wdsz]',x=>{ sz=x.dataset.wdsz; });
-      pick('[data-wdg]',x=>{ gid=x.dataset.wdg; });
-      pick('[data-wdper]',x=>{ per=x.dataset.wdper; });
-      // ціль / лічильник живуть у місії — шторка для місії, яку плитка показує зараз (збережене «Джерело»)
-      const cfgGoal=()=>{ const q=wdGoal(b,fk); return q&&q.id?q:null; };
-      const sg=ov.querySelector('[data-wdsgo]'); if(sg) sg.onclick=()=>{ const q=cfgGoal(); if(!q){ plToast('Спершу вибери місію'); return; } ov.remove(); wdSaveGoalSheet(q.id); };
-      const cg=ov.querySelector('[data-wdcgo]'); if(cg) cg.onclick=()=>{ const q=cfgGoal(); if(!q){ plToast('Спершу вибери місію'); return; } ov.remove(); wdCounterSheet(id,q.id,String(b.cid||'')); };
-      ov.querySelectorAll('[data-wdsh]').forEach(x=>x.onclick=()=>{ const k=x.dataset.wdsh; show[k]=!show[k]; x.classList.toggle('on',show[k]); x.setAttribute('aria-checked',String(show[k])); });
-      ov.querySelector('[data-wdok]').onclick=()=>{
-        const q=getBlock(id); if(!q){ ov.remove(); return; }
-        q.sz=sz; q.gw=WD_SZ[sz].gw; q.gh=WD_SZ[sz].gh;
-        if(q.type!=='dtime'&&q.type!=='dcal'){ if(gid) q.goalId=gid; else delete q.goalId; }
-        if(m.per) q.period=per;
-        const off={}; Object.keys(show).forEach(k=>{ if(!show[k]) off[k]=false; });
-        if(Object.keys(off).length) q.show=off; else delete q.show;
-        saveBoard(); ov.remove(); wdRedraw();
-      };
-      // прибирає лише вікно; місія, трекер і блоки Планера лишаються
-      ov.querySelector('[data-wddel]').onclick=()=>{
-        const arr=findParentArr(curBoard(),id), i=arr?arr.findIndex(x=>x&&String(x.id)===String(id)):-1;
-        if(i>=0){
-          const was=arr.splice(i,1)[0]; saveBoard();
-          // «Скасувати» повертає саме вікно на те саме місце (дані модулів і так не чіпали)
-          flowUndoToast('Віджет прибрано — дані в '+((b.type==='dtime'||b.type==='dcal')?'Планері':'місії')+' лишились',()=>{
-            if(arr.some(x=>x&&String(x.id)===String(was.id))) return;
-            arr.splice(Math.min(i,arr.length),0,was); saveBoard(); wdRedraw();
-          });
-        }
-        ov.remove(); wdRedraw();
-      };
-    });
-  }
+  // налаштування віджета — скляна шторка «Загальні · Цей віджет» (63-widget-sheet.js)
+  function wdCfg(id){ wdSheet(id); }
   // «Повʼязати місію»: у блок пишеться лише goalId
   function wdPickMission(id){
     const goals=wlMissions();
@@ -35515,7 +35660,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const dir=b.dir==='up'?'up':'down';
     let units=Array.isArray(b.units)?TM_U.filter(u=>b.units.includes(u)):[]; if(!units.length) units=TM_DEF.slice();
     return { target:/^\d{4}-\d{2}-\d{2}$/.test(b.target||'')?b.target:'', tm:/^([01]\d|2[0-3]):[0-5]\d$/.test(b.tm||'')?b.tm:'00:00',
-      dir, units, sty:TM_STY.some(s=>s[0]===b.sty)?b.sty:'flip', yearly:!!b.yearly&&dir==='down', date:wdOn(b,'date') };
+      dir, units, sty:TM_STY.some(s=>s[0]===b.sty)?b.sty:'flip', yearly:!!b.yearly&&dir==='down', date:wdOn(b,'date'),
+      end:b.end==='quiet'||b.end==='up'?b.end:'conf' };   // «Коли настане» (19.11.2026): святкувати · тихо · рахувати «від»
   }
   function tmAt(c){ const [y,m,d]=c.target.split('-').map(Number), [h,mi]=c.tm.split(':').map(Number); return new Date(y,m-1,d,h,mi,0,0); }
   // +n календарних місяців; 31 січня + 1 = 28/29 лютого (не 3 березня)
@@ -35540,6 +35686,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     let at=tmAt(c);
     if(c.dir==='down'&&c.yearly){ let n=0; while(at<=now&&n<300){ at=new Date(at.getTime()); at.setFullYear(at.getFullYear()+1); n++; } }
     const off=c.dir==='down'?at<=now:at>now;   // «до»: уже настала · «від»: ще не почалась
+    // «до», дата настала, а людина вибрала «рахувати від» — далі рахуємо, скільки минуло
+    if(off&&c.dir==='down'&&c.end==='up'&&!c.yearly) return {at, off:false, after:true, p:tmParts(at,now,c.units)};
     return {at, off, p:off?null:(c.dir==='down'?tmParts(now,at,c.units):tmParts(at,now,c.units))};
   }
   function tmDateTxt(at,c){ const ds=ymdLocal(at); return jnDateTxt(ds)+(ds.slice(0,4)!==ymdLocal().slice(0,4)?' '+ds.slice(0,4):'')+(c.tm!=='00:00'?', '+c.tm:''); }
@@ -35547,15 +35695,17 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // вміст живої частини віджета; el — щоб флип знав, які цифри змінились з минулої секунди
   function tmInner(c,sz,el){
     const st=tmState(c,new Date());
-    const dt=c.date?`<small class="wd-sub tm-dt">${c.dir==='down'?'':'з '}${esc(tmDateTxt(st.at,c))}${c.yearly?' · щороку':''}</small>`:'';
-    if(st.off) return c.dir==='down'?`<b class="wd-big tm-done">Настав! 🎉</b>${dt}`:`<b class="wd-big sm">Ще не почалось</b><small class="wd-sub">Старт ${esc(tmDateTxt(st.at,c))}</small>`;
+    const tiny=sz==='xs'||sz==='row';   // 1 клітинка чи один ряд: лише найбільша одиниця
+    const dt=c.date&&!tiny?`<small class="wd-sub tm-dt">${c.dir==='down'&&!st.after?'':'з '}${esc(tmDateTxt(st.at,c))}${c.yearly?' · щороку':''}</small>`:'';
+    if(st.off) return c.dir==='down'?`<b class="wd-big tm-done">${c.end==='quiet'?'Настав':'Настав! 🎉'}</b>${dt}`:`<b class="wd-big sm">Ще не почалось</b>${tiny?'':`<small class="wd-sub">Старт ${esc(tmDateTxt(st.at,c))}</small>`}`;
     let us=c.units.slice(); while(us.length>1&&!st.p[us[0]]) us.shift();   // нулі попереду не показуємо: «0 років 1 місяць» → «1 місяць»
     if(sz==='s') us=us.slice(0,2);
+    if(tiny) us=us.slice(0,1);
     const pl=k=>pluralUk(st.p[k],...TM_N[k]);
-    let sty=c.sty; if(sty==='rings'&&sz==='s') sty='huge';
+    let sty=c.sty; if(sty==='rings'&&sz==='s'||tiny) sty='huge';
     if(sty==='huge'){
       const k0=us[0], rest=us.slice(1).map(k=>tmPad(k,st.p[k])+' '+TM_SH[k]).join(' · ');
-      return `<span class="wd-cnt"><b class="wd-big xl">${st.p[k0]}</b><small class="wd-cap">${pl(k0)}</small></span>${rest?`<small class="wd-sub tm-rest">${rest}</small>`:''}${dt}`;
+      return `<span class="wd-cnt"><b class="wd-big xl">${st.p[k0]}</b><small class="wd-cap">${tiny?TM_SH[k0]:pl(k0)}${st.after&&!tiny?' тому':''}</small></span>${rest?`<small class="wd-sub tm-rest">${rest}${st.after?' тому':''}</small>`:''}${dt}`;
     }
     if(sty==='rings'){
       const rk=us.slice(-3), cols=['var(--fc)','#ff7a9a','#5ee0cf'];
@@ -35573,12 +35723,12 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     return `<span class="tm-flip" role="timer" aria-label="${us.map(k=>st.p[k]+' '+pl(k)).join(', ')}">${h}</span>${dt}`;
   }
   function tmHTML(b,fk){
-    const c=tmCfgOf(b), sz=wdSz(b), nm=esc(String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60));
+    const c=tmCfgOf(b), tx=wdTier(b), sz=tx==='xs'||tx==='row'?tx:wdSz(b), nm=esc(String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60));
     const hit=`<button class="wg-hit" data-wga="wdcfg" aria-label="Налаштувати відлік${nm?' «'+nm+'»':''}"></button>`;
     if(!c.target) return wdTile(b,fk,`${hit}${wdHead(b,fk)}<b class="wd-name">${nm||'Новий відлік'}</b>
       <small class="wd-sub">Вибери дату, і відлік почнеться</small><span class="wd-acts"><button data-wga="wdcfg">Вибрати дату</button></span>`,'empty');
     tmStart();
-    const live=`<span class="tm-live" data-tg="${esc(c.target)}" data-tm="${esc(c.tm)}" data-dir="${c.dir}" data-u="${esc(c.units.join(','))}" data-sty="${c.sty}" data-sz="${sz}" data-yr="${c.yearly?1:''}" data-dt="${c.date?1:''}">${tmInner(c,sz,null)}</span>`;
+    const live=`<span class="tm-live" data-tg="${esc(c.target)}" data-tm="${esc(c.tm)}" data-dir="${c.dir}" data-u="${esc(c.units.join(','))}" data-sty="${c.sty}" data-sz="${sz}" data-yr="${c.yearly?1:''}" data-dt="${c.date?1:''}" data-end="${c.end}">${tmInner(c,sz,null)}</span>`;
     return wdTile(b,fk,`${hit}${wdHead(b,fk,c.dir==='up'?'від дати':'')}${nm?`<b class="wd-name">${nm}</b>`:''}${live}`,'tmw');
   }
   // один таймер на весь застосунок: оновлює цифри всіх видимих відліків; налаштування — з data-* самої плитки
@@ -35588,66 +35738,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     document.querySelectorAll('.tm-live').forEach(el=>{
       const d=el.dataset; if(!/^\d{4}-\d{2}-\d{2}$/.test(d.tg||'')) return;
       const c={target:d.tg, tm:/^([01]\d|2[0-3]):[0-5]\d$/.test(d.tm||'')?d.tm:'00:00', dir:d.dir==='up'?'up':'down',
-        units:String(d.u||'').split(',').filter(u=>TM_U.includes(u)), sty:d.sty, yearly:d.yr==='1', date:d.dt==='1'};
+        units:String(d.u||'').split(',').filter(u=>TM_U.includes(u)), sty:d.sty, yearly:d.yr==='1', date:d.dt==='1', end:d.end==='quiet'||d.end==='up'?d.end:'conf'};
       if(!c.units.length) c.units=TM_DEF.slice();
       const h=tmInner(c,d.sz,el); if(h!==el.__tmH){ el.__tmH=h; el.innerHTML=h; }
     });
   }
   function tmStart(){ if(!tmTimer) tmTimer=setInterval(tmTickAll,1000); }
-  // ⚙ відліку: назва, дата й час, напрям, одиниці, стиль, розмір, «щороку»
-  function tmCfg(id){
-    let b=null; try{ b=getBlock(id); }catch(_){} if(!b||b.type!=='countdown') return;
-    const c=tmCfgOf(b), units=new Set(c.units); let sz=wdSz(b), dir=c.dir, sty=c.sty, yearly=c.yearly, date=c.date;
-    const nm=String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
-    jnOverlay(`<div class="jn-ed-h"><b>⏳ Відлік часу</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <label class="jn-f"><span>Назва</span><input id="tmName" type="text" maxlength="60" value="${esc(nm)}" placeholder="Новий рік, відпустка, без цукру…"></label>
-      <div class="tm-dtrow"><label class="jn-f"><span>Дата</span><input id="tmDate" type="date" value="${esc(c.target)}"></label>
-        <label class="jn-f"><span>Час</span><input id="tmTime" type="time" value="${esc(c.tm)}"></label></div>
-      <div class="jn-f"><span>Напрям</span><div class="wl-chips"><button data-tmdir="down" class="${dir==='down'?'on':''}">⏳ До дати</button><button data-tmdir="up" class="${dir==='up'?'on':''}">⏱ Від дати</button></div></div>
-      <div class="jn-f"><span>Що показувати</span><div class="wl-chips">${TM_U.map(u=>`<button data-tmu="${u}" class="${units.has(u)?'on':''}" aria-pressed="${units.has(u)}">${TM_N[u][2][0].toUpperCase()+TM_N[u][2].slice(1)}</button>`).join('')}</div></div>
-      <div class="jn-f"><span>Стиль</span><div class="wl-chips">${TM_STY.map(([k,l])=>`<button data-tmsty="${k}" class="${k===sty?'on':''}">${l}</button>`).join('')}</div></div>
-      <div class="jn-f"><span>Розмір</span><div class="wd-szs">${Object.keys(WD_SZ).map(k=>`<button data-wdsz="${k}" class="${k===sz?'on':''}" aria-pressed="${k===sz}"><i class="wd-szi ${k}"></i><b>${WD_SZ[k].t}</b><small>${WD_SZ[k].d}</small></button>`).join('')}</div></div>
-      <div class="jn-f"><div class="wd-tg">
-        <button data-tmyr role="switch" aria-checked="${yearly}" class="${yearly?'on':''}"><span>Щороку (день народження, річниця)</span><i></i></button>
-        <button data-tmdt role="switch" aria-checked="${date}" class="${date?'on':''}"><span>Дата під цифрами</span><i></i></button></div></div>
-      <div class="jn-ed-foot"><button class="jn-btn" data-tmok>Зберегти</button></div>
-      <button class="wd-del" data-tmdel>Видалити відлік</button>`, ov=>{
-      ov.classList.add('wd-ov');
-      const one=(sel,fn)=>ov.querySelectorAll(sel).forEach(x=>x.onclick=()=>{ fn(x); ov.querySelectorAll(sel).forEach(y=>{ y.classList.toggle('on',y===x); if(y.hasAttribute('aria-pressed')) y.setAttribute('aria-pressed',String(y===x)); }); });
-      one('[data-tmdir]',x=>{ dir=x.dataset.tmdir; });
-      one('[data-tmsty]',x=>{ sty=x.dataset.tmsty; });
-      one('[data-wdsz]',x=>{ sz=x.dataset.wdsz; });
-      ov.querySelectorAll('[data-tmu]').forEach(x=>x.onclick=()=>{ const u=x.dataset.tmu;
-        if(units.has(u)){ if(units.size===1){ plToast('Хоча б одна одиниця'); return; } units.delete(u); } else units.add(u);
-        x.classList.toggle('on',units.has(u)); x.setAttribute('aria-pressed',String(units.has(u))); });
-      const sw=(sel,get,set)=>{ const x=ov.querySelector(sel); x.onclick=()=>{ set(!get()); x.classList.toggle('on',get()); x.setAttribute('aria-checked',String(get())); }; };
-      sw('[data-tmyr]',()=>yearly,v=>{ yearly=v; });
-      sw('[data-tmdt]',()=>date,v=>{ date=v; });
-      ov.querySelector('[data-tmok]').onclick=()=>{
-        const ds=String(ov.querySelector('#tmDate').value||''), tm=String(ov.querySelector('#tmTime').value||'').slice(0,5);
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)){ plToast('Вибери дату'); return; }
-        const q=getBlock(id); if(!q||q.type!=='countdown'){ ov.remove(); return; }
-        const name=String(ov.querySelector('#tmName').value||'').replace(/\s+/g,' ').trim().slice(0,60);
-        q.title=name; q.label=name; q.target=ds;   // label — старе поле підпису, тримаємо разом із назвою
-        if(/^([01]\d|2[0-3]):[0-5]\d$/.test(tm)&&tm!=='00:00') q.tm=tm; else delete q.tm;
-        if(dir==='up') q.dir='up'; else delete q.dir;
-        const us=TM_U.filter(u=>units.has(u)); if(us.join()===TM_DEF.join()) delete q.units; else q.units=us;
-        if(sty!=='flip') q.sty=sty; else delete q.sty;
-        if(yearly&&dir==='down') q.yearly=true; else delete q.yearly;
-        if(date) delete q.show; else q.show={date:false};
-        q.sz=sz; q.gw=WD_SZ[sz].gw; q.gh=WD_SZ[sz].gh;
-        saveBoard(); ov.remove(); wdRedraw();
-      };
-      // відлік сам і є своїми даними (назва + дата), тож видалення — з «Скасувати»
-      ov.querySelector('[data-tmdel]').onclick=()=>{
-        const arr=findParentArr(curBoard(),id), i=arr?arr.findIndex(x=>x&&String(x.id)===String(id)):-1;
-        if(i>=0){ const was=arr.splice(i,1)[0]; saveBoard();
-          flowUndoToast('Відлік прибрано',()=>{ if(arr.some(x=>x&&String(x.id)===String(was.id))) return; arr.splice(Math.min(i,arr.length),0,was); saveBoard(); wdRedraw(); }); }
-        ov.remove(); wdRedraw();
-      };
-      if(!c.target) setTimeout(()=>{ try{ ov.querySelector('#tmName').focus(); }catch(_){} },80);
-    });
-  }
+  // відлік — та сама шторка, одразу на вкладці «Відлік часу» (дата, напрям, одиниці, стиль)
+  function tmCfg(id){ wdSheet(id,{tab:'own'}); }
 
   /* ── «Ще → Дані → Старі віджети»: прибрати старі фінансові блоки й проєкти Кабінету ──
      Лише рукою людини і лише коли сховище довірене (дані з хмари прочитано). Нічого не робить при старті.
@@ -39132,6 +39230,244 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     bsRedraw();
     setTimeout(()=>{ try{ ov.querySelector('[data-bsback]').focus(); }catch(_){} },30);
   }
+  /* ════════ Налаштування віджета «Даних» (19.11.2026, макет «Налаштування віджетів») ════════
+     Скляна шторка з двома вкладками: «Загальні» (назва, колір, фон, шапка, розмір, дублювати, видалити) і «<Цей віджет>».
+     Шестерні ⚙ більше нема: шторка відкривається тапом по шапці, утриманням віджета (ПКМ на компʼютері) і тапом у режимі «Змінити».
+     Розмір — клітинки сітки: телефон 4 колонки, компʼютер (≥760) 8 колонок, свій на кожному пристрої: b.ws = {m:[w,h], d:[w,h]}.
+     Без b.ws віджет живе як раніше (sz S/M/L) — нічого не мігруємо. Зміни видно одразу в прев'ю, а в блок пишуться при закритті шторки,
+     лише ті поля, що в WS_KEYS (дані місій, Планера й Гаманця шторка не чіпає — лише вигляд віджета). */
+  // var, а не const: віджет може намалюватись раніше, ніж виконався цей файл (порядок core) — тоді значення ще undefined, а не «мертва зона»
+  var WD_ROWS=5;
+  var WD_SZ_CELL={s:[2,2],m:[4,2],l:[4,4]};
+  var WD_CC=['#ff8a5c','#ff5d8f','#b67cff','#6d8bff','#38c7e0','#34c77b','#ffcc4d'];
+  function wdDev(){ return (window.innerWidth||0)>=760?'d':'m'; }
+  function wdCols(dev){ return dev==='d'?8:4; }
+  // клітинки віджета на пристрої: збережені (обрізані до сітки) або з S/M/L
+  function wdCell(b,dev){
+    dev=dev||wdDev();
+    const c=b&&b.ws&&typeof b.ws==='object'?b.ws[dev]:null;
+    if(Array.isArray(c)&&c.length===2){ const w=Math.round(+c[0]), h=Math.round(+c[1]);
+      if(w>=1&&h>=1) return [Math.min(w,wdCols(dev)),Math.min(h,5)]; }
+    const t=wdSzOld(b); return t==='l'?[4,4]:t==='m'?[4,2]:[2,2];
+  }
+  // що показати в цій площі: xs — значок і число · row — рядок · s / m / l — як раніше
+  function wdTierOf(w,h,dev){
+    const n=dev==='d'?w*.8:w;   // колонка компʼютера (~62 px) вужча за колонку телефона (~78 px)
+    if(n<=1&&h<=2) return 'xs';
+    if(h<=1) return n<=1.5?'xs':'row';
+    if(h>=4||(h>=3&&n>=3)) return 'l';
+    return n>=3?'m':'s';
+  }
+  function wdTier(b){ if(!b||!b.ws) return ''; const dev=wdDev(), c=wdCell(b,dev); return wdTierOf(c[0],c[1],dev); }
+  // нові клітинки + старі sz/gw/gh (їх читають чат папки, «Полотно» і старі дошки)
+  function wdSetCell(b,dev,w,h){
+    w=Math.max(1,Math.min(wdCols(dev),Math.round(+w)||1)); h=Math.max(1,Math.min(WD_ROWS,Math.round(+h)||1));
+    const ws=b.ws&&typeof b.ws==='object'?b.ws:{}; ws[dev]=[w,h]; b.ws=ws;
+    const t=wdTierOf(w,h,dev), sz=t==='l'?'l':t==='m'?'m':'s';
+    b.sz=sz; b.gw=WD_SZ[sz].gw; b.gh=WD_SZ[sz].gh;
+  }
+  function wdCcOf(b){ return b&&b.cc&&Array.isArray(WD_CC)&&WD_CC.includes(b.cc)?b.cc:''; }
+  // перетнули межу телефон ↔ компʼютер — віджети перемальовуються під свою сітку
+  var wdDevNow=wdDev();
+  window.addEventListener('resize',()=>{ const d=wdDev(); if(d!==wdDevNow){ wdDevNow=d; try{ wdRedraw(); }catch(_){} } });
+
+  // ── шторка ──
+  var WS_KEYS=['ws','sz','gw','gh','hd','cc','bg','nohd','goalId','period','show','title','label','target','tm','dir','units','sty','yearly','end','goal','main','tapmk','ev','q'];
+  var WS_PAL=[['glass','Скло'],['frost','Матове'],['solid','Колір']];
+  function wsName(b){ return b.type==='countdown'?String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60):String(b.hd||'').slice(0,40); }
+  function wdSheet(id,opt){
+    opt=opt||{};
+    let b0=null; try{ b0=getBlock(id); }catch(_){} if(!b0||!wdIs(b0.type)) return;
+    const old=document.querySelector('.ws-ov'); if(old){ try{ old.__wsClose&&old.__wsClose(); }catch(_){} old.remove(); }
+    const m=WD_META[b0.type], fk=wgCtxFolder(), dev=wdDev();
+    const d=JSON.parse(JSON.stringify(b0));   // чернетка: прев'ю малюється з неї, у блок — при закритті
+    const was={}; WS_KEYS.forEach(k=>{ was[k]=JSON.stringify(d[k]); });   // з чим порівнювати при закритті
+    let tab=opt.tab==='own'?'own':'gen';
+    // розмір однієї клітинки — з живої дошки (якщо віджет на екрані), інакше типовий
+    const cellEl=document.querySelector('[data-wghost="'+CSS.escape(String(id))+'"]');
+    const boardEl=cellEl&&cellEl.closest('.pg-board.wboard');
+    let cw=80, rh=76, gap=12;
+    if(boardEl){ const cs=getComputedStyle(boardEl), g=parseFloat(cs.columnGap)||12, cols=wdCols(dev);
+      cw=(boardEl.getBoundingClientRect().width-g*(cols-1))/cols; rh=parseFloat(cs.gridAutoRows)||76; gap=g; }
+
+    const ov=document.createElement('div'); ov.className='ws-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    ov.setAttribute('aria-label','Налаштування віджета «'+m.t+'»');
+    ov.innerHTML=`<div class="ws-sh"><div class="ws-grab" aria-hidden="true"></div>
+      <div class="ws-hd"><b>${m.ic} ${esc(m.t)}</b><button class="ws-done" data-wsdone>Готово</button></div>
+      <div class="ws-pv" aria-hidden="true"><div class="ws-pvc"><div class="wg-host ws-pvh"></div></div></div>
+      <div class="ws-tabs" role="tablist"><button role="tab" data-wstab="gen">Загальні</button><button role="tab" data-wstab="own">${esc(b0.type==='countdown'?m.t:m.h)}</button></div>
+      <div class="ws-body"></div></div>`;
+    document.body.appendChild(ov);
+    const sh=ov.querySelector('.ws-sh'), body=ov.querySelector('.ws-body'), pvc=ov.querySelector('.ws-pvc'), pvh=ov.querySelector('.ws-pvh');
+    pvh.setAttribute('inert','');
+    const pvDraw=()=>{
+      const c=wdCell(d,dev), w=Math.min(c[0]*cw+(c[0]-1)*gap, sh.clientWidth-32), h=c[1]*rh+(c[1]-1)*gap;
+      pvc.style.width=Math.max(70,Math.round(w))+'px'; pvc.style.height=Math.round(Math.min(h,dev==='d'?300:260))+'px';
+      try{ wgFill(pvh,d,fk); }catch(_){}
+    };
+    const seg=(k,opts,v)=>`<span class="ws-seg">${opts.map(([x,l])=>`<button data-wsset="${k}" data-v="${esc(String(x))}" class="${String(x)===String(v)?'on':''}" aria-pressed="${String(x)===String(v)}">${l}</button>`).join('')}</span>`;
+    const tg=(k,on,lbl)=>`<button class="ws-it ws-sw" data-wstg="${k}" role="switch" aria-checked="${!!on}"><span>${lbl}</span><i class="${on?'on':''}"></i></button>`;
+    const row=(lbl,ctl,cls)=>`<div class="ws-it${cls?' '+cls:''}"><span>${lbl}</span>${ctl}</div>`;
+    const grp=(t,inner)=>`<div class="ws-grp">${t?`<div class="ws-gt">${t}</div>`:''}${inner}</div>`;
+
+    function genHTML(){
+      const c=wdCell(d,dev), cols=wdCols(dev);
+      let cells=''; for(let r=1;r<=WD_ROWS;r++) for(let k=1;k<=cols;k++) cells+=`<button data-wspk="${k},${r}" class="${k<=c[0]&&r<=c[1]?'in':''}" aria-label="${k} на ${r}"></button>`;
+      const cc=wdCcOf(d), bg=d.bg==='frost'||d.bg==='solid'?d.bg:'glass';
+      return grp('Вигляд',
+          row('Назва',`<input class="ws-in" data-wsname maxlength="${d.type==='countdown'?60:40}" value="${esc(wsName(d))}" placeholder="${esc(d.type==='countdown'?'Новий рік, відпустка…':m.h)}">`)
+          +row('Колір',`<span class="ws-cc"><button data-wscc="" class="fold${cc?'':' on'}" aria-label="Колір папки" aria-pressed="${!cc}"></button>${WD_CC.map(x=>`<button data-wscc="${x}" style="--s:${x}" class="${cc===x?'on':''}" aria-label="Колір ${x}" aria-pressed="${cc===x}"></button>`).join('')}</span>`,'wrap')
+          +row('Фон',seg('bg',WS_PAL,bg))
+          +tg('nohd',!d.nohd,'Показувати назву'))
+        +grp('Розмір · '+(dev==='d'?'на компʼютері':'на телефоні'),
+          `<div class="ws-pk" style="--cols:${cols}">${cells}</div><div class="ws-pkl"><span>Тапни клітинку або тягни ↘ у «Змінити»</span><b>${c[0]} × ${c[1]}</b></div>`)
+        +`<div class="ws-acts"><button data-wsdup>Дублювати</button><button class="red" data-wsdel>Видалити</button></div>`;
+    }
+    function ownHTML(){
+      const t=d.type;
+      if(t==='countdown'){
+        const c=tmCfgOf(d), units=new Set(c.units);
+        return grp('Відлік',
+            `<div class="ws-it"><span>Дата</span><input class="ws-in sm" type="date" data-wsdate value="${esc(c.target)}"></div>`
+            +`<div class="ws-it"><span>Час</span><input class="ws-in sm" type="time" data-wstime value="${esc(c.tm)}"></div>`
+            +row('Напрям',seg('dir',[['down','До дати'],['up','Від дати']],c.dir))
+            +row('Стиль',seg('sty',TM_STY.map(([k,l])=>[k,l.replace(' 3D','')]),c.sty))
+            +tg('yearly',c.yearly,'Щороку (день народження, річниця)'))
+          +grp('Що показувати',`<div class="ws-chips">${TM_U.map(u=>`<button data-wsu="${u}" class="${units.has(u)?'on':''}" aria-pressed="${units.has(u)}">${TM_N[u][2][0].toUpperCase()+TM_N[u][2].slice(1)}</button>`).join('')}</div>`
+            +tg('show.date',c.date,'Дата під цифрами'))
+          +(c.dir==='down'?grp('Коли настане',`<div class="ws-it">${seg('end',[['conf','🎉 Святкувати'],['quiet','Тихо'],['up','Рахувати «від»']],d.end==='quiet'||d.end==='up'?d.end:'conf')}</div>`):'');
+      }
+      let h='';
+      if(t!=='dtime'&&t!=='dcal'){
+        const goals=wlMissions(), fm=wgFolderMission(fk), gid=d.goalId&&goals.some(g=>String(g.id)===String(d.goalId))?String(d.goalId):'';
+        h+=grp('Джерело',`<div class="ws-chips">
+          <button data-wsg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
+          ${goals.map(g=>`<button data-wsg="${esc(g.id)}" class="${String(g.id)===gid?'on':''}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,24))}</button>`).join('')}</div>`);
+      }
+      let main='';
+      if(m.per) main+=row('Період',seg('period',m.per,wdPer(d)));
+      if(t==='dmission') main+=row('Головне число',seg('main',[['pct','%'],['steps','Кроки'],['days','Дні']],d.main==='steps'||d.main==='days'?d.main:'pct'));
+      if(t==='dhabit'&&wdPer(d)==='week') main+=row('Ціль на тиждень',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
+      if(t==='dhabit') main+=tg('tapmk',!!d.tapmk,'Позначати день тапом по віджету');
+      if(t==='dtime'&&wdPer(d)!=='day') main+=row('Ціль годин',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
+      if(t==='dcal') main+=row('Події',seg('ev',[['fold','Цієї папки'],['all','Весь Планер']],d.ev==='all'?'all':'fold'));
+      if(t==='dsave') main+=row('Кнопка «＋»',seg('q',[['0','Сума'],['100','100'],['500','500'],['1000','1000']],String(wsQ(d))))
+        +`<button class="ws-it ws-go" data-wsgo="save"><span>🐷 Ціль скарбнички</span><em>›</em></button>`;
+      if(t==='dcounter') main+=`<button class="ws-it ws-go" data-wsgo="counter"><span>🔢 Вибрати чи змінити лічильник</span><em>›</em></button>`;
+      if(main) h+=grp(m.h,main);
+      h+=grp('Показувати',m.show.map(([k,l])=>tg('show.'+k,wdOn(d,k),l)).join(''));
+      return h;
+    }
+    function draw(){
+      ov.querySelectorAll('[data-wstab]').forEach(x=>{ const on=x.dataset.wstab===tab; x.classList.toggle('on',on); x.setAttribute('aria-selected',String(on)); });
+      body.innerHTML=tab==='gen'?genHTML():ownHTML();
+      pvDraw();
+    }
+    // ── запис при закритті: лише поля вигляду, у свіжий блок (поки шторка відкрита, синк міг підмінити дошку) ──
+    let closed=false;
+    function commit(){
+      // лише поля, які людина змінила: дата, що прийшла синком з іншого пристрою, поки шторка відкрита, не затирається старою
+      const ch=WS_KEYS.filter(k=>JSON.stringify(d[k])!==was[k]); if(!ch.length) return false;
+      const q=getBlock(id); if(!q||q.type!==d.type) return false;
+      ch.forEach(k=>{ if(d[k]===undefined) delete q[k]; else q[k]=JSON.parse(JSON.stringify(d[k])); });
+      saveBoard(); return true;
+    }
+    function close(){ if(closed) return; closed=true; const ch=commit(); ov.classList.add('out'); setTimeout(()=>ov.remove(),220); if(ch) wdRedraw(); document.removeEventListener('keydown',onKey,true); }
+    ov.__wsClose=()=>{ if(!closed){ closed=true; if(commit()) wdRedraw(); document.removeEventListener('keydown',onKey,true); } };
+    function onKey(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
+    document.addEventListener('keydown',onKey,true);
+    ov.addEventListener('click',e=>{ if(e.target===ov){ close(); return; }
+      const x=e.target.closest('button'); if(!x||!ov.contains(x)) return;
+      if(x.dataset.wsdone!==undefined){ close(); return; }
+      if(x.dataset.wstab){ tab=x.dataset.wstab; draw(); return; }
+      if(x.dataset.wscc!==undefined){ if(x.dataset.wscc) d.cc=x.dataset.wscc; else delete d.cc; draw(); return; }
+      if(x.dataset.wsset){ const k=x.dataset.wsset, v=x.dataset.v;
+        if(k==='bg'){ if(v==='glass') delete d.bg; else d.bg=v; }
+        else if(k==='dir'){ if(v==='up') d.dir='up'; else delete d.dir; }
+        else if(k==='sty'){ if(v==='flip') delete d.sty; else d.sty=v; }
+        else if(k==='end'){ if(v==='conf') delete d.end; else d.end=v; }
+        else if(k==='main'){ if(v==='pct') delete d.main; else d.main=v; }
+        else if(k==='ev'){ if(v==='all') d.ev='all'; else delete d.ev; }
+        else if(k==='q'){ if(v==='0') delete d.q; else d.q=+v; }
+        else if(k==='period'){ d.period=v; }
+        draw(); return; }
+      if(x.dataset.wstg){ const k=x.dataset.wstg;
+        if(k==='nohd'){ if(d.nohd) delete d.nohd; else d.nohd=true; }
+        else if(k==='yearly'){ if(d.yearly) delete d.yearly; else d.yearly=true; }
+        else if(k==='tapmk'){ if(d.tapmk) delete d.tapmk; else d.tapmk=true; }
+        else if(k.slice(0,5)==='show.'){ const s=k.slice(5), on=wdOn(d,s), sh2=d.show&&typeof d.show==='object'?d.show:{};
+          if(on) sh2[s]=false; else delete sh2[s]; if(Object.keys(sh2).length) d.show=sh2; else delete d.show; }
+        draw(); return; }
+      if(x.dataset.wsu){ const c=tmCfgOf(d), us=new Set(c.units), u=x.dataset.wsu;
+        if(us.has(u)){ if(us.size===1){ plToast('Хоча б одна одиниця'); return; } us.delete(u); } else us.add(u);
+        const L=TM_U.filter(z=>us.has(z)); if(L.join()===TM_DEF.join()) delete d.units; else d.units=L; draw(); return; }
+      if(x.dataset.wsg!==undefined){ if(x.dataset.wsg) d.goalId=x.dataset.wsg; else delete d.goalId; draw(); return; }
+      if(x.dataset.wsst){ const mx=d.type==='dhabit'?7:(wdPer(d)==='month'?200:60), v=(wsGoal(d)||0)+(+x.dataset.n<0?-1:1);
+        if(v<=0) delete d.goal; else d.goal=Math.min(mx,v); draw(); return; }
+      if(x.dataset.wspk){ const [w,h]=x.dataset.wspk.split(',').map(Number); wdSetCell(d,dev,w,h); draw(); return; }
+      if(x.dataset.wsgo){ const k=x.dataset.wsgo; close();
+        const q=wdGoal(getBlock(id)||d,fk); if(!q||!q.id){ plToast('Спершу вибери місію'); return; }
+        if(k==='save') wdSaveGoalSheet(q.id); else wdCounterSheet(id,q.id,String(d.cid||'')); return; }
+      if(x.dataset.wsdup!==undefined){ close(); wdDup(id); return; }
+      if(x.dataset.wsdel!==undefined){ closed=true; ov.remove(); document.removeEventListener('keydown',onKey,true); wdRemove(id); return; }
+    });
+    ov.addEventListener('input',e=>{
+      const x=e.target;
+      if(x.matches('[data-wsname]')){ const v=String(x.value||'').replace(/\s+/g,' ').trim();
+        if(d.type==='countdown'){ d.title=v.slice(0,60); d.label=d.title; } else if(v) d.hd=v.slice(0,40); else delete d.hd;
+        try{ wgFill(pvh,d,fk); }catch(_){} return; }
+      if(x.matches('[data-wsdate]')){ const v=String(x.value||''); if(/^\d{4}-\d{2}-\d{2}$/.test(v)){ d.target=v; try{ wgFill(pvh,d,fk); }catch(_){} } return; }
+      if(x.matches('[data-wstime]')){ const v=String(x.value||'').slice(0,5); if(/^([01]\d|2[0-3]):[0-5]\d$/.test(v)&&v!=='00:00') d.tm=v; else delete d.tm; try{ wgFill(pvh,d,fk); }catch(_){} }
+    });
+    // розмір на сітці-вибирачі: наведення підсвічує прямокутник (компʼютер)
+    ov.addEventListener('pointerover',e=>{ const x=e.target.closest('[data-wspk]'); if(!x) return; const [w,h]=x.dataset.wspk.split(',').map(Number);
+      ov.querySelectorAll('[data-wspk]').forEach(y=>{ const [a,c]=y.dataset.wspk.split(',').map(Number); y.classList.toggle('hov',a<=w&&c<=h&&!y.classList.contains('in')); }); });
+    ov.addEventListener('pointerout',e=>{ if(e.target.closest&&e.target.closest('.ws-pk')&&!(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest('.ws-pk'))) ov.querySelectorAll('.ws-pk .hov').forEach(y=>y.classList.remove('hov')); });
+    draw();
+    void ov.offsetWidth; ov.classList.add('on');   // примусовий перерахунок замість кадру анімації: прихована вкладка кадрів не дає, і шторка лишалась би за краєм
+    try{ window.platform.haptic('light'); }catch(_){}
+    if(opt.tab==='own'&&d.type==='countdown'&&!tmCfgOf(d).target) setTimeout(()=>{ try{ ov.querySelector('[data-wsdate]').focus(); }catch(_){} },120);
+  }
+  function wsGoal(b){ const v=Math.round(+b.goal||0); return v>0?v:0; }
+  function wsQ(b){ return [100,500,1000].includes(+b.q)?+b.q:0; }
+
+  // ── дублювати: копія поруч, без місця на «Полотні» ──
+  function wdDup(id){
+    const arr=findParentArr(curBoard(),id), i=arr?arr.findIndex(x=>x&&String(x.id)===String(id)):-1; if(i<0) return;
+    const c=JSON.parse(JSON.stringify(arr[i])); c.id='w'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); delete c.cv;
+    arr.splice(i+1,0,c); saveBoard(); wdRedraw(); plToast('Віджет скопійовано');
+  }
+  // ── прибрати: лише вікно; місія, трекер і блоки Планера лишаються. «Скасувати» повертає на те саме місце ──
+  function wdRemove(id){
+    const arr=findParentArr(curBoard(),id), i=arr?arr.findIndex(x=>x&&String(x.id)===String(id)):-1; if(i<0) return;
+    const prevId=i>0&&arr[i-1]?String(arr[i-1].id):'', nextId=arr[i+1]?String(arr[i+1].id):'';
+    const was=arr.splice(i,1)[0]; saveBoard(); wdRedraw();
+    const t=was.type, msg=t==='countdown'?'Відлік прибрано':'Віджет прибрано — дані в '+((t==='dtime'||t==='dcal')?'Планері':'місії')+' лишились';
+    // «Скасувати» шукає дошку наново: за ці секунди звірка з хмарою могла перечитати boards, і старий масив уже не в дошці
+    flowUndoToast(msg,()=>{
+      const B=curBoard(), live=x=>{ const st=[B]; while(st.length){ const L=st.pop(); if(L===x) return true; (L||[]).forEach(q=>{ if(q&&Array.isArray(q.children)) st.push(q.children); }); } return false; };
+      const a2=(prevId&&findParentArr(B,prevId))||(nextId&&findParentArr(B,nextId))||(live(arr)?arr:null);   // був єдиним — той самий масив, якщо він ще в дошці
+      if(!a2){ plToast('Дошку оновлено з іншого пристрою — додай віджет знову'); return; }
+      if(findBlockDeep(B,was.id)) return;
+      const j=prevId?a2.findIndex(x=>x&&String(x.id)===prevId)+1:Math.max(0,a2.findIndex(x=>x&&String(x.id)===nextId));
+      a2.splice(Math.min(j,a2.length),0,was); saveBoard(); wdRedraw(); });
+  }
+
+  // ── утримати віджет (або ПКМ на компʼютері) → налаштування, як на домашньому екрані iPhone ──
+  (function(){
+    let t=0, x0=0, y0=0, swallow=false;
+    const hostOf=el=>{ const h=el&&el.closest&&el.closest('[data-wghost]'); if(!h||h.closest('.ws-ov')) return null; const w=h.querySelector('.wg-t.wd'); return w?h:null; };
+    const stop=()=>{ clearTimeout(t); t=0; };
+    document.addEventListener('pointerdown',e=>{
+      if(e.button>0) return; const h=hostOf(e.target); if(!h||h.closest('.wb-edit')) return;
+      x0=e.clientX; y0=e.clientY; stop();
+      t=setTimeout(()=>{ t=0; swallow=true; setTimeout(()=>{ swallow=false; },700); wdSheet(h.dataset.wghost); },520);
+    },true);
+    document.addEventListener('pointermove',e=>{ if(t&&Math.hypot(e.clientX-x0,e.clientY-y0)>8) stop(); },true);
+    ['pointerup','pointercancel','scroll'].forEach(n=>document.addEventListener(n,stop,true));
+    document.addEventListener('click',e=>{ if(swallow&&hostOf(e.target)){ e.preventDefault(); e.stopPropagation(); swallow=false; } },true);
+    document.addEventListener('contextmenu',e=>{ const h=hostOf(e.target); if(!h) return; e.preventDefault(); stop(); if(!swallow) wdSheet(h.dataset.wghost); },true);
+  })();
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
@@ -39976,7 +40312,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* ── дошка: сітка 12 колонок, авто-укладання нативним CSS Grid (SPECblocksv2 §4.3) ── */
   function renderBoardBlock(rb,host){
     /* wboard — дошка віджетів «Дані»: на телефоні 2 колонки, як віджети iPhone (CSS 32-widgets.css) */
-    var wrap=document.createElement('div'); wrap.className='pg-board'+(rb.wboard?' wboard':''); wrap.dataset.id=rb.id;
+    var wrap=document.createElement('div'); wrap.className='pg-board'+(rb.wboard?' wboard':'')+(rb.wboard&&window.__wbEdit===rb.id?' wb-edit':''); wrap.dataset.id=rb.id;
     var items=Array.isArray(rb.children)?rb.children:[];
     items.forEach(function(it){
       if(!condMet(it)&&!pgShowHidden) return;
@@ -39984,14 +40320,26 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       cell.style.setProperty('--gw',it.gw||4); cell.style.setProperty('--gh',it.gh||2);
       /* віджети «Дані» мають розміри S/M/L — ширину на телефоні й ноуті задає CSS за data-sz */
       if(typeof wdIs==='function'&&wdIs(it.type)) cell.dataset.sz=wdSz(it);
+      /* дошка віджетів (19.11.2026): розмір — клітинки, свій на телефоні (4 колонки) і компʼютері (8), CSS 41-widget-sheet.css */
+      if(rb.wboard&&typeof wdCell==='function'&&wdIs(it.type)){
+        var cm=wdCell(it,'m'), cd=wdCell(it,'d');
+        cell.style.setProperty('--wcm',cm[0]); cell.style.setProperty('--whm',cm[1]); cell.style.setProperty('--wcd',cd[0]); cell.style.setProperty('--whd',cd[1]);
+        cell.classList.add('wb-cell');
+      }
       renderList([it],cell);
+      if(cell.classList.contains('wb-cell')){
+        var wx=document.createElement('button'); wx.className='wb-x'; wx.dataset.wbx=it.id; wx.setAttribute('aria-label','Прибрати віджет');
+        wx.innerHTML='<span>✕</span>'; cell.appendChild(wx);
+      }
       var rz=document.createElement('span'); rz.className='pg-brz'; rz.dataset.pgboardrz=it.id; rz.textContent='◢';
       cell.appendChild(rz);
       wrap.appendChild(cell);
     });
     host.appendChild(wrap);
     var foot=document.createElement('div'); foot.className='pg-bfoot';
+    var ed=rb.wboard&&window.__wbEdit===rb.id;
     foot.innerHTML='<button class="pg-badd" data-pgboardadd="'+esc(rb.id)+'">'+(rb.wboard?'＋ Віджет':'＋ Віджет у дошку')+'</button>'
+      +(rb.wboard&&items.length?'<button class="wb-ed'+(ed?' on':'')+'" data-wbed="'+esc(rb.id)+'" aria-pressed="'+ed+'">'+(ed?'Готово':'Змінити')+'</button>':'')
       +'<button class="pg-rowdel" data-pgrowdel="'+esc(rb.id)+'" title="Видалити дошку">✕</button>';
     host.appendChild(foot);
   }
@@ -40904,7 +41252,17 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           colW:boardEl.getBoundingClientRect().width/12,
           startX:(e.touches?e.touches[0].clientX:e.clientX),startY:(e.touches?e.touches[0].clientY:e.clientY),
           w0:loc.block.gw||4,h0:loc.block.gh||2};
-      if(typeof wdIs==='function'&&wdIs(loc.block.type)){
+      /* дошка віджетів (19.11.2026): тягнемо по клітинках пристрою — 4 колонки на телефоні, 8 на компʼютері */
+      if(boardEl.classList.contains('wboard')&&typeof wdCell==='function'&&wdIs(loc.block.type)){
+        var cs=getComputedStyle(boardEl), g=parseFloat(cs.columnGap)||12;
+        bz.cellMode=true; bz.dev=wdDev(); bz.cols=wdCols(bz.dev);
+        bz.colW=(boardEl.getBoundingClientRect().width-g*(bz.cols-1))/bz.cols+g;
+        bz.rowH=(parseFloat(cs.gridAutoRows)||76)+(parseFloat(cs.rowGap)||g);
+        bz.c0=wdCell(loc.block,bz.dev); bz.cur=bz.c0.slice();
+        cell.classList.add('wb-drag'); cell.dataset.dim=bz.cur[0]+' × '+bz.cur[1];
+        try{ window.platform.haptic('light'); }catch(_){}
+      }
+      else if(typeof wdIs==='function'&&wdIs(loc.block.type)){
         var sz0=wdSz(loc.block); bz.wd=true; bz.h0=WD_SZ[sz0].gh;
         bz.w0eff=window.innerWidth>=760?WD_SZ[sz0].gw/2:WD_SZ[sz0].gw;
       }
@@ -40915,6 +41273,17 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       if(!bz)return; e.preventDefault();
       var x=e.touches?e.touches[0].clientX:e.clientX,y=e.touches?e.touches[0].clientY:e.clientY;
       var dW=Math.round((x-bz.startX)/Math.max(1,bz.colW)), dH=Math.round((y-bz.startY)/ROWH);
+      if(bz.cellMode){
+        var w=Math.max(1,Math.min(bz.cols,bz.c0[0]+dW)), h=Math.max(1,Math.min(5,bz.c0[1]+Math.round((y-bz.startY)/bz.rowH)));
+        if(w!==bz.cur[0]||h!==bz.cur[1]){
+          bz.cur=[w,h]; wdSetCell(bz.block,bz.dev,w,h); bz.changed=true;
+          var k=bz.dev==='d'?'d':'m';
+          bz.cell.style.setProperty('--wc'+k,w); bz.cell.style.setProperty('--wh'+k,h); bz.cell.dataset.dim=w+' × '+h; bz.cell.dataset.sz=bz.block.sz;
+          var hst=bz.cell.querySelector('[data-wghost]'); if(hst){ try{ wgFill(hst,bz.block,hst.dataset.wgfk||''); }catch(_){} }   /* вміст перебудовується під площу одразу */
+          try{ window.platform.haptic('light'); }catch(_){}
+        }
+        return;
+      }
       if(bz.wd){
         /* віджет «Дані»: лише S / M / L. На ширині ≥760 S=3, M=L=6 колонок (CSS), тож рахуємо в частках ширини M */
         var full=window.innerWidth>=760?6:12, ew=(bz.w0eff+dW)/full, eh=bz.h0+dH;
@@ -40933,12 +41302,27 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       if(!bz)return;
       document.removeEventListener('touchmove',bzMove);document.removeEventListener('mousemove',bzMove);
       document.removeEventListener('touchend',bzEnd);document.removeEventListener('mouseup',bzEnd);
-      var redraw=bz.wd&&bz.changed;
-      save(); bz=null;
+      var redraw=(bz.wd||bz.cellMode)&&bz.changed;
+      if(bz.cellMode){ bz.cell.classList.remove('wb-drag'); delete bz.cell.dataset.dim; }
+      if(!bz.cellMode||bz.changed) save();
+      bz=null;
       if(redraw) render();   /* S/M/L показують різний вміст — перемалювати віджет */
     }
     editor.addEventListener('touchstart',bzStart,{passive:false});
     editor.addEventListener('mousedown',bzStart);
+    /* «Змінити» на дошці віджетів: хитання, ✕ і ручка ↘; тап по віджету — його налаштування (63-widget-sheet.js) */
+    editor.addEventListener('click',function(e){
+      var t=e.target; if(!t.closest) return;
+      var eb=t.closest('[data-wbed]');
+      if(eb){ e.preventDefault(); e.stopPropagation(); window.__wbEdit=window.__wbEdit===eb.dataset.wbed?'':eb.dataset.wbed; render(); return; }
+      var x=t.closest('[data-wbx]');
+      if(x){ e.preventDefault(); e.stopPropagation(); if(typeof wdRemove==='function') wdRemove(x.dataset.wbx); return; }
+      var cl=t.closest('.wb-edit .wb-cell');
+      if(cl&&!t.closest('[data-pgboardrz]')&&!t.closest('[data-pggrip]')){
+        var hs=cl.querySelector('[data-wghost]'); e.preventDefault(); e.stopPropagation();
+        if(hs&&typeof wdSheet==='function') wdSheet(hs.dataset.wghost);
+      }
+    },true);
   })();
 
   // ── block menu ──
