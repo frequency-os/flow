@@ -351,4 +351,9 @@
   }catch(e){ console.error('goPlan',e); } }
   // дані підтягнулись з хмари — якщо План відкритий, перемальовуємо
   try{ document.addEventListener('flowsync',()=>{ if(pnIsOpen()) pnRender(); }); }catch(_){}
+  /* 19.11.2026: кнопка «Журнал» у нижній панелі й бічному меню стала «Планер» і веде сюди (id лишились navJournal /
+     data-dnav="journal" — на них спирається підсвітка в show()). Журнал героя відкривається з віджетів і посилань (goJournal).
+     Цей файл іде після 41-journal.js, тож обробник тут перекриває старий. */
+  { const nj=document.getElementById('navJournal'); if(nj) nj.onclick=()=>goPlan(); }
+  { const dj=document.querySelector('.dsb-i[data-dnav="journal"]'); if(dj) dj.onclick=()=>goPlan(); }
   try{ window.goPlan=goPlan; window.pnRender=pnRender; window.pnIsOpen=pnIsOpen; }catch(_){}

@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 37976 |
+| Рядків JS | 37981 |
 | Файлів CSS | 54 |
 | Рядків CSS | 11961 |
 | Сутностей верхнього рівня | 2903 |
@@ -101,7 +101,7 @@
 | `src/scripts/core/62-block-store.js` | 209 | 25 |
 | `src/scripts/core/63-widget-sheet.js` | 238 | 22 |
 | `src/scripts/core/64-rich-text.js` | 196 | 23 |
-| `src/scripts/core/65-plan.js` | 354 | 58 |
+| `src/scripts/core/65-plan.js` | 359 | 58 |
 | `src/scripts/page-editor/01-palette.js` | 190 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 793 | 55 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1109 | 59 |
