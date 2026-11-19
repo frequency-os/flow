@@ -483,6 +483,8 @@
   }
   function dragBegin(id,row,x,y){
     drag={id:id,row:row,startX:x,startY:y,moved:false,lifted:false,target:null,mode:null};
+    /* ручки «Чисті поля» (19.11.2026): піднятий блок їде під пальцем — памʼятаємо, за яке місце його взяли */
+    try{ var r0=row.getBoundingClientRect(); drag.offX=Math.max(0,Math.min(x-r0.left,r0.width)); drag.offY=Math.max(0,Math.min(y-r0.top,r0.height)); }catch(_){ drag.offX=16; drag.offY=16; }
     document.addEventListener('touchmove',dmove,{passive:false});document.addEventListener('mousemove',dmove);
     document.addEventListener('touchend',dend,{passive:false});document.addEventListener('mouseup',dend);
     document.addEventListener('touchcancel',cancelDrag);
@@ -517,7 +519,21 @@
       return g;
     }catch(_){ return null; }
   }
-  function ghostMove(g,x,y){ if(g){ g.style.left=(x+16)+'px'; g.style.top=(y+16)+'px'; } }
+  function ghostMove(g,x,y){ if(g){ g.style.left=x+'px'; g.style.top=y+'px'; } }
+  /* автопрокрутка: палець біля верху чи низу екрана — сторінка їде сама, і блок можна донести куди завгодно */
+  var asRaf=0;
+  function pgScroller(){
+    for(var el=editor.parentElement;el&&el!==document.documentElement;el=el.parentElement){   /* body теж: у застосунку прокручується саме він */
+      var oy=getComputedStyle(el).overflowY; if((oy==='auto'||oy==='scroll')&&el.scrollHeight>el.clientHeight+2) return el; }
+    return document.scrollingElement||document.documentElement;
+  }
+  function asTick(){
+    asRaf=0; if(!drag||!drag.moved) return;
+    var y=drag.ly, h=window.innerHeight, top=96, bot=h-150, v=0;
+    if(y<top) v=-Math.min(18,Math.ceil((top-y)/5)); else if(y>bot) v=Math.min(18,Math.ceil((y-bot)/5));
+    if(v){ var sc=pgScroller(), b0=sc.scrollTop; sc.scrollTop=b0+v; if(sc.scrollTop!==b0) dtrack(drag.lx,drag.ly); }
+    asRaf=requestAnimationFrame(asTick);
+  }
   function ghostKill(g){ try{ if(g&&g.parentNode) g.parentNode.removeChild(g); }catch(_){} }
   function clearMarks(){editor.querySelectorAll('.drop-before,.drop-after,.drop-into,.drop-left,.drop-right').forEach(function(el){el.classList.remove('drop-before','drop-after','drop-into','drop-left','drop-right');});}
   function dmove(e){
@@ -529,9 +545,17 @@
       drag.moved=true;clearTimeout(drag.hold);lmenuHide();
       drag.row.classList.remove('pg-lifted');drag.row.classList.add('dragging');drag.ghost=ghostMake(drag.row);
     }
-    if(!drag.moved)return;e.preventDefault();clearMarks();
-    if(drag.ghost)ghostMove(drag.ghost,x,y);
-    var rows=[].slice.call(editor.querySelectorAll('.pgb')).filter(function(r){return r!==drag.row;});
+    if(!drag.moved)return;e.preventDefault();
+    if(drag.ghost)ghostMove(drag.ghost,x-drag.offX,y-drag.offY);
+    drag.lx=x; drag.ly=y; if(!asRaf) asRaf=requestAnimationFrame(asTick);
+    dtrack(x,y);
+  }
+  /* куди ляже блок під точкою x,y — лінія до/після, «всередину» чи колонка */
+  function dtrack(x,y){
+    if(!drag)return; clearMarks();
+    /* дошка віджетів — окремий світ: текст у неї не падає, а віджет не випадає з неї (19.11.2026) */
+    var wbOwn=drag.row.closest('.pg-board.wboard');
+    var rows=[].slice.call(editor.querySelectorAll('.pgb')).filter(function(r){return r!==drag.row&&r.closest('.pg-board.wboard')===wbOwn;});
     var tgt=null,best=1e9;
     rows.forEach(function(r){var rc=r.getBoundingClientRect();var mid=rc.top+rc.height/2;var d=Math.abs(y-mid);if(d<best){best=d;tgt=r;}});
     if(!tgt)return;
@@ -752,7 +776,7 @@
   /* ── коротке меню під піднятим блоком: 4 часті дії, «Ще…» — повне меню ── */
   var lmenu=document.createElement('div'),lmId=null;
   lmenu.className='pg-lmenu'; lmenu.id='pgLmenu'; lmenu.setAttribute('role','menu');
-  lmenu.innerHTML=[['dup','Дублювати'],['turn','Перетворити на…'],['more','Ще…'],['del','Видалити']].map(function(a){
+  lmenu.innerHTML=[['up','Вгору ↑'],['down','Вниз ↓'],['dup','Дублювати'],['turn','Перетворити на…'],['more','Ще…'],['del','Видалити']].map(function(a){
     return '<button type="button" role="menuitem" class="pg-lmi'+(a[0]==='del'?' danger':'')+'" data-pglm="'+a[0]+'">'+a[1]+'</button>';
   }).join('');
   document.body.appendChild(lmenu);
@@ -775,6 +799,9 @@
     var act=b.dataset.pglm, id=lmId; lmenuClose();
     if(act==='more'){ openBmenu(id); return; }
     bmId=id; bmRun(act);
+    /* «Вгору / Вниз»: блок лишається піднятим з меню — можна натиснути ще раз */
+    if(act==='up'||act==='down'){ var nr=editor.querySelector('.pgb[data-id="'+id+'"]');
+      if(nr){ try{ nr.scrollIntoView({block:'nearest'}); }catch(_){} nr.classList.add('pg-lifted'); scr.classList.add('pg-liftmode'); lmenuOpen(id,nr); } }   /* спершу прокрутка, потім меню — інакше меню рахує старе місце блока */
   });
   function closeBmenu(){bmenu.classList.remove('show');backdrop.classList.remove('show');bmId=null;}
   bmenu.addEventListener('click',function(e){
@@ -813,6 +840,14 @@
         var rO=moveBlock(bmId,loc.parent.id,'after');
         if(rO)pushOp(function(){undoMove(rO);},function(){redoMove(rO);});
       }
+    }
+    /* «Вгору / Вниз» (19.11.2026): на одне місце серед сусідів, з «Скасувати» */
+    else if(act==='up'||act==='down'){
+      var mA=loc.arr,mB=loc.block,i0=loc.idx,j0=act==='up'?i0-1:i0+1;
+      if(j0<0||j0>=mA.length){ closeBmenu(); try{ plToast(act==='up'?'Блок уже нагорі':'Блок уже внизу'); }catch(_){} return; }
+      mA.splice(i0,1); mA.splice(j0,0,mB);
+      pushOp(function(){var k=mA.indexOf(mB); if(k>-1){mA.splice(k,1); mA.splice(Math.min(i0,mA.length),0,mB);}},
+             function(){var k=mA.indexOf(mB); if(k>-1){mA.splice(k,1); mA.splice(Math.min(j0,mA.length),0,mB);}});
     }
     else if(act==='turn'){var tid=bmId;turnSnap={id:tid,before:JSON.parse(JSON.stringify(loc.block))};closeBmenu();slashCtx=tid;openSlash();return;}
     else if(act==='cond'){var cid=bmId;closeBmenu();openCondSheet(cid);return;}   /* id беремо ДО closeBmenu — той обнуляє bmId */
@@ -879,13 +914,26 @@
 
   // ── кнопка «+ Додати блок»: створює порожній рядок і одразу відкриває меню ──
   var addBtn=document.getElementById('pgAddBlock');
-  function pgAddViaMenu(){
+  /* останній блок, де стояв курсор: «＋» нижнього поля вставляє під ним (19.11.2026), а не в кінець */
+  var pgLastEdit='';
+  /* фокус, тап або набір — будь-що з цього каже, де людина пише (фокус не завжди приходить, напр. у неактивному вікні) */
+  ['focusin','click','input'].forEach(function(t){ editor.addEventListener(t,pgTrackEdit); });
+  function pgTrackEdit(e){
+    var el=e.target&&e.target.closest&&e.target.closest('[data-edit]'); if(!el)return;
+    if(pgLastEdit===el.dataset.edit&&e.type!=='focusin')return;
+    pgLastEdit=el.dataset.edit;
+    /* порада один раз на пристрої (лише памʼять браузера): на телефоні ручок нема — пересувають утриманням */
+    try{ if(window.matchMedia('(hover:none)').matches&&!localStorage.getItem('pg_tip_lift')){ localStorage.setItem('pg_tip_lift','1'); plToast('Порада: утримай блок, щоб пересунути'); } }catch(_){}
+  }
+  function pgAddViaMenu(underCursor){
     if(!bridge())return;
     var nb={id:uid(),type:'note',text:''};
-    pgResolve().arr.push(nb); save(); render();
+    var lc=underCursor&&pgLastEdit?locate(pgLastEdit):null;
+    if(lc) lc.arr.splice(lc.idx+1,0,nb); else pgResolve().arr.push(nb);
+    save(); render();
     slashCtx=nb.id; openSlash(); pgAddPending=nb.id;
   }
-  if(addBtn) addBtn.onclick=pgAddViaMenu;
+  if(addBtn) addBtn.onclick=function(){ pgAddViaMenu(false); };
 
   /* ── Нижнє поле документа (16.10.2026 етап 3; 17.10.2026 — чернетка з кількох рядків) ──
      «＋» — усі блоки (те саме меню, що й «＋ Додати блок»). Поле — чернетка: Enter — новий рядок того ж типу,
@@ -1007,7 +1055,7 @@
       if(rb){ try{ rb.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} }
       made.forEach(function(b){ var el=editor.querySelector('.pgb[data-id="'+b.id+'"]'); if(el){ el.classList.add('pg-born'); setTimeout(function(){ try{ el.classList.remove('pg-born'); }catch(_){} },900); } });
     }
-    document.getElementById('pgcPlus').onclick=function(){ pgAddViaMenu(); };
+    document.getElementById('pgcPlus').onclick=function(){ pgAddViaMenu(true); };
     send.onclick=sendAll;
     draw(null);
     // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі

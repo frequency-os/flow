@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 100 |
-| Рядків JS | 37075 |
+| Рядків JS | 37123 |
 | Файлів CSS | 53 |
-| Рядків CSS | 11688 |
-| Сутностей верхнього рівня | 2777 |
+| Рядків CSS | 11714 |
+| Сутностей верхнього рівня | 2783 |
 | Ключів сховища (FLOW_KEYS) | 81 |
 
 ## Файли JS
@@ -102,7 +102,7 @@
 | `src/scripts/core/63-widget-sheet.js` | 238 | 22 |
 | `src/scripts/page-editor/01-palette.js` | 188 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 790 | 53 |
-| `src/scripts/page-editor/03-premium-pack.js` | 1061 | 53 |
+| `src/scripts/page-editor/03-premium-pack.js` | 1109 | 59 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
@@ -144,7 +144,7 @@
 | `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1205 | 9 |
+| `src/styles/core/02-page-editor.css` | 1231 | 9 |
 | `src/styles/core/03-folders-projects.css` | 684 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -3107,7 +3107,7 @@
 | `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:713` |
 | `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:727` |
 
-### `src/scripts/page-editor/03-premium-pack.js` — 53 сутностей
+### `src/scripts/page-editor/03-premium-pack.js` — 59 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3134,36 +3134,42 @@
 | `dragStale` | функція | `src/scripts/page-editor/03-premium-pack.js:474` |
 | `dstart` | функція | `src/scripts/page-editor/03-premium-pack.js:475` |
 | `dragBegin` | функція | `src/scripts/page-editor/03-premium-pack.js:484` |
-| `dragOff` | функція | `src/scripts/page-editor/03-premium-pack.js:490` |
-| `liftOn` | функція | `src/scripts/page-editor/03-premium-pack.js:496` |
-| `liftOff` | функція | `src/scripts/page-editor/03-premium-pack.js:505` |
-| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:510` |
-| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:520` |
-| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:521` |
-| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:522` |
-| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:523` |
-| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:553` |
-| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:572` |
-| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:703` |
-| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:704` |
-| `lmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:753` |
-| `lmenuOpen` | функція | `src/scripts/page-editor/03-premium-pack.js:759` |
-| `lmenuHide` | функція | `src/scripts/page-editor/03-premium-pack.js:771` |
-| `lmenuClose` | функція | `src/scripts/page-editor/03-premium-pack.js:772` |
-| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:779` |
-| `bmRun` | функція | `src/scripts/page-editor/03-premium-pack.js:784` |
-| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:829` |
-| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:830` |
-| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:835` |
-| `window.__pgThemeAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:844` |
-| `window.__pgThemeIsAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:845` |
-| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:859` |
-| `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:862` |
-| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:881` |
-| `pgAddViaMenu` | функція | `src/scripts/page-editor/03-premium-pack.js:882` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:1040` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:1041` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:1046` |
+| `dragOff` | функція | `src/scripts/page-editor/03-premium-pack.js:492` |
+| `liftOn` | функція | `src/scripts/page-editor/03-premium-pack.js:498` |
+| `liftOff` | функція | `src/scripts/page-editor/03-premium-pack.js:507` |
+| `ghostMake` | функція | `src/scripts/page-editor/03-premium-pack.js:512` |
+| `ghostMove` | функція | `src/scripts/page-editor/03-premium-pack.js:522` |
+| `asRaf` | значення | `src/scripts/page-editor/03-premium-pack.js:524` |
+| `pgScroller` | функція | `src/scripts/page-editor/03-premium-pack.js:525` |
+| `asTick` | функція | `src/scripts/page-editor/03-premium-pack.js:530` |
+| `ghostKill` | функція | `src/scripts/page-editor/03-premium-pack.js:537` |
+| `clearMarks` | функція | `src/scripts/page-editor/03-premium-pack.js:538` |
+| `dmove` | функція | `src/scripts/page-editor/03-premium-pack.js:539` |
+| `dtrack` | функція | `src/scripts/page-editor/03-premium-pack.js:554` |
+| `dend` | функція | `src/scripts/page-editor/03-premium-pack.js:577` |
+| `cancelDrag` | функція | `src/scripts/page-editor/03-premium-pack.js:596` |
+| `bmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:727` |
+| `openBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:728` |
+| `lmenu` | значення | `src/scripts/page-editor/03-premium-pack.js:777` |
+| `lmenuOpen` | функція | `src/scripts/page-editor/03-premium-pack.js:783` |
+| `lmenuHide` | функція | `src/scripts/page-editor/03-premium-pack.js:795` |
+| `lmenuClose` | функція | `src/scripts/page-editor/03-premium-pack.js:796` |
+| `closeBmenu` | функція | `src/scripts/page-editor/03-premium-pack.js:806` |
+| `bmRun` | функція | `src/scripts/page-editor/03-premium-pack.js:811` |
+| `THKEY` | значення | `src/scripts/page-editor/03-premium-pack.js:864` |
+| `applyTheme` | функція | `src/scripts/page-editor/03-premium-pack.js:865` |
+| `pageThemeDefault` | функція | `src/scripts/page-editor/03-premium-pack.js:870` |
+| `window.__pgThemeAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:879` |
+| `window.__pgThemeIsAuto` | функція | `src/scripts/page-editor/03-premium-pack.js:880` |
+| `pgTitle` | значення | `src/scripts/page-editor/03-premium-pack.js:894` |
+| `pgTitleCommit` | функція | `src/scripts/page-editor/03-premium-pack.js:897` |
+| `addBtn` | значення | `src/scripts/page-editor/03-premium-pack.js:916` |
+| `pgLastEdit` | значення | `src/scripts/page-editor/03-premium-pack.js:918` |
+| `pgTrackEdit` | функція | `src/scripts/page-editor/03-premium-pack.js:921` |
+| `pgAddViaMenu` | функція | `src/scripts/page-editor/03-premium-pack.js:928` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:1088` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:1089` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:1094` |
 
 ### `src/scripts/page-editor/04-table.js` — 26 сутностей
 

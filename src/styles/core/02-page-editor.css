@@ -137,6 +137,32 @@
   /* привид живе в body, поза #scr-page, — токенів документа не бачить; фон і текст — свої (21.10.2026) */
   .pg-ghost{--pg-field:#1f232c;color:#eef0f4;opacity:.92;}
   .pg-ghost.pg-paper{--pg-field:#ffffff;color:#1c1a17;box-shadow:0 16px 34px -8px rgba(28,26,23,.3);}
+  /* ════ ручки «Чисті поля» (19.11.2026, макет «Ручки блоків», варіант A) ════
+     Телефон: «＋» і «⠿» на блоках не видно — пересувають утриманням (коротке меню з «Вгору / Вниз»),
+     додають «＋» нижнього поля. Компʼютер: обидві ручки разом зліва, лише при наведенні.
+     Дошку віджетів не чіпаємо — у неї свій режим «Змінити» (41-widget-sheet.css). */
+  @media (max-width:1023px),(hover:none){
+    #scr-page .pgb>.pg-addrow,#scr-page .pgb>.pg-grip{display:none;}
+  }
+  @media (min-width:1024px) and (hover:hover){
+    #scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-addrow,#scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-grip{
+      position:absolute;top:1px;margin:0;width:24px;height:28px;min-height:0;border-radius:7px;opacity:0;transition:opacity .12s,background .12s;}
+    #scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-addrow{left:-56px;}
+    #scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-grip{left:-30px;}
+    #scr-page .pgb.pgb:not(.pg-bitem>.pgb):hover>.pg-addrow,#scr-page .pgb.pgb:not(.pg-bitem>.pgb):hover>.pg-grip{opacity:.6;}
+    #scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-addrow:hover,#scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-grip:hover{opacity:1;background:var(--pg-field);}
+    #scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-addrow:focus-visible,#scr-page .pgb.pgb:not(.pg-bitem>.pgb)>.pg-grip:focus-visible{opacity:1;}
+  }
+  /* куди ляже: товща лінія акценту з ореолом, від краю тексту */
+  .pgb.drop-before::before,.pgb.drop-after::after{left:0;height:3px;box-shadow:0 0 0 3px color-mix(in srgb,var(--pg-acc) 20%,transparent);}
+  /* піднятий блок під пальцем: скло, без нахилу; на його місці — бліда тінь */
+  .pg-ghost{transform:scale(1.03);opacity:1;border-radius:14px;padding:6px 8px;
+    box-shadow:0 22px 40px -14px rgba(0,0,0,.55),0 0 0 1.5px color-mix(in srgb,#7c8cff 60%,transparent);}
+  .pgb.dragging{opacity:.22;}
+  /* коротке меню утримання — скло */
+  .pg-lmenu{background:rgba(24,22,34,.78);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);border-radius:18px;}
+  .pg-lmenu.pg-paper{background:rgba(255,255,255,.8);}
+  @media (prefers-reduced-transparency:reduce){ .pg-lmenu{background:rgba(20,23,32,.98);} .pg-lmenu.pg-paper{background:#fff;} }
   /* ряд колонок (SPECblocksv2 §4.1) */
   .pg-row{display:flex;align-items:stretch;position:relative;margin:2px 0;padding-right:22px;}
   .pg-col{min-width:0;flex:var(--cw,1) 1 0%;}
