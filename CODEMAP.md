@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 37943 |
+| Рядків JS | 37976 |
 | Файлів CSS | 54 |
-| Рядків CSS | 11960 |
-| Сутностей верхнього рівня | 2899 |
+| Рядків CSS | 11961 |
+| Сутностей верхнього рівня | 2903 |
 | Ключів сховища (FLOW_KEYS) | 81 |
 
 ## Файли JS
@@ -82,7 +82,7 @@
 | `src/scripts/core/46-wallet.js` | 508 | 43 |
 | `src/scripts/core/47-rules.js` | 351 | 29 |
 | `src/scripts/core/48-hero.js` | 342 | 41 |
-| `src/scripts/core/48-widgets.js` | 853 | 85 |
+| `src/scripts/core/48-widgets.js` | 862 | 85 |
 | `src/scripts/core/49-calendar.js` | 310 | 36 |
 | `src/scripts/core/49-finlit.js` | 150 | 18 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
@@ -101,7 +101,7 @@
 | `src/scripts/core/62-block-store.js` | 209 | 25 |
 | `src/scripts/core/63-widget-sheet.js` | 238 | 22 |
 | `src/scripts/core/64-rich-text.js` | 196 | 23 |
-| `src/scripts/core/65-plan.js` | 330 | 54 |
+| `src/scripts/core/65-plan.js` | 354 | 58 |
 | `src/scripts/page-editor/01-palette.js` | 190 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 793 | 55 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1109 | 59 |
@@ -185,7 +185,7 @@
 | `src/styles/core/39-folder-canvas.css` | 43 | 0 |
 | `src/styles/core/40-block-store.css` | 126 | 0 |
 | `src/styles/core/41-widget-sheet.css` | 177 | 0 |
-| `src/styles/core/42-plan.css` | 195 | 2 |
+| `src/styles/core/42-plan.css` | 196 | 2 |
 
 ## Ключі сховища — FLOW_KEYS (81)
 
@@ -2508,36 +2508,36 @@
 | `wdCounterSheet` | функція | `src/scripts/core/48-widgets.js:529` |
 | `wdSaveGoalSheet` | функція | `src/scripts/core/48-widgets.js:579` |
 | `wdTT` | функція | `src/scripts/core/48-widgets.js:598` |
-| `wdTasksItems` | функція | `src/scripts/core/48-widgets.js:599` |
-| `wdTasksBlock` | функція | `src/scripts/core/48-widgets.js:606` |
-| `wdTasksHTML` | функція | `src/scripts/core/48-widgets.js:611` |
-| `wdTasksAct` | функція | `src/scripts/core/48-widgets.js:631` |
-| `wdTasksAddSheet` | функція | `src/scripts/core/48-widgets.js:651` |
-| `wdRedraw` | функція | `src/scripts/core/48-widgets.js:668` |
-| `wdAct` | функція | `src/scripts/core/48-widgets.js:669` |
-| `wdCfg` | функція | `src/scripts/core/48-widgets.js:702` |
-| `wdPickMission` | функція | `src/scripts/core/48-widgets.js:704` |
-| `TM_U` | масив | `src/scripts/core/48-widgets.js:723` |
-| `TM_N` | обʼєкт | `src/scripts/core/48-widgets.js:724` |
-| `TM_SH` | обʼєкт | `src/scripts/core/48-widgets.js:726` |
-| `TM_MS` | обʼєкт | `src/scripts/core/48-widgets.js:727` |
-| `TM_STY` | масив | `src/scripts/core/48-widgets.js:728` |
-| `tmCfgOf` | функція | `src/scripts/core/48-widgets.js:729` |
-| `tmAt` | функція | `src/scripts/core/48-widgets.js:736` |
-| `tmAddM` | функція | `src/scripts/core/48-widgets.js:738` |
-| `tmParts` | функція | `src/scripts/core/48-widgets.js:741` |
-| `tmState` | функція | `src/scripts/core/48-widgets.js:755` |
-| `tmDateTxt` | функція | `src/scripts/core/48-widgets.js:763` |
-| `tmPad` | функція | `src/scripts/core/48-widgets.js:764` |
-| `tmInner` | функція | `src/scripts/core/48-widgets.js:766` |
-| `tmHTML` | функція | `src/scripts/core/48-widgets.js:795` |
-| `tmTimer` | значення | `src/scripts/core/48-widgets.js:805` |
-| `tmTickAll` | функція | `src/scripts/core/48-widgets.js:806` |
-| `tmStart` | функція | `src/scripts/core/48-widgets.js:816` |
-| `tmCfg` | функція | `src/scripts/core/48-widgets.js:818` |
-| `WG_OLD` | обʼєкт | `src/scripts/core/48-widgets.js:824` |
-| `wgOldScan` | функція | `src/scripts/core/48-widgets.js:825` |
-| `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:832` |
+| `wdTasksItems` | функція | `src/scripts/core/48-widgets.js:600` |
+| `wdTasksBlock` | функція | `src/scripts/core/48-widgets.js:609` |
+| `wdTasksHTML` | функція | `src/scripts/core/48-widgets.js:614` |
+| `wdTasksAct` | функція | `src/scripts/core/48-widgets.js:640` |
+| `wdTasksAddSheet` | функція | `src/scripts/core/48-widgets.js:660` |
+| `wdRedraw` | функція | `src/scripts/core/48-widgets.js:677` |
+| `wdAct` | функція | `src/scripts/core/48-widgets.js:678` |
+| `wdCfg` | функція | `src/scripts/core/48-widgets.js:711` |
+| `wdPickMission` | функція | `src/scripts/core/48-widgets.js:713` |
+| `TM_U` | масив | `src/scripts/core/48-widgets.js:732` |
+| `TM_N` | обʼєкт | `src/scripts/core/48-widgets.js:733` |
+| `TM_SH` | обʼєкт | `src/scripts/core/48-widgets.js:735` |
+| `TM_MS` | обʼєкт | `src/scripts/core/48-widgets.js:736` |
+| `TM_STY` | масив | `src/scripts/core/48-widgets.js:737` |
+| `tmCfgOf` | функція | `src/scripts/core/48-widgets.js:738` |
+| `tmAt` | функція | `src/scripts/core/48-widgets.js:745` |
+| `tmAddM` | функція | `src/scripts/core/48-widgets.js:747` |
+| `tmParts` | функція | `src/scripts/core/48-widgets.js:750` |
+| `tmState` | функція | `src/scripts/core/48-widgets.js:764` |
+| `tmDateTxt` | функція | `src/scripts/core/48-widgets.js:772` |
+| `tmPad` | функція | `src/scripts/core/48-widgets.js:773` |
+| `tmInner` | функція | `src/scripts/core/48-widgets.js:775` |
+| `tmHTML` | функція | `src/scripts/core/48-widgets.js:804` |
+| `tmTimer` | значення | `src/scripts/core/48-widgets.js:814` |
+| `tmTickAll` | функція | `src/scripts/core/48-widgets.js:815` |
+| `tmStart` | функція | `src/scripts/core/48-widgets.js:825` |
+| `tmCfg` | функція | `src/scripts/core/48-widgets.js:827` |
+| `WG_OLD` | обʼєкт | `src/scripts/core/48-widgets.js:833` |
+| `wgOldScan` | функція | `src/scripts/core/48-widgets.js:834` |
+| `wgOldCleanup` | функція | `src/scripts/core/48-widgets.js:841` |
 
 ### `src/scripts/core/49-calendar.js` — 36 сутностей
 
@@ -3067,7 +3067,7 @@
 | `txLead` | функція | `src/scripts/core/64-rich-text.js:149` |
 | `txChipCard` | функція | `src/scripts/core/64-rich-text.js:156` |
 
-### `src/scripts/core/65-plan.js` — 54 сутностей
+### `src/scripts/core/65-plan.js` — 58 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3079,52 +3079,56 @@
 | `PN_QC` | обʼєкт | `src/scripts/core/65-plan.js:37` |
 | `PN_FC` | масив | `src/scripts/core/65-plan.js:38` |
 | `PN_ICO` | обʼєкт | `src/scripts/core/65-plan.js:39` |
-| `pnLang` | функція | `src/scripts/core/65-plan.js:52` |
-| `pnT` | функція | `src/scripts/core/65-plan.js:53` |
-| `pnPer` | значення | `src/scripts/core/65-plan.js:56` |
-| `pnRemember` | функція | `src/scripts/core/65-plan.js:60` |
-| `pnToday` | функція | `src/scripts/core/65-plan.js:62` |
-| `pnDay` | функція | `src/scripts/core/65-plan.js:63` |
-| `pnAdd` | функція | `src/scripts/core/65-plan.js:64` |
-| `pnMon` | функція | `src/scripts/core/65-plan.js:65` |
-| `pnDowI` | функція | `src/scripts/core/65-plan.js:66` |
-| `pnHM` | функція | `src/scripts/core/65-plan.js:67` |
-| `pnEnd` | функція | `src/scripts/core/65-plan.js:68` |
-| `pnRaw` | функція | `src/scripts/core/65-plan.js:70` |
-| `pnFolder` | функція | `src/scripts/core/65-plan.js:72` |
-| `pnFolderColor` | функція | `src/scripts/core/65-plan.js:73` |
-| `pnItems` | функція | `src/scripts/core/65-plan.js:81` |
-| `pnFind` | функція | `src/scripts/core/65-plan.js:87` |
-| `pnChip` | функція | `src/scripts/core/65-plan.js:89` |
-| `pnCheck` | функція | `src/scripts/core/65-plan.js:93` |
-| `pnStarBtn` | функція | `src/scripts/core/65-plan.js:94` |
-| `pnMeta` | функція | `src/scripts/core/65-plan.js:95` |
-| `pnRow` | функція | `src/scripts/core/65-plan.js:99` |
-| `pnMainHTML` | функція | `src/scripts/core/65-plan.js:106` |
-| `pnAddHTML` | функція | `src/scripts/core/65-plan.js:121` |
-| `pnHoursHTML` | функція | `src/scripts/core/65-plan.js:125` |
-| `pnQuadHTML` | функція | `src/scripts/core/65-plan.js:140` |
-| `pnWeekHTML` | функція | `src/scripts/core/65-plan.js:155` |
-| `pnMonthHTML` | функція | `src/scripts/core/65-plan.js:170` |
-| `pnYearHTML` | функція | `src/scripts/core/65-plan.js:185` |
-| `pnRing` | функція | `src/scripts/core/65-plan.js:195` |
-| `pnHead` | функція | `src/scripts/core/65-plan.js:199` |
-| `pnStrip` | функція | `src/scripts/core/65-plan.js:210` |
-| `pnFlowHint` | функція | `src/scripts/core/65-plan.js:215` |
-| `pnRender` | функція | `src/scripts/core/65-plan.js:219` |
-| `pnSave` | функція | `src/scripts/core/65-plan.js:243` |
-| `pnSplit` | функція | `src/scripts/core/65-plan.js:244` |
-| `pnToggleDone` | функція | `src/scripts/core/65-plan.js:245` |
-| `pnToggleStar` | функція | `src/scripts/core/65-plan.js:251` |
-| `pnFolderSheet` | функція | `src/scripts/core/65-plan.js:257` |
-| `pnQuadSheet` | функція | `src/scripts/core/65-plan.js:264` |
-| `pnOpen` | функція | `src/scripts/core/65-plan.js:270` |
-| `pnAddTask` | функція | `src/scripts/core/65-plan.js:285` |
-| `pnFlowOpen` | функція | `src/scripts/core/65-plan.js:293` |
-| `pnBind` | функція | `src/scripts/core/65-plan.js:297` |
-| `pnTop` | функція | `src/scripts/core/65-plan.js:318` |
-| `pnIsOpen` | функція | `src/scripts/core/65-plan.js:319` |
-| `goPlan` | функція | `src/scripts/core/65-plan.js:322` |
+| `pnLang` | функція | `src/scripts/core/65-plan.js:53` |
+| `pnT` | функція | `src/scripts/core/65-plan.js:54` |
+| `pnPer` | значення | `src/scripts/core/65-plan.js:57` |
+| `pnRemember` | функція | `src/scripts/core/65-plan.js:61` |
+| `pnToday` | функція | `src/scripts/core/65-plan.js:63` |
+| `pnDay` | функція | `src/scripts/core/65-plan.js:64` |
+| `pnAdd` | функція | `src/scripts/core/65-plan.js:65` |
+| `pnMon` | функція | `src/scripts/core/65-plan.js:66` |
+| `pnDowI` | функція | `src/scripts/core/65-plan.js:67` |
+| `pnHM` | функція | `src/scripts/core/65-plan.js:68` |
+| `pnEnd` | функція | `src/scripts/core/65-plan.js:69` |
+| `pnRaw` | функція | `src/scripts/core/65-plan.js:71` |
+| `pnFolder` | функція | `src/scripts/core/65-plan.js:73` |
+| `pnFolderColor` | функція | `src/scripts/core/65-plan.js:74` |
+| `pnTaskDate` | функція | `src/scripts/core/65-plan.js:85` |
+| `pnTaskOn` | функція | `src/scripts/core/65-plan.js:86` |
+| `pnItems` | функція | `src/scripts/core/65-plan.js:94` |
+| `pnDayRead` | функція | `src/scripts/core/65-plan.js:101` |
+| `pnFind` | функція | `src/scripts/core/65-plan.js:107` |
+| `pnChip` | функція | `src/scripts/core/65-plan.js:109` |
+| `pnCheck` | функція | `src/scripts/core/65-plan.js:113` |
+| `pnStarBtn` | функція | `src/scripts/core/65-plan.js:114` |
+| `pnMeta` | функція | `src/scripts/core/65-plan.js:115` |
+| `pnRow` | функція | `src/scripts/core/65-plan.js:120` |
+| `pnMainHTML` | функція | `src/scripts/core/65-plan.js:127` |
+| `pnShort` | функція | `src/scripts/core/65-plan.js:142` |
+| `pnAddHTML` | функція | `src/scripts/core/65-plan.js:143` |
+| `pnHoursHTML` | функція | `src/scripts/core/65-plan.js:146` |
+| `pnQuadHTML` | функція | `src/scripts/core/65-plan.js:161` |
+| `pnWeekHTML` | функція | `src/scripts/core/65-plan.js:176` |
+| `pnMonthHTML` | функція | `src/scripts/core/65-plan.js:191` |
+| `pnYearHTML` | функція | `src/scripts/core/65-plan.js:206` |
+| `pnRing` | функція | `src/scripts/core/65-plan.js:217` |
+| `pnHead` | функція | `src/scripts/core/65-plan.js:221` |
+| `pnStrip` | функція | `src/scripts/core/65-plan.js:232` |
+| `pnFlowHint` | функція | `src/scripts/core/65-plan.js:237` |
+| `pnRender` | функція | `src/scripts/core/65-plan.js:241` |
+| `pnSave` | функція | `src/scripts/core/65-plan.js:265` |
+| `pnSplit` | функція | `src/scripts/core/65-plan.js:266` |
+| `pnToggleDone` | функція | `src/scripts/core/65-plan.js:267` |
+| `pnToggleStar` | функція | `src/scripts/core/65-plan.js:273` |
+| `pnFolderSheet` | функція | `src/scripts/core/65-plan.js:279` |
+| `pnQuadSheet` | функція | `src/scripts/core/65-plan.js:286` |
+| `pnOpen` | функція | `src/scripts/core/65-plan.js:292` |
+| `pnAddTask` | функція | `src/scripts/core/65-plan.js:309` |
+| `pnFlowOpen` | функція | `src/scripts/core/65-plan.js:317` |
+| `pnBind` | функція | `src/scripts/core/65-plan.js:321` |
+| `pnTop` | функція | `src/scripts/core/65-plan.js:342` |
+| `pnIsOpen` | функція | `src/scripts/core/65-plan.js:343` |
+| `goPlan` | функція | `src/scripts/core/65-plan.js:346` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

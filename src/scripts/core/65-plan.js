@@ -16,7 +16,7 @@
       flow:'Скажи Флоу…',flowDay:'Розпиши мені день',flowQuad:'Розклади мої справи по квадратах',flowWeek:'Сплануй мені тиждень',flowMonth:'Що головне цього місяця?',
       starOn:'У головне',starOff:'Прибрати з головного',starMax:'Головних уже три — спершу прибери одну',putQ:'Покласти в квадрат',qNone:'Прибрати з квадрата',
       folder:'Папка',noFolder:'Без папки',toHour:'Поставити на час',details:'Час і деталі',del:'Видалити',deleted:'Справу видалено',
-      old:'зі старого квадрата',of:'з',wk:'Тиждень'},
+      old:'зі старого квадрата',of:'з',wk:'Тиждень',from:'з',move:'Перенести на інший день',moveQ:'На який день?'},
     en:{day:'Day',week:'Week',month:'Month',year:'Year',main:'Focus',hours:'Hours',quad:'Matrix',
       today:'Today',top:'Today’s focus',topDay:'Focus',rest:'Everything else',noTop:'Mark up to three key tasks — tap ☆ next to a task.',
       suggest:'Suggested',empty:'Nothing planned for this day.',add:'New task…',free:'Not scheduled',freeNone:'Everything has a time.',
@@ -27,7 +27,7 @@
       flow:'Ask Flow…',flowDay:'Plan my day',flowQuad:'Sort my tasks into the matrix',flowWeek:'Plan my week',flowMonth:'What matters most this month?',
       starOn:'Add to focus',starOff:'Remove from focus',starMax:'You already have three — remove one first',putQ:'Put in the matrix',qNone:'Remove from matrix',
       folder:'Folder',noFolder:'No folder',toHour:'Give it a time',details:'Time and details',del:'Delete',deleted:'Task deleted',
-      old:'from the old matrix',of:'of',wk:'Week'}
+      old:'from the old matrix',of:'of',wk:'Week',from:'since',move:'Move to another day',moveQ:'Which day?'}
   };
   const PN_DOW={uk:['Пн','Вт','Ср','Чт','Пт','Сб','Нд'],en:['Mo','Tu','We','Th','Fr','Sa','Su']};
   const PN_DOWL={uk:['Понеділок','Вівторок','Середа','Четвер','Пʼятниця','Субота','Неділя'],en:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']};
@@ -42,6 +42,7 @@
     grid:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
     folder:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M3 7l2-3h5l2 3h9v11a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>',
     clock:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+    cal:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
     trash:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
     tick:'<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>',
     spark:'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/></svg>',
@@ -78,10 +79,29 @@
 
   /* Усі справи дня одним списком: блоки з часом + (лише сьогодні) справи без часу.
      kind 'b' — блок з blocksByDay, 't' — справа з tasks (scope 'day', ще не поставлена на час). */
+  /* Етап 3 (19.11.2026): у справи без часу є необовʼязкова дата t.date.
+     Нема дати — «на сьогодні», як було (старі справи не чіпаємо). Невиконана з минулого дня
+     показується на сьогодні з позначкою «з …» — лише показ, дата в даних лишається. */
+  function pnTaskDate(t){ return t&&/^\d{4}-\d{2}-\d{2}$/.test(t.date||'')?t.date:''; }
+  function pnTaskOn(t,ds){
+    if(!t||t.scope!=='day'||t.slotted) return null;
+    const d=pnTaskDate(t), td=pnToday();
+    if(d===ds) return {from:''};
+    if(ds===td&&!d) return {from:''};
+    if(ds===td&&d&&d<td&&!t.done) return {from:d};
+    return null;
+  }
   function pnItems(ds){
     const p=plData(), out=[];
     plBlocksFor(ds).forEach(b=>{ if(b) out.push({kind:'b',ref:b,id:String(b.id),t:b.t||'',done:!!b.done,folder:b.folder||'',h:+b.h||0,end:pnEnd(b)}); });
-    if(ds===pnToday()) (p.tasks||[]).forEach(t=>{ if(t&&t.scope==='day'&&!t.slotted) out.push({kind:'t',ref:t,id:String(t.id),t:t.t||'',done:!!t.done,folder:t.folder||'',h:null,prio:+t.p||2}); });
+    (p.tasks||[]).forEach(t=>{ const on=pnTaskOn(t,ds); if(on) out.push({kind:'t',ref:t,id:String(t.id),t:t.t||'',done:!!t.done,folder:t.folder||'',h:null,prio:+t.p||2,from:on.from}); });
+    return out;
+  }
+  // лише читання (Тиждень, Місяць, Рік): блоки дня без створення масиву + справи з цією датою
+  function pnDayRead(ds){
+    if(ds===pnToday()) return pnItems(ds);
+    const out=pnRaw(ds).map(b=>({done:!!b.done,folder:b.folder||''}));
+    (plData().tasks||[]).forEach(t=>{ if(pnTaskOn(t,ds)) out.push({done:!!t.done,folder:t.folder||''}); });
     return out;
   }
   function pnFind(ds,kind,id){ return pnItems(ds).find(x=>x.kind===kind&&x.id===String(id)); }
@@ -94,7 +114,8 @@
   function pnStarBtn(it){ return `<button class="pn-star${it.ref.star?' on':''}" data-pnstar="${it.kind}:${esc(it.id)}" aria-label="${esc(it.ref.star?pnT('starOff'):pnT('starOn'))}">${it.ref.star?PN_ICO.starF:PN_ICO.star}</button>`; }
   function pnMeta(it){
     const tm=it.h!=null?`<span>${pnHM(it.h)}–${pnHM(Math.min(it.end,24))}</span>`:'';
-    const ch=pnChip(it); return (ch||tm)?`<span class="pn-meta">${ch}${tm}</span>`:'';
+    const fr=it.from?`<span class="pn-from">${esc(pnT('from'))} ${esc(pnShort(it.from))}</span>`:'';
+    const ch=pnChip(it); return (ch||tm||fr)?`<span class="pn-meta">${ch}${tm}${fr}</span>`:'';
   }
   function pnRow(it,big){
     return `<div class="pn-row${big?' pn-big pn-glass':''}${it.done?' done':''}">${pnCheck(it)}
@@ -118,8 +139,8 @@
     if(rest.length) html+=`<div class="pn-lbl"><span>${esc(pnT('rest'))}</span><span>${rest.length}</span></div><div class="pn-list pn-glass">${rest.map(x=>pnRow(x,false)).join('')}</div>`;
     return html+pnAddHTML(ds);
   }
+  function pnShort(ds){ const d=new Date(ds+'T12:00:00'), L=pnLang(); return L==='en'?PN_MON.en[d.getMonth()].slice(0,3)+' '+d.getDate():d.getDate()+' '+PN_MONG.uk[d.getMonth()].slice(0,4)+'.'; }
   function pnAddHTML(ds){
-    if(ds!==pnToday()) return '';
     return `<div class="pn-add pn-glass"><span>＋</span><input id="pnAddIn" type="text" enterkeyhint="done" maxlength="200" placeholder="${esc(pnT('add'))}" aria-label="${esc(pnT('add'))}"></div>`;
   }
   function pnHoursHTML(ds){
@@ -160,7 +181,7 @@
       <div class="pn-list pn-glass">${wt.map(t=>{ const it={kind:'w',ref:t,id:String(t.id),t:t.t||'',done:!!t.done,folder:t.folder||'',h:null};
         return `<div class="pn-row${it.done?' done':''}">${pnCheck(it)}<span class="pn-tx"><span class="pn-t">${esc(it.t)}</span>${pnMeta(it)}</span></div>`; }).join('')}</div>`;
     const rows=[0,1,2,3,4,5,6].map(i=>{
-      const ds=pnAdd(mon,i), bl=ds===td?pnItems(ds):pnRaw(ds).map(b=>({done:!!b.done,folder:b.folder||''}));
+      const ds=pnAdd(mon,i), bl=pnDayRead(ds);
       const dn=bl.filter(b=>b.done).length;
       const bars=bl.slice(0,12).map(b=>`<i style="background:${pnFolderColor(b.folder)||'var(--pn-acc)'};opacity:${b.done?1:.4}"></i>`).join('');
       return `<button class="pn-wd${ds===td?' today':''}" data-pngo="${ds}"><span class="pn-dn">${PN_DOW[L][i]}<b>${+ds.slice(8)}</b></span><span class="pn-bars">${bars}</span><span class="pn-ct">${bl.length?dn+'/'+bl.length:'—'}</span></button>`;
@@ -173,7 +194,7 @@
     let cells='', all=0, done=0;
     for(let i=0;i<lead;i++) cells+='<span></span>';
     for(let d=1;d<=days;d++){
-      const ds=ym+'-'+String(d).padStart(2,'0'), bl=ds===td?pnItems(ds):pnRaw(ds);
+      const ds=ym+'-'+String(d).padStart(2,'0'), bl=pnDayRead(ds);
       all+=bl.length; done+=bl.filter(b=>b.done).length;
       const dots=bl.slice(0,3).map(b=>`<i style="background:${pnFolderColor(b.folder)||'var(--pn-acc)'}"></i>`).join('');
       cells+=`<button class="${ds===td?'td':''}" data-pngo="${ds}"><span>${d}</span><em>${dots}</em></button>`;
@@ -184,8 +205,9 @@
   }
   function pnYearHTML(){
     const p=plData(), y=+(pnYm||pnToday()).slice(0,4), cur=pnToday().slice(0,7), L=pnLang();
-    const stat={}; Object.keys(p.blocksByDay||{}).forEach(ds=>{ if(ds.slice(0,4)!==String(y)) return; const k=ds.slice(0,7), bl=pnRaw(ds);
-      stat[k]=stat[k]||[0,0]; stat[k][0]+=bl.filter(b=>b.done).length; stat[k][1]+=bl.length; });
+    const stat={}, add=(k,done)=>{ stat[k]=stat[k]||[0,0]; if(done) stat[k][0]++; stat[k][1]++; };
+    Object.keys(p.blocksByDay||{}).forEach(ds=>{ if(ds.slice(0,4)!==String(y)) return; pnRaw(ds).forEach(b=>add(ds.slice(0,7),!!b.done)); });
+    (p.tasks||[]).forEach(t=>{ const d=pnTaskDate(t); if(t&&t.scope==='day'&&!t.slotted&&d.slice(0,4)===String(y)) add(d.slice(0,7),!!t.done); });
     const tiles=PN_MON[L].map((nm,i)=>{ const k=y+'-'+String(i+1).padStart(2,'0'), s=stat[k]||[0,0];
       return `<button class="pn-glass${k===cur?' on':''}" data-pnym="${k}"><span>${esc(nm.slice(0,3))}</span><span class="pn-yb"><i style="width:${s[1]?Math.round(s[0]/s[1]*100):0}%"></i></span><small>${s[1]?s[0]+'/'+s[1]:''}</small></button>`; }).join('');
     return `<div class="pn-yr">${tiles}</div><div class="pn-soon pn-glass"><b>${esc(pnT('yearSoon'))}</b>${esc(pnT('yearSoonTx'))}</div>`;
@@ -276,6 +298,8 @@
     ];
     if(kind==='b') items.push({ic:PN_ICO.clock,label:pnT('details'),onClick:()=>{ try{ dyMenu(it.ref,ds); }catch(e){ console.error('pnOpen',e); } }});
     else {
+      if(!it.done) items.push({ic:PN_ICO.cal,label:pnT('move'),sub:pnTaskDate(it.ref)?pnShort(pnTaskDate(it.ref)):pnT('today'),onClick:()=>{
+        try{ dyDayPicker(pnT('moveQ'),it.t,ds,pnTaskDate(it.ref)||pnToday(),target=>{ it.ref.date=target; pnSave(); pnRender(); try{ plToast('📅 '+pnShort(target)); }catch(_){} }); }catch(e){ console.error('pnMove',e); } }});
       if(!it.done) items.push({ic:PN_ICO.clock,label:pnT('toHour'),onClick:()=>{ dyTaskToDay(it.id,ds);
         const b=plBlocksFor(ds).find(x=>x&&String(x.fromTask)===it.id); if(b){ if(it.ref.folder) b.folder=it.ref.folder; if(it.ref.star) b.star=true; if(it.ref.q) b.q=it.ref.q; pnSave(); } pnRender(); }});
       items.push({ic:PN_ICO.trash,label:pnT('del'),danger:true,onClick:()=>{ const p=plData(); p.tasks=(p.tasks||[]).filter(x=>!(x&&String(x.id)===it.id)); pnSave(); pnRender(); try{ plToast(pnT('deleted')); }catch(_){} }});
@@ -285,7 +309,7 @@
   function pnAddTask(v){
     v=String(v||'').trim().slice(0,200); if(!v) return;
     const p=plData();
-    p.tasks.push({id:'t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),scope:'day',t:v,c:'val',p:2,tag:'',done:false,open:false,subs:[]});
+    p.tasks.push({id:'t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),scope:'day',t:v,date:pnDay(),c:'val',p:2,tag:'',done:false,open:false,subs:[]});
     pnSave(); pnRender();
     // фокус одразу, у тому ж обробнику: інакше швидко надруковане зникає, а iPhone ховає клавіатуру
     const i=document.getElementById('pnAddIn'); if(i) try{ i.focus({preventScroll:true}); }catch(_){}

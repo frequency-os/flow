@@ -174,7 +174,7 @@
     dhabit:{t:'Звичка папки', h:'Звичка', ic:'🔥', per:[['week','Тиждень'],['month','Місяць']], show:[['streak','Серія'],['count','Скільки днів'],['days','Дні періоду']]},
     dtime:{t:'Час папки', h:'Час', ic:'⏱', per:[['day','День'],['week','Тиждень'],['month','Місяць']], show:[['hours','Години'],['done','Виконані блоки'],['add','Кнопка «＋ блок»']]},
     /* «Справи папки» (19.11.2026, етап 2 нового Плану, 65-plan.js): справи сьогодні з міткою папки — і з часом, і без */
-    dtasks:{t:'Справи папки', h:'Справи', ic:'✅', per:null, show:[['done','Виконані справи'],['add','Кнопка «＋ справа»'],['star','Зірочки «Головне»']]},
+    dtasks:{t:'Справи папки', h:'Справи', ic:'✅', per:[['day','Сьогодні'],['week','Тиждень']], show:[['done','Виконані справи'],['add','Кнопка «＋ справа»'],['star','Зірочки «Головне»']]},
     dcal:{t:'Календар папки', h:'Календар', ic:'📅', per:null, show:[['hint','Підказка «тап по дню»']]},
     /* прогрес місії (15.11.2026): Відлік · Скарбничка · Лічильник — так само вікна в місію, даних одна копія */
     dcount:{t:'Відлік до мети', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата'],['next','Наступна віха']]},
@@ -194,7 +194,7 @@
   // новий блок із меню «Дані»: лише налаштування, без копії даних
   function wdInit(b,k){
     b.type=k; b.sz=wdSz(b); b.gw=WD_SZ[b.sz].gw; b.gh=WD_SZ[b.sz].gh;
-    if(WD_META[k].per&&!b.period) b.period=k==='dtime'?'day':'week';
+    if(WD_META[k].per&&!b.period) b.period=(k==='dtime'||k==='dtasks')?'day':'week';
     delete b.text;
     if(k==='countdown'){ const bid=b.id; setTimeout(()=>{ try{ tmCfg(bid); }catch(_){} },450); }   // новий відлік — одразу спитати назву й дату
     return b;
@@ -596,10 +596,13 @@
      Вікно в План: блоки Планера цієї папки (folder або місія папки) + справи без часу з folder=папка.
      Даних віджет не має — лише налаштування блоку; галочка/☆/«＋ справа» пишуть у plData() тапом людини. */
   function wdTT(uk,en){ try{ return (window.flowLang&&window.flowLang())==='en'?en:uk; }catch(_){ return uk; } }
-  function wdTasksItems(fk,td){
-    const out=[];
-    plBlocksDisplay(td).forEach(x=>{ if(x&&inFolderBlock(x,fk)) out.push({k:'b',id:String(x.id),t:String(x.t||''),done:!!x.done,h:+x.h||0,star:!!x.star}); });
-    (plData().tasks||[]).forEach(x=>{ if(x&&x.scope==='day'&&!x.slotted&&x.folder===fk) out.push({k:'t',id:String(x.id),t:String(x.t||''),done:!!x.done,h:null,star:!!x.star}); });
+  // справи папки на день ds; справи без часу — за тим самим правилом дати, що й у Плані (pnTaskOn, 65-plan.js)
+  function wdTasksItems(fk,ds){
+    const out=[], td=ymdLocal();
+    plBlocksDisplay(ds).forEach(x=>{ if(x&&inFolderBlock(x,fk)) out.push({k:'b',id:String(x.id),t:String(x.t||''),done:!!x.done,h:+x.h||0,star:!!x.star,ds}); });
+    (plData().tasks||[]).forEach(x=>{ if(!x||x.folder!==fk) return;
+      const on=typeof pnTaskOn==='function'?pnTaskOn(x,ds):(x.scope==='day'&&!x.slotted&&ds===td?{}:null);
+      if(on) out.push({k:'t',id:String(x.id),t:String(x.t||''),done:!!x.done,h:null,star:!!x.star,ds}); });
     return out.sort((a,c)=>(a.done-c.done)||((a.h==null?99:a.h)-(c.h==null?99:c.h)));
   }
   // блок дня за id; повторюваний із показу (disp_/v_) — шукаємо створений за шаблоном (як dyBind у 42-day.js)
@@ -610,26 +613,32 @@
   }
   function wdTasksHTML(b,fk,sz,td){
     if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">${wdTT('Лише в папці','Folders only')}</b><small class="wd-sub">${wdTT('Показує справи з міткою цієї папки','Shows tasks tagged with this folder')}</small>`,'empty');
-    const all=wdTasksItems(fk,td), shown=all.filter(x=>wdOn(b,'done')||!x.done), dn=all.filter(x=>x.done).length;
-    // M — одна найближча невиконана (як «Час папки»: висоти плитки вистачає на один рядок 44px), L — до 6
-    const rows=sz==='l'?shown.slice(0,6):sz==='m'?all.filter(x=>!x.done).slice(0,1):[], more=sz==='l'?shown.length-rows.length:0;
-    const ck=x=>`<button class="wd-tk-c" data-wga="wdtck" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${td}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.t)}"><i>✓</i></button>`;
-    const st=x=>sz==='l'&&wdOn(b,'star')?`<button class="wd-tk-s${x.star?' on':''}" data-wga="wdtstar" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${td}" aria-label="${esc(wdTT(x.star?'Прибрати з головного':'У головне',x.star?'Remove from focus':'Add to focus'))}">${x.star?'★':'☆'}</button>`:'';
+    // Тиждень — 7 днів від сьогодні; рядок каже день («Пт 21»), галочка пише в свій день
+    const wk=wdPer(b)==='week', days=wk?[0,1,2,3,4,5,6].map(i=>{ const d=new Date(td+'T12:00:00'); d.setDate(d.getDate()+i); return ymdLocal(d); }):[td];
+    const all=[].concat(...days.map(ds=>{ const L=wdTasksItems(fk,ds); return wk?L.sort((a,c)=>(a.h==null?99:a.h)-(c.h==null?99:c.h)):L; }));
+    if(wk) all.sort((a,c)=>a.done-c.done);   // стабільне сортування: дні лишаються по порядку, виконані — вниз
+    const shown=all.filter(x=>wdOn(b,'done')||!x.done), dn=all.filter(x=>x.done).length;
+    const dayLbl=ds=>ds===td?wdTT('сьогодні','today'):DY_DOW[(new Date(ds+'T12:00:00').getDay()+6)%7]+' '+(+ds.slice(8));
+    // M — одна найближча невиконана (як «Час папки»: висоти плитки вистачає на один рядок 44px), L — до 5 (6-й на ноутбуці виходив за край)
+    const rows=sz==='l'?shown.slice(0,5):sz==='m'?all.filter(x=>!x.done).slice(0,1):[], more=sz==='l'?shown.length-rows.length:0;
+    const ck=x=>`<button class="wd-tk-c" data-wga="wdtck" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${x.ds}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.t)}"><i>✓</i></button>`;
+    const st=x=>sz==='l'&&wdOn(b,'star')?`<button class="wd-tk-s${x.star?' on':''}" data-wga="wdtstar" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${x.ds}" aria-label="${esc(wdTT(x.star?'Прибрати з головного':'У головне',x.star?'Remove from focus':'Add to focus'))}">${x.star?'★':'☆'}</button>`:'';
     // div, а не span: .wg-t>span вимикає натиски (32-widgets.css:25), а тут галочки
-    const list=rows.length?`<div class="wd-tks">${rows.map(x=>`<span class="wd-tk${x.done?' done':''}">${ck(x)}<button class="wd-tk-t" data-wga="wdtgo">${x.h!=null?`<em>${plHM(x.h)}</em>`:''}<span>${esc(x.t.slice(0,60))}</span></button>${st(x)}</span>`).join('')}${more>0?`<button class="wd-tk-more" data-wga="wdtgo">${wdTT('ще','more')} ${more} ›</button>`:''}</div>`:'';
+    const list=rows.length?`<div class="wd-tks">${rows.map(x=>`<span class="wd-tk${x.done?' done':''}">${ck(x)}<button class="wd-tk-t" data-wga="wdtgo" data-ds="${x.ds}">${wk?`<em>${esc(dayLbl(x.ds))}${x.h!=null?' · '+plHM(x.h):''}</em>`:x.h!=null?`<em>${plHM(x.h)}</em>`:''}<span>${esc(x.t.slice(0,60))}</span></button>${st(x)}</span>`).join('')}${more>0?`<button class="wd-tk-more" data-wga="wdtgo">${wdTT('ще','more')} ${more} ›</button>`:''}</div>`:'';
     const next=all.find(x=>!x.done);
-    const empty=!all.length?`<small class="wd-sub">${wdTT('Сьогодні справ папки нема','No tasks for this folder today')}</small>`
+    const empty=!all.length?`<small class="wd-sub">${wk?wdTT('Цього тижня справ папки нема','No tasks for this folder this week'):wdTT('Сьогодні справ папки нема','No tasks for this folder today')}</small>`
       :!rows.length&&sz==='m'?`<small class="wd-sub">${wdTT('на сьогодні все ✓','all done for today ✓')}</small>`
-      :sz==='s'?`<small class="wd-sub">${next?esc(next.t.slice(0,40)):wdTT('на сьогодні все ✓','all done for today ✓')}</small>`:'';
+      :sz==='s'?`<small class="wd-sub">${next?(wk?esc(dayLbl(next.ds))+' · ':'')+esc(next.t.slice(0,40)):wdTT('на сьогодні все ✓','all done for today ✓')}</small>`:'';
     // «＋» — кругла кнопка поруч із числом: у M дві справи вже заповнюють плитку, окремий рядок кнопки обрізався
     const add=wdOn(b,'add')&&sz!=='s'?`<button class="wd-tk-add" data-wga="wdtadd" aria-label="${esc(wdTT('Додати справу на сьогодні','Add a task for today'))}">＋</button>`:'';
     const cnt=wdTT(pluralUk(all.length,'справа','справи','справ'),all.length===1?'task':'tasks');
-    return wdTile(b,fk,`${wdHead(b,fk,wdTT('сьогодні','today'))}
+    const moreM=sz==='m'&&wk?all.filter(x=>!x.done).length-rows.length:0;
+    return wdTile(b,fk,`${wdHead(b,fk,wk?wdTT('тиждень','week'):wdTT('сьогодні','today'))}
       <div class="wd-tk-top"><button class="wd-tk-big" data-wga="wdtgo"><b class="wd-big">${all.length} <span>${cnt}${dn?' · '+dn+' ✓':''}</span></b></button>${add}</div>
-      ${empty}${list}`,'tsk');
+      ${empty}${list}${moreM>0?`<button class="wd-tk-more" data-wga="wdtgo">${wdTT('ще','more')} ${moreM} ${wdTT('цього тижня','this week')} ›</button>`:''}`,'tsk');
   }
   function wdTasksAct(a,el,fk){
-    if(a==='wdtgo'){ try{ goPlan(); }catch(e){ console.error('wdtgo',e); } return; }
+    if(a==='wdtgo'){ try{ const d=el.dataset.ds; if(/^\d{4}-\d{2}-\d{2}$/.test(d||'')&&d!==ymdLocal()){ plData().selDate=d; goPlan(true); } else goPlan(); }catch(e){ console.error('wdtgo',e); } return; }
     if(!fk) return;
     const td=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(), id=el.dataset.id, k=el.dataset.k;
     if(a==='wdtadd'){ wdTasksAddSheet(fk); return; }
