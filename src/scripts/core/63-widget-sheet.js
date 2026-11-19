@@ -106,7 +106,7 @@
           +(c.dir==='down'?grp('Коли настане',`<div class="ws-it">${seg('end',[['conf','🎉 Святкувати'],['quiet','Тихо'],['up','Рахувати «від»']],d.end==='quiet'||d.end==='up'?d.end:'conf')}</div>`):'');
       }
       let h='';
-      if(t!=='dtime'&&t!=='dcal'){
+      if(t!=='dtime'&&t!=='dcal'&&t!=='dtasks'){
         const goals=wlMissions(), fm=wgFolderMission(fk), gid=d.goalId&&goals.some(g=>String(g.id)===String(d.goalId))?String(d.goalId):'';
         h+=grp('Джерело',`<div class="ws-chips">
           <button data-wsg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
@@ -210,7 +210,7 @@
     const arr=findParentArr(curBoard(),id), i=arr?arr.findIndex(x=>x&&String(x.id)===String(id)):-1; if(i<0) return;
     const prevId=i>0&&arr[i-1]?String(arr[i-1].id):'', nextId=arr[i+1]?String(arr[i+1].id):'';
     const was=arr.splice(i,1)[0]; saveBoard(); wdRedraw();
-    const t=was.type, msg=t==='countdown'?'Відлік прибрано':'Віджет прибрано — дані в '+((t==='dtime'||t==='dcal')?'Планері':'місії')+' лишились';
+    const t=was.type, msg=t==='countdown'?'Відлік прибрано':'Віджет прибрано — дані в '+((t==='dtime'||t==='dcal'||t==='dtasks')?'Планері':'місії')+' лишились';
     // «Скасувати» шукає дошку наново: за ці секунди звірка з хмарою могла перечитати boards, і старий масив уже не в дошці
     flowUndoToast(msg,()=>{
       const B=curBoard(), live=x=>{ const st=[B]; while(st.length){ const L=st.pop(); if(L===x) return true; (L||[]).forEach(q=>{ if(q&&Array.isArray(q.children)) st.push(q.children); }); } return false; };

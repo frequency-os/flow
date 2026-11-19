@@ -6,7 +6,7 @@
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dtasks:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
   function wgIs(t){ return !!WG_TYPES[t]; }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
@@ -173,6 +173,8 @@
     dmission:{t:'Місія папки', h:'Місія', ic:'🎯', per:null, show:[['next','Наступний крок'],['due','Дедлайн'],['ring','Кільце прогресу']]},
     dhabit:{t:'Звичка папки', h:'Звичка', ic:'🔥', per:[['week','Тиждень'],['month','Місяць']], show:[['streak','Серія'],['count','Скільки днів'],['days','Дні періоду']]},
     dtime:{t:'Час папки', h:'Час', ic:'⏱', per:[['day','День'],['week','Тиждень'],['month','Місяць']], show:[['hours','Години'],['done','Виконані блоки'],['add','Кнопка «＋ блок»']]},
+    /* «Справи папки» (19.11.2026, етап 2 нового Плану, 65-plan.js): справи сьогодні з міткою папки — і з часом, і без */
+    dtasks:{t:'Справи папки', h:'Справи', ic:'✅', per:null, show:[['done','Виконані справи'],['add','Кнопка «＋ справа»'],['star','Зірочки «Головне»']]},
     dcal:{t:'Календар папки', h:'Календар', ic:'📅', per:null, show:[['hint','Підказка «тап по дню»']]},
     /* прогрес місії (15.11.2026): Відлік · Скарбничка · Лічильник — так само вікна в місію, даних одна копія */
     dcount:{t:'Відлік до мети', h:'Відлік', ic:'⏳', per:null, show:[['date','Дата'],['next','Наступна віха']]},
@@ -186,7 +188,7 @@
   function wdIs(t){ return Object.prototype.hasOwnProperty.call(WD_META,String(t||'')); }
   // розмір S/M/L: з клітинок пристрою (63-widget-sheet.js wdCell), а для віджетів без b.ws — як раніше
   function wdSz(b){ if(b&&b.ws){ const t=wdTier(b); return t==='l'?'l':t==='m'?'m':'s'; } return wdSzOld(b); }
-  function wdSzOld(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
+  function wdSzOld(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dtasks'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
@@ -323,6 +325,7 @@
         ${wdSz(b)==='s'?wdCalWeek(td,cfk):calMonthGridHTML(ym,cfk)}
         ${wdOn(b,'hint')?'<small class="wd-sub cal-hint">Тап по дню — події й блоки папки</small>':''}`,'calw');
     }
+    if(t==='dtasks') return wdTasksHTML(b,fk,sz,td);
     if(t==='dtime'){
       if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">Лише в папці</b><small class="wd-sub">Час рахується з блоків Планера з міткою папки</small>`,'empty');
       const per=wdPer(b), shown=x=>inFolderBlock(x,fk)&&(wdOn(b,'done')||!x.done);
@@ -589,6 +592,78 @@
     });
   }
 
+  /* ═══ «Справи папки» (dtasks, 19.11.2026) ═══
+     Вікно в План: блоки Планера цієї папки (folder або місія папки) + справи без часу з folder=папка.
+     Даних віджет не має — лише налаштування блоку; галочка/☆/«＋ справа» пишуть у plData() тапом людини. */
+  function wdTT(uk,en){ try{ return (window.flowLang&&window.flowLang())==='en'?en:uk; }catch(_){ return uk; } }
+  function wdTasksItems(fk,td){
+    const out=[];
+    plBlocksDisplay(td).forEach(x=>{ if(x&&inFolderBlock(x,fk)) out.push({k:'b',id:String(x.id),t:String(x.t||''),done:!!x.done,h:+x.h||0,star:!!x.star}); });
+    (plData().tasks||[]).forEach(x=>{ if(x&&x.scope==='day'&&!x.slotted&&x.folder===fk) out.push({k:'t',id:String(x.id),t:String(x.t||''),done:!!x.done,h:null,star:!!x.star}); });
+    return out.sort((a,c)=>(a.done-c.done)||((a.h==null?99:a.h)-(c.h==null?99:c.h)));
+  }
+  // блок дня за id; повторюваний із показу (disp_/v_) — шукаємо створений за шаблоном (як dyBind у 42-day.js)
+  function wdTasksBlock(td,id){
+    const L=plBlocksFor(td); let x=L.find(q=>q&&String(q.id)===String(id));
+    if(!x){ const m=String(id).match(/^(?:v_|disp_)(.+)$/); if(m) x=L.find(q=>q&&q.fromRecur===m[1]); }
+    return x||null;
+  }
+  function wdTasksHTML(b,fk,sz,td){
+    if(!fk) return wdTile(b,'',`${wdHead(b,'')}<b class="wd-big sm">${wdTT('Лише в папці','Folders only')}</b><small class="wd-sub">${wdTT('Показує справи з міткою цієї папки','Shows tasks tagged with this folder')}</small>`,'empty');
+    const all=wdTasksItems(fk,td), shown=all.filter(x=>wdOn(b,'done')||!x.done), dn=all.filter(x=>x.done).length;
+    // M — одна найближча невиконана (як «Час папки»: висоти плитки вистачає на один рядок 44px), L — до 6
+    const rows=sz==='l'?shown.slice(0,6):sz==='m'?all.filter(x=>!x.done).slice(0,1):[], more=sz==='l'?shown.length-rows.length:0;
+    const ck=x=>`<button class="wd-tk-c" data-wga="wdtck" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${td}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.t)}"><i>✓</i></button>`;
+    const st=x=>sz==='l'&&wdOn(b,'star')?`<button class="wd-tk-s${x.star?' on':''}" data-wga="wdtstar" data-k="${x.k}" data-id="${esc(x.id)}" data-ds="${td}" aria-label="${esc(wdTT(x.star?'Прибрати з головного':'У головне',x.star?'Remove from focus':'Add to focus'))}">${x.star?'★':'☆'}</button>`:'';
+    // div, а не span: .wg-t>span вимикає натиски (32-widgets.css:25), а тут галочки
+    const list=rows.length?`<div class="wd-tks">${rows.map(x=>`<span class="wd-tk${x.done?' done':''}">${ck(x)}<button class="wd-tk-t" data-wga="wdtgo">${x.h!=null?`<em>${plHM(x.h)}</em>`:''}<span>${esc(x.t.slice(0,60))}</span></button>${st(x)}</span>`).join('')}${more>0?`<button class="wd-tk-more" data-wga="wdtgo">${wdTT('ще','more')} ${more} ›</button>`:''}</div>`:'';
+    const next=all.find(x=>!x.done);
+    const empty=!all.length?`<small class="wd-sub">${wdTT('Сьогодні справ папки нема','No tasks for this folder today')}</small>`
+      :!rows.length&&sz==='m'?`<small class="wd-sub">${wdTT('на сьогодні все ✓','all done for today ✓')}</small>`
+      :sz==='s'?`<small class="wd-sub">${next?esc(next.t.slice(0,40)):wdTT('на сьогодні все ✓','all done for today ✓')}</small>`:'';
+    // «＋» — кругла кнопка поруч із числом: у M дві справи вже заповнюють плитку, окремий рядок кнопки обрізався
+    const add=wdOn(b,'add')&&sz!=='s'?`<button class="wd-tk-add" data-wga="wdtadd" aria-label="${esc(wdTT('Додати справу на сьогодні','Add a task for today'))}">＋</button>`:'';
+    const cnt=wdTT(pluralUk(all.length,'справа','справи','справ'),all.length===1?'task':'tasks');
+    return wdTile(b,fk,`${wdHead(b,fk,wdTT('сьогодні','today'))}
+      <div class="wd-tk-top"><button class="wd-tk-big" data-wga="wdtgo"><b class="wd-big">${all.length} <span>${cnt}${dn?' · '+dn+' ✓':''}</span></b></button>${add}</div>
+      ${empty}${list}`,'tsk');
+  }
+  function wdTasksAct(a,el,fk){
+    if(a==='wdtgo'){ try{ goPlan(); }catch(e){ console.error('wdtgo',e); } return; }
+    if(!fk) return;
+    const td=/^\d{4}-\d{2}-\d{2}$/.test(el.dataset.ds||'')?el.dataset.ds:ymdLocal(), id=el.dataset.id, k=el.dataset.k;
+    if(a==='wdtadd'){ wdTasksAddSheet(fk); return; }
+    const ref=k==='b'?wdTasksBlock(td,id):(plData().tasks||[]).find(x=>x&&String(x.id)===String(id));
+    if(!ref){ plToast(wdTT('Справу змінили на іншому пристрої','The task changed on another device')); wdRedraw(); return; }
+    if(a==='wdtck'){
+      try{ window.platform.haptic('light'); }catch(_){}
+      if(k==='b') dyComplete(ref.id,td);            // блок — та сама логіка, що в Плані й Журналі (XP, нагадування, звʼязки)
+      else { ref.done=!ref.done; saveGoals(); }
+      wgRefresh(); return;   // не wdRedraw: перебудова сторінки (__pgWidgetsSync) кидала папку нагору — розмір віджета ж не змінився
+    }
+    if(a==='wdtstar'){
+      if(!ref.star){ const n=(typeof pnItems==='function'?pnItems(td):[]).filter(x=>x.ref&&x.ref.star).length;
+        if(n>=3){ plToast(wdTT('Головних уже три — спершу прибери одну','You already have three — remove one first')); return; } ref.star=true; }
+      else delete ref.star;
+      saveGoals(); wgRefresh();
+    }
+  }
+  function wdTasksAddSheet(fk){
+    const f=wdFolder(fk), nm=String((f&&f.name)||wdTT('Папка','Folder')).slice(0,40);
+    jnOverlay(`<div class="jn-ed-h"><b>＋ ${esc(wdTT('Справа на сьогодні','Task for today'))}</b><button data-jnx aria-label="${esc(wdTT('Закрити','Close'))}">✕</button></div>
+      <small class="dy-fm-sub">${esc(wdTT('Папка','Folder'))}: ${esc(nm)}</small>
+      <label class="jn-f"><span>${esc(wdTT('Що зробити','What to do'))}</span><input id="wdTkIn" type="text" maxlength="200" enterkeyhint="done"></label>
+      <div class="jn-ed-foot"><button class="jn-btn" data-wdtkok>${esc(wdTT('Додати','Add'))}</button></div>`, ov=>{
+      const inp=ov.querySelector('#wdTkIn');
+      const ok=()=>{ const v=String(inp.value||'').trim().slice(0,200); if(!v){ inp.focus(); return; }
+        plData().tasks.push({id:'t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),scope:'day',t:v,c:'val',p:2,tag:'',folder:fk,done:false,open:false,subs:[]});
+        saveGoals(); ov.remove(); wgRefresh(); plToast('✓ '+wdTT('Додано в План','Added to Plan')); };
+      ov.querySelector('[data-wdtkok]').onclick=ok;
+      inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing){ e.preventDefault(); ok(); } });
+      setTimeout(()=>{ try{ inp.focus(); }catch(_){} },60);
+    });
+  }
+
   // перемалювати після дії: сторінка (розмір клітинки міг змінитись) + усі видимі віджети
   function wdRedraw(){ try{ if(window.__pgWidgetsSync) window.__pgWidgetsSync(); }catch(_){} wgRefresh(); }
   function wdAct(a,el,b,fk,id){
@@ -605,6 +680,7 @@
     }
     else if(a==='wdtrk'){ const q=wdGoal(b,fk); if(q&&moAddTracker(q.folderKey,q)){ plToast('Трекер додано в папку місії'); wdRedraw(); } }
     else if(a==='wdadd'){ if(fk) plFolderAddBlock(fk); }
+    else if(a==='wdtck'||a==='wdtstar'||a==='wdtadd'||a==='wdtgo') wdTasksAct(a,el,fk);
     else if(a==='wdday'){ if(fk) plFolderDaySheet(fk); }
     else if(a==='wdmonth'){ if(fk) plFolderMonthSheet(fk); }
     // день — з плитки (коли її намалювали), а не з моменту тапу: після півночі не шукаємо блок у новому дні

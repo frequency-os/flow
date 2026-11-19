@@ -21,6 +21,9 @@
     dtime:{sp:['work','study'],ic:'⏱',c:'#ffd27a',pv:'time',ln:['Планер','Planner'],
       uk:{n:'Час папки',s:'Скільки годин папки сьогодні',d:'Смуга дня з блоками Планера цієї папки й рискою «зараз». Скільки заплановано й зроблено — за день, тиждень чи місяць.',st:['Додай у папку','«＋ блок» прямо з віджета','Тиждень — стовпчики по днях']},
       en:{n:'Folder time',s:'Hours of this folder today',d:'A day strip with this folder’s Planner blocks and a “now” line. Planned and done — per day, week or month.',st:['Add it to a folder','“+ block” right from the widget','Week view — bars by day']}},
+    dtasks:{sp:['work','study','home','goals'],ic:'✅',c:'#34c77b',pv:'tasks',ln:['План','Plan'],since:'2026-11-19',
+      uk:{n:'Справи папки',s:'Що зробити сьогодні в цій папці',d:'Справи на сьогодні з міткою папки — і з часом, і без. Галочка прямо у віджеті, ☆ — у Головне, «＋ справа» одразу з міткою папки. Тап — відкриває План.',st:['Додай у папку','«＋ справа» прямо з віджета','Відмічай — План знає одразу']},
+      en:{n:'Folder tasks',s:'What to do today in this folder',d:'Today’s tasks tagged with this folder — timed or not. Tick right in the widget, ☆ adds to Focus, “+ task” comes tagged with the folder. Tap opens Plan.',st:['Add it to a folder','“+ task” right from the widget','Tick it — Plan knows at once']}},
     dmission:{sp:['goals','work'],ic:'🎯',c:'#a99cff',pv:'mis',ln:['Місія','Mission'],
       uk:{n:'Місія папки',s:'Прогрес, наступний крок, дедлайн',d:'Кільце прогресу місії, наступний крок і скільки днів до дедлайну. Тап — сторінка місії.',st:['Повʼяжи місію','Відмічай віхи — кільце росте','Наступний крок завжди зверху']},
       en:{n:'Folder mission',s:'Progress, next step, deadline',d:'Mission progress ring, the next step and days to the deadline. Tap to open the mission.',st:['Link a mission','Tick milestones — the ring grows','The next step is always on top']}},
@@ -67,7 +70,7 @@
       uk:{n:'Флоу AI',s:'AI-дія з цією сторінкою',d:'Попроси Флоу щось зробити з цією сторінкою: підсумувати, розбити на кроки, переписати.',st:['Додай блок','Напиши, що зробити','Прийми або відкинь результат']},
       en:{n:'Flow AI',s:'An AI action on this page',d:'Ask Flow to do something with this page: summarise, split into steps, rewrite.',st:['Add the block','Say what to do','Accept or discard']}}
   };
-  var BS_REL={countdown:['dcount','dmission','dcal'],dcal:['dtime','tbl','countdown'],dtime:['dcal','tbl','dmission'],dmission:['dhabit','dsave','countdown'],dhabit:['dmission','dcounter','dphoto'],dcount:['countdown','dmission'],dsave:['wgin','dmission','wgenv'],dcounter:['dhabit','tbl','dphoto'],dphoto:['dhabit','dcounter','dmission'],wgin:['wgout','dsave','wgwallet'],wgout:['wgin','wgenv','wgdebt'],wgwallet:['wgin','wgout','wgenv'],wgmission:['dsave','dmission','wgin'],wgenv:['wgout','wgdebt','wgwallet'],wgdebt:['wgenv','wgout'],tbl:['dcal','dcounter','weekreview'],weekreview:['tbl','dmission'],ai:['weekreview','tbl']};
+  var BS_REL={countdown:['dcount','dmission','dcal'],dcal:['dtime','tbl','countdown'],dtime:['dcal','tbl','dmission'],dtasks:['dtime','dcal','dmission'],dmission:['dhabit','dsave','countdown'],dhabit:['dmission','dcounter','dphoto'],dcount:['countdown','dmission'],dsave:['wgin','dmission','wgenv'],dcounter:['dhabit','tbl','dphoto'],dphoto:['dhabit','dcounter','dmission'],wgin:['wgout','dsave','wgwallet'],wgout:['wgin','wgenv','wgdebt'],wgwallet:['wgin','wgout','wgenv'],wgmission:['dsave','dmission','wgin'],wgenv:['wgout','wgdebt','wgwallet'],wgdebt:['wgenv','wgout'],tbl:['dcal','dcounter','weekreview'],weekreview:['tbl','dmission'],ai:['weekreview','tbl']};
   function bsLang(){ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } }
   function bsT(it){ return it[bsLang()]||it.uk; }
   /* «Ще» (29-more-screen.js) і меню блоків малюються ще ДО цього файлу, а функції в збірці «спливають» раніше за var —
@@ -108,6 +111,7 @@
     let x='';
     switch(it.pv){
       case 'cd': x=h()+`<b class="bsw-n">${en?'New Year':'Новий рік'}</b>`+(s?big(44,en?'days':'днів')+sub('02:10:05'):`<span class="bsw-flip">${[['44',en?'days':'дні'],['02',en?'hours':'год'],['10',en?'min':'хв'],['05',en?'sec':'с']].map(u=>`<span><span class="bsw-fd">${u[0].split('').map(d=>`<i>${d}</i>`).join('')}</span><small>${u[1]}</small></span>`).join('')}</span>`); break;
+      case 'tasks': x=h()+big(3,en?'tasks':'справи')+(s?sub(en?'Easy run 6 km':'Легкий біг 6 км'):`<span class="bsw-tks"><span class="on"><i style="background:${c}"></i>${en?'Book the hall':'Забронювати зал'}</span><span><i></i>${en?'Easy run 6 km':'Легкий біг 6 км'}</span><span><i></i>${en?'Buy shoes':'Купити кросівки'}</span></span>`); break;
       case 'cal': { let g=''; for(let d=1;d<=30;d++) g+=`<span class="${d===17?'td':d>17?'f':''}">${d}${[3,5,8,13,15,19,21].includes(d)?'<u></u>':''}</span>`;
         x=s?h()+big(17,en?'Nov':'лист')+sub(en?'2 plans · run 18:00':'2 справи · біг 18:00'):h(en?'November':'Листопад')+`<span class="bsw-cal">${g}</span>`; break; }
       case 'time': x=h()+big('2,5',en?'h':'год')+`<span class="bsw-tl"><i style="left:6%;width:12%;background:${c}"></i><i style="left:60%;width:14%;background:${c};opacity:.6"></i><b style="left:48%"></b></span>`+(s?'':sub(en?'18:00 · Easy run 6 km':'18:00 · Легкий біг 6 км')); break;

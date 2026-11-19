@@ -98,7 +98,8 @@
   }
   function pnRow(it,big){
     return `<div class="pn-row${big?' pn-big pn-glass':''}${it.done?' done':''}">${pnCheck(it)}
-      <button class="pn-tx" data-pnopen="${it.kind}:${esc(it.id)}"><span class="pn-t">${esc(it.t)}</span>${pnMeta(it)}</button>${pnStarBtn(it)}</div>`;
+      <div class="pn-tx"><button class="pn-tl" data-pnopen="${it.kind}:${esc(it.id)}"><span class="pn-t">${esc(it.t)}</span></button>${pnMeta(it)}</div>${pnStarBtn(it)}</div>`;
+    // назва і мітка папки — дві окремі кнопки: кнопка в кнопці недопустима, браузер виносив мітку з назви в рядок
   }
 
   /* ─── День ─── */

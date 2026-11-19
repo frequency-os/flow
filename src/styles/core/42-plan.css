@@ -70,6 +70,7 @@
   .done .pn-chk i,.pn-chk[aria-pressed="true"] i{background:var(--pn-ok);border-color:var(--pn-ok);}
   .done .pn-chk svg,.pn-chk[aria-pressed="true"] svg{opacity:1;}
   .pn-tx{flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:10px 4px;cursor:pointer;display:flex;flex-direction:column;gap:4px;}
+  .pn-tl{border:0;background:transparent;padding:0;margin:0;text-align:left;cursor:pointer;width:100%;min-height:24px;}
   .pn-t{font-size:15px;line-height:1.3;overflow-wrap:anywhere;}
   .pn-big .pn-t{font-size:16px;font-weight:650;letter-spacing:-.01em;}
   .done .pn-t{text-decoration:line-through;color:var(--pn-tx3);}
@@ -160,3 +161,35 @@
     .pn-pad{height:90px;}
   }
   @media (prefers-reduced-motion:reduce){ .pn-ring .pn-ring-v{transition:none;} }
+
+  /* ════════ Віджет «Справи папки» (dtasks, 48-widgets.js, 19.11.2026) ════════
+     Кольори — з плитки віджета (--pg-fg, --pg-mut, --fc), тож живе в усіх темах і стилях папки. */
+  .wg-t.wd.tsk{gap:6px;}
+  .wd-tk-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .wd-tk-big{all:unset;cursor:pointer;display:block;min-width:0;}
+  .wd-tk-add{all:unset;cursor:pointer;flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:600;
+    color:var(--fc);background:color-mix(in srgb,var(--fc) 16%,transparent);margin:-6px -4px -6px 0;}
+  .wd-tk-add:focus-visible{outline:2px solid var(--fc);outline-offset:2px;}
+  /* ноутбук: L-віджети ділять на 2 колонки (32-widgets.css:300) — справам друга не потрібна, інакше назви різались до «Холо…» */
+  .wg-t.wd.tsk.sz-l>*{grid-column:1 / -1;}
+  .wd-tks{display:flex;flex-direction:column;min-width:0;}
+  .wd-tk{display:flex;align-items:center;min-width:0;min-height:44px;}
+  .wd-tk+.wd-tk{border-top:1px solid color-mix(in srgb,var(--pg-fg,var(--text)) 9%,transparent);}
+  .wd-tk-c{all:unset;cursor:pointer;flex:none;width:40px;height:44px;display:grid;place-items:center;margin-left:-8px;}
+  .wd-tk-c i{width:20px;height:20px;border-radius:50%;box-sizing:border-box;border:1.8px solid color-mix(in srgb,var(--pg-fg,var(--text)) 35%,transparent);
+    display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:900;color:transparent;}
+  .wd-tk.done .wd-tk-c i{background:var(--fc);border-color:var(--fc);color:#fff;}
+  .wd-tk-t{all:unset;cursor:pointer;flex:1;min-width:0;min-height:44px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:650;color:var(--pg-fg,var(--text));}
+  .wd-tk-t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wd-tk-t em{flex:none;font-style:normal;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--pg-mut,var(--muted));}
+  .wd-tk.done .wd-tk-t span{text-decoration:line-through;color:var(--pg-mut,var(--muted));}
+  .wd-tk-s{all:unset;cursor:pointer;flex:none;width:40px;height:44px;display:grid;place-items:center;font-size:18px;color:var(--pg-mut,var(--muted));margin-right:-8px;}
+  .wd-tk-s.on{color:#ffb800;}
+  .wd-tk-more{all:unset;cursor:pointer;min-height:36px;font-size:12.5px;font-weight:700;color:var(--pg-mut,var(--muted));}
+  .wd-tk-c:focus-visible,.wd-tk-t:focus-visible,.wd-tk-s:focus-visible,.wd-tk-big:focus-visible,.wd-tk-more:focus-visible{outline:2px solid var(--fc);outline-offset:2px;border-radius:8px;}
+  /* прев'ю в Магазині блоків */
+  .bsw-tks{display:flex;flex-direction:column;gap:5px;margin-top:6px;font-size:11.5px;font-weight:650;}
+  .bsw-tks span{display:flex;align-items:center;gap:6px;}
+  .bsw-tks i{width:11px;height:11px;border-radius:50%;border:1.5px solid currentColor;opacity:.5;box-sizing:border-box;}
+  .bsw-tks .on{text-decoration:line-through;opacity:.6;}
+  .bsw-tks .on i{border:0;opacity:1;}
