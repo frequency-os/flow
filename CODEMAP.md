@@ -16,7 +16,7 @@
 | Файлів JS | 100 |
 | Рядків JS | 37075 |
 | Файлів CSS | 53 |
-| Рядків CSS | 11683 |
+| Рядків CSS | 11688 |
 | Сутностей верхнього рівня | 2777 |
 | Ключів сховища (FLOW_KEYS) | 81 |
 
@@ -181,7 +181,7 @@
 | `src/styles/core/38-core.css` | 88 | 0 |
 | `src/styles/core/39-folder-canvas.css` | 43 | 0 |
 | `src/styles/core/40-block-store.css` | 126 | 0 |
-| `src/styles/core/41-widget-sheet.css` | 172 | 0 |
+| `src/styles/core/41-widget-sheet.css` | 177 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (81)
 

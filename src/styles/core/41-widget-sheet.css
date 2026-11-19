@@ -170,3 +170,8 @@
   /* кольоровий фон: сьогодні — біла таблетка з кольоровою цифрою, день тижня білий */
   .wg-t.wg-t.wd.bg-solid .cal-d.td{background:#fff;color:color-mix(in srgb,var(--fc) 70%,#140f24);}
   .wg-t.wd.bg-solid .wd-big.cal-today span{color:rgba(255,255,255,.85);}
+  /* день тижня на кольоровому фоні — сильніший селектор, ніж у малого календаря й тиру xs/row вище */
+  .pg-board.wboard .wg-t.wd.bg-solid.calw .wd-big.cal-today span,.wg-t.wd.bg-solid.calw.sz-s .wd-big.cal-today span{color:rgba(255,255,255,.88);}
+  /* рядки з полем (Назва, Дата, Час): підпис не стискається до нуля, поле — праворуч */
+  .ws-it:has(.ws-in)>span:first-child{flex:0 0 auto;}
+  .ws-in.sm{margin-left:auto;max-width:62%;}
