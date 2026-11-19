@@ -449,6 +449,8 @@
 
   // рендерить планер у активний контейнер (новий екран scr-planner або старий під-таб gTabBody)
   function plRerender(){
+    // новий екран «План» (65-plan.js), якщо відкритий
+    if(typeof pnIsOpen==='function' && pnIsOpen()){ pnRender(); return; }
     // Планер у Журналі: перемальовуємо Журнал (вкладка сама знає, що показати)
     const js=document.getElementById('scr-journal'); if(js && js.classList.contains('active') && typeof jnRender==='function'){ jnRender(); return; }
     const scr=document.getElementById('scr-planner');
