@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-19-0604-9cd576c';
+  var BUILD='2026-11-19-0620-0ac1e26';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1840,6 +1840,22 @@
   .pg-rbaa button.on{background:color-mix(in srgb,#7c8cff 22%,transparent);font-weight:800;}
   @media (prefers-reduced-transparency:reduce){ .pg-rbar,.pg-rbaa{background:#1c1a28;} .pg-rbar.pg-paper,.pg-rbaa.pg-paper{background:#fff;} }
   .pgask-b .rb-unlink{margin-right:auto;color:#d4405a;}
+  /* «Живий текст»: фішки дат, сум і @папок (лише показ) і картка дії над ними */
+  #scr-page .pgb [data-edit] .tx-chip{border-radius:7px;padding:0 5px;font-weight:700;cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone;}
+  #scr-page .pgb [data-edit] .tx-chip.d{background:color-mix(in srgb,#5b8def 16%,transparent);color:color-mix(in srgb,#5b8def 80%,var(--pg-fg,#000));}
+  #scr-page .pgb [data-edit] .tx-chip.m{background:color-mix(in srgb,#34c77b 18%,transparent);color:color-mix(in srgb,#1ea566 80%,var(--pg-fg,#000));}
+  #scr-page .pgb [data-edit] .tx-chip.f{background:color-mix(in srgb,#f0b429 22%,transparent);color:color-mix(in srgb,#b07a00 80%,var(--pg-fg,#000));}
+  #scr-page .pgb [data-edit]:focus .tx-chip{cursor:text;}
+  .tx-card{position:fixed;z-index:250;display:grid;gap:8px;padding:14px;border-radius:20px;color:#eef0f4;
+    background:rgba(28,26,40,.82);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);
+    box-shadow:0 18px 40px -12px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.1);}
+  .tx-card.paper{color:#1d1a24;background:rgba(252,251,255,.88);box-shadow:0 18px 40px -12px rgba(28,26,23,.35),inset 0 0 0 1px rgba(0,0,0,.06);}
+  .tx-card b{font-size:15px;} .tx-card small{font-size:12.5px;font-weight:600;opacity:.7;}
+  .tx-card-a{display:grid;gap:6px;}
+  .tx-card-a button{border:0;border-radius:12px;min-height:44px;padding:0 12px;font:inherit;font-size:14px;font-weight:800;cursor:pointer;background:#6d5cf0;color:#fff;}
+  .tx-card-a button.g{background:rgba(127,127,127,.16);color:inherit;}
+  .tx-card-a button:focus-visible{outline:2px solid #9aa6ff;outline-offset:2px;}
+  @media (prefers-reduced-transparency:reduce){ .tx-card{background:#1c1a28;} .tx-card.paper{background:#fff;} }
 /* ══════════════════════════════════════════════════════════════════
    ЧОМУ ТУТ СКРІЗЬ var(--c, #6a7dff), а не просто var(--c)
 
@@ -22321,6 +22337,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       </div>`;
     document.body.appendChild(ov);
     if(preset && preset.folder){ const fs=ov.querySelector('#pbFolder'); if(fs) fs.value=preset.folder; }
+    // назва з тексту нотатки («Живий текст», 64-rich-text.js) — лише підставляємо в поле, пише людина кнопкою
+    if(preset && preset.title && !b){ const ti=ov.querySelector('#pbTitle'); if(ti) ti.value=String(preset.title).slice(0,80); }
     const close=()=>ov.remove();
     ov.addEventListener('click',(e)=>{ if(e.target===ov) close(); });
     // ── підпункти у формі редагування ──
@@ -39623,6 +39641,113 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function txFromHTML(html){
     try{ const d=new DOMParser().parseFromString(String(html||''),'text/html'); return txFromDom(d.body); }catch(_){ return ''; }
   }
+
+  /* ════════ «Живий текст» (19.11.2026, варіант B етап 1): дати, суми й @папки стають фішками ════════
+     Фішки — лише ПОКАЗ: у збережений текст нічого не додається (txFromDom читає їх як звичайний текст).
+     Тап по фішці відкриває картку з дією, а дія — наявна шторка застосунку (блок Планера, запис Гаманця) з підставленими
+     значеннями. Записує тільки сама шторка, коли людина натисне «Зберегти». */
+  var TX_MON=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+  var TX_DOW=[['нд','неділ'],['пн','понеділ'],['вт','вівтор'],['ср','серед'],['чт','четвер'],['пт','пʼятниц|п\'ятниц|пятниц'],['сб','субот']];
+  var TX_CUR={'₴':'UAH','грн':'UAH','гривень':'UAH','гривні':'UAH','гривня':'UAH','$':'USD','usd':'USD','€':'EUR','eur':'EUR','zł':'PLN','£':'GBP'};
+  // шматок тексту → {ds:'YYYY-MM-DD', h:число годин|null} або null
+  function txDateOf(raw){
+    const t=String(raw||'').toLowerCase().replace(/[ʼ’]/g,'ʼ'), now=new Date(), d=new Date(now.getFullYear(),now.getMonth(),now.getDate(),12);
+    let ok=false, m;
+    if(/післязавтра/.test(t)){ d.setDate(d.getDate()+2); ok=true; }
+    else if(/завтра/.test(t)){ d.setDate(d.getDate()+1); ok=true; }
+    else if(/сьогодні/.test(t)){ ok=true; }
+    else if((m=/(\d{1,2})\.(\d{1,2})(?:\.(\d{4}))?/.exec(t))){ const y=m[3]?+m[3]:now.getFullYear(), mo=+m[2]-1, dd=+m[1];
+      if(mo>=0&&mo<12&&dd>=1&&dd<=31){ d.setFullYear(y,mo,dd); ok=d.getMonth()===mo; } }
+    else if((m=new RegExp('(\\d{1,2})\\s+('+TX_MON.join('|')+')').exec(t))){ d.setMonth(TX_MON.indexOf(m[2]),+m[1]); ok=true; }
+    else { for(let i=0;i<7;i++){ const re=new RegExp('(^|[^а-яіїєґ])('+TX_DOW[i][0]+'|'+TX_DOW[i][1]+')'); if(re.test(t)){ const add=(i-d.getDay()+7)%7; d.setDate(d.getDate()+add); ok=true; break; } } }
+    const tm=/([01]?\d|2[0-3]):([0-5]\d)/.exec(t), h=tm?(+tm[1])+(+tm[2])/60:null;
+    if(!ok&&h===null) return null;
+    return {ds:ymdLocal(d), h};
+  }
+  function txMoneyOf(raw){
+    const m=/(\d[\d\s ]{0,9}(?:[.,]\d{1,2})?)\s*(₴|грн|гривень|гривні|гривня|\$|usd|€|eur|zł|£)/i.exec(String(raw||''))||/(\$|€|£)\s*(\d[\d\s ]{0,9}(?:[.,]\d{1,2})?)/.exec(String(raw||''));
+    if(!m) return null;
+    const num=/\d/.test(m[1])?m[1]:m[2], sym=/\d/.test(m[1])?m[2]:m[1];
+    const v=parseFloat(String(num).replace(/[\s ]/g,'').replace(',','.')); if(!(v>0)) return null;
+    return {v, cur:TX_CUR[String(sym).toLowerCase()]||'UAH'};
+  }
+  // папки для @: довші назви першими, щоб «@Спорт зал» не впіймало «@Спорт»
+  function txFolderList(){ try{ return Object.keys(folders||{}).filter(k=>folders[k]&&folders[k].name).map(k=>[k,String(folders[k].name)]).sort((a,b)=>b[1].length-a[1].length); }catch(_){ return []; } }
+  const txReEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  // готовий HTML (з txHTML) → той самий HTML, де у ТЕКСТІ (не в тегах і не в посиланнях) дати, суми й @папки обгорнуто фішками
+  function txChips(html){
+    const fl=txFolderList();
+    const fRe=fl.length?new RegExp('@('+fl.map(f=>txReEsc(esc(f[1]))).join('|')+')(?![\\wа-яіїєґ])','gi'):null;
+    // день тижня — лише повні форми або скорочення окремим словом; ліва межа — окрема група (без «погляду назад»: його не знає старіший Safari)
+    const DW='понеділ(?:ок|ка|ку)|вівтор(?:ок|ка|ку)|серед(?:а|у|и)|четвер(?:га|гу)?|(?:пʼятниц|п&#39;ятниц|пятниц)(?:я|ю|і)|субот(?:а|у|и)|неділ(?:я|ю|і)|пн|вт|ср|чт|пт|сб|нд';
+    const dRe=new RegExp('(^|[^а-яіїєґa-z0-9])((?:(?:в|у|до|на)\\s+)?(?:сьогодні|післязавтра|завтра|\\d{2}\\.\\d{2}(?:\\.\\d{4})?|\\d{1,2}\\.\\d{1,2}\\.\\d{4}|\\d{1,2}\\s+(?:'+TX_MON.join('|')+')|(?:'+DW+'))(?![а-яіїєґa-z0-9])(?:,?\\s{0,3}(?:о|об)?\\s{0,3}(?:[01]?\\d|2[0-3]):[0-5]\\d)?|(?:о|об)\\s{1,3}(?:[01]?\\d|2[0-3]):[0-5]\\d)(?![\\d])','gi');
+    // число: пробіл усередині — лише між цифрами («1 200»), тож хвостовий пробіл у фішку не потрапляє
+    const NUM='\\d(?:\\d|[\\s\\u00a0](?=\\d)){0,9}(?:[.,]\\d{1,2})?';
+    const mRe=new RegExp('(^|[^\\d.,])('+NUM+'\\s*(?:₴|грн|гривень|гривні|гривня|\\$|usd|€|eur|zł|£)(?![а-яіїєґa-z])|(?:\\$|€|£)\\s*'+NUM+')','gi');
+    let inA=0;
+    return String(html).split(/(<[^>]+>)/).map(part=>{
+      if(!part) return part;
+      if(part[0]==='<'){ if(/^<a[\s>]/i.test(part)) inA++; else if(/^<\/a>/i.test(part)) inA=Math.max(0,inA-1); return part; }
+      if(inA) return part;
+      let s=part;
+      if(fRe) s=s.replace(fRe,(m,name)=>{ const f=fl.find(x=>esc(x[1]).toLowerCase()===name.toLowerCase()); return f?'<span class="tx-chip f" data-txf="'+esc(f[0])+'">'+m+'</span>':m; });
+      // далі лише в тексті поза вже готовими фішками
+      const each=(str,fn)=>str.replace(/(<span[^>]*>[\s\S]*?<\/span>)|([^<]+)/g,(m,sp,txt)=>sp?sp:fn(txt));
+      s=each(s,t=>t.replace(mRe,(m,pre,x)=>pre+'<span class="tx-chip m">'+x+'</span>'));
+      s=each(s,t=>t.replace(dRe,(m,pre,x)=>txDateOf(x.replace(/&#39;/g,"'"))?pre+'<span class="tx-chip d">'+x+'</span>':m));
+      return s;
+    }).join('');
+  }
+  // картка дії над фішкою; el — сама фішка, fk — папка, де стоїть текст
+  // назва для блоку чи витрати: текст рядка до першої фішки, без прийменника й розділових знаків у кінці
+  function txLead(el){
+    const f=el.closest('[data-edit]')||el.parentElement; if(!f) return '';
+    let t=''; for(const n of f.childNodes){ if(n.nodeType===1&&n.classList&&n.classList.contains('tx-chip')) break; t+=n.textContent||''; }
+    t=t.replace(/\s+/g,' ').trim().replace(/(?:[\s,.;:—–-]+|\s(?:в|у|до|на|о|об|з|за|і|та))+$/i,'').trim();
+    if(!t){ const rest=(f.textContent||'').replace(el.textContent||'',' '); t=rest.replace(/\s+/g,' ').replace(/^[\s,.;:—–-]+|[\s,.;:—–-]+$/g,''); }
+    return t.slice(0,80);
+  }
+  function txChipCard(el,fk){
+    document.querySelectorAll('.tx-card').forEach(x=>x.remove());
+    const raw=el.textContent||'';
+    let ic='', head='', sub='', acts=[];
+    if(el.classList.contains('d')){ const d=txDateOf(raw); if(!d) return;
+      const dt=new Date(d.ds+'T12:00:00'), dow=['Нд','Пн','Вт','Ср','Чт','Пт','Сб'][dt.getDay()];
+      ic='📅'; head=dow+', '+dt.getDate()+' '+TX_MON[dt.getMonth()]+(d.h!==null?' · '+plHM(d.h):'');
+      const title=txLead(el);
+      // день Планера ставимо лише на час шторки: закрили без «Зберегти» — повертаємо, як було, і нічого не пишемо
+      acts=[['Додати блок у Планер',()=>{ const p=plData(), was=p.selDate, n0=plBlocksFor(d.ds).length; p.selDate=d.ds;
+        plBlockSheet(null,d.h!==null?d.h:null,{folder:fk&&folders[fk]?fk:'',title});
+        const ov=[...document.querySelectorAll('.pl-sheet-ov')].pop();
+        if(ov){ const mo=new MutationObserver(()=>{ if(ov.isConnected) return; mo.disconnect();
+          const q=plData(); if(q.selDate===d.ds&&plBlocksFor(d.ds).length===n0) q.selDate=was; }); mo.observe(document.body,{childList:true}); } }],
+            ['Відкрити цей день',()=>{ try{ goJournal({tab:'day',ds:d.ds}); }catch(_){} }]]; }
+    else if(el.classList.contains('m')){ const mv=txMoneyOf(raw); if(!mv) return;
+      ic='💸'; head=raw.trim();
+      const label=txLead(el);
+      // валюту передаємо, лише якщо такий баланс уже є: шторка Гаманця інакше додала б його одразу, ще до «Зберегти»
+      let curOk=false; try{ curOk=mv.cur!==mainCur()&&wlCurList().includes(mv.cur); }catch(_){}
+      const o=t=>()=>wlOpSheet(t,'',Object.assign({amount:mv.v,label},fk&&folders[fk]?{folderKey:fk}:{},curOk?{cur:mv.cur}:{}));
+      acts=[['Записати витрату',o('out')],['Записати дохід',o('in')]]; }
+    else if(el.classList.contains('f')){ const k=el.dataset.txf; if(!k||!folders[k]) return;
+      ic='📁'; head=String(folders[k].name||'Папка');
+      acts=[['Відкрити папку',()=>{ try{ goFolder(k); }catch(_){} }]]; }
+    else return;
+    sub=el.classList.contains('f')?'Згадка папки':'Нічого не записано, поки не натиснеш';
+    const card=document.createElement('div'); card.className='tx-card'; card.setAttribute('role','dialog'); card.setAttribute('aria-label',head);
+    card.innerHTML=`<b>${ic} ${esc(head)}</b><small>${esc(sub)}</small><div class="tx-card-a">${acts.map((a,i)=>`<button type="button" data-txa="${i}" class="${i?'g':''}">${esc(a[0])}</button>`).join('')}</div>`;
+    if(document.querySelector('#scr-page.pg-paper')) card.classList.add('paper');
+    document.body.appendChild(card);
+    const r=el.getBoundingClientRect(), w=Math.min(300,window.innerWidth-24), h=card.offsetHeight;
+    card.style.width=w+'px'; card.style.left=Math.max(12,Math.min(window.innerWidth-w-12,r.left+r.width/2-w/2))+'px';
+    card.style.top=(r.bottom+8+h>window.innerHeight-90?Math.max(12,r.top-h-8):r.bottom+8)+'px';
+    const close=()=>{ card.remove(); document.removeEventListener('pointerdown',out,true); document.removeEventListener('keydown',key,true); };
+    const out=e=>{ if(!card.contains(e.target)) close(); };
+    const key=e=>{ if(e.key==='Escape') close(); };
+    setTimeout(()=>{ document.addEventListener('pointerdown',out,true); document.addEventListener('keydown',key,true); },0);
+    card.addEventListener('click',e=>{ const b=e.target.closest('[data-txa]'); if(!b) return; const a=acts[+b.dataset.txa]; close(); try{ a[1](); }catch(err){ console.error('txChipCard',err); } });
+    try{ card.querySelector('button').focus({preventScroll:true}); }catch(_){}
+  }
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
@@ -39990,7 +40115,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function snapshotArr(arr){ return JSON.parse(JSON.stringify(arr)); }
   function restoreArr(arr,snap){ arr.length=0; for(var i=0;i<snap.length;i++) arr.push(snap[i]); }
   /* оформлений текст у полі (19.11.2026): позначки → <b> <i> <s> <mark> <a>, усе інше екрановано (core/64-rich-text.js) */
-  function txRich(b){ try{ if(typeof txHTML==='function') return txHTML(txtOf(b)); }catch(_){} return esc(txtOf(b)); }
+  function txRich(b){ try{ if(typeof txHTML==='function'){ var h=txHTML(txtOf(b)); return typeof txChips==='function'?txChips(h):h; } }catch(_){} return esc(txtOf(b)); }   /* + фішки дат, сум і @папок (лише показ) */
   function txIsRich(b){ return !!(b&&typeof TX_RICH!=='undefined'&&TX_RICH[b.type]); }
   function equalizeWidths(cols){ var n=cols.length||1; cols.forEach(function(c){ c.width=1/n; }); }
 
@@ -43015,7 +43140,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     if(rbBusy) return;
     var el=e.target&&e.target.closest&&e.target.closest('[data-edit]'); if(!el) return;
     var lc=locate(el.dataset.edit); if(!lc||!txIsRich(lc.block)) return;
-    var h=txHTML(txtOf(lc.block)); if(el.innerHTML!==h) el.innerHTML=h;
+    var h=txRich(lc.block); if(el.innerHTML!==h) el.innerHTML=h;
     setTimeout(function(){ if(!rbField()) rbHide(); },0);
   });
   // клавіші компʼютера
@@ -43062,6 +43187,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   var rbPre=null;   // що було у фокусі ДО дотику: сам дотик уже переносить фокус у поле
   editor.addEventListener('pointerdown',function(){ rbPre=document.activeElement; },true);
   editor.addEventListener('click',function(e){
+    /* фішка дати, суми чи @папки: картка з дією (64-rich-text.js txChipCard); поки пишеш у полі — це просто текст */
+    var ch=e.target&&e.target.closest&&e.target.closest('[data-edit] .tx-chip');
+    if(ch){ var cf=ch.closest('[data-edit]'); if(rbPre!==cf){ e.preventDefault(); e.stopPropagation(); if(typeof txChipCard==='function') txChipCard(ch,typeof wgCtxFolder==='function'?wgCtxFolder():''); } return; }   /* картка — поки фішка ще в полі; фокус забирає сама картка */
     var a=e.target&&e.target.closest&&e.target.closest('[data-edit] a.tx-a, [data-edit] a[href]'); if(!a) return;
     var ce=a.closest('[data-edit]'); if(rbPre===ce&&!(e.metaKey||e.ctrlKey)) return;
     var u=a.getAttribute('href')||''; if(!TX_URL.test(u)) return;
