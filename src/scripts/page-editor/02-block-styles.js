@@ -1,5 +1,5 @@
   /* оформлений текст у полі (19.11.2026): позначки → <b> <i> <s> <mark> <a>, усе інше екрановано (core/64-rich-text.js) */
-  function txRich(b){ try{ if(typeof txHTML==='function') return txHTML(txtOf(b)); }catch(_){} return esc(txtOf(b)); }
+  function txRich(b){ try{ if(typeof txHTML==='function'){ var h=txHTML(txtOf(b)); return typeof txChips==='function'?txChips(h):h; } }catch(_){} return esc(txtOf(b)); }   /* + фішки дат, сум і @папок (лише показ) */
   function txIsRich(b){ return !!(b&&typeof TX_RICH!=='undefined'&&TX_RICH[b.type]); }
   function equalizeWidths(cols){ var n=cols.length||1; cols.forEach(function(c){ c.width=1/n; }); }
 

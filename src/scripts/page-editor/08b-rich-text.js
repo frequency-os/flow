@@ -137,7 +137,7 @@
     if(rbBusy) return;
     var el=e.target&&e.target.closest&&e.target.closest('[data-edit]'); if(!el) return;
     var lc=locate(el.dataset.edit); if(!lc||!txIsRich(lc.block)) return;
-    var h=txHTML(txtOf(lc.block)); if(el.innerHTML!==h) el.innerHTML=h;
+    var h=txRich(lc.block); if(el.innerHTML!==h) el.innerHTML=h;
     setTimeout(function(){ if(!rbField()) rbHide(); },0);
   });
   // клавіші компʼютера
@@ -184,6 +184,9 @@
   var rbPre=null;   // що було у фокусі ДО дотику: сам дотик уже переносить фокус у поле
   editor.addEventListener('pointerdown',function(){ rbPre=document.activeElement; },true);
   editor.addEventListener('click',function(e){
+    /* фішка дати, суми чи @папки: картка з дією (64-rich-text.js txChipCard); поки пишеш у полі — це просто текст */
+    var ch=e.target&&e.target.closest&&e.target.closest('[data-edit] .tx-chip');
+    if(ch){ var cf=ch.closest('[data-edit]'); if(rbPre!==cf){ e.preventDefault(); e.stopPropagation(); if(typeof txChipCard==='function') txChipCard(ch,typeof wgCtxFolder==='function'?wgCtxFolder():''); } return; }   /* картка — поки фішка ще в полі; фокус забирає сама картка */
     var a=e.target&&e.target.closest&&e.target.closest('[data-edit] a.tx-a, [data-edit] a[href]'); if(!a) return;
     var ce=a.closest('[data-edit]'); if(rbPre===ce&&!(e.metaKey||e.ctrlKey)) return;
     var u=a.getAttribute('href')||''; if(!TX_URL.test(u)) return;

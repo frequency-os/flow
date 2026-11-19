@@ -1264,3 +1264,19 @@
   .pg-rbaa button.on{background:color-mix(in srgb,#7c8cff 22%,transparent);font-weight:800;}
   @media (prefers-reduced-transparency:reduce){ .pg-rbar,.pg-rbaa{background:#1c1a28;} .pg-rbar.pg-paper,.pg-rbaa.pg-paper{background:#fff;} }
   .pgask-b .rb-unlink{margin-right:auto;color:#d4405a;}
+  /* «Живий текст»: фішки дат, сум і @папок (лише показ) і картка дії над ними */
+  #scr-page .pgb [data-edit] .tx-chip{border-radius:7px;padding:0 5px;font-weight:700;cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone;}
+  #scr-page .pgb [data-edit] .tx-chip.d{background:color-mix(in srgb,#5b8def 16%,transparent);color:color-mix(in srgb,#5b8def 80%,var(--pg-fg,#000));}
+  #scr-page .pgb [data-edit] .tx-chip.m{background:color-mix(in srgb,#34c77b 18%,transparent);color:color-mix(in srgb,#1ea566 80%,var(--pg-fg,#000));}
+  #scr-page .pgb [data-edit] .tx-chip.f{background:color-mix(in srgb,#f0b429 22%,transparent);color:color-mix(in srgb,#b07a00 80%,var(--pg-fg,#000));}
+  #scr-page .pgb [data-edit]:focus .tx-chip{cursor:text;}
+  .tx-card{position:fixed;z-index:250;display:grid;gap:8px;padding:14px;border-radius:20px;color:#eef0f4;
+    background:rgba(28,26,40,.82);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);
+    box-shadow:0 18px 40px -12px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.1);}
+  .tx-card.paper{color:#1d1a24;background:rgba(252,251,255,.88);box-shadow:0 18px 40px -12px rgba(28,26,23,.35),inset 0 0 0 1px rgba(0,0,0,.06);}
+  .tx-card b{font-size:15px;} .tx-card small{font-size:12.5px;font-weight:600;opacity:.7;}
+  .tx-card-a{display:grid;gap:6px;}
+  .tx-card-a button{border:0;border-radius:12px;min-height:44px;padding:0 12px;font:inherit;font-size:14px;font-weight:800;cursor:pointer;background:#6d5cf0;color:#fff;}
+  .tx-card-a button.g{background:rgba(127,127,127,.16);color:inherit;}
+  .tx-card-a button:focus-visible{outline:2px solid #9aa6ff;outline-offset:2px;}
+  @media (prefers-reduced-transparency:reduce){ .tx-card{background:#1c1a28;} .tx-card.paper{background:#fff;} }

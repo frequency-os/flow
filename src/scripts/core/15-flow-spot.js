@@ -1496,6 +1496,8 @@
       </div>`;
     document.body.appendChild(ov);
     if(preset && preset.folder){ const fs=ov.querySelector('#pbFolder'); if(fs) fs.value=preset.folder; }
+    // назва з тексту нотатки («Живий текст», 64-rich-text.js) — лише підставляємо в поле, пише людина кнопкою
+    if(preset && preset.title && !b){ const ti=ov.querySelector('#pbTitle'); if(ti) ti.value=String(preset.title).slice(0,80); }
     const close=()=>ov.remove();
     ov.addEventListener('click',(e)=>{ if(e.target===ov) close(); });
     // ── підпункти у формі редагування ──

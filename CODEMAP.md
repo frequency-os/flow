@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 102 |
-| Рядків JS | 37414 |
+| Рядків JS | 37526 |
 | Файлів CSS | 53 |
-| Рядків CSS | 11749 |
-| Сутностей верхнього рівня | 2828 |
+| Рядків CSS | 11765 |
+| Сутностей верхнього рівня | 2839 |
 | Ключів сховища (FLOW_KEYS) | 81 |
 
 ## Файли JS
@@ -49,7 +49,7 @@
 | `src/scripts/core/12-ai-agent.js` | 1860 | 98 |
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
-| `src/scripts/core/15-flow-spot.js` | 1695 | 89 |
+| `src/scripts/core/15-flow-spot.js` | 1697 | 89 |
 | `src/scripts/core/16-dashboard.js` | 1262 | 68 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
@@ -100,14 +100,14 @@
 | `src/scripts/core/61-folder-canvas.js` | 150 | 15 |
 | `src/scripts/core/62-block-store.js` | 205 | 25 |
 | `src/scripts/core/63-widget-sheet.js` | 238 | 22 |
-| `src/scripts/core/64-rich-text.js` | 89 | 13 |
+| `src/scripts/core/64-rich-text.js` | 196 | 23 |
 | `src/scripts/page-editor/01-palette.js` | 188 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 793 | 55 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1109 | 59 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
-| `src/scripts/page-editor/08b-rich-text.js` | 194 | 30 |
+| `src/scripts/page-editor/08b-rich-text.js` | 197 | 31 |
 | `src/scripts/page-editor/09-open-page.js` | 33 | 1 |
 | `src/scripts/page-editor/10-mic.js` | 154 | 8 |
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
@@ -146,7 +146,7 @@
 | `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1266 | 9 |
+| `src/styles/core/02-page-editor.css` | 1282 | 9 |
 | `src/styles/core/03-folders-projects.css` | 684 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -1278,8 +1278,8 @@
 | `plUncompleteEffects` | функція | `src/scripts/core/15-flow-spot.js:1394` |
 | `plToast` | функція | `src/scripts/core/15-flow-spot.js:1411` |
 | `plBlockSheet` | функція | `src/scripts/core/15-flow-spot.js:1419` |
-| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1641` |
-| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1644` |
+| `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1643` |
+| `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1646` |
 
 ### `src/scripts/core/16-dashboard.js` — 68 сутностей
 
@@ -3031,7 +3031,7 @@
 | `hostOf` | функція | `src/scripts/core/63-widget-sheet.js:227` |
 | `stop` | функція | `src/scripts/core/63-widget-sheet.js:228` |
 
-### `src/scripts/core/64-rich-text.js` — 13 сутностей
+### `src/scripts/core/64-rich-text.js` — 23 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3048,6 +3048,16 @@
 | `txMerge` | функція | `src/scripts/core/64-rich-text.js:54` |
 | `txFromDom` | функція | `src/scripts/core/64-rich-text.js:59` |
 | `txFromHTML` | функція | `src/scripts/core/64-rich-text.js:87` |
+| `TX_MON` | масив | `src/scripts/core/64-rich-text.js:95` |
+| `TX_DOW` | масив | `src/scripts/core/64-rich-text.js:96` |
+| `TX_CUR` | обʼєкт | `src/scripts/core/64-rich-text.js:97` |
+| `txDateOf` | функція | `src/scripts/core/64-rich-text.js:99` |
+| `txMoneyOf` | функція | `src/scripts/core/64-rich-text.js:113` |
+| `txFolderList` | функція | `src/scripts/core/64-rich-text.js:121` |
+| `txReEsc` | функція | `src/scripts/core/64-rich-text.js:122` |
+| `txChips` | функція | `src/scripts/core/64-rich-text.js:124` |
+| `txLead` | функція | `src/scripts/core/64-rich-text.js:149` |
+| `txChipCard` | функція | `src/scripts/core/64-rich-text.js:156` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 
@@ -3285,7 +3295,7 @@
 | `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:689` |
 | `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:690` |
 
-### `src/scripts/page-editor/08b-rich-text.js` — 30 сутностей
+### `src/scripts/page-editor/08b-rich-text.js` — 31 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3316,9 +3326,10 @@
 | `cd` | значення | `src/scripts/page-editor/08b-rich-text.js:173` |
 | `html` | значення | `src/scripts/page-editor/08b-rich-text.js:175` |
 | `marks` | значення | `src/scripts/page-editor/08b-rich-text.js:178` |
-| `a` | значення | `src/scripts/page-editor/08b-rich-text.js:187` |
-| `ce` | значення | `src/scripts/page-editor/08b-rich-text.js:188` |
-| `u` | значення | `src/scripts/page-editor/08b-rich-text.js:189` |
+| `ch` | значення | `src/scripts/page-editor/08b-rich-text.js:188` |
+| `a` | значення | `src/scripts/page-editor/08b-rich-text.js:190` |
+| `ce` | значення | `src/scripts/page-editor/08b-rich-text.js:191` |
+| `u` | значення | `src/scripts/page-editor/08b-rich-text.js:192` |
 
 ### `src/scripts/page-editor/09-open-page.js` — 1 сутностей
 
