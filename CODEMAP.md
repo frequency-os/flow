@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 38841 |
+| Рядків JS | 39033 |
 | Файлів CSS | 54 |
-| Рядків CSS | 12108 |
-| Сутностей верхнього рівня | 3001 |
+| Рядків CSS | 12154 |
+| Сутностей верхнього рівня | 3036 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -104,11 +104,11 @@
 | `src/scripts/core/65-plan.js` | 359 | 58 |
 | `src/scripts/page-editor/01-palette.js` | 190 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 793 | 55 |
-| `src/scripts/page-editor/03-premium-pack.js` | 1162 | 60 |
+| `src/scripts/page-editor/03-premium-pack.js` | 1165 | 60 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
-| `src/scripts/page-editor/08b-rich-text.js` | 396 | 65 |
+| `src/scripts/page-editor/08b-rich-text.js` | 585 | 100 |
 | `src/scripts/page-editor/09-open-page.js` | 33 | 1 |
 | `src/scripts/page-editor/10-mic.js` | 201 | 13 |
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
@@ -147,7 +147,7 @@
 | `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1351 | 9 |
+| `src/styles/core/02-page-editor.css` | 1397 | 9 |
 | `src/styles/core/03-folders-projects.css` | 706 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -3331,9 +3331,9 @@
 | `pgTrackEdit` | функція | `src/scripts/page-editor/03-premium-pack.js:921` |
 | `pgAddViaMenu` | функція | `src/scripts/page-editor/03-premium-pack.js:928` |
 | `pgcApi` | значення | `src/scripts/page-editor/03-premium-pack.js:943` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:1141` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:1142` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:1147` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:1144` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:1145` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:1150` |
 
 ### `src/scripts/page-editor/04-table.js` — 26 сутностей
 
@@ -3425,7 +3425,7 @@
 | `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:689` |
 | `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:690` |
 
-### `src/scripts/page-editor/08b-rich-text.js` — 65 сутностей
+### `src/scripts/page-editor/08b-rich-text.js` — 100 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3439,61 +3439,96 @@
 | `rbHide` | функція | `src/scripts/page-editor/08b-rich-text.js:35` |
 | `rbPlace` | функція | `src/scripts/page-editor/08b-rich-text.js:36` |
 | `rbSync` | функція | `src/scripts/page-editor/08b-rich-text.js:58` |
-| `rbSave` | функція | `src/scripts/page-editor/08b-rich-text.js:75` |
-| `rbDo` | функція | `src/scripts/page-editor/08b-rich-text.js:82` |
-| `rbMark` | функція | `src/scripts/page-editor/08b-rich-text.js:100` |
-| `rbUrl` | функція | `src/scripts/page-editor/08b-rich-text.js:111` |
-| `range` | значення | `src/scripts/page-editor/08b-rich-text.js:131` |
-| `br` | значення | `src/scripts/page-editor/08b-rich-text.js:153` |
-| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:160` |
-| `s` | значення | `src/scripts/page-editor/08b-rich-text.js:162` |
-| `keepMarks` | значення | `src/scripts/page-editor/08b-rich-text.js:164` |
-| `src` | значення | `src/scripts/page-editor/08b-rich-text.js:165` |
-| `id` | значення | `src/scripts/page-editor/08b-rich-text.js:168` |
-| `isList` | значення | `src/scripts/page-editor/08b-rich-text.js:169` |
-| `ov` | значення | `src/scripts/page-editor/08b-rich-text.js:172` |
-| `out` | значення | `src/scripts/page-editor/08b-rich-text.js:179` |
-| `close` | функція | `src/scripts/page-editor/08b-rich-text.js:180` |
-| `key` | функція | `src/scripts/page-editor/08b-rich-text.js:182` |
-| `mo` | обʼєкт | `src/scripts/page-editor/08b-rich-text.js:185` |
-| `SYS` | значення | `src/scripts/page-editor/08b-rich-text.js:187` |
-| `txt` | значення | `src/scripts/page-editor/08b-rich-text.js:195` |
-| `o` | значення | `src/scripts/page-editor/08b-rich-text.js:199` |
-| `clean` | функція | `src/scripts/page-editor/08b-rich-text.js:201` |
-| `items` | значення | `src/scripts/page-editor/08b-rich-text.js:202` |
-| `text` | значення | `src/scripts/page-editor/08b-rich-text.js:203` |
-| `A` | значення | `src/scripts/page-editor/08b-rich-text.js:207` |
-| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:218` |
-| `arr` | значення | `src/scripts/page-editor/08b-rich-text.js:219` |
-| `isList` | значення | `src/scripts/page-editor/08b-rich-text.js:220` |
-| `after` | значення | `src/scripts/page-editor/08b-rich-text.js:236` |
-| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:261` |
-| `br` | значення | `src/scripts/page-editor/08b-rich-text.js:265` |
-| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:282` |
-| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:283` |
-| `h` | значення | `src/scripts/page-editor/08b-rich-text.js:284` |
-| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:290` |
-| `k` | значення | `src/scripts/page-editor/08b-rich-text.js:291` |
-| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:302` |
-| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:303` |
-| `raw` | значення | `src/scripts/page-editor/08b-rich-text.js:304` |
-| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:317` |
-| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:318` |
-| `cd` | значення | `src/scripts/page-editor/08b-rich-text.js:319` |
-| `html` | значення | `src/scripts/page-editor/08b-rich-text.js:321` |
-| `marks` | значення | `src/scripts/page-editor/08b-rich-text.js:324` |
-| `ch` | значення | `src/scripts/page-editor/08b-rich-text.js:334` |
-| `a` | значення | `src/scripts/page-editor/08b-rich-text.js:336` |
-| `ce` | значення | `src/scripts/page-editor/08b-rich-text.js:337` |
-| `u` | значення | `src/scripts/page-editor/08b-rich-text.js:338` |
-| `b` | значення | `src/scripts/page-editor/08b-rich-text.js:349` |
-| `plus` | значення | `src/scripts/page-editor/08b-rich-text.js:350` |
-| `vv` | значення | `src/scripts/page-editor/08b-rich-text.js:377` |
-| `cap` | значення | `src/scripts/page-editor/08b-rich-text.js:378` |
-| `t` | значення | `src/scripts/page-editor/08b-rich-text.js:379` |
-| `moved` | функція | `src/scripts/page-editor/08b-rich-text.js:380` |
-| `b` | значення | `src/scripts/page-editor/08b-rich-text.js:392` |
-| `k` | значення | `src/scripts/page-editor/08b-rich-text.js:393` |
+| `rbSave` | функція | `src/scripts/page-editor/08b-rich-text.js:76` |
+| `rbDo` | функція | `src/scripts/page-editor/08b-rich-text.js:83` |
+| `rbMark` | функція | `src/scripts/page-editor/08b-rich-text.js:102` |
+| `rbUrl` | функція | `src/scripts/page-editor/08b-rich-text.js:113` |
+| `range` | значення | `src/scripts/page-editor/08b-rich-text.js:133` |
+| `br` | значення | `src/scripts/page-editor/08b-rich-text.js:155` |
+| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:162` |
+| `s` | значення | `src/scripts/page-editor/08b-rich-text.js:164` |
+| `keepMarks` | значення | `src/scripts/page-editor/08b-rich-text.js:166` |
+| `src` | значення | `src/scripts/page-editor/08b-rich-text.js:167` |
+| `id` | значення | `src/scripts/page-editor/08b-rich-text.js:170` |
+| `isList` | значення | `src/scripts/page-editor/08b-rich-text.js:171` |
+| `ov` | значення | `src/scripts/page-editor/08b-rich-text.js:174` |
+| `out` | значення | `src/scripts/page-editor/08b-rich-text.js:181` |
+| `close` | функція | `src/scripts/page-editor/08b-rich-text.js:182` |
+| `key` | функція | `src/scripts/page-editor/08b-rich-text.js:184` |
+| `mo` | обʼєкт | `src/scripts/page-editor/08b-rich-text.js:187` |
+| `SYS` | значення | `src/scripts/page-editor/08b-rich-text.js:189` |
+| `txt` | значення | `src/scripts/page-editor/08b-rich-text.js:197` |
+| `o` | значення | `src/scripts/page-editor/08b-rich-text.js:201` |
+| `clean` | функція | `src/scripts/page-editor/08b-rich-text.js:203` |
+| `items` | значення | `src/scripts/page-editor/08b-rich-text.js:204` |
+| `text` | значення | `src/scripts/page-editor/08b-rich-text.js:205` |
+| `A` | значення | `src/scripts/page-editor/08b-rich-text.js:209` |
+| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:220` |
+| `arr` | значення | `src/scripts/page-editor/08b-rich-text.js:221` |
+| `isList` | значення | `src/scripts/page-editor/08b-rich-text.js:222` |
+| `after` | значення | `src/scripts/page-editor/08b-rich-text.js:238` |
+| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:263` |
+| `br` | значення | `src/scripts/page-editor/08b-rich-text.js:267` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:284` |
+| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:285` |
+| `h` | значення | `src/scripts/page-editor/08b-rich-text.js:286` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:292` |
+| `k` | значення | `src/scripts/page-editor/08b-rich-text.js:293` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:304` |
+| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:305` |
+| `raw` | значення | `src/scripts/page-editor/08b-rich-text.js:306` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:319` |
+| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:320` |
+| `cd` | значення | `src/scripts/page-editor/08b-rich-text.js:321` |
+| `html` | значення | `src/scripts/page-editor/08b-rich-text.js:323` |
+| `marks` | значення | `src/scripts/page-editor/08b-rich-text.js:326` |
+| `ch` | значення | `src/scripts/page-editor/08b-rich-text.js:336` |
+| `a` | значення | `src/scripts/page-editor/08b-rich-text.js:338` |
+| `ce` | значення | `src/scripts/page-editor/08b-rich-text.js:339` |
+| `u` | значення | `src/scripts/page-editor/08b-rich-text.js:340` |
+| `q` | значення | `src/scripts/page-editor/08b-rich-text.js:352` |
+| `q` | значення | `src/scripts/page-editor/08b-rich-text.js:359` |
+| `cats` | значення | `src/scripts/page-editor/08b-rich-text.js:360` |
+| `nn` | значення | `src/scripts/page-editor/08b-rich-text.js:361` |
+| `hid` | значення | `src/scripts/page-editor/08b-rich-text.js:362` |
+| `b` | значення | `src/scripts/page-editor/08b-rich-text.js:370` |
+| `plus` | значення | `src/scripts/page-editor/08b-rich-text.js:371` |
+| `b` | значення | `src/scripts/page-editor/08b-rich-text.js:396` |
+| `nb` | обʼєкт | `src/scripts/page-editor/08b-rich-text.js:403` |
+| `s` | значення | `src/scripts/page-editor/08b-rich-text.js:418` |
+| `pgc` | значення | `src/scripts/page-editor/08b-rich-text.js:419` |
+| `phone` | значення | `src/scripts/page-editor/08b-rich-text.js:422` |
+| `box` | значення | `src/scripts/page-editor/08b-rich-text.js:424` |
+| `more` | значення | `src/scripts/page-editor/08b-rich-text.js:429` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:446` |
+| `lim` | значення | `src/scripts/page-editor/08b-rich-text.js:447` |
+| `d` | значення | `src/scripts/page-editor/08b-rich-text.js:448` |
+| `cb` | значення | `src/scripts/page-editor/08b-rich-text.js:455` |
+| `more` | значення | `src/scripts/page-editor/08b-rich-text.js:456` |
+| `head` | значення | `src/scripts/page-editor/08b-rich-text.js:469` |
+| `sty` | значення | `src/scripts/page-editor/08b-rich-text.js:476` |
+| `sel` | значення | `src/scripts/page-editor/08b-rich-text.js:477` |
+| `b` | значення | `src/scripts/page-editor/08b-rich-text.js:490` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:491` |
+| `a` | значення | `src/scripts/page-editor/08b-rich-text.js:495` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:518` |
+| `r` | значення | `src/scripts/page-editor/08b-rich-text.js:519` |
+| `w0` | значення | `src/scripts/page-editor/08b-rich-text.js:520` |
+| `n` | значення | `src/scripts/page-editor/08b-rich-text.js:521` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:531` |
+| `lc` | значення | `src/scripts/page-editor/08b-rich-text.js:533` |
+| `el` | значення | `src/scripts/page-editor/08b-rich-text.js:540` |
+| `r` | значення | `src/scripts/page-editor/08b-rich-text.js:541` |
+| `IN` | значення | `src/scripts/page-editor/08b-rich-text.js:545` |
+| `pv` | значення | `src/scripts/page-editor/08b-rich-text.js:548` |
+| `nx` | значення | `src/scripts/page-editor/08b-rich-text.js:549` |
+| `t` | значення | `src/scripts/page-editor/08b-rich-text.js:550` |
+| `vv` | значення | `src/scripts/page-editor/08b-rich-text.js:566` |
+| `cap` | значення | `src/scripts/page-editor/08b-rich-text.js:567` |
+| `t` | значення | `src/scripts/page-editor/08b-rich-text.js:568` |
+| `moved` | функція | `src/scripts/page-editor/08b-rich-text.js:569` |
+| `b` | значення | `src/scripts/page-editor/08b-rich-text.js:581` |
+| `k` | значення | `src/scripts/page-editor/08b-rich-text.js:582` |
 
 ### `src/scripts/page-editor/09-open-page.js` — 1 сутностей
 

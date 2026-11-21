@@ -1105,7 +1105,9 @@
       save:function(el){ var i=+el.dataset.i; if(lines[i]){ lines[i].text=lnText(el); syncBar(); } },
       // рядок беремо з поля, де курсор (el), а не з «поточного»: подія фокусу приходить не завжди
       type:function(el){ var i=el&&el.dataset?+el.dataset.i:cur; return (lines[i]||lines[cur]||lines[0]).t; },
-      setType:function(t,el){ var i=el&&el.dataset&&lines[+el.dataset.i]?+el.dataset.i:cur; cur=i; var l=lines[i]||lines[0]; var le=wrap.querySelector('[data-i="'+i+'"]'); if(le) l.text=lnText(le); l.t=t; draw(i); },
+      // nofocus — з панелі «⋯»: не повертати фокус, інакше на iPhone вискочить клавіатура
+      setType:function(t,el,nofocus){ var i=el&&el.dataset&&lines[+el.dataset.i]?+el.dataset.i:cur; cur=i; var l=lines[i]||lines[0]; var le=wrap.querySelector('[data-i="'+i+'"]'); if(le) l.text=lnText(le); l.t=t; draw(nofocus?null:i); },
+      line:function(i){ return wrap.querySelector('[data-i="'+i+'"]'); },
       empty:function(){ return !filled().length; }
     };
     document.getElementById('pgcPlus').onclick=function(){ if(typeof pgcBlocks==='function') pgcBlocks(); else pgAddViaMenu(true); };
@@ -1114,6 +1116,7 @@
     // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі
     var vv=window.visualViewport;
     if(vv){ var kb=function(){ if(!scr.classList.contains('active')){ box.style.bottom=''; return; }
+        if(box.classList.contains('pgc-panemode')) return;   // відкрита панель «⋯» (08b-rich-text.js) сама тримає картку над собою
         var h=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); box.style.bottom = h>120 ? (h+8)+'px' : ''; };
       vv.addEventListener('resize',kb); vv.addEventListener('scroll',kb); }
     // видно лише в документі (і не в «Стрічці» папки); на ноутбуці — по ширині колонки документа

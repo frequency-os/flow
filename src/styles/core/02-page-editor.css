@@ -1333,15 +1333,61 @@
   #pgComposer .pg-rbar button.on{color:var(--pg-acc);}
   /* пишеш на сторінці — у картці лише кнопки (вони діють на текст сторінки) */
   #pgComposer.pgc-pageedit .pgc-plus,#pgComposer.pgc-pageedit .pgc-field{display:none;}
-  /* ＋ — блоки над полем */
-  .pgc-blocks{flex:1 0 100%;order:-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:4px;}
-  .pgc-blocks button{border:0;border-radius:14px;min-height:56px;display:grid;justify-items:center;align-content:center;gap:2px;cursor:pointer;
-    background:color-mix(in srgb,var(--pg-fg) 7%,transparent);color:var(--pg-fg);font:inherit;font-size:18px;}
-  .pgc-blocks small{font-size:11px;font-weight:700;color:var(--pg-mut);}
-  .pgc-blocks button:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
-  #pgComposer.pgc-blk{gap:6px;padding:5px;border-radius:24px;background:color-mix(in srgb,var(--pgsheet,var(--pg-bg)) 90%,transparent);
-    -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid color-mix(in srgb,var(--pg-fg) 12%,transparent);}
-  #pgComposer.pgc-blk .pgc-plus svg{transform:rotate(45deg);}
+  /* ＋ — пошук блоків прямо в полі (те саме меню, що «/») */
+  #pgComposer.pgc-search{gap:6px;padding:5px;border-radius:24px;background:color-mix(in srgb,var(--pgsheet,var(--pg-bg)) 92%,transparent);
+    -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid color-mix(in srgb,var(--pg-fg) 12%,transparent);box-shadow:0 12px 32px -14px rgba(0,0,0,.6);}
+  #pgComposer.pgc-search .pgc-plus svg{transform:rotate(45deg);}
+  #pgComposer.pgc-search .pg-rbar,#pgComposer.pgc-search #pgcLines,#pgComposer.pgc-search .pgc-mic,#pgComposer.pgc-search .pgc-send,#pgComposer.pgc-search .pgc-keys{display:none !important;}
+  #pgComposer.pgc-search .pgc-field{display:flex !important;}
+  .pgbm-q{flex:1;min-width:0;height:40px;border:0;outline:none;background:transparent;color:var(--pg-fg);font:inherit;font-size:16px;padding:0 6px;-webkit-appearance:none;appearance:none;}
+  .pgbm-q::placeholder{color:var(--pg-mut);}
+  .pgbm{flex:1 0 100%;order:-1;display:grid;gap:6px;max-height:min(46vh,380px);min-height:0;}
+  .pgbm-cats{display:flex;gap:6px;overflow-x:auto;padding:4px 4px 2px;scrollbar-width:none;}
+  .pgbm-cats::-webkit-scrollbar{display:none;}
+  .pgbm-cats button{flex:none;border:0;border-radius:999px;min-height:32px;padding:0 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;
+    background:color-mix(in srgb,var(--pg-fg) 7%,transparent);color:var(--pg-fg);}
+  .pgbm-cats button.on{background:var(--pg-acc);color:#fff;}
+  .pgbm-cats .pgbm-shop b{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:#ff5c7a;color:#fff;font-size:11px;margin-left:4px;}
+  .pgbm-list{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:grid;gap:2px;padding:0 2px 2px;min-height:0;}
+  .pgbm-it{display:flex;align-items:center;gap:10px;border:0;border-radius:14px;min-height:48px;padding:6px 10px;text-align:left;cursor:pointer;
+    background:transparent;color:var(--pg-fg);font:inherit;}
+  .pgbm-it:hover,.pgbm-it.on{background:color-mix(in srgb,var(--pg-fg) 8%,transparent);}
+  .pgbm-it .sic{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--sc) 22%,transparent);color:var(--sc);}
+  .pgbm-it .sic svg{width:18px;height:18px;}
+  .pgbm-t{display:grid;min-width:0;} .pgbm-t b{font-size:14.5px;font-weight:700;} .pgbm-t small{font-size:12px;color:var(--pg-mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgbm-more{justify-content:center;font-size:13px;font-weight:700;color:var(--pg-acc);}
+  .pgbm-none{padding:14px;text-align:center;font-size:13px;color:var(--pg-mut);}
+  .pgbm-it:focus-visible,.pgbm-cats button:focus-visible{outline:2px solid var(--pg-acc);outline-offset:1px;}
+  /* «⋯» — велика панель на місці клавіатури (телефон) / віконце над карткою (ноутбук) */
+  .pg-rbar [data-rb="more"]{font-size:18px;font-weight:800;}
+  .pg-pane{position:fixed;left:0;right:0;bottom:0;z-index:250;box-sizing:border-box;display:grid;gap:10px;align-content:start;
+    max-height:min(62vh,440px);overflow-y:auto;overscroll-behavior:contain;padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));
+    border-radius:26px 26px 0 0;color:#eef0f4;background:rgba(28,26,40,.9);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);
+    box-shadow:0 -18px 40px -12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.14);}
+  .pg-pane.pg-paper{color:#1d1a24;background:rgba(250,249,255,.94);}
+  .pg-pane.desk{right:auto;border-radius:22px;max-height:min(70vh,520px);padding-bottom:14px;}
+  #pgComposer.pgc-panemode{bottom:calc(var(--pn-h,300px) + 10px) !important;}
+  .pn-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;}
+  .pn-h button{border:0;border-radius:999px;min-height:36px;padding:0 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;background:rgba(127,127,127,.18);color:inherit;}
+  .pn-sty{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;} .pn-sty::-webkit-scrollbar{display:none;}
+  .pn-sty button{flex:none;border:0;border-radius:14px;min-height:44px;padding:0 14px;cursor:pointer;background:rgba(127,127,127,.14);color:inherit;font:inherit;font-size:14px;}
+  .pn-sty .pn-h1{font-size:18px;font-weight:800;} .pn-sty .pn-h2{font-size:15.5px;font-weight:800;} .pn-sty .pn-code{font-family:ui-monospace,Menlo,monospace;font-size:13px;}
+  .pn-sty .pn-quote{font-style:italic;border-left:3px solid #9aa6ff;}
+  .pg-pane button.on,.pg-pane button[aria-pressed="true"]{background:#6d5cf0;color:#fff;}
+  .pn-fmt{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+  .pn-fmt button{border:0;border-radius:14px;min-height:48px;font:inherit;font-size:19px;cursor:pointer;background:rgba(127,127,127,.14);color:inherit;}
+  .pn-fmt.dim button{opacity:.45;}
+  .pn-hint{font-size:12px;opacity:.65;margin-top:-4px;}
+  .pn-gt{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-top:2px;}
+  .pn-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+  .pn-grid button{border:0;border-radius:14px;min-height:58px;display:grid;justify-items:center;align-content:center;gap:2px;cursor:pointer;
+    background:rgba(127,127,127,.14);color:inherit;font:inherit;}
+  .pn-grid span{font-size:18px;font-weight:800;line-height:1;} .pn-grid small{font-size:11px;font-weight:700;opacity:.75;}
+  .pn-grid button.on small{opacity:1;}
+  .pn-folds{display:grid;gap:4px;}
+  .pn-folds button{border:0;border-radius:12px;min-height:44px;padding:0 12px;text-align:left;cursor:pointer;background:rgba(127,127,127,.12);color:inherit;font:inherit;font-size:14px;}
+  .pg-pane button:focus-visible{outline:2px solid #9aa6ff;outline-offset:2px;}
+  @media (prefers-reduced-transparency:reduce){ .pg-pane{background:#1c1a28;} .pg-pane.pg-paper{background:#fff;} }
   /* поки клавіатура їде — картку не видно (iPhone повідомляє висоту із запізненням) */
   #pgComposer.pgc-moving{opacity:0 !important;transition:none !important;}
   /* смужка під годинником, коли клавіатура зсуває видиму частину */
