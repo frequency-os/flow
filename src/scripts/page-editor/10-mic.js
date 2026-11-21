@@ -55,10 +55,17 @@
     var ins = document.querySelectorAll('#pgcLines .pgc-in');
     if (!ins.length) return false;
     var cur = document.querySelector('#pgcLines .pgc-ln.cur .pgc-in') || ins[ins.length - 1];
-    var v = cur.value || '';
-    cur.value = v + (v && !/\s$/.test(v) ? ' ' : '') + text;
+    // рядок поля — «живий» (contenteditable, картка B3 21.11.2026): дописуємо текстовим вузлом у кінець, без HTML
+    var v = cur.isContentEditable ? (cur.textContent || '') : (cur.value || '');
+    var add = (v && !/\s$/.test(v) ? ' ' : '') + text;
+    if (cur.isContentEditable) { while (cur.lastChild && cur.lastChild.nodeName === 'BR') cur.removeChild(cur.lastChild); cur.appendChild(document.createTextNode(add)); }   // хвостовий <br> від Safari дав би зайвий перенос
+    else cur.value = v + add;
     cur.dispatchEvent(new Event('input', { bubbles: true }));
-    try { cur.focus({ preventScroll: true }); var n = cur.value.length; cur.setSelectionRange(n, n); } catch (_) {}
+    try {
+      cur.focus({ preventScroll: true });
+      if (cur.isContentEditable) { var r = document.createRange(); r.selectNodeContents(cur); r.collapse(false); var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(r); }
+      else { var n = cur.value.length; cur.setSelectionRange(n, n); }
+    } catch (_) {}
     return true;
   }
   function composerShown() { var c = document.getElementById('pgComposer'); return !!(c && !c.hidden && c.offsetParent !== null); }

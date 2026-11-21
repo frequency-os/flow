@@ -939,13 +939,15 @@
      «＋» — усі блоки (те саме меню, що й «＋ Додати блок»). Поле — чернетка: Enter — новий рядок того ж типу,
      Т · Завдання · Список міняють тип рядка з курсором; порожнє завдання/пункт + Enter — назад у текст;
      ↑ (або ⌘/Ctrl+Enter) — усі рядки разом у кінець документа, кожен окремим блоком, одним «Скасувати». */
+  /* картка B3 (21.11.2026): поле — «живий» текст з оформленням; панель оформлення (08b-rich-text.js) говорить із ним через pgcApi */
+  var pgcApi=null;
   (function(){
     var box=document.getElementById('pgComposer'); if(!box) return;
     var wrap=document.getElementById('pgcLines'), send=document.getElementById('pgcSend'),
         modes=document.getElementById('pgcModes'), count=document.getElementById('pgcCount'),
         scr=document.getElementById('scr-page');
-    var PH={note:'Написати…', task:'Завдання…', bullet:'Пункт списку…'},
-        NAME={note:'текст', task:'завдання', bullet:'пункт списку'};
+    var PH={note:'Написати…', task:'Завдання…', bullet:'Пункт списку…', num:'Пункт…', h1:'Заголовок…', h2:'Підзаголовок…'},
+        NAME={note:'текст', task:'завдання', bullet:'пункт списку', num:'нумерований пункт', h1:'заголовок', h2:'підзаголовок'};
     var lines=[{t:'note',text:''}], cur=0;
     function plR(n){ var m10=n%10, m100=n%100; return (m10===1&&m100!==11)?'рядок':(m10>=2&&m10<=4&&(m100<12||m100>14))?'рядки':'рядків'; }
     function filled(){ return lines.filter(function(l){ return l.text.trim(); }); }
@@ -967,7 +969,7 @@
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!modeMenu.hidden) menuOpen(false); });
     function syncBar(){
       var t=(lines[cur]||lines[0]).t, n=filled().length;
-      modeBtn.innerHTML=MIC[t]||''; modeBtn.setAttribute('aria-label','Тип рядка: '+({note:'текст',task:'завдання',bullet:'список'})[t]+' — змінити');
+      modeBtn.innerHTML=MIC[t]||''; modeBtn.setAttribute('aria-label','Тип рядка: '+(NAME[t]||'текст')+' — змінити');
       modeMenu.querySelectorAll('[data-pgcm]').forEach(function(b){ var on=b.dataset.pgcm===t; b.classList.toggle('on',on); b.setAttribute('aria-checked',String(on)); });
       modes.querySelectorAll('[data-pgcmode]').forEach(function(b){ var on=b.dataset.pgcmode===t; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); });
       count.textContent=n>1?(n+' '+plR(n)+' разом'):'';
@@ -979,18 +981,34 @@
       lines.forEach(function(l,i){
         var row=document.createElement('div'); row.className='pgc-ln'; row.dataset.t=l.t;
         var mk=document.createElement('span'); mk.className='pgc-mk'; mk.setAttribute('aria-hidden','true');
-        var inp=document.createElement('input'); inp.className='pgc-in'; inp.type='text'; inp.value=l.text; inp.dataset.i=i;
-        inp.setAttribute('enterkeyhint','enter'); inp.setAttribute('autocomplete','off');
-        inp.placeholder=PH[l.t];
+        // «живий» рядок: оформлення як у документі; показ — txHTML (спершу esc), запис — txFromDom (позначки **…**)
+        var inp=document.createElement('div'); inp.className='pgc-in'; inp.contentEditable='true'; inp.setAttribute('role','textbox');
+        inp.innerHTML=typeof txHTML==='function'?txHTML(l.text):esc(l.text); inp.dataset.i=i;
+        inp.setAttribute('enterkeyhint','enter'); inp.setAttribute('autocapitalize','sentences');
+        inp.dataset.ph=PH[l.t]||PH.note;
         inp.setAttribute('aria-label','Рядок '+(i+1)+': '+NAME[l.t]);
         row.appendChild(mk); row.appendChild(inp); wrap.appendChild(row);
       });
       syncBar();
       if(focusIdx!=null){ var x=wrap.querySelector('[data-i="'+focusIdx+'"]');
-        if(x){ x.focus(); var n=x.value.length; try{ x.setSelectionRange(n,n); }catch(_){} try{ x.scrollIntoView({block:'nearest'}); }catch(_){} } }
+        if(x){ caretEnd(x); try{ x.scrollIntoView({block:'nearest'}); }catch(_){} } }
     }
+    // курсор має бути саме в цьому рядку (Firefox без caretRangeFromPoint лишає його деінде) — інакше ставимо в кінець
+    function pgcCaretIn(el){ var s=window.getSelection(); if(!s||!s.rangeCount||!el.contains(s.getRangeAt(0).startContainer)) caretEnd(el); }
+    function lnText(el){ return typeof txFromDom==='function'?txFromDom(el):(el.textContent||''); }
+    // курсор на самому початку рядка (для Backspace) і поставити курсор після n-го символу тексту
+    function caretAtStart(el){ var s=window.getSelection(); if(!s||!s.rangeCount||!s.isCollapsed) return false;
+      var r=document.createRange(); r.selectNodeContents(el); r.setEnd(s.anchorNode,s.anchorOffset); return r.toString()===''; }
+    function caretAt(el,n){ var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null), t, left=n;
+      while((t=w.nextNode())){ if(left<=t.nodeValue.length){ var r=document.createRange(); r.setStart(t,left); r.collapse(true); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); return; } left-=t.nodeValue.length; }
+      caretEnd(el); }
     function idx(e){ var t=e.target; return t&&t.classList&&t.classList.contains('pgc-in')?+t.dataset.i:-1; }
-    wrap.addEventListener('input',function(e){ var i=idx(e); if(i<0) return; lines[i].text=e.target.value; syncBar(); });
+    wrap.addEventListener('input',function(e){ var i=idx(e); if(i<0) return;
+      var el=e.target, t=lnText(el);
+      if(!t.replace(/\n/g,'')&&el.innerHTML){ el.innerHTML=''; t=''; }   // порожній рядок — без <br>, щоб видно підказку
+      // «/» на порожньому рядку — меню блоків прямо в картці (як у документі)
+      if(t==='/'&&typeof pgcBlocks==='function'){ el.innerHTML=''; lines[i].text=''; syncBar(); pgcBlocks(true); return; }
+      lines[i].text=t; syncBar(); });
     wrap.addEventListener('focusin',function(e){ var i=idx(e); if(i<0) return; cur=i; syncBar(); });
     wrap.addEventListener('keydown',function(e){
       var i=idx(e); if(i<0||e.isComposing) return; var l=lines[i];
@@ -998,29 +1016,53 @@
         e.preventDefault();
         if(e.metaKey||e.ctrlKey){ sendAll(); return; }
         if(!l.text.trim()&&l.t!=='note'){ l.t='note'; draw(i); return; }   // вихід зі списку, як у Нотатках
-        var caret=e.target.selectionStart==null?l.text.length:e.target.selectionStart;
-        var tail=l.text.slice(caret); l.text=l.text.slice(0,caret);         // Enter посеред рядка — ділить його
+        // Enter посеред рядка — ділить його: усе після курсора (з оформленням) іде в новий рядок
+        var tail='', sel=window.getSelection();
+        if(sel&&sel.rangeCount){ var rg=sel.getRangeAt(0).cloneRange(); rg.deleteContents(); var rt=document.createRange(); rt.setStart(rg.startContainer,rg.startOffset); rt.setEnd(e.target,e.target.childNodes.length);
+          var tmp=document.createElement('div'); tmp.appendChild(rt.extractContents()); tail=lnText(tmp); }
+        l.text=lnText(e.target);
         lines.splice(i+1,0,{t:l.t,text:tail}); cur=i+1; draw(i+1);
-        var nx=wrap.querySelector('[data-i="'+(i+1)+'"]'); if(nx){ try{ nx.setSelectionRange(0,0); }catch(_){} }
+        var nx=wrap.querySelector('[data-i="'+(i+1)+'"]'); if(nx) caretAt(nx,0);
         return;
       }
-      if(e.key==='Backspace'&&e.target.selectionStart===0&&e.target.selectionEnd===0){
+      if(e.key==='Backspace'&&caretAtStart(e.target)){
         if(l.t!=='note'){ e.preventDefault(); l.t='note'; draw(i); return; }   // спершу знімаємо галочку / крапку
-        if(i>0){ e.preventDefault(); var pv=lines[i-1], at=pv.text.length; pv.text+=l.text; lines.splice(i,1); cur=i-1; draw(i-1);
-          var pi=wrap.querySelector('[data-i="'+(i-1)+'"]'); if(pi){ try{ pi.setSelectionRange(at,at); }catch(_){} } }
+        if(i>0){ e.preventDefault(); var pv=lines[i-1], at=(typeof txPlain==='function'?txPlain(pv.text):pv.text).replace(/\n/g,'').length;
+          pv.text+=l.text; lines.splice(i,1); cur=i-1; draw(i-1);
+          var pi=wrap.querySelector('[data-i="'+(i-1)+'"]'); if(pi) caretAt(pi,at); }
         return;
       }
       if(e.key==='ArrowUp'&&i>0){ e.preventDefault(); var u=wrap.querySelector('[data-i="'+(i-1)+'"]'); if(u) u.focus(); return; }
       if(e.key==='ArrowDown'&&i<lines.length-1){ e.preventDefault(); var d=wrap.querySelector('[data-i="'+(i+1)+'"]'); if(d) d.focus(); return; }
     });
     // вставили кілька рядків — кожен стає рядком чернетки того ж типу
+    // перетягнутий шматок сторінки — так само через позначки, а не сирим HTML (чужі картинки з мережі тощо)
+    wrap.addEventListener('drop',function(e){
+      var i=idx(e); if(i<0) return; e.preventDefault();   // завжди: інакше Safari сам вставив би перетягнуту картинку-файл
+      var dt=e.dataTransfer; if(!dt) return;
+      var html='', txt=''; try{ html=dt.getData('text/html')||''; txt=dt.getData('text/plain')||''; }catch(_){}
+      if(!html&&!txt) return;
+      try{ if(document.caretRangeFromPoint){ var cr=document.caretRangeFromPoint(e.clientX,e.clientY); if(cr){ e.target.focus(); var sl=window.getSelection(); sl.removeAllRanges(); sl.addRange(cr); } } }catch(_){}
+      pgcCaretIn(e.target);
+      var marks=((html&&typeof txFromHTML==='function'?txFromHTML(html):'')||txt).replace(/\r?\n+/g,' ');
+      document.execCommand('insertHTML',false,typeof txHTML==='function'?txHTML(marks):esc(marks)); lines[i].text=lnText(e.target); syncBar();
+    });
+    // вставка: чужий HTML спершу стає позначками (у поле не потрапляє жоден сторонній тег); кілька рядків — кілька рядків чернетки
     wrap.addEventListener('paste',function(e){
-      var i=idx(e); if(i<0) return; var txt=''; try{ txt=(e.clipboardData||window.clipboardData).getData('text'); }catch(_){}
-      if(!txt||txt.indexOf('\n')<0) return; e.preventDefault();
-      var parts=txt.replace(/\r/g,'').split('\n').map(function(x){ return x.trim(); }).filter(Boolean); if(!parts.length) return;
-      var l=lines[i], at=e.target.selectionStart==null?l.text.length:e.target.selectionStart, tail=l.text.slice(at);
-      l.text=l.text.slice(0,at)+parts[0];
-      var add=parts.slice(1).map(function(x){ return {t:l.t,text:x}; }); if(add.length) add[add.length-1].text+=tail; else l.text+=tail;
+      var i=idx(e); if(i<0) return; var cd=e.clipboardData||window.clipboardData; if(!cd) return;
+      var html='', txt=''; try{ html=cd.getData('text/html')||''; txt=cd.getData('text')||''; }catch(_){}
+      e.preventDefault();
+      var marks=(html&&typeof txFromHTML==='function'?txFromHTML(html):'')||txt; if(!marks) return;
+      pgcCaretIn(e.target);
+      if(marks.indexOf('\n')<0){ document.execCommand('insertHTML',false,typeof txHTML==='function'?txHTML(marks):esc(marks)); lines[i].text=lnText(e.target); syncBar(); return; }
+      var parts=marks.replace(/\r/g,'').split('\n').map(function(x){ return x.trim(); }).filter(Boolean); if(!parts.length) return;
+      // кілька рядків — з місця курсора: що було після нього, іде в кінець останнього вставленого
+      var tail='', sl2=window.getSelection();
+      if(sl2&&sl2.rangeCount){ var rg=sl2.getRangeAt(0).cloneRange(); rg.deleteContents(); var rt=document.createRange(); rt.setStart(rg.startContainer,rg.startOffset); rt.setEnd(e.target,e.target.childNodes.length);
+        var tmp=document.createElement('div'); tmp.appendChild(rt.extractContents()); tail=lnText(tmp); }
+      var l=lines[i]; l.text=lnText(e.target)+parts[0];
+      var add=parts.slice(1).map(function(x){ return {t:l.t,text:x}; });
+      if(add.length) add[add.length-1].text+=tail; else l.text+=tail;
       Array.prototype.splice.apply(lines,[i+1,0].concat(add)); cur=i+add.length; draw(cur);
     });
     // кнопки типу не забирають фокус у рядка (інакше на iPhone ховається клавіатура)
@@ -1032,8 +1074,10 @@
     function sendAll(){
       var add=filled(); if(!add.length||!bridge()) return;
       var arr=pgResolve().arr, made=[], last=arr[arr.length-1], reuse=null, was=null;
+      // заголовок — без позначок оформлення (і для «заповнити порожній рядок», і для повтору ↷)
+      add=add.map(function(l){ var t=l.text.trim(); if(typeof TX_RICH!=='undefined'&&!TX_RICH[l.t]&&typeof txPlainKeep==='function') t=txPlainKeep(t); return {t:l.t,text:t}; });
       add.forEach(function(l,k){
-        var t=l.text.trim();
+        var t=l.text;
         if(!k&&last&&last.type==='note'&&!String(last.text||'').trim()&&!(last.children&&last.children.length)){
           // порожній рядок у кінці («Пишіть…») — заповнюємо його, а не ставимо запис після нього
           reuse=last; was={type:last.type,text:last.text,done:last.done};
@@ -1055,7 +1099,16 @@
       if(rb){ try{ rb.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} }
       made.forEach(function(b){ var el=editor.querySelector('.pgb[data-id="'+b.id+'"]'); if(el){ el.classList.add('pg-born'); setTimeout(function(){ try{ el.classList.remove('pg-born'); }catch(_){} },900); } });
     }
-    document.getElementById('pgcPlus').onclick=function(){ pgAddViaMenu(true); };
+    pgcApi={
+      box:box,
+      isLine:function(el){ return !!(el&&el.classList&&el.classList.contains('pgc-in')&&wrap.contains(el)); },
+      save:function(el){ var i=+el.dataset.i; if(lines[i]){ lines[i].text=lnText(el); syncBar(); } },
+      // рядок беремо з поля, де курсор (el), а не з «поточного»: подія фокусу приходить не завжди
+      type:function(el){ var i=el&&el.dataset?+el.dataset.i:cur; return (lines[i]||lines[cur]||lines[0]).t; },
+      setType:function(t,el){ var i=el&&el.dataset&&lines[+el.dataset.i]?+el.dataset.i:cur; cur=i; var l=lines[i]||lines[0]; var le=wrap.querySelector('[data-i="'+i+'"]'); if(le) l.text=lnText(le); l.t=t; draw(i); },
+      empty:function(){ return !filled().length; }
+    };
+    document.getElementById('pgcPlus').onclick=function(){ if(typeof pgcBlocks==='function') pgcBlocks(); else pgAddViaMenu(true); };
     send.onclick=sendAll;
     draw(null);
     // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі
