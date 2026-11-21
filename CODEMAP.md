@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 38132 |
+| Рядків JS | 38151 |
 | Файлів CSS | 54 |
-| Рядків CSS | 11992 |
-| Сутностей верхнього рівня | 2929 |
+| Рядків CSS | 12006 |
+| Сутностей верхнього рівня | 2935 |
 | Ключів сховища (FLOW_KEYS) | 81 |
 
 ## Файли JS
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1697 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1305 | 71 |
+| `src/scripts/core/16-dashboard.js` | 1320 | 77 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -69,7 +69,7 @@
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
 | `src/scripts/core/35-channel.js` | 709 | 65 |
-| `src/scripts/core/36-chats.js` | 1004 | 106 |
+| `src/scripts/core/36-chats.js` | 1008 | 106 |
 | `src/scripts/core/37-ai-privacy.js` | 202 | 20 |
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
@@ -148,7 +148,7 @@
 | `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
 | `src/styles/core/02-page-editor.css` | 1302 | 9 |
-| `src/styles/core/03-folders-projects.css` | 692 | 0 |
+| `src/styles/core/03-folders-projects.css` | 706 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
@@ -1283,7 +1283,7 @@
 | `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1643` |
 | `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1646` |
 
-### `src/scripts/core/16-dashboard.js` — 71 сутностей
+### `src/scripts/core/16-dashboard.js` — 77 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1341,23 +1341,29 @@
 | `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:824` |
 | `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:838` |
 | `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:845` |
-| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:864` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:913` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:936` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:964` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:1036` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:1056` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:1057` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:1058` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1059` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1113` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1129` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1151` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1160` |
-| `folderPathName` | функція | `src/scripts/core/16-dashboard.js:1195` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1196` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1222` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1275` |
+| `pgDocStripHTML` | функція | `src/scripts/core/16-dashboard.js:865` |
+| `pgDocStripBind` | функція | `src/scripts/core/16-dashboard.js:878` |
+| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:886` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:897` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:920` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:948` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:1020` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:1040` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:1041` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:1042` |
+| `fmSwRow` | функція | `src/scripts/core/16-dashboard.js:1047` |
+| `FM_VIEW` | масив | `src/scripts/core/16-dashboard.js:1048` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1049` |
+| `fmSwSet` | функція | `src/scripts/core/16-dashboard.js:1117` |
+| `fmSetView` | функція | `src/scripts/core/16-dashboard.js:1119` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1128` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1144` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1166` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1175` |
+| `folderPathName` | функція | `src/scripts/core/16-dashboard.js:1210` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1211` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1237` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1290` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -1983,31 +1989,31 @@
 | `fhCoverSheet` | функція | `src/scripts/core/36-chats.js:702` |
 | `fhAddSheet` | функція | `src/scripts/core/36-chats.js:718` |
 | `fhLookSheet` | функція | `src/scripts/core/36-chats.js:731` |
-| `fhView` | функція | `src/scripts/core/36-chats.js:772` |
-| `fhSetView` | функція | `src/scripts/core/36-chats.js:773` |
-| `fhFind` | функція | `src/scripts/core/36-chats.js:781` |
-| `fhCommit` | функція | `src/scripts/core/36-chats.js:788` |
-| `FH_TEXTY` | обʼєкт | `src/scripts/core/36-chats.js:791` |
-| `fhRich` | функція | `src/scripts/core/36-chats.js:792` |
-| `fhTblVal` | функція | `src/scripts/core/36-chats.js:795` |
-| `fhTblHTML` | функція | `src/scripts/core/36-chats.js:802` |
-| `fhPeek` | значення | `src/scripts/core/36-chats.js:822` |
-| `fhPeekOpen` | функція | `src/scripts/core/36-chats.js:823` |
-| `fhPeekEnd` | функція | `src/scripts/core/36-chats.js:824` |
-| `fhBubble` | функція | `src/scripts/core/36-chats.js:829` |
-| `fhChatHTML` | функція | `src/scripts/core/36-chats.js:842` |
-| `fhWallHTML` | функція | `src/scripts/core/36-chats.js:852` |
-| `fhWallSig` | значення | `src/scripts/core/36-chats.js:858` |
-| `fhApplyView` | функція | `src/scripts/core/36-chats.js:859` |
-| `fhMsgSheet` | функція | `src/scripts/core/36-chats.js:893` |
-| `fhCopy` | функція | `src/scripts/core/36-chats.js:915` |
-| `fhPickFolder` | функція | `src/scripts/core/36-chats.js:917` |
-| `fhPickChat` | функція | `src/scripts/core/36-chats.js:924` |
-| `fhEdit` | функція | `src/scripts/core/36-chats.js:932` |
-| `pgHubData` | функція | `src/scripts/core/36-chats.js:950` |
-| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:959` |
-| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:974` |
-| `chatsInit` | функція | `src/scripts/core/36-chats.js:984` |
+| `fhView` | функція | `src/scripts/core/36-chats.js:776` |
+| `fhSetView` | функція | `src/scripts/core/36-chats.js:777` |
+| `fhFind` | функція | `src/scripts/core/36-chats.js:785` |
+| `fhCommit` | функція | `src/scripts/core/36-chats.js:792` |
+| `FH_TEXTY` | обʼєкт | `src/scripts/core/36-chats.js:795` |
+| `fhRich` | функція | `src/scripts/core/36-chats.js:796` |
+| `fhTblVal` | функція | `src/scripts/core/36-chats.js:799` |
+| `fhTblHTML` | функція | `src/scripts/core/36-chats.js:806` |
+| `fhPeek` | значення | `src/scripts/core/36-chats.js:826` |
+| `fhPeekOpen` | функція | `src/scripts/core/36-chats.js:827` |
+| `fhPeekEnd` | функція | `src/scripts/core/36-chats.js:828` |
+| `fhBubble` | функція | `src/scripts/core/36-chats.js:833` |
+| `fhChatHTML` | функція | `src/scripts/core/36-chats.js:846` |
+| `fhWallHTML` | функція | `src/scripts/core/36-chats.js:856` |
+| `fhWallSig` | значення | `src/scripts/core/36-chats.js:862` |
+| `fhApplyView` | функція | `src/scripts/core/36-chats.js:863` |
+| `fhMsgSheet` | функція | `src/scripts/core/36-chats.js:897` |
+| `fhCopy` | функція | `src/scripts/core/36-chats.js:919` |
+| `fhPickFolder` | функція | `src/scripts/core/36-chats.js:921` |
+| `fhPickChat` | функція | `src/scripts/core/36-chats.js:928` |
+| `fhEdit` | функція | `src/scripts/core/36-chats.js:936` |
+| `pgHubData` | функція | `src/scripts/core/36-chats.js:954` |
+| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:963` |
+| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:978` |
+| `chatsInit` | функція | `src/scripts/core/36-chats.js:988` |
 
 ### `src/scripts/core/37-ai-privacy.js` — 20 сутностей
 

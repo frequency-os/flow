@@ -734,7 +734,8 @@
     let ph=''; try{ ph=f.photo?safeImg(window.photoSrc(f.photo)):''; }catch(_){}
     const ICONS=(typeof ICON_ALL!=='undefined'?ICON_ALL:[]).slice(0,24);
     chSheet('Вигляд · '+esc(f.name),
-      `<button class="ch-sheet-row" data-fhl="photo"><span class="ic"${ph?` style="background-image:url('${esc(ph)}');background-size:cover"`:''}>${ph?'':chI('camera')}</span><span>${ph?'Змінити фото':'Вибрати фото'}</span></button>
+      `<button class="ch-sheet-row" data-fhl="name"><span class="ic">${chI('edit')}</span><span>Назва<small data-i18n-skip="1">${esc(f.name)}</small></span></button>
+       <button class="ch-sheet-row" data-fhl="photo"><span class="ic"${ph?` style="background-image:url('${esc(ph)}');background-size:cover"`:''}>${ph?'':chI('camera')}</span><span>${ph?'Змінити фото':'Вибрати фото'}</span></button>
        ${ph?`<button class="ch-sheet-row" data-fhl="crop"><span class="ic">${chI('edit')}</span><span>Кадрувати фото</span></button>
        <button class="ch-sheet-row danger" data-fhl="nophoto"><span class="ic">${chI('trash')}</span><span>Прибрати фото</span></button>`:''}
        <div class="fh-ic-grid">${ICONS.map(([id,nm])=>`<button class="fh-ic${!ph&&cur===id?' on':''}" data-fhic="${esc(id)}" style="--c:${cc}" aria-label="${esc(nm)}" title="${esc(nm)}"><svg class="ico" aria-hidden="true"><use href="#${esc(id)}"/></svg></button>`).join('')}</div>
@@ -744,6 +745,9 @@
         const done=()=>{ saveFolders(); try{ renderDashboard(); }catch(_){}
           if(document.getElementById('scr-page')?.classList.contains('active')){ fhRender(); try{ renderPgLinks(); }catch(_){} }
           try{ if(o&&o.after) o.after(); }catch(_){} chHaptic('select'); };
+        // назва — тут же (21.11.2026, меню «А2»: шапка меню папки веде сюди — «назва, фото, колір»)
+        ov.querySelector('[data-fhl="name"]').onclick=()=>{ close(); inputModal({ title:'Перейменувати папку', value:f.name, placeholder:'Назва папки',
+          onOk:(v)=>{ v=String(v||'').trim(); if(v){ f.name=v; done(); } } }); };
         ov.querySelector('[data-fhl="photo"]').onclick=()=>{ close(); chPickFile(file=>chShrink(file,1400,1400,du=>{
           const prev=f.photo; f.photoPos=null;
           Promise.resolve(window.photoPut?window.photoPut('ph_'+key,du):du).then(ref=>{ f.photo=ref; if(prev&&prev!==ref&&window.photoDel) window.photoDel(prev); done(); });

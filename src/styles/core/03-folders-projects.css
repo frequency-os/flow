@@ -657,6 +657,20 @@
   /* меню папки (крок 3): щільніші рядки, щоб «Видалити» влазило без прокрутки на 375×812 */
   .fmenu-in .pgb-row{padding:8px 10px;min-height:46px;}
   .fmenu-in .fgs-head{margin-bottom:4px;}
+  /* меню папки «А2 · полички» (21.11.2026): перемикачі на місці, 4 вигляди в ряд, дії документа зверху */
+  .fm-seg{grid-template-columns:repeat(4,1fr);}
+  .fm-swrow .pgb-tx{flex:1;min-width:0;}
+  .fm-sw{flex:none;width:40px;height:24px;border-radius:12px;background:var(--hair-2,var(--line));position:relative;transition:background .2s;}
+  .fm-sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s;}
+  .fm-swrow[aria-checked="true"] .fm-sw{background:var(--accent);}
+  .fm-swrow[aria-checked="true"] .fm-sw::after{transform:translateX(16px);}
+  .fm-docbar{display:flex;gap:6px;margin:0 2px 10px;overflow-x:auto;}
+  .fm-dact{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;padding:7px 8px;border-radius:12px;
+    border:1px solid var(--line);background:none;color:var(--text);font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;}
+  .fm-dact span{font-size:16px;line-height:1;}
+  .fm-dact.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);}
+  .fm-dact:disabled{opacity:.35;cursor:default;}
+  .fm-gap{height:8px;}
   /* довгий натиск на папку — без системного виділення й меню iOS (інакше воно перебиває перетягування) */
   #folderGrid .fcard{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
   /* пріоритет папки — крапка перед назвою (04-folders-nav.js prioDot) */
