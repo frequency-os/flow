@@ -1319,11 +1319,14 @@
     const rootRow=(f.parent||'')?`<button class="fmi fmv" data-mv=""><span class="fmv-th home">⌂</span><span class="fmv-t"><b>На Огляд</b><small>без папки</small></span></button>`:'';
     const list=rows.map(([k,d])=>{ const tf=folders[k], cur=(f.parent||'')===k;
       return `<button class="fmi fmv${cur?' on':''}" data-mv="${esc(k)}" style="--d:${d}">${thumb(tf)}<span class="fmv-t"><b data-i18n-skip="1">${esc(tf.name)}</b>${d?`<small data-i18n-skip="1">у «${esc(folderPathName(tf.parent))}»</small>`:''}</span>${cur?'<span class="fmv-ok">тут</span>':''}</button>`; }).join('');
+    // своя вкладка Огляду (36-chats.js, 21.11.2026): зверху — у яку вкладку; «тут» лише для папки верхнього рівня
+    const tabsHtml=userTabs.length?`<div class="fmi-label">Вкладка Огляду</div>${tabPickRows((f.parent||'')?null:itemTab(f),'Папки')}<div class="fmi-label">У папку</div>`:'';
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
       <div class="fmenu-title">Перенести «${esc(f.name)}» в…</div>
-      <div class="fmv-list">${rootRow}${list||'<div class="fmi-label">Немає інших папок</div>'}</div></div>`;
+      <div class="fmv-list">${tabsHtml}${rootRow}${list||'<div class="fmi-label">Немає інших папок</div>'}</div></div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
+    m.querySelectorAll('[data-mvtab]').forEach(b=>b.onclick=()=>{ closeFolderMenu(); moveFolderToTab(key, b.dataset.mvtab); });
     m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{
       const to=b.dataset.mv, prev=f.parent||''; closeFolderMenu();
       if(to===prev) return;

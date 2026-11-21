@@ -346,6 +346,46 @@
       m.querySelector('[data-act="nc"]').onclick=()=>{ closeFolderMenu(); createChat({tab}); };
     });
   }
+  /* ── перенесення наявного у вкладку (21.11.2026): розділ «Вкладка Огляду» в «Перенести в…» і рядок у чаті ── */
+  // рядки вибору: «Папки»/«Чати» (без вкладки) і кожна своя вкладка; cur — де річ зараз ('' — загальні), null — ніде не позначати
+  function tabPickRows(cur, homeLabel){
+    const row=(id,ic,name,sub)=>{ const on=cur===id;
+      return `<button class="fmi fmv${on?' on':''}" data-mvtab="${esc(id)}"><span class="fmv-th home">${ic}</span><span class="fmv-t"><b data-i18n-skip="1">${name}</b>${sub?`<small>${sub}</small>`:''}</span>${on?'<span class="fmv-ok">тут</span>':''}</button>`; };
+    return row('','⌂',homeLabel,'загальні на Огляді')+userTabs.map(t=>row(t.id, t.emoji?esc(t.emoji):'▢', esc(t.name), 'своя вкладка')).join('');
+  }
+  function tabLabel(tab, homeLabel){ const t=utById(tab); return t?((t.emoji?t.emoji+' ':'')+t.name):homeLabel; }
+  // папка (і все в ній) лягає нагору вибраної вкладки; «Скасувати» повертає і батька, і мітку
+  function moveFolderToTab(key, tab){
+    const f=folders[key]; if(!f) return;
+    tab=utById(tab)?tab:'';
+    const prevParent=f.parent||'', prevTab=f.tab;
+    if(!prevParent && itemTab(f)===tab) return;
+    f.parent='';
+    if(tab) f.tab=tab; else delete f.tab;
+    saveFolders(); renderDashboard();
+    try{ window.platform.haptic('success'); }catch(_){}
+    try{ if(window.flowUndoToast) window.flowUndoToast('«'+f.name+'» — у «'+tabLabel(tab,'Папки')+'»', ()=>{
+      if(!folders[key]) return;
+      folders[key].parent=prevParent; if(prevTab) folders[key].tab=prevTab; else delete folders[key].tab;
+      saveFolders(); renderDashboard(); }, 7000); }catch(_){}
+  }
+  function moveChatToTab(id, tab){
+    const c=chatById(id); if(!c||id===INBOX_CHAT) return;
+    tab=utById(tab)?tab:'';
+    const prev=c.tab; if(itemTab(c)===tab) return;
+    if(tab) c.tab=tab; else delete c.tab;
+    saveChats(); chatsRefresh();
+    try{ window.platform.haptic('success'); }catch(_){}
+    try{ if(window.flowUndoToast) window.flowUndoToast('«'+c.name+'» — у «'+tabLabel(tab,'Чати')+'»', ()=>{
+      const cc=chatById(id); if(!cc) return; if(prev) cc.tab=prev; else delete cc.tab; saveChats(); chatsRefresh(); }, 7000); }catch(_){}
+  }
+  function chatTabSheet(id){
+    const c=chatById(id); if(!c) return;
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Перенести «<span data-i18n-skip="1">${esc(c.name)}</span>» у вкладку</div>
+      <div class="fmv-list">${tabPickRows(itemTab(c),'Чати')}</div>`,
+    m=>{ m.querySelectorAll('[data-mvtab]').forEach(b=>b.onclick=()=>{ closeFolderMenu(); moveChatToTab(id, b.dataset.mvtab); }); });
+  }
   // викликається з renderDashboard (16-dashboard.js): перемикає видимість і лічильники.
   // true — активна вкладка «Чати», сітку папок малювати не треба (своя вкладка — сітка + її чати під нею).
   function chatsHomeSync(){
@@ -454,6 +494,7 @@
       ${fmRow('rename','pen','Назва і емодзі','<span data-i18n-skip="1">'+esc(c.name)+'</span>')}
       <div class="fmi-label">Порядок</div>
       ${fmRow('pin','pin',c.pinned?'Відкріпити':'Закріпити зверху','')}
+      ${userTabs.length&&id!==INBOX_CHAT?fmRow('tab','folder','Вкладка · <span data-i18n-skip="1">'+esc(tabLabel(itemTab(c),'Чати'))+'</span>','перенести в іншу вкладку Огляду'):''}
       <div class="fmi-label">Звʼязки</div>
       ${fmRow('folders','folder','Папки',nf?('повʼязано: '+nf):'не повʼязано')}
       ${inChat?`<div class="fmi-label">Особливе для чату</div>
@@ -471,6 +512,7 @@
         if(a==='rename') later(()=>chatRename(id));
         if(a==='pin'){ c.pinned=!c.pinned; saveChats(); chatsRefresh(); closeFolderMenu(); }
         if(a==='folders') later(()=>chatAddSheet(id));
+        if(a==='tab') later(()=>chatTabSheet(id));
         if(a==='media'){ closeFolderMenu(); chTopic=chTopic==='media'?'all':'media'; chHaptic('select'); renderChChips(); renderChFeed(); chScrollBottom(false); }
         if(a==='delete') later(()=>chatDelete(id));
       });
