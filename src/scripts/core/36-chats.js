@@ -258,6 +258,55 @@
     try{ window.platform.haptic('select'); }catch(_){}
     renderDashboard();
   }
+  /* ── вигляд вкладок (21.11.2026, вибір Ярослава «Б і В, міняти в налаштуваннях»):
+     'drop' — одна кнопка «Робота ▾», тап — плитки вниз (типове); 'swipe' — капсула гортається вбік.
+     Лише інтерфейс: prefSet, як hometab; даних не торкається. */
+  const HTV_KEY='htabs_view';
+  const htvOk=v=>v==='drop'||v==='swipe';
+  let htabsView='drop', htDropOpen=false;
+  try{ const v=localStorage.getItem(HTV_KEY); if(htvOk(v)) htabsView=v; }catch(_){}
+  prefCatchup(HTV_KEY, v=>{ if(htvOk(v)){ htabsView=v; try{ renderDashboard(); }catch(_){} } });
+  function setHtabsView(v){ if(!htvOk(v)||v===htabsView) return; htabsView=v; htDropOpen=false; try{ prefSet(HTV_KEY,v); }catch(_){} renderDashboard(); }
+  function htInfo(id){
+    const tabs=document.getElementById('homeTabs');
+    const ic=k=>{ const s=tabs&&tabs.querySelector('[data-htab="'+k+'"] .htab-ic'); return s?s.outerHTML:''; };
+    if(id==='folders') return {ic:ic('folders'), name:'Папки', n:homeFolderCount('')};
+    if(id==='chats') return {ic:ic('chats'), name:'Чати', n:chats.filter(c=>!itemTab(c)).length};
+    const t=utById(id); if(!t) return null;
+    return {ic:t.emoji?`<span class="htab-e" aria-hidden="true">${esc(t.emoji)}</span>`:ic('folders'), name:t.name, n:homeFolderCount(id)+chats.filter(c=>itemTab(c)===id).length, user:true};
+  }
+  function renderHtDrop(){
+    const tabs=document.getElementById('homeTabs'), btn=document.getElementById('htDropBtn'), pan=document.getElementById('htPanel');
+    if(!tabs||!btn||!pan) return;
+    const drop=htabsView==='drop';
+    tabs.hidden=drop; btn.hidden=!drop;
+    if(!drop){ pan.hidden=true; htDropOpen=false; return; }
+    const cur=htInfo(homeTab)||htInfo('folders');
+    btn.innerHTML=`${cur.ic}<span class="htdrop-n" data-i18n-skip="1">${esc(cur.name)}</span><span class="count">${cur.n}</span><svg class="htdrop-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+    btn.setAttribute('aria-expanded', htDropOpen?'true':'false');
+    btn.classList.toggle('open', htDropOpen);
+    btn.setAttribute('aria-label','Вкладка: '+cur.name+(htDropOpen?' — сховати вибір':' — вибрати іншу'));
+    pan.hidden=!htDropOpen;
+    if(!htDropOpen){ pan.innerHTML=''; return; }
+    const ids=['folders','chats'].concat(userTabs.map(t=>t.id));
+    pan.innerHTML=ids.map(id=>{ const x=htInfo(id), on=id===homeTab;
+        return `<button type="button" class="htp-t${on?' on':''}" data-htp="${esc(id)}" aria-pressed="${on}">${x.ic}<b data-i18n-skip="1">${esc(x.name)}</b><small>${x.n}</small></button>`; }).join('')
+      +(userTabs.length<UTAB_MAX?`<button type="button" class="htp-t htp-add" data-htpnew="1"><span aria-hidden="true">＋</span><b>Вкладка</b></button>`:'')
+      +(userTabs.length?`<p class="htp-hint">Утримай свою вкладку — перейменувати чи видалити</p>`:'');
+    pan.querySelectorAll('[data-htp]').forEach(b=>{ const id=b.dataset.htp;
+      const pick=()=>{ htDropOpen=false; if(id===homeTab) renderDashboard(); else setHomeTab(id); };
+      if(utById(id)) bindUserTab(b,id,pick); else b.onclick=pick; });
+    const nw=pan.querySelector('[data-htpnew]'); if(nw) nw.onclick=()=>{ htDropOpen=false; renderDashboard(); newUserTab(); };
+  }
+  function toggleHtDrop(open){
+    htDropOpen = open==null ? !htDropOpen : !!open;
+    try{ window.platform.haptic('select'); }catch(_){}
+    renderHtDrop();
+  }
+  // тап повз шторку закриває її
+  try{ document.addEventListener('click',e=>{ if(!htDropOpen) return;
+    if(e.target.closest&&(e.target.closest('#htPanel')||e.target.closest('#htDropBtn'))) return;
+    toggleHtDrop(false); }, true); }catch(_){}
   // свої вкладки в капсулі — між «Чатами» і кнопкою «＋ вкладка»
   function renderUserTabs(){
     const tabs=document.getElementById('homeTabs'); if(!tabs) return;
@@ -276,9 +325,10 @@
     tabs.classList.toggle('has-ut', userTabs.length>0);   // компактна капсула на телефоні (24-home-gallery.css)
   }
   // тап — відкрити; тап по вже відкритій, довге натискання чи правий клік — меню вкладки
-  function bindUserTab(b, id){
+  // onTap — для плитки шторки (вибрати й закрити); без нього — як у капсулі
+  function bindUserTab(b, id, onTap){
     let lt=0, fired=false;
-    b.onclick=()=>{ if(fired){ fired=false; return; } if(homeTab===id) userTabMenu(id); else setHomeTab(id); };
+    b.onclick=()=>{ if(fired){ fired=false; return; } if(onTap) onTap(); else if(homeTab===id) userTabMenu(id); else setHomeTab(id); };
     b.oncontextmenu=e=>{ e.preventDefault(); userTabMenu(id); };
     b.onpointerdown=()=>{ fired=false; clearTimeout(lt); lt=setTimeout(()=>{ fired=true; try{ window.platform.haptic('medium'); }catch(_){} userTabMenu(id); },550); };
     b.onpointerup=b.onpointerleave=b.onpointercancel=()=>clearTimeout(lt);
@@ -391,6 +441,7 @@
   function chatsHomeSync(){
     if(!htabOk(homeTab)) homeTab='folders';   // вкладку видалили (тут чи на іншому пристрої)
     renderUserTabs();
+    renderHtDrop();
     const on = homeTab==='chats', ut=homeUserTab();
     const tabs=document.getElementById('homeTabs');
     if(tabs) tabs.querySelectorAll('[data-htab]').forEach(b=>{ const a=b.dataset.htab===homeTab; b.classList.toggle('on', a); b.setAttribute('aria-pressed', a?'true':'false'); });
@@ -1178,6 +1229,7 @@
     // свої вкладки Огляду: «＋» у капсулі створює вкладку, «＋» праворуч — додати в неї
     const un=document.getElementById('utNewBtn'); if(un&&!un.__init){ un.__init=true; un.onclick=()=>newUserTab(); }
     const ua=document.getElementById('utAddBtn'); if(ua&&!ua.__init){ ua.__init=true; ua.onclick=()=>userTabAddSheet(homeUserTab()); }
+    const hd=document.getElementById('htDropBtn'); if(hd&&!hd.__init){ hd.__init=true; hd.onclick=()=>toggleHtDrop(); }
     const pa=document.getElementById('pgAddLink'); if(pa&&!pa.__init){ pa.__init=true; pa.onclick=()=>{ const fk=pgFolderKey(); if(fk) folderAddSheet(fk); }; }
     // блок «Чати папки» малюється при кожному відкритті документа
     if(typeof window.openFlowPage==='function' && !window.openFlowPage.__chats){

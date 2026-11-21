@@ -50,6 +50,32 @@
   #homeTabs.has-ut .htab{padding:0 11px;gap:4px;}
 }
 
+/* вигляд «Шторка вниз» (36-chats.js renderHtDrop): одна кнопка з назвою вкладки, тап — плитки вниз */
+#homeTabs.htabs[hidden],.htdrop[hidden],.htpanel[hidden]{display:none;}
+.htdrop{flex:1;min-width:0;height:46px;display:flex;align-items:center;gap:8px;padding:0 16px;border:0;border-radius:23px;
+  background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--text);font:inherit;font-size:15px;font-weight:800;cursor:pointer;text-align:left;}
+.htdrop .htab-ic{width:18px;height:18px;flex:none;color:var(--muted);}
+.htdrop .htab-e{font-size:17px;line-height:1;}
+.htdrop-n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.htdrop .count{font-size:12px;font-weight:800;color:var(--accent);background:none;border:0;padding:0;}
+.htdrop-ch{width:18px;height:18px;flex:none;margin-left:auto;color:var(--muted);transition:transform .2s;}
+.htdrop.open .htdrop-ch{transform:rotate(180deg);}
+.htpanel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:-4px 0 16px;padding:8px;border-radius:20px;
+  background:color-mix(in srgb,var(--text) 6%,transparent);animation:htpIn .18s ease-out;}
+@keyframes htpIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+.htp-t{min-width:0;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:4px;padding:10px 12px;
+  border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--text);font:inherit;text-align:left;cursor:pointer;}
+.htp-t .htab-ic{width:18px;height:18px;color:var(--muted);}
+.htp-t .htab-e{font-size:18px;line-height:1;}
+.htp-t b{font-size:13.5px;font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.htp-t small{font-size:11.5px;font-weight:700;color:var(--muted);}
+.htp-t.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;}
+.htp-t.on small,.htp-t.on .htab-ic{color:var(--accent);}
+.htp-add{border-style:dashed;background:transparent;color:var(--muted);justify-content:center;align-items:center;}
+.htp-add span{font-size:20px;line-height:1;}
+.htp-hint{grid-column:1/-1;margin:2px 4px 0;font-size:11.5px;color:var(--muted);}
+@media (min-width:700px){ .htdrop{flex:0 1 320px;} .htpanel{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));max-width:720px;} }
+
 /* широкий екран: капсула за вмістом, ⚙ праворуч — а не дві вкладки на 900px */
 @media (min-width:700px){
   #homeTabs.htabs{flex:0 1 auto;}

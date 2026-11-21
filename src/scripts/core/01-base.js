@@ -149,6 +149,7 @@
     // легкі налаштування (prefSet у 02-storage.js — сирий ключ + копія тут)
     'flowtheme','flowprotheme','flowcardskin','folderview','homewidgets','hometab','homeov',
     'folderopts',                                        // розмір/порядок/фото плиток папок (16-dashboard.js, 06.10.2026)
+    'htabs_view',                                        // вигляд вкладок Огляду: шторка вниз чи свайп (36-chats.js, 21.11.2026)
     'blocks_got',                                        // магазин блоків: які блоки взято в меню «＋ Блок» (62-block-store.js, 18.11.2026)
     'sidebarcol','spacefull','fx_mode','fx_say','ai_pet','hero_look','ai_voice','pet_hidden','pet_pos','pet_sleep',
     'forcedesktop','forcemobile'                         // фічу видалено; у сховищі лишається '0'

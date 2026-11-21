@@ -785,6 +785,7 @@
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fvs-head"><b>Вигляд папок</b><button type="button" class="fvs-done" data-fvdone>Готово</button></div>
       <div class="fvs-views">${FV_ORDER.map(v=>`<button type="button" class="fvs-view${v===homeFolderView?' on':''}" data-fv="${v}" aria-pressed="${v===homeFolderView}"><span class="fvs-prev fvs-prev-${v}" aria-hidden="true">${FV_PREV[v]}</span><span class="fvs-vn">${FV_NAME[v]}</span></button>`).join('')}</div>
+      <div class="fvs-lbl">Вкладки</div><div class="fvs-seg" role="group" aria-label="Вкладки">${[['drop','Шторка вниз'],['swipe','Свайп убік']].map(([v,t])=>`<button type="button" data-htv="${v}" class="${htabsView===v?'on':''}" aria-pressed="${htabsView===v}">${t}</button>`).join('')}</div>
       ${seg('size','Розмір плиток',[['l','Великі'],['m','Звичайні'],['s','Дрібні']],folderOpts.size)}
       ${seg('sort','Порядок',[['manual','Вручну'],['name','За назвою'],['prio','За пріоритетом']],folderOpts.sort)}
       <button type="button" class="fvs-tog" data-fotog role="switch" aria-checked="${folderOpts.covers?'true':'false'}"><span class="fvs-tt">Фото на всю плитку<small>вимкнеш — усі папки будуть кольоровими обкладинками</small></span><i class="fvs-sw" aria-hidden="true"></i></button>
@@ -800,6 +801,11 @@
       m.querySelectorAll('[data-fo]').forEach(b=>b.onclick=()=>{
         const k=b.dataset.fo; setFolderOpt(k,b.dataset.v);
         m.querySelectorAll('[data-fo="'+k+'"]').forEach(x=>{ const on=x.dataset.v===folderOpts[k]; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+      });
+      // вигляд вкладок Огляду (36-chats.js setHtabsView)
+      m.querySelectorAll('[data-htv]').forEach(b=>b.onclick=()=>{
+        setHtabsView(b.dataset.htv);
+        m.querySelectorAll('[data-htv]').forEach(x=>{ const on=x.dataset.htv===htabsView; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
       });
       const tg=m.querySelector('[data-fotog]');
       tg.onclick=()=>{ setFolderOpt('covers', folderOpts.covers?0:1); tg.setAttribute('aria-checked',folderOpts.covers?'true':'false'); };
