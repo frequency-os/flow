@@ -13,6 +13,24 @@ if [ "$branch" != main ]; then
   exit 1
 fi
 
+ROOT=$(pwd)
+# ── Чиста копія (21.11.2026) ──
+# Сайт збирається НЕ з робочої теки, а з окремої тимчасової копії рівно останнього коміту (git worktree).
+# Причина: поруч працюють інші сесії, і їхні незакомічені правки в src/ потрапляли на сайт — так 21.11
+# поїхали неперевірені 16-dashboard.js і 03-folders-projects.css, що змінились саме під час перевірок.
+# Тепер на сайт іде лише закомічене, а чужа робота в теці лишається недоторканою.
+SRC=$(git rev-parse HEAD)
+WT=$(mktemp -d "${TMPDIR:-/tmp}/fq-pub.XXXXXX")
+cleanup(){ cd "$ROOT" 2>/dev/null; git worktree remove --force "$WT" >/dev/null 2>&1 || rm -rf "$WT"; git worktree prune >/dev/null 2>&1 || true; }
+trap cleanup EXIT INT TERM
+git worktree add -q --detach "$WT" "$SRC"
+# оригінал для порівняння (крок 5 перевірки) лежить поза git — даємо копії посилання, якщо він є
+[ -f original/index11.html ] && mkdir -p "$WT/original" && ln -s "$ROOT/original/index11.html" "$WT/original/index11.html"
+echo "0) Чиста копія коміту $(git log --oneline -1 "$SRC")"
+dirty=$(git status --porcelain -- src tools | wc -l | tr -d ' ')
+[ "$dirty" != 0 ] && echo "   ℹ️ у робочій теці є незакомічене в src/ чи tools/ ($dirty) — на сайт воно НЕ поїде"
+cd "$WT"
+
 echo "1) Перевірка і збірка (npm run check)"
 # check.sh сам збирає dist/ і повертає код 1 при будь-якій проблемі.
 # Раніше тут стояла лише збірка через пайп, який ковтав її помилку:
@@ -48,15 +66,29 @@ if ! ./tools/test-month.sh; then
   exit 1
 fi
 
+cd "$ROOT"
+# поки йшли перевірки, в main могли зʼявитись нові коміти (інша сесія) — тоді зібране вже не «останнє»
+if [ "$(git rev-parse HEAD)" != "$SRC" ]; then
+  echo "\n❌ Поки йшли перевірки, у main зʼявились нові коміти — зібране вже не останнє. Запусти публікацію ще раз."
+  exit 1
+fi
+
+# пробний прогін (DEPLOY_DRY=1): усі ворота пройдено, але нічого не копіюємо, не комітимо й не відправляємо
+if [ -n "$DEPLOY_DRY" ]; then
+  DRY="${TMPDIR:-/tmp}/fq-pub-dry.html"; cp "$WT/dist/index.html" "$DRY"
+  echo "\n🧪 Пробний прогін: усі перевірки пройдено, сайт НЕ змінено. Зібраний файл: $DRY"
+  exit 0
+fi
+
 echo "3) Кладемо зібране в корінь (звідти GitHub Pages віддає сайт)"
 # Публікуємо лише файли сайту: index.html, усе, що build.py кладе з src/web
 # (sw.js, маніфест, іконки), і vendor/. Список беремо з src/web, а не пишемо
 # руками: колись так забули іконки з маніфестом, і вони не доїхали на сайт.
 # Будь-що інше в dist/ (макет _mock.html, __test-*.html з даними для
 # відтворення бага) — стоп: раніше воно тихо ставало публічним назавжди.
-PUB="index.html $(ls src/web | tr '\n' ' ')"
+PUB="index.html $(ls "$WT/src/web" | tr '\n' ' ')"
 extra=""
-for f in dist/*; do
+for f in "$WT"/dist/*; do
   n=$(basename "$f")
   [ "$n" = vendor ] && continue
   case " $PUB " in *" $n "*) ;; *) extra="$extra $n";; esac
@@ -67,8 +99,10 @@ if [ -n "$extra" ]; then
   echo "      у scratchpad, а звідси прибери. Нічого не закомічено й не відправлено."
   exit 1
 fi
-for n in $PUB; do cp "dist/$n" .; done
-rm -rf vendor && cp -R dist/vendor vendor
+for n in $PUB; do cp "$WT/dist/$n" .; done
+rm -rf vendor && cp -R "$WT/dist/vendor" vendor
+# робочий dist/ теж оновлюємо зібраним — щоб npm run smoke чи прев'ю показували те, що на сайті
+rm -rf dist && cp -R "$WT/dist" dist
 echo "   $PUB vendor/"
 
 echo "4) Записуємо в історію (лише файли сайту)"
@@ -84,8 +118,8 @@ else
 fi
 left=$(git status --porcelain -- src tools CODEMAP.md | wc -l | tr -d ' ')
 if [ "$left" != 0 ]; then
-  echo "   ⚠️ у src/, tools/ чи CODEMAP.md є незакомічені правки ($left): сайт зібрано"
-  echo "      з них, але в історію вони не пішли — закоміть їх окремим комітом."
+  echo "   ℹ️ у src/, tools/ чи CODEMAP.md є незакомічені правки ($left) — на сайт вони не пішли"
+  echo "      (сайт зібрано з коміту ${SRC%"${SRC#???????}"}); їх власник закомітить і опублікує окремо."
 fi
 
 echo "5) Відправляємо на GitHub"
