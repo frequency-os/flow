@@ -215,7 +215,7 @@
       if(replaced){ var i=arr.indexOf(blk); if(i>-1) arr.splice(i,1); Array.prototype.splice.apply(arr,[Math.min(at,arr.length),0].concat(added)); }
       else Array.prototype.splice.apply(arr,[Math.min(at+1,arr.length),0].concat(added));
     });
-    save(); render(); plToast('✦ Готово — ↶ поверне, як було');
+    save(); render(); plToast('✦ Готово — можна скасувати');
   }
   function rbAaOpen(el){
     if(rbAa){ rbAaClose(); return; }
