@@ -656,7 +656,7 @@
     const f=folders[key]; if(!f) return;
     const cur=gviewOf(key);
     fgSheet(`<div class="fmenu-grip"></div>
-      <div class="fmenu-title">Як відкривати · <span data-i18n-skip="1">${esc(f.name)}</span></div>
+      <div class="fmenu-title">Як відкривати групу · <span data-i18n-skip="1">${esc(f.name)}</span></div>
       ${Object.keys(GVIEW).map(v=>`<button class="fgs-row${cur===v?' on':''}" data-gv="${v}" aria-pressed="${cur===v}">
         <span class="fgs-t"><b>${GVIEW[v][0]}</b><small>${GVIEW[v][1]}</small></span><span class="fgs-go">${cur===v?'✓':''}</span></button>`).join('')}
       <button class="fmi" data-back>‹ Назад до меню</button>`,
@@ -860,18 +860,16 @@
       });
     });
   }
+  /* Диктування живе в нижньому полі (🎙 замість ↑, поки поле порожнє) — у меню його більше нема (21.11.2026). */
   /* ⋯ документа (21.11.2026, «А2 · полички»): у папці — те саме меню, що й на плитці Огляду, а зверху
      рядок дій самого документа. Раніше тут було друге меню з повторами (Звʼязки, Чати, обкладинка, вигляд). */
   function pgDocStripHTML(){
     const undo=document.getElementById('pgUndoBtn'), hid=document.getElementById('pgShowHiddenBtn');
-    const mic=document.getElementById('pgMicBtn');
-    const live=!!(mic&&mic.classList.contains('live'));
     const wideOn=document.getElementById('scr-page').classList.contains('pg-wide');
     const hasCond=pgBarHasCond(), hidOn=!!(hid&&hid.classList.contains('on'));
     const d=(act,ic,t,dis,on)=>`<button class="fm-dact${on?' on':''}" data-pgm="${act}"${dis?' disabled':''}><span aria-hidden="true">${ic}</span>${t}</button>`;
     return `<div class="fm-docbar" role="group" aria-label="Дії документа">
       ${d('undo','↶','Скасувати',!(undo&&!undo.disabled))}
-      ${d('mic','🎙',live?'Стоп':'Диктувати',false,live)}
       ${d('wide','⛶',wideOn?'Звичайна':'На весь екран',false,wideOn)}
       ${hasCond?d('hid','◌',hidOn?'Ховати':'Сховані',false,hidOn):''}</div>`;
   }
@@ -879,7 +877,7 @@
     const run=(fn)=>{ closeFolderMenu(); setTimeout(fn,60); };
     const btn=id=>document.getElementById(id);
     m.querySelectorAll('[data-pgm]').forEach(b=>b.onclick=()=>{
-      const a=b.dataset.pgm, id={undo:'pgUndoBtn',mic:'pgMicBtn',wide:'pgWideBtn',hid:'pgShowHiddenBtn'}[a];
+      const a=b.dataset.pgm, id={undo:'pgUndoBtn',wide:'pgWideBtn',hid:'pgShowHiddenBtn'}[a];
       if(id) run(()=>{ const e=btn(id); if(e) e.click(); });
     });
   }
@@ -1024,6 +1022,7 @@
     type:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
     group:'<rect x="3.5" y="8" width="13" height="12" rx="2.5"/><path d="M7.5 5h10a3 3 0 0 1 3 3v9"/>',
     ungroup:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M13.5 7h4M7 13.5v4"/>',
+    copy:'<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/>',
     pin:'<path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/>',
     chat:'<path d="M4 5.5h16v10H9l-5 4z"/>',
     bld:'<path d="M4 20.5h16M6 20.5V8l6-4 6 4v12.5"/><path d="M10 20.5v-4h4v4"/>',
@@ -1054,6 +1053,8 @@
     const role=f.role==='project'?'project':'area';   // «Сторінка» відкривалась так само, як «Документ» — окремим вибором не показуємо
     const dev=!!(window.upDevOn&&window.upDevOn());
     const onPage=(()=>{ const a=document.querySelector('.screen.active'); return !!(a&&a.id==='scr-page'&&pgBarFolder()===key); })();
+    // відкрите над документом цієї ж папки — з рядком дій документа; так і «‹ Назад до меню» з Пріоритету повертає повне меню
+    if(onPage&&!document.querySelector('.fsp-ov')) o={...o,doc:true};
     const fv=(typeof fhView==='function')?fhView(key):'doc';
     const feed=onPage&&lkView[key]==='feed';
     const ph=!!f.photo, pp=f.photoPos;
@@ -1089,6 +1090,8 @@
       ${fmRow('links','chat','Звʼязки','місія · звичка · час · календар · гроші · чати')}
       ${onPage?fmSwRow('feed','media','Стрічка подій','замість документа — усе, що сталося в папці',feed):''}
       ${dev?fmRow('sphere','bld','Сфера · будівля в грі',f.sphere?'повʼязано · змінити чи прибрати':'не повʼязано'):''}
+      <div class="fmi-label">Поділитись</div>
+      ${fmRow('copytext','copy','Скопіювати як текст','документ папки — у буфер, щоб вставити деінде')}
       ${f.custom?`<div class="fm-gap"></div>`+fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
       if(o.doc) pgDocStripBind(m);
@@ -1101,6 +1104,7 @@
         if(a==='asgroup'){ if(f.group) delete f.group; else f.group=true;   // рядки групи (як відкривати, розгрупувати) зʼявляються/зникають — перемалювати
           saveFolders(); renderDashboard(); openFolderMenu(key,o); try{ window.platform.haptic('select'); }catch(_){} return; }
         if(a==='feed'){ fmSetView(key, feed?fv:'feed'); closeFolderMenu(); return; }
+        if(a==='copytext'){ closeFolderMenu(); fmCopyText(key); return; }
         folderAction(key,a);
       });
       m.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{
@@ -1115,6 +1119,40 @@
     });
   }
   function fmSwSet(b,on){ b.setAttribute('aria-checked',on?'true':'false'); try{ window.platform.haptic('select'); }catch(_){} }
+  /* «Скопіювати як текст» (21.11.2026): документ папки (boards[key]) — простим текстом у буфер обміну.
+     Лише читає: нічого не пише ні в папку, ні в хмару. Заголовки — #, завдання — ☐/☑, список — •, вкладене — з відступом. */
+  function fmDocText(key){
+    const out=[]; let num=0;
+    const tx=b=>String(b&&(b.text!=null?b.text:(b.title!=null?b.title:''))||'').trim();
+    const walk=(arr,d)=>{ (Array.isArray(arr)?arr:[]).forEach(b=>{ if(!b||typeof b!=='object') return;
+      const s=tx(b), pad='  '.repeat(d), ty=b.type;
+      if(ty!=='num') num=0;
+      let line='';
+      if(ty==='h1') line='# '+s; else if(ty==='h2') line='## '+s; else if(ty==='h3') line='### '+s;
+      else if(ty==='task') line=(b.done?'☑ ':'☐ ')+s;
+      else if(ty==='bullet') line='• '+s;
+      else if(ty==='num') line=(++num)+'. '+s;
+      else if(ty==='quote') line='> '+s;
+      else if(ty==='toggle') line='▸ '+s;
+      else line=s;
+      if(s) out.push(pad+line);
+      if(Array.isArray(b.children)&&b.children.length) walk(b.children, (ty==='col'||ty==='row'||ty==='board')?d:d+1);
+    }); };
+    walk(typeof boards!=='undefined'?boards[key]:[],0);
+    return out;
+  }
+  async function fmCopyText(key){
+    const f=folders[key]; if(!f) return;
+    const lines=fmDocText(key);
+    if(!lines.length){ fgToast('У документі «'+f.name+'» поки нема тексту'); return; }
+    const text=[f.name||'Папка',''].concat(lines).join('\n');
+    let ok=false;
+    try{ if(navigator.clipboard&&navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); ok=true; } }catch(_){}
+    if(!ok){ try{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;left:-9999px;top:0;';
+      document.body.appendChild(ta); ta.select(); ok=document.execCommand('copy'); ta.remove(); }catch(_){} }
+    fgToast(ok?('Скопійовано: '+lines.length+' '+pluralUk(lines.length,'рядок','рядки','рядків')):'Не вдалося скопіювати — спробуй ще раз');
+    try{ window.platform.haptic(ok?'success':'error'); }catch(_){}
+  }
   // вигляд папки: Документ · Чат · Фото · Полотно зберігаються в папці; «Стрічка» — лише поки відкрита сторінка
   function fmSetView(fk,v){
     if(typeof lkView!=='undefined') lkView[fk]=(v==='feed')?'feed':'doc';
@@ -1221,7 +1259,7 @@
     const list=rows.map(([k,d])=>{ const tf=folders[k], cur=(f.parent||'')===k;
       return `<button class="fmi fmv${cur?' on':''}" data-mv="${esc(k)}" style="--d:${d}">${thumb(tf)}<span class="fmv-t"><b data-i18n-skip="1">${esc(tf.name)}</b>${d?`<small data-i18n-skip="1">у «${esc(folderPathName(tf.parent))}»</small>`:''}</span>${cur?'<span class="fmv-ok">тут</span>':''}</button>`; }).join('');
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
-      <div class="fmenu-title">Куди перемістити «${esc(f.name)}»</div>
+      <div class="fmenu-title">Перенести «${esc(f.name)}» в…</div>
       <div class="fmv-list">${rootRow}${list||'<div class="fmi-label">Немає інших папок</div>'}</div></div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
@@ -1282,7 +1320,9 @@
     // Іконку, обрану вручну (iconSet), зміна емодзі не чіпає — інакше вибір
     // губився б мовчки. Автоматичну — переобираємо під нове емодзі.
     if(act==='emoji'){ closeFolderMenu(); inputModal({title:'Емодзі папки',value:f.emoji,placeholder:'Встав емодзі або лишай порожнім',emoji:false,onOk:(v)=>{ f.emoji=v; if(!f.iconSet) f.icon=folderIconFor(v); saveFolders(); renderDashboard(); }}); return; }
-    if(act==='delete'){ const nm=f.name; confirmSheet({title:'Видалити папку «'+nm+'»?',
+    if(act==='delete'){ const nm=f.name;
+      closeFolderMenu();   // 21.11.2026: у групі меню (1350) лежало над «Видалити?» (1300) — підтвердження було не видно
+      confirmSheet({title:'Видалити папку «'+nm+'»?',
       sub:'Зникнуть документ папки, її обкладинка й фото, звʼязки з чатами. Протягом 10 секунд можна повернути.',
       onOk:()=>{ closeFolderMenu(); folderDeleteLater(key,10600);   // трохи довше за тост — «Повернути» на самому краю ще спрацює
         try{ window.flowUndoToast('Папку «'+nm+'» видалено', ()=>folderDeleteCancel(key), 10000); }catch(_){} }}); return; }   // з документом, темами, фото й посиланнями чатів — і надгробком для інших пристроїв

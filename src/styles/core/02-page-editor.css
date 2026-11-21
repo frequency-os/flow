@@ -1219,6 +1219,18 @@
   #pgComposer .pgc-mode svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
   #pgComposer .pgc-mode circle{fill:currentColor;stroke:none;}
   #pgComposer .pgc-send{width:36px;height:36px;border-radius:18px;}
+  /* 🎙 у полі (21.11.2026): поле порожнє — мікрофон на місці ↑; є текст — ↑; під час запису й розпізнавання — лише 🎙 */
+  #pgComposer .pgc-mic{flex:none;width:36px;height:36px;border-radius:18px;border:0;padding:0;cursor:pointer;display:grid;place-items:center;
+    background:color-mix(in srgb,var(--pg-fg) 10%,transparent);color:var(--pg-fg);}
+  #pgComposer .pgc-mic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  #pgComposer .pgc-mic:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
+  #pgComposer .pgc-mic.live{background:#e5484d;color:#fff;animation:pgcMicPulse 1.2s ease-in-out infinite;}
+  #pgComposer .pgc-mic.busy{opacity:.55;cursor:progress;}
+  @keyframes pgcMicPulse{0%,100%{box-shadow:0 0 0 0 rgba(229,72,77,.45);}50%{box-shadow:0 0 0 7px rgba(229,72,77,0);}}
+  @media (prefers-reduced-motion: reduce){ #pgComposer .pgc-mic.live{animation:none;} }
+  #pgComposer .pgc-field:has(.pgc-send:disabled) .pgc-send,
+  #pgComposer .pgc-field:has(.pgc-mic.live, .pgc-mic.busy) .pgc-send{display:none;}
+  #pgComposer .pgc-field:not(:has(.pgc-send:disabled)) .pgc-mic:not(.live):not(.busy){display:none;}
   #pgComposer .pgc-mode:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
   .pgc-mmenu{position:absolute;left:56px;bottom:calc(100% + 8px);min-width:170px;padding:4px;border-radius:14px;z-index:2;
     background:var(--pg-surface,var(--card));border:1px solid color-mix(in srgb,var(--pg-fg) 12%,transparent);box-shadow:0 14px 34px -14px rgba(0,0,0,.6);}

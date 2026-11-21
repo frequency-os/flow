@@ -12,6 +12,8 @@
   'use strict';
 
   var btn = null, rec = null, stream = null;
+  var micC = null;            // 🎙 у нижньому полі (21.11.2026) — диктує в рядок поля, видно до відправки
+  var target = 'block';       // куди йде розпізнане: 'block' (кнопка редактора) чи 'composer' (нижнє поле)
   var lastEl = null;          // куди вставляти: останній блок, де стояв курсор
   var lastRange = null;       // і точне місце в ньому
 
@@ -39,14 +41,37 @@
 
   function setLive(on) {
     if (btn) btn.classList.toggle('live', !!on);
+    if (micC) {
+      micC.classList.toggle('live', !!on);
+      micC.setAttribute('aria-pressed', on ? 'true' : 'false');
+      micC.setAttribute('aria-label', on ? 'Зупинити запис' : 'Диктувати в поле');
+    }
   }
+  function setBusy(on) { if (micC) micC.classList.toggle('busy', !!on); }
+
+  /* Нижнє поле: розпізнане дописується в рядок з курсором (чи в останній) — людина бачить
+     текст і сама тисне ↑. Поле слухає подію input, тож чернетка оновлюється як від клавіатури. */
+  function insertComposer(text) {
+    var ins = document.querySelectorAll('#pgcLines .pgc-in');
+    if (!ins.length) return false;
+    var cur = document.querySelector('#pgcLines .pgc-ln.cur .pgc-in') || ins[ins.length - 1];
+    var v = cur.value || '';
+    cur.value = v + (v && !/\s$/.test(v) ? ' ' : '') + text;
+    cur.dispatchEvent(new Event('input', { bubbles: true }));
+    try { cur.focus({ preventScroll: true }); var n = cur.value.length; cur.setSelectionRange(n, n); } catch (_) {}
+    return true;
+  }
+  function composerShown() { var c = document.getElementById('pgComposer'); return !!(c && !c.hidden && c.offsetParent !== null); }
 
   /* Вставка розпізнаного. Головне тут — надіслати подію input:
      редактор зберігає блоки саме по ній, інакше текст зникне
      після перемальовування сторінки. */
   function insert(text) {
+    if (target === 'composer' && insertComposer(text)) return;
     var el = lastEl;
     if (!el || !document.body.contains(el)) {
+      // раніше тут сказане губилось («Спершу постав курсор у блок») — тепер іде в нижнє поле, якщо воно є
+      if (composerShown() && insertComposer(text)) return;
       toast('🎙 Спершу постав курсор у блок');
       return;
     }
@@ -119,7 +144,9 @@
           : '🎙 Мікрофон нічого не почув (' + blob.size + ' Б за ' + secs.toFixed(1) + ' с)');
         return;
       }
-      var txt = await window.__flowTranscribe(blob);
+      setBusy(true);
+      var txt = '';
+      try { txt = await window.__flowTranscribe(blob); } finally { setBusy(false); }
       if (txt) insert(txt);
     };
     rec.start(250);   // шматки кожні 250 мс — надійніше, ніж один в кінці
@@ -136,18 +163,31 @@
     } catch (_) {}
   }
 
-  function toggle() { if (rec) stop(); else start(); }
+  function toggle(t) { if (rec) stop(); else { target = t || 'block'; start(); } }
 
   function wire() {
     btn = document.getElementById('pgMicBtn');
     if (!btn || btn.__wired) return;
     btn.__wired = 1;
     btn.addEventListener('mousedown', function (e) { e.preventDefault(); });  // не забирати фокус з блока
-    btn.addEventListener('click', function (e) { e.preventDefault(); toggle(); });
+    btn.addEventListener('click', function (e) { e.preventDefault(); toggle('block'); });
+  }
+  // 🎙 у нижньому полі: видно, поки поле порожнє (на місці ↑) — як у Telegram
+  function wireComposer() {
+    var field = document.querySelector('#pgComposer .pgc-field');
+    if (!field || document.getElementById('pgcMic')) return;
+    micC = document.createElement('button');
+    micC.type = 'button'; micC.id = 'pgcMic'; micC.className = 'pgc-mic';
+    micC.setAttribute('aria-label', 'Диктувати в поле'); micC.setAttribute('aria-pressed', 'false'); micC.title = 'Диктувати';
+    micC.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>';
+    micC.addEventListener('pointerdown', function (e) { e.preventDefault(); });   // не ховати клавіатуру на iPhone
+    micC.addEventListener('click', function (e) { e.preventDefault(); if (micC.classList.contains('busy')) return; toggle('composer'); });
+    field.appendChild(micC);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
-  else wire();
+  function wireAll() { wire(); wireComposer(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireAll);
+  else wireAll();
 
   // сторінка згорнулась — не тримаємо мікрофон увімкненим
   document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); });

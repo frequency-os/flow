@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 38151 |
+| Рядків JS | 38231 |
 | Файлів CSS | 54 |
-| Рядків CSS | 12006 |
-| Сутностей верхнього рівня | 2935 |
+| Рядків CSS | 12018 |
+| Сутностей верхнього рівня | 2941 |
 | Ключів сховища (FLOW_KEYS) | 81 |
 
 ## Файли JS
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1697 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1320 | 77 |
+| `src/scripts/core/16-dashboard.js` | 1360 | 79 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -110,7 +110,7 @@
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
 | `src/scripts/page-editor/08b-rich-text.js` | 302 | 54 |
 | `src/scripts/page-editor/09-open-page.js` | 33 | 1 |
-| `src/scripts/page-editor/10-mic.js` | 154 | 8 |
+| `src/scripts/page-editor/10-mic.js` | 194 | 12 |
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
 | `src/vendor/pdf.min.js` _(мініфікований вендор)_ | 22 | — |
 | `src/vendor/supabase.min.js` _(мініфікований вендор)_ | 11 | — |
@@ -147,7 +147,7 @@
 | `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 349 | 9 |
-| `src/styles/core/02-page-editor.css` | 1302 | 9 |
+| `src/styles/core/02-page-editor.css` | 1314 | 9 |
 | `src/styles/core/03-folders-projects.css` | 706 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
@@ -1283,7 +1283,7 @@
 | `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1643` |
 | `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1646` |
 
-### `src/scripts/core/16-dashboard.js` — 77 сутностей
+### `src/scripts/core/16-dashboard.js` — 79 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1341,29 +1341,31 @@
 | `pgBarSync` | функція | `src/scripts/core/16-dashboard.js:824` |
 | `pgBarHasCond` | функція | `src/scripts/core/16-dashboard.js:838` |
 | `pgBarSwitchSheet` | функція | `src/scripts/core/16-dashboard.js:845` |
-| `pgDocStripHTML` | функція | `src/scripts/core/16-dashboard.js:865` |
-| `pgDocStripBind` | функція | `src/scripts/core/16-dashboard.js:878` |
-| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:886` |
-| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:897` |
-| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:920` |
-| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:948` |
-| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:1020` |
-| `fmIc` | функція | `src/scripts/core/16-dashboard.js:1040` |
-| `fmRow` | функція | `src/scripts/core/16-dashboard.js:1041` |
-| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:1042` |
-| `fmSwRow` | функція | `src/scripts/core/16-dashboard.js:1047` |
-| `FM_VIEW` | масив | `src/scripts/core/16-dashboard.js:1048` |
-| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1049` |
-| `fmSwSet` | функція | `src/scripts/core/16-dashboard.js:1117` |
-| `fmSetView` | функція | `src/scripts/core/16-dashboard.js:1119` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1128` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1144` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1166` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1175` |
-| `folderPathName` | функція | `src/scripts/core/16-dashboard.js:1210` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1211` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1237` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1290` |
+| `pgDocStripHTML` | функція | `src/scripts/core/16-dashboard.js:866` |
+| `pgDocStripBind` | функція | `src/scripts/core/16-dashboard.js:876` |
+| `pgBarMoreSheet` | функція | `src/scripts/core/16-dashboard.js:884` |
+| `pgBarInit` | функція | `src/scripts/core/16-dashboard.js:895` |
+| `createProjectFolder` | функція | `src/scripts/core/16-dashboard.js:918` |
+| `openPhotoCropEditor` | функція | `src/scripts/core/16-dashboard.js:946` |
+| `FM_IC` | обʼєкт | `src/scripts/core/16-dashboard.js:1018` |
+| `fmIc` | функція | `src/scripts/core/16-dashboard.js:1039` |
+| `fmRow` | функція | `src/scripts/core/16-dashboard.js:1040` |
+| `FM_TYPE` | обʼєкт | `src/scripts/core/16-dashboard.js:1041` |
+| `fmSwRow` | функція | `src/scripts/core/16-dashboard.js:1046` |
+| `FM_VIEW` | масив | `src/scripts/core/16-dashboard.js:1047` |
+| `openFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1048` |
+| `fmSwSet` | функція | `src/scripts/core/16-dashboard.js:1121` |
+| `fmDocText` | функція | `src/scripts/core/16-dashboard.js:1124` |
+| `fmCopyText` | функція | `src/scripts/core/16-dashboard.js:1144` |
+| `fmSetView` | функція | `src/scripts/core/16-dashboard.js:1157` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1166` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1182` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1204` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1213` |
+| `folderPathName` | функція | `src/scripts/core/16-dashboard.js:1248` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1249` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1275` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1330` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
@@ -3440,18 +3442,22 @@
 |---|---|---|
 | `fid` | значення | `src/scripts/page-editor/09-open-page.js:19` |
 
-### `src/scripts/page-editor/10-mic.js` — 8 сутностей
+### `src/scripts/page-editor/10-mic.js` — 12 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `el` | значення | `src/scripts/page-editor/10-mic.js:24` |
-| `el` | значення | `src/scripts/page-editor/10-mic.js:48` |
-| `before` | значення | `src/scripts/page-editor/10-mic.js:57` |
-| `needSpace` | значення | `src/scripts/page-editor/10-mic.js:58` |
-| `ok` | значення | `src/scripts/page-editor/10-mic.js:61` |
-| `mime` | значення | `src/scripts/page-editor/10-mic.js:100` |
-| `chunks` | масив | `src/scripts/page-editor/10-mic.js:106` |
-| `startedAt` | значення | `src/scripts/page-editor/10-mic.js:107` |
+| `el` | значення | `src/scripts/page-editor/10-mic.js:26` |
+| `ins` | значення | `src/scripts/page-editor/10-mic.js:55` |
+| `cur` | значення | `src/scripts/page-editor/10-mic.js:57` |
+| `v` | значення | `src/scripts/page-editor/10-mic.js:58` |
+| `el` | значення | `src/scripts/page-editor/10-mic.js:71` |
+| `before` | значення | `src/scripts/page-editor/10-mic.js:82` |
+| `needSpace` | значення | `src/scripts/page-editor/10-mic.js:83` |
+| `ok` | значення | `src/scripts/page-editor/10-mic.js:86` |
+| `mime` | значення | `src/scripts/page-editor/10-mic.js:125` |
+| `chunks` | масив | `src/scripts/page-editor/10-mic.js:131` |
+| `startedAt` | значення | `src/scripts/page-editor/10-mic.js:132` |
+| `field` | значення | `src/scripts/page-editor/10-mic.js:177` |
 
 ### `src/web/sw.js` — 9 сутностей
 
