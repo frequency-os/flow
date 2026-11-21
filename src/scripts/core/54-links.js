@@ -249,7 +249,7 @@
     // «⋯» біля папки — те саме меню, що й усередині: пріоритет, колір, назва, група, видалення (16.10.2026)
     t.querySelectorAll('[data-dsbtmore]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.dsbtmore; if(folders[k]) openFolderMenu(k); });
     t.querySelectorAll('[data-dsbt]').forEach(b=>b.onclick=()=>{ const k=b.dataset.dsbt; if(!folders[k]) return;
-      try{ if(typeof groupKids==='function'&&groupKids(k).length&&typeof openGroupAsChosen==='function'){ dsbOpen[k]=true; openGroupAsChosen(k); dsbTreeSync(); return; } }catch(_){}
+      try{ if(typeof isFolderGroup==='function'&&isFolderGroup(k)&&typeof openGroupAsChosen==='function'){ dsbOpen[k]=true; openGroupAsChosen(k); dsbTreeSync(); return; } }catch(_){}
       try{ goFolder(k); }catch(_){} });
     if(!dsbTreeHidden) dsbDragBind(t,fb);
   }

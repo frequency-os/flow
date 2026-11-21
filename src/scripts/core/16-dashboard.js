@@ -56,6 +56,9 @@
     let startX=0, startY=0, armed=false, pid=null;
     let rafId=0, lastX=0, lastY=0, cardRects=null;
     const LONG=300, JITTER=10;
+    /* «покласти всередину» — лише після утримання над папкою (21.11.2026): раніше вся середина
+       плитки (28–72%) одразу клала папку всередину, і при перестановці папки «зникали» */
+    const INTO_HOLD=600;
 
     function cancelPending(){ if(holdTimer){ clearTimeout(holdTimer); holdTimer=null; } startedKey=null; startCard=null; armed=false; }
 
@@ -74,7 +77,14 @@
     }
     // підказка один раз за сеанс: що робить перетягування
     let hinted=false;
-    function dragHint(){ if(hinted) return; hinted=true; try{ (window.__flowToast||function(){})('Тягни на папку — покласти всередину · між папками — переставити'); }catch(_){} }
+    function dragHint(){ if(hinted) return; hinted=true; try{ (window.__flowToast||function(){})('Відпусти між папками — переставити · затримай на папці — покласти всередину'); }catch(_){} }
+    // напис угорі екрана, поки палець тримає папку над іншою: плитку-ціль закриває «привид»
+    function intoPill(name){
+      let p=document.getElementById('fdropPill');
+      if(name==null){ if(p) p.remove(); return; }
+      if(!p){ p=document.createElement('div'); p.id='fdropPill'; p.className='fdrop-pill'; p.setAttribute('role','status'); document.body.appendChild(p); }
+      p.textContent='Відпусти — покласти в «'+name+'»';
+    }
     function begin(card,x,y){
       const key=card.dataset.fkey; if(!key) return;
       const rect=card.getBoundingClientRect();
@@ -83,7 +93,7 @@
       ghost.style.willChange='transform';
       document.body.appendChild(ghost);
       const line=document.createElement('div'); line.className='fdrop-line'; line.style.display='none'; grid.appendChild(line);
-      st={ key, card, ghost, line, offX:x-rect.left, offY:y-rect.top, mode:null, targetKey:null, lift:false };
+      st={ key, card, ghost, line, offX:x-rect.left, offY:y-rect.top, mode:null, targetKey:null, lift:false, hoverKey:null, hoverAt:0, dwellT:0 };
       card.classList.add('fdrag-src'); grid.classList.add('fdragging');
       snapshotRects();
       try{ window.platform.haptic('medium'); }catch(_){}
@@ -100,22 +110,32 @@
       const prevTarget=st.targetKey, prevMode=st.mode;
       st.mode=null; st.targetKey=null;
       let intoEl=null, lineStyle=null;
+      let centerKey=null;
       if(it && it.key!==st.key){
         const okey=it.key, r=it.r, relX=(lastX-r.left)/r.width;
         const forbidden=isDescendantFolder(okey, st.key);
-        if(!forbidden && relX>0.28 && relX<0.72){ st.mode='into'; st.targetKey=okey; intoEl=it.el; }
+        if(!forbidden && relX>0.28 && relX<0.72){
+          centerKey=okey;
+          // щойно наїхали на середину — засікаємо час і будимо кадр, коли мине INTO_HOLD (палець може стояти)
+          if(st.hoverKey!==okey){ st.hoverKey=okey; st.hoverAt=Date.now(); clearTimeout(st.dwellT); st.dwellT=setTimeout(scheduleFrame, INTO_HOLD+20); }
+          if(Date.now()-st.hoverAt>=INTO_HOLD){ st.mode='into'; st.targetKey=okey; intoEl=it.el; }
+        }
         // «За назвою» порядок задає абетка — переставляти нема чого (вкласти в папку можна)
-        else if(folderOpts.sort==='manual' && (folders[okey].parent||'')===(folders[st.key].parent||'')){
+        if(st.mode!=='into' && folderOpts.sort==='manual' && (folders[okey].parent||'')===(folders[st.key].parent||'')){
           const before=relX<0.5; st.mode='reorder'; st.targetKey=before?okey:nextAfterCached(okey);
           const gr=grid.getBoundingClientRect();
           lineStyle={ top:(r.top-gr.top+r.height*0.15), height:(r.height*0.7),
                       left:((before?r.left:r.right)-gr.left-1.5) };
         }
       }
+      if(!centerKey && st.hoverKey){ st.hoverKey=null; clearTimeout(st.dwellT); }
       // оновлюємо підсвітку лише коли вона змінилась
       if(prevTarget!==st.targetKey || prevMode!==st.mode){
         grid.querySelectorAll('.fdrop-into').forEach(e=>e.classList.remove('fdrop-into'));
         if(intoEl) intoEl.classList.add('fdrop-into');
+        st.ghost.classList.toggle('fdrag-into', st.mode==='into');
+        intoPill(st.mode==='into' && folders[st.targetKey] ? String(folders[st.targetKey].name||'') : null);
+        if(st.mode==='into'){ try{ window.platform.haptic('select'); }catch(_){} }
       }
       if(lineStyle){ st.line.style.display='block'; st.line.style.width='3px';
         st.line.style.top=lineStyle.top+'px'; st.line.style.height=lineStyle.height+'px'; st.line.style.left=lineStyle.left+'px'; }
@@ -129,6 +149,7 @@
       if(!st){ cancelPending(); return; }
       if(rafId){ cancelAnimationFrame(rafId); rafId=0; }
       const {key,card,ghost,line,mode,targetKey}=st;
+      clearTimeout(st.dwellT); intoPill(null);
       try{ghost.remove();}catch(_){} try{line.remove();}catch(_){}
       card.classList.remove('fdrag-src'); grid.classList.remove('fdragging');
       grid.querySelectorAll('.fdrop-into').forEach(e=>e.classList.remove('fdrop-into'));
@@ -136,8 +157,10 @@
       if(commit && mode==='into' && targetKey){ try{window.platform.haptic('success');}catch(_){}
         /* відпустили посередині іншої плитки — папка лягає всередину; без «Скасувати» це було мовчки (10.10.2026) */
         const prevParent=(folders[key]&&folders[key].parent)||'';
+        const prevGroup=!!(folders[targetKey]&&folders[targetKey].group);
+        if(folders[targetKey]) folders[targetKey].group=true;   // зібрали дві папки з Огляду — це група (21.11.2026)
         moveFolderTo(key,targetKey);
-        try{ if(window.flowUndoToast&&folders[key]&&folders[targetKey]) window.flowUndoToast('Покладено в «'+folders[targetKey].name+'»', ()=>moveFolderTo(key,prevParent)); }catch(_){}
+        try{ hideFolderHint(); if(window.flowUndoToast&&folders[key]&&folders[targetKey]) window.flowUndoToast('Покладено в «'+folders[targetKey].name+'»', ()=>{ if(folders[targetKey]&&!prevGroup) delete folders[targetKey].group; moveFolderTo(key,prevParent); }, 7000); }catch(_){}
         return; }
       if(commit && mode==='reorder'){ try{window.platform.haptic('light');}catch(_){} moveOrderItem(key,targetKey); saveFolders(); renderDashboard(); return; }
       renderDashboard();
@@ -185,10 +208,11 @@
   function fc3Svg(n){ return '<svg class="fc3-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(FC3_IC[n]||'')+'</svg>'; }
   // підпис під назвою: лише те, що справді щось каже («0 активних» — шум)
   function fc3Meta(k,f){
-    const n=groupKids(k).length;
+    const n=isFolderGroup(k)?groupKids(k).length:0;
     // вкладені глибше теж рахуємо: інакше папка, покладена в підпапку, «зникала» — підпис не мінявся (15.11.2026)
     if(n){ let all=0; const seen={}; const walk=(x,d)=>{ if(d>20) return; groupKids(x).forEach(c=>{ if(seen[c]) return; seen[c]=1; all++; walk(c,d+1); }); }; walk(k,0);   // запобіжник від циклу parent
-      return 'група · '+n+' '+pluralUk(n,'папка','папки','папок')+(all>n?' · ще '+(all-n)+' глибше':''); }
+      const names=groupKids(k).slice(0,3).map(c=>String(folders[c].name||'').trim()).filter(Boolean).join(' · ');
+      return (names||('група · '+n+' '+pluralUk(n,'папка','папки','папок')))+(n>3?' · ще '+(n-3):'')+(all>n?' · '+(all-n)+' глибше':''); }
     if(f.role==='page') return 'сторінка';
     // папка-сфера з місією (12.10.2026): відсоток місії і справи цього тижня — щоб з Огляду було видно рух
     try{ const g=wgFolderMission(k); if(g){ let done=0, plan=0;
@@ -200,7 +224,7 @@
   // плитка-обкладинка; shape: '' | 'wide' (карусель секцій) | 'big' | 'tall' (бенто)
   function fc3Tile(k, shape){
     const f=folders[k];
-    const isGroup=groupKids(k).length>0;
+    const isGroup=isFolderGroup(k);
     const photo=!!(f.photo && folderOpts.covers);
     const el=document.createElement('div');
     el.className='fcard fc3 '+(photo?'fc3-has-photo':'fc3-color')+(isGroup?' fc3-group':'')+(shape?' fc3-'+shape:'');
@@ -210,12 +234,13 @@
     const meta=fc3Meta(k,f);
     const emojiShow=(f.emoji&&f.emoji.trim())?esc(f.emoji.trim()):esc((f.name||'?').trim().charAt(0).toUpperCase());
     let h='';
-    // група — стос (15.11.2026): з-за плитки визирають фото (чи колір) двох вкладених папок; фон плитки — .fc3-face
+    // група — «Вкладка без вушка» (21.11.2026): рамка кольору групи + кружечки її папок угорі;
+    // нічого не визирає з-за плитки (стос прибрано — на компʼютері виглядав як помилка верстки)
     if(isGroup){
-      h+=kids.slice(0,2).map((ck,i)=>{ const cf=folders[ck]; let u='';
+      const av=kids.slice(0,3).map(ck=>{ const cf=folders[ck]; let u='';
         try{ u=(cf.photo&&folderOpts.covers)?safeImg(window.photoSrc(cf.photo)):''; }catch(_){ u=''; }
-        return `<span class="fc3-under u${i+1}" style="--uc:${safeColor(cf.c,'#6a7dff')};${u?`background-image:url('${esc(u)}')`:''}" aria-hidden="true"></span>`; }).reverse().join('');
-      h+=`<span class="fc3-face" aria-hidden="true"></span>`;   // «група · N папок» уже пише підпис плитки (fc3Meta)
+        return `<i class="fc3-gav" style="--uc:${safeColor(cf.c,'#6a7dff')};${u?`background-image:url('${esc(u)}')`:''}"></i>`; }).join('');
+      h+=`<span class="fc3-gavs" aria-hidden="true">${av}<b>${kids.length}</b></span>`;
     }
     if(photo){
       const pp=f.photoPos;
@@ -278,8 +303,8 @@
     grid.classList.add('fsz-'+folderOpts.size);
     if(v==='sections'){
       const pinned=keys.filter(k=>folders[k].pinned);
-      const groups=keys.filter(k=>!folders[k].pinned && groupKids(k).length);
-      const rest=keys.filter(k=>!folders[k].pinned && !groupKids(k).length);
+      const groups=keys.filter(k=>!folders[k].pinned && isFolderGroup(k));
+      const rest=keys.filter(k=>!folders[k].pinned && !isFolderGroup(k));
       const sec=(title,n,cls)=>{
         const s=document.createElement('div'); s.className='fsec';
         s.innerHTML=`<div class="fsec-h"><span>${title}</span>${n?`<small>${n}</small>`:''}</div><div class="${cls}"></div>`;
@@ -299,7 +324,7 @@
       let shape='';
       if(v==='bento'){
         if(!bigUsed && folders[k].pinned){ shape='big'; bigUsed=true; }
-        else if(groupKids(k).length) shape='tall';
+        else if(isFolderGroup(k)) shape='tall';
       }
       prioHeadMaybe(grid,k); grid.appendChild(fc3Tile(k,shape));
     });
@@ -333,10 +358,10 @@
       const active = (f.widgets||[]).filter(w=>w.ready).length;
       const subCount = childFolderKeys(k).length;
       // група: у папці лежать інші папки (проєкти не рахуємо — вони живуть на вкладці «Проєкти»)
-      const kids = groupKids(k), isGroup = kids.length>0;
+      const kids = groupKids(k), isGroup = isFolderGroup(k);
       const emojiShow = (f.emoji && f.emoji.trim()) ? esc(f.emoji.trim()) : esc((f.name||'?').trim().charAt(0).toUpperCase());
       const pinDot = f.pinned ? `<span class="fpin">📌</span>` : '';
-      const subBadge = (subCount && !isGroup) ? `<span class="fsub">📁 ${subCount}</span>` : '';
+      const subBadge = '';   // підпапки звичайної папки на Огляді не показуємо (21.11.2026) — лише всередині; subCount лишився для сумісності
       // метарядок залежно від ролі папки
       let metaHtml;
       if(isGroup){
@@ -484,11 +509,19 @@
   function groupKids(key){
     return childFolderKeys(key).filter(folderVisible);
   }
+  // прибрати підказку перетягування, щоб не лежала поверх «Повернути» (той самий низ екрана)
+  function hideFolderHint(){ try{ const t=document.getElementById('plToast'); if(t) t.classList.remove('show'); }catch(_){} }
+  /* Група ≠ папка з підпапками (21.11.2026, Ярослав): групою (рамка, кружечки, «простір»)
+     показуємо лише те, що людина сама зібрала — «Обʼєднати», перетягування на Огляді,
+     «Додати наявну» (поле group:true). Папка, в якій підпапки створено зсередини, —
+     звичайна плитка й одразу сторінка, підпапки живуть у ній. */
+  function isFolderGroup(key){ return !!(folders[key]&&folders[key].group===true) && groupKids(key).length>0; }
+  window.isFolderGroup=isFolderGroup;
   function fgIcon(f, cls){
     return `<span class="${cls||'fgs-ic'}" style="--c:${safeColor(f.c,'#6a7dff')}"><svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(f))}"/></svg></span>`;
   }
   function fgSub(ck){
-    const n=groupKids(ck).length;
+    const n=isFolderGroup(ck)?groupKids(ck).length:0;
     if(n) return n+' '+pluralUk(n,'папка','папки','папок')+' · група';
     const pr=folderProgress(ck), open=pr.total-pr.done;
     if(!pr.total) return 'поки порожньо';
@@ -525,7 +558,7 @@
       m.querySelector('[data-gnotes]').onclick=()=>go(key);
       m.querySelectorAll('[data-gkid]').forEach(b=>b.onclick=()=>{
         const ck=b.dataset.gkid;
-        if(groupKids(ck).length){ closeFolderMenu(); openGroupAsChosen(ck,key); return; }   // група в групі — її спосіб показу
+        if(isFolderGroup(ck)){ closeFolderMenu(); openGroupAsChosen(ck,key); return; }   // група в групі — її спосіб показу
         go(ck);
       });
       m.querySelector('[data-gnew]').onclick=()=>{ closeFolderMenu(); createFolder(key); };
@@ -580,7 +613,7 @@
       kids.forEach(ck=>{ const t=fc3Tile(ck);
         // вкладена папка відкривається з міткою батька — «назад» веде в цю групу (goSpaceFor читає __fgNext)
         t.onclick=e=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')) return;
-          if(groupKids(ck).length){ close(); openGroupAsChosen(ck,key); return; }
+          if(isFolderGroup(ck)){ close(); openGroupAsChosen(ck,key); return; }
           close(); window.__fgNext=key; try{ goFolder(ck); }finally{ window.__fgNext=null; } };
         grid.appendChild(t); });
       const add=document.createElement('button'); add.type='button'; add.className='fc3-add'; add.textContent='＋ Нова'; add.setAttribute('aria-label','Нова папка в «'+String(g.name||'')+'»');
@@ -611,7 +644,7 @@
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
     const go=(k)=>{ closeFolderMenu(); window.__fgNext=key; goFolder(k); window.__fgNext=null; };
-    m.querySelectorAll('[data-iokid]').forEach(b=>b.onclick=()=>{ const ck=b.dataset.iokid; if(groupKids(ck).length){ openGroupAsChosen(ck,key); return; } go(ck); });
+    m.querySelectorAll('[data-iokid]').forEach(b=>b.onclick=()=>{ const ck=b.dataset.iokid; if(isFolderGroup(ck)){ openGroupAsChosen(ck,key); return; } go(ck); });
     m.querySelector('[data-ionew]').onclick=()=>{ closeFolderMenu(); createFolder(key); };
     m.querySelector('[data-ionotes]').onclick=()=>go(key);
     m.querySelector('[data-iomore]').onclick=()=>openFolderMenu(key);
@@ -664,6 +697,7 @@
       <button class="fmi" data-gback>‹ Назад до групи</button>`,
     m=>{
       m.querySelectorAll('[data-gpick]').forEach(b=>b.onclick=()=>{
+        if(folders[key]) folders[key].group=true;   // додали в неї папку з Огляду — це група (moveFolderTo нижче збереже)
         moveFolderTo(b.dataset.gpick, key);
         try{ window.platform.haptic('success'); }catch(_){}
         openFolderGroup(key);
@@ -693,7 +727,7 @@
       <label class="fgm-lbl" for="fgmName">Назва групи</label>
       <input class="fgm-name" id="fgmName" maxlength="60" placeholder="напр. Фінанси" autocomplete="off">
       <div class="fmi-label">Які папки</div>
-      ${cand.map(k=>`<button class="fgs-row${sel.has(k)?' on':''}" data-gsel="${esc(k)}" aria-pressed="${sel.has(k)}">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b>${groupKids(k).length?'<small>група</small>':''}</span><span class="fgm-chk" aria-hidden="true"></span></button>`).join('')}
+      ${cand.map(k=>`<button class="fgs-row${sel.has(k)?' on':''}" data-gsel="${esc(k)}" aria-pressed="${sel.has(k)}">${fgIcon(folders[k])}<span class="fgs-t"><b data-i18n-skip="1">${esc(folders[k].name)}</b>${isFolderGroup(k)?'<small>група</small>':''}</span><span class="fgm-chk" aria-hidden="true"></span></button>`).join('')}
       <button class="fgm-ok" data-gok disabled>Обери хоча б дві папки</button>`,
     m=>{
       const ok=m.querySelector('[data-gok]'), inp=m.querySelector('#fgmName');
@@ -711,7 +745,7 @@
         const nm=(inp.value||'').trim()||'Група';
         const key='f_'+Date.now(), used=order.length;
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length], emoji:'🗂', icon:folderIconFor('🗂'),
-          name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
+          name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[], group:true };
         // група стає на місце першої обраної папки
         const at=order.indexOf(picked[0]);
         if(at>=0) order.splice(at,0,key); else order.push(key);
@@ -819,7 +853,7 @@
       m.querySelectorAll('[data-pgsw]').forEach(b=>b.onclick=()=>{
         const k=b.dataset.pgsw; closeFolderMenu();
         if(k===fk) return;
-        if(k!==g && groupKids(k).length){ goHome(); setTimeout(()=>openFolderGroup(k),60); return; }   // група в групі — її шторка
+        if(k!==g && isFolderGroup(k)){ goHome(); setTimeout(()=>openFolderGroup(k),60); return; }   // група в групі — її шторка
         window.__fgNext=g; goFolder(k); window.__fgNext=null;
       });
     });
@@ -880,7 +914,7 @@
     const up=document.getElementById('pgCrumbUp'), nm=document.getElementById('pgCrumbName'), more=document.getElementById('pgMoreBtn');
     if(up) up.onclick=()=>{ const f=folders[pgBarFolder()]; const p=f&&f.parent;
       // вгору — туди, звідки прийшли: простір групи (типово з 15.11.2026) або документ папки-батька
-      if(p&&folders[p]){ if(gviewOf(p)==='space'&&groupKids(p).length){ goHome(); openFolderGroupSpace(p); return; } goFolder(p); return; }
+      if(p&&folders[p]){ if(gviewOf(p)==='space'&&isFolderGroup(p)){ goHome(); openFolderGroupSpace(p); return; } goFolder(p); return; }
       goHome(); };
     if(nm) nm.onclick=pgBarSwitchSheet;
     if(more) more.onclick=pgBarMoreSheet;
@@ -1059,8 +1093,9 @@
       ${f.due?fmRow('rmdue','del','Прибрати дедлайн',''):''}`:''}
       ${fmRow('move','group',par?('Група · <span data-i18n-skip="1">'+esc(folders[par].name)+'</span>'):'Перемістити в групу',par?'змінити або винести на головну':'покласти в іншу папку')}
       ${fmRow('subnew','plus','Нова підпапка','папка всередині «'+esc(f.name)+'»')}
-      ${kids.length?fmRow('gview','type','Як відкривати · '+GVIEW[gviewOf(key)][0],'простір, як папка, стос чи як на iPhone'):''}
-      ${kids.length?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
+      ${kids.length?fmRow('asgroup','group',f.group?'Показувати як звичайну папку':'Показувати як групу',f.group?'підпапки — лише всередині сторінки':'рамка на Огляді, папки окремо'):''}
+      ${isFolderGroup(key)?fmRow('gview','type','Як відкривати · '+GVIEW[gviewOf(key)][0],'простір, як папка, стос чи як на iPhone'):''}
+      ${isFolderGroup(key)?fmRow('ungroup','ungroup','Розгрупувати','папки виходять з групи, нічого не видаляється'):''}
       ${f.custom?fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
       m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>folderAction(key,b.dataset.act));
@@ -1207,9 +1242,15 @@
         onOk:()=>{ const prev=f.photo; f.photo=''; f.photoPos=null;
           window.photoDel(prev); saveFolders(); renderDashboard(); } });
       return; }
+    if(act==='asgroup'){
+      if(f.group) delete f.group; else f.group=true;
+      saveFolders(); renderDashboard(); openFolderMenu(key);
+      try{ window.platform.haptic('select'); }catch(_){}
+      return; }
     if(act==='ungroup'){
       const kids=groupKids(key), up=(f.parent&&folders[f.parent])?f.parent:'';   // батька вже нема — на головну
       kids.forEach(ck=>{ folders[ck].parent=up; });
+      delete f.group;
       saveFolders(); renderDashboard(); closeFolderMenu();
       fgToast('«'+f.name+'» розгруповано: '+kids.length+' '+pluralUk(kids.length,'папка','папки','папок')+' на місці');
       return;

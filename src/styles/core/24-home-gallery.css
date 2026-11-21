@@ -90,9 +90,7 @@
 :is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-name{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.35);}
 :is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-meta{color:rgba(255,255,255,.86);}
 :is(#folderGrid,#fspGrid) .fc3-has-photo .fc3-pin .fc3-svg{color:#fff;}
-/* група — стос карток під плиткою */
-:is(#folderGrid,#fspGrid) .fc3-group{box-shadow:0 6px 0 -2px color-mix(in srgb,var(--c,#6a7dff) 32%,var(--card)),
-  0 11px 0 -4px color-mix(in srgb,var(--c,#6a7dff) 18%,var(--card));margin-bottom:6px;}
+/* (стос групи прибрано 21.11.2026 — див. «Вкладка без вушка» нижче) */
 /* дрібні плитки — лише значок і назва */
 :is(#folderGrid,#fspGrid).fsz-s .fc3-ic{left:8px;top:8px;width:34px;height:34px;border-radius:11px;font-size:17px;}
 :is(#folderGrid,#fspGrid).fsz-s .fc3-ic .fc2-ico{width:17px;height:17px;}
@@ -237,21 +235,24 @@
   :is(#folderGrid,#fspGrid).fv2-rows .fr-add{grid-column:1 / -1;}
 }
 
-/* ── група-стос з фото (15.11.2026): з-за плитки визирають фото вкладених папок ──
-   Плитка групи без власного фону й без обрізання: фон малює .fc3-face, а дві .fc3-under
-   лежать позаду (z -1 у межах isolation плитки), тож фото самої групи завжди зверху. */
-:is(#folderGrid,#fspGrid) .fc3-group{overflow:visible;background:transparent;box-shadow:none;margin-bottom:0;}
-:is(#folderGrid,#fspGrid) .fc3-group .fc3-bg,:is(#folderGrid,#fspGrid) .fc3-group .fc3-veil{border-radius:inherit;overflow:hidden;}
-:is(#folderGrid,#fspGrid) .fc3-face{position:absolute;inset:0;z-index:0;border-radius:inherit;
-  background:color-mix(in srgb,var(--c,#6a7dff) 22%,var(--card));box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 24px -14px var(--shadow);}
-:is(#folderGrid,#fspGrid) .fc3-under{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
-  background:color-mix(in srgb,var(--uc,#6a7dff) 40%,var(--card)) center/cover no-repeat;
-  box-shadow:0 6px 16px -10px rgba(0,0,0,.55);border:1px solid color-mix(in srgb,var(--text) 10%,transparent);}
-:is(#folderGrid,#fspGrid) .fc3-under.u1{transform:translate(8px,-10px) rotate(4deg);}
-:is(#folderGrid,#fspGrid) .fc3-under.u2{transform:translate(15px,-17px) rotate(8deg) scale(.96);opacity:.85;}
-:is(#folderGrid,#fspGrid).fsz-s .fc3-under.u1{transform:translate(4px,-5px) rotate(3deg);}
-:is(#folderGrid,#fspGrid).fsz-s .fc3-under.u2{transform:translate(7px,-8px) rotate(6deg) scale(.97);}
-@media (prefers-reduced-motion: reduce){ :is(#folderGrid,#fspGrid) .fc3-under{transition:none;} }
+/* ── група «Вкладка без вушка» (21.11.2026): рамка кольору групи + кружечки її папок ──
+   Стос (картки, що визирали ззаду) прибрано. Плитка групи — та сама за розміром, що й інші,
+   тож ряд лишається рівним. Камеру ховаємо: її місце біля ⋯ займають кружечки (фото — через «Вигляд»). */
+:is(#folderGrid,#fspGrid) .fc3-group{box-shadow:inset 0 0 0 3px var(--c,#6a7dff),0 10px 24px -14px var(--shadow);margin-bottom:0;}
+:is(#folderGrid,#fspGrid) .fc3-group .fc3-photo{display:none;}
+:is(#folderGrid,#fspGrid) .fc3-gavs{position:absolute;top:12px;right:54px;z-index:3;display:flex;align-items:center;gap:4px;
+  padding:3px 8px 3px 3px;border-radius:99px;background:color-mix(in srgb,var(--card) 88%,transparent);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:11.5px;line-height:1;color:var(--text);pointer-events:none;}
+:is(#folderGrid,#fspGrid) .fc3-gavs b{font-weight:800;margin-left:2px;}
+:is(#folderGrid,#fspGrid) .fc3-gav{width:22px;height:22px;border-radius:50%;display:block;flex:none;
+  background:var(--uc,#6a7dff) center/cover no-repeat;border:2px solid var(--card);}
+:is(#folderGrid,#fspGrid) .fc3-gav+.fc3-gav{margin-left:-10px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-gavs{top:6px;right:42px;padding:2px 6px 2px 2px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-gav{width:16px;height:16px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-gav+.fc3-gav{margin-left:-7px;}
+/* рамка має бути поверх фото плитки: фото (.fc3-bg) малюється всередині, тож дублюємо її над ним */
+:is(#folderGrid,#fspGrid) .fc3-group.fc3-has-photo::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  box-shadow:inset 0 0 0 3px var(--c,#6a7dff);pointer-events:none;z-index:2;}
 
 /* ── простір сфери (16-dashboard.js openFolderGroupSpace): та сама сітка плиток, що й на Огляді ── */
 .fsp-ov{position:fixed;inset:0;z-index:1250;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
