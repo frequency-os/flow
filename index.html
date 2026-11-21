@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-21-1736-340a98c';
+  var BUILD='2026-11-21-1815-d786c2c';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -6977,6 +6977,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 #homeTabs .htab-new[hidden]{display:none;}
 /* група недоступна (у вкладці менше двох папок) — видно, але приглушено */
 .fmi:disabled{opacity:.45;cursor:default;}
+/* «Перенести · Копіювати» над списком місць (16-dashboard.js openFolderMovePicker) */
+.fmv-mode{display:flex;margin:2px 0 10px;}
+.fmv-mode button{flex:1;}
+.fmv-note{text-transform:none;letter-spacing:0;margin-top:-4px;}
 /* чати своєї вкладки — під сіткою її папок */
 #chatList.chl-in-tab{margin-top:18px;}
 /* телефон і є свої вкладки: без значків і лічильників — інакше в капсулу влазить 2,5 вкладки,
@@ -10942,6 +10946,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     'lang_pref','i18n_content_cache',
     'chats_v1',
     'home_tabs_v1',   // свої вкладки Огляду: назва й емодзі (36-chats.js, prefSet; 21.11.2026)
+    'home_tabs_del',  // надгробки видалених вкладок Огляду {id:час}, щоб злиття їх не воскрешало (36-chats.js)
     'folders_deleted_v1',   // «надгробки» видалених папок — щоб інший пристрій не повернув їх (04-folders-nav.js)
     /* Звірка 30.09.2026 (ARCH-10): ці ключі модулі давно пишуть через
        window.storage / prefSet, але в реєстр вони не потрапили — отже, їх
@@ -23944,7 +23949,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <div class="fmi-label">Місце</div>
       ${fmSwRow('pin','pin','Закріпити зверху','',!!f.pinned)}
       ${fmRow('prio','flag','Пріоритет · '+(folderPrio(key)?FPRIO[folderPrio(key)][0]:'без'),'високий, середній чи низький')}
-      ${fmRow('move','folder','Перенести в…',par?('зараз у «<span data-i18n-skip="1">'+esc(folders[par].name)+'</span>»'):'зараз на Огляді')}
+      ${fmRow('move','folder','Перенести або копіювати в…',par?('зараз у «<span data-i18n-skip="1">'+esc(folders[par].name)+'</span>»'):'зараз на Огляді')}
       <div class="fmi-label">Всередині</div>
       ${fmRow('subnew','plus','Нова підпапка','')}
       ${kids.length?fmSwRow('asgroup','group','Група на Огляді',f.group?'рамка і кружечки папок':'вимкнено — підпапки лише на сторінці',!!f.group):''}
@@ -24077,6 +24082,75 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     }catch(e){ console.error('fmDuplicate',e); fgToast('Не вдалося зробити копію'); }
     finally{ fmDupBusy=false; }
   }
+  /* «Копіювати в…» (21.11.2026, Ярослав: «не тільки переміщати, а й копіювати», обрав «з усіма підпапками»).
+     Копія папки РАЗОМ З ДЕРЕВОМ підпапок у вибране місце: dest={parent:'ключ папки'} або {parent:'', tab:'t…'|''}.
+     Правила ті самі, що в «Копії папки» вище: документ і теми (key, key__sp_*), фото — окремим знімком;
+     не копіюються звʼязки (місія, чати), закріплення, сфера. Позначка групи й «як відкривати» лишаються —
+     підпапки ж копіюються разом. Дія людини — звичайний saveFolders; «↩ Повернути» видаляє копії (з надгробками). */
+  async function fmCopyTree(key, dest){
+    const f=folders[key]; if(!f||fmDupBusy) return;
+    if(foldersLoaded!==true){ fgToast('Папки ще завантажуються — спробуй за мить'); return; }
+    dest=dest||{};
+    const par=(typeof dest.parent==='string'&&folders[dest.parent])?dest.parent:'';
+    if(par&&(par===key||isDescendantFolder(par,key))){ fgToast('У саму себе скопіювати не можна'); return; }
+    const tab=(!par&&utById(dest.tab))?dest.tab:'';
+    fmDupBusy=true;
+    try{
+      // дерево: сама папка, далі підпапки вглиб (батько завжди раніше за дитину)
+      const src=[]; const walk=k=>{ src.push(k); childFolderKeys(k).filter(folderVisible).forEach(walk); }; walk(key);
+      const base=Date.now(), map={};
+      src.forEach((k,i)=>{ map[k]='f_'+base+(i?'_'+i:''); });
+      if(src.some(k=>folders[map[k]])){ fgToast('Спробуй ще раз'); return; }
+      let photoLost=0, nb=0, ns=0;
+      const made=[];
+      /* крок 1 — лише фото (тут є очікування). Лише посилання на фотосховище (idb:…): якщо воно не спрацювало,
+         photoPut віддає сам base64 — а кілька таких у folders_cfg переповнили б квоту; тоді копія без фото */
+      const ph={};
+      for(const k of src){ const o=folders[k]; if(!o||!o.photo) continue;
+        let ref='';
+        try{ const data=await fmPhotoData(o.photo); if(data) ref=await window.photoPut('ph_'+map[k], data); }catch(_){ ref=''; }
+        ph[k]=(window.photoIsRef&&window.photoIsRef(ref))?ref:''; }
+      /* крок 2 — без жодного очікування: папки, документи, теми. Якщо між фото підтягнулись дані з хмари
+         (load() замінює boards), ми вже беремо свіжі — і нічого з копії не губиться */
+      if(foldersLoaded!==true||!folders[key]){ fgToast('Папки оновились — спробуй ще раз'); return; }
+      for(const k of src){
+        const o=folders[k], nk=map[k]; if(!o) continue;
+        const c=JSON.parse(JSON.stringify(o));
+        ['sphere','pinned'].forEach(x=>{ delete c[x]; });
+        c.key=nk; c.custom=true; c.photo=ph[k]||'';
+        if(o.photo&&!c.photo){ photoLost++; delete c.photoPos; }
+        if(k===key){
+          c.name=String(o.name||'Папка').slice(0,54)+' (копія)';
+          if(par) c.parent=par; else delete c.parent;
+          if(tab) c.tab=tab; else delete c.tab;
+        } else { c.parent=map[o.parent]; delete c.tab; }   // підпапка йде за своєю копією-батьком
+        folders[nk]=c; made.push(nk);
+        Object.keys(boards||{}).forEach(bk=>{
+          if(bk!==k&&bk.indexOf(k+'__sp_')!==0) return;
+          if(!Array.isArray(boards[bk])) return;
+          boards[nk+bk.slice(k.length)]=JSON.parse(JSON.stringify(boards[bk])); nb++;
+        });
+        // список тем документа (05-spaces.js): без нього скопійовані теми лежали б невидимо
+        try{ if(Array.isArray(spacesMap[k])&&spacesMap[k].length){ spacesMap[nk]=JSON.parse(JSON.stringify(spacesMap[k])); ns++; } }catch(_){}
+      }
+      // порядок: копія — одразу за оригіналом, її підпапки — за нею
+      const at=order.indexOf(key);
+      if(at>=0) order.splice(at+1,0,...made); else order.push(...made);
+      saveFolders();
+      if(nb) saveBoard();
+      if(ns) try{ saveSpacesMeta(); }catch(_){}
+      try{ renderDashboard(); }catch(_){}
+      try{ dsbTreeSync(); }catch(_){}
+      try{ window.platform.haptic('success'); }catch(_){}
+      const where=par?('«'+folderPathName(par)+'»'):(tab?('вкладку «'+tabLabel(tab,'Папки')+'»'):'Огляд');
+      const n=made.length-1;
+      const msg='Скопійовано у '+where+(n?(' · +'+n+' '+pluralUk(n,'підпапка','підпапки','підпапок')):'')+(photoLost?' · без '+photoLost+' фото':'');
+      try{ if(window.flowUndoToast) window.flowUndoToast(msg, ()=>{
+        made.slice().reverse().forEach(k=>{ try{ folderDelete(k); }catch(_){} });
+        try{ renderDashboard(); }catch(_){} try{ dsbTreeSync(); }catch(_){} }, 7000); else fgToast(msg); }catch(_){}
+    }catch(e){ console.error('fmCopyTree',e); fgToast('Не вдалося скопіювати'); }
+    finally{ fmDupBusy=false; }
+  }
   // вигляд папки: Документ · Чат · Фото · Полотно зберігаються в папці; «Стрічка» — лише поки відкрита сторінка
   function fmSetView(fk,v){
     if(typeof lkView!=='undefined') lkView[fk]=(v==='feed')?'feed':'doc';
@@ -24170,8 +24244,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* «Перемістити в папку» (15.11.2026): список ДЕРЕВОМ — вкладені з відступом і шляхом «Здоров'я › Гроші».
      Раніше всі папки йшли одним рівнем, і папка, покладена у вкладену, «зникала» з Огляду без сліду. */
   function folderPathName(k){ const a=[]; let cur=k, g=0; while(cur&&folders[cur]&&g++<20){ a.unshift(folders[cur].name||'Папка'); cur=folders[cur].parent||''; } return a.join(' › '); }
-  function openFolderMovePicker(key){
+  // mode: 'move' (типово) або 'copy' — той самий список місць, але створюється копія з підпапками (fmCopyTree)
+  function openFolderMovePicker(key, mode){
     const f=folders[key]; if(!f) return;
+    const copy=mode==='copy';
     closeFolderMenu();
     const ok=k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k);
     const rows=[]; const walk=(k,d)=>{ if(!ok(k)) return; rows.push([k,d]); childFolderKeys(k).forEach(c=>walk(c,d+1)); };
@@ -24179,16 +24255,27 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const thumb=tf=>{ let u=''; try{ u=tf.photo?safeImg(window.photoSrc(tf.photo)):''; }catch(_){ u=''; }
       return `<span class="fmv-th" style="--c:${safeColor(tf.c,'#6a7dff')}${u?`;background-image:url('${esc(u)}')`:''}">${u?'':`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(tf))}"/></svg>`}</span>`; };
     const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='fmenuSheet';
-    const rootRow=(f.parent||'')?`<button class="fmi fmv" data-mv=""><span class="fmv-th home">⌂</span><span class="fmv-t"><b>На Огляд</b><small>без папки</small></span></button>`:'';
-    const list=rows.map(([k,d])=>{ const tf=folders[k], cur=(f.parent||'')===k;
+    const rootRow=((f.parent||'')||(copy&&!userTabs.length))?`<button class="fmi fmv" data-mv=""><span class="fmv-th home">⌂</span><span class="fmv-t"><b>На Огляд</b><small>без папки</small></span></button>`:'';
+    const list=rows.map(([k,d])=>{ const tf=folders[k], cur=!copy&&(f.parent||'')===k;
       return `<button class="fmi fmv${cur?' on':''}" data-mv="${esc(k)}" style="--d:${d}">${thumb(tf)}<span class="fmv-t"><b data-i18n-skip="1">${esc(tf.name)}</b>${d?`<small data-i18n-skip="1">у «${esc(folderPathName(tf.parent))}»</small>`:''}</span>${cur?'<span class="fmv-ok">тут</span>':''}</button>`; }).join('');
     // своя вкладка Огляду (36-chats.js, 21.11.2026): зверху — у яку вкладку; «тут» лише для папки верхнього рівня
-    const tabsHtml=userTabs.length?`<div class="fmi-label">Вкладка Огляду</div>${tabPickRows((f.parent||'')?null:itemTab(f),'Папки')}<div class="fmi-label">У папку</div>`:'';
+    const tabsHtml=userTabs.length?`<div class="fmi-label">Вкладка Огляду</div>${tabPickRows((copy||(f.parent||''))?null:itemTab(f),'Папки')}<div class="fmi-label">У папку</div>`:'';
+    const nKids=(()=>{ let n=0; const w=k=>childFolderKeys(k).filter(folderVisible).forEach(c=>{ n++; w(c); }); w(key); return n; })();
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
-      <div class="fmenu-title">Перенести «${esc(f.name)}» в…</div>
+      <div class="pgb-seg fm-seg fmv-mode" role="group" aria-label="Перенести чи копіювати"><button type="button" data-mvmode="move" class="${copy?'':'on'}" aria-pressed="${!copy}">Перенести</button><button type="button" data-mvmode="copy" class="${copy?'on':''}" aria-pressed="${copy}">Копіювати</button></div>
+      <div class="fmenu-title">${copy?'Копіювати':'Перенести'} «<span data-i18n-skip="1">${esc(f.name)}</span>» в…</div>
+      ${copy?`<div class="fmi-label fmv-note">Оригінал лишиться на місці${nKids?` · копія разом із ${nKids} ${pluralUk(nKids,'підпапкою','підпапками','підпапками')}`:''}</div>`:''}
       <div class="fmv-list">${tabsHtml}${rootRow}${list||'<div class="fmi-label">Немає інших папок</div>'}</div></div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
+    m.querySelectorAll('[data-mvmode]').forEach(b=>b.onclick=()=>{ if((b.dataset.mvmode==='copy')!==copy){ try{ window.platform.haptic('select'); }catch(_){} openFolderMovePicker(key, b.dataset.mvmode); } });
+    if(copy){
+      // своя вкладка: верхній рівень цієї вкладки; без вкладок — «На Огляд» туди ж, де оригінал
+      m.querySelectorAll('[data-mvtab]').forEach(b=>b.onclick=()=>{ closeFolderMenu(); fmCopyTree(key,{parent:'', tab:b.dataset.mvtab}); });
+      m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const to=b.dataset.mv; closeFolderMenu();
+        fmCopyTree(key, to?{parent:to}:{parent:'', tab:folderTabOf(key)}); });
+      return;
+    }
     m.querySelectorAll('[data-mvtab]').forEach(b=>b.onclick=()=>{ closeFolderMenu(); moveFolderToTab(key, b.dataset.mvtab); });
     m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{
       const to=b.dataset.mv, prev=f.parent||''; closeFolderMenu();
@@ -30790,16 +30877,63 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      вона показується в загальних «Папках»/«Чатах». Пишеться лише з дії людини. */
   const UTABS_KEY='home_tabs_v1';
   const UTAB_MAX=8;
-  let userTabs=[];                 // [{id,name,emoji}]
+  let userTabs=[];                 // [{id,name,emoji,at}] — at: час останньої зміни (створення чи перейменування)
+  let utDel={};                    // надгробки видалених вкладок {id: час}, щоб злиття їх не воскрешало
+  const UTAB_TOMB_MS=60*864e5;     // надгробки старші за 60 днів прибираємо
   const utIdOk=id=>typeof id==='string' && /^t[a-z0-9]{1,23}$/.test(id);
-  function applyUTabsRaw(raw){
-    try{ const p=raw?JSON.parse(raw):null;
-      if(Array.isArray(p)) userTabs=p.filter(t=>t&&utIdOk(t.id)).slice(0,UTAB_MAX)
-        .map(t=>({id:t.id, name:String(t.name||'Вкладка').slice(0,40), emoji:String(t.emoji||'').slice(0,16)})); }
-    catch(e){ console.error('home tabs parse',e); }
+  /* Формат: home_tabs_v1 лишається МАСИВОМ [{id,name,emoji,at}] — його розуміє й стара версія застосунку
+     (об'єкт вона прочитала б як «0 вкладок» і першим записом затерла б усі). Надгробки — окремим ключем
+     home_tabs_del {id:час}: стара версія його не бачить і не чіпає. */
+  const UTDEL_KEY='home_tabs_del';
+  function parseUTabs(raw){
+    let p=null; try{ p=raw?JSON.parse(raw):null; }catch(e){ console.error('home tabs parse',e); return null; }
+    if(!Array.isArray(p)) return null;
+    return p.filter(t=>t&&utIdOk(t.id))
+      .map(t=>({id:t.id, name:String(t.name||'Вкладка').slice(0,40), emoji:String(t.emoji||'').slice(0,16), at:Math.max(0,+t.at||0)}));
   }
-  try{ applyUTabsRaw(localStorage.getItem(UTABS_KEY)); }catch(_){}
-  function saveUTabs(){ try{ prefSet(UTABS_KEY, JSON.stringify(userTabs)); }catch(_){} }
+  function parseUTDel(raw){
+    let p=null; try{ p=raw?JSON.parse(raw):null; }catch(_){ return null; }
+    if(!p||typeof p!=='object'||Array.isArray(p)) return null;
+    const del={}; Object.keys(p).forEach(id=>{ const v=+p[id]; if(utIdOk(id)&&v>0) del[id]=v; });
+    return del;
+  }
+  /* злиття двох знімків: вкладки з обох боків лишаються (порядок — наш, нові з іншого боку — в кінець),
+     однаковий id — перемагає новіша зміна (at), а надгробок перемагає завжди: видалене не повертається */
+  function utMerge(a, b){
+    const del=Object.assign({}, a.del);
+    Object.keys(b.del).forEach(id=>{ if(!(del[id]>=b.del[id])) del[id]=b.del[id]; });
+    const now=Date.now(); Object.keys(del).forEach(id=>{ if(now-del[id]>UTAB_TOMB_MS) delete del[id]; });
+    const byId={}; b.tabs.forEach(t=>{ byId[t.id]=t; });
+    const out=[], seen={};
+    a.tabs.concat(b.tabs).forEach(t=>{ if(seen[t.id]||del[t.id]) return; seen[t.id]=1;
+      const o=byId[t.id]; out.push(o&&o.at>t.at?o:t); });
+    // ліміт після злиття не ріжемо: інакше вкладки з іншого пристрою зникли б мовчки; UTAB_MAX стримує лише створення
+    return {tabs:out, del};
+  }
+  function applyUTabsRaw(raw, rawDel){
+    const tabs=parseUTabs(raw), del=parseUTDel(rawDel);
+    if(!tabs&&!del) return false;
+    const m=utMerge({tabs:userTabs, del:utDel}, {tabs:tabs||[], del:del||{}});
+    userTabs=m.tabs; utDel=m.del; return true;
+  }
+  // злите з хмари — лише в локальну копію (не в хмару: автозапису нема), щоб пережило перезапуск
+  function utKeepLocal(){ try{ localStorage.setItem(UTABS_KEY, JSON.stringify(userTabs)); localStorage.setItem(UTDEL_KEY, JSON.stringify(utDel)); }catch(_){} }
+  try{ applyUTabsRaw(localStorage.getItem(UTABS_KEY), localStorage.getItem(UTDEL_KEY)); }catch(_){}
+  /* запис: спершу свіжий знімок зі сховища (хмара, якщо там новіше), злиття — і лише тоді запис цілком.
+     Записи йдуть по черзі, щоб два швидкі натискання не обігнали одне одного. */
+  let utSaving=Promise.resolve();
+  function saveUTabs(){
+    utSaving=utSaving.then(async()=>{
+      let rt=null, rd=null;
+      try{ const r=await window.storage.get(UTABS_KEY); rt=r&&r.value; }catch(_){}
+      try{ const r=await window.storage.get(UTDEL_KEY); rd=r&&r.value; }catch(_){}
+      applyUTabsRaw(rt, rd);
+      try{ prefSet(UTDEL_KEY, JSON.stringify(utDel)); }catch(_){}   // спершу надгробки: список без вкладки не має доїхати раніше за причину
+      try{ prefSet(UTABS_KEY, JSON.stringify(userTabs)); }catch(_){}
+      try{ renderDashboard(); }catch(_){}
+    }).catch(e=>console.error('home tabs save',e));
+    return utSaving;
+  }
   function utById(id){ return utIdOk(id) ? (userTabs.find(t=>t.id===id)||null) : null; }
   // вкладка, у якій лежить річ ('' — загальні «Папки»/«Чати»)
   function itemTab(o){ const t=o&&o.tab; return utById(t)?t:''; }
@@ -30822,7 +30956,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      і після звірок (як 62-block-store.js), інакше новий пристрій не побачив би вкладок з іншого */
   let utCatchAt=0;
   function utCatchup(){ const t=Date.now(); if(t-utCatchAt<15000) return; utCatchAt=t;
-    try{ prefCatchup(UTABS_KEY, v=>{ applyUTabsRaw(v); try{ renderDashboard(); }catch(_){} }); }catch(_){} }
+    try{ prefCatchup(UTABS_KEY, v=>{ if(applyUTabsRaw(v,null)){ utKeepLocal(); try{ renderDashboard(); }catch(_){} } }); }catch(_){}
+    try{ prefCatchup(UTDEL_KEY, v=>{ if(applyUTabsRaw(null,v)){ utKeepLocal(); try{ renderDashboard(); }catch(_){} } }); }catch(_){} }
   utCatchup();
   try{ document.addEventListener('flowsbready',()=>{ utCatchAt=0; utCatchup(); }); document.addEventListener('flowsync',utCatchup); }catch(_){}
   // поки хмару не звірено (є вхід, а дані ще не довірені) — список вкладок не пишемо: запис цілком затер би вкладки з іншого пристрою
@@ -31107,7 +31242,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       onOk:(name,em)=>{
         if(!utTrusted()) return;
         const t={ id:'t'+Date.now().toString(36), name:(name||'').trim().slice(0,40)||('Вкладка '+(userTabs.length+1)),
-          emoji:((em||'').trim()).slice(0,16) };
+          emoji:((em||'').trim()).slice(0,16), at:Date.now() };
         userTabs.push(t); saveUTabs();
         homeTab=''; setHomeTab(t.id);
         chToast('Вкладка «'+t.name+'» — додавай сюди папки й чати');
@@ -31122,6 +31257,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           if(!utTrusted()) return;
           if((name||'').trim()) t.name=name.trim().slice(0,40);
           if(em!==undefined) t.emoji=((em||'').trim()).slice(0,16);
+          t.at=Date.now();   // новіша зміна перемагає при злитті
           saveUTabs(); renderDashboard(); }})},
       {ic:'trash', label:'Видалити вкладку', sub:'папки й чати повернуться в «Папки» і «Чати»', danger:true, onClick:()=>deleteUserTab(id)}
     ]});
@@ -31140,7 +31276,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         ck.forEach(c=>{ delete c.tab; });
         if(fk.length) saveFolders();
         if(ck.length) saveChats();
-        userTabs=userTabs.filter(x=>x.id!==id); saveUTabs();
+        userTabs=userTabs.filter(x=>x.id!==id); utDel[id]=Date.now(); saveUTabs();   // надгробок: злиття не поверне
         homeTab=''; setHomeTab('folders');
         chToast('Вкладку видалено');
       }});
