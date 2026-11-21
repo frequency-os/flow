@@ -1087,7 +1087,7 @@
       <div class="fmi-label">Місце</div>
       ${fmSwRow('pin','pin','Закріпити зверху','',!!f.pinned)}
       ${fmRow('prio','flag','Пріоритет · '+(folderPrio(key)?FPRIO[folderPrio(key)][0]:'без'),'високий, середній чи низький')}
-      ${fmRow('move','folder','Перенести в…',par?('зараз у «<span data-i18n-skip="1">'+esc(folders[par].name)+'</span>»'):'зараз на Огляді')}
+      ${fmRow('move','folder','Перенести або копіювати в…',par?('зараз у «<span data-i18n-skip="1">'+esc(folders[par].name)+'</span>»'):'зараз на Огляді')}
       <div class="fmi-label">Всередині</div>
       ${fmRow('subnew','plus','Нова підпапка','')}
       ${kids.length?fmSwRow('asgroup','group','Група на Огляді',f.group?'рамка і кружечки папок':'вимкнено — підпапки лише на сторінці',!!f.group):''}
@@ -1220,6 +1220,75 @@
     }catch(e){ console.error('fmDuplicate',e); fgToast('Не вдалося зробити копію'); }
     finally{ fmDupBusy=false; }
   }
+  /* «Копіювати в…» (21.11.2026, Ярослав: «не тільки переміщати, а й копіювати», обрав «з усіма підпапками»).
+     Копія папки РАЗОМ З ДЕРЕВОМ підпапок у вибране місце: dest={parent:'ключ папки'} або {parent:'', tab:'t…'|''}.
+     Правила ті самі, що в «Копії папки» вище: документ і теми (key, key__sp_*), фото — окремим знімком;
+     не копіюються звʼязки (місія, чати), закріплення, сфера. Позначка групи й «як відкривати» лишаються —
+     підпапки ж копіюються разом. Дія людини — звичайний saveFolders; «↩ Повернути» видаляє копії (з надгробками). */
+  async function fmCopyTree(key, dest){
+    const f=folders[key]; if(!f||fmDupBusy) return;
+    if(foldersLoaded!==true){ fgToast('Папки ще завантажуються — спробуй за мить'); return; }
+    dest=dest||{};
+    const par=(typeof dest.parent==='string'&&folders[dest.parent])?dest.parent:'';
+    if(par&&(par===key||isDescendantFolder(par,key))){ fgToast('У саму себе скопіювати не можна'); return; }
+    const tab=(!par&&utById(dest.tab))?dest.tab:'';
+    fmDupBusy=true;
+    try{
+      // дерево: сама папка, далі підпапки вглиб (батько завжди раніше за дитину)
+      const src=[]; const walk=k=>{ src.push(k); childFolderKeys(k).filter(folderVisible).forEach(walk); }; walk(key);
+      const base=Date.now(), map={};
+      src.forEach((k,i)=>{ map[k]='f_'+base+(i?'_'+i:''); });
+      if(src.some(k=>folders[map[k]])){ fgToast('Спробуй ще раз'); return; }
+      let photoLost=0, nb=0, ns=0;
+      const made=[];
+      /* крок 1 — лише фото (тут є очікування). Лише посилання на фотосховище (idb:…): якщо воно не спрацювало,
+         photoPut віддає сам base64 — а кілька таких у folders_cfg переповнили б квоту; тоді копія без фото */
+      const ph={};
+      for(const k of src){ const o=folders[k]; if(!o||!o.photo) continue;
+        let ref='';
+        try{ const data=await fmPhotoData(o.photo); if(data) ref=await window.photoPut('ph_'+map[k], data); }catch(_){ ref=''; }
+        ph[k]=(window.photoIsRef&&window.photoIsRef(ref))?ref:''; }
+      /* крок 2 — без жодного очікування: папки, документи, теми. Якщо між фото підтягнулись дані з хмари
+         (load() замінює boards), ми вже беремо свіжі — і нічого з копії не губиться */
+      if(foldersLoaded!==true||!folders[key]){ fgToast('Папки оновились — спробуй ще раз'); return; }
+      for(const k of src){
+        const o=folders[k], nk=map[k]; if(!o) continue;
+        const c=JSON.parse(JSON.stringify(o));
+        ['sphere','pinned'].forEach(x=>{ delete c[x]; });
+        c.key=nk; c.custom=true; c.photo=ph[k]||'';
+        if(o.photo&&!c.photo){ photoLost++; delete c.photoPos; }
+        if(k===key){
+          c.name=String(o.name||'Папка').slice(0,54)+' (копія)';
+          if(par) c.parent=par; else delete c.parent;
+          if(tab) c.tab=tab; else delete c.tab;
+        } else { c.parent=map[o.parent]; delete c.tab; }   // підпапка йде за своєю копією-батьком
+        folders[nk]=c; made.push(nk);
+        Object.keys(boards||{}).forEach(bk=>{
+          if(bk!==k&&bk.indexOf(k+'__sp_')!==0) return;
+          if(!Array.isArray(boards[bk])) return;
+          boards[nk+bk.slice(k.length)]=JSON.parse(JSON.stringify(boards[bk])); nb++;
+        });
+        // список тем документа (05-spaces.js): без нього скопійовані теми лежали б невидимо
+        try{ if(Array.isArray(spacesMap[k])&&spacesMap[k].length){ spacesMap[nk]=JSON.parse(JSON.stringify(spacesMap[k])); ns++; } }catch(_){}
+      }
+      // порядок: копія — одразу за оригіналом, її підпапки — за нею
+      const at=order.indexOf(key);
+      if(at>=0) order.splice(at+1,0,...made); else order.push(...made);
+      saveFolders();
+      if(nb) saveBoard();
+      if(ns) try{ saveSpacesMeta(); }catch(_){}
+      try{ renderDashboard(); }catch(_){}
+      try{ dsbTreeSync(); }catch(_){}
+      try{ window.platform.haptic('success'); }catch(_){}
+      const where=par?('«'+folderPathName(par)+'»'):(tab?('вкладку «'+tabLabel(tab,'Папки')+'»'):'Огляд');
+      const n=made.length-1;
+      const msg='Скопійовано у '+where+(n?(' · +'+n+' '+pluralUk(n,'підпапка','підпапки','підпапок')):'')+(photoLost?' · без '+photoLost+' фото':'');
+      try{ if(window.flowUndoToast) window.flowUndoToast(msg, ()=>{
+        made.slice().reverse().forEach(k=>{ try{ folderDelete(k); }catch(_){} });
+        try{ renderDashboard(); }catch(_){} try{ dsbTreeSync(); }catch(_){} }, 7000); else fgToast(msg); }catch(_){}
+    }catch(e){ console.error('fmCopyTree',e); fgToast('Не вдалося скопіювати'); }
+    finally{ fmDupBusy=false; }
+  }
   // вигляд папки: Документ · Чат · Фото · Полотно зберігаються в папці; «Стрічка» — лише поки відкрита сторінка
   function fmSetView(fk,v){
     if(typeof lkView!=='undefined') lkView[fk]=(v==='feed')?'feed':'doc';
@@ -1313,8 +1382,10 @@
   /* «Перемістити в папку» (15.11.2026): список ДЕРЕВОМ — вкладені з відступом і шляхом «Здоров'я › Гроші».
      Раніше всі папки йшли одним рівнем, і папка, покладена у вкладену, «зникала» з Огляду без сліду. */
   function folderPathName(k){ const a=[]; let cur=k, g=0; while(cur&&folders[cur]&&g++<20){ a.unshift(folders[cur].name||'Папка'); cur=folders[cur].parent||''; } return a.join(' › '); }
-  function openFolderMovePicker(key){
+  // mode: 'move' (типово) або 'copy' — той самий список місць, але створюється копія з підпапками (fmCopyTree)
+  function openFolderMovePicker(key, mode){
     const f=folders[key]; if(!f) return;
+    const copy=mode==='copy';
     closeFolderMenu();
     const ok=k=>k!==key && k!=='work' && folders[k] && !isDescendantFolder(k,key) && folderVisible(k);
     const rows=[]; const walk=(k,d)=>{ if(!ok(k)) return; rows.push([k,d]); childFolderKeys(k).forEach(c=>walk(c,d+1)); };
@@ -1322,16 +1393,27 @@
     const thumb=tf=>{ let u=''; try{ u=tf.photo?safeImg(window.photoSrc(tf.photo)):''; }catch(_){ u=''; }
       return `<span class="fmv-th" style="--c:${safeColor(tf.c,'#6a7dff')}${u?`;background-image:url('${esc(u)}')`:''}">${u?'':`<svg class="ico" aria-hidden="true"><use href="#${esc(folderIcon(tf))}"/></svg>`}</span>`; };
     const m=document.createElement('div'); m.className='fmenu-sheet'; m.id='fmenuSheet';
-    const rootRow=(f.parent||'')?`<button class="fmi fmv" data-mv=""><span class="fmv-th home">⌂</span><span class="fmv-t"><b>На Огляд</b><small>без папки</small></span></button>`:'';
-    const list=rows.map(([k,d])=>{ const tf=folders[k], cur=(f.parent||'')===k;
+    const rootRow=((f.parent||'')||(copy&&!userTabs.length))?`<button class="fmi fmv" data-mv=""><span class="fmv-th home">⌂</span><span class="fmv-t"><b>На Огляд</b><small>без папки</small></span></button>`:'';
+    const list=rows.map(([k,d])=>{ const tf=folders[k], cur=!copy&&(f.parent||'')===k;
       return `<button class="fmi fmv${cur?' on':''}" data-mv="${esc(k)}" style="--d:${d}">${thumb(tf)}<span class="fmv-t"><b data-i18n-skip="1">${esc(tf.name)}</b>${d?`<small data-i18n-skip="1">у «${esc(folderPathName(tf.parent))}»</small>`:''}</span>${cur?'<span class="fmv-ok">тут</span>':''}</button>`; }).join('');
     // своя вкладка Огляду (36-chats.js, 21.11.2026): зверху — у яку вкладку; «тут» лише для папки верхнього рівня
-    const tabsHtml=userTabs.length?`<div class="fmi-label">Вкладка Огляду</div>${tabPickRows((f.parent||'')?null:itemTab(f),'Папки')}<div class="fmi-label">У папку</div>`:'';
+    const tabsHtml=userTabs.length?`<div class="fmi-label">Вкладка Огляду</div>${tabPickRows((copy||(f.parent||''))?null:itemTab(f),'Папки')}<div class="fmi-label">У папку</div>`:'';
+    const nKids=(()=>{ let n=0; const w=k=>childFolderKeys(k).filter(folderVisible).forEach(c=>{ n++; w(c); }); w(key); return n; })();
     m.innerHTML=`<div class="fmenu-in"><div class="fmenu-grip"></div>
-      <div class="fmenu-title">Перенести «${esc(f.name)}» в…</div>
+      <div class="pgb-seg fm-seg fmv-mode" role="group" aria-label="Перенести чи копіювати"><button type="button" data-mvmode="move" class="${copy?'':'on'}" aria-pressed="${!copy}">Перенести</button><button type="button" data-mvmode="copy" class="${copy?'on':''}" aria-pressed="${copy}">Копіювати</button></div>
+      <div class="fmenu-title">${copy?'Копіювати':'Перенести'} «<span data-i18n-skip="1">${esc(f.name)}</span>» в…</div>
+      ${copy?`<div class="fmi-label fmv-note">Оригінал лишиться на місці${nKids?` · копія разом із ${nKids} ${pluralUk(nKids,'підпапкою','підпапками','підпапками')}`:''}</div>`:''}
       <div class="fmv-list">${tabsHtml}${rootRow}${list||'<div class="fmi-label">Немає інших папок</div>'}</div></div>`;
     m.onclick=e=>{ if(e.target===m) closeFolderMenu(); };
     document.body.appendChild(m);
+    m.querySelectorAll('[data-mvmode]').forEach(b=>b.onclick=()=>{ if((b.dataset.mvmode==='copy')!==copy){ try{ window.platform.haptic('select'); }catch(_){} openFolderMovePicker(key, b.dataset.mvmode); } });
+    if(copy){
+      // своя вкладка: верхній рівень цієї вкладки; без вкладок — «На Огляд» туди ж, де оригінал
+      m.querySelectorAll('[data-mvtab]').forEach(b=>b.onclick=()=>{ closeFolderMenu(); fmCopyTree(key,{parent:'', tab:b.dataset.mvtab}); });
+      m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const to=b.dataset.mv; closeFolderMenu();
+        fmCopyTree(key, to?{parent:to}:{parent:'', tab:folderTabOf(key)}); });
+      return;
+    }
     m.querySelectorAll('[data-mvtab]').forEach(b=>b.onclick=()=>{ closeFolderMenu(); moveFolderToTab(key, b.dataset.mvtab); });
     m.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{
       const to=b.dataset.mv, prev=f.parent||''; closeFolderMenu();

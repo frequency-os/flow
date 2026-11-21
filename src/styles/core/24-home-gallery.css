@@ -41,6 +41,10 @@
 #homeTabs .htab-new[hidden]{display:none;}
 /* група недоступна (у вкладці менше двох папок) — видно, але приглушено */
 .fmi:disabled{opacity:.45;cursor:default;}
+/* «Перенести · Копіювати» над списком місць (16-dashboard.js openFolderMovePicker) */
+.fmv-mode{display:flex;margin:2px 0 10px;}
+.fmv-mode button{flex:1;}
+.fmv-note{text-transform:none;letter-spacing:0;margin-top:-4px;}
 /* чати своєї вкладки — під сіткою її папок */
 #chatList.chl-in-tab{margin-top:18px;}
 /* телефон і є свої вкладки: без значків і лічильників — інакше в капсулу влазить 2,5 вкладки,

@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 38605 |
+| Рядків JS | 38687 |
 | Файлів CSS | 54 |
-| Рядків CSS | 12067 |
-| Сутностей верхнього рівня | 2987 |
+| Рядків CSS | 12071 |
+| Сутностей верхнього рівня | 2988 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -50,7 +50,7 @@
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1697 | 89 |
-| `src/scripts/core/16-dashboard.js` | 1431 | 82 |
+| `src/scripts/core/16-dashboard.js` | 1513 | 83 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
@@ -167,7 +167,7 @@
 | `src/styles/core/21-spheres.css` | 82 | 0 |
 | `src/styles/core/22-year-letter.css` | 70 | 0 |
 | `src/styles/core/23-ritual-steps.css` | 65 | 0 |
-| `src/styles/core/24-home-gallery.css` | 354 | 0 |
+| `src/styles/core/24-home-gallery.css` | 358 | 0 |
 | `src/styles/core/25-journal.css` | 316 | 0 |
 | `src/styles/core/26-day.css` | 173 | 0 |
 | `src/styles/core/27-month.css` | 212 | 0 |
@@ -1283,7 +1283,7 @@
 | `plEditBlock` | функція | `src/scripts/core/15-flow-spot.js:1643` |
 | `plRangeSheet` | функція | `src/scripts/core/15-flow-spot.js:1646` |
 
-### `src/scripts/core/16-dashboard.js` — 82 сутностей
+### `src/scripts/core/16-dashboard.js` — 83 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1360,15 +1360,16 @@
 | `fmPhotoData` | функція | `src/scripts/core/16-dashboard.js:1177` |
 | `fmDupBusy` | значення | `src/scripts/core/16-dashboard.js:1187` |
 | `fmDuplicate` | функція | `src/scripts/core/16-dashboard.js:1188` |
-| `fmSetView` | функція | `src/scripts/core/16-dashboard.js:1224` |
-| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1233` |
-| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1249` |
-| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1271` |
-| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1280` |
-| `folderPathName` | функція | `src/scripts/core/16-dashboard.js:1315` |
-| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1316` |
-| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1345` |
-| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1401` |
+| `fmCopyTree` | функція | `src/scripts/core/16-dashboard.js:1228` |
+| `fmSetView` | функція | `src/scripts/core/16-dashboard.js:1293` |
+| `openFolderLook` | функція | `src/scripts/core/16-dashboard.js:1302` |
+| `openFolderType` | функція | `src/scripts/core/16-dashboard.js:1318` |
+| `closeFolderMenu` | функція | `src/scripts/core/16-dashboard.js:1340` |
+| `openFolderIconPicker` | функція | `src/scripts/core/16-dashboard.js:1349` |
+| `folderPathName` | функція | `src/scripts/core/16-dashboard.js:1384` |
+| `openFolderMovePicker` | функція | `src/scripts/core/16-dashboard.js:1386` |
+| `folderAction` | функція | `src/scripts/core/16-dashboard.js:1427` |
+| `pickFolderPhoto` | функція | `src/scripts/core/16-dashboard.js:1483` |
 
 ### `src/scripts/core/17-folder-render.js` — 2 сутностей
 
