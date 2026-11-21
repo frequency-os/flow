@@ -290,6 +290,9 @@
   /* шар «шторка над шторкою» (12.10.2026): вибір папки відкривається з вікна місії (.jn-ov 1200), а не лише з Огляду.
      Шари: .fmenu-sheet 300 · .jn-ov 1200 · .asheet / .imodal 1300 · .fmenu-sheet.on-top 1350 */
   .fmenu-sheet.on-top{z-index:1350;}
+  /* 21.11.2026: «простір» групи (.fsp-ov) лежить на 1250 — меню папки (300) і «Звʼязки» (.jn-ov 1200),
+     відкриті з нього, ховались позаду: тап по ⋯ «нічого не відкривав». Поки простір відкритий — вони над ним. */
+  body:has(.fsp-ov) .fmenu-sheet, body:has(.fsp-ov) .jn-ov{z-index:1350;}
   .fmenu-in{width:100%;max-width:480px;background:var(--sheet);border-top:1px solid var(--hair-2);
     border-radius:24px 24px 0 0;padding:10px 14px 28px;box-shadow:0 -14px 50px rgba(0,0,0,.5);animation:up .3s cubic-bezier(.2,.85,.25,1);max-height:80vh;overflow-y:auto;}
   .fmenu-in::-webkit-scrollbar{width:0;}

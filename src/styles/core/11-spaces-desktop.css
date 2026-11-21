@@ -102,7 +102,9 @@
 
     /* СТАН: сайдбар схований → робоча область на весь екран */
     body.sidebar-collapsed .dsb{transform:translateX(-100%);pointer-events:none;}
-    body.sidebar-collapsed .phone{margin-left:0;max-width:1180px;padding-left:64px;}
+    /* 21.11.2026: було max-width:1180px — на Mac 1440 праворуч лишалась порожня смуга ~300px
+       (і в «На весь екран», і між документом та «Звʼязками», що прибиті до краю вікна) */
+    body.sidebar-collapsed .phone{margin-left:0;max-width:none;padding-left:64px;}
 
     /* ПОВНОЕКРАННИЙ Простір: і сайдбар, і обмеження ширини геть */
 

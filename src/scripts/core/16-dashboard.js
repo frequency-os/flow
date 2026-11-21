@@ -498,7 +498,9 @@
         if(opts&&typeof opts.onCreated==='function'){ try{ opts.onCreated(key); }catch(_){} return; }
         if(par){ const act=document.querySelector('.screen.active');
           if(act&&act.id==='scr-page'&&pgBarFolder()===par){ try{ renderPgLinks(); }catch(_){} }
-          else openGroupAsChosen(par); }
+          // «простір» — лише для групи, яку людина зібрала сама (21.11.2026); звичайна папка з підпапками — її сторінка
+          else if(isFolderGroup(par)) openGroupAsChosen(par);
+          else { window.__fgNext=folders[par].parent||''; try{ goFolder(par); }finally{ window.__fgNext=null; } } }
       }});
   }
 
