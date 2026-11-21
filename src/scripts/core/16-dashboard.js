@@ -1099,6 +1099,7 @@
       ${onPage?fmSwRow('feed','media','Стрічка подій','замість документа — усе, що сталося в папці',feed):''}
       ${dev?fmRow('sphere','bld','Сфера · будівля в грі',f.sphere?'повʼязано · змінити чи прибрати':'не повʼязано'):''}
       <div class="fmi-label">Поділитись</div>
+      ${fmRow('dup','folder','Копія папки','документ, фото й налаштування — без підпапок і звʼязків')}
       ${fmRow('copytext','copy','Скопіювати як текст','документ папки — у буфер, щоб вставити деінде')}
       ${f.custom?`<div class="fm-gap"></div>`+fmRow('delete','del','Видалити папку','','danger'):''}`,
     m=>{
@@ -1113,6 +1114,7 @@
           saveFolders(); renderDashboard(); openFolderMenu(key,o); try{ window.platform.haptic('select'); }catch(_){} return; }
         if(a==='feed'){ fmSetView(key, feed?fv:'feed'); closeFolderMenu(); return; }
         if(a==='copytext'){ closeFolderMenu(); fmCopyText(key); return; }
+        if(a==='dup'){ closeFolderMenu(); fmDuplicate(key); return; }
         folderAction(key,a);
       });
       m.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{
@@ -1160,6 +1162,57 @@
       document.body.appendChild(ta); ta.select(); ok=document.execCommand('copy'); ta.remove(); }catch(_){} }
     fgToast(ok?('Скопійовано: '+lines.length+' '+pluralUk(lines.length,'рядок','рядки','рядків')):'Не вдалося скопіювати — спробуй ще раз');
     try{ window.platform.haptic(ok?'success':'error'); }catch(_){}
+  }
+  /* «Копія папки» (21.11.2026, Ярослав: «копіювати і фото»). Дія людини — звичайний saveFolders, не {auto:true}.
+     Копіюється: налаштування папки, документ і його теми (boards key і key__sp_*), фото обкладинки — ОКРЕМИМ знімком
+     (своє посилання ph_<новий ключ>): інакше «Прибрати фото» в одній папці стерло б його і з другої, і з хмари.
+     Не копіюється: підпапки, звʼязки (місія, чати), закріплення, позначка групи, сфера в грі — копія незалежна.
+     Id блоків лишаються ті самі: блоки шукаються в парі «дошка + id», а посилання всередині документа не ламаються. */
+  async function fmPhotoData(ref){
+    if(!ref) return '';
+    const r=String(ref);
+    if(!window.photoIsRef||!window.photoIsRef(r)) return r;            // старий формат — сам data-URL
+    const id=r.slice(4);
+    try{ if(window.__photoCache&&window.__photoCache[id]) return window.__photoCache[id]; }catch(_){}
+    try{ if(window.PhotoDB&&window.PhotoDB.available()){ const v=await window.PhotoDB.get(id); if(v) return v; } }catch(_){}
+    try{ if(window.sbPhotoFetch){ const v=await window.sbPhotoFetch(id); if(v) return v; } }catch(_){}
+    return '';
+  }
+  let fmDupBusy=false;
+  async function fmDuplicate(key){
+    const f=folders[key]; if(!f||fmDupBusy) return;
+    if(foldersLoaded!==true){ fgToast('Папки ще завантажуються — спробуй за мить'); return; }   // як folder.create у Ядрі
+    fmDupBusy=true;
+    try{
+      const nk='f_'+Date.now();
+      if(folders[nk]){ fgToast('Спробуй ще раз'); return; }
+      const c=JSON.parse(JSON.stringify(f));
+      ['group','sphere','pinned','gview'].forEach(x=>{ delete c[x]; });
+      c.key=nk; c.custom=true; c.photo='';
+      c.name=String(f.name||'Папка').slice(0,54)+' (копія)';
+      if(c.parent&&!folders[c.parent]) delete c.parent;
+      // фото — окремим знімком; не вдалося дістати — копія без фото, а не спільне посилання
+      let photoLost=false;
+      if(f.photo){ const data=await fmPhotoData(f.photo);
+        if(data){ try{ c.photo=await window.photoPut('ph_'+nk, data); }catch(_){ c.photo=''; } }
+        if(!c.photo){ photoLost=true; delete c.photoPos; } }
+      folders[nk]=c;
+      const i=order.indexOf(key); if(i>=0) order.splice(i+1,0,nk); else order.push(nk);   // поруч з оригіналом
+      // документ і його теми
+      let nb=0;
+      Object.keys(boards||{}).forEach(bk=>{
+        if(bk!==key&&bk.indexOf(key+'__sp_')!==0) return;
+        if(!Array.isArray(boards[bk])) return;
+        boards[nk+bk.slice(key.length)]=JSON.parse(JSON.stringify(boards[bk])); nb++;
+      });
+      saveFolders();
+      if(nb) saveBoard();
+      try{ renderDashboard(); }catch(_){}
+      try{ dsbTreeSync(); }catch(_){}
+      fgToast('Створено «'+c.name+'»'+(photoLost?' — фото не вдалося скопіювати':''));
+      try{ window.platform.haptic('success'); }catch(_){}
+    }catch(e){ console.error('fmDuplicate',e); fgToast('Не вдалося зробити копію'); }
+    finally{ fmDupBusy=false; }
   }
   // вигляд папки: Документ · Чат · Фото · Полотно зберігаються в папці; «Стрічка» — лише поки відкрита сторінка
   function fmSetView(fk,v){
