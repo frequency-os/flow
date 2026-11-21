@@ -27,6 +27,29 @@
 .htab-cfg svg{width:19px;height:19px;}
 #scr-home .sec-htabs .htab-add[hidden],.htab-cfg[hidden]{display:none;}
 .htab-cfg:active{transform:scale(.94);}
+/* свої вкладки (36-chats.js, 21.11.2026): капсула гортається вбік, коли вкладок більше,
+   ніж вміщає телефон; «Папки» і «Чати» не стискаються до нечитабельного */
+#homeTabs.htabs{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+#homeTabs.htabs::-webkit-scrollbar{display:none;}
+#homeTabs .htab{flex:1 0 auto;}
+#homeTabs .htab-e{font-size:15px;line-height:1;}
+#homeTabs .htab-u{max-width:170px;}
+#homeTabs .htab-new{flex:none;width:38px;height:38px;border:0;border-radius:50%;padding:0;display:grid;place-items:center;
+  background:transparent;color:var(--muted);cursor:pointer;}
+#homeTabs .htab-new svg{width:17px;height:17px;}
+#homeTabs .htab-new:active{transform:scale(.92);}
+#homeTabs .htab-new[hidden]{display:none;}
+/* група недоступна (у вкладці менше двох папок) — видно, але приглушено */
+.fmi:disabled{opacity:.45;cursor:default;}
+/* чати своєї вкладки — під сіткою її папок */
+#chatList.chl-in-tab{margin-top:18px;}
+/* телефон і є свої вкладки: без значків і лічильників — інакше в капсулу влазить 2,5 вкладки,
+   а «＋» ховається за краєм (перевірено на 375px, 21.11.2026) */
+@media (max-width:699px){
+  #homeTabs.has-ut .htab-ic,#homeTabs.has-ut .htab .count{display:none;}
+  #homeTabs.has-ut .htab{padding:0 11px;gap:4px;}
+}
+
 /* широкий екран: капсула за вмістом, ⚙ праворуч — а не дві вкладки на 900px */
 @media (min-width:700px){
   #homeTabs.htabs{flex:0 1 auto;}

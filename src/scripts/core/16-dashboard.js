@@ -343,8 +343,10 @@
     try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
     let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');   // проєкти — звичайні папки зі статусом (14.10.2026)
-    // порожній акаунт — «Стартовий набір» замість голого «＋ Нова папка» (53-starter.js)
-    try{ if(starterActive()){ starterRender(grid); return; } stHeroOff(); }catch(e){ console.error('starter',e); }
+    // своя вкладка Огляду — лише її папки, «Папки» — без вкладки (36-chats.js, 21.11.2026)
+    keys=homeKeysForTab(keys);
+    // порожній акаунт — «Стартовий набір» замість голого «＋ Нова папка» (53-starter.js); у своїй вкладці — ні
+    try{ if(!homeUserTab() && starterActive()){ starterRender(grid); return; } stHeroOff(); }catch(e){ console.error('starter',e); }
     // «за назвою»: закріплені однаково зверху, решта — за абеткою
     if(folderOpts.sort==='name') keys=keys.slice().sort((a,b)=>
       ((folders[b].pinned?1:0)-(folders[a].pinned?1:0)) || String(folders[a].name||'').localeCompare(String(folders[b].name||''),'uk'));
@@ -436,7 +438,7 @@
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
     // «фото» на кольоровій обкладинці — одразу вибір знімка
     grid.querySelectorAll('[data-fphoto]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pickFolderPhoto(b.dataset.fphoto); });
-    try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length; }catch(_){}
+    try{ const cb=document.getElementById('folderCountBadge'); if(cb) cb.textContent=homeFolderCount(''); }catch(_){}
     if(!grid.__dragInit){ grid.__dragInit=true; enableFolderDrag(grid); }
     try{ requestAnimationFrame(()=>{ if(typeof fcCheckOverlap==='function') fcCheckOverlap(); }); }catch(_){}
   }
@@ -492,7 +494,7 @@
       onOk:async (name, emojiVal)=>{
         // створення — через реєстр дій Ядра (60-core-actions.js, 17.11.2026): та сама папка (назва за замовч.,
         // 📁 для порожнього поля, колір по колу), плюс перевірка «папки цієї сесії прочитано»
-        const r=await window.Core.run('folder.create',{name, emoji:emojiVal, parent:par},{undo:false});
+        const r=await window.Core.run('folder.create',{name, emoji:emojiVal, parent:par, tab:(!par&&opts&&opts.tab)||undefined},{undo:false});
         if(!r.ok) return;
         const key=r.key;
         if(opts&&typeof opts.onCreated==='function'){ try{ opts.onCreated(key); }catch(_){} return; }
@@ -709,7 +711,9 @@
   }
   // «＋ Нова папка» на головній: порожня папка чи група з кількох наявних (12.10.2026 — «Обʼєднати» було сховане в ⚙)
   function openNewFolderChoice(){
-    const n=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length;
+    // у своїй вкладці Огляду — її шторка: папка · група · чат (36-chats.js)
+    if(homeUserTab()){ userTabAddSheet(homeUserTab()); return; }
+    const n=homeFolderCount('');
     if(n<2){ createFolder(); return; }
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Що створити</div>
@@ -721,8 +725,11 @@
     });
   }
   // «Обʼєднати»: кілька папок з головної → нова група; pre — папка, вже відмічена (з перемикача в документі)
-  function openFolderMerge(pre){
-    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');
+  // tab — своя вкладка Огляду: кандидати лише з неї, і група ляже туди ж (з документа — вкладка відміченої папки)
+  function openFolderMerge(pre, tab){
+    if(typeof tab!=='string') tab=(typeof pre==='string'&&folders[pre])?itemTab(folders[pre]):homeUserTab();
+    if(tab&&!utById(tab)) tab='';
+    const cand=topFolderKeys().filter(folderVisible).filter(k=>k!=='work'&&itemTab(folders[k])===tab);
     const sel=new Set(typeof pre==='string'&&cand.includes(pre)?[pre]:[]);
     fgSheet(`<div class="fmenu-grip"></div>
       <div class="fmenu-title">Обʼєднати в групу</div>
@@ -748,10 +755,11 @@
         const key='f_'+Date.now(), used=order.length;
         folders[key]={ key, c:FOLDER_COLORS[used%FOLDER_COLORS.length], emoji:'🗂', icon:folderIconFor('🗂'),
           name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[], group:true };
+        if(tab) folders[key].tab=tab;
         // група стає на місце першої обраної папки
         const at=order.indexOf(picked[0]);
         if(at>=0) order.splice(at,0,key); else order.push(key);
-        picked.forEach(k=>{ folders[k].parent=key; });
+        picked.forEach(k=>{ folders[k].parent=key; delete folders[k].tab; });   // мітка — на групі, папки йдуть за нею
         saveFolders(); renderDashboard();
         try{ window.platform.haptic('success'); }catch(_){}
         fgToast('Група «'+nm+'»: '+picked.length+' '+pluralUk(picked.length,'папка','папки','папок'));
@@ -1304,7 +1312,8 @@
       return; }
     if(act==='ungroup'){
       const kids=groupKids(key), up=(f.parent&&folders[f.parent])?f.parent:'';   // батька вже нема — на головну
-      kids.forEach(ck=>{ folders[ck].parent=up; });
+      const tb=up?'':folderTabOf(key);   // група жила у своїй вкладці Огляду — папки лишаються там же
+      kids.forEach(ck=>{ folders[ck].parent=up; if(tb) folders[ck].tab=tb; });
       delete f.group;
       saveFolders(); renderDashboard(); closeFolderMenu();
       fgToast('«'+f.name+'» розгруповано: '+kids.length+' '+pluralUk(kids.length,'папка','папки','папок')+' на місці');

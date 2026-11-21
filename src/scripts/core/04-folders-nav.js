@@ -161,6 +161,8 @@
         if(f.view==='chat'||f.view==='photo'||f.view==='canvas') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
         if(folderPrioOk(f.prio)) cfg[k].prio=f.prio;
+        // своя вкладка Огляду (36-chats.js, 21.11.2026): лише в папок, створених у ній; без поля — загальні «Папки»
+        if(typeof f.tab==='string'&&/^t[a-z0-9]{1,23}$/.test(f.tab)) cfg[k].tab=f.tab;
       });
       const put=()=>{
         const p1=window.storage.set(FKEY,JSON.stringify(cfg),false); if(p1&&p1.catch)p1.catch(()=>{});
@@ -402,7 +404,11 @@
     parentKey=parentKey||'';
     if(parentKey===key) return;
     if(parentKey && isDescendantFolder(parentKey, key)) return;
+    // своя вкладка Огляду: усередині групи мітка не потрібна (йде за батьком), а винесена нагору
+    // папка лишається у вкладці, де лежала (36-chats.js folderTabOf)
+    let was=''; try{ was=folderTabOf(key); }catch(_){}
     f.parent=parentKey;
+    if(parentKey) delete f.tab; else if(was) f.tab=was;
     saveFolders(); renderDashboard();
   }
 

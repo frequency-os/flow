@@ -108,7 +108,7 @@
     };
 
     ACTIONS['folder.create']={
-      id:'folder.create', fields:{name:'text≤60', emoji:'emoji?', parent:'id?', goalId:'id?'}, keys:['folders_cfg'],
+      id:'folder.create', fields:{name:'text≤60', emoji:'emoji?', parent:'id?', goalId:'id?', tab:'id?'}, keys:['folders_cfg'],
       ready(inp){ return foldersLoaded===true&&(!inp.goalId||caReady(['goals_data'])); },   // папки цієї сесії прочитано
       check(inp){
         const used=order.length;
@@ -120,7 +120,9 @@
         // як «＋ Папка» (16-dashboard.js, createFolder): порожнє поле — 📁, не передали — по колу;
         // 16 — як maxlength поля емодзі в inputModal (прапор чи «родина» — кілька символів)
         const emoji=inp.emoji!==undefined?(caStr(inp.emoji,16)||'📁'):FOLDER_EMOJIS[used%FOLDER_EMOJIS.length];
-        return {val:{name, emoji, parent, g, used}};
+        // своя вкладка Огляду (36-chats.js) — лише для папки верхнього рівня; підпапка йде за батьком
+        const tab=(!parent&&typeof inp.tab==='string'&&utById(inp.tab))?inp.tab:'';
+        return {val:{name, emoji, parent, g, used, tab}};
       },
       say(v){ return caT('sayFolder')(v.name); },
       run(v){
@@ -128,6 +130,7 @@
         folders[key]={ key, c:FOLDER_COLORS[v.used%FOLDER_COLORS.length], emoji:v.emoji, icon:folderIconFor(v.emoji),
           name:v.name, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[] };
         if(v.parent) folders[key].parent=v.parent;
+        if(v.tab) folders[key].tab=v.tab;
         order.push(key);
         saveFolders();
         let prev;

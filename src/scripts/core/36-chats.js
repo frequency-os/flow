@@ -16,12 +16,60 @@
   const CHAT_PALETTE=['#5b8def','#34c77b','#e8843c','#c77dff','#ff6b9d','#4ecdc4','#f0b429','#9b8cff'];
   let chats=[];                    // [{id,name,emoji,c,members,folders,at,pinned}]
 
-  /* вкладка Огляду: 'folders' | 'chats' | 'spheres' (39-spheres.js) — запам'ятовується як інші дрібні налаштування */
+  /* ── свої вкладки Огляду (21.11.2026, варіант A — вибір Ярослава) ──
+     Вкладка — окремий простір: список вкладок (назва, емодзі) живе в home_tabs_v1,
+     а папка чи чат, створені у вкладці, мають мітку tab:'t…'. Підпапки й папки групи
+     мітки не мають — ідуть за батьком. Мітка вкладки, якої нема в списку (список
+     ще не доїхав з хмари, вкладку видалили на іншому пристрої), не ховає річ:
+     вона показується в загальних «Папках»/«Чатах». Пишеться лише з дії людини. */
+  const UTABS_KEY='home_tabs_v1';
+  const UTAB_MAX=8;
+  let userTabs=[];                 // [{id,name,emoji}]
+  const utIdOk=id=>typeof id==='string' && /^t[a-z0-9]{1,23}$/.test(id);
+  function applyUTabsRaw(raw){
+    try{ const p=raw?JSON.parse(raw):null;
+      if(Array.isArray(p)) userTabs=p.filter(t=>t&&utIdOk(t.id)).slice(0,UTAB_MAX)
+        .map(t=>({id:t.id, name:String(t.name||'Вкладка').slice(0,40), emoji:String(t.emoji||'').slice(0,16)})); }
+    catch(e){ console.error('home tabs parse',e); }
+  }
+  try{ applyUTabsRaw(localStorage.getItem(UTABS_KEY)); }catch(_){}
+  function saveUTabs(){ try{ prefSet(UTABS_KEY, JSON.stringify(userTabs)); }catch(_){} }
+  function utById(id){ return utIdOk(id) ? (userTabs.find(t=>t.id===id)||null) : null; }
+  // вкладка, у якій лежить річ ('' — загальні «Папки»/«Чати»)
+  function itemTab(o){ const t=o&&o.tab; return utById(t)?t:''; }
+  // для папки — вкладка її верхнього предка (підпапка йде за батьком)
+  function folderTabOf(key){
+    let cur=key, guard=0;
+    while(folders[cur] && folders[cur].parent && folders[folders[cur].parent] && guard++<100) cur=folders[cur].parent;
+    return itemTab(folders[cur]);
+  }
+
+  /* вкладка Огляду: 'folders' | 'chats' | id своєї вкладки — запам'ятовується як інші дрібні налаштування.
+     «Сфери» прибрано з Огляду 21.11.2026 (самі папки-сфери лишились звичайними папками) */
   const HTAB_KEY='hometab';
-  const HTABS=['folders','chats','spheres'];
+  const HTABS=['folders','chats'];
+  const htabOk=v=>HTABS.includes(v)||!!utById(v);
   let homeTab='folders';
-  try{ const v=localStorage.getItem(HTAB_KEY); if(HTABS.includes(v)) homeTab=v; }catch(_){}
-  prefCatchup(HTAB_KEY, v=>{ homeTab = HTABS.includes(v) ? v : 'folders'; });
+  try{ const v=localStorage.getItem(HTAB_KEY); if(htabOk(v)) homeTab=v; }catch(_){}
+  prefCatchup(HTAB_KEY, v=>{ homeTab = htabOk(v) ? v : 'folders'; });
+  /* на холодному старті сесії ще нема — prefCatchup бачить лише локальне; доганяємо хмару, коли сесія зʼявилась
+     і після звірок (як 62-block-store.js), інакше новий пристрій не побачив би вкладок з іншого */
+  let utCatchAt=0;
+  function utCatchup(){ const t=Date.now(); if(t-utCatchAt<15000) return; utCatchAt=t;
+    try{ prefCatchup(UTABS_KEY, v=>{ applyUTabsRaw(v); try{ renderDashboard(); }catch(_){} }); }catch(_){} }
+  utCatchup();
+  try{ document.addEventListener('flowsbready',()=>{ utCatchAt=0; utCatchup(); }); document.addEventListener('flowsync',utCatchup); }catch(_){}
+  // поки хмару не звірено (є вхід, а дані ще не довірені) — список вкладок не пишемо: запис цілком затер би вкладки з іншого пристрою
+  function utTrusted(){
+    let ok=true; try{ ok = typeof window.sbDataTrusted!=='function' || window.sbDataTrusted(); }catch(_){}
+    if(!ok){ try{ chToast('Звіряюсь із хмарою — спробуй за мить'); }catch(_){} }
+    return ok;
+  }
+  function homeUserTab(){ return utById(homeTab)?homeTab:''; }
+  // папки Огляду для відкритої вкладки: у «Папках» — без мітки, у своїй — лише її
+  function homeKeysForTab(keys){ const cur=homeUserTab(); return keys.filter(k=>itemTab(folders[k])===cur); }
+  function homeChatsForTab(){ const cur=homeUserTab(); return chats.filter(c=>itemTab(c)===cur); }
+  function homeFolderCount(tab){ try{ return topFolderKeys().filter(folderVisible).filter(k=>k!=='work'&&itemTab(folders[k])===(tab||'')).length; }catch(_){ return 0; } }
 
   function chatBk(id){ return 'chat_'+id; }
   function chatById(id){ return chats.find(c=>c&&c.id===id)||null; }
@@ -33,7 +81,7 @@
     return { id:String(c.id), name:String(c.name||'Чат'), emoji:String(c.emoji||'💬').slice(0,4), c:c.c||CHAT_PALETTE[0],
       members:(Array.isArray(c.members)&&c.members.length)?c.members:['me'],
       folders:Array.isArray(c.folders)?c.folders.filter(k=>typeof k==='string'):[],
-      at:+c.at||0, pinned:!!c.pinned };
+      at:+c.at||0, pinned:!!c.pinned, ...(utIdOk(c.tab)?{tab:c.tab}:{}) };
   }
   function saveChats(){
     try{ const p=window.storage.set(CHATS_KEY,JSON.stringify(chats),false); if(p&&p.catch)p.catch(()=>{}); }catch(_){}
@@ -50,6 +98,7 @@
     const c={ id:o.id||chatUid(), name:(o.name||'').trim()||('Чат '+(n+1)),
       emoji:((o.emoji!=null?o.emoji:'💬')||'').trim().slice(0,4), c:o.c||CHAT_PALETTE[n%CHAT_PALETTE.length],
       members:['me'], folders:(o.folders||[]).filter(k=>folders[k]), at:Date.now(), pinned:false };
+    if(utById(o.tab)) c.tab=o.tab;   // створено у своїй вкладці Огляду
     chats.push(c);
     if(!boards[chatBk(c.id)]) boards[chatBk(c.id)]=[];
     saveChats(); saveBoard();
@@ -60,7 +109,7 @@
     o=o||{};
     inputModal({ title:'Новий чат', placeholder:'Назва чату', emoji:true, emojiVal:'💬',
       onOk:(name,em)=>{
-        const c=chatCreate({name, emoji:(em!==undefined?em:'💬'), folders:o.folders});
+        const c=chatCreate({name, emoji:(em!==undefined?em:'💬'), folders:o.folders, tab:o.tab});
         try{ renderDashboard(); }catch(_){}
         if(o.then) o.then(c); else goChat(c.id,{from:'home'});
       }});
@@ -203,36 +252,130 @@
 
   /* ── Огляд: вкладки і список чатів ── */
   function setHomeTab(t){
-    t = HTABS.includes(t) ? t : 'folders';
+    t = htabOk(t) ? t : 'folders';
     if(t===homeTab) return;
     homeTab=t; try{ prefSet(HTAB_KEY,t); }catch(_){}
     try{ window.platform.haptic('select'); }catch(_){}
     renderDashboard();
   }
+  // свої вкладки в капсулі — між «Чатами» і кнопкою «＋ вкладка»
+  function renderUserTabs(){
+    const tabs=document.getElementById('homeTabs'); if(!tabs) return;
+    tabs.querySelectorAll('[data-utab]').forEach(b=>b.remove());
+    const plus=document.getElementById('utNewBtn');
+    userTabs.forEach(t=>{
+      const n=homeFolderCount(t.id)+chats.filter(c=>itemTab(c)===t.id).length;
+      const b=document.createElement('button');
+      b.className='htab htab-u'; b.dataset.htab=t.id; b.dataset.utab=t.id;
+      b.setAttribute('data-i18n-skip','1');
+      b.innerHTML=(t.emoji?`<span class="htab-e" aria-hidden="true">${esc(t.emoji)}</span>`:'')+esc(t.name)+`<span class="count">${n}</span>`;
+      bindUserTab(b, t.id);
+      tabs.insertBefore(b, plus||null);
+    });
+    if(plus) plus.hidden=userTabs.length>=UTAB_MAX;
+    tabs.classList.toggle('has-ut', userTabs.length>0);   // компактна капсула на телефоні (24-home-gallery.css)
+  }
+  // тап — відкрити; тап по вже відкритій, довге натискання чи правий клік — меню вкладки
+  function bindUserTab(b, id){
+    let lt=0, fired=false;
+    b.onclick=()=>{ if(fired){ fired=false; return; } if(homeTab===id) userTabMenu(id); else setHomeTab(id); };
+    b.oncontextmenu=e=>{ e.preventDefault(); userTabMenu(id); };
+    b.onpointerdown=()=>{ fired=false; clearTimeout(lt); lt=setTimeout(()=>{ fired=true; try{ window.platform.haptic('medium'); }catch(_){} userTabMenu(id); },550); };
+    b.onpointerup=b.onpointerleave=b.onpointercancel=()=>clearTimeout(lt);
+  }
+  function newUserTab(){
+    if(!utTrusted()) return;
+    if(userTabs.length>=UTAB_MAX){ chToast('Вже '+UTAB_MAX+' вкладок — це максимум'); return; }
+    inputModal({ title:'Нова вкладка', placeholder:'Назва, напр. Робота', emoji:true, emojiVal:'', emojiPh:'🗂',
+      emojiPicks:['💼','🏡','📚','💪','🎨','💰','✈️','🧠'],
+      onOk:(name,em)=>{
+        if(!utTrusted()) return;
+        const t={ id:'t'+Date.now().toString(36), name:(name||'').trim().slice(0,40)||('Вкладка '+(userTabs.length+1)),
+          emoji:((em||'').trim()).slice(0,16) };
+        userTabs.push(t); saveUTabs();
+        homeTab=''; setHomeTab(t.id);
+        chToast('Вкладка «'+t.name+'» — додавай сюди папки й чати');
+      }});
+  }
+  function userTabMenu(id){
+    const t=utById(id); if(!t) return;
+    actionSheet({ title:(t.emoji?t.emoji+' ':'')+t.name, items:[
+      {ic:'plus', label:'Додати сюди', sub:'папку, групу папок чи чат', onClick:()=>userTabAddSheet(id)},
+      {ic:'edit', label:'Перейменувати', onClick:()=>inputModal({ title:'Перейменувати вкладку', value:t.name, placeholder:'Назва вкладки',
+        emoji:true, emojiVal:t.emoji||'', onOk:(name,em)=>{
+          if(!utTrusted()) return;
+          if((name||'').trim()) t.name=name.trim().slice(0,40);
+          if(em!==undefined) t.emoji=((em||'').trim()).slice(0,16);
+          saveUTabs(); renderDashboard(); }})},
+      {ic:'trash', label:'Видалити вкладку', sub:'папки й чати повернуться в «Папки» і «Чати»', danger:true, onClick:()=>deleteUserTab(id)}
+    ]});
+  }
+  // видалення вкладки нічого не видаляє: знімаємо мітку — і все повертається в загальні списки
+  function deleteUserTab(id){
+    const t=utById(id); if(!t||!utTrusted()) return;
+    const fk=Object.keys(folders).filter(k=>folders[k]&&folders[k].tab===id), ck=chats.filter(c=>c.tab===id);
+    const what=[fk.length?fk.length+' '+pluralUk(fk.length,'папка','папки','папок'):'', ck.length?ck.length+' '+pluralUk(ck.length,'чат','чати','чатів'):''].filter(Boolean).join(' і ');
+    confirmSheet({ title:'Видалити вкладку «'+t.name+'»?',
+      sub: what ? (what+' нікуди не зникнуть — повернуться в «Папки» і «Чати».') : 'Вкладка порожня.',
+      okLabel:'Видалити вкладку',
+      onOk:()=>{
+        if(!utTrusted()) return;
+        fk.forEach(k=>{ delete folders[k].tab; });
+        ck.forEach(c=>{ delete c.tab; });
+        if(fk.length) saveFolders();
+        if(ck.length) saveChats();
+        userTabs=userTabs.filter(x=>x.id!==id); saveUTabs();
+        homeTab=''; setHomeTab('folders');
+        chToast('Вкладку видалено');
+      }});
+  }
+  // «＋» усередині своєї вкладки: папка · група з папок цієї вкладки · чат
+  function userTabAddSheet(id){
+    const tab=utById(id)?id:homeUserTab(); if(!tab) return;
+    const n=homeFolderCount(tab);
+    fgSheet(`<div class="fmenu-grip"></div>
+      <div class="fmenu-title">Додати у «<span data-i18n-skip="1">${esc(utById(tab).name)}</span>»</div>
+      ${fmRow('nf','folder','Нова папка','документ, підпапки, віджети')}
+      ${fmRow('ng','group','Група папок', n<2?'спершу створи тут хоча б дві папки':'обери 2+ папки цієї вкладки — вони ляжуть усередину')}
+      ${fmRow('nc','chat','Новий чат','стрічка як у месенджері')}`,
+    m=>{
+      m.querySelector('[data-act="nf"]').onclick=()=>{ closeFolderMenu(); createFolder('',{tab}); };
+      const g=m.querySelector('[data-act="ng"]');
+      if(n<2){ g.disabled=true; g.setAttribute('aria-disabled','true'); }
+      else g.onclick=()=>openFolderMerge(null, tab);
+      m.querySelector('[data-act="nc"]').onclick=()=>{ closeFolderMenu(); createChat({tab}); };
+    });
+  }
   // викликається з renderDashboard (16-dashboard.js): перемикає видимість і лічильники.
-  // true — активна вкладка «Чати» чи «Сфери», сітку папок малювати не треба.
+  // true — активна вкладка «Чати», сітку папок малювати не треба (своя вкладка — сітка + її чати під нею).
   function chatsHomeSync(){
-    // «Сфери» поки лише для розробника: якщо вкладку не видно — повертаємось до папок
-    if(homeTab==='spheres' && !(window.upDevOn&&window.upDevOn())) homeTab='folders';
-    const sph = homeTab==='spheres';
-    try{ if(window.sphHomeSync) window.sphHomeSync(sph); }catch(e){ console.error('sphHomeSync',e); }
-    const on = homeTab==='chats';
+    if(!htabOk(homeTab)) homeTab='folders';   // вкладку видалили (тут чи на іншому пристрої)
+    renderUserTabs();
+    const on = homeTab==='chats', ut=homeUserTab();
     const tabs=document.getElementById('homeTabs');
-    if(tabs) tabs.querySelectorAll('[data-htab]').forEach(b=>b.classList.toggle('on', b.dataset.htab===homeTab));
+    if(tabs) tabs.querySelectorAll('[data-htab]').forEach(b=>{ const a=b.dataset.htab===homeTab; b.classList.toggle('on', a); b.setAttribute('aria-pressed', a?'true':'false'); });
+    // на телефоні капсула гортається вбік — відкрита вкладка має бути видна цілком, а не «Ро…»
+    try{ const a=tabs&&tabs.querySelector('.htab.on');
+      if(a&&tabs.scrollWidth>tabs.clientWidth){ const l=a.offsetLeft-tabs.offsetLeft, r=l+a.offsetWidth;
+        // відкрита остання вкладка — до кінця, щоб поруч було видно «＋ Нова вкладка»
+        if(a.dataset.htab===(userTabs.length?userTabs[userTabs.length-1].id:'')) tabs.scrollLeft=tabs.scrollWidth;
+        else if(l<tabs.scrollLeft) tabs.scrollLeft=l-8; else if(r>tabs.scrollLeft+tabs.clientWidth) tabs.scrollLeft=r-tabs.clientWidth+46; } }catch(_){}
     const row=document.querySelector('#scr-home .foh-row'), list=document.getElementById('chatList'),
           seg=document.getElementById('folderViewRow')||document.getElementById('folderViewSeg'), add=document.getElementById('chatAddBtn');
-    if(row) row.style.display = (on||sph) ? 'none' : '';
-    if(list) list.hidden=!on;
-    if(seg) seg.style.display = (on||sph) ? 'none' : '';
+    const utChats = ut ? homeChatsForTab().length : 0;
+    if(row) row.style.display = on ? 'none' : '';
+    if(list){ list.hidden=!(on||utChats); list.classList.toggle('chl-in-tab', !!ut); }
+    if(seg) seg.style.display = on ? 'none' : '';
     if(add) add.hidden=!on;
-    // ⚙ «Вигляд папок» (16-dashboard.js) — лише на вкладці «Папки»
-    const look=document.getElementById('folderLookBtn'); if(look) look.hidden=(on||sph);
-    try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.length; }catch(_){}
-    // лічильник папок теж тут: коли відкрита вкладка «Чати» чи «Сфери», сітка папок не малюється
+    const uadd=document.getElementById('utAddBtn'); if(uadd) uadd.hidden=!ut;
+    // ⚙ «Вигляд папок» (16-dashboard.js) — де є сітка папок
+    const look=document.getElementById('folderLookBtn'); if(look) look.hidden=on;
+    try{ const cb=document.getElementById('chatCountBadge'); if(cb) cb.textContent=chats.filter(c=>!itemTab(c)).length; }catch(_){}
+    // лічильник папок теж тут: коли відкрита вкладка «Чати», сітка папок не малюється
     // і цифра лишалась застарілою (на старті — взагалі «5» з розмітки)
-    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=topFolderKeys().filter(folderVisible).filter(k=>k!=='work').length; }catch(_){}
-    if(on) renderChatList();
-    return on||sph;
+    try{ const fb=document.getElementById('folderCountBadge'); if(fb) fb.textContent=homeFolderCount(''); }catch(_){}
+    if(on||utChats) renderChatList();
+    return on;
   }
   // останній запис чату (за часом) — для рядка списку і блоку в документі
   function chatLast(c){
@@ -259,7 +402,8 @@
   }
   function renderChatList(){
     const host=document.getElementById('chatList'); if(!host) return;
-    const rows=chats.map(c=>({c,last:chatLast(c)}))
+    // «Чати» — лише без вкладки, своя вкладка — лише її чати (homeChatsForTab вище)
+    const rows=homeChatsForTab().map(c=>({c,last:chatLast(c)}))
       .sort((a,b)=>((b.c.pinned?1:0)-(a.c.pinned?1:0)) || ((b.last?b.last.at:b.c.at)-(a.last?a.last.at:a.c.at)));
     let h='';
     if(!rows.length) h+=`<div class="chl-empty"><b>Чатів ще нема</b><span>Чат — стрічка як у месенджері: думки, завдання, фото за часом. До чату можна прикріпити папки.</span></div>`;
@@ -987,8 +1131,11 @@
   /* ── старт: викликає load() у 27-canvas.js, коли дані вже застосовано ── */
   function chatsInit(){
     const tabs=document.getElementById('homeTabs');
-    if(tabs&&!tabs.__init){ tabs.__init=true; tabs.querySelectorAll('[data-htab]').forEach(b=>b.onclick=()=>setHomeTab(b.dataset.htab)); }
+    if(tabs&&!tabs.__init){ tabs.__init=true; tabs.querySelectorAll('[data-htab]:not([data-utab])').forEach(b=>b.onclick=()=>setHomeTab(b.dataset.htab)); }
     const add=document.getElementById('chatAddBtn'); if(add&&!add.__init){ add.__init=true; add.onclick=()=>createChat(); }
+    // свої вкладки Огляду: «＋» у капсулі створює вкладку, «＋» праворуч — додати в неї
+    const un=document.getElementById('utNewBtn'); if(un&&!un.__init){ un.__init=true; un.onclick=()=>newUserTab(); }
+    const ua=document.getElementById('utAddBtn'); if(ua&&!ua.__init){ ua.__init=true; ua.onclick=()=>userTabAddSheet(homeUserTab()); }
     const pa=document.getElementById('pgAddLink'); if(pa&&!pa.__init){ pa.__init=true; pa.onclick=()=>{ const fk=pgFolderKey(); if(fk) folderAddSheet(fk); }; }
     // блок «Чати папки» малюється при кожному відкритті документа
     if(typeof window.openFlowPage==='function' && !window.openFlowPage.__chats){

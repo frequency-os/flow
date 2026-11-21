@@ -285,9 +285,10 @@
         const pr=folderPrioOk(c.prio)?c.prio:undefined;
         const vw=(c.view==='chat'||c.view==='photo'||c.view==='canvas')?c.view:undefined;   // вигляд папки (36-chats.js fhView); canvas — «Полотно»; решта — «Документ»
         const grp=c.group===true?true:undefined;   // група, зібрана людиною (16-dashboard.js isFolderGroup); без поля — звичайна папка
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp}); }
+        const tb=(typeof c.tab==='string'&&/^t[a-z0-9]{1,23}$/.test(c.tab))?c.tab:undefined;   // своя вкладка Огляду (36-chats.js); без поля — «Папки»
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp,tab:tb}); }
         // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
-        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp}; }
+        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp,tab:tb}; }
       });
     }
   }
