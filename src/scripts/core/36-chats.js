@@ -24,16 +24,63 @@
      вона показується в загальних «Папках»/«Чатах». Пишеться лише з дії людини. */
   const UTABS_KEY='home_tabs_v1';
   const UTAB_MAX=8;
-  let userTabs=[];                 // [{id,name,emoji}]
+  let userTabs=[];                 // [{id,name,emoji,at}] — at: час останньої зміни (створення чи перейменування)
+  let utDel={};                    // надгробки видалених вкладок {id: час}, щоб злиття їх не воскрешало
+  const UTAB_TOMB_MS=60*864e5;     // надгробки старші за 60 днів прибираємо
   const utIdOk=id=>typeof id==='string' && /^t[a-z0-9]{1,23}$/.test(id);
-  function applyUTabsRaw(raw){
-    try{ const p=raw?JSON.parse(raw):null;
-      if(Array.isArray(p)) userTabs=p.filter(t=>t&&utIdOk(t.id)).slice(0,UTAB_MAX)
-        .map(t=>({id:t.id, name:String(t.name||'Вкладка').slice(0,40), emoji:String(t.emoji||'').slice(0,16)})); }
-    catch(e){ console.error('home tabs parse',e); }
+  /* Формат: home_tabs_v1 лишається МАСИВОМ [{id,name,emoji,at}] — його розуміє й стара версія застосунку
+     (об'єкт вона прочитала б як «0 вкладок» і першим записом затерла б усі). Надгробки — окремим ключем
+     home_tabs_del {id:час}: стара версія його не бачить і не чіпає. */
+  const UTDEL_KEY='home_tabs_del';
+  function parseUTabs(raw){
+    let p=null; try{ p=raw?JSON.parse(raw):null; }catch(e){ console.error('home tabs parse',e); return null; }
+    if(!Array.isArray(p)) return null;
+    return p.filter(t=>t&&utIdOk(t.id))
+      .map(t=>({id:t.id, name:String(t.name||'Вкладка').slice(0,40), emoji:String(t.emoji||'').slice(0,16), at:Math.max(0,+t.at||0)}));
   }
-  try{ applyUTabsRaw(localStorage.getItem(UTABS_KEY)); }catch(_){}
-  function saveUTabs(){ try{ prefSet(UTABS_KEY, JSON.stringify(userTabs)); }catch(_){} }
+  function parseUTDel(raw){
+    let p=null; try{ p=raw?JSON.parse(raw):null; }catch(_){ return null; }
+    if(!p||typeof p!=='object'||Array.isArray(p)) return null;
+    const del={}; Object.keys(p).forEach(id=>{ const v=+p[id]; if(utIdOk(id)&&v>0) del[id]=v; });
+    return del;
+  }
+  /* злиття двох знімків: вкладки з обох боків лишаються (порядок — наш, нові з іншого боку — в кінець),
+     однаковий id — перемагає новіша зміна (at), а надгробок перемагає завжди: видалене не повертається */
+  function utMerge(a, b){
+    const del=Object.assign({}, a.del);
+    Object.keys(b.del).forEach(id=>{ if(!(del[id]>=b.del[id])) del[id]=b.del[id]; });
+    const now=Date.now(); Object.keys(del).forEach(id=>{ if(now-del[id]>UTAB_TOMB_MS) delete del[id]; });
+    const byId={}; b.tabs.forEach(t=>{ byId[t.id]=t; });
+    const out=[], seen={};
+    a.tabs.concat(b.tabs).forEach(t=>{ if(seen[t.id]||del[t.id]) return; seen[t.id]=1;
+      const o=byId[t.id]; out.push(o&&o.at>t.at?o:t); });
+    // ліміт після злиття не ріжемо: інакше вкладки з іншого пристрою зникли б мовчки; UTAB_MAX стримує лише створення
+    return {tabs:out, del};
+  }
+  function applyUTabsRaw(raw, rawDel){
+    const tabs=parseUTabs(raw), del=parseUTDel(rawDel);
+    if(!tabs&&!del) return false;
+    const m=utMerge({tabs:userTabs, del:utDel}, {tabs:tabs||[], del:del||{}});
+    userTabs=m.tabs; utDel=m.del; return true;
+  }
+  // злите з хмари — лише в локальну копію (не в хмару: автозапису нема), щоб пережило перезапуск
+  function utKeepLocal(){ try{ localStorage.setItem(UTABS_KEY, JSON.stringify(userTabs)); localStorage.setItem(UTDEL_KEY, JSON.stringify(utDel)); }catch(_){} }
+  try{ applyUTabsRaw(localStorage.getItem(UTABS_KEY), localStorage.getItem(UTDEL_KEY)); }catch(_){}
+  /* запис: спершу свіжий знімок зі сховища (хмара, якщо там новіше), злиття — і лише тоді запис цілком.
+     Записи йдуть по черзі, щоб два швидкі натискання не обігнали одне одного. */
+  let utSaving=Promise.resolve();
+  function saveUTabs(){
+    utSaving=utSaving.then(async()=>{
+      let rt=null, rd=null;
+      try{ const r=await window.storage.get(UTABS_KEY); rt=r&&r.value; }catch(_){}
+      try{ const r=await window.storage.get(UTDEL_KEY); rd=r&&r.value; }catch(_){}
+      applyUTabsRaw(rt, rd);
+      try{ prefSet(UTDEL_KEY, JSON.stringify(utDel)); }catch(_){}   // спершу надгробки: список без вкладки не має доїхати раніше за причину
+      try{ prefSet(UTABS_KEY, JSON.stringify(userTabs)); }catch(_){}
+      try{ renderDashboard(); }catch(_){}
+    }).catch(e=>console.error('home tabs save',e));
+    return utSaving;
+  }
   function utById(id){ return utIdOk(id) ? (userTabs.find(t=>t.id===id)||null) : null; }
   // вкладка, у якій лежить річ ('' — загальні «Папки»/«Чати»)
   function itemTab(o){ const t=o&&o.tab; return utById(t)?t:''; }
@@ -56,7 +103,8 @@
      і після звірок (як 62-block-store.js), інакше новий пристрій не побачив би вкладок з іншого */
   let utCatchAt=0;
   function utCatchup(){ const t=Date.now(); if(t-utCatchAt<15000) return; utCatchAt=t;
-    try{ prefCatchup(UTABS_KEY, v=>{ applyUTabsRaw(v); try{ renderDashboard(); }catch(_){} }); }catch(_){} }
+    try{ prefCatchup(UTABS_KEY, v=>{ if(applyUTabsRaw(v,null)){ utKeepLocal(); try{ renderDashboard(); }catch(_){} } }); }catch(_){}
+    try{ prefCatchup(UTDEL_KEY, v=>{ if(applyUTabsRaw(null,v)){ utKeepLocal(); try{ renderDashboard(); }catch(_){} } }); }catch(_){} }
   utCatchup();
   try{ document.addEventListener('flowsbready',()=>{ utCatchAt=0; utCatchup(); }); document.addEventListener('flowsync',utCatchup); }catch(_){}
   // поки хмару не звірено (є вхід, а дані ще не довірені) — список вкладок не пишемо: запис цілком затер би вкладки з іншого пристрою
@@ -341,7 +389,7 @@
       onOk:(name,em)=>{
         if(!utTrusted()) return;
         const t={ id:'t'+Date.now().toString(36), name:(name||'').trim().slice(0,40)||('Вкладка '+(userTabs.length+1)),
-          emoji:((em||'').trim()).slice(0,16) };
+          emoji:((em||'').trim()).slice(0,16), at:Date.now() };
         userTabs.push(t); saveUTabs();
         homeTab=''; setHomeTab(t.id);
         chToast('Вкладка «'+t.name+'» — додавай сюди папки й чати');
@@ -356,6 +404,7 @@
           if(!utTrusted()) return;
           if((name||'').trim()) t.name=name.trim().slice(0,40);
           if(em!==undefined) t.emoji=((em||'').trim()).slice(0,16);
+          t.at=Date.now();   // новіша зміна перемагає при злитті
           saveUTabs(); renderDashboard(); }})},
       {ic:'trash', label:'Видалити вкладку', sub:'папки й чати повернуться в «Папки» і «Чати»', danger:true, onClick:()=>deleteUserTab(id)}
     ]});
@@ -374,7 +423,7 @@
         ck.forEach(c=>{ delete c.tab; });
         if(fk.length) saveFolders();
         if(ck.length) saveChats();
-        userTabs=userTabs.filter(x=>x.id!==id); saveUTabs();
+        userTabs=userTabs.filter(x=>x.id!==id); utDel[id]=Date.now(); saveUTabs();   // надгробок: злиття не поверне
         homeTab=''; setHomeTab('folders');
         chToast('Вкладку видалено');
       }});

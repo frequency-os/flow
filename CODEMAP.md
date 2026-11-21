@@ -14,11 +14,11 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 38555 |
+| Рядків JS | 38605 |
 | Файлів CSS | 54 |
 | Рядків CSS | 12067 |
-| Сутностей верхнього рівня | 2979 |
-| Ключів сховища (FLOW_KEYS) | 83 |
+| Сутностей верхнього рівня | 2987 |
+| Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
 
@@ -35,7 +35,7 @@
 | `src/scripts/43-planner.js` | 137 | 0 |
 | `src/scripts/45-month.js` | 662 | 0 |
 | `src/scripts/46-mx.js` | 220 | 0 |
-| `src/scripts/core/01-base.js` | 430 | 39 |
+| `src/scripts/core/01-base.js` | 431 | 39 |
 | `src/scripts/core/02-storage.js` | 2173 | 177 |
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 449 | 63 |
@@ -69,7 +69,7 @@
 | `src/scripts/core/32-global-search.js` | 152 | 13 |
 | `src/scripts/core/34-shortcuts.js` | 54 | 5 |
 | `src/scripts/core/35-channel.js` | 709 | 65 |
-| `src/scripts/core/36-chats.js` | 1249 | 141 |
+| `src/scripts/core/36-chats.js` | 1298 | 149 |
 | `src/scripts/core/37-ai-privacy.js` | 202 | 20 |
 | `src/scripts/core/38-world.js` | 107 | 5 |
 | `src/scripts/core/39-spheres.js` | 233 | 20 |
@@ -187,7 +187,7 @@
 | `src/styles/core/41-widget-sheet.css` | 177 | 0 |
 | `src/styles/core/42-plan.css` | 196 | 2 |
 
-## Ключі сховища — FLOW_KEYS (83)
+## Ключі сховища — FLOW_KEYS (84)
 
 `src/scripts/core/01-base.js`
 
@@ -205,19 +205,19 @@
 
 `folderview` · `forcedesktop` · `forcemobile` · `fx_cfg` · `fx_mode` · `fx_say`
 
-`goals_data` · `hero_look` · `home_glass_on` · `home_tabs_v1` · `homeov` · `hometab`
+`goals_data` · `hero_look` · `home_glass_on` · `home_tabs_del` · `home_tabs_v1` · `homeov`
 
-`homewidgets` · `htabs_view` · `i18n_content_cache` · `income_cards` · `lang_pref` · `main_cur`
+`hometab` · `homewidgets` · `htabs_view` · `i18n_content_cache` · `income_cards` · `lang_pref`
 
-`patterns_chains` · `patterns_score` · `patterns_transform` · `pet_hidden` · `pet_pos` · `pet_sleep`
+`main_cur` · `patterns_chains` · `patterns_score` · `patterns_transform` · `pet_hidden` · `pet_pos`
 
-`readerCfg` · `ritual_board` · `sidebarcol` · `spacecanvas` · `spacecanvaszoom` · `spacefull`
+`pet_sleep` · `readerCfg` · `ritual_board` · `sidebarcol` · `spacecanvas` · `spacecanvaszoom`
 
-`spaces_map_v2` · `spaceview` · `spacewide` · `spend` · `switcher_style` · `ui_mode`
+`spacefull` · `spaces_map_v2` · `spaceview` · `spacewide` · `spend` · `switcher_style`
 
-`upgrade_profile_v1` · `values_state` · `vision_v1` · `wish_active_days_v1` · `wish_price` · `wishes_board`
+`ui_mode` · `upgrade_profile_v1` · `values_state` · `vision_v1` · `wish_active_days_v1` · `wish_price`
 
-`work_blocks` · `work_cfg` · `work_extras` · `work_sessions` · `world_game`
+`wishes_board` · `work_blocks` · `work_cfg` · `work_extras` · `work_sessions` · `world_game`
 
 ## Сутності по файлах
 
@@ -319,31 +319,31 @@
 | `safeColor` | функція | `src/scripts/core/01-base.js:106` |
 | `window.safeColor` | значення | `src/scripts/core/01-base.js:111` |
 | `window.FLOW_KEYS` | масив | `src/scripts/core/01-base.js:120` |
-| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:183` |
-| `getLang` | функція | `src/scripts/core/01-base.js:201` |
-| `setLang` | функція | `src/scripts/core/01-base.js:202` |
-| `window.__flowLang` | значення | `src/scripts/core/01-base.js:203` |
-| `window.flowLang` | значення | `src/scripts/core/01-base.js:204` |
-| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:205` |
-| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:210` |
-| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:276` |
-| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:304` |
-| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:319` |
-| `translateNode` | функція | `src/scripts/core/01-base.js:322` |
-| `i18nApply` | функція | `src/scripts/core/01-base.js:345` |
-| `window.i18nApply` | значення | `src/scripts/core/01-base.js:349` |
-| `i18nBlocked` | функція | `src/scripts/core/01-base.js:353` |
-| `raf` | значення | `src/scripts/core/01-base.js:363` |
-| `flush` | функція | `src/scripts/core/01-base.js:364` |
-| `mo` | функція | `src/scripts/core/01-base.js:371` |
-| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:392` |
-| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:395` |
-| `hash` | функція | `src/scripts/core/01-base.js:396` |
-| `cacheGet` | функція | `src/scripts/core/01-base.js:397` |
-| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:402` |
-| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:418` |
-| `push` | функція | `src/scripts/core/01-base.js:419` |
-| `window.flowErrors` | функція | `src/scripts/core/01-base.js:428` |
+| `window.FLOW_RAW_KEYS` | масив | `src/scripts/core/01-base.js:184` |
+| `getLang` | функція | `src/scripts/core/01-base.js:202` |
+| `setLang` | функція | `src/scripts/core/01-base.js:203` |
+| `window.__flowLang` | значення | `src/scripts/core/01-base.js:204` |
+| `window.flowLang` | значення | `src/scripts/core/01-base.js:205` |
+| `window.flowSetLang` | значення | `src/scripts/core/01-base.js:206` |
+| `I18N_DICT` | обʼєкт | `src/scripts/core/01-base.js:211` |
+| `I18N_WORDS` | масив | `src/scripts/core/01-base.js:277` |
+| `wordLevelTranslate` | функція | `src/scripts/core/01-base.js:305` |
+| `I18N_NO_TOUCH` | обʼєкт | `src/scripts/core/01-base.js:320` |
+| `translateNode` | функція | `src/scripts/core/01-base.js:323` |
+| `i18nApply` | функція | `src/scripts/core/01-base.js:346` |
+| `window.i18nApply` | значення | `src/scripts/core/01-base.js:350` |
+| `i18nBlocked` | функція | `src/scripts/core/01-base.js:354` |
+| `raf` | значення | `src/scripts/core/01-base.js:364` |
+| `flush` | функція | `src/scripts/core/01-base.js:365` |
+| `mo` | функція | `src/scripts/core/01-base.js:372` |
+| `contentTranslateOn` | функція | `src/scripts/core/01-base.js:393` |
+| `window.flowContentTranslateOn` | значення | `src/scripts/core/01-base.js:396` |
+| `hash` | функція | `src/scripts/core/01-base.js:397` |
+| `cacheGet` | функція | `src/scripts/core/01-base.js:398` |
+| `window.flowTranslateContent` | функція | `src/scripts/core/01-base.js:403` |
+| `window.__flowErrors` | масив | `src/scripts/core/01-base.js:419` |
+| `push` | функція | `src/scripts/core/01-base.js:420` |
+| `window.flowErrors` | функція | `src/scripts/core/01-base.js:429` |
 
 ### `src/scripts/core/02-storage.js` — 177 сутностей
 
@@ -1909,7 +1909,7 @@
 | `chVoice` | функція | `src/scripts/core/35-channel.js:664` |
 | `chSheet` | функція | `src/scripts/core/35-channel.js:695` |
 
-### `src/scripts/core/36-chats.js` — 141 сутностей
+### `src/scripts/core/36-chats.js` — 149 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1920,140 +1920,148 @@
 | `UTABS_KEY` | значення | `src/scripts/core/36-chats.js:25` |
 | `UTAB_MAX` | значення | `src/scripts/core/36-chats.js:26` |
 | `userTabs` | масив | `src/scripts/core/36-chats.js:27` |
-| `utIdOk` | функція | `src/scripts/core/36-chats.js:28` |
-| `applyUTabsRaw` | функція | `src/scripts/core/36-chats.js:29` |
-| `saveUTabs` | функція | `src/scripts/core/36-chats.js:36` |
-| `utById` | функція | `src/scripts/core/36-chats.js:37` |
-| `itemTab` | функція | `src/scripts/core/36-chats.js:39` |
-| `folderTabOf` | функція | `src/scripts/core/36-chats.js:41` |
-| `HTAB_KEY` | значення | `src/scripts/core/36-chats.js:49` |
-| `HTABS` | масив | `src/scripts/core/36-chats.js:50` |
-| `htabOk` | функція | `src/scripts/core/36-chats.js:51` |
-| `homeTab` | значення | `src/scripts/core/36-chats.js:52` |
-| `utCatchAt` | значення | `src/scripts/core/36-chats.js:57` |
-| `utCatchup` | функція | `src/scripts/core/36-chats.js:58` |
-| `utTrusted` | функція | `src/scripts/core/36-chats.js:63` |
-| `homeUserTab` | функція | `src/scripts/core/36-chats.js:68` |
-| `homeKeysForTab` | функція | `src/scripts/core/36-chats.js:70` |
-| `homeChatsForTab` | функція | `src/scripts/core/36-chats.js:71` |
-| `homeFolderCount` | функція | `src/scripts/core/36-chats.js:72` |
-| `chatBk` | функція | `src/scripts/core/36-chats.js:74` |
-| `chatById` | функція | `src/scripts/core/36-chats.js:75` |
-| `chatsForFolder` | функція | `src/scripts/core/36-chats.js:76` |
-| `chatFolders` | функція | `src/scripts/core/36-chats.js:78` |
-| `chatUid` | функція | `src/scripts/core/36-chats.js:79` |
-| `normChat` | функція | `src/scripts/core/36-chats.js:80` |
-| `saveChats` | функція | `src/scripts/core/36-chats.js:86` |
-| `applyChatsRaw` | функція | `src/scripts/core/36-chats.js:89` |
-| `chatCreate` | функція | `src/scripts/core/36-chats.js:95` |
-| `createChat` | функція | `src/scripts/core/36-chats.js:108` |
-| `chatRename` | функція | `src/scripts/core/36-chats.js:117` |
-| `chatDelete` | функція | `src/scripts/core/36-chats.js:126` |
-| `chatsRefresh` | функція | `src/scripts/core/36-chats.js:140` |
-| `ensureInboxChat` | функція | `src/scripts/core/36-chats.js:147` |
-| `chatsMigrateInboxOnce` | функція | `src/scripts/core/36-chats.js:163` |
-| `chatLinkFolder` | функція | `src/scripts/core/36-chats.js:195` |
-| `chatUnlinkFolder` | функція | `src/scripts/core/36-chats.js:205` |
-| `linkableFolders` | функція | `src/scripts/core/36-chats.js:210` |
-| `chatAddSheet` | функція | `src/scripts/core/36-chats.js:216` |
-| `newFolderForChat` | функція | `src/scripts/core/36-chats.js:231` |
-| `pickFolderForChat` | функція | `src/scripts/core/36-chats.js:243` |
-| `setHomeTab` | функція | `src/scripts/core/36-chats.js:254` |
-| `HTV_KEY` | значення | `src/scripts/core/36-chats.js:264` |
-| `htvOk` | функція | `src/scripts/core/36-chats.js:265` |
-| `htabsView` | значення | `src/scripts/core/36-chats.js:266` |
-| `setHtabsView` | функція | `src/scripts/core/36-chats.js:269` |
-| `htInfo` | функція | `src/scripts/core/36-chats.js:270` |
-| `renderHtDrop` | функція | `src/scripts/core/36-chats.js:278` |
-| `toggleHtDrop` | функція | `src/scripts/core/36-chats.js:301` |
-| `renderUserTabs` | функція | `src/scripts/core/36-chats.js:311` |
-| `bindUserTab` | функція | `src/scripts/core/36-chats.js:329` |
-| `newUserTab` | функція | `src/scripts/core/36-chats.js:336` |
-| `userTabMenu` | функція | `src/scripts/core/36-chats.js:350` |
-| `deleteUserTab` | функція | `src/scripts/core/36-chats.js:364` |
-| `userTabAddSheet` | функція | `src/scripts/core/36-chats.js:383` |
-| `tabPickRows` | функція | `src/scripts/core/36-chats.js:401` |
-| `tabLabel` | функція | `src/scripts/core/36-chats.js:406` |
-| `moveFolderToTab` | функція | `src/scripts/core/36-chats.js:408` |
-| `moveChatToTab` | функція | `src/scripts/core/36-chats.js:422` |
-| `chatTabSheet` | функція | `src/scripts/core/36-chats.js:432` |
-| `chatsHomeSync` | функція | `src/scripts/core/36-chats.js:441` |
-| `chatLast` | функція | `src/scripts/core/36-chats.js:472` |
-| `chatPreview` | функція | `src/scripts/core/36-chats.js:478` |
-| `chatTimeLabel` | функція | `src/scripts/core/36-chats.js:487` |
-| `renderChatList` | функція | `src/scripts/core/36-chats.js:494` |
-| `chatMenu` | функція | `src/scripts/core/36-chats.js:523` |
-| `openChatSettings` | функція | `src/scripts/core/36-chats.js:527` |
-| `window.openChatSettings` | значення | `src/scripts/core/36-chats.js:572` |
-| `pgFolderKey` | функція | `src/scripts/core/36-chats.js:575` |
-| `renderPgLinks` | функція | `src/scripts/core/36-chats.js:576` |
-| `pgSubStripHTML` | функція | `src/scripts/core/36-chats.js:599` |
-| `pgHasSubsBlock` | функція | `src/scripts/core/36-chats.js:612` |
-| `pgSubHTML` | функція | `src/scripts/core/36-chats.js:615` |
-| `pgSubOpen` | функція | `src/scripts/core/36-chats.js:621` |
-| `pgSubNew` | функція | `src/scripts/core/36-chats.js:622` |
-| `FH_I` | обʼєкт | `src/scripts/core/36-chats.js:629` |
-| `fhBridge` | функція | `src/scripts/core/36-chats.js:633` |
-| `fhWalk` | функція | `src/scripts/core/36-chats.js:634` |
-| `fhStats` | функція | `src/scripts/core/36-chats.js:636` |
-| `fhTx` | функція | `src/scripts/core/36-chats.js:647` |
-| `fhRichTx` | функція | `src/scripts/core/36-chats.js:649` |
-| `fhPlain` | функція | `src/scripts/core/36-chats.js:651` |
-| `fhLabel` | функція | `src/scripts/core/36-chats.js:652` |
-| `fhCoverStyle` | функція | `src/scripts/core/36-chats.js:658` |
-| `fhAvatar` | функція | `src/scripts/core/36-chats.js:670` |
-| `fhChipsHTML` | функція | `src/scripts/core/36-chats.js:675` |
-| `fhTitleHome` | функція | `src/scripts/core/36-chats.js:684` |
-| `fhRender` | функція | `src/scripts/core/36-chats.js:688` |
-| `FH_NOTE` | обʼєкт | `src/scripts/core/36-chats.js:728` |
-| `FH_FILT` | обʼєкт | `src/scripts/core/36-chats.js:729` |
-| `fhFilt` | обʼєкт | `src/scripts/core/36-chats.js:730` |
-| `fhFiltKey` | функція | `src/scripts/core/36-chats.js:731` |
-| `fhKidsHTML` | функція | `src/scripts/core/36-chats.js:732` |
-| `fhPillsHTML` | функція | `src/scripts/core/36-chats.js:743` |
-| `fhBelowRender` | функція | `src/scripts/core/36-chats.js:751` |
-| `FH_SPARK` | значення | `src/scripts/core/36-chats.js:773` |
-| `fhAi` | обʼєкт | `src/scripts/core/36-chats.js:774` |
-| `fhAiHTML` | функція | `src/scripts/core/36-chats.js:775` |
-| `fhAiBind` | функція | `src/scripts/core/36-chats.js:789` |
-| `fhAiRun` | функція | `src/scripts/core/36-chats.js:797` |
-| `fhAiMove` | функція | `src/scripts/core/36-chats.js:829` |
-| `fhFilterApply` | функція | `src/scripts/core/36-chats.js:852` |
-| `fhMeltRaf` | значення | `src/scripts/core/36-chats.js:876` |
-| `fhMelt` | функція | `src/scripts/core/36-chats.js:877` |
-| `fhMeltSoon` | функція | `src/scripts/core/36-chats.js:889` |
-| `fhT` | значення | `src/scripts/core/36-chats.js:893` |
-| `fhSoon` | функція | `src/scripts/core/36-chats.js:894` |
-| `fhFlash` | функція | `src/scripts/core/36-chats.js:898` |
-| `fhStatSheet` | функція | `src/scripts/core/36-chats.js:902` |
-| `fhCoverSheet` | функція | `src/scripts/core/36-chats.js:939` |
-| `fhAddSheet` | функція | `src/scripts/core/36-chats.js:955` |
-| `fhLookSheet` | функція | `src/scripts/core/36-chats.js:968` |
-| `fhView` | функція | `src/scripts/core/36-chats.js:1013` |
-| `fhSetView` | функція | `src/scripts/core/36-chats.js:1014` |
-| `fhFind` | функція | `src/scripts/core/36-chats.js:1022` |
-| `fhCommit` | функція | `src/scripts/core/36-chats.js:1029` |
-| `FH_TEXTY` | обʼєкт | `src/scripts/core/36-chats.js:1032` |
-| `fhRich` | функція | `src/scripts/core/36-chats.js:1033` |
-| `fhTblVal` | функція | `src/scripts/core/36-chats.js:1036` |
-| `fhTblHTML` | функція | `src/scripts/core/36-chats.js:1043` |
-| `fhPeek` | значення | `src/scripts/core/36-chats.js:1063` |
-| `fhPeekOpen` | функція | `src/scripts/core/36-chats.js:1064` |
-| `fhPeekEnd` | функція | `src/scripts/core/36-chats.js:1065` |
-| `fhBubble` | функція | `src/scripts/core/36-chats.js:1070` |
-| `fhChatHTML` | функція | `src/scripts/core/36-chats.js:1083` |
-| `fhWallHTML` | функція | `src/scripts/core/36-chats.js:1093` |
-| `fhWallSig` | значення | `src/scripts/core/36-chats.js:1099` |
-| `fhApplyView` | функція | `src/scripts/core/36-chats.js:1100` |
-| `fhMsgSheet` | функція | `src/scripts/core/36-chats.js:1134` |
-| `fhCopy` | функція | `src/scripts/core/36-chats.js:1156` |
-| `fhPickFolder` | функція | `src/scripts/core/36-chats.js:1158` |
-| `fhPickChat` | функція | `src/scripts/core/36-chats.js:1165` |
-| `fhEdit` | функція | `src/scripts/core/36-chats.js:1173` |
-| `pgHubData` | функція | `src/scripts/core/36-chats.js:1191` |
-| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:1200` |
-| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:1215` |
-| `chatsInit` | функція | `src/scripts/core/36-chats.js:1225` |
+| `utDel` | обʼєкт | `src/scripts/core/36-chats.js:28` |
+| `UTAB_TOMB_MS` | значення | `src/scripts/core/36-chats.js:29` |
+| `utIdOk` | функція | `src/scripts/core/36-chats.js:30` |
+| `UTDEL_KEY` | значення | `src/scripts/core/36-chats.js:34` |
+| `parseUTabs` | функція | `src/scripts/core/36-chats.js:35` |
+| `parseUTDel` | функція | `src/scripts/core/36-chats.js:41` |
+| `utMerge` | функція | `src/scripts/core/36-chats.js:49` |
+| `applyUTabsRaw` | функція | `src/scripts/core/36-chats.js:60` |
+| `utKeepLocal` | функція | `src/scripts/core/36-chats.js:67` |
+| `utSaving` | значення | `src/scripts/core/36-chats.js:71` |
+| `saveUTabs` | функція | `src/scripts/core/36-chats.js:72` |
+| `utById` | функція | `src/scripts/core/36-chats.js:84` |
+| `itemTab` | функція | `src/scripts/core/36-chats.js:86` |
+| `folderTabOf` | функція | `src/scripts/core/36-chats.js:88` |
+| `HTAB_KEY` | значення | `src/scripts/core/36-chats.js:96` |
+| `HTABS` | масив | `src/scripts/core/36-chats.js:97` |
+| `htabOk` | функція | `src/scripts/core/36-chats.js:98` |
+| `homeTab` | значення | `src/scripts/core/36-chats.js:99` |
+| `utCatchAt` | значення | `src/scripts/core/36-chats.js:104` |
+| `utCatchup` | функція | `src/scripts/core/36-chats.js:105` |
+| `utTrusted` | функція | `src/scripts/core/36-chats.js:111` |
+| `homeUserTab` | функція | `src/scripts/core/36-chats.js:116` |
+| `homeKeysForTab` | функція | `src/scripts/core/36-chats.js:118` |
+| `homeChatsForTab` | функція | `src/scripts/core/36-chats.js:119` |
+| `homeFolderCount` | функція | `src/scripts/core/36-chats.js:120` |
+| `chatBk` | функція | `src/scripts/core/36-chats.js:122` |
+| `chatById` | функція | `src/scripts/core/36-chats.js:123` |
+| `chatsForFolder` | функція | `src/scripts/core/36-chats.js:124` |
+| `chatFolders` | функція | `src/scripts/core/36-chats.js:126` |
+| `chatUid` | функція | `src/scripts/core/36-chats.js:127` |
+| `normChat` | функція | `src/scripts/core/36-chats.js:128` |
+| `saveChats` | функція | `src/scripts/core/36-chats.js:134` |
+| `applyChatsRaw` | функція | `src/scripts/core/36-chats.js:137` |
+| `chatCreate` | функція | `src/scripts/core/36-chats.js:143` |
+| `createChat` | функція | `src/scripts/core/36-chats.js:156` |
+| `chatRename` | функція | `src/scripts/core/36-chats.js:165` |
+| `chatDelete` | функція | `src/scripts/core/36-chats.js:174` |
+| `chatsRefresh` | функція | `src/scripts/core/36-chats.js:188` |
+| `ensureInboxChat` | функція | `src/scripts/core/36-chats.js:195` |
+| `chatsMigrateInboxOnce` | функція | `src/scripts/core/36-chats.js:211` |
+| `chatLinkFolder` | функція | `src/scripts/core/36-chats.js:243` |
+| `chatUnlinkFolder` | функція | `src/scripts/core/36-chats.js:253` |
+| `linkableFolders` | функція | `src/scripts/core/36-chats.js:258` |
+| `chatAddSheet` | функція | `src/scripts/core/36-chats.js:264` |
+| `newFolderForChat` | функція | `src/scripts/core/36-chats.js:279` |
+| `pickFolderForChat` | функція | `src/scripts/core/36-chats.js:291` |
+| `setHomeTab` | функція | `src/scripts/core/36-chats.js:302` |
+| `HTV_KEY` | значення | `src/scripts/core/36-chats.js:312` |
+| `htvOk` | функція | `src/scripts/core/36-chats.js:313` |
+| `htabsView` | значення | `src/scripts/core/36-chats.js:314` |
+| `setHtabsView` | функція | `src/scripts/core/36-chats.js:317` |
+| `htInfo` | функція | `src/scripts/core/36-chats.js:318` |
+| `renderHtDrop` | функція | `src/scripts/core/36-chats.js:326` |
+| `toggleHtDrop` | функція | `src/scripts/core/36-chats.js:349` |
+| `renderUserTabs` | функція | `src/scripts/core/36-chats.js:359` |
+| `bindUserTab` | функція | `src/scripts/core/36-chats.js:377` |
+| `newUserTab` | функція | `src/scripts/core/36-chats.js:384` |
+| `userTabMenu` | функція | `src/scripts/core/36-chats.js:398` |
+| `deleteUserTab` | функція | `src/scripts/core/36-chats.js:413` |
+| `userTabAddSheet` | функція | `src/scripts/core/36-chats.js:432` |
+| `tabPickRows` | функція | `src/scripts/core/36-chats.js:450` |
+| `tabLabel` | функція | `src/scripts/core/36-chats.js:455` |
+| `moveFolderToTab` | функція | `src/scripts/core/36-chats.js:457` |
+| `moveChatToTab` | функція | `src/scripts/core/36-chats.js:471` |
+| `chatTabSheet` | функція | `src/scripts/core/36-chats.js:481` |
+| `chatsHomeSync` | функція | `src/scripts/core/36-chats.js:490` |
+| `chatLast` | функція | `src/scripts/core/36-chats.js:521` |
+| `chatPreview` | функція | `src/scripts/core/36-chats.js:527` |
+| `chatTimeLabel` | функція | `src/scripts/core/36-chats.js:536` |
+| `renderChatList` | функція | `src/scripts/core/36-chats.js:543` |
+| `chatMenu` | функція | `src/scripts/core/36-chats.js:572` |
+| `openChatSettings` | функція | `src/scripts/core/36-chats.js:576` |
+| `window.openChatSettings` | значення | `src/scripts/core/36-chats.js:621` |
+| `pgFolderKey` | функція | `src/scripts/core/36-chats.js:624` |
+| `renderPgLinks` | функція | `src/scripts/core/36-chats.js:625` |
+| `pgSubStripHTML` | функція | `src/scripts/core/36-chats.js:648` |
+| `pgHasSubsBlock` | функція | `src/scripts/core/36-chats.js:661` |
+| `pgSubHTML` | функція | `src/scripts/core/36-chats.js:664` |
+| `pgSubOpen` | функція | `src/scripts/core/36-chats.js:670` |
+| `pgSubNew` | функція | `src/scripts/core/36-chats.js:671` |
+| `FH_I` | обʼєкт | `src/scripts/core/36-chats.js:678` |
+| `fhBridge` | функція | `src/scripts/core/36-chats.js:682` |
+| `fhWalk` | функція | `src/scripts/core/36-chats.js:683` |
+| `fhStats` | функція | `src/scripts/core/36-chats.js:685` |
+| `fhTx` | функція | `src/scripts/core/36-chats.js:696` |
+| `fhRichTx` | функція | `src/scripts/core/36-chats.js:698` |
+| `fhPlain` | функція | `src/scripts/core/36-chats.js:700` |
+| `fhLabel` | функція | `src/scripts/core/36-chats.js:701` |
+| `fhCoverStyle` | функція | `src/scripts/core/36-chats.js:707` |
+| `fhAvatar` | функція | `src/scripts/core/36-chats.js:719` |
+| `fhChipsHTML` | функція | `src/scripts/core/36-chats.js:724` |
+| `fhTitleHome` | функція | `src/scripts/core/36-chats.js:733` |
+| `fhRender` | функція | `src/scripts/core/36-chats.js:737` |
+| `FH_NOTE` | обʼєкт | `src/scripts/core/36-chats.js:777` |
+| `FH_FILT` | обʼєкт | `src/scripts/core/36-chats.js:778` |
+| `fhFilt` | обʼєкт | `src/scripts/core/36-chats.js:779` |
+| `fhFiltKey` | функція | `src/scripts/core/36-chats.js:780` |
+| `fhKidsHTML` | функція | `src/scripts/core/36-chats.js:781` |
+| `fhPillsHTML` | функція | `src/scripts/core/36-chats.js:792` |
+| `fhBelowRender` | функція | `src/scripts/core/36-chats.js:800` |
+| `FH_SPARK` | значення | `src/scripts/core/36-chats.js:822` |
+| `fhAi` | обʼєкт | `src/scripts/core/36-chats.js:823` |
+| `fhAiHTML` | функція | `src/scripts/core/36-chats.js:824` |
+| `fhAiBind` | функція | `src/scripts/core/36-chats.js:838` |
+| `fhAiRun` | функція | `src/scripts/core/36-chats.js:846` |
+| `fhAiMove` | функція | `src/scripts/core/36-chats.js:878` |
+| `fhFilterApply` | функція | `src/scripts/core/36-chats.js:901` |
+| `fhMeltRaf` | значення | `src/scripts/core/36-chats.js:925` |
+| `fhMelt` | функція | `src/scripts/core/36-chats.js:926` |
+| `fhMeltSoon` | функція | `src/scripts/core/36-chats.js:938` |
+| `fhT` | значення | `src/scripts/core/36-chats.js:942` |
+| `fhSoon` | функція | `src/scripts/core/36-chats.js:943` |
+| `fhFlash` | функція | `src/scripts/core/36-chats.js:947` |
+| `fhStatSheet` | функція | `src/scripts/core/36-chats.js:951` |
+| `fhCoverSheet` | функція | `src/scripts/core/36-chats.js:988` |
+| `fhAddSheet` | функція | `src/scripts/core/36-chats.js:1004` |
+| `fhLookSheet` | функція | `src/scripts/core/36-chats.js:1017` |
+| `fhView` | функція | `src/scripts/core/36-chats.js:1062` |
+| `fhSetView` | функція | `src/scripts/core/36-chats.js:1063` |
+| `fhFind` | функція | `src/scripts/core/36-chats.js:1071` |
+| `fhCommit` | функція | `src/scripts/core/36-chats.js:1078` |
+| `FH_TEXTY` | обʼєкт | `src/scripts/core/36-chats.js:1081` |
+| `fhRich` | функція | `src/scripts/core/36-chats.js:1082` |
+| `fhTblVal` | функція | `src/scripts/core/36-chats.js:1085` |
+| `fhTblHTML` | функція | `src/scripts/core/36-chats.js:1092` |
+| `fhPeek` | значення | `src/scripts/core/36-chats.js:1112` |
+| `fhPeekOpen` | функція | `src/scripts/core/36-chats.js:1113` |
+| `fhPeekEnd` | функція | `src/scripts/core/36-chats.js:1114` |
+| `fhBubble` | функція | `src/scripts/core/36-chats.js:1119` |
+| `fhChatHTML` | функція | `src/scripts/core/36-chats.js:1132` |
+| `fhWallHTML` | функція | `src/scripts/core/36-chats.js:1142` |
+| `fhWallSig` | значення | `src/scripts/core/36-chats.js:1148` |
+| `fhApplyView` | функція | `src/scripts/core/36-chats.js:1149` |
+| `fhMsgSheet` | функція | `src/scripts/core/36-chats.js:1183` |
+| `fhCopy` | функція | `src/scripts/core/36-chats.js:1205` |
+| `fhPickFolder` | функція | `src/scripts/core/36-chats.js:1207` |
+| `fhPickChat` | функція | `src/scripts/core/36-chats.js:1214` |
+| `fhEdit` | функція | `src/scripts/core/36-chats.js:1222` |
+| `pgHubData` | функція | `src/scripts/core/36-chats.js:1240` |
+| `folderAddSheet` | функція | `src/scripts/core/36-chats.js:1249` |
+| `pickChatForFolder` | функція | `src/scripts/core/36-chats.js:1264` |
+| `chatsInit` | функція | `src/scripts/core/36-chats.js:1274` |
 
 ### `src/scripts/core/37-ai-privacy.js` — 20 сутностей
 
