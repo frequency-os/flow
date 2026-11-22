@@ -79,6 +79,14 @@
   .yp-add.in{margin-left:0;border:0;padding:0 4px;}
   .yp-ln.plan{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,var(--line));}
 
+  /* шторка-пакет «Флоу пропонує план» (етап 4) — поверх наявного .asheet */
+  .yp-bl{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;margin:4px 0 12px;-webkit-overflow-scrolling:touch;}
+  .yp-bi{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 12px;border-radius:14px;background:var(--field,var(--bg-2));border:1px solid var(--line);cursor:pointer;}
+  .yp-bi input{flex:none;width:20px;height:20px;margin:0;accent-color:var(--accent);}
+  .yp-bi span{flex:1;min-width:0;font-size:14px;line-height:1.35;color:var(--text);overflow-wrap:break-word;}
+  .yp-bi em{flex:none;font-style:normal;font-size:11px;font-weight:800;color:var(--muted);padding:3px 7px;border-radius:7px;border:1px solid var(--line);}
+  .yp-bi:has(input:not(:checked)) span{color:var(--muted);text-decoration:line-through;}
+
   /* порожній рік */
   .yp-empty{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:20px;background:var(--card);border:1px dashed var(--line);}
   .yp-empty b{font-size:17px;font-weight:800;color:var(--text);line-height:1.3;}
