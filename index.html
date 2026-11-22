@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-22-0933-03fa494';
+  var BUILD='2026-11-22-1522-9d239ea';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -7113,6 +7113,20 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
 /* ── сітка: без лівої колонки і без від'ємних полів ──────────────────── */
 #scr-home .foh-row>:is(#folderGrid,#fspGrid){flex:1 1 auto;min-width:0;}
+#scr-home .foh-row:has(#folderGrid.folder-searching){display:none;}
+.folder-tools{margin:0 0 16px;min-width:0;}
+.folder-find-label,.folder-tools h2{display:block;margin:0 0 8px;font-size:14px;font-weight:700;color:var(--text);}
+.folder-tools input{box-sizing:border-box;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--line);
+  border-radius:12px;background:var(--card);color:var(--text);font:inherit;font-size:16px;}
+.folder-tools input::placeholder,.folder-tools small,.folder-tools p{color:var(--muted);}
+.folder-tools section{margin-top:16px;}
+.folder-tool-result{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:start;width:100%;
+  min-height:44px;padding:8px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);font:inherit;cursor:pointer;}
+.folder-tool-result>*{min-width:0;overflow-wrap:anywhere;}
+.folder-tool-result small{text-align:end;}
+.folder-card-open{position:absolute;inset:0;z-index:3;border:0;padding:0;border-radius:inherit;background:transparent;cursor:pointer;}
+#folderGrid .fr .fmenu,#folderGrid .fc3-grip,#folderGrid .fc3-photo{z-index:4;}
+.folder-tools :focus-visible,.folder-card-open:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;}
 :is(#folderGrid,#fspGrid){--fc3-min:148px;--fc3-row:118px;}
 :is(#folderGrid,#fspGrid).fsz-s{--fc3-min:96px;--fc3-row:96px;}
 :is(#folderGrid,#fspGrid).fsz-l{--fc3-min:240px;--fc3-row:150px;}
@@ -8867,6 +8881,56 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   @media (prefers-reduced-motion:reduce){ .tm-d.go{animation:none;} }
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .wg-t.wg-t{background:var(--pg-surface,var(--card));} }
   @media (prefers-reduced-transparency:reduce){ .wg-t.wg-t{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--pg-surface,var(--card));} }
+
+  /* ── Трекер цілі: вигляди Шлях · Сезон · Росток · Кільце (22.11.2026, 48-widgets.js wdHabLook) ── */
+  .wd-path{display:grid;grid-template-columns:repeat(var(--c,10),minmax(0,1fr));gap:3px;flex:0 1 auto;min-height:0;overflow:hidden;align-content:start;}
+  .wd-path i{aspect-ratio:1;max-height:18px;border-radius:4px;background:var(--pg-track,rgba(127,127,127,.22));}
+  .wd-path i.on{background:var(--fc);}
+  .wd-path i.ms{box-shadow:inset 0 0 0 1.5px var(--pg-mut,var(--muted));}
+  .wd-path i.ms.on{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#fff 45%,var(--fc));}
+  .wd-path i.nx{box-shadow:inset 0 0 0 2px var(--pg-fg,var(--text));}
+  /* сітка сезону: квадратні клітинки фіксованого розміру — висоту плитки вона не роздуває і не сплющується в смужки */
+  .wd-hm{--cl:9px;display:grid;grid-template-rows:repeat(7,var(--cl));grid-template-columns:repeat(var(--w,8),var(--cl));grid-auto-flow:column;gap:3px;justify-content:center;align-content:center;flex:1 1 auto;min-height:0;overflow:hidden;}
+  .wg-t.wd.grid.sz-l .wd-hm{--cl:12px;}
+  .wd-hm i{border-radius:2px;background:var(--pg-track,rgba(127,127,127,.22));}
+  .wg-t.wd small.wd-sub.one{-webkit-line-clamp:1;}
+  /* кругла «✓ сьогодні» у куті шапки (S/M) */
+  .wd-ck{all:unset;box-sizing:border-box;pointer-events:auto;cursor:pointer;position:absolute;top:6px;right:6px;z-index:3;width:44px;height:44px;border-radius:50%;
+    display:grid;place-items:center;font-size:18px;font-weight:800;color:var(--pg-fg,var(--text));border:2px solid var(--fc);background:var(--pg-surface,var(--card));}
+  .wg-t>.wd-ck{position:absolute;z-index:3;}   /* загальне .wg-t>*:not(.wg-hit){position:relative} інакше ставить її в потік */
+  .wd-ck.on{background:var(--fc);color:#fff;}
+  .wd-ck:active{transform:scale(.94);}
+  .wd-ck:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .wg-t.wd.trk .wd-h{padding-right:52px;}
+  .wd-hm i.on{background:var(--fc);}
+  .wd-hm i.td{box-shadow:0 0 0 1.5px var(--pg-fg,var(--text));}
+  .wd-hm i.fut{opacity:.35;}
+  .wd-pl{display:flex;align-items:flex-end;gap:12px;min-width:0;flex:1 1 auto;min-height:0;}
+  .wd-plant{flex:none;height:100%;max-height:120px;min-height:56px;width:auto;aspect-ratio:100/124;}
+  .wd-plant .gr{fill:var(--pg-track,rgba(127,127,127,.22));}
+  .wd-plant .st{fill:none;stroke:var(--fc);stroke-width:4;stroke-linecap:round;}
+  .wd-plant .lf{fill:var(--fc);opacity:.85;}
+  .wd-plant .sd{fill:color-mix(in srgb,var(--fc) 60%,#6b4a2b);}
+  .wd-plant .bd{fill:#ffd166;}
+  .wg-t.wd.plant .wd-col{align-self:center;}
+  .wd-rg{display:flex;align-items:center;gap:14px;min-width:0;flex:1 1 auto;min-height:0;}
+  .wd-tapr{all:unset;box-sizing:border-box;pointer-events:auto;cursor:pointer;position:relative;flex:none;width:88px;height:88px;display:grid;place-items:center;border-radius:50%;}
+  .wd-tapr svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+  .wd-tapr circle{fill:none;stroke-width:3.4;}
+  .wd-tapr .tr{stroke:var(--pg-track,rgba(127,127,127,.22));}
+  .wd-tapr .vl{stroke:var(--fc);stroke-linecap:round;transition:stroke-dasharray .35s ease;}
+  .wd-tapr.on .tr{fill:var(--fc);}
+  .wd-tapr .ck{fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transform-origin:18px 18px;}
+  .wd-tapr b{position:relative;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--pg-fg,var(--text));}
+  .wd-tapr:active{transform:scale(.96);}
+  .wd-tapr:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:3px;}
+  .wg-t.wd.trk.sz-s .wd-tapr{width:72px;height:72px;}
+  .wg-t.wd.trk.sz-s .wd-rg{flex-direction:column;gap:6px;text-align:center;}
+  .wg-t.wd.trk.sz-s .wd-rg .wd-big{display:none;}
+  .wg-t.wd.trk.sz-s .wd-pl .wd-cap{-webkit-line-clamp:2;}
+  @media (prefers-reduced-motion:reduce){ .wd-tapr .vl{transition:none;} }
+  /* вихідні трекера (22.11.2026, крок 2): смугастий день — не пропуск */
+  .wd-days.week i.rest u,.wd-hg i.rest,.wd-hm i.rest,.wd-days.month i.rest{background:repeating-linear-gradient(45deg,var(--pg-track,rgba(127,127,127,.25)) 0 2px,transparent 2px 4px);}
   /* ════════ «Стартовий набір» — порожній Огляд нової людини (53-starter.js, 10.10.2026) ════════
      Банер Карти бажань → колаж мрій; сітка папок → 4 приклади + Журнал + «Зробити своїм».
      Кольори лише з токенів теми; текст на фото — білий під затемненням знизу. */
@@ -9561,6 +9625,23 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .pg-sitem.pgs-more{justify-content:center;border:1.5px dashed color-mix(in srgb,var(--accent) 50%,transparent);border-radius:12px;margin-top:6px;font-weight:800;color:var(--accent);}
   /* Ще → Магазин блоків */
   .acc-row .bs-badge{margin-left:auto;margin-right:6px;font-size:10px;font-weight:800;background:#ff6b9a;color:#fff;border-radius:7px;padding:2px 7px;}
+  /* вкладка «Трекери» і вигляди «Трекера цілі» (22.11.2026) */
+  .bs-lead{margin:4px 16px 8px;font-size:13.5px;line-height:1.45;color:var(--muted);}
+  .bs-looks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 10px;margin:12px 16px 4px;}
+  .bs-look:last-child:nth-child(odd){grid-column:1 / -1;}   /* пʼятий вигляд — на всю ширину, не сам у половині ряду */
+  .bs-look{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:6px;min-width:0;}
+  .bs-look:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:16px;}
+  .bs-lkt{display:grid;gap:1px;padding:0 4px;}
+  .bs-lkt b{font-size:13.5px;font-weight:800;color:var(--text);}
+  .bs-lkt small{font-size:11.5px;font-weight:600;color:var(--muted);}
+  .bs-look .bsw{min-height:118px;}
+  .bsw-path{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px;}
+  .bsw-path i{aspect-ratio:1;border-radius:3px;background:color-mix(in srgb,var(--text) 12%,transparent);}
+  .bsw-hm{display:grid;grid-template-rows:repeat(7,7px);grid-auto-flow:column;grid-auto-columns:7px;gap:2px;}
+  .bsw-hm i{border-radius:2px;background:color-mix(in srgb,var(--text) 12%,transparent);}
+  .bsw-pl{display:flex;align-items:flex-end;gap:8px;}
+  .bsw-pl .wd-plant{height:64px;min-height:0;}
+  .bsw-pl>span{display:grid;gap:3px;}
   /* ════════ Налаштування віджетів і розмір клітинками (19.11.2026, 63-widget-sheet.js) ════════
      Дошка віджетів: телефон 4 колонки, компʼютер (≥760) 8 колонок; розмір клітинки — --wcm/--whm і --wcd/--whd з блоку.
      «Змінити»: хитання, ✕ і ручка ↘. Шторка: скло на токенах теми (--card, --text, --muted), тож живе і в світлій, і в темній. */
@@ -9650,8 +9731,8 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .ws-ov{position:fixed;inset:0;z-index:1250;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,5,14,0);transition:background .25s;}
   .ws-ov.on{background:rgba(6,5,14,.4);}
   .ws-ov.out{background:rgba(6,5,14,0);}
-  .ws-sh{box-sizing:border-box;width:100%;max-width:560px;max-height:min(90vh,880px);overflow-y:auto;overscroll-behavior:contain;
-    border-radius:28px 28px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;align-content:start;
+  .ws-sh{box-sizing:border-box;width:100%;max-width:560px;max-height:min(90dvh,880px);overflow:hidden;
+    border-radius:28px 28px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;
     color:var(--text);background:color-mix(in srgb,var(--card) 82%,transparent);
     -webkit-backdrop-filter:blur(28px) saturate(170%);backdrop-filter:blur(28px) saturate(170%);
     box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 18%,transparent),0 -20px 44px -12px rgba(0,0,0,.45);
@@ -9668,8 +9749,13 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .ws-grab{width:40px;height:5px;border-radius:3px;margin:0 auto;background:color-mix(in srgb,var(--text) 22%,transparent);}
   .ws-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:16px;}
   .ws-hd b{font-weight:800;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ws-done{flex:none;border:0;border-radius:999px;padding:8px 16px;min-height:36px;cursor:pointer;font:inherit;font-size:13px;font-weight:800;
-    color:var(--text);background:color-mix(in srgb,var(--text) 12%,transparent);}
+  .ws-footer button[data-wsdone]{background:var(--accent);color:var(--bg);}
+  .ws-sh>:not(.ws-body){flex-shrink:0;}
+  .ws-sh .ws-in{min-height:44px;font-size:16px;}
+  .pgwg .wg-t.wg-settings{width:var(--money-width,100%);min-height:var(--money-height,150px);}
+  .wg-t.wd button.wg-settings-head{min-height:44px;padding-right:0;}
+  .wg-settings-head b,.wg-mission-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #scr-page .pg-bitem.wb-cell .wg-t.wg-settings{min-height:0;}
   .ws-pv{display:flex;justify-content:center;padding:2px 0 4px;}
   .ws-pvc{display:flex;max-width:100%;transition:width .2s,height .2s;}
   .ws-pvh{flex:1;display:flex;min-width:0;pointer-events:none;}
@@ -9677,7 +9763,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .ws-tabs{display:flex;padding:3px;border-radius:12px;background:color-mix(in srgb,var(--text) 9%,transparent);}
   .ws-tabs button{flex:1;border:0;background:transparent;border-radius:10px;padding:8px 6px;min-height:36px;cursor:pointer;font:inherit;font-size:13px;font-weight:800;color:var(--muted);}
   .ws-tabs button.on{background:color-mix(in srgb,var(--card) 70%,color-mix(in srgb,var(--text) 14%,transparent));color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.12);}
-  .ws-body{display:grid;gap:12px;}
+  .ws-body{display:grid;gap:12px;align-content:start;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
   .ws-grp{border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--text) 6%,transparent);}
   .ws-gt{padding:10px 14px 0;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
   .ws-it{display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:48px;box-sizing:border-box;font-size:14px;font-weight:600;color:var(--text);}
@@ -9738,6 +9824,24 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   /* рядки з полем (Назва, Дата, Час): підпис не стискається до нуля, поле — праворуч */
   .ws-it:has(.ws-in)>span:first-child{flex:0 0 auto;}
   .ws-in.sm{margin-left:auto;max-width:62%;}
+  /* вигляди трекера (22.11.2026): 5 плиток зі значком */
+  .ws-looks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:10px 14px 12px;}
+  .ws-looks button{border:0;border-radius:12px;padding:8px 2px 6px;min-height:58px;cursor:pointer;font:inherit;font-size:11.5px;font-weight:700;color:var(--text);
+    display:flex;flex-direction:column;align-items:center;gap:5px;background:color-mix(in srgb,var(--text) 7%,transparent);}
+  .ws-looks button.on{background:color-mix(in srgb,var(--accent) 22%,transparent);box-shadow:inset 0 0 0 1.5px var(--accent);}
+  .ws-looks button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .ws-lk{width:24px;height:24px;display:block;border-radius:6px;}
+  .ws-lk.chain{border-radius:50%;border:3px solid currentColor;box-shadow:inset 0 0 0 4px transparent;background:radial-gradient(circle,var(--accent) 0 5px,transparent 5.5px);}
+  .ws-lk.path{background:linear-gradient(90deg,var(--accent) 0 55%,transparent 55%),repeating-linear-gradient(90deg,currentColor 0 5px,transparent 5px 8px);background-size:100% 6px,100% 6px;background-position:0 4px,0 14px;background-repeat:no-repeat;opacity:.9;}
+  .ws-lk.grid{background:repeating-linear-gradient(90deg,transparent 0 2px,var(--bgc,transparent) 2px 2px),conic-gradient(var(--accent) 25%,color-mix(in srgb,var(--accent) 40%,transparent) 0 50%,var(--accent) 0 75%,color-mix(in srgb,var(--accent) 20%,transparent) 0);background-size:auto,8px 8px;}
+  .ws-lk.plant{background:radial-gradient(ellipse 6px 3px at 7px 12px,var(--accent) 98%,transparent),radial-gradient(ellipse 6px 3px at 17px 8px,var(--accent) 98%,transparent),linear-gradient(var(--accent),var(--accent)) 11px 6px/2.5px 17px no-repeat;}
+  .ws-lk.ring{border-radius:50%;background:conic-gradient(var(--accent) 0 60%,color-mix(in srgb,currentColor 25%,transparent) 0);-webkit-mask:radial-gradient(circle,transparent 7px,#000 7.5px);mask:radial-gradient(circle,transparent 7px,#000 7.5px);}
+  /* вихідні трекера (22.11.2026) */
+  .ws-days7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;padding:10px 14px 4px;}
+  .ws-days7 button{border:0;border-radius:10px;min-height:40px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;color:var(--text);background:color-mix(in srgb,var(--text) 7%,transparent);}
+  .ws-days7 button.on{background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--accent) 30%,transparent) 0 4px,transparent 4px 8px);box-shadow:inset 0 0 0 1.5px var(--accent);}
+  .ws-days7 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .ws-note{font-size:12px;color:var(--muted);padding:2px 14px 12px;line-height:1.35;}
   /* ════════ «План» (65-plan.js, 19.11.2026) ════════
      Вибраний дизайн «Два ряди зверху»: період → (на Дні) вигляд → справи → поле Флоу.
      Світла тема (html.t-light) — «Ранкове скло», темна — «Нічне скло».
@@ -10253,6 +10357,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       <button class="htab-new" id="utNewBtn" aria-label="Нова вкладка" title="Нова вкладка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div><div class="sec-actions"><button class="htab-add" id="utAddBtn" hidden aria-label="Додати у вкладку" title="Додати у вкладку"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><button class="htab-cfg" id="folderLookBtn" aria-label="Вигляд папок" title="Вигляд папок"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div></div>
     <div class="htpanel" id="htPanel" hidden></div>
+    <div class="folder-tools" id="folderTools" hidden>
+      <label class="folder-find-label" for="folderFind">Знайти папку</label>
+      <input id="folderFind" type="search" placeholder="Назва папки" autocomplete="off">
+      <div id="folderMatches"></div>
+      <p id="folderFindEmpty" role="status" hidden>Папок не знайдено</p>
+      <section id="folderAttention" aria-labelledby="folderAttentionTitle" hidden>
+        <h2 id="folderAttentionTitle">Потребують уваги</h2>
+        <div id="folderDeadlines"></div>
+      </section>
+    </div>
     <div class="foh-row">
       <div class="grid" id="folderGrid"></div>
     </div>
@@ -11104,6 +11218,17 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     // Наповнюється поступово, екран за екраном. Ключі — точний текст,
     // який реально є в DOM (без зайвих пробілів).
     const I18N_DICT = {
+      'Розмір на компʼютері':'Desktop size', 'Розмір на телефоні':'Phone size',
+      'Широкий':'Wide', 'Малий':'Small', 'Великий':'Large', 'Тип доходу':'Income type',
+      'Загальні':'General', 'Доходи':'Income', 'Витрати':'Spending',
+      'Назва':'Name', 'Валюта':'Currency', 'Фон':'Background',
+      'Скло':'Glass', 'Матове':'Frosted', 'Колір':'Color',
+      'Ціль на місяць':'Monthly target', 'Ліміт на місяць':'Monthly limit',
+      'Гаманець':'Wallet', 'Робота':'Work', 'Гроші місії':'Mission money',
+      'Конверти й платежі':'Envelopes & bills', 'Борги й правила':'Debts & rules', 'Місія':'Mission',
+      'Спершу збережи або скасуй зміни':'Save or cancel your changes first',
+      'Знайти папку':'Find a folder',
+      'Папок не знайдено':'No folders found', 'Потребують уваги':'Need attention',
       // «Ще → Про застосунок»: прев'ю «Що таке Frequency» (54-intro.js)
       'Що таке Frequency':'What is Frequency', 'коротка екскурсія: навіщо це і як допомагає рости':'a short tour: why it exists and how it helps you grow',
       // нижня навігація
@@ -14377,7 +14502,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const k=b.dataset.dnav;
     if(k==='home') goHome();
     else if(k==='ai'){ if(window.aiChatSheet) window.aiChatSheet(); }
-    else if(k==='folders'){ goHome(); setTimeout(()=>{ const el=document.getElementById('folderGrid'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },120); }
+    else if(k==='folders'){
+      goHome();
+      setHomeTab('folders');
+      setTimeout(()=>{
+        const tabs=document.querySelector('#scr-home .sec-htabs');
+        if(tabs) tabs.scrollIntoView({behavior:'smooth',block:'start'});
+      },120);
+    }
     /* «Простір» прибрано з навігації — всі дошки живуть у папках */
     else if(k==='finance') goFinance();
     else if(k==='planner') goPlanner();
@@ -23280,6 +23412,92 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     });
     grid.appendChild(fc3Add());
   }
+  function openFolderFromList(key){
+    if(!folderVisible(key)) return;
+    if(isFolderGroup(key)) openGroupAsChosen(key);
+    else goFolder(key);
+  }
+
+  function addFolderOpenButton(card, key){
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='folder-card-open';
+    button.setAttribute('aria-label',folders[key].name);
+    button.setAttribute('data-i18n-skip','1');
+    card.prepend(button);
+  }
+
+  function renderFolderTools(){
+    const tools=document.getElementById('folderTools');
+    const input=document.getElementById('folderFind');
+    const matches=document.getElementById('folderMatches');
+    const empty=document.getElementById('folderFindEmpty');
+    const attention=document.getElementById('folderAttention');
+    const deadlines=document.getElementById('folderDeadlines');
+    const grid=document.getElementById('folderGrid');
+    tools.hidden=homeTab!=='folders';
+    grid.classList.remove('folder-searching');
+    if(tools.hidden){ input.value=''; return; }
+
+    const keys=orderedFolderKeys().filter(key=>key!=='work'&&folderVisible(key));
+    function addResult(list,key,detail){
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='folder-tool-result';
+      const title=document.createElement('span');
+      title.dataset.i18nSkip='1';
+      title.textContent=folders[key].name;
+      button.append(title);
+      if(detail) button.append(detail);
+      button.onclick=()=>{
+        input.value='';
+        updateSearch();
+        openFolderFromList(key);
+      };
+      list.append(button);
+    }
+
+    const english=flowLang()==='en';
+    input.placeholder=english?'Folder name':'Назва папки';
+    const today=Date.parse(ymdLocal());
+    const weekEnd=today+7*86400000;
+    const projects=keys.filter(key=>folderTabOf(key)===''&&folders[key].role==='project'&&folders[key].status!=='done')
+      .map(key=>({key,date:Date.parse(folders[key].due+'T00:00:00Z')}))
+      .filter(project=>project.date<=weekEnd)
+      .sort((a,b)=>a.date-b.date).slice(0,3);
+    const format=new Intl.DateTimeFormat(english?'en':'uk',{day:'numeric',month:'short',timeZone:'UTC'});
+    deadlines.replaceChildren();
+    projects.forEach(({key,date})=>{
+      const detail=document.createElement('small');
+      if(date<today){
+        const overdue=document.createElement('span');
+        overdue.textContent=english?'Overdue':'Прострочено';
+        detail.append(overdue,' · ');
+      }
+      detail.append(format.format(date));
+      addResult(deadlines,key,detail);
+    });
+
+    function updateSearch(){
+      const query=input.value.trim().toLocaleLowerCase();
+      matches.replaceChildren();
+      if(query){
+        keys.filter(key=>String(folders[key].name||'').toLocaleLowerCase().includes(query)).forEach(key=>{
+          const parent=folders[key].parent;
+          const path=parent&&folders[parent]?document.createElement('small'):null;
+          if(path){ path.dataset.i18nSkip='1'; path.textContent=folderPathName(parent); }
+          addResult(matches,key,path);
+        });
+      }
+      empty.hidden=!query||matches.childElementCount>0;
+      attention.hidden=!!query||!projects.length;
+      grid.classList.toggle('folder-searching',!!query);
+    }
+    input.oninput=updateSearch;
+    updateSearch();
+  }
+  document.addEventListener('flowlangchange',renderFolderTools);
+
   function renderDashboard(){
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
@@ -23290,7 +23508,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
-    try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
+    let showingChats=false;
+    try{ showingChats=chatsHomeSync(); }catch(e){ console.error('chatsHomeSync',e); }
+    renderFolderTools();
+    if(showingChats) return;
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
     let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');   // проєкти — звичайні папки зі статусом (14.10.2026)
     // своя вкладка Огляду — лише її папки, «Папки» — без вкладки (36-chats.js, 21.11.2026)
@@ -23378,12 +23599,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       prioHeadMaybe(grid,k); grid.appendChild(el);
     });
     // add-folder card — під поточний режим
-    const add=document.createElement('div');
+    const add=document.createElement('button');
+    add.type='button';
     add.className=homeFolderView==='rows'?'fr fr-add':'fc2 fc2-add '+(homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
     add.innerHTML=homeFolderView==='rows'?`<span class="fr-ic" style="background:transparent;box-shadow:none;color:var(--accent);font-size:22px">＋</span><span>Нова папка</span>`:`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
     add.onclick=()=>openNewFolderChoice();
     grid.appendChild(add);
     }
+    grid.querySelectorAll('.fcard[data-fkey]').forEach(card=>addFolderOpenButton(card,card.dataset.fkey));
     // bind menus
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
     // «фото» на кольоровій обкладинці — одразу вибір знімка
@@ -24960,6 +25183,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       }
     }
     saveWork(); renderWork(); try{renderFinance();}catch(_){}
+    try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджет «Робота» на сторінці папки — нові цифри одразу
     window.platform.haptic('success');
     wkmClose();
   }
@@ -30075,7 +30299,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         const act=hit.dataset.gs, a=hit.dataset.a, b=hit.dataset.b;
         close();
         try{
-          if(act==='folder')     goFolder(a);
+          if(act==='folder')     openFolderFromList(a);
           else if(act==='chat')  goChat(a,{from:'home'});
           else if(act==='block') window.flowOpenBlock(a,b);
           else if(act==='diary') window.goDiary(a);
@@ -34455,6 +34679,30 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function moNotes(fk){ return moBoard(fk).filter(b=>b&&b.type==='note'&&!b.vision&&String(b.text||'').trim()).sort((a,b)=>(+a.at||0)-(+b.at||0)).slice(-3).reverse(); }
   function moVision(fk){ return moBoard(fk).find(b=>b&&b.type==='note'&&b.vision)||null; }
   function moMarked(t,ds){ const v=t.marks[ds]; return t.type==='heatmap'?(+v>0):!!v; }
+  /* ритм і вихідні трекера (22.11.2026, крок 2 «Трекера цілі»): поля t.rest=[0..6] (0 = Пн) і t.rhythm={k:'week',n}|{k:'days',n}.
+     Нема полів — щодня і без вихідних, як було. Пишуться лише зі шторки віджета (63-widget-sheet.js) після «Готово». */
+  const MO_DAYS_N=[21,30,66,100];
+  function moRest(t){ return Array.isArray(t&&t.rest)?[...new Set(t.rest.map(Number).filter(x=>Number.isInteger(x)&&x>=0&&x<=6))].sort():[]; }
+  function moIsRest(t,ds){
+    if(!Array.isArray(t&&t.rest)) return false;   // у старих трекерів списку нема зовсім — тоді вихідних нема
+    const den=(new Date(ds+'T12:00:00').getDay()+6)%7;
+    return moRest(t).includes(den);
+  }
+  function moRhythm(t){
+    const r=t&&t.rhythm, n=Math.round(+(r&&r.n)||0);
+    if(r&&r.k==='week'&&n>=1&&n<=7) return {k:'week',n};
+    if(r&&r.k==='days'&&MO_DAYS_N.includes(n)) return {k:'days',n};
+    return {k:'day'};
+  }
+  // серія: дні поспіль до сьогодні (або до вчора, якщо сьогодні ще не позначено); непозначений вихідний серію не рве і не рахується
+  function moStreak(t,mk){
+    mk=mk||(ds=>moMarked(t,ds)); let st=0; const d=new Date();
+    if(!mk(ymdLocal(d))) d.setDate(d.getDate()-1);
+    for(let i=0;i<400;i++){ const ds=ymdLocal(d);
+      if(mk(ds)) st++; else if(!moIsRest(t,ds)) break;
+      d.setDate(d.getDate()-1); }
+    return st;
+  }
   /* позначка дня в трекері місії — одна функція для сторінки місії і віджета «Звичка папки» (48-widgets.js).
      Лише з дії людини; майбутні дні не позначаються. Повертає новий стан (true/false) або null, якщо не вийшло. */
   function moToggleMark(fk,ds){
@@ -36064,7 +36312,15 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
   const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dtasks:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
+  const WG_SETTINGS={
+    wgwallet:{t:'Гаманець',ic:'👛'},
+    wgwork:{t:'Робота',ic:'⏱'},
+    wgmission:{t:'Гроші місії',h:'Місія',ic:'🎯'},
+    wgenv:{t:'Конверти й платежі',ic:'✉️'},
+    wgdebt:{t:'Борги й правила',ic:'⚖️'}
+  };
   function wgIs(t){ return !!WG_TYPES[t]; }
+  function wgHasSettings(t){ return t==='wgmoney'||Object.hasOwn(WG_SETTINGS,t); }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
   function wgFolderMission(fk){ return fk?(goalsData.goals||[]).find(g=>g&&g.id&&String(g.folderKey||'')===String(fk)&&jnStatus(g)!=='archive')||null:null; }
@@ -36078,7 +36334,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       b.type='wgmoney'; b.kind=k==='wgin'?'in':'out'; b.label=b.label||(k==='wgin'?'Доходи':'Витрати');
       if(k==='wgin'&&!b.src) b.src='extra';   // у папці-проєкті дохід зазвичай додатковий
       if(b.goal==null) b.goal=0;
-      const id=b.id; setTimeout(()=>{ try{ wgMoneyCfg(id,true); }catch(_){} },450);   // одразу спитати тип і назву
+      wdOpenNew(b.id);
       return true;
     }
     if(wgIs(k)){ b.type=k; return true; }
@@ -36087,6 +36343,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
   // ── HTML плиток ──
   function wgTile(cls,inner,attrs){ return `<div class="wg-t ${cls}"${attrs||''}>${inner}</div>`; }
+  function wgPageTile(b,fk,cls,inner,color){
+    return b.id?wdTile(b,fk,inner,'wg-settings '+cls,color)
+      :wgTile(cls,inner,color?` style="--mc:${safeColor(color,'#34c77b')}"`:'');
+  }
+  function wgSettingsHead(b,label,legacy,custom=b.hd){
+    if(!b.id) return `<span class="wg-h">${legacy}</span>`;
+    const name=String(custom||'').slice(0,40);
+    return `<button class="wd-h wg-settings-head" data-wga="cfg" aria-label="Налаштувати віджет «${esc(name||label)}»"><b${name?' data-i18n-skip="1"':''}>${name?esc(name):legacy}</b></button>`;
+  }
+  function wgMoneyMission(b,fk){
+    const chosen=b.goalId&&wlGoal(b.goalId);
+    return chosen||wgFolderMission(fk)||wlMissions()[0]||null;
+  }
   function wgHTML(b,fk){
     const ym=wlYm(), t=b&&b.type;
     if(wdIs(t)) return wdHTML(b,fk);   // «Дані»: вікна в місію / трекер / Планер
@@ -36098,55 +36367,59 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const rings=g&&(+g.earn>0||+g.spend>0||+g.save>0)
         ?`<span class="wg-rings">${+g.earn>0?ring(all.inc/g.earn*100,'заробив'):''}${+g.spend>0?ring(all.out/g.spend*100,'витратив'):''}${+g.save>0?ring(svd/g.save*100,'відклав'):''}</span>`
         :`<span class="wg-fact"><span>+${wgK(all.inc)}</span><span>−${wgK(all.out)}</span></span>`;
-      return wgTile('wide c-wallet',`<button class="wg-hit" data-wga="wallet" aria-label="Відкрити Гаманець"></button>
-        <span class="wg-h">Гаманець · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><b class="wg-big">${wgMoney(bal)}</b>
+      return wgPageTile(b,fk,'wide c-wallet',`<button class="wg-hit" data-wga="wallet" aria-label="Відкрити Гаманець"></button>
+        ${wgSettingsHead(b,'Гаманець','Гаманець · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase()))}<b class="wg-big">${wgMoney(bal)}</b>
         <small>${fc!==null?'прогноз на кінець місяця '+wgMoney(fc):''}${pz?(fc!==null?' · ':'')+'на призи '+wgMoney(pz):''}</small>
         ${(()=>{ let l=[]; try{ l=wlCurList(); }catch(_){} return l.length?`<small class="wg-curs">${l.map(c=>esc(money(curBalance(c),c))).join(' · ')}</small>`:''; })()}
         <span class="wg-foot">${rings}<span class="wg-acts"><button data-wga="out" aria-label="Витрата">−</button><button data-wga="in" aria-label="Дохід">＋</button></span></span>`);
     }
     if(t==='wgmission'){
-      const g=wgFolderMission(fk)||(b.goalId&&wlGoal(b.goalId))||wlMissions()[0]||null;
-      if(!g) return wgTile('c-mission',`<button class="wg-hit" data-wga="journal" aria-label="Журнал"></button><span class="wg-h">🎯 Гроші місії</span><b class="wg-big sm">Ще нема місій</b><small>створи в Журналі</small>`);
+      const g=wgMoneyMission(b,fk);
+      if(!g) return wgPageTile(b,fk,'c-mission',`<button class="wg-hit" data-wga="journal" aria-label="Журнал"></button>${wgSettingsHead(b,'Гроші місії','🎯 Гроші місії')}<b class="wg-big sm">Ще нема місій</b><small>створи в Журналі</small>`);
       const a=wlAgg(wlMonthOps(ym),g.id), bud=g.budget&&+g.budget.money>0?+g.budget.money:0;
       const rw=g.reward&&String(g.reward.t||'').trim()?g.reward:null, sv=rw&&typeof pzSaved==='function'?pzSaved(g):0, rp=rw&&+rw.sum>0?Math.min(100,Math.round(sv/rw.sum*100)):0;
-      return wgTile('c-mission',`<button class="wg-hit" data-wga="mission" data-wgg="${esc(g.id)}" aria-label="Гроші місії ${esc(g.name||'')}"></button>
-        <span class="wg-h">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,22))}</span><b class="wg-big">${a.inc-a.out>0?'+':a.inc-a.out<0?'−':''}${wgK(Math.abs(a.inc-a.out))}</b>
+      return wgPageTile(b,fk,'c-mission',`<button class="wg-hit" data-wga="mission" data-wgg="${esc(g.id)}" aria-label="Гроші місії ${esc(g.name||'')}"></button>
+        ${wgSettingsHead(b,'Гроші місії',safeEmoji(g.emoji,'🎯')+' <span data-i18n-skip="1">'+esc(String(g.name||'Місія').slice(0,22))+'</span>')}
+        ${b.id&&b.hd?`<small data-i18n-skip="1" class="wg-mission-name">${esc(String(g.name||'Місія').slice(0,40))}</small>`:''}
+        <b class="wg-big">${a.inc-a.out>0?'+':a.inc-a.out<0?'−':''}${wgK(Math.abs(a.inc-a.out))}</b>
         <small>${bud?'бюджет '+wgK(a.out)+' / '+wgK(bud):'дохід '+wgK(a.inc)+' · витрати '+wgK(a.out)}</small>
         ${bud?`<span class="wg-bar"><i class="${a.out>bud?'over':''}" style="width:${Math.min(100,Math.round(a.out/bud*100))}%"></i></span>`:''}
-        ${rw?`<small class="wg-pz">${safeEmoji(rw.emoji,'🎁')} ${rp}% на «${esc(String(rw.t).slice(0,18))}»</small>`:''}`,` style="--mc:${safeColor(g.color,'#34c77b')}"`);
+        ${rw?`<small class="wg-pz">${safeEmoji(rw.emoji,'🎁')} ${rp}% на «${esc(String(rw.t).slice(0,18))}»</small>`:''}`,g.color||'#34c77b');
     }
     if(t==='wgenv'){
       const envs=(envelopes||[]).filter(e=>e&&e.id&&!envCur(e)); let tot=0; envs.forEach(e=>{ try{ tot+=envSaved(e); }catch(_){} });   // сума — лише головна валюта
       let rows=[]; try{ rows=rlPlanOpen(ym).slice(0,2); }catch(_){}
       const td=+ymdLocal().slice(8,10);
-      return wgTile('c-env',`<button class="wg-hit" data-wga="envs" aria-label="Конверти"></button>
-        <span class="wg-h">✉️ Конверти</span><b class="wg-big">${wgK(tot)}</b>
+      return wgPageTile(b,fk,'c-env',`<button class="wg-hit" data-wga="envs" aria-label="Конверти"></button>
+        ${wgSettingsHead(b,'Конверти й платежі','✉️ Конверти')}<b class="wg-big">${wgK(tot)}</b>
         ${rows.length?rows.map(x=>`<button class="wg-li" data-wga="plan" data-wgp="${x.k}|${esc(x.r.id)}"><span>${esc(String(x.r.t||'').slice(0,14))}${x.r.day?` · ${+x.r.day<td?'<i>прострочено</i>':esc(String(x.r.day))+'-го'}`:''}</span><b>${x.k==='in'?'+':'−'}${esc(moneyK(x.rest,rlRowCur(x.r)))}</b></button>`).join('')
           :`<button class="wg-li" data-wga="planadd"><span>План місяця порожній</span><b>＋</b></button>`}`);
     }
     if(t==='wgdebt'){
       const d=wgDebtNet(); let s=0, dc={ok:0,all:0}; try{ s=jnStreak(); dc=rlDiscipline(); }catch(_){}
-      return wgTile('wide c-debt',`<button class="wg-hit" data-wga="debts" aria-label="Борги"></button>
-        <span class="wg-h">🤝 Борги · 📖 Правила</span>
+      return wgPageTile(b,fk,'wide c-debt',`<button class="wg-hit" data-wga="debts" aria-label="Борги"></button>
+        ${wgSettingsHead(b,'Борги й правила','🤝 Борги · 📖 Правила')}
         <span class="wg-two"><span><b class="wg-big">${d.net>0?'+':''}${wgK(d.net)}</b><small>${d.owed||d.owe?'мені винні '+wgK(d.owed)+' · я винен '+wgK(d.owe):'боргів нема'}</small></span>
         <button class="wg-rules" data-wga="rules"><b>🔥 ${s} ${pluralUk(s,'день','дні','днів')}</b><small>${dc.all?'дисципліна '+Math.round(dc.ok/dc.all*100)+'%':'Книга правил ›'}</small></button></span>`);
     }
     if(t==='wgwork'){
       const i=typeof wkMoneyInfo==='function'?wkMoneyInfo(ym):null;
-      if(!i) return '';
-      return wgTile('wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
-        <span class="wg-h">⏱ Робота · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
-        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>`);
+      if(!i) return b.id?wgPageTile(b,fk,'wide c-work',`${wgSettingsHead(b,'Робота','⏱ Робота')}<small>Дані про години недоступні</small>`):'';
+      return wgPageTile(b,fk,'wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
+        ${wgSettingsHead(b,'Робота','⏱ Робота · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase()))}<b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
+        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>
+        ${b.id?'<span class="wg-acts one"><button data-wga="workadd">＋ Години</button></span>':''}`);   // на сторінці папки (є id блока) — запис годин на сьогодні; у Гаманці — без кнопки
     }
     if(t==='wgmoney'){
       const kind=b.kind==='out'?'out':'in', src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&b.cur!==mainCur()&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:'';
-      if(!fk) return wgTile('c-'+kind,`<span class="wg-h">${kind==='in'?'＋ Доходи':'− Витрати'}</span><b class="wg-big sm">Лише в папці</b><small>постав віджет у папку-проєкт</small>`);
+      const name=String(b.label||(kind==='in'?'Доходи':'Витрати')).slice(0,40);
+      const head=wgSettingsHead(b,name,esc(name),name);
+      if(!fk) return wgPageTile(b,fk,'c-'+kind,`${head}<b class="wg-big sm">Лише в папці</b><small>постав віджет у папку-проєкт</small>`);
       // віджет із валютою (етап 2) рахує лише свою валюту; без — головну
       const ops=wlMonthOps(ym).filter(o=>inFolderOp(o,fk)&&(o.cur||'')===cur&&(kind==='in'?_isIncAny(o)&&wlSrc(o)===src:_isExpAny(o)));
       const sum=ops.reduce((s,o)=>s+(+o.amount||0),0), goal=+b.goal>0?+b.goal:0, last=ops[ops.length-1];
-      return wgTile('c-'+kind,`<button class="wg-hit" data-wga="folderops" aria-label="Записи папки"></button>
-        <button class="wg-cfg" data-wga="cfg" aria-label="Налаштувати віджет">⚙</button>
-        <span class="wg-h">${kind==='in'?WL_SRC[src][0]:'−'} ${esc(String(b.label||(kind==='in'?'Доходи':'Витрати')).slice(0,20))}</span>
+      return wgPageTile(b,fk,'c-'+kind,`<button class="wg-hit" data-wga="folderops" aria-label="Записи папки"></button>
+        ${head}
         <b class="wg-big">${esc(moneyK(sum,cur))}</b>
         <small>${goal?(kind==='in'?'ціль ':'ліміт ')+esc(moneyK(goal,cur))+' · '+Math.round(sum/goal*100)+'%':ops.length?ops.length+' '+pluralUk(ops.length,'запис','записи','записів')+(last?' · '+esc(String(last.label||'').slice(0,14)):''):'цього місяця ще нема'}</small>
         ${goal?`<span class="wg-bar"><i class="${kind==='out'&&sum>goal?'over':''}" style="width:${Math.min(100,Math.round(sum/goal*100))}%"></i></span>`:''}
@@ -36170,9 +36443,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     else if(a==='planadd'){ try{ wlState.tab='plan'; goFinance(); }catch(_){} }
     else if(a==='debts'){ try{ goDebts(); }catch(_){} }
     else if(a==='work'){ try{ goWork(); }catch(_){} }
+    else if(a==='workadd'){ try{ workTapDay(ymdLocal()); }catch(_){} }   // та сама шторка, що й тап по дню в календарі Роботи
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }
-    else if(a==='cfg'){ if(id) wgMoneyCfg(id,false); }
+    else if(a==='cfg'){ if(id) wdSheet(id,{tab:'own'}); }
     else if(a.slice(0,2)==='wd'){ wdAct(a,el,blk(),fk,id); }
     else if(a==='add'){ const b=blk(); if(!b||!fk) return; const g=wgFolderMission(fk);
       wlOpSheet(b.kind==='out'?'out':'in', g?String(g.id):'', {folderKey:fk, src:b.src, cur:b.cur, label:b.kind==='out'?'':(b.label||'')}); }
@@ -36180,6 +36454,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function wgFill(host,b,fk){
     host.dataset.wgfk=fk||'';
     let html=''; try{ html=wgHTML(b,fk); }catch(err){ console.error('wgHTML',err); }
+    if(b&&wgHasSettings(b.type)&&b.ws&&host.classList.contains('pgwg')&&!host.closest('.pg-board')){
+      const dev=wdDev(), [w,h]=wdCell(b,dev);
+      host.style.setProperty('--money-width',w/wdCols(dev)*100+'%');
+      host.style.setProperty('--money-height',Math.max(150,h*54)+'px');
+    }else{
+      host.style.removeProperty('--money-width');
+      host.style.removeProperty('--money-height');
+    }
     host.innerHTML=html||'<div class="wg-t c-none"><small>Віджет недоступний</small></div>';
     if(!host.__wgBound){ host.__wgBound=true; host.addEventListener('click',e=>wgAct(e,host)); }
   }
@@ -36195,30 +36477,6 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   // після будь-якого запису грошей — перемалювати всі видимі віджети
   function wgRefresh(){ try{ wgFillPage(document); }catch(_){} try{ wgHome(); }catch(_){} }
 
-  // ── налаштування «Доходи»/«Витрати»: тип доходу, назва, ціль/ліміт ──
-  function wgMoneyCfg(id,isNew){
-    let b=null; try{ b=getBlock(id); }catch(_){} if(!b||b.type!=='wgmoney') return;
-    const kind=b.kind==='out'?'out':'in'; let src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:mainCur();
-    jnOverlay(`<div class="jn-ed-h"><b>${isNew?'Новий віджет':'Віджет'} «${kind==='in'?'Доходи':'Витрати'}»</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <small class="dy-fm-sub">Записи з нього підуть у Гаманець з міткою цієї папки${kind==='in'?' і типом доходу':''}.</small>
-      ${kind==='in'?`<div class="jn-f"><span>Тип доходу</span><div class="wl-chips" id="wgSrc">${Object.keys(WL_SRC).map(k=>`<button data-wgsrc="${k}"${k===src?' class="on"':''}>${WL_SRC[k][0]} ${WL_SRC[k][1]}</button>`).join('')}</div></div>`:''}
-      <div class="jn-f"><span>Валюта</span><div class="wl-chips" id="wgCur">${Object.keys(CUR_LIST).map(k=>`<button data-wgcur="${k}"${k===cur?' class="on"':''}>${CUR_LIST[k].s} ${CUR_LIST[k].n}${k===mainCur()?' · головна':''}</button>`).join('')}</div></div>
-      <label class="jn-f"><span>Назва</span><input id="wgLbl" maxlength="40" value="${esc(String(b.label||''))}" placeholder="${kind==='in'?'Фріланс, клієнти…':'Реклама, софт…'}"></label>
-      <label class="jn-f"><span>${kind==='in'?'Ціль':'Ліміт'} на місяць, ${curSym(cur)} (необовʼязково)</span><input id="wgGoal" type="number" inputmode="numeric" min="0" step="100" value="${+b.goal>0?+b.goal:''}" placeholder="Напр. 15000"></label>
-      <div class="jn-ed-foot"><button class="jn-btn" data-wgok>Зберегти</button></div>`, ov=>{
-      ov.querySelectorAll('[data-wgcur]').forEach(x=>x.onclick=()=>{ cur=x.dataset.wgcur; ov.querySelectorAll('[data-wgcur]').forEach(y=>y.classList.toggle('on',y===x)); });
-      ov.querySelectorAll('[data-wgsrc]').forEach(x=>x.onclick=()=>{ src=x.dataset.wgsrc; ov.querySelectorAll('[data-wgsrc]').forEach(y=>y.classList.toggle('on',y===x)); });
-      ov.querySelector('[data-wgok]').onclick=()=>{
-        const q=getBlock(id); if(!q){ ov.remove(); return; }
-        q.label=String(ov.querySelector('#wgLbl').value||'').trim().slice(0,40)||(kind==='in'?'Доходи':'Витрати');
-        const gv=Math.round(parseFloat(String(ov.querySelector('#wgGoal').value||'').replace(',','.'))||0); q.goal=gv>0?gv:0;
-        if(kind==='in') q.src=src;
-        if(cur!==mainCur()){ q.cur=cur; const l=wlCurList(); if(!l.includes(cur)){ l.push(cur); wlCurSave(l); } } else delete q.cur;   // інша валюта — зʼявиться окремим балансом у Гаманці
-        saveBoard(); ov.remove(); wgRefresh();
-      };
-    });
-  }
-
   /* ════════ «Дані» (10.10.2026): віджети-вікна в екосистему — Місія · Звичка · Час папки ════════
      Блок зберігає ЛИШЕ свої налаштування: sz ('s'|'m'|'l', + gw/gh для сітки дошки), goalId (місія; порожньо — місія цієї папки),
      period ('day'|'week'|'month'), show{ключ:false} — вимкнені рядки. Дані живуть у модулях (місії, трекер місії, Планер),
@@ -36228,7 +36486,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   const WD_SZ={s:{gw:6,gh:2,t:'S',d:'Половина'}, m:{gw:12,gh:2,t:'M',d:'Широкий'}, l:{gw:12,gh:4,t:'L',d:'Великий'}};
   const WD_META={
     dmission:{t:'Місія папки', h:'Місія', ic:'🎯', per:null, show:[['next','Наступний крок'],['due','Дедлайн'],['ring','Кільце прогресу']]},
-    dhabit:{t:'Звичка папки', h:'Звичка', ic:'🔥', per:[['week','Тиждень'],['month','Місяць']], show:[['streak','Серія'],['count','Скільки днів'],['days','Дні періоду']]},
+    dhabit:{t:'Трекер цілі', h:'Звичка', ic:'🔥', per:[['week','Тиждень'],['month','Місяць']], show:[['streak','Серія'],['count','Скільки днів'],['days','Дні періоду']]},
     dtime:{t:'Час папки', h:'Час', ic:'⏱', per:[['day','День'],['week','Тиждень'],['month','Місяць']], show:[['hours','Години'],['done','Виконані блоки'],['add','Кнопка «＋ блок»']]},
     /* «Справи папки» (19.11.2026, етап 2 нового Плану, 65-plan.js): справи сьогодні з міткою папки — і з часом, і без */
     dtasks:{t:'Справи папки', h:'Справи', ic:'✅', per:[['day','Сьогодні'],['week','Тиждень']], show:[['done','Виконані справи'],['add','Кнопка «＋ справа»'],['star','Зірочки «Головне»']]},
@@ -36248,12 +36506,18 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function wdSzOld(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dtasks'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
+  function wdOpenNew(id){
+    const key=boardKey;
+    setTimeout(()=>{
+      if(boardKey===key&&!document.querySelector('.ws-ov.on:not(.out)')) wdSheet(id,{tab:'own'});
+    },450);
+  }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
   function wdInit(b,k){
     b.type=k; b.sz=wdSz(b); b.gw=WD_SZ[b.sz].gw; b.gh=WD_SZ[b.sz].gh;
     if(WD_META[k].per&&!b.period) b.period=(k==='dtime'||k==='dtasks')?'day':'week';
     delete b.text;
-    if(k==='countdown'){ const bid=b.id; setTimeout(()=>{ try{ tmCfg(bid); }catch(_){} },450); }   // новий відлік — одразу спитати назву й дату
+    if(k==='countdown'||k==='dhabit') wdOpenNew(b.id);
     return b;
   }
   // місія віджета: обрана в налаштуваннях (не архівна) → інакше місія цієї папки
@@ -36307,15 +36571,94 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
 
   // L-звичка: 4 тижні (Пн–Нд) до кінця поточного тижня — сітка, як на макеті ноутбука
-  function wdHabGrid(mk,td){
+  function wdHabGrid(mk,td,rs){
     const end=new Date(td+'T12:00:00'); end.setDate(end.getDate()+(7-((end.getDay()+6)%7)-1));
-    const rows=[]; for(let w=3;w>=0;w--){ const r=[]; for(let i=6;i>=0;i--){ const d=new Date(end); d.setDate(end.getDate()-w*7-i); const ds=ymdLocal(d); r.push(`<i class="${mk(ds)?'on':''}${ds===td?' td':''}${ds>td?' fut':''}"></i>`); } rows.push(`<span>${r.join('')}</span>`); }
+    const rows=[]; for(let w=3;w>=0;w--){ const r=[]; for(let i=6;i>=0;i--){ const d=new Date(end); d.setDate(end.getDate()-w*7-i); const ds=ymdLocal(d); r.push(`<i class="${mk(ds)?'on':''}${rs&&rs(ds)?' rest':''}${ds===td?' td':''}${ds>td?' fut':''}"></i>`); } rows.push(`<span>${r.join('')}</span>`); }
     return `<span class="wd-hg" aria-hidden="true">${rows.join('')}</span>`;
   }
   // L-час: години папки по днях цього тижня (стовпчики), сьогодні виділено
   function wdWeekBars(mine,hrs,td){
     const by=jnWeek().map(ds=>({ds,h:mine(ds).reduce((s,x)=>s+hrs(x),0)})), mx=Math.max(1,...by.map(x=>x.h));
     return `<span class="wd-bars week">${by.map(x=>`<i class="${x.ds===td?'td':''}"><u style="height:${x.h?Math.max(10,Math.round(x.h/mx*100)):0}%"></u><s>${DY_DOW[(new Date(x.ds+'T12:00:00').getDay()+6)%7]}</s></i>`).join('')}</span>`;
+  }
+  /* ════════ Трекер цілі — вигляди (22.11.2026, полотно «Трекери в Магазині блоків») ════════
+     Ланцюг (chain) — нинішня «Звичка». Шлях · Сезон · Росток · Кільце — інші малюнки тих самих позначок трекера місії.
+     Пишеться лише b.look / b.days (поля вигляду, шторка 63-widget-sheet.js); позначка дня — як і раніше, wdmark → moToggleMark. */
+  const WD_LOOKS=[['chain','Ланцюг'],['path','Шлях'],['grid','Сезон'],['plant','Росток'],['ring','Кільце']];
+  const WD_PATH_N=[21,30,66,100];
+  function wdLook(b){ const v=String(b&&b.look||''); return WD_LOOKS.some(x=>x[0]===v)?v:'chain'; }
+  function wdPathN(b){ return WD_PATH_N.includes(+(b&&b.days))?+b.days:30; }
+  // усі позначені дні до сьогодні включно (ключі — лише справжні дати)
+  // ритм і вихідні для показу: чернетка шторки (b.__tr, у блок не пишеться — нема в WS_KEYS) або сам трекер
+  function wdTrkView(b,tr){ return b&&b.__tr&&typeof b.__tr==='object'?b.__tr:tr; }
+  // ціль тижня: ритм «N на тиждень»; поки ритму в трекері нема — старе поле віджета b.goal (без міграції)
+  function wdWeekGoal(b,tv){ const r=moRhythm(tv); if(r.k==='week') return r.n; return tv&&tv.rhythm?0:wsGoal(b); }
+  function wdMarkedAll(tr,mk,td){ return Object.keys(tr&&tr.marks||{}).filter(ds=>/^\d{4}-\d{2}-\d{2}$/.test(ds)&&ds<=td&&mk(ds)).length; }
+  const WD_PLANT=[[0,'Насінина','Seed'],[3,'Паросток','Sprout'],[7,'Росток','Seedling'],[21,'Кущ','Bush'],[66,'Дерево','Tree']];
+  function wdPlantSvg(n){
+    const h=Math.min(n,66), stem=24+Math.round(h/66*70), top=114-stem, leaves=Math.min(10,Math.ceil(n/3));
+    let L='';
+    for(let i=0;i<leaves;i++){ const y=110-Math.round((i+1)*stem/(leaves+1)), sd=i%2?1:-1, r=9+Math.min(6,Math.floor(n/12));
+      L+=`<ellipse class="lf" cx="${50+sd*r}" cy="${y}" rx="${r}" ry="${Math.round(r*.45)}" transform="rotate(${sd*-28} ${50+sd*r} ${y})"/>`; }
+    const bud=n>=21?`<circle class="bd" cx="50" cy="${top-5}" r="${n>=66?8:5}"/>`:'';
+    return `<svg class="wd-plant" viewBox="0 0 100 124" aria-hidden="true"><ellipse class="gr" cx="50" cy="118" rx="34" ry="4"/>`
+      +(n?`<path class="st" d="M50 118 Q53 ${Math.round((118+top)/2)} 50 ${top}"/>${L}${bud}`:`<ellipse class="sd" cx="50" cy="112" rx="6" ry="4"/>`)+`</svg>`;
+  }
+  function wdHabLook(lk,b,fk,g,gk,tr,mk,td,on,tv){
+    const rs=ds=>!mk(ds)&&moIsRest(tv,ds), rh=moRhythm(tv);
+    const sz=wdSz(b), tx=wdTier(b), col=folders[gk].c;
+    const head=wdHead(b,fk,sz==='s'?'':'🔗 '+(WD_LOOKS.find(x=>x[0]===lk)||['',''])[1].toLowerCase());
+    const hit=`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" data-wgtab="folder" aria-label="Трекер місії ${esc(g.name||'')}"></button>`;
+    // L — пігулка з текстом; S/M — кругла «✓» у правому куті шапки (пігулка там не влазить по висоті)
+    const pill=(l0,l1)=>sz==='l'?`<span class="wd-acts c"><button data-wga="wdmark" class="pill${on?' on':''}" aria-pressed="${on}">${on?l1:l0}</button></span>`
+      :`<button class="wd-ck${on?' on':''}" data-wga="wdmark" aria-pressed="${on}" aria-label="${esc(on?l1:l0)}">✓</button>`;
+    const all=wdMarkedAll(tr,mk,td);
+    // XS і рядок: лише головне число (решту ховає 41-widget-sheet.css)
+    const tiny=big=>tx==='xs'||tx==='row'?wdTile(b,fk,`${hit}${head}<b class="wd-big">${big}</b>`,'hab trk '+lk,col):'';
+    if(lk==='path'){
+      const N=rh.k==='days'?rh.n:wdPathN(b), n=Math.min(all,N), ms=[7,21,N].filter((x,i,a)=>x<=N&&a.indexOf(x)===i), fin=n>=N;
+      const t0=tiny(`${n}<span>/${N}</span>`); if(t0) return t0;
+      const cols=N===21?7:N===66?11:10;
+      const cells=sz==='s'||(sz==='m'&&N>30)?`<span class="wd-bar"><i style="width:${Math.round(n/N*100)}%"></i></span>`
+        :`<span class="wd-path" style="--c:${cols}" aria-hidden="true">${Array.from({length:N},(_,i)=>`<i class="${i<n?'on':''}${ms.includes(i+1)?' ms':''}${i===n&&!on&&!fin?' nx':''}"></i>`).join('')}</span>`;
+      return wdTile(b,fk,`${hit}${head}
+        <span class="wd-strk"><b class="wd-big xl">${n}</b><small class="wd-cap">${fin?'шлях пройдено ✓':`з ${N} ${pluralUk(N,'дня','днів','днів')}<br>лишилось ${N-n}`}</small></span>
+        ${cells}${pill(fin?'✓ Сьогодні':`Крок ${n+1} — зроблено`,`Крок ${n} ✓`)}`,'hab trk path',col);
+    }
+    if(lk==='grid'){
+      // тижні Пн–Нд до кінця цього тижня, стовпчик = тиждень; клітинки квадратні (32-widgets.css), тому S — 8 тижнів, M/L — 20
+      const W=sz==='s'?8:20, end=new Date(td+'T12:00:00'); end.setDate(end.getDate()+(6-((end.getDay()+6)%7)));
+      let cells='', past=0, hit2=0;
+      for(let w=W-1;w>=0;w--) for(let i=6;i>=0;i--){ const d=new Date(end); d.setDate(end.getDate()-w*7-i); const ds=ymdLocal(d), m=mk(ds);
+        if(ds<=td&&!rs(ds)){ past++; if(m) hit2++; } cells+=`<i class="${m?'on':''}${rs(ds)?' rest':''}${ds===td?' td':''}${ds>td?' fut':''}"></i>`; }
+      const pct=past?Math.round(hit2/past*100):0, wk=jnWeek().filter(ds=>ds<=td&&mk(ds)).length;
+      const t0=tiny(`${pct}%`); if(t0) return t0;
+      const sum=`за ${W} ${pluralUk(W,'тиждень','тижні','тижнів')}`;
+      return wdTile(b,fk,`${hit}${head}
+        ${sz==='l'?`<span class="wd-strk"><b class="wd-big xl">${pct}%</b><small class="wd-cap">${sum}<br>${wk}/7 цього тижня</small></span>`
+          :`<small class="wd-sub one"><em>${pct}%</em> ${sum}${sz==='m'?` · <em>${wk}/7</em> цей тиждень`:''}</small>`}
+        <span class="wd-hm" style="--w:${W}" aria-hidden="true">${cells}</span>${pill('✓ Сьогодні','✓ Сьогодні є')}`,'hab trk grid',col);
+    }
+    if(lk==='plant'){
+      const st=WD_PLANT.filter(x=>all>=x[0]).pop(), nx=WD_PLANT.find(x=>x[0]>all);
+      const t0=tiny(`${all}<span> ${pluralUk(all,'день','дні','днів')}</span>`); if(t0) return t0;
+      return wdTile(b,fk,`${hit}${head}
+        <span class="wd-pl">${wdPlantSvg(all)}<span class="wd-col"><b class="wd-big xl">${all}</b>
+          <small class="wd-cap">${st[1]}${nx?` · ${nx[1].toLowerCase()} на ${nx[0]}`:''}</small>
+          ${sz==='l'?'<small class="wd-sub">Пропустив день — росток не вʼяне, просто чекає.</small>':''}</span></span>
+        ${pill('Полити сьогодні','Полито ✓')}`,'hab trk plant',col);
+    }
+    // ring: тиждень кільцем; саме кільце — кнопка позначки
+    const per=jnWeek(), n=per.filter(ds=>ds<=td&&mk(ds)).length, gl=wdWeekGoal(b,tv)||Math.max(1,7-moRest(tv).length), pct=Math.min(100,Math.round(n/gl*100));
+    const t0=tiny(`${n}<span>/${gl}</span>`); if(t0) return t0;
+    const st=moStreak(tv,mk);
+    const ring=`<button class="wd-tapr${on?' on':''}" data-wga="wdmark" aria-pressed="${on}" aria-label="${on?'Зняти позначку за сьогодні':'Позначити сьогодні'}">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.5" class="tr"/><circle cx="18" cy="18" r="15.5" class="vl" pathLength="100" stroke-dasharray="${pct} 100"/>${on?'<path class="ck" d="M12 18.5l4 4 8-9"/>':''}</svg>
+      <b>${on?'':n+'/'+gl}</b></button>`;
+    return wdTile(b,fk,`${hit}${head}
+      <span class="wd-rg">${ring}<span class="wd-col"><b class="wd-big xl">${n}<span>/${gl}</span></b>
+        <small class="wd-cap">цього тижня${st?`<br>${st} ${pluralUk(st,'день','дні','днів')} поспіль`:''}</small></span></span>
+      ${sz==='s'?'':'<small class="wd-sub">Тап по кільцю — позначити сьогодні.</small>'}`,'hab trk ring',col);
   }
   // малий календар (S і менше): місяць не влазить — число дня і цей тиждень із позначками папки
   function wdCalWeek(td,fk){
@@ -36355,20 +36698,23 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         <small class="wd-sub">Позначки місії живуть у її папці — привʼяжи папку на сторінці місії.</small>`,'empty',g.color);
       if(!tr) return wdTile(b,fk,`${wdHead(b,fk)}${name}<small class="wd-sub">У папці місії ще нема трекера днів.</small>
         <span class="wd-acts"><button data-wga="wdtrk">＋ Трекер</button></span>`,'empty',folders[gk].c);
-      const per=wdPer(b), mk=ds=>moMarked(tr,ds);
+      const per=wdPer(b), mk=ds=>moMarked(tr,ds), tv=wdTrkView(b,tr), rs=ds=>!mk(ds)&&moIsRest(tv,ds);
       const days=per==='month'?Array.from({length:moDim(td.slice(0,7))},(_,i)=>td.slice(0,8)+String(i+1).padStart(2,'0')):jnWeek();
-      const past=days.filter(ds=>ds<=td), n=past.filter(mk).length;
-      let st=0; { const d=new Date(); if(!mk(ymdLocal(d))) d.setDate(d.getDate()-1); for(let i=0;i<400&&mk(ymdLocal(d));i++){ st++; d.setDate(d.getDate()-1); } }
-      const on=mk(td), gl=per==='week'?wsGoal(b):0;   // ціль днів на тиждень (19.11.2026)
+      // непозначені вихідні не рахуються в «з N» (22.11.2026, крок 2)
+      const past=days.filter(ds=>ds<=td&&!rs(ds)), n=past.filter(mk).length;
+      const st=moStreak(tv,mk);
+      const on=mk(td), gl=per==='week'?wdWeekGoal(b,tv):0;   // ціль днів на тиждень: ритм трекера, інакше старе b.goal (19.11.2026)
+      // вигляд трекера (22.11.2026): без b.look — «Ланцюг», тобто все нижче як було; інші вигляди лише інакше малюють ті самі позначки
+      const lk=wdLook(b); if(lk!=='chain') return wdHabLook(lk,b,fk,g,gk,tr,mk,td,on,tv);
       // макет: велике число серії, підпис, 7 крапок тижня (місяць — сітка), обведена кнопка «✓ Сьогодні»
       const big=wdOn(b,'streak')?`<span class="wd-strk"><b class="wd-big xl">${st}</b><small class="wd-cap">${pluralUk(st,'день','дні','днів')}<br>поспіль</small></span>`:'';
       const cnt=gl?`<small class="wd-sub${n>=gl?' ok':''}"><em>${n} з ${gl}</em> ${n>=gl?'ціль тижня взято ✓':'до цілі тижня'}</small>`
         :wdOn(b,'count')&&(sz==='l'||!wdOn(b,'streak'))?`<small class="wd-sub"><em>${n} з ${past.length}</em> ${per==='month'?'цього місяця':'цього тижня'}</small>`:'';
-      const dots=wdOn(b,'days')?`<span class="wd-days ${per}">${days.map(ds=>`<i class="${mk(ds)?'on':''}${ds===td?' td':''}${ds>td?' fut':''}"><u></u>${per==='week'?`<s>${DY_DOW[(new Date(ds+'T12:00:00').getDay()+6)%7]}</s>`:''}</i>`).join('')}</span>`:'';
+      const dots=wdOn(b,'days')?`<span class="wd-days ${per}">${days.map(ds=>`<i class="${mk(ds)?'on':''}${rs(ds)?' rest':''}${ds===td?' td':''}${ds>td?' fut':''}"><u></u>${per==='week'?`<s>${DY_DOW[(new Date(ds+'T12:00:00').getDay()+6)%7]}</s>`:''}</i>`).join('')}</span>`:'';
       const hitH=b.tapmk?`<button class="wg-hit" data-wga="wdmark" aria-pressed="${on}" aria-label="${on?'Зняти позначку за сьогодні':'Позначити сьогодні'}"></button>`
         :`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" data-wgtab="folder" aria-label="Трекер місії ${esc(g.name||'')}"></button>`;
       return wdTile(b,fk,`${hitH}
-        ${wdHead(b,fk,sz==='s'?'':'🔗 трекер місії')}${sz==='l'?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td):''}
+        ${wdHead(b,fk,sz==='s'?'':'🔗 трекер місії')}${sz==='l'?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td,rs):''}
         <span class="wd-acts c"><button data-wga="wdmark" class="pill${on?' on':''}" aria-pressed="${on}">✓ Сьогодні${on?' є':''}</button></span>`,'hab',folders[gk].c);
     }
     if(t==='dcal'){
@@ -38122,7 +38468,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     let g=null; try{ g=wgFolderMission(fk); }catch(_){}
     rows.push({k:'mission', ic:'🎯', t:'Місія', v:g?esc(String(g.name||'Місія').slice(0,40))+' · '+jnPct(g)+'%':'не привʼязано', on:!!g, act:g?'Відкрити':'＋ Привʼязати'});
     let tr=null; try{ tr=g&&moOwnFolder(g.folderKey)?moTracker(g.folderKey):null; }catch(_){}
-    let st=0; if(tr){ const d=new Date(); if(!moMarked(tr,ymdLocal(d))) d.setDate(d.getDate()-1); for(let i=0;i<400&&moMarked(tr,ymdLocal(d));i++){ st++; d.setDate(d.getDate()-1); } }
+    const st=tr?moStreak(tr):0;   // та сама серія, що й у віджеті (вихідні не рвуть)
     rows.push({k:'habit', ic:'🔥', t:'Звичка', v:tr?'трекер місії · '+st+' '+pluralUk(st,'день','дні','днів')+' поспіль':g?'у папці місії ще нема трекера':'спершу привʼяжи місію', on:!!tr, act:tr?'':g?'＋ Трекер':''});
     let bl=[]; try{ bl=plBlocksDisplay(td).filter(b=>inFolderBlock(b,fk)); }catch(_){}
     const h=bl.reduce((s,b)=>s+Math.max(0,Math.min(plBlockEnd(b),24)-(+b.h||0)),0);
@@ -40173,7 +40519,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      Блок із полем since новіше за BS_BASE — «Нове»: у меню нема, поки людина його не візьме. Агент Флоу і шаблони
      створюють блоки як раніше — магазин керує лише меню. Тексти — двома мовами (flowLang). */
   var BS_KEY='blocks_got', BS_BASE='2026-11-18';
-  var BS_SPH=[['all','Усе','All'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
+  var BS_SPH=[['all','Усе','All'],['trk','Трекери','Trackers'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
   /* k → сфери, значок, колір, звʼязок, прев'ю; тексти uk/en: n назва, s одне речення, d опис, st три кроки.
      ПРАВИЛО: кожен НОВИЙ запис тут — з since:'РРРР-ММ-ДД' пізніше за BS_BASE. Без since блок у людей, що вже
      тапали «Отримати/Прибрати», мовчки зник би з меню (у їхньому збереженому списку його нема). */
@@ -40193,19 +40539,19 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     dmission:{sp:['goals','work'],ic:'🎯',c:'#a99cff',pv:'mis',ln:['Місія','Mission'],
       uk:{n:'Місія папки',s:'Прогрес, наступний крок, дедлайн',d:'Кільце прогресу місії, наступний крок і скільки днів до дедлайну. Тап — сторінка місії.',st:['Повʼяжи місію','Відмічай віхи — кільце росте','Наступний крок завжди зверху']},
       en:{n:'Folder mission',s:'Progress, next step, deadline',d:'Mission progress ring, the next step and days to the deadline. Tap to open the mission.',st:['Link a mission','Tick milestones — the ring grows','The next step is always on top']}},
-    dhabit:{sp:['health','goals','study'],ic:'🔥',c:'#ff8a4c',pv:'hab',ln:['Місія','Mission'],
-      uk:{n:'Звичка папки',s:'Серія днів і ✓ сьогодні',d:'Трекер звички місії: позначай день одним тапом, дивись серію і тиждень.',st:['Повʼяжи з місією','Тапни «✓ Сьогодні»','Тримай серію']},
-      en:{n:'Folder habit',s:'Streak and ✓ today',d:'A mission habit tracker: mark the day with one tap, see the streak and the week.',st:['Link a mission','Tap “✓ Today”','Keep the streak']}},
-    dcount:{sp:['goals'],ic:'🏁',c:'#9b8cff',pv:'dcount',ln:['Місія','Mission'],
+    dhabit:{sp:['health','goals','study','trk'],ic:'🔥',c:'#ff8a4c',pv:'hab',ln:['Місія','Mission'],
+      uk:{n:'Трекер цілі',s:'Позначка щодня · 5 виглядів',d:'Повʼяжи ціль із папкою — і щодня один тап «зробив». Ланцюг, Шлях, Сезон, Росток чи Кільце: вигляд міняється будь-коли, позначки ті самі. Ритм і вихідні — у налаштуваннях.',st:['Додай у папку з ціллю','Вибери вигляд','Тапай «✓» щодня']},
+      en:{n:'Goal tracker',s:'A daily check · 5 looks',d:'Link a goal to a folder and tap “done” once a day. Chain, Path, Season, Sprout or Ring: switch the look any time, the marks stay. Rhythm and rest days are in the settings.',st:['Add it to a goal folder','Pick a look','Tap “✓” every day']}},
+    dcount:{sp:['goals','trk'],ic:'🏁',c:'#9b8cff',pv:'dcount',ln:['Місія','Mission'],
       uk:{n:'Відлік до мети',s:'Скільки днів до фінішу місії',d:'Дні до останньої віхи місії і найближчий крок.',st:['Повʼяжи місію з датою фінішу','Дивись, скільки лишилось','Наступна віха — під числом']},
       en:{n:'Days to goal',s:'Days until the mission finish',d:'Days to the mission’s last milestone and the next step.',st:['Link a mission with a finish date','See what’s left','Next milestone under the number']}},
-    dsave:{sp:['money','goals'],ic:'🐷',c:'#ffc261',pv:'save',ln:['Гаманець','Wallet'],
+    dsave:{sp:['money','goals','trk'],ic:'🐷',c:'#ffc261',pv:'save',ln:['Гаманець','Wallet'],
       uk:{n:'Скарбничка',s:'Скільки зібрано на мету',d:'Доходи з міткою місії складаються в суму, смужка — скільки лишилось до цілі. «＋ ₴» — відкласти з віджета.',st:['Задай ціль','«＋ ₴» — дохід у Гаманець','«Зібрано ✓», коли дійшов']},
       en:{n:'Savings jar',s:'How much is saved for the goal',d:'Mission-tagged income adds up, the bar shows what’s left. “+ ₴” saves right from the widget.',st:['Set a target','“+ ₴” records income in the Wallet','“Saved ✓” when you get there']}},
-    dcounter:{sp:['health','study','goals'],ic:'🔢',c:'#f0b429',pv:'cnt',ln:['Місія','Mission'],
+    dcounter:{sp:['health','study','goals','trk'],ic:'🔢',c:'#f0b429',pv:'cnt',ln:['Місія','Mission'],
       uk:{n:'Лічильник',s:'Будь-яке число з метою',d:'Слова, кілограми, сторінки, кілометри: число, мета й смужка, «−» і «＋» на віджеті.',st:['Назви лічильник і мету','Тисни «＋» або впиши число','Відсоток і смужка']},
       en:{n:'Counter',s:'Any number with a target',d:'Words, kilos, pages, kilometres: a number, a target and a bar, “−” and “+” on the widget.',st:['Name it and set a target','Tap “+” or type a value','Percent and bar']}},
-    dphoto:{sp:['health','home','goals'],ic:'📸',c:'#ff7a9a',pv:'photo',ln:['Місія','Mission'],
+    dphoto:{sp:['health','home','goals','trk'],ic:'📸',c:'#ff7a9a',pv:'photo',ln:['Місія','Mission'],
       uk:{n:'Фото-прогрес',s:'Було → стало',d:'Перше й останнє фото місії поруч — видно зміну, якої не помічаєш щодня.',st:['Додай перше фото','Фотографуй час від часу','Порівнюй «було → стало»']},
       en:{n:'Photo progress',s:'Before → after',d:'The first and latest mission photos side by side — change you don’t notice day to day.',st:['Add the first photo','Take photos now and then','Compare before → after']}},
     wgin:{sp:['money','work'],ic:'💚',c:'#22b573',pv:'in',ln:['Гаманець','Wallet'],
@@ -40217,6 +40563,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     wgwallet:{sp:['money'],ic:'👛',c:'#7f8cff',pv:'wallet',ln:['Гаманець','Wallet'],
       uk:{n:'Гаманець',s:'Баланс і прогноз місяця',d:'Баланс, прогноз місяця і кільця, «−» і «＋» прямо з віджета.',st:['Додай на сторінку','«−» витрата, «＋» дохід','Кільця — як іде місяць']},
       en:{n:'Wallet',s:'Balance and month forecast',d:'Balance, month forecast and rings, “−” and “+” right from the widget.',st:['Add it to a page','“−” expense, “+” income','Rings show the month']}},
+    wgwork:{sp:['work','money'],ic:'⏱',c:'#5b8def',pv:'work',ln:['Робота','Work'],since:'2026-11-22',
+      uk:{n:'Робота',s:'Години й зароблене за місяць',d:'Скільки годин відпрацьовано цього місяця і скільки це грошей за твоєю ставкою. «＋ Години» записує сьогоднішню зміну, тап — календар Роботи і зарплата.',st:['Додай у папку','«＋ Години» — запис на сьогодні','Сума за місяць росте сама']},
+      en:{n:'Work',s:'Hours and earnings this month',d:'How many hours you worked this month and what that makes at your rate. “+ Hours” logs today’s shift, a tap opens the Work calendar and salary.',st:['Add it to a folder','“+ Hours” logs today','The month total grows by itself']}},
     wgmission:{sp:['money','goals'],ic:'🎯',c:'#34c77b',pv:'mmoney',ln:['Гаманець','Wallet'],
       uk:{n:'Гроші місії',s:'Дохід, бюджет і приз місії',d:'Скільки місія заробила і витратила, бюджет і приз.',st:['Повʼяжи місію','Мітка місії на операціях','Бюджет і приз — одним поглядом']},
       en:{n:'Mission money',s:'Income, budget and prize of a mission',d:'What the mission earned and spent, its budget and prize.',st:['Link a mission','Tag operations with it','Budget and prize at a glance']}},
@@ -40236,7 +40585,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       uk:{n:'Флоу AI',s:'AI-дія з цією сторінкою',d:'Попроси Флоу щось зробити з цією сторінкою: підсумувати, розбити на кроки, переписати.',st:['Додай блок','Напиши, що зробити','Прийми або відкинь результат']},
       en:{n:'Flow AI',s:'An AI action on this page',d:'Ask Flow to do something with this page: summarise, split into steps, rewrite.',st:['Add the block','Say what to do','Accept or discard']}}
   };
-  var BS_REL={countdown:['dcount','dmission','dcal'],dcal:['dtime','tbl','countdown'],dtime:['dcal','tbl','dmission'],dtasks:['dtime','dcal','dmission'],dmission:['dhabit','dsave','countdown'],dhabit:['dmission','dcounter','dphoto'],dcount:['countdown','dmission'],dsave:['wgin','dmission','wgenv'],dcounter:['dhabit','tbl','dphoto'],dphoto:['dhabit','dcounter','dmission'],wgin:['wgout','dsave','wgwallet'],wgout:['wgin','wgenv','wgdebt'],wgwallet:['wgin','wgout','wgenv'],wgmission:['dsave','dmission','wgin'],wgenv:['wgout','wgdebt','wgwallet'],wgdebt:['wgenv','wgout'],tbl:['dcal','dcounter','weekreview'],weekreview:['tbl','dmission'],ai:['weekreview','tbl']};
+  var BS_REL={countdown:['dcount','dmission','dcal'],dcal:['dtime','tbl','countdown'],dtime:['dcal','tbl','dmission'],dtasks:['dtime','dcal','dmission'],dmission:['dhabit','dsave','countdown'],dhabit:['dmission','dcounter','dphoto'],dcount:['countdown','dmission'],dsave:['wgin','dmission','wgenv'],dcounter:['dhabit','tbl','dphoto'],dphoto:['dhabit','dcounter','dmission'],wgin:['wgout','dsave','wgwallet'],wgout:['wgin','wgenv','wgdebt'],wgwallet:['wgin','wgout','wgenv'],wgwork:['wgin','wgwallet','dtime'],wgmission:['dsave','dmission','wgin'],wgenv:['wgout','wgdebt','wgwallet'],wgdebt:['wgenv','wgout'],tbl:['dcal','dcounter','weekreview'],weekreview:['tbl','dmission'],ai:['weekreview','tbl']};
   function bsLang(){ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } }
   function bsT(it){ return it[bsLang()]||it.uk; }
   /* «Ще» (29-more-screen.js) і меню блоків малюються ще ДО цього файлу, а функції в збірці «спливають» раніше за var —
@@ -40269,7 +40618,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function bsTrusted(){ try{ return typeof window.sbDataTrusted!=='function'||window.sbDataTrusted(); }catch(_){ return true; } }
 
   /* ── прев'ю з прикладними даними (не дані людини) ── */
-  function bsPv(k,sz){
+  /* вигляди «Трекера цілі» (22.11.2026, 48-widgets.js wdHabLook) — прев'ю з прикладними даними */
+  var BS_LOOKS=[['chain','Ланцюг','Chain','Серія днів поспіль','Days in a row'],['path','Шлях','Path','66 днів клітинками, віхи','66 days in cells, milestones'],
+    ['grid','Сезон','Season','Сітка тижнів, ритм','Weeks grid, your rhythm'],['plant','Росток','Sprout','Росте з кожним днем','Grows every day'],['ring','Кільце','Ring','Тиждень кільцем, тап — ✓','Week as a ring, tap — ✓']];
+  function bsPv(k,sz,lk){
     const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en', c=it.c, s=sz==='s';
     const h=(a)=>`<span class="bsw-h"><i style="background:${c}"></i>${a||esc(t.n)}</span>`;
     const big=(v,u)=>`<b class="bsw-big">${v}<small>${u||''}</small></b>`, sub=v=>`<small class="bsw-sub">${v}</small>`;
@@ -40282,7 +40634,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         x=s?h()+big(17,en?'Nov':'лист')+sub(en?'2 plans · run 18:00':'2 справи · біг 18:00'):h(en?'November':'Листопад')+`<span class="bsw-cal">${g}</span>`; break; }
       case 'time': x=h()+big('2,5',en?'h':'год')+`<span class="bsw-tl"><i style="left:6%;width:12%;background:${c}"></i><i style="left:60%;width:14%;background:${c};opacity:.6"></i><b style="left:48%"></b></span>`+(s?'':sub(en?'18:00 · Easy run 6 km':'18:00 · Легкий біг 6 км')); break;
       case 'mis': x=h()+`<span class="bsw-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="tr"/><circle cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="62 100" style="stroke:${c}"/></svg><b>62%</b></span>`+(s?'':sub(en?'Next: sign up for the race':'Далі: зареєструватись на забіг')); break;
-      case 'hab': x=h()+big(12,en?'days':'днів')+`<span class="bsw-d7">${[1,1,1,1,1,0,0].map(o=>`<i style="${o?'background:'+c:''}"></i>`).join('')}</span>`; break;
+      case 'hab':
+        if(lk==='path') x=h()+big(23,'/ 66')+`<span class="bsw-path">${Array.from({length:s?22:44},(_,i)=>`<i style="${i<23?'background:'+c:''}"></i>`).join('')}</span>`;
+        else if(lk==='grid'){ let g=''; for(let i=0;i<(s?42:84);i++){ const v=(i*37+11)%10; g+=`<i style="${v>2?'background:'+c+';opacity:'+(v>7?1:v>5?.7:.4):''}"></i>`; }
+          x=h()+big('72%',en?'12 weeks':'12 тижнів')+`<span class="bsw-hm${s?' s':''}">${g}</span>`; }
+        else if(lk==='plant') x=h()+`<span class="bsw-pl" style="--fc:${c}">${typeof wdPlantSvg==='function'?wdPlantSvg(14):''}<span>${big(14,en?'days':'днів')}${sub(en?'Seedling · bush at 21':'Росток · кущ на 21')}</span></span>`;
+        else if(lk==='ring') x=h()+`<span class="bsw-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="tr"/><circle cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="71 100" style="stroke:${c}"/></svg><b>5/7</b></span>`+(s?'':sub(en?'this week · tap the ring':'цього тижня · тап по кільцю'));
+        else x=h()+big(12,en?'days':'днів')+`<span class="bsw-d7">${[1,1,1,1,1,0,0].map(o=>`<i style="${o?'background:'+c:''}"></i>`).join('')}</span>`;
+        break;
       case 'dcount': x=h()+big(31,en?'days left':'день лишилось')+(s?'':sub(en?'Half marathon · Dec 19':'Півмарафон · 19 грудня')); break;
       case 'save': x=h()+big('8 400',en?'of 12 000 ₴':'з 12 000 ₴')+bar(70)+(s?'':sub(en?'Sneakers · 70%':'Кросівки · 70%')); break;
       case 'cnt': x=h()+`<b class="bsw-n">${en?'Pages in English':'Сторінок англійською'}</b>`+big('214','/ 300')+bar(71); break;
@@ -40290,6 +40649,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       case 'in': x=h()+big('18 500','₴')+bar(74)+sub(en?'target 25 000':'ціль 25 000'); break;
       case 'out': x=h()+big('3 920',en?'of 5 000 ₴':'з 5 000 ₴')+bar(78)+sub(en?'1 080 ₴ left':'лишилось 1 080 ₴'); break;
       case 'wallet': x=h()+big('12 340','₴')+sub(en?'forecast +4 100 by month end':'прогноз +4 100 до кінця місяця'); break;
+      case 'work': x=h()+big('14 400','₴')+(s?sub(en?'96 h this month':'96 год за місяць'):`<span class="bsw-d7">${[8,8,6,8,0,0,4].map(v=>`<i style="${v?'background:'+c+';opacity:'+(.35+v/12):''}"></i>`).join('')}</span>`+sub(en?'96 h · payday on the 31st':'96 год · виплата 31-го')); break;
       case 'mmoney': x=h()+big('+6 200','₴')+bar(55)+sub(en?'budget 11 000 · prize: trip':'бюджет 11 000 · приз: подорож'); break;
       case 'env': x=h()+big('9 600',en?'₴ in envelopes':'₴ у конвертах')+(s?'':`<span class="bsw-row"><b>${en?'Rent':'Оренда'}</b><span>${en?'Dec 1 · 8 000':'1 груд · 8 000'}</span></span>`); break;
       case 'debt': x=h()+big('−1 200',en?'₴ net':'₴ нетто')+bar(40)+(s?'':sub(en?'🔥 12 days without new debt':'🔥 12 днів без нових боргів')); break;
@@ -40301,7 +40661,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   }
 
   /* ── вітрина ── */
-  var bsState={sph:'all',q:'',open:''};
+  var bsState={sph:'all',q:'',open:'',look:''};
   function bsBtn(k,big){
     const g=bsGot(k), en=bsLang()==='en';
     return `<button class="bs-get${big?' big':''}${g?' got':''}" data-bsget="${esc(k)}" aria-pressed="${g}">${g?(big?(en?'In menu ✓':'У меню ✓'):'✓'):(en?'Get':'Отримати')}</button>`;
@@ -40313,6 +40673,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const match=k=>{ const t=bsT(BS_ITEMS[k]); return !q||(t.n+' '+t.s+' '+(BS_ITEMS[k].uk.n)).toLowerCase().includes(q); };
     const sp=bsState.sph, inSp=k=>sp==='all'||BS_ITEMS[k].sp.includes(sp);
     let h=`<div class="bs-chips" role="group">${BS_SPH.map(s=>`<button class="bs-chip${sp===s[0]?' on':''}" data-bssph="${s[0]}">${en?s[2]:s[1]}</button>`).join('')}</div>`;
+    if(sp==='trk'&&!q) return h+bsTrkHTML(en);
     if(q||sp!=='all'){ const L=keys.filter(k=>match(k)&&inSp(k));
       return h+(L.length?`<div class="bs-shelf">${L.map(bsRow).join('')}</div>`:`<p class="bs-empty">${en?'Nothing found':'Нічого не знайшлось'}</p>`); }
     // прибрані людиною (не нові) — одразу зверху: сюди веде рядок «Ще N блоків у Магазині» з меню «＋ Блок»
@@ -40325,13 +40686,24 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       h+=`<div class="bs-sh"><b>${title}</b><button data-bssph="${s}">${en?'All ›':'Усі ›'}</button></div><div class="bs-shelf">${L.map(bsRow).join('')}</div>`; });
     return h;
   }
+  // вкладка «Трекери»: один блок «Трекер цілі» і його пʼять виглядів, нижче — інші блоки прогресу місії
+  function bsTrkHTML(en){
+    const L=['dcounter','dphoto','dcount','dsave'].filter(bsInStore);
+    return `<p class="bs-lead">${en?'Link a goal to a folder and mark each day with one tap. One tracker — five looks, switch any time.':'Повʼяжи ціль із папкою — і щодня один тап. Один трекер — пʼять виглядів, міняються будь-коли.'}</p>
+      <div class="bs-shelf">${bsRow('dhabit')}</div>
+      <div class="bs-looks">${BS_LOOKS.map(l=>`<button class="bs-look" data-bsopen="dhabit" data-bslook="${l[0]}"><span class="bs-lkt"><b>${en?l[2]:l[1]}</b><small>${esc(en?l[4]:l[3])}</small></span>${bsPv('dhabit','s',l[0])}</button>`).join('')}</div>
+      ${L.length?`<div class="bs-sh"><b>${en?'More for progress':'Ще для прогресу'}</b></div><div class="bs-shelf">${L.map(bsRow).join('')}</div>`:''}`;
+  }
   function bsPageHTML(k){
     const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en', g=bsGot(k), sp=BS_SPH.find(s=>s[0]===it.sp[0])||BS_SPH[0];
+    const selected=BS_LOOKS.find(l=>l[0]===bsState.look);
+    const looks=selected?[selected,...BS_LOOKS.filter(l=>l!==selected)]:BS_LOOKS;
     return `<div class="bs-dh"><span class="bs-ico lg" style="--c:${it.c}">${it.ic}</span><div class="bs-dtx"><h3>${esc(t.n)}</h3><small>${esc(t.s)}</small>
         <div class="bs-acts">${bsBtn(k,true)}${g?`<button class="bs-rm" data-bsrm="${esc(k)}">${en?'Remove from menu':'Прибрати з меню'}</button>`:''}</div></div></div>
       <div class="bs-info"><div><small>${en?'Area':'Сфера'}</small><b>${en?sp[2]:sp[1]}</b></div><div><small>${en?'Linked to':'Звʼязок'}</small><b>${esc(it.ln[en?1:0])}</b></div><div><small>${en?'Sizes':'Розміри'}</small><b>S·M·L</b></div><div><small>${en?'Offline':'Офлайн'}</small><b>✓</b></div></div>
       <div class="bs-sec"><b>${en?'How it looks':'Як виглядає'}</b><small>${en?'Example data':'Приклад, не твої дані'}</small></div>
-      <div class="bs-shots"><div class="bs-shot"><small>${en?'Small':'Малий'}</small>${bsPv(k,'s')}</div><div class="bs-shot m"><small>${en?'Wide':'Широкий'}</small>${bsPv(k,'m')}</div><div class="bs-shot m"><small>${en?'Large':'Великий'}</small>${bsPv(k,'l')}</div></div>
+      <div class="bs-shots">${k==='dhabit'?looks.map(l=>`<div class="bs-shot"><small>${en?l[2]:l[1]}</small>${bsPv(k,'s',l[0])}</div>`).join('')
+        :`<div class="bs-shot"><small>${en?'Small':'Малий'}</small>${bsPv(k,'s')}</div><div class="bs-shot m"><small>${en?'Wide':'Широкий'}</small>${bsPv(k,'m')}</div><div class="bs-shot m"><small>${en?'Large':'Великий'}</small>${bsPv(k,'l')}</div>`}</div>
       <div class="bs-sec"><b>${en?'What it does':'Що робить'}</b></div><p class="bs-desc">${esc(t.d)}</p>
       <div class="bs-sec"><b>${en?'How it works':'Як працює'}</b></div><div class="bs-steps">${t.st.map((s,i)=>`<div><i style="--c:${it.c}">${i+1}</i><span>${esc(s)}</span></div>`).join('')}</div>
       <div class="bs-sec"><b>${en?'Goes well with':'Поєднується з'}</b></div><div class="bs-rel">${(BS_REL[k]||[]).filter(bsInStore).map(r=>`<button data-bsopen="${r}"><span class="bs-ico" style="--c:${BS_ITEMS[r].c}">${BS_ITEMS[r].ic}</span>${esc(bsT(BS_ITEMS[r]).n)}</button>`).join('')}</div>
@@ -40350,7 +40722,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   function bsToast(t){ try{ plToast(t); }catch(_){} }
   function bsOpen(o){
     if(!bsReady()) return;
-    o=o||{}; bsState={sph:o.sph||'all',q:'',open:o.k&&bsInStore(o.k)?o.k:''};
+    o=o||{}; bsState={sph:o.sph||'all',q:'',open:o.k&&bsInStore(o.k)?o.k:'',look:''};
     let ov=document.getElementById('bsOv'); if(ov) ov.remove();
     const en=bsLang()==='en';
     ov=document.createElement('div'); ov.id='bsOv'; ov.className='bs-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('data-i18n-skip','1');
@@ -40366,7 +40738,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const g=t.closest('[data-bsget]'); if(g){ e.stopPropagation(); const k=g.dataset.bsget, on=!bsGot(k); if(bsSet(k,on)===false) return; if(on) bsToast(en?'In the “+ Block” menu ✓':'Є в меню «＋ Блок» ✓'); return; }
       const rm=t.closest('[data-bsrm]'); if(rm){ if(bsSet(rm.dataset.bsrm,false)===false) return; bsToast(en?'Removed from the menu — still works in folders':'Прибрано з меню — у папках працює далі'); return; }
       const s=t.closest('[data-bssph]'); if(s){ bsState.sph=s.dataset.bssph; bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
-      const op=t.closest('[data-bsopen]'); if(op){ bsState.open=op.dataset.bsopen; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
+      const op=t.closest('[data-bsopen]'); if(op){ bsState.open=op.dataset.bsopen; bsState.look=op.dataset.bslook||''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
     });
     ov.addEventListener('keydown',e=>{ if(e.key==='Escape'){ close(); return; } if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-bsopen]')&&e.target.tagName!=='BUTTON'){ e.preventDefault(); e.target.click(); } });
     ov.querySelector('#bsQ').addEventListener('input',e=>{ bsState.q=e.target.value.slice(0,60); bsRedraw(); });
@@ -40377,8 +40749,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
      Скляна шторка з двома вкладками: «Загальні» (назва, колір, фон, шапка, розмір, дублювати, видалити) і «<Цей віджет>».
      Шестерні ⚙ більше нема: шторка відкривається тапом по шапці, утриманням віджета (ПКМ на компʼютері) і тапом у режимі «Змінити».
      Розмір — клітинки сітки: телефон 4 колонки, компʼютер (≥760) 8 колонок, свій на кожному пристрої: b.ws = {m:[w,h], d:[w,h]}.
-     Без b.ws віджет живе як раніше (sz S/M/L) — нічого не мігруємо. Зміни видно одразу в прев'ю, а в блок пишуться при закритті шторки,
-     лише ті поля, що в WS_KEYS (дані місій, Планера й Гаманця шторка не чіпає — лише вигляд віджета). */
+     Без b.ws віджет живе як раніше (sz S/M/L). Чернетку видно в прев'ю, у блок пишемо змінені поля лише за кнопкою «Зберегти». */
   // var, а не const: віджет може намалюватись раніше, ніж виконався цей файл (порядок core) — тоді значення ще undefined, а не «мертва зона»
   var WD_ROWS=5;
   var WD_SZ_CELL={s:[2,2],m:[4,2],l:[4,4]};
@@ -40391,6 +40762,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const c=b&&b.ws&&typeof b.ws==='object'?b.ws[dev]:null;
     if(Array.isArray(c)&&c.length===2){ const w=Math.round(+c[0]), h=Math.round(+c[1]);
       if(w>=1&&h>=1) return [Math.min(w,wdCols(dev)),Math.min(h,5)]; }
+    if(b&&wgHasSettings(b.type)) return [wdCols(dev),2];
     const t=wdSzOld(b); return t==='l'?[4,4]:t==='m'?[4,2]:[2,2];
   }
   // що показати в цій площі: xs — значок і число · row — рядок · s / m / l — як раніше
@@ -40415,17 +40787,36 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   window.addEventListener('resize',()=>{ const d=wdDev(); if(d!==wdDevNow){ wdDevNow=d; try{ wdRedraw(); }catch(_){} } });
 
   // ── шторка ──
-  var WS_KEYS=['ws','sz','gw','gh','hd','cc','bg','nohd','goalId','period','show','title','label','target','tm','dir','units','sty','yearly','end','goal','main','tapmk','ev','q'];
+  var WS_KEYS=['ws','sz','gw','gh','hd','cc','bg','nohd','goalId','period','show','title','label','target','tm','dir','units','sty','yearly','end','goal','main','tapmk','ev','q','look','days','cur','src'];
   var WS_PAL=[['glass','Скло'],['frost','Матове'],['solid','Колір']];
-  function wsName(b){ return b.type==='countdown'?String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60):String(b.hd||'').slice(0,40); }
+  function wsName(b){
+    if(b.type==='wgmoney') return String(b.label||'').slice(0,40);
+    if(b.type==='countdown') return String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
+    return String(b.hd||'').slice(0,40);
+  }
   function wdSheet(id,opt){
     opt=opt||{};
-    let b0=null; try{ b0=getBlock(id); }catch(_){} if(!b0||!wdIs(b0.type)) return;
-    const old=document.querySelector('.ws-ov'); if(old){ try{ old.__wsClose&&old.__wsClose(); }catch(_){} old.remove(); }
-    const m=WD_META[b0.type], fk=wgCtxFolder(), dev=wdDev();
-    const d=JSON.parse(JSON.stringify(b0));   // чернетка: прев'ю малюється з неї, у блок — при закритті
-    const was={}; WS_KEYS.forEach(k=>{ was[k]=JSON.stringify(d[k]); });   // з чим порівнювати при закритті
-    let tab=opt.tab==='own'?'own':'gen';
+    let b0=null; try{ b0=getBlock(id); }catch(_){}
+    if(!b0||(!wdIs(b0.type)&&!wgHasSettings(b0.type))) return;
+    document.querySelectorAll('.ws-ov').forEach(old=>{ old.__wsClose(); old.remove(); });
+    const money=b0.type==='wgmoney', income=b0.kind!=='out';
+    const moneyName=income?'Доходи':'Витрати';
+    const finance=wgHasSettings(b0.type), mission=b0.type==='wgmission';
+    const m=money?{t:moneyName,h:moneyName,ic:income?'💚':'🧾'}:WG_SETTINGS[b0.type]||WD_META[b0.type];
+    const fk=wgCtxFolder(), dev=wdDev(), openedBoard=boardKey, opener=document.activeElement;
+    const d=JSON.parse(JSON.stringify(b0));
+    const was={}; WS_KEYS.forEach(k=>{ was[k]=JSON.stringify(d[k]); });
+    let tab=m.h&&opt.tab==='own'?'own':'gen';
+    /* ритм і вихідні (22.11.2026, крок 2): це поля ТРЕКЕРА місії, не віджета. Чернетка trD (ключ — папка місії);
+       прев'ю бачить її через d.__tr (поля нема в WS_KEYS — у блок не пишеться); у трекер — лише при закритті і лише якщо змінено */
+    let trD=null;
+    const trSync=()=>{ if(d.type!=='dhabit'){ trD=null; return null; }
+      let q=null; try{ q=wdGoal(d,fk); }catch(_){}
+      const gk=q&&moOwnFolder(q.folderKey)?q.folderKey:'', t=gk?moTracker(gk):null;
+      if(!t){ trD=null; delete d.__tr; return null; }
+      if(!trD||trD.gk!==gk){ const r=moRhythm(t); trD={gk, rest:moRest(t), rhythm:t.rhythm?r:null};
+        trD.wasRest=JSON.stringify(trD.rest); trD.wasRh=JSON.stringify(trD.rhythm); }   // окремо: пишемо лише змінене поле
+      d.__tr={rest:trD.rest.slice(), rhythm:trD.rhythm?Object.assign({},trD.rhythm):undefined}; return t; };
     // розмір однієї клітинки — з живої дошки (якщо віджет на екрані), інакше типовий
     const cellEl=document.querySelector('[data-wghost="'+CSS.escape(String(id))+'"]');
     const boardEl=cellEl&&cellEl.closest('.pg-board.wboard');
@@ -40436,14 +40827,16 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     const ov=document.createElement('div'); ov.className='ws-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
     ov.setAttribute('aria-label','Налаштування віджета «'+m.t+'»');
     ov.innerHTML=`<div class="ws-sh"><div class="ws-grab" aria-hidden="true"></div>
-      <div class="ws-hd"><b>${m.ic} ${esc(m.t)}</b><button class="ws-done" data-wsdone>Готово</button></div>
+      <div class="ws-hd"><b><span aria-hidden="true">${m.ic}</span> <span>${esc(m.t)}</span></b></div>
       <div class="ws-pv" aria-hidden="true"><div class="ws-pvc"><div class="wg-host ws-pvh"></div></div></div>
-      <div class="ws-tabs" role="tablist"><button role="tab" data-wstab="gen">Загальні</button><button role="tab" data-wstab="own">${esc(b0.type==='countdown'?m.t:m.h)}</button></div>
-      <div class="ws-body"></div></div>`;
+      ${m.h?`<div class="ws-tabs" role="tablist"><button role="tab" data-wstab="gen">Загальні</button><button role="tab" data-wstab="own">${esc(b0.type==='countdown'?m.t:m.h)}</button></div>`:''}
+      <div class="ws-body"></div>
+      <div class="ws-acts ws-footer"><button type="button" data-wscancel>Скасувати</button><button type="button" data-wsdone>Зберегти</button></div></div>`;
     document.body.appendChild(ov);
     const sh=ov.querySelector('.ws-sh'), body=ov.querySelector('.ws-body'), pvc=ov.querySelector('.ws-pvc'), pvh=ov.querySelector('.ws-pvh');
     pvh.setAttribute('inert','');
     const pvDraw=()=>{
+      trSync();
       const c=wdCell(d,dev), w=Math.min(c[0]*cw+(c[0]-1)*gap, sh.clientWidth-32), h=c[1]*rh+(c[1]-1)*gap;
       pvc.style.width=Math.max(70,Math.round(w))+'px'; pvc.style.height=Math.round(Math.min(h,dev==='d'?300:260))+'px';
       try{ wgFill(pvh,d,fk); }catch(_){}
@@ -40455,8 +40848,15 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
     function genHTML(){
       const c=wdCell(d,dev), cols=wdCols(dev);
+      const bg=d.bg==='frost'||d.bg==='solid'?d.bg:'glass';
+      if(finance){
+        const size=c[1]>=4?'large':c[0]<cols?'small':'wide';
+        return grp('',`<label class="ws-it"><span>Назва</span><input class="ws-in" data-wsname maxlength="40" value="${escAttr(wsName(d))}" placeholder="${escAttr(m.t)}"></label>`
+          +row('Фон',seg('bg',WS_PAL,bg))
+          +row(dev==='d'?'Розмір на компʼютері':'Розмір на телефоні',seg('money-size',[['small','Малий'],['wide','Широкий'],['large','Великий']],size),'wrap'));
+      }
       let cells=''; for(let r=1;r<=WD_ROWS;r++) for(let k=1;k<=cols;k++) cells+=`<button data-wspk="${k},${r}" class="${k<=c[0]&&r<=c[1]?'in':''}" aria-label="${k} на ${r}"></button>`;
-      const cc=wdCcOf(d), bg=d.bg==='frost'||d.bg==='solid'?d.bg:'glass';
+      const cc=wdCcOf(d);
       return grp('Вигляд',
           row('Назва',`<input class="ws-in" data-wsname maxlength="${d.type==='countdown'?60:40}" value="${esc(wsName(d))}" placeholder="${esc(d.type==='countdown'?'Новий рік, відпустка…':m.h)}">`)
           +row('Колір',`<span class="ws-cc"><button data-wscc="" class="fold${cc?'':' on'}" aria-label="Колір папки" aria-pressed="${!cc}"></button>${WD_CC.map(x=>`<button data-wscc="${x}" style="--s:${x}" class="${cc===x?'on':''}" aria-label="Колір ${x}" aria-pressed="${cc===x}"></button>`).join('')}</span>`,'wrap')
@@ -40468,6 +40868,27 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     }
     function ownHTML(){
       const t=d.type;
+      if(mission){
+        const defaultMission=wgMoneyMission({},fk), linked=wgFolderMission(fk);
+        const english=flowLang()==='en';
+        const label=linked?(english?'Folder mission':'Місія цієї папки'):(english?'First available mission':'Перша доступна місія');
+        const options=wlMissions();
+        const selected=d.goalId&&wlGoal(d.goalId);
+        if(selected&&!options.some(g=>String(g.id)===String(selected.id))) options.push(selected);
+        return grp('',`<label class="ws-it"><span>Місія</span><select class="ws-in" data-wsmission>
+          <option value="">${label}${defaultMission?' · '+esc(defaultMission.name||''):''}</option>
+          ${options.map(g=>`<option value="${escAttr(g.id)}"${selected&&String(g.id)===String(selected.id)?' selected':''}>${esc(g.name||'Місія')}</option>`).join('')}
+          </select></label>`);
+      }
+      if(money){
+        const currency=Object.hasOwn(CUR_LIST,d.cur)?d.cur:mainCur();
+        const source=Object.hasOwn(WL_SRC,d.src)?d.src:'main';
+        const english=flowLang()==='en';
+        const sourceNames={main:'Main',extra:'Side',passive:'Passive'};
+        return grp('',(income?`<label class="ws-it"><span>Тип доходу</span><select class="ws-in" data-wsmoney="src">${Object.keys(WL_SRC).map(k=>`<option value="${k}"${k===source?' selected':''}>${english?sourceNames[k]:WL_SRC[k][1]}</option>`).join('')}</select></label>`:'')
+          +`<label class="ws-it"><span>Валюта</span><select class="ws-in" data-wsmoney="cur">${Object.keys(CUR_LIST).map(k=>`<option value="${k}"${k===currency?' selected':''}>${CUR_LIST[k].s} ${english?k:CUR_LIST[k].n}</option>`).join('')}</select></label>
+          <label class="ws-it"><span>${income?'Ціль на місяць':'Ліміт на місяць'}</span><input class="ws-in" data-wsmoney="goal" type="number" min="0" step="1" inputmode="numeric" value="${+d.goal>0?+d.goal:''}"></label>`);
+      }
       if(t==='countdown'){
         const c=tmCfgOf(d), units=new Set(c.units);
         return grp('Відлік',
@@ -40487,18 +40908,27 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           <button data-wsg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
           ${goals.map(g=>`<button data-wsg="${esc(g.id)}" class="${String(g.id)===gid?'on':''}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,24))}</button>`).join('')}</div>`);
       }
+      // трекер (22.11.2026): вигляд — лише малюнок; позначки ті самі. Період і «Показувати» стосуються лише «Ланцюга»
+      const lk=t==='dhabit'?wdLook(d):'', trk=t==='dhabit'?trSync():null, rh=trD&&trD.rhythm?trD.rhythm:{k:'day'};
+      if(t==='dhabit') h=grp('Вигляд',`<span class="ws-looks">${WD_LOOKS.map(([k,l])=>`<button data-wsset="look" data-v="${k}" class="${lk===k?'on':''}" aria-pressed="${lk===k}"><i class="ws-lk ${k}" aria-hidden="true"></i>${l}</button>`).join('')}</span>`
+        +(lk==='path'&&rh.k!=='days'?row('Днів у шляху',seg('days',WD_PATH_N.map(n=>[n,n]),wdPathN(d))):''))
+        +(trk?grp('Ритм · для всієї місії',`<div class="ws-it">${seg('rhy',[['day','Щодня'],['week','На тиждень'],['days','N днів']],rh.k)}</div>`
+            +(rh.k==='week'?row('Днів на тиждень',`<span class="ws-step"><button data-wsst="rhn" data-n="-1" aria-label="Менше">−</button><b>${rh.n}</b><button data-wsst="rhn" data-n="1" aria-label="Більше">＋</button></span>`):'')
+            +(rh.k==='days'?row('Скільки днів',seg('rdays',MO_DAYS_N.map(n=>[n,n]),rh.n)):''))
+          +grp('Вихідні дні',`<span class="ws-days7">${DY_DOW.map((x,i)=>`<button data-wsrest="${i}" class="${trD.rest.includes(i)?'on':''}" aria-pressed="${trD.rest.includes(i)}">${x}</button>`).join('')}</span>`
+            +'<div class="ws-note">Пропущений вихідний не рве серію і не рахується в «з N».</div>'):'')+h;
       let main='';
-      if(m.per) main+=row('Період',seg('period',m.per,wdPer(d)));
+      if(m.per&&(!lk||lk==='chain')) main+=row('Період',seg('period',m.per,wdPer(d)));
       if(t==='dmission') main+=row('Головне число',seg('main',[['pct','%'],['steps','Кроки'],['days','Дні']],d.main==='steps'||d.main==='days'?d.main:'pct'));
-      if(t==='dhabit'&&wdPer(d)==='week') main+=row('Ціль на тиждень',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
-      if(t==='dhabit') main+=tg('tapmk',!!d.tapmk,'Позначати день тапом по віджету');
+      if(t==='dhabit'&&!trk&&((lk==='chain'&&wdPer(d)==='week')||lk==='ring')) main+=row('Ціль на тиждень',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
+      if(t==='dhabit'&&lk==='chain') main+=tg('tapmk',!!d.tapmk,'Позначати день тапом по віджету');
       if(t==='dtime'&&wdPer(d)!=='day') main+=row('Ціль годин',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
       if(t==='dcal') main+=row('Події',seg('ev',[['fold','Цієї папки'],['all','Весь Планер']],d.ev==='all'?'all':'fold'));
       if(t==='dsave') main+=row('Кнопка «＋»',seg('q',[['0','Сума'],['100','100'],['500','500'],['1000','1000']],String(wsQ(d))))
         +`<button class="ws-it ws-go" data-wsgo="save"><span>🐷 Ціль скарбнички</span><em>›</em></button>`;
       if(t==='dcounter') main+=`<button class="ws-it ws-go" data-wsgo="counter"><span>🔢 Вибрати чи змінити лічильник</span><em>›</em></button>`;
       if(main) h+=grp(m.h,main);
-      h+=grp('Показувати',m.show.map(([k,l])=>tg('show.'+k,wdOn(d,k),l)).join(''));
+      if(!lk||lk==='chain') h+=grp('Показувати',m.show.map(([k,l])=>tg('show.'+k,wdOn(d,k),l)).join(''));
       return h;
     }
     function draw(){
@@ -40506,26 +40936,66 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       body.innerHTML=tab==='gen'?genHTML():ownHTML();
       pvDraw();
     }
-    // ── запис при закритті: лише поля вигляду, у свіжий блок (поки шторка відкрита, синк міг підмінити дошку) ──
+    // Записуємо лише змінені поля у свіжий блок тієї самої дошки.
     let closed=false;
-    function commit(){
-      // лише поля, які людина змінила: дата, що прийшла синком з іншого пристрою, поки шторка відкрита, не затирається старою
-      const ch=WS_KEYS.filter(k=>JSON.stringify(d[k])!==was[k]); if(!ch.length) return false;
-      const q=getBlock(id); if(!q||q.type!==d.type) return false;
-      ch.forEach(k=>{ if(d[k]===undefined) delete q[k]; else q[k]=JSON.parse(JSON.stringify(d[k])); });
-      saveBoard(); return true;
+    const changedKeys=()=>WS_KEYS.filter(k=>JSON.stringify(d[k])!==was[k]);
+    const trackerChanged=()=>trD&&(JSON.stringify(trD.rest)!==trD.wasRest||JSON.stringify(trD.rhythm)!==trD.wasRh);
+    function liveBlock(){
+      if(boardKey!==openedBoard) return null;
+      const b=getBlock(id);
+      return b&&b.type===d.type&&(!money||b.kind===d.kind)?b:null;
     }
-    function close(){ if(closed) return; closed=true; const ch=commit(); ov.classList.add('out'); setTimeout(()=>ov.remove(),220); if(ch) wdRedraw(); document.removeEventListener('keydown',onKey,true); }
-    ov.__wsClose=()=>{ if(!closed){ closed=true; if(commit()) wdRedraw(); document.removeEventListener('keydown',onKey,true); } };
+    function commit(q){
+      // лише поля, які людина змінила: дата, що прийшла синком з іншого пристрою, поки шторка відкрита, не затирається старою
+      const ch=changedKeys(); if(!ch.length) return false;
+      ch.forEach(k=>{
+        if(k==='ws') q.ws={...q.ws,[dev]:d.ws[dev].slice()};
+        else if(d[k]===undefined) delete q[k];
+        else q[k]=JSON.parse(JSON.stringify(d[k]));
+      });
+      return true;
+    }
+    // ритм/вихідні — у свіжий трекер (синк міг його підмінити), лише змінені, лише після дії людини
+    function commitTr(){
+      if(!trD) return false;
+      const chRest=JSON.stringify(trD.rest)!==trD.wasRest, chRh=JSON.stringify(trD.rhythm)!==trD.wasRh;
+      if(!chRest&&!chRh) return false;
+      const t=moOwnFolder(trD.gk)?moTracker(trD.gk):null; if(!t) return false;
+      // лише змінене поле: вихідні, що прийшли синком з іншого пристрою, не затираються зміною ритму (і навпаки);
+      // незнайомий ритм із новішої версії лишається, поки людина сама не вибере інший
+      if(chRest){ if(trD.rest.length) t.rest=trD.rest.slice(); else delete t.rest; }
+      if(chRh){ if(trD.rhythm&&trD.rhythm.k!=='day') t.rhythm=Object.assign({},trD.rhythm); else delete t.rhythm; }
+      return true;
+    }
+    function close(save=false){
+      if(closed) return;
+      closed=true;
+      document.removeEventListener('keydown',onKey,true);
+      const q=save?liveBlock():null;
+      if(q){
+        const blockChanged=commit(q), trackerSaved=commitTr();
+        if(blockChanged||trackerSaved){ saveBoard(); wdRedraw(); }
+      }
+      ov.inert=true;
+      ov.classList.add('out');
+      setTimeout(()=>ov.remove(),220);
+      if(opener?.isConnected) opener.focus();
+    }
+    ov.__wsClose=close;
     function onKey(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
     document.addEventListener('keydown',onKey,true);
     ov.addEventListener('click',e=>{ if(e.target===ov){ close(); return; }
       const x=e.target.closest('button'); if(!x||!ov.contains(x)) return;
-      if(x.dataset.wsdone!==undefined){ close(); return; }
+      if(x.dataset.wsdone!==undefined){ close(true); return; }
+      if(x.dataset.wscancel!==undefined){ close(); return; }
       if(x.dataset.wstab){ tab=x.dataset.wstab; draw(); return; }
       if(x.dataset.wscc!==undefined){ if(x.dataset.wscc) d.cc=x.dataset.wscc; else delete d.cc; draw(); return; }
       if(x.dataset.wsset){ const k=x.dataset.wsset, v=x.dataset.v;
         if(k==='bg'){ if(v==='glass') delete d.bg; else d.bg=v; }
+        else if(k==='money-size'){
+          const cols=wdCols(dev);
+          wdSetCell(d,dev,v==='small'?cols/2:cols,v==='large'?4:2);
+        }
         else if(k==='dir'){ if(v==='up') d.dir='up'; else delete d.dir; }
         else if(k==='sty'){ if(v==='flip') delete d.sty; else d.sty=v; }
         else if(k==='end'){ if(v==='conf') delete d.end; else d.end=v; }
@@ -40533,6 +41003,10 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         else if(k==='ev'){ if(v==='all') d.ev='all'; else delete d.ev; }
         else if(k==='q'){ if(v==='0') delete d.q; else d.q=+v; }
         else if(k==='period'){ d.period=v; }
+        else if(k==='rhy'&&trD){ trD.rhythm=v==='week'?{k:'week',n:Math.min(7,wsGoal(d)||4)}:v==='days'?{k:'days',n:MO_DAYS_N.includes(wdPathN(d))?wdPathN(d):30}:null; }
+        else if(k==='rdays'&&trD&&trD.rhythm){ trD.rhythm={k:'days',n:MO_DAYS_N.includes(+v)?+v:30}; }
+        else if(k==='look'){ if(v==='chain') delete d.look; else d.look=v; }
+        else if(k==='days'){ if(+v===30) delete d.days; else d.days=+v; }
         draw(); return; }
       if(x.dataset.wstg){ const k=x.dataset.wstg;
         if(k==='nohd'){ if(d.nohd) delete d.nohd; else d.nohd=true; }
@@ -40545,9 +41019,18 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
         if(us.has(u)){ if(us.size===1){ plToast('Хоча б одна одиниця'); return; } us.delete(u); } else us.add(u);
         const L=TM_U.filter(z=>us.has(z)); if(L.join()===TM_DEF.join()) delete d.units; else d.units=L; draw(); return; }
       if(x.dataset.wsg!==undefined){ if(x.dataset.wsg) d.goalId=x.dataset.wsg; else delete d.goalId; draw(); return; }
+      if(x.dataset.wsrest!==undefined&&trD){ const i=+x.dataset.wsrest;
+        if(trD.rest.includes(i)) trD.rest=trD.rest.filter(z=>z!==i); else if(trD.rest.length<6) trD.rest=[...trD.rest,i].sort(); else plToast('Хоча б один робочий день');
+        draw(); return; }
+      if(x.dataset.wsst==='rhn'&&trD&&trD.rhythm){ trD.rhythm={k:'week',n:Math.max(1,Math.min(7,trD.rhythm.n+(+x.dataset.n<0?-1:1)))}; draw(); return; }
       if(x.dataset.wsst){ const mx=d.type==='dhabit'?7:(wdPer(d)==='month'?200:60), v=(wsGoal(d)||0)+(+x.dataset.n<0?-1:1);
         if(v<=0) delete d.goal; else d.goal=Math.min(mx,v); draw(); return; }
       if(x.dataset.wspk){ const [w,h]=x.dataset.wspk.split(',').map(Number); wdSetCell(d,dev,w,h); draw(); return; }
+      if((x.dataset.wsgo||x.dataset.wsdup!==undefined||x.dataset.wsdel!==undefined)&&!liveBlock()){ close(); return; }
+      if((x.dataset.wsgo||x.dataset.wsdup!==undefined)&&(changedKeys().length||trackerChanged())){
+        plToast('Спершу збережи або скасуй зміни');
+        return;
+      }
       if(x.dataset.wsgo){ const k=x.dataset.wsgo; close();
         const q=wdGoal(getBlock(id)||d,fk); if(!q||!q.id){ plToast('Спершу вибери місію'); return; }
         if(k==='save') wdSaveGoalSheet(q.id); else wdCounterSheet(id,q.id,String(d.cid||'')); return; }
@@ -40557,10 +41040,29 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     ov.addEventListener('input',e=>{
       const x=e.target;
       if(x.matches('[data-wsname]')){ const v=String(x.value||'').replace(/\s+/g,' ').trim();
-        if(d.type==='countdown'){ d.title=v.slice(0,60); d.label=d.title; } else if(v) d.hd=v.slice(0,40); else delete d.hd;
+        if(money) d.label=v.slice(0,40)||moneyName;
+        else if(d.type==='countdown'){ d.title=v.slice(0,60); d.label=d.title; } else if(v) d.hd=v.slice(0,40); else delete d.hd;
         try{ wgFill(pvh,d,fk); }catch(_){} return; }
+      if(x.dataset.wsmoney==='goal'){
+        const n=Math.round(x.valueAsNumber);
+        d.goal=Number.isFinite(n)&&n>0?n:0;
+        pvDraw(); return;
+      }
       if(x.matches('[data-wsdate]')){ const v=String(x.value||''); if(/^\d{4}-\d{2}-\d{2}$/.test(v)){ d.target=v; try{ wgFill(pvh,d,fk); }catch(_){} } return; }
       if(x.matches('[data-wstime]')){ const v=String(x.value||'').slice(0,5); if(/^([01]\d|2[0-3]):[0-5]\d$/.test(v)&&v!=='00:00') d.tm=v; else delete d.tm; try{ wgFill(pvh,d,fk); }catch(_){} }
+    });
+    ov.addEventListener('change',e=>{
+      const x=e.target;
+      if(mission&&x.matches('[data-wsmission]')){
+        if(!x.value) delete d.goalId;
+        else if(wlGoal(x.value)) d.goalId=x.value;
+        else return;
+      }else if(x.dataset.wsmoney==='src'&&Object.hasOwn(WL_SRC,x.value)) d.src=x.value;
+      else if(x.dataset.wsmoney==='cur'&&Object.hasOwn(CUR_LIST,x.value)){
+        if(x.value===mainCur()) delete d.cur;
+        else d.cur=x.value;
+      }else return;
+      pvDraw();
     });
     // розмір на сітці-вибирачі: наведення підсвічує прямокутник (компʼютер)
     ov.addEventListener('pointerover',e=>{ const x=e.target.closest('[data-wspk]'); if(!x) return; const [w,h]=x.dataset.wspk.split(',').map(Number);
@@ -41383,7 +41885,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     {cat:'data',k:'dtasks',   t:'Справи папки', d:'Справи на сьогодні з цією папкою: галочки, ☆, ＋ справа', c:'#34c77b', ic:'task'},
     {cat:'data',k:'dcal',     t:'Календар папки', d:'Місяць: блоки й події папки, тап — день у Планері', c:'#ff9a4d', ic:'calendar'},
     {cat:'data',k:'dmission', t:'Місія папки', d:'Прогрес місії, наступний крок, дедлайн',        c:'#34c77b', ic:'target'},
-    {cat:'data',k:'dhabit',   t:'Звичка папки', d:'Позначки місії за тиждень, серія, ✓ сьогодні',  c:'#e8843c', ic:'habits'},
+    {cat:'data',k:'dhabit',   t:'Трекер цілі', d:'Позначка щодня: ланцюг, шлях, сезон, росток, кільце',  c:'#e8843c', ic:'habits'},
     {cat:'data',k:'dcount',   t:'Відлік до мети', d:'Скільки днів до фінішу місії',               c:'#9b8cff', ic:'calendar'},
     {cat:'data',k:'countdown',t:'Відлік часу',    d:'До дати чи від дати: роки … секунди',          c:'#5ec8ff', ic:'countdown'},   /* 17.11.2026: старий блок «Відлік» — тепер віджет (48-widgets.js tmHTML) */
     {cat:'data',k:'dsave',    t:'Скарбничка місії', d:'Скільки зібрано на місію з цілі, ＋ ₴',      c:'#34c77b', ic:'envelope'},
@@ -41395,6 +41897,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     {cat:'data',  k:'wgwallet', t:'Гаманець',      d:'Баланс, прогноз місяця, кільця, − / ＋',   c:'#7f8cff', ic:'envelope'},
     {cat:'data',  k:'wgmission',t:'Гроші місії',   d:'Дохід, бюджет і приз місії цієї папки',   c:'#34c77b', ic:'envelope'},
     {cat:'data',  k:'wgenv',    t:'Конверти й платежі', d:'Сума в конвертах і найближчі рядки Плану', c:'#f0b429', ic:'envelope'},
+    {cat:'data',  k:'wgwork',   t:'Робота',        d:'Години й зароблене за місяць, ＋ години сьогодні', c:'#5b8def', ic:'calendar'},   /* 22.11.2026: плитка з Гаманця — у Магазин блоків */
     {cat:'data',  k:'wgdebt',   t:'Борги й правила', d:'Хто кому винен, серія, дисципліна',     c:'#ff4d6d', ic:'envelope'},
     /* ═══ PREMIUM PACK V1 ═══ */
     {cat:'struct',k:'tabs',   t:'Таби',      d:'Кілька вкладок в одному блоці', c:'#9b8cff', ic:'tabs'},
@@ -41421,6 +41924,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     tabs:['tabs','вкладки','таби'],
     heatmap:['heatmap','хітмапа','calendar','активність'],
     wgin:['дохід','гроші','income','money','заробіток'], wgout:['витрати','гроші','expense','money'], wgwallet:['гаманець','баланс','wallet','гроші'],
+    wgwork:['робота','години','зміна','зарплата','ставка','work','hours','salary','shift'],
     wgmission:['місія','гроші','бюджет'], wgenv:['конверт','платежі','план'], wgdebt:['борги','правила','debt'],
     wfocus:['focus','фокус','pomodoro','помодоро'],
     dmission:['місія','ціль','прогрес','mission','goal','progress','дедлайн','віджет','дані'],
@@ -42024,8 +42528,9 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       /* віджети «Дані» мають розміри S/M/L — ширину на телефоні й ноуті задає CSS за data-sz */
       if(typeof wdIs==='function'&&wdIs(it.type)) cell.dataset.sz=wdSz(it);
       /* дошка віджетів (19.11.2026): розмір — клітинки, свій на телефоні (4 колонки) і компʼютері (8), CSS 41-widget-sheet.css */
-      if(rb.wboard&&typeof wdCell==='function'&&wdIs(it.type)){
+      if(rb.wboard&&typeof wdCell==='function'&&(wdIs(it.type)||wgHasSettings(it.type)&&it.ws)){
         var cm=wdCell(it,'m'), cd=wdCell(it,'d');
+        cell.dataset.sz=wdSz(it);
         cell.style.setProperty('--wcm',cm[0]); cell.style.setProperty('--whm',cm[1]); cell.style.setProperty('--wcd',cd[0]); cell.style.setProperty('--whd',cd[1]);
         cell.classList.add('wb-cell');
       }
@@ -42980,7 +43485,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
           startX:(e.touches?e.touches[0].clientX:e.clientX),startY:(e.touches?e.touches[0].clientY:e.clientY),
           w0:loc.block.gw||4,h0:loc.block.gh||2};
       /* дошка віджетів (19.11.2026): тягнемо по клітинках пристрою — 4 колонки на телефоні, 8 на компʼютері */
-      if(boardEl.classList.contains('wboard')&&typeof wdCell==='function'&&wdIs(loc.block.type)){
+      if(boardEl.classList.contains('wboard')&&typeof wdCell==='function'&&(wdIs(loc.block.type)||wgHasSettings(loc.block.type)&&loc.block.ws)){
         var cs=getComputedStyle(boardEl), g=parseFloat(cs.columnGap)||12;
         bz.cellMode=true; bz.dev=wdDev(); bz.cols=wdCols(bz.dev);
         bz.colW=(boardEl.getBoundingClientRect().width-g*(bz.cols-1))/bz.cols+g;
