@@ -303,7 +303,6 @@
     { const sub=jnEl('jnSub'); if(sub) sub.textContent='сьогодні · '+JN_DOW[now.getDay()].toLowerCase()+', '+now.getDate()+' '+JN_MON[now.getMonth()]+(list.length?' · '+list.filter(b=>b.done).length+'/'+list.length+' зроблено':''); }
     const week=jnWeek().map(ds=>{ const l=jnDayLevel(ds), d=new Date(ds+'T12:00:00');
       return `<button class="jn-d${ds===td?' today':''}${ds>td?' fut':''}" data-jnday="${ds}"><small>${JN_DOW[d.getDay()]}</small><b>${d.getDate()}</b><i class="jl${ds>td?'x':(l<0?'x':l)}"></i></button>`; }).join('');
-    const dev=!!(window.upDevOn&&window.upDevOn());
     /* ноутбук (≥1180px): ліворуч день по годинах, праворуч герой, місії, ресурси — 32-journal… CSS .jn-cols; телефон — той самий порядок */
     body.innerHTML=`<div class="jn-cols"><div class="jn-side">
       ${mrDayCard()}
@@ -334,7 +333,6 @@
       <div class="jn-ai"><button data-jnai="day">День</button><button data-jnai="week">Тиждень</button><button data-jnai="month">Місяць</button></div>
       <button class="jn-arch" data-rlbook>📖 Правила гри</button>
       <button class="jn-arch" data-jnset>Налаштування гри</button>
-      ${dev?`<button class="jn-map" data-jnmap>Карта · «Мій світ» (розробник)</button>`:''}
       </div></div>
       <div class="jn-pad"></div>`;
     body.querySelectorAll('[data-jnm]').forEach(b=>b.onclick=()=>{ const gl=goals.find(g=>String(g.id)===b.dataset.jnm); if(gl) jnEditor(gl); });
@@ -354,7 +352,6 @@
     { const m=body.querySelector('[data-jnmate]'); if(m) m.onclick=e=>{ e.stopPropagation();
         try{ const id=petCur(); if(FLOW_PETS[id]&&FLOW_PETS[id].hero) heroWardrobe(id); else petPickerSheet(); }catch(_){} }; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
-    { const m=body.querySelector('[data-jnmap]'); if(m) m.onclick=()=>{ if(window.goWorld) window.goWorld(); }; }
     { const st=body.querySelector('[data-jnstart]'); if(st) st.onclick=e=>{ e.stopPropagation(); jnStart(+jnHero().startStep||1); }; }
     mrDayBind(body);   // картка «Мій рік» (57-my-plan.js)
     { const hs=body.querySelector('[data-jnhist]'); if(hs) hs.onclick=()=>jnDaySheet(ymdLocal()); }
