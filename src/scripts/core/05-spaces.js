@@ -84,7 +84,8 @@
       const bm=document.getElementById('brandMark');
       if(bm){ bm.classList.remove('lg-play'); void bm.offsetWidth; bm.classList.add('lg-play'); }
       // картка Карти бажань рахує й закриті справи (dayInMotion) — їх закривають в інших екранах, тож перемальовуємо при поверненні
-      try{ if(typeof renderHeroStreak==='function') renderHeroStreak(); }catch(_){} }
+      try{ if(typeof renderHeroStreak==='function') renderHeroStreak(); }catch(_){}
+      try{ if(typeof ypHomeHint==='function') ypHomeHint(); }catch(_){} }   // підпис банера: «Мій рік · ще N кроків» (66-year-planner.js)
     if(id==='scr-finance'){ const nf=document.getElementById('navFinance'); if(nf) nf.classList.add('on'); }
     if(id==='scr-world'){ const nw=document.getElementById('navWorld'); if(nw) nw.classList.add('on'); }
     if(id==='scr-journal'){ const nj=document.getElementById('navJournal'); if(nj) nj.classList.add('on'); }
