@@ -107,6 +107,8 @@
     document.body.classList.toggle('in-world', id==='scr-world');
     // «План» — скляний фон на весь екран (42-plan.css)
     document.body.classList.toggle('in-plan', id==='scr-plan');
+    // «Мій рік» — поле Флоу над нижньою панеллю (43-year-planner.css)
+    document.body.classList.toggle('in-yplan', id==='scr-yplan');
     if(id==='scr-reader'){ try{ initReader(); applyRdrCfg(); }catch(_){} }
     if(id==='scr-nyc'){ try{ if(window.__nycRefresh) window.__nycRefresh(); }catch(_){} }
     if(id==='scr-home'){ try{ renderRightRail(); }catch(_){} }
@@ -679,10 +681,17 @@
     if(!keepDay){ const pp=plData(); const td=plTodayStr();
       if(pp.selDate!==td){ pp.selDate=td; pp.calMonth=td.slice(0,7); saveGoals(); } }
     const c=document.getElementById('plannerBody'); if(c) renderPlanner(c); show('scr-planner'); const sb=document.getElementById('plSettingsBtn'); if(sb) sb.onclick=()=>plRangeSheet(); const ab=document.getElementById('plAiBtn'); if(ab) ab.onclick=()=>aiChatSheet(); }catch(e){ console.error('goPlanner',e); } }
-  function goWishes(){ try{ renderWishes(); show('scr-wishes'); }catch(e){ console.error('goWishes',e); } }
+  /* opts.back — куди веде «‹ …» (з «Мого року» — назад у нього); без opts — на Огляд.
+     Обробник кліку передає сюди подію, тож back беремо лише як функцію. */
+  let wishBackFn=null;
+  function goWishes(opts){ try{
+    wishBackFn=(opts&&typeof opts.back==='function')?opts.back:null;
+    const wb=document.getElementById('wishBack'); if(wb) wb.textContent=(wishBackFn&&opts.label)?opts.label:'‹ Огляд';
+    renderWishes(); show('scr-wishes'); }catch(e){ console.error('goWishes',e); } }
   window.goWishes=goWishes;
-  document.getElementById('wishBack').onclick = goHome;
-  { const sc=document.getElementById('summaryCard'); if(sc) sc.onclick=goWishes; }
+  document.getElementById('wishBack').onclick = ()=>{ const f=wishBackFn; wishBackFn=null; if(f) f(); else goHome(); };
+  // банер Карти бажань на Огляді → «Мій рік» (66-year-planner.js); кнопка «Карта бажань» на ньому — сама Карта
+  { const sc=document.getElementById('summaryCard'); if(sc) sc.onclick=()=>{ if(window.goYearPlan) window.goYearPlan(); else goWishes(); }; }
   document.getElementById('debtsBack').onclick = () => goFolder('fin');
   document.getElementById('spendBack').onclick = () => goFolder('fin');
   { const wb=document.getElementById('workBack'); if(wb) wb.onclick=workBack; }   // туди, звідки прийшли (04-folders-nav.js)

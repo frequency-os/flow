@@ -93,7 +93,7 @@
     h+=`<div class="mr-tiles">${goals.map(mrTile).join('')}<button class="mr-tile add" data-mradd><span aria-hidden="true">＋</span><b>Нова ціль</b></button></div>`;
     h+=`<div class="mr-sec"><b>${mrT('Гроші на цілі','Money for goals')}</b><span>${mrT('усі разом','all together')}</span></div>`+mrMoneyHTML(goals);   // етап 4
     h+=`<div class="mr-sec"><b>Календар року</b><span>${nowLv.length?mrT('цей квартал: ','this quarter: ')+nowLv.filter(m=>m.done).length+mrT(' з ',' of ')+nowLv.length:'великі кроки по чвертях'}</span></div>`;
-    h+=goals.length?mrCalendar(goals)+`<button class="mr-link" data-mrdetail>Усі квартали і таблиця ›</button>`
+    h+=goals.length?mrCalendar(goals)+`<button class="mr-link" data-mrplan>${mrT('Планер року по цілях ›','Year planner by goal ›')}</button><button class="mr-link" data-mrdetail>Усі квартали і таблиця ›</button>`
       :`<div class="dy-empty"><b>Тут стануть кроки</b><span>Додай ціль і розбий її на 3–4 великі кроки — вони розкладуться по чвертях року.</span></div>`;
     h+=`<div class="mr-sec"><b>${mrT('Правила року','Rules of the year')}</b><span>${mrT('нюанси, які легко забути','things easy to forget')}</span></div>`+mrRulesHTML();   // етап 4
     return h+'</div><div class="jn-pad"></div>';
@@ -106,6 +106,7 @@
     { const l=c.querySelector('[data-mrletter]'); if(l) l.onclick=()=>ylEdit(()=>{ if(jnTab==='year') jnRender(); }); }
     { const a=c.querySelector('[data-mradd]'); if(a) a.onclick=mrNewGoal; }   // проста форма (етап 3)
     { const d=c.querySelector('[data-mrdetail]'); if(d) d.onclick=()=>{ mrDetail=true; jnRender(); jnTop(); }; }
+    { const p=c.querySelector('[data-mrplan]'); if(p) p.onclick=()=>{ if(window.goYearPlan) window.goYearPlan({from:'journal'}); }; }   // 66-year-planner.js
     c.querySelectorAll('[data-mrg]').forEach(b=>b.onclick=()=>{ const g=jnGoalById(b.dataset.mrg); if(g) mrGoalPage(g); });
     c.querySelectorAll('[data-mrlv]').forEach(b=>b.onclick=()=>yrLvMenu(b.dataset.mrlv));
     { const r=c.querySelector('[data-mrruleadd]'); if(r) r.onclick=()=>mrRuleEdit(null); }
@@ -219,7 +220,7 @@
     const old=document.querySelector('.mr-gp'); if(old) old.remove();
     const ov=document.createElement('div'); ov.className='mr-gp'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
     document.body.appendChild(ov);
-    const close=()=>{ ov.remove(); try{ jnRender(); }catch(_){} };
+    const close=()=>{ ov.remove(); try{ jnRender(); }catch(_){} try{ if(typeof ypRefresh==='function') ypRefresh(); }catch(_){} };   // і «Мій рік» (66-year-planner.js)
     const draw=()=>{
       const g=jnGoalById(gl.id); if(!g){ close(); return; }   // ціль прибрали (редактор, інший пристрій)
       const top=ov.scrollTop;
@@ -415,6 +416,7 @@
         if(main) goalsData.goals.forEach(x=>{ if(x&&jnRole(x)==='main') x.role='side'; });   // головна одна — як у редакторі місії
         goalsData.goals.push(g);
         saveGoals(); ov.remove(); jnRender(); try{ renderGoals(); }catch(_){}
+        try{ if(typeof ypRefresh==='function'){ ypSel=String(g.id); ypRefresh(); } }catch(_){}   // нова ціль — одразу вибрана в «Моєму році»
         plToast(mrT('Ціль додано','Goal added'));
         mrGoalPage(g);
       };
