@@ -16,7 +16,7 @@
 | Файлів JS | 101 |
 | Рядків JS | 39638 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12438 |
+| Рядків CSS | 12441 |
 | Сутностей верхнього рівня | 3112 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
@@ -144,7 +144,7 @@
 | `src/styles/21-hero-week.css` | 133 | 2 |
 | `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
-| `src/styles/core/01-tokens-base.css` | 350 | 9 |
+| `src/styles/core/01-tokens-base.css` | 353 | 9 |
 | `src/styles/core/02-page-editor.css` | 1397 | 9 |
 | `src/styles/core/03-folders-projects.css` | 706 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
