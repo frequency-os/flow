@@ -40,7 +40,7 @@
   window.addEventListener('resize',()=>{ const d=wdDev(); if(d!==wdDevNow){ wdDevNow=d; try{ wdRedraw(); }catch(_){} } });
 
   // ── шторка ──
-  var WS_KEYS=['ws','sz','gw','gh','hd','cc','bg','nohd','goalId','period','show','title','label','target','tm','dir','units','sty','yearly','end','goal','main','tapmk','ev','q'];
+  var WS_KEYS=['ws','sz','gw','gh','hd','cc','bg','nohd','goalId','period','show','title','label','target','tm','dir','units','sty','yearly','end','goal','main','tapmk','ev','q','look','days'];
   var WS_PAL=[['glass','Скло'],['frost','Матове'],['solid','Колір']];
   function wsName(b){ return b.type==='countdown'?String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60):String(b.hd||'').slice(0,40); }
   function wdSheet(id,opt){
@@ -112,18 +112,22 @@
           <button data-wsg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
           ${goals.map(g=>`<button data-wsg="${esc(g.id)}" class="${String(g.id)===gid?'on':''}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,24))}</button>`).join('')}</div>`);
       }
+      // трекер (22.11.2026): вигляд — лише малюнок; позначки ті самі. Період і «Показувати» стосуються лише «Ланцюга»
+      const lk=t==='dhabit'?wdLook(d):'';
+      if(t==='dhabit') h=grp('Вигляд',`<span class="ws-looks">${WD_LOOKS.map(([k,l])=>`<button data-wsset="look" data-v="${k}" class="${lk===k?'on':''}" aria-pressed="${lk===k}"><i class="ws-lk ${k}" aria-hidden="true"></i>${l}</button>`).join('')}</span>`
+        +(lk==='path'?row('Днів у шляху',seg('days',WD_PATH_N.map(n=>[n,n]),wdPathN(d))):''))+h;
       let main='';
-      if(m.per) main+=row('Період',seg('period',m.per,wdPer(d)));
+      if(m.per&&(!lk||lk==='chain')) main+=row('Період',seg('period',m.per,wdPer(d)));
       if(t==='dmission') main+=row('Головне число',seg('main',[['pct','%'],['steps','Кроки'],['days','Дні']],d.main==='steps'||d.main==='days'?d.main:'pct'));
-      if(t==='dhabit'&&wdPer(d)==='week') main+=row('Ціль на тиждень',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
-      if(t==='dhabit') main+=tg('tapmk',!!d.tapmk,'Позначати день тапом по віджету');
+      if(t==='dhabit'&&((lk==='chain'&&wdPer(d)==='week')||lk==='ring')) main+=row('Ціль на тиждень',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
+      if(t==='dhabit'&&lk==='chain') main+=tg('tapmk',!!d.tapmk,'Позначати день тапом по віджету');
       if(t==='dtime'&&wdPer(d)!=='day') main+=row('Ціль годин',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
       if(t==='dcal') main+=row('Події',seg('ev',[['fold','Цієї папки'],['all','Весь Планер']],d.ev==='all'?'all':'fold'));
       if(t==='dsave') main+=row('Кнопка «＋»',seg('q',[['0','Сума'],['100','100'],['500','500'],['1000','1000']],String(wsQ(d))))
         +`<button class="ws-it ws-go" data-wsgo="save"><span>🐷 Ціль скарбнички</span><em>›</em></button>`;
       if(t==='dcounter') main+=`<button class="ws-it ws-go" data-wsgo="counter"><span>🔢 Вибрати чи змінити лічильник</span><em>›</em></button>`;
       if(main) h+=grp(m.h,main);
-      h+=grp('Показувати',m.show.map(([k,l])=>tg('show.'+k,wdOn(d,k),l)).join(''));
+      if(!lk||lk==='chain') h+=grp('Показувати',m.show.map(([k,l])=>tg('show.'+k,wdOn(d,k),l)).join(''));
       return h;
     }
     function draw(){
@@ -158,6 +162,8 @@
         else if(k==='ev'){ if(v==='all') d.ev='all'; else delete d.ev; }
         else if(k==='q'){ if(v==='0') delete d.q; else d.q=+v; }
         else if(k==='period'){ d.period=v; }
+        else if(k==='look'){ if(v==='chain') delete d.look; else d.look=v; }
+        else if(k==='days'){ if(+v===30) delete d.days; else d.days=+v; }
         draw(); return; }
       if(x.dataset.wstg){ const k=x.dataset.wstg;
         if(k==='nohd'){ if(d.nohd) delete d.nohd; else d.nohd=true; }

@@ -260,6 +260,80 @@
     const by=jnWeek().map(ds=>({ds,h:mine(ds).reduce((s,x)=>s+hrs(x),0)})), mx=Math.max(1,...by.map(x=>x.h));
     return `<span class="wd-bars week">${by.map(x=>`<i class="${x.ds===td?'td':''}"><u style="height:${x.h?Math.max(10,Math.round(x.h/mx*100)):0}%"></u><s>${DY_DOW[(new Date(x.ds+'T12:00:00').getDay()+6)%7]}</s></i>`).join('')}</span>`;
   }
+  /* ════════ Трекер цілі — вигляди (22.11.2026, полотно «Трекери в Магазині блоків») ════════
+     Ланцюг (chain) — нинішня «Звичка». Шлях · Сезон · Росток · Кільце — інші малюнки тих самих позначок трекера місії.
+     Пишеться лише b.look / b.days (поля вигляду, шторка 63-widget-sheet.js); позначка дня — як і раніше, wdmark → moToggleMark. */
+  const WD_LOOKS=[['chain','Ланцюг'],['path','Шлях'],['grid','Сезон'],['plant','Росток'],['ring','Кільце']];
+  const WD_PATH_N=[21,30,66,100];
+  function wdLook(b){ const v=String(b&&b.look||''); return WD_LOOKS.some(x=>x[0]===v)?v:'chain'; }
+  function wdPathN(b){ return WD_PATH_N.includes(+(b&&b.days))?+b.days:30; }
+  // усі позначені дні до сьогодні включно (ключі — лише справжні дати)
+  function wdMarkedAll(tr,mk,td){ return Object.keys(tr&&tr.marks||{}).filter(ds=>/^\d{4}-\d{2}-\d{2}$/.test(ds)&&ds<=td&&mk(ds)).length; }
+  const WD_PLANT=[[0,'Насінина','Seed'],[3,'Паросток','Sprout'],[7,'Росток','Seedling'],[21,'Кущ','Bush'],[66,'Дерево','Tree']];
+  function wdPlantSvg(n){
+    const h=Math.min(n,66), stem=24+Math.round(h/66*70), top=114-stem, leaves=Math.min(10,Math.ceil(n/3));
+    let L='';
+    for(let i=0;i<leaves;i++){ const y=110-Math.round((i+1)*stem/(leaves+1)), sd=i%2?1:-1, r=9+Math.min(6,Math.floor(n/12));
+      L+=`<ellipse class="lf" cx="${50+sd*r}" cy="${y}" rx="${r}" ry="${Math.round(r*.45)}" transform="rotate(${sd*-28} ${50+sd*r} ${y})"/>`; }
+    const bud=n>=21?`<circle class="bd" cx="50" cy="${top-5}" r="${n>=66?8:5}"/>`:'';
+    return `<svg class="wd-plant" viewBox="0 0 100 124" aria-hidden="true"><ellipse class="gr" cx="50" cy="118" rx="34" ry="4"/>`
+      +(n?`<path class="st" d="M50 118 Q53 ${Math.round((118+top)/2)} 50 ${top}"/>${L}${bud}`:`<ellipse class="sd" cx="50" cy="112" rx="6" ry="4"/>`)+`</svg>`;
+  }
+  function wdHabLook(lk,b,fk,g,gk,tr,mk,td,on){
+    const sz=wdSz(b), tx=wdTier(b), col=folders[gk].c;
+    const head=wdHead(b,fk,sz==='s'?'':'🔗 '+(WD_LOOKS.find(x=>x[0]===lk)||['',''])[1].toLowerCase());
+    const hit=`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" data-wgtab="folder" aria-label="Трекер місії ${esc(g.name||'')}"></button>`;
+    // L — пігулка з текстом; S/M — кругла «✓» у правому куті шапки (пігулка там не влазить по висоті)
+    const pill=(l0,l1)=>sz==='l'?`<span class="wd-acts c"><button data-wga="wdmark" class="pill${on?' on':''}" aria-pressed="${on}">${on?l1:l0}</button></span>`
+      :`<button class="wd-ck${on?' on':''}" data-wga="wdmark" aria-pressed="${on}" aria-label="${esc(on?l1:l0)}">✓</button>`;
+    const all=wdMarkedAll(tr,mk,td);
+    // XS і рядок: лише головне число (решту ховає 41-widget-sheet.css)
+    const tiny=big=>tx==='xs'||tx==='row'?wdTile(b,fk,`${hit}${head}<b class="wd-big">${big}</b>`,'hab trk '+lk,col):'';
+    if(lk==='path'){
+      const N=wdPathN(b), n=Math.min(all,N), ms=[7,21,N].filter((x,i,a)=>x<=N&&a.indexOf(x)===i), fin=n>=N;
+      const t0=tiny(`${n}<span>/${N}</span>`); if(t0) return t0;
+      const cols=N===21?7:N===66?11:10;
+      const cells=sz==='s'||(sz==='m'&&N>30)?`<span class="wd-bar"><i style="width:${Math.round(n/N*100)}%"></i></span>`
+        :`<span class="wd-path" style="--c:${cols}" aria-hidden="true">${Array.from({length:N},(_,i)=>`<i class="${i<n?'on':''}${ms.includes(i+1)?' ms':''}${i===n&&!on&&!fin?' nx':''}"></i>`).join('')}</span>`;
+      return wdTile(b,fk,`${hit}${head}
+        <span class="wd-strk"><b class="wd-big xl">${n}</b><small class="wd-cap">${fin?'шлях пройдено ✓':`з ${N} ${pluralUk(N,'дня','днів','днів')}<br>лишилось ${N-n}`}</small></span>
+        ${cells}${pill(fin?'✓ Сьогодні':`Крок ${n+1} — зроблено`,`Крок ${n} ✓`)}`,'hab trk path',col);
+    }
+    if(lk==='grid'){
+      // тижні Пн–Нд до кінця цього тижня, стовпчик = тиждень; клітинки квадратні (32-widgets.css), тому S — 8 тижнів, M/L — 20
+      const W=sz==='s'?8:20, end=new Date(td+'T12:00:00'); end.setDate(end.getDate()+(6-((end.getDay()+6)%7)));
+      let cells='', past=0, hit2=0;
+      for(let w=W-1;w>=0;w--) for(let i=6;i>=0;i--){ const d=new Date(end); d.setDate(end.getDate()-w*7-i); const ds=ymdLocal(d), m=mk(ds);
+        if(ds<=td){ past++; if(m) hit2++; } cells+=`<i class="${m?'on':''}${ds===td?' td':''}${ds>td?' fut':''}"></i>`; }
+      const pct=past?Math.round(hit2/past*100):0, wk=jnWeek().filter(ds=>ds<=td&&mk(ds)).length;
+      const t0=tiny(`${pct}%`); if(t0) return t0;
+      const sum=`за ${W} ${pluralUk(W,'тиждень','тижні','тижнів')}`;
+      return wdTile(b,fk,`${hit}${head}
+        ${sz==='l'?`<span class="wd-strk"><b class="wd-big xl">${pct}%</b><small class="wd-cap">${sum}<br>${wk}/7 цього тижня</small></span>`
+          :`<small class="wd-sub one"><em>${pct}%</em> ${sum}${sz==='m'?` · <em>${wk}/7</em> цей тиждень`:''}</small>`}
+        <span class="wd-hm" style="--w:${W}" aria-hidden="true">${cells}</span>${pill('✓ Сьогодні','✓ Сьогодні є')}`,'hab trk grid',col);
+    }
+    if(lk==='plant'){
+      const st=WD_PLANT.filter(x=>all>=x[0]).pop(), nx=WD_PLANT.find(x=>x[0]>all);
+      const t0=tiny(`${all}<span> ${pluralUk(all,'день','дні','днів')}</span>`); if(t0) return t0;
+      return wdTile(b,fk,`${hit}${head}
+        <span class="wd-pl">${wdPlantSvg(all)}<span class="wd-col"><b class="wd-big xl">${all}</b>
+          <small class="wd-cap">${st[1]}${nx?` · ${nx[1].toLowerCase()} на ${nx[0]}`:''}</small>
+          ${sz==='l'?'<small class="wd-sub">Пропустив день — росток не вʼяне, просто чекає.</small>':''}</span></span>
+        ${pill('Полити сьогодні','Полито ✓')}`,'hab trk plant',col);
+    }
+    // ring: тиждень кільцем; саме кільце — кнопка позначки
+    const per=jnWeek(), n=per.filter(ds=>ds<=td&&mk(ds)).length, gl=wsGoal(b)||7, pct=Math.min(100,Math.round(n/gl*100));
+    const t0=tiny(`${n}<span>/${gl}</span>`); if(t0) return t0;
+    let st=0; { const d=new Date(); if(!mk(ymdLocal(d))) d.setDate(d.getDate()-1); for(let i=0;i<400&&mk(ymdLocal(d));i++){ st++; d.setDate(d.getDate()-1); } }
+    const ring=`<button class="wd-tapr${on?' on':''}" data-wga="wdmark" aria-pressed="${on}" aria-label="${on?'Зняти позначку за сьогодні':'Позначити сьогодні'}">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.5" class="tr"/><circle cx="18" cy="18" r="15.5" class="vl" pathLength="100" stroke-dasharray="${pct} 100"/>${on?'<path class="ck" d="M12 18.5l4 4 8-9"/>':''}</svg>
+      <b>${on?'':n+'/'+gl}</b></button>`;
+    return wdTile(b,fk,`${hit}${head}
+      <span class="wd-rg">${ring}<span class="wd-col"><b class="wd-big xl">${n}<span>/${gl}</span></b>
+        <small class="wd-cap">цього тижня${st?`<br>${st} ${pluralUk(st,'день','дні','днів')} поспіль`:''}</small></span></span>
+      ${sz==='s'?'':'<small class="wd-sub">Тап по кільцю — позначити сьогодні.</small>'}`,'hab trk ring',col);
+  }
   // малий календар (S і менше): місяць не влазить — число дня і цей тиждень із позначками папки
   function wdCalWeek(td,fk){
     return `<span class="cal-wk">${jnWeek().map(ds=>{ const m=calMarks(ds,fk), d=+ds.slice(8);
@@ -303,6 +377,8 @@
       const past=days.filter(ds=>ds<=td), n=past.filter(mk).length;
       let st=0; { const d=new Date(); if(!mk(ymdLocal(d))) d.setDate(d.getDate()-1); for(let i=0;i<400&&mk(ymdLocal(d));i++){ st++; d.setDate(d.getDate()-1); } }
       const on=mk(td), gl=per==='week'?wsGoal(b):0;   // ціль днів на тиждень (19.11.2026)
+      // вигляд трекера (22.11.2026): без b.look — «Ланцюг», тобто все нижче як було; інші вигляди лише інакше малюють ті самі позначки
+      const lk=wdLook(b); if(lk!=='chain') return wdHabLook(lk,b,fk,g,gk,tr,mk,td,on);
       // макет: велике число серії, підпис, 7 крапок тижня (місяць — сітка), обведена кнопка «✓ Сьогодні»
       const big=wdOn(b,'streak')?`<span class="wd-strk"><b class="wd-big xl">${st}</b><small class="wd-cap">${pluralUk(st,'день','дні','днів')}<br>поспіль</small></span>`:'';
       const cnt=gl?`<small class="wd-sub${n>=gl?' ok':''}"><em>${n} з ${gl}</em> ${n>=gl?'ціль тижня взято ✓':'до цілі тижня'}</small>`

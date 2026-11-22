@@ -415,3 +415,51 @@
   @media (prefers-reduced-motion:reduce){ .tm-d.go{animation:none;} }
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .wg-t.wg-t{background:var(--pg-surface,var(--card));} }
   @media (prefers-reduced-transparency:reduce){ .wg-t.wg-t{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--pg-surface,var(--card));} }
+
+  /* ── Трекер цілі: вигляди Шлях · Сезон · Росток · Кільце (22.11.2026, 48-widgets.js wdHabLook) ── */
+  .wd-path{display:grid;grid-template-columns:repeat(var(--c,10),minmax(0,1fr));gap:3px;flex:0 1 auto;min-height:0;overflow:hidden;align-content:start;}
+  .wd-path i{aspect-ratio:1;max-height:18px;border-radius:4px;background:var(--pg-track,rgba(127,127,127,.22));}
+  .wd-path i.on{background:var(--fc);}
+  .wd-path i.ms{box-shadow:inset 0 0 0 1.5px var(--pg-mut,var(--muted));}
+  .wd-path i.ms.on{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#fff 45%,var(--fc));}
+  .wd-path i.nx{box-shadow:inset 0 0 0 2px var(--pg-fg,var(--text));}
+  /* сітка сезону: квадратні клітинки фіксованого розміру — висоту плитки вона не роздуває і не сплющується в смужки */
+  .wd-hm{--cl:9px;display:grid;grid-template-rows:repeat(7,var(--cl));grid-template-columns:repeat(var(--w,8),var(--cl));grid-auto-flow:column;gap:3px;justify-content:center;align-content:center;flex:1 1 auto;min-height:0;overflow:hidden;}
+  .wg-t.wd.grid.sz-l .wd-hm{--cl:12px;}
+  .wd-hm i{border-radius:2px;background:var(--pg-track,rgba(127,127,127,.22));}
+  .wg-t.wd small.wd-sub.one{-webkit-line-clamp:1;}
+  /* кругла «✓ сьогодні» у куті шапки (S/M) */
+  .wd-ck{all:unset;box-sizing:border-box;pointer-events:auto;cursor:pointer;position:absolute;top:6px;right:6px;z-index:3;width:44px;height:44px;border-radius:50%;
+    display:grid;place-items:center;font-size:18px;font-weight:800;color:var(--pg-fg,var(--text));border:2px solid var(--fc);background:var(--pg-surface,var(--card));}
+  .wg-t>.wd-ck{position:absolute;z-index:3;}   /* загальне .wg-t>*:not(.wg-hit){position:relative} інакше ставить її в потік */
+  .wd-ck.on{background:var(--fc);color:#fff;}
+  .wd-ck:active{transform:scale(.94);}
+  .wd-ck:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:2px;}
+  .wg-t.wd.trk .wd-h{padding-right:52px;}
+  .wd-hm i.on{background:var(--fc);}
+  .wd-hm i.td{box-shadow:0 0 0 1.5px var(--pg-fg,var(--text));}
+  .wd-hm i.fut{opacity:.35;}
+  .wd-pl{display:flex;align-items:flex-end;gap:12px;min-width:0;flex:1 1 auto;min-height:0;}
+  .wd-plant{flex:none;height:100%;max-height:120px;min-height:56px;width:auto;aspect-ratio:100/124;}
+  .wd-plant .gr{fill:var(--pg-track,rgba(127,127,127,.22));}
+  .wd-plant .st{fill:none;stroke:var(--fc);stroke-width:4;stroke-linecap:round;}
+  .wd-plant .lf{fill:var(--fc);opacity:.85;}
+  .wd-plant .sd{fill:color-mix(in srgb,var(--fc) 60%,#6b4a2b);}
+  .wd-plant .bd{fill:#ffd166;}
+  .wg-t.wd.plant .wd-col{align-self:center;}
+  .wd-rg{display:flex;align-items:center;gap:14px;min-width:0;flex:1 1 auto;min-height:0;}
+  .wd-tapr{all:unset;box-sizing:border-box;pointer-events:auto;cursor:pointer;position:relative;flex:none;width:88px;height:88px;display:grid;place-items:center;border-radius:50%;}
+  .wd-tapr svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+  .wd-tapr circle{fill:none;stroke-width:3.4;}
+  .wd-tapr .tr{stroke:var(--pg-track,rgba(127,127,127,.22));}
+  .wd-tapr .vl{stroke:var(--fc);stroke-linecap:round;transition:stroke-dasharray .35s ease;}
+  .wd-tapr.on .tr{fill:var(--fc);}
+  .wd-tapr .ck{fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transform-origin:18px 18px;}
+  .wd-tapr b{position:relative;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--pg-fg,var(--text));}
+  .wd-tapr:active{transform:scale(.96);}
+  .wd-tapr:focus-visible{outline:2px solid var(--pg-acc,var(--accent));outline-offset:3px;}
+  .wg-t.wd.trk.sz-s .wd-tapr{width:72px;height:72px;}
+  .wg-t.wd.trk.sz-s .wd-rg{flex-direction:column;gap:6px;text-align:center;}
+  .wg-t.wd.trk.sz-s .wd-rg .wd-big{display:none;}
+  .wg-t.wd.trk.sz-s .wd-pl .wd-cap{-webkit-line-clamp:2;}
+  @media (prefers-reduced-motion:reduce){ .wd-tapr .vl{transition:none;} }
