@@ -189,6 +189,30 @@
   function moNotes(fk){ return moBoard(fk).filter(b=>b&&b.type==='note'&&!b.vision&&String(b.text||'').trim()).sort((a,b)=>(+a.at||0)-(+b.at||0)).slice(-3).reverse(); }
   function moVision(fk){ return moBoard(fk).find(b=>b&&b.type==='note'&&b.vision)||null; }
   function moMarked(t,ds){ const v=t.marks[ds]; return t.type==='heatmap'?(+v>0):!!v; }
+  /* ритм і вихідні трекера (22.11.2026, крок 2 «Трекера цілі»): поля t.rest=[0..6] (0 = Пн) і t.rhythm={k:'week',n}|{k:'days',n}.
+     Нема полів — щодня і без вихідних, як було. Пишуться лише зі шторки віджета (63-widget-sheet.js) після «Готово». */
+  const MO_DAYS_N=[21,30,66,100];
+  function moRest(t){ return Array.isArray(t&&t.rest)?[...new Set(t.rest.map(Number).filter(x=>Number.isInteger(x)&&x>=0&&x<=6))].sort():[]; }
+  function moIsRest(t,ds){
+    if(!Array.isArray(t&&t.rest)) return false;   // у старих трекерів списку нема зовсім — тоді вихідних нема
+    const den=(new Date(ds+'T12:00:00').getDay()+6)%7;
+    return moRest(t).includes(den);
+  }
+  function moRhythm(t){
+    const r=t&&t.rhythm, n=Math.round(+(r&&r.n)||0);
+    if(r&&r.k==='week'&&n>=1&&n<=7) return {k:'week',n};
+    if(r&&r.k==='days'&&MO_DAYS_N.includes(n)) return {k:'days',n};
+    return {k:'day'};
+  }
+  // серія: дні поспіль до сьогодні (або до вчора, якщо сьогодні ще не позначено); непозначений вихідний серію не рве і не рахується
+  function moStreak(t,mk){
+    mk=mk||(ds=>moMarked(t,ds)); let st=0; const d=new Date();
+    if(!mk(ymdLocal(d))) d.setDate(d.getDate()-1);
+    for(let i=0;i<400;i++){ const ds=ymdLocal(d);
+      if(mk(ds)) st++; else if(!moIsRest(t,ds)) break;
+      d.setDate(d.getDate()-1); }
+    return st;
+  }
   /* позначка дня в трекері місії — одна функція для сторінки місії і віджета «Звичка папки» (48-widgets.js).
      Лише з дії людини; майбутні дні не позначаються. Повертає новий стан (true/false) або null, якщо не вийшло. */
   function moToggleMark(fk,ds){

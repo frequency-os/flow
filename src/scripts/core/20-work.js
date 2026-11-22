@@ -97,6 +97,7 @@
       }
     }
     saveWork(); renderWork(); try{renderFinance();}catch(_){}
+    try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // віджет «Робота» на сторінці папки — нові цифри одразу
     window.platform.haptic('success');
     wkmClose();
   }

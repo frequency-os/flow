@@ -23,7 +23,7 @@
     let g=null; try{ g=wgFolderMission(fk); }catch(_){}
     rows.push({k:'mission', ic:'🎯', t:'Місія', v:g?esc(String(g.name||'Місія').slice(0,40))+' · '+jnPct(g)+'%':'не привʼязано', on:!!g, act:g?'Відкрити':'＋ Привʼязати'});
     let tr=null; try{ tr=g&&moOwnFolder(g.folderKey)?moTracker(g.folderKey):null; }catch(_){}
-    let st=0; if(tr){ const d=new Date(); if(!moMarked(tr,ymdLocal(d))) d.setDate(d.getDate()-1); for(let i=0;i<400&&moMarked(tr,ymdLocal(d));i++){ st++; d.setDate(d.getDate()-1); } }
+    const st=tr?moStreak(tr):0;   // та сама серія, що й у віджеті (вихідні не рвуть)
     rows.push({k:'habit', ic:'🔥', t:'Звичка', v:tr?'трекер місії · '+st+' '+pluralUk(st,'день','дні','днів')+' поспіль':g?'у папці місії ще нема трекера':'спершу привʼяжи місію', on:!!tr, act:tr?'':g?'＋ Трекер':''});
     let bl=[]; try{ bl=plBlocksDisplay(td).filter(b=>inFolderBlock(b,fk)); }catch(_){}
     const h=bl.reduce((s,b)=>s+Math.max(0,Math.min(plBlockEnd(b),24)-(+b.h||0)),0);

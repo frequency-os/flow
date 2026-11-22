@@ -7,7 +7,7 @@
      Блок із полем since новіше за BS_BASE — «Нове»: у меню нема, поки людина його не візьме. Агент Флоу і шаблони
      створюють блоки як раніше — магазин керує лише меню. Тексти — двома мовами (flowLang). */
   var BS_KEY='blocks_got', BS_BASE='2026-11-18';
-  var BS_SPH=[['all','Усе','All'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
+  var BS_SPH=[['all','Усе','All'],['trk','Трекери','Trackers'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
   /* k → сфери, значок, колір, звʼязок, прев'ю; тексти uk/en: n назва, s одне речення, d опис, st три кроки.
      ПРАВИЛО: кожен НОВИЙ запис тут — з since:'РРРР-ММ-ДД' пізніше за BS_BASE. Без since блок у людей, що вже
      тапали «Отримати/Прибрати», мовчки зник би з меню (у їхньому збереженому списку його нема). */
@@ -27,19 +27,19 @@
     dmission:{sp:['goals','work'],ic:'🎯',c:'#a99cff',pv:'mis',ln:['Місія','Mission'],
       uk:{n:'Місія папки',s:'Прогрес, наступний крок, дедлайн',d:'Кільце прогресу місії, наступний крок і скільки днів до дедлайну. Тап — сторінка місії.',st:['Повʼяжи місію','Відмічай віхи — кільце росте','Наступний крок завжди зверху']},
       en:{n:'Folder mission',s:'Progress, next step, deadline',d:'Mission progress ring, the next step and days to the deadline. Tap to open the mission.',st:['Link a mission','Tick milestones — the ring grows','The next step is always on top']}},
-    dhabit:{sp:['health','goals','study'],ic:'🔥',c:'#ff8a4c',pv:'hab',ln:['Місія','Mission'],
-      uk:{n:'Звичка папки',s:'Серія днів і ✓ сьогодні',d:'Трекер звички місії: позначай день одним тапом, дивись серію і тиждень.',st:['Повʼяжи з місією','Тапни «✓ Сьогодні»','Тримай серію']},
-      en:{n:'Folder habit',s:'Streak and ✓ today',d:'A mission habit tracker: mark the day with one tap, see the streak and the week.',st:['Link a mission','Tap “✓ Today”','Keep the streak']}},
-    dcount:{sp:['goals'],ic:'🏁',c:'#9b8cff',pv:'dcount',ln:['Місія','Mission'],
+    dhabit:{sp:['health','goals','study','trk'],ic:'🔥',c:'#ff8a4c',pv:'hab',ln:['Місія','Mission'],
+      uk:{n:'Трекер цілі',s:'Позначка щодня · 5 виглядів',d:'Повʼяжи ціль із папкою — і щодня один тап «зробив». Ланцюг, Шлях, Сезон, Росток чи Кільце: вигляд міняється будь-коли, позначки ті самі. Ритм і вихідні — у налаштуваннях.',st:['Додай у папку з ціллю','Вибери вигляд','Тапай «✓» щодня']},
+      en:{n:'Goal tracker',s:'A daily check · 5 looks',d:'Link a goal to a folder and tap “done” once a day. Chain, Path, Season, Sprout or Ring: switch the look any time, the marks stay. Rhythm and rest days are in the settings.',st:['Add it to a goal folder','Pick a look','Tap “✓” every day']}},
+    dcount:{sp:['goals','trk'],ic:'🏁',c:'#9b8cff',pv:'dcount',ln:['Місія','Mission'],
       uk:{n:'Відлік до мети',s:'Скільки днів до фінішу місії',d:'Дні до останньої віхи місії і найближчий крок.',st:['Повʼяжи місію з датою фінішу','Дивись, скільки лишилось','Наступна віха — під числом']},
       en:{n:'Days to goal',s:'Days until the mission finish',d:'Days to the mission’s last milestone and the next step.',st:['Link a mission with a finish date','See what’s left','Next milestone under the number']}},
-    dsave:{sp:['money','goals'],ic:'🐷',c:'#ffc261',pv:'save',ln:['Гаманець','Wallet'],
+    dsave:{sp:['money','goals','trk'],ic:'🐷',c:'#ffc261',pv:'save',ln:['Гаманець','Wallet'],
       uk:{n:'Скарбничка',s:'Скільки зібрано на мету',d:'Доходи з міткою місії складаються в суму, смужка — скільки лишилось до цілі. «＋ ₴» — відкласти з віджета.',st:['Задай ціль','«＋ ₴» — дохід у Гаманець','«Зібрано ✓», коли дійшов']},
       en:{n:'Savings jar',s:'How much is saved for the goal',d:'Mission-tagged income adds up, the bar shows what’s left. “+ ₴” saves right from the widget.',st:['Set a target','“+ ₴” records income in the Wallet','“Saved ✓” when you get there']}},
-    dcounter:{sp:['health','study','goals'],ic:'🔢',c:'#f0b429',pv:'cnt',ln:['Місія','Mission'],
+    dcounter:{sp:['health','study','goals','trk'],ic:'🔢',c:'#f0b429',pv:'cnt',ln:['Місія','Mission'],
       uk:{n:'Лічильник',s:'Будь-яке число з метою',d:'Слова, кілограми, сторінки, кілометри: число, мета й смужка, «−» і «＋» на віджеті.',st:['Назви лічильник і мету','Тисни «＋» або впиши число','Відсоток і смужка']},
       en:{n:'Counter',s:'Any number with a target',d:'Words, kilos, pages, kilometres: a number, a target and a bar, “−” and “+” on the widget.',st:['Name it and set a target','Tap “+” or type a value','Percent and bar']}},
-    dphoto:{sp:['health','home','goals'],ic:'📸',c:'#ff7a9a',pv:'photo',ln:['Місія','Mission'],
+    dphoto:{sp:['health','home','goals','trk'],ic:'📸',c:'#ff7a9a',pv:'photo',ln:['Місія','Mission'],
       uk:{n:'Фото-прогрес',s:'Було → стало',d:'Перше й останнє фото місії поруч — видно зміну, якої не помічаєш щодня.',st:['Додай перше фото','Фотографуй час від часу','Порівнюй «було → стало»']},
       en:{n:'Photo progress',s:'Before → after',d:'The first and latest mission photos side by side — change you don’t notice day to day.',st:['Add the first photo','Take photos now and then','Compare before → after']}},
     wgin:{sp:['money','work'],ic:'💚',c:'#22b573',pv:'in',ln:['Гаманець','Wallet'],
@@ -51,6 +51,9 @@
     wgwallet:{sp:['money'],ic:'👛',c:'#7f8cff',pv:'wallet',ln:['Гаманець','Wallet'],
       uk:{n:'Гаманець',s:'Баланс і прогноз місяця',d:'Баланс, прогноз місяця і кільця, «−» і «＋» прямо з віджета.',st:['Додай на сторінку','«−» витрата, «＋» дохід','Кільця — як іде місяць']},
       en:{n:'Wallet',s:'Balance and month forecast',d:'Balance, month forecast and rings, “−” and “+” right from the widget.',st:['Add it to a page','“−” expense, “+” income','Rings show the month']}},
+    wgwork:{sp:['work','money'],ic:'⏱',c:'#5b8def',pv:'work',ln:['Робота','Work'],since:'2026-11-22',
+      uk:{n:'Робота',s:'Години й зароблене за місяць',d:'Скільки годин відпрацьовано цього місяця і скільки це грошей за твоєю ставкою. «＋ Години» записує сьогоднішню зміну, тап — календар Роботи і зарплата.',st:['Додай у папку','«＋ Години» — запис на сьогодні','Сума за місяць росте сама']},
+      en:{n:'Work',s:'Hours and earnings this month',d:'How many hours you worked this month and what that makes at your rate. “+ Hours” logs today’s shift, a tap opens the Work calendar and salary.',st:['Add it to a folder','“+ Hours” logs today','The month total grows by itself']}},
     wgmission:{sp:['money','goals'],ic:'🎯',c:'#34c77b',pv:'mmoney',ln:['Гаманець','Wallet'],
       uk:{n:'Гроші місії',s:'Дохід, бюджет і приз місії',d:'Скільки місія заробила і витратила, бюджет і приз.',st:['Повʼяжи місію','Мітка місії на операціях','Бюджет і приз — одним поглядом']},
       en:{n:'Mission money',s:'Income, budget and prize of a mission',d:'What the mission earned and spent, its budget and prize.',st:['Link a mission','Tag operations with it','Budget and prize at a glance']}},
@@ -70,7 +73,7 @@
       uk:{n:'Флоу AI',s:'AI-дія з цією сторінкою',d:'Попроси Флоу щось зробити з цією сторінкою: підсумувати, розбити на кроки, переписати.',st:['Додай блок','Напиши, що зробити','Прийми або відкинь результат']},
       en:{n:'Flow AI',s:'An AI action on this page',d:'Ask Flow to do something with this page: summarise, split into steps, rewrite.',st:['Add the block','Say what to do','Accept or discard']}}
   };
-  var BS_REL={countdown:['dcount','dmission','dcal'],dcal:['dtime','tbl','countdown'],dtime:['dcal','tbl','dmission'],dtasks:['dtime','dcal','dmission'],dmission:['dhabit','dsave','countdown'],dhabit:['dmission','dcounter','dphoto'],dcount:['countdown','dmission'],dsave:['wgin','dmission','wgenv'],dcounter:['dhabit','tbl','dphoto'],dphoto:['dhabit','dcounter','dmission'],wgin:['wgout','dsave','wgwallet'],wgout:['wgin','wgenv','wgdebt'],wgwallet:['wgin','wgout','wgenv'],wgmission:['dsave','dmission','wgin'],wgenv:['wgout','wgdebt','wgwallet'],wgdebt:['wgenv','wgout'],tbl:['dcal','dcounter','weekreview'],weekreview:['tbl','dmission'],ai:['weekreview','tbl']};
+  var BS_REL={countdown:['dcount','dmission','dcal'],dcal:['dtime','tbl','countdown'],dtime:['dcal','tbl','dmission'],dtasks:['dtime','dcal','dmission'],dmission:['dhabit','dsave','countdown'],dhabit:['dmission','dcounter','dphoto'],dcount:['countdown','dmission'],dsave:['wgin','dmission','wgenv'],dcounter:['dhabit','tbl','dphoto'],dphoto:['dhabit','dcounter','dmission'],wgin:['wgout','dsave','wgwallet'],wgout:['wgin','wgenv','wgdebt'],wgwallet:['wgin','wgout','wgenv'],wgwork:['wgin','wgwallet','dtime'],wgmission:['dsave','dmission','wgin'],wgenv:['wgout','wgdebt','wgwallet'],wgdebt:['wgenv','wgout'],tbl:['dcal','dcounter','weekreview'],weekreview:['tbl','dmission'],ai:['weekreview','tbl']};
   function bsLang(){ try{ return (window.flowLang&&window.flowLang())==='en'?'en':'uk'; }catch(_){ return 'uk'; } }
   function bsT(it){ return it[bsLang()]||it.uk; }
   /* «Ще» (29-more-screen.js) і меню блоків малюються ще ДО цього файлу, а функції в збірці «спливають» раніше за var —
@@ -103,7 +106,10 @@
   function bsTrusted(){ try{ return typeof window.sbDataTrusted!=='function'||window.sbDataTrusted(); }catch(_){ return true; } }
 
   /* ── прев'ю з прикладними даними (не дані людини) ── */
-  function bsPv(k,sz){
+  /* вигляди «Трекера цілі» (22.11.2026, 48-widgets.js wdHabLook) — прев'ю з прикладними даними */
+  var BS_LOOKS=[['chain','Ланцюг','Chain','Серія днів поспіль','Days in a row'],['path','Шлях','Path','66 днів клітинками, віхи','66 days in cells, milestones'],
+    ['grid','Сезон','Season','Сітка тижнів, ритм','Weeks grid, your rhythm'],['plant','Росток','Sprout','Росте з кожним днем','Grows every day'],['ring','Кільце','Ring','Тиждень кільцем, тап — ✓','Week as a ring, tap — ✓']];
+  function bsPv(k,sz,lk){
     const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en', c=it.c, s=sz==='s';
     const h=(a)=>`<span class="bsw-h"><i style="background:${c}"></i>${a||esc(t.n)}</span>`;
     const big=(v,u)=>`<b class="bsw-big">${v}<small>${u||''}</small></b>`, sub=v=>`<small class="bsw-sub">${v}</small>`;
@@ -116,7 +122,14 @@
         x=s?h()+big(17,en?'Nov':'лист')+sub(en?'2 plans · run 18:00':'2 справи · біг 18:00'):h(en?'November':'Листопад')+`<span class="bsw-cal">${g}</span>`; break; }
       case 'time': x=h()+big('2,5',en?'h':'год')+`<span class="bsw-tl"><i style="left:6%;width:12%;background:${c}"></i><i style="left:60%;width:14%;background:${c};opacity:.6"></i><b style="left:48%"></b></span>`+(s?'':sub(en?'18:00 · Easy run 6 km':'18:00 · Легкий біг 6 км')); break;
       case 'mis': x=h()+`<span class="bsw-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="tr"/><circle cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="62 100" style="stroke:${c}"/></svg><b>62%</b></span>`+(s?'':sub(en?'Next: sign up for the race':'Далі: зареєструватись на забіг')); break;
-      case 'hab': x=h()+big(12,en?'days':'днів')+`<span class="bsw-d7">${[1,1,1,1,1,0,0].map(o=>`<i style="${o?'background:'+c:''}"></i>`).join('')}</span>`; break;
+      case 'hab':
+        if(lk==='path') x=h()+big(23,'/ 66')+`<span class="bsw-path">${Array.from({length:s?22:44},(_,i)=>`<i style="${i<23?'background:'+c:''}"></i>`).join('')}</span>`;
+        else if(lk==='grid'){ let g=''; for(let i=0;i<(s?42:84);i++){ const v=(i*37+11)%10; g+=`<i style="${v>2?'background:'+c+';opacity:'+(v>7?1:v>5?.7:.4):''}"></i>`; }
+          x=h()+big('72%',en?'12 weeks':'12 тижнів')+`<span class="bsw-hm${s?' s':''}">${g}</span>`; }
+        else if(lk==='plant') x=h()+`<span class="bsw-pl" style="--fc:${c}">${typeof wdPlantSvg==='function'?wdPlantSvg(14):''}<span>${big(14,en?'days':'днів')}${sub(en?'Seedling · bush at 21':'Росток · кущ на 21')}</span></span>`;
+        else if(lk==='ring') x=h()+`<span class="bsw-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="tr"/><circle cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="71 100" style="stroke:${c}"/></svg><b>5/7</b></span>`+(s?'':sub(en?'this week · tap the ring':'цього тижня · тап по кільцю'));
+        else x=h()+big(12,en?'days':'днів')+`<span class="bsw-d7">${[1,1,1,1,1,0,0].map(o=>`<i style="${o?'background:'+c:''}"></i>`).join('')}</span>`;
+        break;
       case 'dcount': x=h()+big(31,en?'days left':'день лишилось')+(s?'':sub(en?'Half marathon · Dec 19':'Півмарафон · 19 грудня')); break;
       case 'save': x=h()+big('8 400',en?'of 12 000 ₴':'з 12 000 ₴')+bar(70)+(s?'':sub(en?'Sneakers · 70%':'Кросівки · 70%')); break;
       case 'cnt': x=h()+`<b class="bsw-n">${en?'Pages in English':'Сторінок англійською'}</b>`+big('214','/ 300')+bar(71); break;
@@ -124,6 +137,7 @@
       case 'in': x=h()+big('18 500','₴')+bar(74)+sub(en?'target 25 000':'ціль 25 000'); break;
       case 'out': x=h()+big('3 920',en?'of 5 000 ₴':'з 5 000 ₴')+bar(78)+sub(en?'1 080 ₴ left':'лишилось 1 080 ₴'); break;
       case 'wallet': x=h()+big('12 340','₴')+sub(en?'forecast +4 100 by month end':'прогноз +4 100 до кінця місяця'); break;
+      case 'work': x=h()+big('14 400','₴')+(s?sub(en?'96 h this month':'96 год за місяць'):`<span class="bsw-d7">${[8,8,6,8,0,0,4].map(v=>`<i style="${v?'background:'+c+';opacity:'+(.35+v/12):''}"></i>`).join('')}</span>`+sub(en?'96 h · payday on the 31st':'96 год · виплата 31-го')); break;
       case 'mmoney': x=h()+big('+6 200','₴')+bar(55)+sub(en?'budget 11 000 · prize: trip':'бюджет 11 000 · приз: подорож'); break;
       case 'env': x=h()+big('9 600',en?'₴ in envelopes':'₴ у конвертах')+(s?'':`<span class="bsw-row"><b>${en?'Rent':'Оренда'}</b><span>${en?'Dec 1 · 8 000':'1 груд · 8 000'}</span></span>`); break;
       case 'debt': x=h()+big('−1 200',en?'₴ net':'₴ нетто')+bar(40)+(s?'':sub(en?'🔥 12 days without new debt':'🔥 12 днів без нових боргів')); break;
@@ -147,6 +161,7 @@
     const match=k=>{ const t=bsT(BS_ITEMS[k]); return !q||(t.n+' '+t.s+' '+(BS_ITEMS[k].uk.n)).toLowerCase().includes(q); };
     const sp=bsState.sph, inSp=k=>sp==='all'||BS_ITEMS[k].sp.includes(sp);
     let h=`<div class="bs-chips" role="group">${BS_SPH.map(s=>`<button class="bs-chip${sp===s[0]?' on':''}" data-bssph="${s[0]}">${en?s[2]:s[1]}</button>`).join('')}</div>`;
+    if(sp==='trk'&&!q) return h+bsTrkHTML(en);
     if(q||sp!=='all'){ const L=keys.filter(k=>match(k)&&inSp(k));
       return h+(L.length?`<div class="bs-shelf">${L.map(bsRow).join('')}</div>`:`<p class="bs-empty">${en?'Nothing found':'Нічого не знайшлось'}</p>`); }
     // прибрані людиною (не нові) — одразу зверху: сюди веде рядок «Ще N блоків у Магазині» з меню «＋ Блок»
@@ -159,13 +174,22 @@
       h+=`<div class="bs-sh"><b>${title}</b><button data-bssph="${s}">${en?'All ›':'Усі ›'}</button></div><div class="bs-shelf">${L.map(bsRow).join('')}</div>`; });
     return h;
   }
+  // вкладка «Трекери»: один блок «Трекер цілі» і його пʼять виглядів, нижче — інші блоки прогресу місії
+  function bsTrkHTML(en){
+    const L=['dcounter','dphoto','dcount','dsave'].filter(bsInStore);
+    return `<p class="bs-lead">${en?'Link a goal to a folder and mark each day with one tap. One tracker — five looks, switch any time.':'Повʼяжи ціль із папкою — і щодня один тап. Один трекер — пʼять виглядів, міняються будь-коли.'}</p>
+      <div class="bs-shelf">${bsRow('dhabit')}</div>
+      <div class="bs-looks">${BS_LOOKS.map(l=>`<button class="bs-look" data-bsopen="dhabit"><span class="bs-lkt"><b>${en?l[2]:l[1]}</b><small>${esc(en?l[4]:l[3])}</small></span>${bsPv('dhabit','s',l[0])}</button>`).join('')}</div>
+      ${L.length?`<div class="bs-sh"><b>${en?'More for progress':'Ще для прогресу'}</b></div><div class="bs-shelf">${L.map(bsRow).join('')}</div>`:''}`;
+  }
   function bsPageHTML(k){
     const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en', g=bsGot(k), sp=BS_SPH.find(s=>s[0]===it.sp[0])||BS_SPH[0];
     return `<div class="bs-dh"><span class="bs-ico lg" style="--c:${it.c}">${it.ic}</span><div class="bs-dtx"><h3>${esc(t.n)}</h3><small>${esc(t.s)}</small>
         <div class="bs-acts">${bsBtn(k,true)}${g?`<button class="bs-rm" data-bsrm="${esc(k)}">${en?'Remove from menu':'Прибрати з меню'}</button>`:''}</div></div></div>
       <div class="bs-info"><div><small>${en?'Area':'Сфера'}</small><b>${en?sp[2]:sp[1]}</b></div><div><small>${en?'Linked to':'Звʼязок'}</small><b>${esc(it.ln[en?1:0])}</b></div><div><small>${en?'Sizes':'Розміри'}</small><b>S·M·L</b></div><div><small>${en?'Offline':'Офлайн'}</small><b>✓</b></div></div>
       <div class="bs-sec"><b>${en?'How it looks':'Як виглядає'}</b><small>${en?'Example data':'Приклад, не твої дані'}</small></div>
-      <div class="bs-shots"><div class="bs-shot"><small>${en?'Small':'Малий'}</small>${bsPv(k,'s')}</div><div class="bs-shot m"><small>${en?'Wide':'Широкий'}</small>${bsPv(k,'m')}</div><div class="bs-shot m"><small>${en?'Large':'Великий'}</small>${bsPv(k,'l')}</div></div>
+      <div class="bs-shots">${k==='dhabit'?BS_LOOKS.map(l=>`<div class="bs-shot"><small>${en?l[2]:l[1]}</small>${bsPv(k,'s',l[0])}</div>`).join('')
+        :`<div class="bs-shot"><small>${en?'Small':'Малий'}</small>${bsPv(k,'s')}</div><div class="bs-shot m"><small>${en?'Wide':'Широкий'}</small>${bsPv(k,'m')}</div><div class="bs-shot m"><small>${en?'Large':'Великий'}</small>${bsPv(k,'l')}</div>`}</div>
       <div class="bs-sec"><b>${en?'What it does':'Що робить'}</b></div><p class="bs-desc">${esc(t.d)}</p>
       <div class="bs-sec"><b>${en?'How it works':'Як працює'}</b></div><div class="bs-steps">${t.st.map((s,i)=>`<div><i style="--c:${it.c}">${i+1}</i><span>${esc(s)}</span></div>`).join('')}</div>
       <div class="bs-sec"><b>${en?'Goes well with':'Поєднується з'}</b></div><div class="bs-rel">${(BS_REL[k]||[]).filter(bsInStore).map(r=>`<button data-bsopen="${r}"><span class="bs-ico" style="--c:${BS_ITEMS[r].c}">${BS_ITEMS[r].ic}</span>${esc(bsT(BS_ITEMS[r]).n)}</button>`).join('')}</div>
