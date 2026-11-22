@@ -9,7 +9,7 @@ const { app, BrowserWindow } = require('electron');
 const target = process.argv.slice(2).find(a => /\.html$/.test(a))
   || path.join(__dirname, '..', 'dist', 'index.html');
 const SCREENS = ['goHome','goPlanner','goFinance','goSpend','goDebts','goDiary','goGoals',
-  'goWishes','goWork','goMore','goProjects','goMyYear','goUpgrade','goHome'];
+  'goWishes','goWork','goMore','goProjects','goHome'];
 // шум, що не є поломкою коду: мережа (прогін офлайн), SW на file://
 const NOISE = /Failed to load resource|net::ERR_|ServiceWorker|service worker|sw\.js|supabase|fetch|NetworkError|Load failed|favicon/i;
 const errors = [], noise = [];

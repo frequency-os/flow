@@ -49,7 +49,6 @@
 .sph-hn i b{color:var(--text);}
 .sph-hn i.in b{color:#22c55e;}
 .sph-hn i.out b{color:#ef4444;}
-.sph-go{flex:none;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:inherit;font-weight:800;font-size:13px;cursor:pointer;}
 
 /* шторка шаблонів: на телефоні вища за екран — тримаємо в межах і даємо прокрутку */
 .ch-sheet.sph-sheet{max-height:calc(100dvh - env(safe-area-inset-top) - 24px);overflow-y:auto;overscroll-behavior:contain;}
