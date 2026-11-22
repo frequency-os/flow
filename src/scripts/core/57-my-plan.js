@@ -210,12 +210,22 @@
       `<div class="mr-gb-ph">${ws.map(w=>`<button class="mr-ph" data-gpw="${esc(w.id)}" style="background-image:url('${esc(mrWishImg(w))}')" aria-label="${esc(w.cap||mrT('Фото','Photo'))}"></button>`).join('')}
         <button class="mr-ph add" data-gpphoto>${mrT('＋ Фото','＋ Photo')}</button></div>`);
     // Папка
-    h+=sec(mrT('Папка','Folder'), `<button class="mr-gb-a" data-gpedit>${mrT('Змінити','Edit')}</button>`,
+    h+=sec(mrT('Папка','Folder'), `<button class="mr-gb-a" data-gpfpick>${fk?mrT('Змінити','Change'):mrT('Привʼязати','Link')}</button>`,
       fk?`<button class="mr-fold" data-gpfold>${safeEmoji(folders[fk].emoji,'📁')} ${esc(folders[fk].name||'Папка')} ›</button>`:`<p class="mr-gb-mut">${mrT('Без папки. Привʼяжи, де лежать нотатки й матеріали цілі.','No folder. Link the one with this goal’s notes.')}</p>`);
     h+=`<button class="mr-link" data-gpedit>${mrT('Редагувати все: роль, розклад, приз ›','Edit everything: role, schedule, prize ›')}</button></div>`;
     return h;
   }
 
+  /* ціль → папка (планер року, етап 3): той самий вибір, що й у місії (pickFolderForGoal, 09-goals.js),
+     але без повної форми. Пише лише g.folderKey після вибору людини; «Нова папка» — там же, теж тапом. */
+  function mrPickFolder(g,after){
+    pickFolderForGoal(k=>{
+      const c=jnGoalById(g.id); if(!c) return;   // ціль могли прибрати, поки відкрита шторка
+      c.folderKey=(k&&moOwnFolder(k))?k:null; saveGoals();
+      try{ plToast(c.folderKey?mrT('Папку привʼязано','Folder linked'):mrT('Без папки','No folder')); }catch(_){}
+      if(typeof after==='function') after();
+    });
+  }
   function mrGoalPage(gl){
     const old=document.querySelector('.mr-gp'); if(old) old.remove();
     const ov=document.createElement('div'); ov.className='mr-gp'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
@@ -246,6 +256,7 @@
           onClick:()=>{ const x=(wishes||[]).find(y=>y&&String(y.id)===String(w.id)); if(x){ delete x.goalId; saveWishes(); try{ renderWishes(); }catch(_){} } draw(); }}]}); });
       q('[data-gpfold]').forEach(b=>b.onclick=()=>{ const k=g.folderKey; ov.remove(); try{ goFolder(k); }catch(_){} });
       q('[data-gpedit]').forEach(b=>b.onclick=()=>jnEditor(g,{after:draw}));
+      q('[data-gpfpick]').forEach(b=>b.onclick=()=>mrPickFolder(g,draw));
     };
     draw();
   }

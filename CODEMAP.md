@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 105 |
-| Рядків JS | 39733 |
+| Рядків JS | 39746 |
 | Файлів CSS | 56 |
 | Рядків CSS | 12415 |
-| Сутностей верхнього рівня | 3115 |
+| Сутностей верхнього рівня | 3116 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -43,7 +43,7 @@
 | `src/scripts/core/06-wishes.js` | 1508 | 115 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 655 | 84 |
-| `src/scripts/core/09-goals.js` | 734 | 31 |
+| `src/scripts/core/09-goals.js` | 736 | 31 |
 | `src/scripts/core/10-planner.js` | 881 | 43 |
 | `src/scripts/core/11-ai-flow.js` | 336 | 36 |
 | `src/scripts/core/12-ai-agent.js` | 1860 | 98 |
@@ -94,7 +94,7 @@
 | `src/scripts/core/55-focus.js` | 391 | 43 |
 | `src/scripts/core/56-run.js` | 347 | 50 |
 | `src/scripts/core/57-core.js` | 116 | 14 |
-| `src/scripts/core/57-my-plan.js` | 475 | 49 |
+| `src/scripts/core/57-my-plan.js` | 486 | 50 |
 | `src/scripts/core/58-moods.js` | 418 | 44 |
 | `src/scripts/core/59-core-screen.js` | 173 | 19 |
 | `src/scripts/core/60-core-actions.js` | 180 | 14 |
@@ -933,7 +933,7 @@
 | `dgSync` | функція | `src/scripts/core/09-goals.js:371` |
 | `dayGoalsBlock` | функція | `src/scripts/core/09-goals.js:391` |
 | `pickFolderForGoal` | функція | `src/scripts/core/09-goals.js:443` |
-| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:485` |
+| `renderGoalsTab` | функція | `src/scripts/core/09-goals.js:487` |
 
 ### `src/scripts/core/10-planner.js` — 43 сутностей
 
@@ -2933,7 +2933,7 @@
 | `snapshot` | функція | `src/scripts/core/57-core.js:103` |
 | `window.Core` | обʼєкт | `src/scripts/core/57-core.js:115` |
 
-### `src/scripts/core/57-my-plan.js` — 49 сутностей
+### `src/scripts/core/57-my-plan.js` — 50 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -2971,21 +2971,22 @@
 | `mrUnlinkWishes` | функція | `src/scripts/core/57-my-plan.js:169` |
 | `mrWishImg` | функція | `src/scripts/core/57-my-plan.js:174` |
 | `mrGoalHTML` | функція | `src/scripts/core/57-my-plan.js:176` |
-| `mrGoalPage` | функція | `src/scripts/core/57-my-plan.js:219` |
-| `mrWhySheet` | функція | `src/scripts/core/57-my-plan.js:254` |
-| `mrDueSheet` | функція | `src/scripts/core/57-my-plan.js:268` |
-| `mrSumSheet` | функція | `src/scripts/core/57-my-plan.js:277` |
-| `mrMoveSheet` | функція | `src/scripts/core/57-my-plan.js:298` |
-| `mrDeposit` | функція | `src/scripts/core/57-my-plan.js:323` |
-| `mrAddStep` | функція | `src/scripts/core/57-my-plan.js:337` |
-| `mrAddPhoto` | функція | `src/scripts/core/57-my-plan.js:350` |
-| `mrLinkWish` | функція | `src/scripts/core/57-my-plan.js:375` |
-| `mrNewGoal` | функція | `src/scripts/core/57-my-plan.js:392` |
-| `mrMoneyHTML` | функція | `src/scripts/core/57-my-plan.js:433` |
-| `mrRules` | функція | `src/scripts/core/57-my-plan.js:449` |
-| `mrRulesHTML` | функція | `src/scripts/core/57-my-plan.js:450` |
-| `mrRuleEdit` | функція | `src/scripts/core/57-my-plan.js:456` |
-| `mrRuleMenu` | функція | `src/scripts/core/57-my-plan.js:468` |
+| `mrPickFolder` | функція | `src/scripts/core/57-my-plan.js:221` |
+| `mrGoalPage` | функція | `src/scripts/core/57-my-plan.js:229` |
+| `mrWhySheet` | функція | `src/scripts/core/57-my-plan.js:265` |
+| `mrDueSheet` | функція | `src/scripts/core/57-my-plan.js:279` |
+| `mrSumSheet` | функція | `src/scripts/core/57-my-plan.js:288` |
+| `mrMoveSheet` | функція | `src/scripts/core/57-my-plan.js:309` |
+| `mrDeposit` | функція | `src/scripts/core/57-my-plan.js:334` |
+| `mrAddStep` | функція | `src/scripts/core/57-my-plan.js:348` |
+| `mrAddPhoto` | функція | `src/scripts/core/57-my-plan.js:361` |
+| `mrLinkWish` | функція | `src/scripts/core/57-my-plan.js:386` |
+| `mrNewGoal` | функція | `src/scripts/core/57-my-plan.js:403` |
+| `mrMoneyHTML` | функція | `src/scripts/core/57-my-plan.js:444` |
+| `mrRules` | функція | `src/scripts/core/57-my-plan.js:460` |
+| `mrRulesHTML` | функція | `src/scripts/core/57-my-plan.js:461` |
+| `mrRuleEdit` | функція | `src/scripts/core/57-my-plan.js:467` |
+| `mrRuleMenu` | функція | `src/scripts/core/57-my-plan.js:479` |
 
 ### `src/scripts/core/58-moods.js` — 44 сутностей
 

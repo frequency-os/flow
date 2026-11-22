@@ -469,6 +469,8 @@
       close();
       inputModal({ title:'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'📁',
         onOk:(nm,emojiVal)=>{
+          // папки ще не прочитано — інакше saveFolders запише заглушку з однією новою папкою (як 16-dashboard.js:1190)
+          if(foldersLoaded!==true){ try{ plToast('Папки ще завантажуються — спробуй за мить'); }catch(_){} return; }
           const used=order.length;
           const key='f_'+Date.now();
           const em=(emojiVal!==undefined?emojiVal:'📁');

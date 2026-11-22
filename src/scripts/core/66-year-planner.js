@@ -42,7 +42,7 @@
     const arrow='<i class="yp-to" aria-hidden="true">→</i>';
     const parts=[
       ph?`<span class="yp-ln">${ypT('Мрія','Dream')}</span>`:`<button class="yp-ln add" data-ypopen>＋ ${ypT('фото мрії','dream photo')}</button>`,
-      fk?`<button class="yp-ln" data-ypfold>${esc(String(folders[fk].name||ypT('Папка','Folder')))}</button>`:`<button class="yp-ln add" data-ypedit>＋ ${ypT('папка','folder')}</button>`,
+      fk?`<button class="yp-ln" data-ypfold>${safeEmoji(folders[fk].emoji,'📁')} ${esc(String(folders[fk].name||ypT('Папка','Folder')))}</button>`:`<button class="yp-ln add" data-ypfpick>＋ ${ypT('папка','folder')}</button>`,
       sum?`<button class="yp-ln" data-ypopen>${esc(mrK(mrSaved(g),g))} / ${esc(mrK(sum,g))}</button>`:`<button class="yp-ln add" data-ypsum>＋ ${ypT('гроші','money')}</button>`,
       `<span class="yp-ln${lv.length?'':' dim'}">${ypT('кроки ','steps ')}${done}/${lv.length}</span>`
     ];
@@ -150,7 +150,7 @@
     q('[data-ypnew]').forEach(b=>b.onclick=mrNewGoal);
     q('[data-ypjn]').forEach(b=>b.onclick=()=>{ mrDetail=false; goJournal({tab:'year'}); });
     q('[data-ypopen]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrGoalPage(g); });
-    q('[data-ypedit]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) jnEditor(g,{after:ypRender}); });
+    q('[data-ypfpick]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrPickFolder(g,ypRender); });   // етап 3
     q('[data-ypsum]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrSumSheet(g,ypRender); });
     q('[data-ypfold]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g&&moOwnFolder(g.folderKey)) goFolder(g.folderKey); });
     q('[data-ypstep]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrAddStep(g,ypRender); });
