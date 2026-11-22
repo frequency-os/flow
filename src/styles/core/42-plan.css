@@ -148,7 +148,7 @@
   .pn-pad{height:96px;}
   /* телефон: ліворуч від котика-напарника (#flowCap, 66px праворуч), над нижньою панеллю */
   .pn-flow{position:fixed;z-index:150;left:max(14px, calc(50% - 226px));width:calc(min(100% - 28px, 452px) - 76px);box-sizing:border-box;
-    bottom:calc(max(10px, calc(env(safe-area-inset-bottom) + 4px)) + 91px);
+    bottom:calc(var(--nav-top) + 14px);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Manrope',system-ui,sans-serif;
     display:flex;align-items:center;gap:10px;min-height:48px;padding:0 16px 0 12px;border-radius:26px;cursor:pointer;color:var(--pn-tx2);font-size:15px;text-align:left;}
   .pn-flow em{flex:1;min-width:0;font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}

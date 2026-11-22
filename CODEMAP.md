@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 39033 |
+| Рядків JS | 39041 |
 | Файлів CSS | 54 |
-| Рядків CSS | 12154 |
-| Сутностей верхнього рівня | 3036 |
+| Рядків CSS | 12159 |
+| Сутностей верхнього рівня | 3037 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -61,7 +61,7 @@
 | `src/scripts/core/24-reminders.js` | 181 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
 | `src/scripts/core/26-blocks-render.js` | 1207 | 16 |
-| `src/scripts/core/27-canvas.js` | 598 | 27 |
+| `src/scripts/core/27-canvas.js` | 606 | 28 |
 | `src/scripts/core/28-vision.js` | 36 | 3 |
 | `src/scripts/core/29-more-screen.js` | 629 | 30 |
 | `src/scripts/core/30-upgrade.js` | 303 | 30 |
@@ -146,13 +146,13 @@
 | `src/styles/21-hero-week.css` | 133 | 2 |
 | `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
-| `src/styles/core/01-tokens-base.css` | 349 | 9 |
+| `src/styles/core/01-tokens-base.css` | 350 | 9 |
 | `src/styles/core/02-page-editor.css` | 1397 | 9 |
 | `src/styles/core/03-folders-projects.css` | 706 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
-| `src/styles/core/07-finance.css` | 586 | 0 |
+| `src/styles/core/07-finance.css` | 590 | 0 |
 | `src/styles/core/08-work.css` | 202 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
@@ -1676,7 +1676,7 @@
 | `focusItem` | функція | `src/scripts/core/26-blocks-render.js:607` |
 | `bindTiles` | функція | `src/scripts/core/26-blocks-render.js:616` |
 
-### `src/scripts/core/27-canvas.js` — 27 сутностей
+### `src/scripts/core/27-canvas.js` — 28 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1703,10 +1703,11 @@
 | `isField` | функція | `src/scripts/core/27-canvas.js:514` |
 | `kbHeight` | функція | `src/scripts/core/27-canvas.js:517` |
 | `syncKb` | функція | `src/scripts/core/27-canvas.js:521` |
-| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:528` |
-| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:564` |
-| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:571` |
-| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:589` |
+| `unshift` | функція | `src/scripts/core/27-canvas.js:531` |
+| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:536` |
+| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:572` |
+| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:579` |
+| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:597` |
 
 ### `src/scripts/core/28-vision.js` — 3 сутностей
 

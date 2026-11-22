@@ -2,7 +2,7 @@
   @keyframes petBlink{0%,44%,50%,100%{transform:scaleY(1)}47%{transform:scaleY(.08)}}
   @keyframes petBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
   @keyframes petGlow{0%,100%{opacity:.7}50%{opacity:1}}
-  #flowCap{position:fixed;right:16px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:190;
+  #flowCap{position:fixed;right:16px;bottom:calc(var(--nav-top) + 10px);z-index:190;
     width:66px;height:66px;border-radius:50%;cursor:pointer;display:grid;place-items:center;
     background:transparent;border:none;
     filter:drop-shadow(0 8px 14px rgba(0,0,0,.5)) drop-shadow(0 0 16px var(--pet-halo,rgba(139,123,255,.3)));
@@ -120,7 +120,7 @@
   #aiCapPet .cap-z2{position:absolute;top:-3px;left:36px;font-size:8.5px;animation:fcZz 2.4s ease-in-out infinite 1.2s;pointer-events:none;}
   #aiCapPet .cap-pet.wakefx{animation:fcAppear .5s cubic-bezier(.34,1.56,.64,1);}
   /* ── Флоу-спот: міні-простір ── */
-  #flowSpot{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:1100;
+  #flowSpot{position:fixed;left:12px;right:12px;bottom:calc(var(--nav-top) + 8px);z-index:1100;
     background:rgba(20,24,48,.68);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);
     border:1px solid rgba(139,123,255,.45);border-radius:22px;padding:11px 12px 12px;
     box-shadow:0 18px 50px rgba(0,0,0,.55);

@@ -522,6 +522,14 @@
       const open = kbHeight() > 120 && isField(document.activeElement);
       document.body.classList.toggle('kb-open', open);
       if(open) ensureVisible(document.activeElement);
+      else if(kbHeight() <= 120) unshift();
+    }
+
+    // Клавіатура сховалась, а iOS (з іконки) лишає всю сторінку зсунутою вгору: знизу
+    // чорна смуга, панель висить над нею (22.11). Прокручується в нас лише body,
+    // тож вікно завжди має стояти на нулі — повертаємо його туди.
+    function unshift(){
+      if(window.scrollY || document.documentElement.scrollTop) window.scrollTo(0, 0);
     }
 
     // скрол активного поля так, щоб воно було над клавіатурою
@@ -551,7 +559,7 @@
     document.addEventListener('focusout', e=>{
       // невелика затримка: фокус може перейти на інше поле
       setTimeout(()=>{
-        if(!isField(document.activeElement)) document.body.classList.remove('kb-open');
+        if(!isField(document.activeElement)){ document.body.classList.remove('kb-open'); unshift(); }
       }, 120);
     });
   })();

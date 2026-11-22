@@ -366,38 +366,42 @@
     font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;}
 
   /* ---------- bottom nav · liquid glass ---------- */
-  /* Відступ знизу: на iPhone env(safe-area-inset-bottom) ≈ 34pt (зона індикатора «додому»),
-     і колишні +14px піднімали панель майже на 50pt від краю. Тепер вона стоїть на 4pt над
-     індикатором, як плаваючі панелі iOS; там, де зони нема (Mac, Android, Safari з тулбаром) — 10px. */
-  .nav{position:fixed;bottom:max(10px, calc(env(safe-area-inset-bottom) + 4px));left:50%;transform:translateX(-50%);
-    width:calc(100% - 28px);max-width:452px;z-index:200;display:flex;justify-content:space-around;
-    padding:10px 6px;border-radius:30px;
+  /* Відступ знизу (варіант A1, 22.11): панель стоїть ≈20pt від краю iPhone і трохи заходить
+     у зону смужки «додому», як рідна панель iOS (34pt зони − 14). Де зони нема (Mac, Android,
+     Safari з тулбаром) — 10px. Висота панелі — 52px. Усе, що стоїть над панеллю (котик, підказки,
+     тости), рахується від --nav-top, щоб не висіти в повітрі, коли панель зміниться знову. */
+  :root{--nav-b:max(10px, calc(env(safe-area-inset-bottom, 0px) - 14px));--nav-top:calc(var(--nav-b) + 52px);}
+  .nav{position:fixed;bottom:var(--nav-b);left:50%;transform:translateX(-50%);
+    width:calc(100% - 28px);max-width:452px;z-index:200;display:flex;justify-content:space-around;align-items:stretch;
+    height:52px;padding:4px 6px;border-radius:26px;
     background:var(--nav-bg);
     backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
     border:1px solid var(--nav-line);
     box-shadow:0 1px 0 var(--nav-line) inset,0 16px 40px var(--shadow),0 2px 8px var(--shadow);}
   .nav::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
     background:radial-gradient(120% 80% at 50% -20%,rgba(255,255,255,.14),transparent 60%);}
-  .nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
-    color:var(--nav-ink);font-size:10.5px;font-weight:600;cursor:pointer;padding:6px 0 4px;
+  .nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    color:var(--nav-ink);font-size:10.5px;line-height:13px;font-weight:600;cursor:pointer;padding:0;
     border-radius:18px;transition:color .25s ease;-webkit-tap-highlight-color:transparent;}
   .nav a.on{color:var(--nav-ink-on);}
-  .nav a.on::after{content:"";position:absolute;inset:2px 8px;border-radius:16px;z-index:-1;
+  .nav a.on::after{content:"";position:absolute;inset:0 4px;border-radius:20px;z-index:-1;
     background:linear-gradient(180deg,rgba(125,141,255,.30),rgba(125,141,255,.10));
     border:1px solid rgba(125,141,255,.30);
     box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 4px 14px rgba(96,112,255,.30);
     animation:navpop .3s ease;}
   @keyframes navpop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
-  .nav .ni{display:grid;place-items:center;height:24px;}
-  .nav .ni svg{width:23px;height:23px;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
+  .nav .ni{display:grid;place-items:center;height:22px;}
+  .nav .ni svg{width:22px;height:22px;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
   /* центральна кнопка AI */
-  .nav #navAI .ni{width:36px;height:36px;margin-top:-10px;border-radius:13px;
+  /* без підпису: кнопка сама по центру панелі; слово «AI» лишається для читача екрана (.nl) */
+  .nav #navAI .ni{width:36px;height:36px;border-radius:12px;
     background:linear-gradient(135deg,var(--accent),#a06bff);
     box-shadow:0 5px 14px rgba(106,125,255,.45),0 1px 0 rgba(255,255,255,.25) inset;}
   .nav #navAI .ni svg{width:19px;height:19px;color:#fff;}
   .nav #navAI{color:var(--nav-ink-on);}
+  .nav #navAI .nl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
   /* ховаємо плаваючий бар, коли відкрита клавіатура — щоб не перекривав поля й кнопки */
-  body.kb-open .nav{opacity:0;transform:translateX(-50%) translateY(140%);pointer-events:none;transition:transform .22s ease,opacity .22s ease;}
+  body.kb-open .nav{opacity:0;transform:translateX(-50%) translateY(160%);pointer-events:none;transition:transform .22s ease,opacity .22s ease;}
   body.kb-open .phone{padding-bottom:28px;}
 
   /* spending */

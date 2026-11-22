@@ -223,15 +223,16 @@
   body{background:var(--bg);color:var(--text);font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;
     min-height:100vh;min-height:100dvh;
     min-height:var(--tg-viewport-stable-height, 100dvh);
-    height:100vh;height:100dvh;height:var(--tg-viewport-stable-height, 100dvh);
     overflow-y:auto;overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
-    position:fixed;top:0;left:0;right:0;
+    /* прив'язка до всіх чотирьох країв замість height:100dvh — iPhone з іконки інколи
+       рахує dvh меншим за екран, і знизу лишалась чорна смуга (22.11) */
+    position:fixed;top:0;left:0;right:0;bottom:0;
     overscroll-behavior:none;}
   .phone{max-width:480px;margin:0 auto;
     min-height:100vh;min-height:100dvh;
     min-height:var(--tg-viewport-stable-height, 100dvh);
-    padding:26px 18px calc(124px + env(safe-area-inset-bottom));
+    padding:26px 18px calc(var(--nav-top, 62px) + 40px);
     background:radial-gradient(900px 320px at 50% -10%,var(--glow),transparent 60%),var(--bg);}
 
   /* ---------- screens ---------- */
