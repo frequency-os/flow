@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-22-0901-5dae650';
+  var BUILD='2026-11-22-0933-03fa494';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -450,15 +450,16 @@
   body{background:var(--bg);color:var(--text);font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;
     min-height:100vh;min-height:100dvh;
     min-height:var(--tg-viewport-stable-height, 100dvh);
-    height:100vh;height:100dvh;height:var(--tg-viewport-stable-height, 100dvh);
     overflow-y:auto;overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
-    position:fixed;top:0;left:0;right:0;
+    /* прив'язка до всіх чотирьох країв замість height:100dvh — iPhone з іконки інколи
+       рахує dvh меншим за екран, і знизу лишалась чорна смуга (22.11) */
+    position:fixed;top:0;left:0;right:0;bottom:0;
     overscroll-behavior:none;}
   .phone{max-width:480px;margin:0 auto;
     min-height:100vh;min-height:100dvh;
     min-height:var(--tg-viewport-stable-height, 100dvh);
-    padding:26px 18px calc(124px + env(safe-area-inset-bottom));
+    padding:26px 18px calc(var(--nav-top, 62px) + 40px);
     background:radial-gradient(900px 320px at 50% -10%,var(--glow),transparent 60%),var(--bg);}
 
   /* ---------- screens ---------- */
@@ -3466,38 +3467,42 @@
     font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;}
 
   /* ---------- bottom nav · liquid glass ---------- */
-  /* Відступ знизу: на iPhone env(safe-area-inset-bottom) ≈ 34pt (зона індикатора «додому»),
-     і колишні +14px піднімали панель майже на 50pt від краю. Тепер вона стоїть на 4pt над
-     індикатором, як плаваючі панелі iOS; там, де зони нема (Mac, Android, Safari з тулбаром) — 10px. */
-  .nav{position:fixed;bottom:max(10px, calc(env(safe-area-inset-bottom) + 4px));left:50%;transform:translateX(-50%);
-    width:calc(100% - 28px);max-width:452px;z-index:200;display:flex;justify-content:space-around;
-    padding:10px 6px;border-radius:30px;
+  /* Відступ знизу (варіант A1, 22.11): панель стоїть ≈20pt від краю iPhone і трохи заходить
+     у зону смужки «додому», як рідна панель iOS (34pt зони − 14). Де зони нема (Mac, Android,
+     Safari з тулбаром) — 10px. Висота панелі — 52px. Усе, що стоїть над панеллю (котик, підказки,
+     тости), рахується від --nav-top, щоб не висіти в повітрі, коли панель зміниться знову. */
+  :root{--nav-b:max(10px, calc(env(safe-area-inset-bottom, 0px) - 14px));--nav-top:calc(var(--nav-b) + 52px);}
+  .nav{position:fixed;bottom:var(--nav-b);left:50%;transform:translateX(-50%);
+    width:calc(100% - 28px);max-width:452px;z-index:200;display:flex;justify-content:space-around;align-items:stretch;
+    height:52px;padding:4px 6px;border-radius:26px;
     background:var(--nav-bg);
     backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
     border:1px solid var(--nav-line);
     box-shadow:0 1px 0 var(--nav-line) inset,0 16px 40px var(--shadow),0 2px 8px var(--shadow);}
   .nav::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
     background:radial-gradient(120% 80% at 50% -20%,rgba(255,255,255,.14),transparent 60%);}
-  .nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
-    color:var(--nav-ink);font-size:10.5px;font-weight:600;cursor:pointer;padding:6px 0 4px;
+  .nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    color:var(--nav-ink);font-size:10.5px;line-height:13px;font-weight:600;cursor:pointer;padding:0;
     border-radius:18px;transition:color .25s ease;-webkit-tap-highlight-color:transparent;}
   .nav a.on{color:var(--nav-ink-on);}
-  .nav a.on::after{content:"";position:absolute;inset:2px 8px;border-radius:16px;z-index:-1;
+  .nav a.on::after{content:"";position:absolute;inset:0 4px;border-radius:20px;z-index:-1;
     background:linear-gradient(180deg,rgba(125,141,255,.30),rgba(125,141,255,.10));
     border:1px solid rgba(125,141,255,.30);
     box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 4px 14px rgba(96,112,255,.30);
     animation:navpop .3s ease;}
   @keyframes navpop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
-  .nav .ni{display:grid;place-items:center;height:24px;}
-  .nav .ni svg{width:23px;height:23px;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
+  .nav .ni{display:grid;place-items:center;height:22px;}
+  .nav .ni svg{width:22px;height:22px;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
   /* центральна кнопка AI */
-  .nav #navAI .ni{width:36px;height:36px;margin-top:-10px;border-radius:13px;
+  /* без підпису: кнопка сама по центру панелі; слово «AI» лишається для читача екрана (.nl) */
+  .nav #navAI .ni{width:36px;height:36px;border-radius:12px;
     background:linear-gradient(135deg,var(--accent),#a06bff);
     box-shadow:0 5px 14px rgba(106,125,255,.45),0 1px 0 rgba(255,255,255,.25) inset;}
   .nav #navAI .ni svg{width:19px;height:19px;color:#fff;}
   .nav #navAI{color:var(--nav-ink-on);}
+  .nav #navAI .nl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
   /* ховаємо плаваючий бар, коли відкрита клавіатура — щоб не перекривав поля й кнопки */
-  body.kb-open .nav{opacity:0;transform:translateX(-50%) translateY(140%);pointer-events:none;transition:transform .22s ease,opacity .22s ease;}
+  body.kb-open .nav{opacity:0;transform:translateX(-50%) translateY(160%);pointer-events:none;transition:transform .22s ease,opacity .22s ease;}
   body.kb-open .phone{padding-bottom:28px;}
 
   /* spending */
@@ -4747,7 +4752,7 @@
   @keyframes petBlink{0%,44%,50%,100%{transform:scaleY(1)}47%{transform:scaleY(.08)}}
   @keyframes petBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
   @keyframes petGlow{0%,100%{opacity:.7}50%{opacity:1}}
-  #flowCap{position:fixed;right:16px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:190;
+  #flowCap{position:fixed;right:16px;bottom:calc(var(--nav-top) + 10px);z-index:190;
     width:66px;height:66px;border-radius:50%;cursor:pointer;display:grid;place-items:center;
     background:transparent;border:none;
     filter:drop-shadow(0 8px 14px rgba(0,0,0,.5)) drop-shadow(0 0 16px var(--pet-halo,rgba(139,123,255,.3)));
@@ -4865,7 +4870,7 @@
   #aiCapPet .cap-z2{position:absolute;top:-3px;left:36px;font-size:8.5px;animation:fcZz 2.4s ease-in-out infinite 1.2s;pointer-events:none;}
   #aiCapPet .cap-pet.wakefx{animation:fcAppear .5s cubic-bezier(.34,1.56,.64,1);}
   /* ── Флоу-спот: міні-простір ── */
-  #flowSpot{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:1100;
+  #flowSpot{position:fixed;left:12px;right:12px;bottom:calc(var(--nav-top) + 8px);z-index:1100;
     background:rgba(20,24,48,.68);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);
     border:1px solid rgba(139,123,255,.45);border-radius:22px;padding:11px 12px 12px;
     box-shadow:0 18px 50px rgba(0,0,0,.55);
@@ -6012,7 +6017,7 @@
 
   /* ===== UNDO (кнопка повернення) ===== */
   /* z-index 270 — над шторками планера (.fd-cab 250, матриця .fdx 260): з них теж видаляють «×» */
-  .undo-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom));
+  .undo-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-top) + 12px);
     z-index:270;background:var(--card-2);border:1px solid var(--line);border-radius:14px;
     padding:10px 12px 10px 15px;display:none;align-items:center;gap:12px;box-shadow:0 6px 26px rgba(0,0,0,.4);
     max-width:calc(100% - 32px);
@@ -6788,7 +6793,7 @@
 /* екран світу: рамка на весь екран над нижньою панеллю (панель 77px + відступ від краю) */
 #scr-world.active{position:fixed;left:0;right:0;top:0;z-index:5;
   padding-top:env(safe-area-inset-top);
-  bottom:calc(max(10px, calc(env(safe-area-inset-bottom) + 4px)) + 88px);
+  bottom:calc(var(--nav-top) + 11px);
   background:#0d1014;}
 .wld-frame{position:absolute;left:0;right:0;bottom:0;top:env(safe-area-inset-top);}
 .wld-frame iframe{display:block;width:100%;height:100%;border:0;background:#0d1014;}
@@ -7654,7 +7659,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
 
   /* ── Планер у Журналі (09.10.2026): плаваючий перемикач періоду, стрічка дня, інший день, місяць ── */
   /* ліворуч, а не по центру: праворуч над панеллю живе котик-напарник (flowCap), він не має лягати на кнопки */
-  .jn-float{position:fixed;left:16px;z-index:60;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);
+  .jn-float{position:fixed;left:16px;z-index:60;bottom:calc(var(--nav-top) + 10px);
     display:flex;gap:2px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--card) 88%,transparent);
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 26px rgba(0,0,0,.35);}
   .jn-float[hidden]{display:none;}   /* display:flex вище перебиває стандартне [hidden] */
@@ -8370,7 +8375,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .wl-work i{font-style:normal;font-size:20px;color:var(--muted);}
   .wl-work:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   /* ============ ПРАВИЛА ГРИ (47-rules.js): пропозиції, Книга правил, розподіл зарплати, план місяця ============ */
-  .rl-offer{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:1250;max-width:460px;margin:0 auto;padding:14px 14px 12px;border-radius:20px;
+  .rl-offer{position:fixed;left:12px;right:12px;bottom:calc(var(--nav-top) + 8px);z-index:1250;max-width:460px;margin:0 auto;padding:14px 14px 12px;border-radius:20px;
     background:var(--card);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.35);animation:rlUp .28s ease-out;}
   @keyframes rlUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
   .rl-offer-h,.rl-card-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
@@ -9883,7 +9888,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   .pn-pad{height:96px;}
   /* телефон: ліворуч від котика-напарника (#flowCap, 66px праворуч), над нижньою панеллю */
   .pn-flow{position:fixed;z-index:150;left:max(14px, calc(50% - 226px));width:calc(min(100% - 28px, 452px) - 76px);box-sizing:border-box;
-    bottom:calc(max(10px, calc(env(safe-area-inset-bottom) + 4px)) + 91px);
+    bottom:calc(var(--nav-top) + 14px);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Manrope',system-ui,sans-serif;
     display:flex;align-items:center;gap:10px;min-height:48px;padding:0 16px 0 12px;border-radius:26px;cursor:pointer;color:var(--pn-tx2);font-size:15px;text-align:left;}
   .pn-flow em{flex:1;min-width:0;font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -10878,7 +10883,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
   <a class="on" id="navHome" role="button" tabindex="0"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10.5V19a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19v-8.5"/><path d="M10 20.5v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/></svg></span>Огляд</a>
   <a id="navJournal" role="button" tabindex="0"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M8 3v3M16 3v3"/></svg></span>Планер</a>
   <a id="navPlanner" role="button" tabindex="0" hidden><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M8 3v3M16 3v3"/></svg></span>Планер</a>
-  <a id="navAI" role="button" tabindex="0"><span class="ni"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M11 6c.6 3.6 2.2 5.2 5.8 5.8.4.07.4.63 0 .7-3.6.6-5.2 2.2-5.8 5.8-.07.4-.63.4-.7 0-.6-3.6-2.2-5.2-5.8-5.8-.4-.07-.4-.63 0-.7 3.6-.6 5.2-2.2 5.8-5.8.07-.4.63-.4.7 0z"/><path d="M18.7 2.6c.33 1.95 1.2 2.82 3.15 3.15.28.05.28.45 0 .5-1.95.33-2.82 1.2-3.15 3.15-.05.28-.45.28-.5 0-.33-1.95-1.2-2.82-3.15-3.15-.28-.05-.28-.45 0-.5 1.95-.33 2.82-1.2 3.15-3.15.05-.28.45-.28.5 0z"/></svg></span>AI</a>
+  <a id="navAI" role="button" tabindex="0"><span class="ni"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M11 6c.6 3.6 2.2 5.2 5.8 5.8.4.07.4.63 0 .7-3.6.6-5.2 2.2-5.8 5.8-.07.4-.63.4-.7 0-.6-3.6-2.2-5.2-5.8-5.8-.4-.07-.4-.63 0-.7 3.6-.6 5.2-2.2 5.8-5.8.07-.4.63-.4.7 0z"/><path d="M18.7 2.6c.33 1.95 1.2 2.82 3.15 3.15.28.05.28.45 0 .5-1.95.33-2.82 1.2-3.15 3.15-.05.28-.45.28-.5 0-.33-1.95-1.2-2.82-3.15-3.15-.28-.05-.28-.45 0-.5 1.95-.33 2.82-1.2 3.15-3.15.05-.28.45-.28.5 0z"/></svg></span><span class="nl">AI</span></a>
   <a id="navWorld" role="button" tabindex="0" hidden><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h17"/><path d="M5.5 20.5V11l4-2.5v12"/><path d="M9.5 20.5V6.5l5-3v17"/><path d="M14.5 20.5V10.5l4 2v8"/><path d="M12 9v.01M12 12.5v.01M7.5 13.5v.01M16.5 15v.01"/></svg></span>Мій світ</a>
   <a id="navFinance" role="button" tabindex="0"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg></span>Гаманець</a>
   <a id="navMore" role="button" tabindex="0"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg></span>Ще</a>
@@ -28777,6 +28782,14 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
       const open = kbHeight() > 120 && isField(document.activeElement);
       document.body.classList.toggle('kb-open', open);
       if(open) ensureVisible(document.activeElement);
+      else if(kbHeight() <= 120) unshift();
+    }
+
+    // Клавіатура сховалась, а iOS (з іконки) лишає всю сторінку зсунутою вгору: знизу
+    // чорна смуга, панель висить над нею (22.11). Прокручується в нас лише body,
+    // тож вікно завжди має стояти на нулі — повертаємо його туди.
+    function unshift(){
+      if(window.scrollY || document.documentElement.scrollTop) window.scrollTo(0, 0);
     }
 
     // скрол активного поля так, щоб воно було над клавіатурою
@@ -28806,7 +28819,7 @@ body.in-world #flowCap,body.in-world #fcSay{display:none!important;}
     document.addEventListener('focusout', e=>{
       // невелика затримка: фокус може перейти на інше поле
       setTimeout(()=>{
-        if(!isField(document.activeElement)) document.body.classList.remove('kb-open');
+        if(!isField(document.activeElement)){ document.body.classList.remove('kb-open'); unshift(); }
       }, 120);
     });
   })();
@@ -45879,7 +45892,7 @@ html[data-theme="light"] .wdk-ritual{background:#fff;border-color:rgba(32,24,72,
   letter-spacing:.08em;text-transform:uppercase;}
 .clg-stick{text-align:center;font-size:30px;padding:8px 0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));}
 .clg-stick .clg-mn{opacity:.6;}
-.clg-bar{position:sticky;bottom:calc(96px + env(safe-area-inset-bottom));display:flex;gap:6px;margin-top:14px;padding:7px;border-radius:18px;z-index:150;
+.clg-bar{position:sticky;bottom:calc(var(--nav-top) + 12px);display:flex;gap:6px;margin-top:14px;padding:7px;border-radius:18px;z-index:150;
   background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.035));
   backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
   border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 34px rgba(0,0,0,.4);}
