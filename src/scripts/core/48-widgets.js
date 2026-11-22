@@ -79,7 +79,8 @@
       if(!i) return '';
       return wgTile('wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
         <span class="wg-h">⏱ Робота · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
-        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>`);
+        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>
+        ${b.id?'<span class="wg-acts one"><button data-wga="workadd">＋ Години</button></span>':''}`);   // на сторінці папки (є id блока) — запис годин на сьогодні; у Гаманці — без кнопки
     }
     if(t==='wgmoney'){
       const kind=b.kind==='out'?'out':'in', src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&b.cur!==mainCur()&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:'';
@@ -113,6 +114,7 @@
     else if(a==='planadd'){ try{ wlState.tab='plan'; goFinance(); }catch(_){} }
     else if(a==='debts'){ try{ goDebts(); }catch(_){} }
     else if(a==='work'){ try{ goWork(); }catch(_){} }
+    else if(a==='workadd'){ try{ workTapDay(ymdLocal()); }catch(_){} }   // та сама шторка, що й тап по дню в календарі Роботи
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }
     else if(a==='cfg'){ if(id) wgMoneyCfg(id,false); }
