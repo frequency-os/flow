@@ -651,7 +651,7 @@
           startX:(e.touches?e.touches[0].clientX:e.clientX),startY:(e.touches?e.touches[0].clientY:e.clientY),
           w0:loc.block.gw||4,h0:loc.block.gh||2};
       /* дошка віджетів (19.11.2026): тягнемо по клітинках пристрою — 4 колонки на телефоні, 8 на компʼютері */
-      if(boardEl.classList.contains('wboard')&&typeof wdCell==='function'&&wdIs(loc.block.type)){
+      if(boardEl.classList.contains('wboard')&&typeof wdCell==='function'&&(wdIs(loc.block.type)||wgHasSettings(loc.block.type)&&loc.block.ws)){
         var cs=getComputedStyle(boardEl), g=parseFloat(cs.columnGap)||12;
         bz.cellMode=true; bz.dev=wdDev(); bz.cols=wdCols(bz.dev);
         bz.colW=(boardEl.getBoundingClientRect().width-g*(bz.cols-1))/bz.cols+g;

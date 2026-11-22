@@ -368,7 +368,14 @@
     const k=b.dataset.dnav;
     if(k==='home') goHome();
     else if(k==='ai'){ if(window.aiChatSheet) window.aiChatSheet(); }
-    else if(k==='folders'){ goHome(); setTimeout(()=>{ const el=document.getElementById('folderGrid'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },120); }
+    else if(k==='folders'){
+      goHome();
+      setHomeTab('folders');
+      setTimeout(()=>{
+        const tabs=document.querySelector('#scr-home .sec-htabs');
+        if(tabs) tabs.scrollIntoView({behavior:'smooth',block:'start'});
+      },120);
+    }
     /* «Простір» прибрано з навігації — всі дошки живуть у папках */
     else if(k==='finance') goFinance();
     else if(k==='planner') goPlanner();

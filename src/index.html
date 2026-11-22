@@ -213,6 +213,16 @@
       <button class="htab-new" id="utNewBtn" aria-label="Нова вкладка" title="Нова вкладка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div><div class="sec-actions"><button class="htab-add" id="utAddBtn" hidden aria-label="Додати у вкладку" title="Додати у вкладку"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="htab-add" id="chatAddBtn" hidden aria-label="Новий чат" title="Новий чат"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><button class="htab-cfg" id="folderLookBtn" aria-label="Вигляд папок" title="Вигляд папок"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div></div>
     <div class="htpanel" id="htPanel" hidden></div>
+    <div class="folder-tools" id="folderTools" hidden>
+      <label class="folder-find-label" for="folderFind">Знайти папку</label>
+      <input id="folderFind" type="search" placeholder="Назва папки" autocomplete="off">
+      <div id="folderMatches"></div>
+      <p id="folderFindEmpty" role="status" hidden>Папок не знайдено</p>
+      <section id="folderAttention" aria-labelledby="folderAttentionTitle" hidden>
+        <h2 id="folderAttentionTitle">Потребують уваги</h2>
+        <div id="folderDeadlines"></div>
+      </section>
+    </div>
     <div class="foh-row">
       <div class="grid" id="folderGrid"></div>
     </div>

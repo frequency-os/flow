@@ -41,7 +41,7 @@
         const act=hit.dataset.gs, a=hit.dataset.a, b=hit.dataset.b;
         close();
         try{
-          if(act==='folder')     goFolder(a);
+          if(act==='folder')     openFolderFromList(a);
           else if(act==='chat')  goChat(a,{from:'home'});
           else if(act==='block') window.flowOpenBlock(a,b);
           else if(act==='diary') window.goDiary(a);

@@ -89,6 +89,20 @@
 
 /* ── сітка: без лівої колонки і без від'ємних полів ──────────────────── */
 #scr-home .foh-row>:is(#folderGrid,#fspGrid){flex:1 1 auto;min-width:0;}
+#scr-home .foh-row:has(#folderGrid.folder-searching){display:none;}
+.folder-tools{margin:0 0 16px;min-width:0;}
+.folder-find-label,.folder-tools h2{display:block;margin:0 0 8px;font-size:14px;font-weight:700;color:var(--text);}
+.folder-tools input{box-sizing:border-box;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--line);
+  border-radius:12px;background:var(--card);color:var(--text);font:inherit;font-size:16px;}
+.folder-tools input::placeholder,.folder-tools small,.folder-tools p{color:var(--muted);}
+.folder-tools section{margin-top:16px;}
+.folder-tool-result{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:start;width:100%;
+  min-height:44px;padding:8px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);font:inherit;cursor:pointer;}
+.folder-tool-result>*{min-width:0;overflow-wrap:anywhere;}
+.folder-tool-result small{text-align:end;}
+.folder-card-open{position:absolute;inset:0;z-index:3;border:0;padding:0;border-radius:inherit;background:transparent;cursor:pointer;}
+#folderGrid .fr .fmenu,#folderGrid .fc3-grip,#folderGrid .fc3-photo{z-index:4;}
+.folder-tools :focus-visible,.folder-card-open:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;}
 :is(#folderGrid,#fspGrid){--fc3-min:148px;--fc3-row:118px;}
 :is(#folderGrid,#fspGrid).fsz-s{--fc3-min:96px;--fc3-row:96px;}
 :is(#folderGrid,#fspGrid).fsz-l{--fc3-min:240px;--fc3-row:150px;}

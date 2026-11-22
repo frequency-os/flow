@@ -7,7 +7,15 @@
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
   const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dtasks:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
+  const WG_SETTINGS={
+    wgwallet:{t:'Гаманець',ic:'👛'},
+    wgwork:{t:'Робота',ic:'⏱'},
+    wgmission:{t:'Гроші місії',h:'Місія',ic:'🎯'},
+    wgenv:{t:'Конверти й платежі',ic:'✉️'},
+    wgdebt:{t:'Борги й правила',ic:'⚖️'}
+  };
   function wgIs(t){ return !!WG_TYPES[t]; }
+  function wgHasSettings(t){ return t==='wgmoney'||Object.hasOwn(WG_SETTINGS,t); }
   // папка відкритої сторінки (ключ дошки без простору); '' — не в папці
   function wgCtxFolder(){ try{ const k=String(boardKey||'').split('__sp_')[0]; return k&&moOwnFolder(k)?k:''; }catch(_){ return ''; } }
   function wgFolderMission(fk){ return fk?(goalsData.goals||[]).find(g=>g&&g.id&&String(g.folderKey||'')===String(fk)&&jnStatus(g)!=='archive')||null:null; }
@@ -21,7 +29,7 @@
       b.type='wgmoney'; b.kind=k==='wgin'?'in':'out'; b.label=b.label||(k==='wgin'?'Доходи':'Витрати');
       if(k==='wgin'&&!b.src) b.src='extra';   // у папці-проєкті дохід зазвичай додатковий
       if(b.goal==null) b.goal=0;
-      const id=b.id; setTimeout(()=>{ try{ wgMoneyCfg(id,true); }catch(_){} },450);   // одразу спитати тип і назву
+      wdOpenNew(b.id);
       return true;
     }
     if(wgIs(k)){ b.type=k; return true; }
@@ -30,6 +38,19 @@
 
   // ── HTML плиток ──
   function wgTile(cls,inner,attrs){ return `<div class="wg-t ${cls}"${attrs||''}>${inner}</div>`; }
+  function wgPageTile(b,fk,cls,inner,color){
+    return b.id?wdTile(b,fk,inner,'wg-settings '+cls,color)
+      :wgTile(cls,inner,color?` style="--mc:${safeColor(color,'#34c77b')}"`:'');
+  }
+  function wgSettingsHead(b,label,legacy,custom=b.hd){
+    if(!b.id) return `<span class="wg-h">${legacy}</span>`;
+    const name=String(custom||'').slice(0,40);
+    return `<button class="wd-h wg-settings-head" data-wga="cfg" aria-label="Налаштувати віджет «${esc(name||label)}»"><b${name?' data-i18n-skip="1"':''}>${name?esc(name):legacy}</b></button>`;
+  }
+  function wgMoneyMission(b,fk){
+    const chosen=b.goalId&&wlGoal(b.goalId);
+    return chosen||wgFolderMission(fk)||wlMissions()[0]||null;
+  }
   function wgHTML(b,fk){
     const ym=wlYm(), t=b&&b.type;
     if(wdIs(t)) return wdHTML(b,fk);   // «Дані»: вікна в місію / трекер / Планер
@@ -41,56 +62,59 @@
       const rings=g&&(+g.earn>0||+g.spend>0||+g.save>0)
         ?`<span class="wg-rings">${+g.earn>0?ring(all.inc/g.earn*100,'заробив'):''}${+g.spend>0?ring(all.out/g.spend*100,'витратив'):''}${+g.save>0?ring(svd/g.save*100,'відклав'):''}</span>`
         :`<span class="wg-fact"><span>+${wgK(all.inc)}</span><span>−${wgK(all.out)}</span></span>`;
-      return wgTile('wide c-wallet',`<button class="wg-hit" data-wga="wallet" aria-label="Відкрити Гаманець"></button>
-        <span class="wg-h">Гаманець · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><b class="wg-big">${wgMoney(bal)}</b>
+      return wgPageTile(b,fk,'wide c-wallet',`<button class="wg-hit" data-wga="wallet" aria-label="Відкрити Гаманець"></button>
+        ${wgSettingsHead(b,'Гаманець','Гаманець · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase()))}<b class="wg-big">${wgMoney(bal)}</b>
         <small>${fc!==null?'прогноз на кінець місяця '+wgMoney(fc):''}${pz?(fc!==null?' · ':'')+'на призи '+wgMoney(pz):''}</small>
         ${(()=>{ let l=[]; try{ l=wlCurList(); }catch(_){} return l.length?`<small class="wg-curs">${l.map(c=>esc(money(curBalance(c),c))).join(' · ')}</small>`:''; })()}
         <span class="wg-foot">${rings}<span class="wg-acts"><button data-wga="out" aria-label="Витрата">−</button><button data-wga="in" aria-label="Дохід">＋</button></span></span>`);
     }
     if(t==='wgmission'){
-      const g=wgFolderMission(fk)||(b.goalId&&wlGoal(b.goalId))||wlMissions()[0]||null;
-      if(!g) return wgTile('c-mission',`<button class="wg-hit" data-wga="journal" aria-label="Журнал"></button><span class="wg-h">🎯 Гроші місії</span><b class="wg-big sm">Ще нема місій</b><small>створи в Журналі</small>`);
+      const g=wgMoneyMission(b,fk);
+      if(!g) return wgPageTile(b,fk,'c-mission',`<button class="wg-hit" data-wga="journal" aria-label="Журнал"></button>${wgSettingsHead(b,'Гроші місії','🎯 Гроші місії')}<b class="wg-big sm">Ще нема місій</b><small>створи в Журналі</small>`);
       const a=wlAgg(wlMonthOps(ym),g.id), bud=g.budget&&+g.budget.money>0?+g.budget.money:0;
       const rw=g.reward&&String(g.reward.t||'').trim()?g.reward:null, sv=rw&&typeof pzSaved==='function'?pzSaved(g):0, rp=rw&&+rw.sum>0?Math.min(100,Math.round(sv/rw.sum*100)):0;
-      return wgTile('c-mission',`<button class="wg-hit" data-wga="mission" data-wgg="${esc(g.id)}" aria-label="Гроші місії ${esc(g.name||'')}"></button>
-        <span class="wg-h">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,22))}</span><b class="wg-big">${a.inc-a.out>0?'+':a.inc-a.out<0?'−':''}${wgK(Math.abs(a.inc-a.out))}</b>
+      return wgPageTile(b,fk,'c-mission',`<button class="wg-hit" data-wga="mission" data-wgg="${esc(g.id)}" aria-label="Гроші місії ${esc(g.name||'')}"></button>
+        ${wgSettingsHead(b,'Гроші місії',safeEmoji(g.emoji,'🎯')+' <span data-i18n-skip="1">'+esc(String(g.name||'Місія').slice(0,22))+'</span>')}
+        ${b.id&&b.hd?`<small data-i18n-skip="1" class="wg-mission-name">${esc(String(g.name||'Місія').slice(0,40))}</small>`:''}
+        <b class="wg-big">${a.inc-a.out>0?'+':a.inc-a.out<0?'−':''}${wgK(Math.abs(a.inc-a.out))}</b>
         <small>${bud?'бюджет '+wgK(a.out)+' / '+wgK(bud):'дохід '+wgK(a.inc)+' · витрати '+wgK(a.out)}</small>
         ${bud?`<span class="wg-bar"><i class="${a.out>bud?'over':''}" style="width:${Math.min(100,Math.round(a.out/bud*100))}%"></i></span>`:''}
-        ${rw?`<small class="wg-pz">${safeEmoji(rw.emoji,'🎁')} ${rp}% на «${esc(String(rw.t).slice(0,18))}»</small>`:''}`,` style="--mc:${safeColor(g.color,'#34c77b')}"`);
+        ${rw?`<small class="wg-pz">${safeEmoji(rw.emoji,'🎁')} ${rp}% на «${esc(String(rw.t).slice(0,18))}»</small>`:''}`,g.color||'#34c77b');
     }
     if(t==='wgenv'){
       const envs=(envelopes||[]).filter(e=>e&&e.id&&!envCur(e)); let tot=0; envs.forEach(e=>{ try{ tot+=envSaved(e); }catch(_){} });   // сума — лише головна валюта
       let rows=[]; try{ rows=rlPlanOpen(ym).slice(0,2); }catch(_){}
       const td=+ymdLocal().slice(8,10);
-      return wgTile('c-env',`<button class="wg-hit" data-wga="envs" aria-label="Конверти"></button>
-        <span class="wg-h">✉️ Конверти</span><b class="wg-big">${wgK(tot)}</b>
+      return wgPageTile(b,fk,'c-env',`<button class="wg-hit" data-wga="envs" aria-label="Конверти"></button>
+        ${wgSettingsHead(b,'Конверти й платежі','✉️ Конверти')}<b class="wg-big">${wgK(tot)}</b>
         ${rows.length?rows.map(x=>`<button class="wg-li" data-wga="plan" data-wgp="${x.k}|${esc(x.r.id)}"><span>${esc(String(x.r.t||'').slice(0,14))}${x.r.day?` · ${+x.r.day<td?'<i>прострочено</i>':esc(String(x.r.day))+'-го'}`:''}</span><b>${x.k==='in'?'+':'−'}${esc(moneyK(x.rest,rlRowCur(x.r)))}</b></button>`).join('')
           :`<button class="wg-li" data-wga="planadd"><span>План місяця порожній</span><b>＋</b></button>`}`);
     }
     if(t==='wgdebt'){
       const d=wgDebtNet(); let s=0, dc={ok:0,all:0}; try{ s=jnStreak(); dc=rlDiscipline(); }catch(_){}
-      return wgTile('wide c-debt',`<button class="wg-hit" data-wga="debts" aria-label="Борги"></button>
-        <span class="wg-h">🤝 Борги · 📖 Правила</span>
+      return wgPageTile(b,fk,'wide c-debt',`<button class="wg-hit" data-wga="debts" aria-label="Борги"></button>
+        ${wgSettingsHead(b,'Борги й правила','🤝 Борги · 📖 Правила')}
         <span class="wg-two"><span><b class="wg-big">${d.net>0?'+':''}${wgK(d.net)}</b><small>${d.owed||d.owe?'мені винні '+wgK(d.owed)+' · я винен '+wgK(d.owe):'боргів нема'}</small></span>
         <button class="wg-rules" data-wga="rules"><b>🔥 ${s} ${pluralUk(s,'день','дні','днів')}</b><small>${dc.all?'дисципліна '+Math.round(dc.ok/dc.all*100)+'%':'Книга правил ›'}</small></button></span>`);
     }
     if(t==='wgwork'){
       const i=typeof wkMoneyInfo==='function'?wkMoneyInfo(ym):null;
-      if(!i) return '';
-      return wgTile('wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
-        <span class="wg-h">⏱ Робота · ${esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase())}</span><b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
+      if(!i) return b.id?wgPageTile(b,fk,'wide c-work',`${wgSettingsHead(b,'Робота','⏱ Робота')}<small>Дані про години недоступні</small>`):'';
+      return wgPageTile(b,fk,'wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
+        ${wgSettingsHead(b,'Робота','⏱ Робота · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase()))}<b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
         <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>
         ${b.id?'<span class="wg-acts one"><button data-wga="workadd">＋ Години</button></span>':''}`);   // на сторінці папки (є id блока) — запис годин на сьогодні; у Гаманці — без кнопки
     }
     if(t==='wgmoney'){
       const kind=b.kind==='out'?'out':'in', src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&b.cur!==mainCur()&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:'';
-      if(!fk) return wgTile('c-'+kind,`<span class="wg-h">${kind==='in'?'＋ Доходи':'− Витрати'}</span><b class="wg-big sm">Лише в папці</b><small>постав віджет у папку-проєкт</small>`);
+      const name=String(b.label||(kind==='in'?'Доходи':'Витрати')).slice(0,40);
+      const head=wgSettingsHead(b,name,esc(name),name);
+      if(!fk) return wgPageTile(b,fk,'c-'+kind,`${head}<b class="wg-big sm">Лише в папці</b><small>постав віджет у папку-проєкт</small>`);
       // віджет із валютою (етап 2) рахує лише свою валюту; без — головну
       const ops=wlMonthOps(ym).filter(o=>inFolderOp(o,fk)&&(o.cur||'')===cur&&(kind==='in'?_isIncAny(o)&&wlSrc(o)===src:_isExpAny(o)));
       const sum=ops.reduce((s,o)=>s+(+o.amount||0),0), goal=+b.goal>0?+b.goal:0, last=ops[ops.length-1];
-      return wgTile('c-'+kind,`<button class="wg-hit" data-wga="folderops" aria-label="Записи папки"></button>
-        <button class="wg-cfg" data-wga="cfg" aria-label="Налаштувати віджет">⚙</button>
-        <span class="wg-h">${kind==='in'?WL_SRC[src][0]:'−'} ${esc(String(b.label||(kind==='in'?'Доходи':'Витрати')).slice(0,20))}</span>
+      return wgPageTile(b,fk,'c-'+kind,`<button class="wg-hit" data-wga="folderops" aria-label="Записи папки"></button>
+        ${head}
         <b class="wg-big">${esc(moneyK(sum,cur))}</b>
         <small>${goal?(kind==='in'?'ціль ':'ліміт ')+esc(moneyK(goal,cur))+' · '+Math.round(sum/goal*100)+'%':ops.length?ops.length+' '+pluralUk(ops.length,'запис','записи','записів')+(last?' · '+esc(String(last.label||'').slice(0,14)):''):'цього місяця ще нема'}</small>
         ${goal?`<span class="wg-bar"><i class="${kind==='out'&&sum>goal?'over':''}" style="width:${Math.min(100,Math.round(sum/goal*100))}%"></i></span>`:''}
@@ -117,7 +141,7 @@
     else if(a==='workadd'){ try{ workTapDay(ymdLocal()); }catch(_){} }   // та сама шторка, що й тап по дню в календарі Роботи
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }
-    else if(a==='cfg'){ if(id) wgMoneyCfg(id,false); }
+    else if(a==='cfg'){ if(id) wdSheet(id,{tab:'own'}); }
     else if(a.slice(0,2)==='wd'){ wdAct(a,el,blk(),fk,id); }
     else if(a==='add'){ const b=blk(); if(!b||!fk) return; const g=wgFolderMission(fk);
       wlOpSheet(b.kind==='out'?'out':'in', g?String(g.id):'', {folderKey:fk, src:b.src, cur:b.cur, label:b.kind==='out'?'':(b.label||'')}); }
@@ -125,6 +149,14 @@
   function wgFill(host,b,fk){
     host.dataset.wgfk=fk||'';
     let html=''; try{ html=wgHTML(b,fk); }catch(err){ console.error('wgHTML',err); }
+    if(b&&wgHasSettings(b.type)&&b.ws&&host.classList.contains('pgwg')&&!host.closest('.pg-board')){
+      const dev=wdDev(), [w,h]=wdCell(b,dev);
+      host.style.setProperty('--money-width',w/wdCols(dev)*100+'%');
+      host.style.setProperty('--money-height',Math.max(150,h*54)+'px');
+    }else{
+      host.style.removeProperty('--money-width');
+      host.style.removeProperty('--money-height');
+    }
     host.innerHTML=html||'<div class="wg-t c-none"><small>Віджет недоступний</small></div>';
     if(!host.__wgBound){ host.__wgBound=true; host.addEventListener('click',e=>wgAct(e,host)); }
   }
@@ -139,30 +171,6 @@
   function wgHome(root){ (root||document).querySelectorAll('[data-wghome]').forEach(h=>wgFill(h,{type:h.dataset.wghome},'')); }
   // після будь-якого запису грошей — перемалювати всі видимі віджети
   function wgRefresh(){ try{ wgFillPage(document); }catch(_){} try{ wgHome(); }catch(_){} }
-
-  // ── налаштування «Доходи»/«Витрати»: тип доходу, назва, ціль/ліміт ──
-  function wgMoneyCfg(id,isNew){
-    let b=null; try{ b=getBlock(id); }catch(_){} if(!b||b.type!=='wgmoney') return;
-    const kind=b.kind==='out'?'out':'in'; let src=WL_SRC[b.src]?b.src:'main', cur=b.cur&&Object.prototype.hasOwnProperty.call(CUR_LIST,b.cur)?b.cur:mainCur();
-    jnOverlay(`<div class="jn-ed-h"><b>${isNew?'Новий віджет':'Віджет'} «${kind==='in'?'Доходи':'Витрати'}»</b><button data-jnx aria-label="Закрити">✕</button></div>
-      <small class="dy-fm-sub">Записи з нього підуть у Гаманець з міткою цієї папки${kind==='in'?' і типом доходу':''}.</small>
-      ${kind==='in'?`<div class="jn-f"><span>Тип доходу</span><div class="wl-chips" id="wgSrc">${Object.keys(WL_SRC).map(k=>`<button data-wgsrc="${k}"${k===src?' class="on"':''}>${WL_SRC[k][0]} ${WL_SRC[k][1]}</button>`).join('')}</div></div>`:''}
-      <div class="jn-f"><span>Валюта</span><div class="wl-chips" id="wgCur">${Object.keys(CUR_LIST).map(k=>`<button data-wgcur="${k}"${k===cur?' class="on"':''}>${CUR_LIST[k].s} ${CUR_LIST[k].n}${k===mainCur()?' · головна':''}</button>`).join('')}</div></div>
-      <label class="jn-f"><span>Назва</span><input id="wgLbl" maxlength="40" value="${esc(String(b.label||''))}" placeholder="${kind==='in'?'Фріланс, клієнти…':'Реклама, софт…'}"></label>
-      <label class="jn-f"><span>${kind==='in'?'Ціль':'Ліміт'} на місяць, ${curSym(cur)} (необовʼязково)</span><input id="wgGoal" type="number" inputmode="numeric" min="0" step="100" value="${+b.goal>0?+b.goal:''}" placeholder="Напр. 15000"></label>
-      <div class="jn-ed-foot"><button class="jn-btn" data-wgok>Зберегти</button></div>`, ov=>{
-      ov.querySelectorAll('[data-wgcur]').forEach(x=>x.onclick=()=>{ cur=x.dataset.wgcur; ov.querySelectorAll('[data-wgcur]').forEach(y=>y.classList.toggle('on',y===x)); });
-      ov.querySelectorAll('[data-wgsrc]').forEach(x=>x.onclick=()=>{ src=x.dataset.wgsrc; ov.querySelectorAll('[data-wgsrc]').forEach(y=>y.classList.toggle('on',y===x)); });
-      ov.querySelector('[data-wgok]').onclick=()=>{
-        const q=getBlock(id); if(!q){ ov.remove(); return; }
-        q.label=String(ov.querySelector('#wgLbl').value||'').trim().slice(0,40)||(kind==='in'?'Доходи':'Витрати');
-        const gv=Math.round(parseFloat(String(ov.querySelector('#wgGoal').value||'').replace(',','.'))||0); q.goal=gv>0?gv:0;
-        if(kind==='in') q.src=src;
-        if(cur!==mainCur()){ q.cur=cur; const l=wlCurList(); if(!l.includes(cur)){ l.push(cur); wlCurSave(l); } } else delete q.cur;   // інша валюта — зʼявиться окремим балансом у Гаманці
-        saveBoard(); ov.remove(); wgRefresh();
-      };
-    });
-  }
 
   /* ════════ «Дані» (10.10.2026): віджети-вікна в екосистему — Місія · Звичка · Час папки ════════
      Блок зберігає ЛИШЕ свої налаштування: sz ('s'|'m'|'l', + gw/gh для сітки дошки), goalId (місія; порожньо — місія цієї папки),
@@ -193,13 +201,18 @@
   function wdSzOld(b){ return b&&Object.prototype.hasOwnProperty.call(WD_SZ,String(b.sz||''))?b.sz:(b&&b.type==='dcal'?'l':b&&(b.type==='dtime'||b.type==='dtasks'||b.type==='dphoto'||b.type==='countdown')?'m':'s'); }
   function wdPer(b){ const m=WD_META[b.type]; if(!m||!m.per) return ''; return m.per.some(x=>x[0]===b.period)?b.period:m.per[0][0]; }
   function wdOn(b,k){ return !(b&&b.show&&typeof b.show==='object'&&b.show[k]===false); }
+  function wdOpenNew(id){
+    const key=boardKey;
+    setTimeout(()=>{
+      if(boardKey===key&&!document.querySelector('.ws-ov.on:not(.out)')) wdSheet(id,{tab:'own'});
+    },450);
+  }
   // новий блок із меню «Дані»: лише налаштування, без копії даних
   function wdInit(b,k){
     b.type=k; b.sz=wdSz(b); b.gw=WD_SZ[b.sz].gw; b.gh=WD_SZ[b.sz].gh;
     if(WD_META[k].per&&!b.period) b.period=(k==='dtime'||k==='dtasks')?'day':'week';
     delete b.text;
-    if(k==='countdown'){ const bid=b.id; setTimeout(()=>{ try{ tmCfg(bid); }catch(_){} },450); }   // новий відлік — одразу спитати назву й дату
-    if(k==='dhabit'){ const bid=b.id; setTimeout(()=>{ try{ wdSheet(bid,{tab:'own'}); }catch(_){} },450); }   // новий трекер — одразу шторка з рядом «Вигляд» (22.11.2026)
+    if(k==='countdown'||k==='dhabit') wdOpenNew(b.id);
     return b;
   }
   // місія віджета: обрана в налаштуваннях (не архівна) → інакше місія цієї папки

@@ -488,8 +488,9 @@
       /* віджети «Дані» мають розміри S/M/L — ширину на телефоні й ноуті задає CSS за data-sz */
       if(typeof wdIs==='function'&&wdIs(it.type)) cell.dataset.sz=wdSz(it);
       /* дошка віджетів (19.11.2026): розмір — клітинки, свій на телефоні (4 колонки) і компʼютері (8), CSS 41-widget-sheet.css */
-      if(rb.wboard&&typeof wdCell==='function'&&wdIs(it.type)){
+      if(rb.wboard&&typeof wdCell==='function'&&(wdIs(it.type)||wgHasSettings(it.type)&&it.ws)){
         var cm=wdCell(it,'m'), cd=wdCell(it,'d');
+        cell.dataset.sz=wdSz(it);
         cell.style.setProperty('--wcm',cm[0]); cell.style.setProperty('--whm',cm[1]); cell.style.setProperty('--wcd',cd[0]); cell.style.setProperty('--whd',cd[1]);
         cell.classList.add('wb-cell');
       }

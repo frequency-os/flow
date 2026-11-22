@@ -2,8 +2,7 @@
      Скляна шторка з двома вкладками: «Загальні» (назва, колір, фон, шапка, розмір, дублювати, видалити) і «<Цей віджет>».
      Шестерні ⚙ більше нема: шторка відкривається тапом по шапці, утриманням віджета (ПКМ на компʼютері) і тапом у режимі «Змінити».
      Розмір — клітинки сітки: телефон 4 колонки, компʼютер (≥760) 8 колонок, свій на кожному пристрої: b.ws = {m:[w,h], d:[w,h]}.
-     Без b.ws віджет живе як раніше (sz S/M/L) — нічого не мігруємо. Зміни видно одразу в прев'ю, а в блок пишуться при закритті шторки,
-     лише ті поля, що в WS_KEYS (дані місій, Планера й Гаманця шторка не чіпає — лише вигляд віджета). */
+     Без b.ws віджет живе як раніше (sz S/M/L). Чернетку видно в прев'ю, у блок пишемо змінені поля лише за кнопкою «Зберегти». */
   // var, а не const: віджет може намалюватись раніше, ніж виконався цей файл (порядок core) — тоді значення ще undefined, а не «мертва зона»
   var WD_ROWS=5;
   var WD_SZ_CELL={s:[2,2],m:[4,2],l:[4,4]};
@@ -16,6 +15,7 @@
     const c=b&&b.ws&&typeof b.ws==='object'?b.ws[dev]:null;
     if(Array.isArray(c)&&c.length===2){ const w=Math.round(+c[0]), h=Math.round(+c[1]);
       if(w>=1&&h>=1) return [Math.min(w,wdCols(dev)),Math.min(h,5)]; }
+    if(b&&wgHasSettings(b.type)) return [wdCols(dev),2];
     const t=wdSzOld(b); return t==='l'?[4,4]:t==='m'?[4,2]:[2,2];
   }
   // що показати в цій площі: xs — значок і число · row — рядок · s / m / l — як раніше
@@ -40,17 +40,26 @@
   window.addEventListener('resize',()=>{ const d=wdDev(); if(d!==wdDevNow){ wdDevNow=d; try{ wdRedraw(); }catch(_){} } });
 
   // ── шторка ──
-  var WS_KEYS=['ws','sz','gw','gh','hd','cc','bg','nohd','goalId','period','show','title','label','target','tm','dir','units','sty','yearly','end','goal','main','tapmk','ev','q','look','days'];
+  var WS_KEYS=['ws','sz','gw','gh','hd','cc','bg','nohd','goalId','period','show','title','label','target','tm','dir','units','sty','yearly','end','goal','main','tapmk','ev','q','look','days','cur','src'];
   var WS_PAL=[['glass','Скло'],['frost','Матове'],['solid','Колір']];
-  function wsName(b){ return b.type==='countdown'?String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60):String(b.hd||'').slice(0,40); }
+  function wsName(b){
+    if(b.type==='wgmoney') return String(b.label||'').slice(0,40);
+    if(b.type==='countdown') return String(b.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,60);
+    return String(b.hd||'').slice(0,40);
+  }
   function wdSheet(id,opt){
     opt=opt||{};
-    let b0=null; try{ b0=getBlock(id); }catch(_){} if(!b0||!wdIs(b0.type)) return;
-    const old=document.querySelector('.ws-ov'); if(old){ try{ old.__wsClose&&old.__wsClose(); }catch(_){} old.remove(); }
-    const m=WD_META[b0.type], fk=wgCtxFolder(), dev=wdDev();
-    const d=JSON.parse(JSON.stringify(b0));   // чернетка: прев'ю малюється з неї, у блок — при закритті
-    const was={}; WS_KEYS.forEach(k=>{ was[k]=JSON.stringify(d[k]); });   // з чим порівнювати при закритті
-    let tab=opt.tab==='own'?'own':'gen';
+    let b0=null; try{ b0=getBlock(id); }catch(_){}
+    if(!b0||(!wdIs(b0.type)&&!wgHasSettings(b0.type))) return;
+    document.querySelectorAll('.ws-ov').forEach(old=>{ old.__wsClose(); old.remove(); });
+    const money=b0.type==='wgmoney', income=b0.kind!=='out';
+    const moneyName=income?'Доходи':'Витрати';
+    const finance=wgHasSettings(b0.type), mission=b0.type==='wgmission';
+    const m=money?{t:moneyName,h:moneyName,ic:income?'💚':'🧾'}:WG_SETTINGS[b0.type]||WD_META[b0.type];
+    const fk=wgCtxFolder(), dev=wdDev(), openedBoard=boardKey, opener=document.activeElement;
+    const d=JSON.parse(JSON.stringify(b0));
+    const was={}; WS_KEYS.forEach(k=>{ was[k]=JSON.stringify(d[k]); });
+    let tab=m.h&&opt.tab==='own'?'own':'gen';
     /* ритм і вихідні (22.11.2026, крок 2): це поля ТРЕКЕРА місії, не віджета. Чернетка trD (ключ — папка місії);
        прев'ю бачить її через d.__tr (поля нема в WS_KEYS — у блок не пишеться); у трекер — лише при закритті і лише якщо змінено */
     let trD=null;
@@ -71,10 +80,11 @@
     const ov=document.createElement('div'); ov.className='ws-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
     ov.setAttribute('aria-label','Налаштування віджета «'+m.t+'»');
     ov.innerHTML=`<div class="ws-sh"><div class="ws-grab" aria-hidden="true"></div>
-      <div class="ws-hd"><b>${m.ic} ${esc(m.t)}</b><button class="ws-done" data-wsdone>Готово</button></div>
+      <div class="ws-hd"><b><span aria-hidden="true">${m.ic}</span> <span>${esc(m.t)}</span></b></div>
       <div class="ws-pv" aria-hidden="true"><div class="ws-pvc"><div class="wg-host ws-pvh"></div></div></div>
-      <div class="ws-tabs" role="tablist"><button role="tab" data-wstab="gen">Загальні</button><button role="tab" data-wstab="own">${esc(b0.type==='countdown'?m.t:m.h)}</button></div>
-      <div class="ws-body"></div></div>`;
+      ${m.h?`<div class="ws-tabs" role="tablist"><button role="tab" data-wstab="gen">Загальні</button><button role="tab" data-wstab="own">${esc(b0.type==='countdown'?m.t:m.h)}</button></div>`:''}
+      <div class="ws-body"></div>
+      <div class="ws-acts ws-footer"><button type="button" data-wscancel>Скасувати</button><button type="button" data-wsdone>Зберегти</button></div></div>`;
     document.body.appendChild(ov);
     const sh=ov.querySelector('.ws-sh'), body=ov.querySelector('.ws-body'), pvc=ov.querySelector('.ws-pvc'), pvh=ov.querySelector('.ws-pvh');
     pvh.setAttribute('inert','');
@@ -91,8 +101,15 @@
 
     function genHTML(){
       const c=wdCell(d,dev), cols=wdCols(dev);
+      const bg=d.bg==='frost'||d.bg==='solid'?d.bg:'glass';
+      if(finance){
+        const size=c[1]>=4?'large':c[0]<cols?'small':'wide';
+        return grp('',`<label class="ws-it"><span>Назва</span><input class="ws-in" data-wsname maxlength="40" value="${escAttr(wsName(d))}" placeholder="${escAttr(m.t)}"></label>`
+          +row('Фон',seg('bg',WS_PAL,bg))
+          +row(dev==='d'?'Розмір на компʼютері':'Розмір на телефоні',seg('money-size',[['small','Малий'],['wide','Широкий'],['large','Великий']],size),'wrap'));
+      }
       let cells=''; for(let r=1;r<=WD_ROWS;r++) for(let k=1;k<=cols;k++) cells+=`<button data-wspk="${k},${r}" class="${k<=c[0]&&r<=c[1]?'in':''}" aria-label="${k} на ${r}"></button>`;
-      const cc=wdCcOf(d), bg=d.bg==='frost'||d.bg==='solid'?d.bg:'glass';
+      const cc=wdCcOf(d);
       return grp('Вигляд',
           row('Назва',`<input class="ws-in" data-wsname maxlength="${d.type==='countdown'?60:40}" value="${esc(wsName(d))}" placeholder="${esc(d.type==='countdown'?'Новий рік, відпустка…':m.h)}">`)
           +row('Колір',`<span class="ws-cc"><button data-wscc="" class="fold${cc?'':' on'}" aria-label="Колір папки" aria-pressed="${!cc}"></button>${WD_CC.map(x=>`<button data-wscc="${x}" style="--s:${x}" class="${cc===x?'on':''}" aria-label="Колір ${x}" aria-pressed="${cc===x}"></button>`).join('')}</span>`,'wrap')
@@ -104,6 +121,27 @@
     }
     function ownHTML(){
       const t=d.type;
+      if(mission){
+        const defaultMission=wgMoneyMission({},fk), linked=wgFolderMission(fk);
+        const english=flowLang()==='en';
+        const label=linked?(english?'Folder mission':'Місія цієї папки'):(english?'First available mission':'Перша доступна місія');
+        const options=wlMissions();
+        const selected=d.goalId&&wlGoal(d.goalId);
+        if(selected&&!options.some(g=>String(g.id)===String(selected.id))) options.push(selected);
+        return grp('',`<label class="ws-it"><span>Місія</span><select class="ws-in" data-wsmission>
+          <option value="">${label}${defaultMission?' · '+esc(defaultMission.name||''):''}</option>
+          ${options.map(g=>`<option value="${escAttr(g.id)}"${selected&&String(g.id)===String(selected.id)?' selected':''}>${esc(g.name||'Місія')}</option>`).join('')}
+          </select></label>`);
+      }
+      if(money){
+        const currency=Object.hasOwn(CUR_LIST,d.cur)?d.cur:mainCur();
+        const source=Object.hasOwn(WL_SRC,d.src)?d.src:'main';
+        const english=flowLang()==='en';
+        const sourceNames={main:'Main',extra:'Side',passive:'Passive'};
+        return grp('',(income?`<label class="ws-it"><span>Тип доходу</span><select class="ws-in" data-wsmoney="src">${Object.keys(WL_SRC).map(k=>`<option value="${k}"${k===source?' selected':''}>${english?sourceNames[k]:WL_SRC[k][1]}</option>`).join('')}</select></label>`:'')
+          +`<label class="ws-it"><span>Валюта</span><select class="ws-in" data-wsmoney="cur">${Object.keys(CUR_LIST).map(k=>`<option value="${k}"${k===currency?' selected':''}>${CUR_LIST[k].s} ${english?k:CUR_LIST[k].n}</option>`).join('')}</select></label>
+          <label class="ws-it"><span>${income?'Ціль на місяць':'Ліміт на місяць'}</span><input class="ws-in" data-wsmoney="goal" type="number" min="0" step="1" inputmode="numeric" value="${+d.goal>0?+d.goal:''}"></label>`);
+      }
       if(t==='countdown'){
         const c=tmCfgOf(d), units=new Set(c.units);
         return grp('Відлік',
@@ -151,14 +189,24 @@
       body.innerHTML=tab==='gen'?genHTML():ownHTML();
       pvDraw();
     }
-    // ── запис при закритті: лише поля вигляду, у свіжий блок (поки шторка відкрита, синк міг підмінити дошку) ──
+    // Записуємо лише змінені поля у свіжий блок тієї самої дошки.
     let closed=false;
-    function commit(){
+    const changedKeys=()=>WS_KEYS.filter(k=>JSON.stringify(d[k])!==was[k]);
+    const trackerChanged=()=>trD&&(JSON.stringify(trD.rest)!==trD.wasRest||JSON.stringify(trD.rhythm)!==trD.wasRh);
+    function liveBlock(){
+      if(boardKey!==openedBoard) return null;
+      const b=getBlock(id);
+      return b&&b.type===d.type&&(!money||b.kind===d.kind)?b:null;
+    }
+    function commit(q){
       // лише поля, які людина змінила: дата, що прийшла синком з іншого пристрою, поки шторка відкрита, не затирається старою
-      const ch=WS_KEYS.filter(k=>JSON.stringify(d[k])!==was[k]); if(!ch.length) return false;
-      const q=getBlock(id); if(!q||q.type!==d.type) return false;
-      ch.forEach(k=>{ if(d[k]===undefined) delete q[k]; else q[k]=JSON.parse(JSON.stringify(d[k])); });
-      saveBoard(); return true;
+      const ch=changedKeys(); if(!ch.length) return false;
+      ch.forEach(k=>{
+        if(k==='ws') q.ws={...q.ws,[dev]:d.ws[dev].slice()};
+        else if(d[k]===undefined) delete q[k];
+        else q[k]=JSON.parse(JSON.stringify(d[k]));
+      });
+      return true;
     }
     // ритм/вихідні — у свіжий трекер (синк міг його підмінити), лише змінені, лише після дії людини
     function commitTr(){
@@ -170,19 +218,37 @@
       // незнайомий ритм із новішої версії лишається, поки людина сама не вибере інший
       if(chRest){ if(trD.rest.length) t.rest=trD.rest.slice(); else delete t.rest; }
       if(chRh){ if(trD.rhythm&&trD.rhythm.k!=='day') t.rhythm=Object.assign({},trD.rhythm); else delete t.rhythm; }
-      saveBoard(); return true;
+      return true;
     }
-    function close(){ if(closed) return; closed=true; const ch=commitTr()|commit(); ov.classList.add('out'); setTimeout(()=>ov.remove(),220); if(ch) wdRedraw(); document.removeEventListener('keydown',onKey,true); }
-    ov.__wsClose=()=>{ if(!closed){ closed=true; if(commitTr()|commit()) wdRedraw(); document.removeEventListener('keydown',onKey,true); } };
+    function close(save=false){
+      if(closed) return;
+      closed=true;
+      document.removeEventListener('keydown',onKey,true);
+      const q=save?liveBlock():null;
+      if(q){
+        const blockChanged=commit(q), trackerSaved=commitTr();
+        if(blockChanged||trackerSaved){ saveBoard(); wdRedraw(); }
+      }
+      ov.inert=true;
+      ov.classList.add('out');
+      setTimeout(()=>ov.remove(),220);
+      if(opener?.isConnected) opener.focus();
+    }
+    ov.__wsClose=close;
     function onKey(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
     document.addEventListener('keydown',onKey,true);
     ov.addEventListener('click',e=>{ if(e.target===ov){ close(); return; }
       const x=e.target.closest('button'); if(!x||!ov.contains(x)) return;
-      if(x.dataset.wsdone!==undefined){ close(); return; }
+      if(x.dataset.wsdone!==undefined){ close(true); return; }
+      if(x.dataset.wscancel!==undefined){ close(); return; }
       if(x.dataset.wstab){ tab=x.dataset.wstab; draw(); return; }
       if(x.dataset.wscc!==undefined){ if(x.dataset.wscc) d.cc=x.dataset.wscc; else delete d.cc; draw(); return; }
       if(x.dataset.wsset){ const k=x.dataset.wsset, v=x.dataset.v;
         if(k==='bg'){ if(v==='glass') delete d.bg; else d.bg=v; }
+        else if(k==='money-size'){
+          const cols=wdCols(dev);
+          wdSetCell(d,dev,v==='small'?cols/2:cols,v==='large'?4:2);
+        }
         else if(k==='dir'){ if(v==='up') d.dir='up'; else delete d.dir; }
         else if(k==='sty'){ if(v==='flip') delete d.sty; else d.sty=v; }
         else if(k==='end'){ if(v==='conf') delete d.end; else d.end=v; }
@@ -213,6 +279,11 @@
       if(x.dataset.wsst){ const mx=d.type==='dhabit'?7:(wdPer(d)==='month'?200:60), v=(wsGoal(d)||0)+(+x.dataset.n<0?-1:1);
         if(v<=0) delete d.goal; else d.goal=Math.min(mx,v); draw(); return; }
       if(x.dataset.wspk){ const [w,h]=x.dataset.wspk.split(',').map(Number); wdSetCell(d,dev,w,h); draw(); return; }
+      if((x.dataset.wsgo||x.dataset.wsdup!==undefined||x.dataset.wsdel!==undefined)&&!liveBlock()){ close(); return; }
+      if((x.dataset.wsgo||x.dataset.wsdup!==undefined)&&(changedKeys().length||trackerChanged())){
+        plToast('Спершу збережи або скасуй зміни');
+        return;
+      }
       if(x.dataset.wsgo){ const k=x.dataset.wsgo; close();
         const q=wdGoal(getBlock(id)||d,fk); if(!q||!q.id){ plToast('Спершу вибери місію'); return; }
         if(k==='save') wdSaveGoalSheet(q.id); else wdCounterSheet(id,q.id,String(d.cid||'')); return; }
@@ -222,10 +293,29 @@
     ov.addEventListener('input',e=>{
       const x=e.target;
       if(x.matches('[data-wsname]')){ const v=String(x.value||'').replace(/\s+/g,' ').trim();
-        if(d.type==='countdown'){ d.title=v.slice(0,60); d.label=d.title; } else if(v) d.hd=v.slice(0,40); else delete d.hd;
+        if(money) d.label=v.slice(0,40)||moneyName;
+        else if(d.type==='countdown'){ d.title=v.slice(0,60); d.label=d.title; } else if(v) d.hd=v.slice(0,40); else delete d.hd;
         try{ wgFill(pvh,d,fk); }catch(_){} return; }
+      if(x.dataset.wsmoney==='goal'){
+        const n=Math.round(x.valueAsNumber);
+        d.goal=Number.isFinite(n)&&n>0?n:0;
+        pvDraw(); return;
+      }
       if(x.matches('[data-wsdate]')){ const v=String(x.value||''); if(/^\d{4}-\d{2}-\d{2}$/.test(v)){ d.target=v; try{ wgFill(pvh,d,fk); }catch(_){} } return; }
       if(x.matches('[data-wstime]')){ const v=String(x.value||'').slice(0,5); if(/^([01]\d|2[0-3]):[0-5]\d$/.test(v)&&v!=='00:00') d.tm=v; else delete d.tm; try{ wgFill(pvh,d,fk); }catch(_){} }
+    });
+    ov.addEventListener('change',e=>{
+      const x=e.target;
+      if(mission&&x.matches('[data-wsmission]')){
+        if(!x.value) delete d.goalId;
+        else if(wlGoal(x.value)) d.goalId=x.value;
+        else return;
+      }else if(x.dataset.wsmoney==='src'&&Object.hasOwn(WL_SRC,x.value)) d.src=x.value;
+      else if(x.dataset.wsmoney==='cur'&&Object.hasOwn(CUR_LIST,x.value)){
+        if(x.value===mainCur()) delete d.cur;
+        else d.cur=x.value;
+      }else return;
+      pvDraw();
     });
     // розмір на сітці-вибирачі: наведення підсвічує прямокутник (компʼютер)
     ov.addEventListener('pointerover',e=>{ const x=e.target.closest('[data-wspk]'); if(!x) return; const [w,h]=x.dataset.wspk.split(',').map(Number);

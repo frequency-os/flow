@@ -209,6 +209,17 @@
     // Наповнюється поступово, екран за екраном. Ключі — точний текст,
     // який реально є в DOM (без зайвих пробілів).
     const I18N_DICT = {
+      'Розмір на компʼютері':'Desktop size', 'Розмір на телефоні':'Phone size',
+      'Широкий':'Wide', 'Малий':'Small', 'Великий':'Large', 'Тип доходу':'Income type',
+      'Загальні':'General', 'Доходи':'Income', 'Витрати':'Spending',
+      'Назва':'Name', 'Валюта':'Currency', 'Фон':'Background',
+      'Скло':'Glass', 'Матове':'Frosted', 'Колір':'Color',
+      'Ціль на місяць':'Monthly target', 'Ліміт на місяць':'Monthly limit',
+      'Гаманець':'Wallet', 'Робота':'Work', 'Гроші місії':'Mission money',
+      'Конверти й платежі':'Envelopes & bills', 'Борги й правила':'Debts & rules', 'Місія':'Mission',
+      'Спершу збережи або скасуй зміни':'Save or cancel your changes first',
+      'Знайти папку':'Find a folder',
+      'Папок не знайдено':'No folders found', 'Потребують уваги':'Need attention',
       // «Ще → Про застосунок»: прев'ю «Що таке Frequency» (54-intro.js)
       'Що таке Frequency':'What is Frequency', 'коротка екскурсія: навіщо це і як допомагає рости':'a short tour: why it exists and how it helps you grow',
       // нижня навігація

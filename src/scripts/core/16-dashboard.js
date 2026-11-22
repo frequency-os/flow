@@ -330,6 +330,92 @@
     });
     grid.appendChild(fc3Add());
   }
+  function openFolderFromList(key){
+    if(!folderVisible(key)) return;
+    if(isFolderGroup(key)) openGroupAsChosen(key);
+    else goFolder(key);
+  }
+
+  function addFolderOpenButton(card, key){
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='folder-card-open';
+    button.setAttribute('aria-label',folders[key].name);
+    button.setAttribute('data-i18n-skip','1');
+    card.prepend(button);
+  }
+
+  function renderFolderTools(){
+    const tools=document.getElementById('folderTools');
+    const input=document.getElementById('folderFind');
+    const matches=document.getElementById('folderMatches');
+    const empty=document.getElementById('folderFindEmpty');
+    const attention=document.getElementById('folderAttention');
+    const deadlines=document.getElementById('folderDeadlines');
+    const grid=document.getElementById('folderGrid');
+    tools.hidden=homeTab!=='folders';
+    grid.classList.remove('folder-searching');
+    if(tools.hidden){ input.value=''; return; }
+
+    const keys=orderedFolderKeys().filter(key=>key!=='work'&&folderVisible(key));
+    function addResult(list,key,detail){
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='folder-tool-result';
+      const title=document.createElement('span');
+      title.dataset.i18nSkip='1';
+      title.textContent=folders[key].name;
+      button.append(title);
+      if(detail) button.append(detail);
+      button.onclick=()=>{
+        input.value='';
+        updateSearch();
+        openFolderFromList(key);
+      };
+      list.append(button);
+    }
+
+    const english=flowLang()==='en';
+    input.placeholder=english?'Folder name':'Назва папки';
+    const today=Date.parse(ymdLocal());
+    const weekEnd=today+7*86400000;
+    const projects=keys.filter(key=>folderTabOf(key)===''&&folders[key].role==='project'&&folders[key].status!=='done')
+      .map(key=>({key,date:Date.parse(folders[key].due+'T00:00:00Z')}))
+      .filter(project=>project.date<=weekEnd)
+      .sort((a,b)=>a.date-b.date).slice(0,3);
+    const format=new Intl.DateTimeFormat(english?'en':'uk',{day:'numeric',month:'short',timeZone:'UTC'});
+    deadlines.replaceChildren();
+    projects.forEach(({key,date})=>{
+      const detail=document.createElement('small');
+      if(date<today){
+        const overdue=document.createElement('span');
+        overdue.textContent=english?'Overdue':'Прострочено';
+        detail.append(overdue,' · ');
+      }
+      detail.append(format.format(date));
+      addResult(deadlines,key,detail);
+    });
+
+    function updateSearch(){
+      const query=input.value.trim().toLocaleLowerCase();
+      matches.replaceChildren();
+      if(query){
+        keys.filter(key=>String(folders[key].name||'').toLocaleLowerCase().includes(query)).forEach(key=>{
+          const parent=folders[key].parent;
+          const path=parent&&folders[parent]?document.createElement('small'):null;
+          if(path){ path.dataset.i18nSkip='1'; path.textContent=folderPathName(parent); }
+          addResult(matches,key,path);
+        });
+      }
+      empty.hidden=!query||matches.childElementCount>0;
+      attention.hidden=!!query||!projects.length;
+      grid.classList.toggle('folder-searching',!!query);
+    }
+    input.oninput=updateSearch;
+    updateSearch();
+  }
+  document.addEventListener('flowlangchange',renderFolderTools);
+
   function renderDashboard(){
     try{ window.__renderDashboard=renderDashboard; }catch(_){}
     try{ renderHeroStreak(); }catch(_){}
@@ -340,7 +426,10 @@
     grid.classList.add('fv2-'+homeFolderView);
     applyFolderViewIcon();
     // вкладка «Чати» на Огляді (36-chats.js): замість сітки папок — список чатів
-    try{ if(chatsHomeSync()) return; }catch(e){ console.error('chatsHomeSync',e); }
+    let showingChats=false;
+    try{ showingChats=chatsHomeSync(); }catch(e){ console.error('chatsHomeSync',e); }
+    renderFolderTools();
+    if(showingChats) return;
     // 🚀 проєкти переїхали на вкладку «Проєкти»: Робота + папки-проєкти не показуємо в Огляді
     let keys=topFolderKeys().filter(folderVisible).filter(k=>k!=='work');   // проєкти — звичайні папки зі статусом (14.10.2026)
     // своя вкладка Огляду — лише її папки, «Папки» — без вкладки (36-chats.js, 21.11.2026)
@@ -428,12 +517,14 @@
       prioHeadMaybe(grid,k); grid.appendChild(el);
     });
     // add-folder card — під поточний режим
-    const add=document.createElement('div');
+    const add=document.createElement('button');
+    add.type='button';
     add.className=homeFolderView==='rows'?'fr fr-add':'fc2 fc2-add '+(homeFolderView==='mag'?'fc2-mag-add':'fc2-row-add');
     add.innerHTML=homeFolderView==='rows'?`<span class="fr-ic" style="background:transparent;box-shadow:none;color:var(--accent);font-size:22px">＋</span><span>Нова папка</span>`:`<div class="fc2-plus">＋</div><div class="fc2-addt">Нова папка</div>`;
     add.onclick=()=>openNewFolderChoice();
     grid.appendChild(add);
     }
+    grid.querySelectorAll('.fcard[data-fkey]').forEach(card=>addFolderOpenButton(card,card.dataset.fkey));
     // bind menus
     grid.querySelectorAll('[data-fmenu]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openFolderMenu(b.dataset.fmenu); });
     // «фото» на кольоровій обкладинці — одразу вибір знімка

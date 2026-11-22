@@ -149,7 +149,7 @@
   }
 
   /* ── вітрина ── */
-  var bsState={sph:'all',q:'',open:''};
+  var bsState={sph:'all',q:'',open:'',look:''};
   function bsBtn(k,big){
     const g=bsGot(k), en=bsLang()==='en';
     return `<button class="bs-get${big?' big':''}${g?' got':''}" data-bsget="${esc(k)}" aria-pressed="${g}">${g?(big?(en?'In menu ✓':'У меню ✓'):'✓'):(en?'Get':'Отримати')}</button>`;
@@ -179,16 +179,18 @@
     const L=['dcounter','dphoto','dcount','dsave'].filter(bsInStore);
     return `<p class="bs-lead">${en?'Link a goal to a folder and mark each day with one tap. One tracker — five looks, switch any time.':'Повʼяжи ціль із папкою — і щодня один тап. Один трекер — пʼять виглядів, міняються будь-коли.'}</p>
       <div class="bs-shelf">${bsRow('dhabit')}</div>
-      <div class="bs-looks">${BS_LOOKS.map(l=>`<button class="bs-look" data-bsopen="dhabit"><span class="bs-lkt"><b>${en?l[2]:l[1]}</b><small>${esc(en?l[4]:l[3])}</small></span>${bsPv('dhabit','s',l[0])}</button>`).join('')}</div>
+      <div class="bs-looks">${BS_LOOKS.map(l=>`<button class="bs-look" data-bsopen="dhabit" data-bslook="${l[0]}"><span class="bs-lkt"><b>${en?l[2]:l[1]}</b><small>${esc(en?l[4]:l[3])}</small></span>${bsPv('dhabit','s',l[0])}</button>`).join('')}</div>
       ${L.length?`<div class="bs-sh"><b>${en?'More for progress':'Ще для прогресу'}</b></div><div class="bs-shelf">${L.map(bsRow).join('')}</div>`:''}`;
   }
   function bsPageHTML(k){
     const it=BS_ITEMS[k], t=bsT(it), en=bsLang()==='en', g=bsGot(k), sp=BS_SPH.find(s=>s[0]===it.sp[0])||BS_SPH[0];
+    const selected=BS_LOOKS.find(l=>l[0]===bsState.look);
+    const looks=selected?[selected,...BS_LOOKS.filter(l=>l!==selected)]:BS_LOOKS;
     return `<div class="bs-dh"><span class="bs-ico lg" style="--c:${it.c}">${it.ic}</span><div class="bs-dtx"><h3>${esc(t.n)}</h3><small>${esc(t.s)}</small>
         <div class="bs-acts">${bsBtn(k,true)}${g?`<button class="bs-rm" data-bsrm="${esc(k)}">${en?'Remove from menu':'Прибрати з меню'}</button>`:''}</div></div></div>
       <div class="bs-info"><div><small>${en?'Area':'Сфера'}</small><b>${en?sp[2]:sp[1]}</b></div><div><small>${en?'Linked to':'Звʼязок'}</small><b>${esc(it.ln[en?1:0])}</b></div><div><small>${en?'Sizes':'Розміри'}</small><b>S·M·L</b></div><div><small>${en?'Offline':'Офлайн'}</small><b>✓</b></div></div>
       <div class="bs-sec"><b>${en?'How it looks':'Як виглядає'}</b><small>${en?'Example data':'Приклад, не твої дані'}</small></div>
-      <div class="bs-shots">${k==='dhabit'?BS_LOOKS.map(l=>`<div class="bs-shot"><small>${en?l[2]:l[1]}</small>${bsPv(k,'s',l[0])}</div>`).join('')
+      <div class="bs-shots">${k==='dhabit'?looks.map(l=>`<div class="bs-shot"><small>${en?l[2]:l[1]}</small>${bsPv(k,'s',l[0])}</div>`).join('')
         :`<div class="bs-shot"><small>${en?'Small':'Малий'}</small>${bsPv(k,'s')}</div><div class="bs-shot m"><small>${en?'Wide':'Широкий'}</small>${bsPv(k,'m')}</div><div class="bs-shot m"><small>${en?'Large':'Великий'}</small>${bsPv(k,'l')}</div>`}</div>
       <div class="bs-sec"><b>${en?'What it does':'Що робить'}</b></div><p class="bs-desc">${esc(t.d)}</p>
       <div class="bs-sec"><b>${en?'How it works':'Як працює'}</b></div><div class="bs-steps">${t.st.map((s,i)=>`<div><i style="--c:${it.c}">${i+1}</i><span>${esc(s)}</span></div>`).join('')}</div>
@@ -208,7 +210,7 @@
   function bsToast(t){ try{ plToast(t); }catch(_){} }
   function bsOpen(o){
     if(!bsReady()) return;
-    o=o||{}; bsState={sph:o.sph||'all',q:'',open:o.k&&bsInStore(o.k)?o.k:''};
+    o=o||{}; bsState={sph:o.sph||'all',q:'',open:o.k&&bsInStore(o.k)?o.k:'',look:''};
     let ov=document.getElementById('bsOv'); if(ov) ov.remove();
     const en=bsLang()==='en';
     ov=document.createElement('div'); ov.id='bsOv'; ov.className='bs-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('data-i18n-skip','1');
@@ -224,7 +226,7 @@
       const g=t.closest('[data-bsget]'); if(g){ e.stopPropagation(); const k=g.dataset.bsget, on=!bsGot(k); if(bsSet(k,on)===false) return; if(on) bsToast(en?'In the “+ Block” menu ✓':'Є в меню «＋ Блок» ✓'); return; }
       const rm=t.closest('[data-bsrm]'); if(rm){ if(bsSet(rm.dataset.bsrm,false)===false) return; bsToast(en?'Removed from the menu — still works in folders':'Прибрано з меню — у папках працює далі'); return; }
       const s=t.closest('[data-bssph]'); if(s){ bsState.sph=s.dataset.bssph; bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
-      const op=t.closest('[data-bsopen]'); if(op){ bsState.open=op.dataset.bsopen; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
+      const op=t.closest('[data-bsopen]'); if(op){ bsState.open=op.dataset.bsopen; bsState.look=op.dataset.bslook||''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
     });
     ov.addEventListener('keydown',e=>{ if(e.key==='Escape'){ close(); return; } if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-bsopen]')&&e.target.tagName!=='BUTTON'){ e.preventDefault(); e.target.click(); } });
     ov.querySelector('#bsQ').addEventListener('input',e=>{ bsState.q=e.target.value.slice(0,60); bsRedraw(); });
