@@ -228,3 +228,24 @@
   .ypy-m i{flex:none;width:7px;height:7px;border-radius:50%;}
   .ypy-f{display:block;width:100%;box-sizing:border-box;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;}
   .pn-gchip:focus-visible,.ypm-r:focus-visible,.ypm-money:focus-visible{outline:2px solid var(--pn-acc,var(--accent));outline-offset:2px;}
+
+  /* ════ Етап 8: трекери — число з історією й темпом, моменти ════ */
+  .yp-trk.num{gap:4px;cursor:default;}
+  .yp-trk-h{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:2px;}
+  .yp-trk-h em{font-style:normal;font-weight:700;}
+  .yp-trk-h em.ok{color:color-mix(in srgb,#30d158 75%,var(--text));}
+  .yp-trk-h em.warn{color:color-mix(in srgb,#e0b060 80%,var(--text));}
+  .yp-spk{display:block;width:100%;height:30px;color:var(--accent);}
+  .yp-trk-a{all:unset;box-sizing:border-box;cursor:pointer;align-self:flex-start;min-height:36px;display:inline-flex;align-items:center;font-size:13px;font-weight:800;color:var(--accent);}
+  .yp-trk.add{border-style:dashed;background:transparent;}
+  .yp-trk.add b{color:var(--accent);}
+  .yp-trk-h:focus-visible,.yp-trk-a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ Етап 10: гроші цілі за місяць ════ */
+  .yp-tile.money{cursor:default;}
+  .yp-tile-h{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:3px;}
+  .yp-tile span.ok{color:color-mix(in srgb,#30d158 75%,var(--text));}
+  .yp-tile-a{all:unset;box-sizing:border-box;cursor:pointer;align-self:flex-start;min-height:36px;display:inline-flex;align-items:center;font-size:13px;font-weight:800;color:var(--accent);}
+  .yp-tempo.ok{background:color-mix(in srgb,#30d158 10%,var(--card));border-color:color-mix(in srgb,#30d158 30%,var(--line));}
+  .ypm-money b small{font-size:12px;font-weight:500;color:var(--pn-tx2,var(--muted));}
+  .yp-tile-h:focus-visible,.yp-tile-a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}

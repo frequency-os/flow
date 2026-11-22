@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 105 |
-| Рядків JS | 40284 |
+| Рядків JS | 40358 |
 | Файлів CSS | 56 |
-| Рядків CSS | 12628 |
-| Сутностей верхнього рівня | 3164 |
+| Рядків CSS | 12649 |
+| Сутностей верхнього рівня | 3173 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -103,7 +103,7 @@
 | `src/scripts/core/63-widget-sheet.js` | 278 | 22 |
 | `src/scripts/core/64-rich-text.js` | 196 | 23 |
 | `src/scripts/core/65-plan.js` | 365 | 58 |
-| `src/scripts/core/66-year-planner.js` | 492 | 59 |
+| `src/scripts/core/66-year-planner.js` | 566 | 68 |
 | `src/scripts/page-editor/01-palette.js` | 192 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 793 | 55 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1165 | 60 |
@@ -189,7 +189,7 @@
 | `src/styles/core/40-block-store.css` | 143 | 0 |
 | `src/styles/core/41-widget-sheet.css` | 195 | 0 |
 | `src/styles/core/42-plan.css` | 196 | 2 |
-| `src/styles/core/43-year-planner.css` | 230 | 0 |
+| `src/styles/core/43-year-planner.css` | 251 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (84)
 
@@ -3266,7 +3266,7 @@
 | `pnIsOpen` | функція | `src/scripts/core/65-plan.js:349` |
 | `goPlan` | функція | `src/scripts/core/65-plan.js:352` |
 
-### `src/scripts/core/66-year-planner.js` — 59 сутностей
+### `src/scripts/core/66-year-planner.js` — 68 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3284,51 +3284,60 @@
 | `ypLinks` | функція | `src/scripts/core/66-year-planner.js:42` |
 | `ypHero` | функція | `src/scripts/core/66-year-planner.js:45` |
 | `ypTiles` | функція | `src/scripts/core/66-year-planner.js:53` |
-| `ypTempo` | функція | `src/scripts/core/66-year-planner.js:74` |
-| `ypTrackers` | функція | `src/scripts/core/66-year-planner.js:82` |
-| `ypWishCard` | функція | `src/scripts/core/66-year-planner.js:89` |
-| `ypNewCard` | функція | `src/scripts/core/66-year-planner.js:94` |
-| `YP_DOW` | обʼєкт | `src/scripts/core/66-year-planner.js:99` |
-| `ypAddDays` | функція | `src/scripts/core/66-year-planner.js:100` |
-| `ypWeekMon` | функція | `src/scripts/core/66-year-planner.js:101` |
-| `ypDow` | функція | `src/scripts/core/66-year-planner.js:102` |
-| `ypWeekTasks` | функція | `src/scripts/core/66-year-planner.js:104` |
-| `ypWeekHTML` | функція | `src/scripts/core/66-year-planner.js:110` |
-| `ypAddWeekStep` | функція | `src/scripts/core/66-year-planner.js:118` |
-| `ypReady` | функція | `src/scripts/core/66-year-planner.js:129` |
-| `ypNotReady` | функція | `src/scripts/core/66-year-planner.js:130` |
-| `ypPushTask` | функція | `src/scripts/core/66-year-planner.js:131` |
-| `ypRoad` | функція | `src/scripts/core/66-year-planner.js:142` |
-| `ypEmpty` | функція | `src/scripts/core/66-year-planner.js:154` |
-| `ypHTML` | функція | `src/scripts/core/66-year-planner.js:164` |
-| `ypRender` | функція | `src/scripts/core/66-year-planner.js:186` |
-| `ypBind` | функція | `src/scripts/core/66-year-planner.js:194` |
-| `ypItemGoalId` | функція | `src/scripts/core/66-year-planner.js:231` |
-| `ypGoalChip` | функція | `src/scripts/core/66-year-planner.js:232` |
-| `ypPerMonthAll` | функція | `src/scripts/core/66-year-planner.js:237` |
-| `ypPlanMonthHTML` | функція | `src/scripts/core/66-year-planner.js:238` |
-| `ypPlanYearMs` | функція | `src/scripts/core/66-year-planner.js:250` |
-| `ypPlanYearFoot` | функція | `src/scripts/core/66-year-planner.js:256` |
-| `ypPlanBind` | функція | `src/scripts/core/66-year-planner.js:264` |
-| `ypGoalsOfFolder` | функція | `src/scripts/core/66-year-planner.js:280` |
-| `ypFolderGoalPhoto` | функція | `src/scripts/core/66-year-planner.js:281` |
-| `ypFolderGoalHTML` | функція | `src/scripts/core/66-year-planner.js:282` |
-| `ypFolderGoalBind` | функція | `src/scripts/core/66-year-planner.js:299` |
-| `ypFlowAsk` | функція | `src/scripts/core/66-year-planner.js:308` |
-| `ypFlowOpen` | функція | `src/scripts/core/66-year-planner.js:316` |
-| `ypDock` | функція | `src/scripts/core/66-year-planner.js:321` |
-| `YP_BATCH_MAX` | значення | `src/scripts/core/66-year-planner.js:332` |
-| `YP_TYPE_UK` | обʼєкт | `src/scripts/core/66-year-planner.js:333` |
-| `YP_TYPE_EN` | обʼєкт | `src/scripts/core/66-year-planner.js:334` |
-| `ypYm` | функція | `src/scripts/core/66-year-planner.js:335` |
-| `ypBatchPrepare` | функція | `src/scripts/core/66-year-planner.js:337` |
-| `ypBatchSheet` | функція | `src/scripts/core/66-year-planner.js:393` |
-| `ypBatchApply` | функція | `src/scripts/core/66-year-planner.js:419` |
-| `ypBatchUndo` | функція | `src/scripts/core/66-year-planner.js:458` |
-| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:484` |
-| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:485` |
-| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:486` |
-| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:491` |
+| `ypMonthSaved` | функція | `src/scripts/core/66-year-planner.js:80` |
+| `ypMonthTarget` | функція | `src/scripts/core/66-year-planner.js:84` |
+| `ypTempo` | функція | `src/scripts/core/66-year-planner.js:90` |
+| `ypNumLog` | функція | `src/scripts/core/66-year-planner.js:102` |
+| `ypFmtNum` | функція | `src/scripts/core/66-year-planner.js:103` |
+| `ypSpark` | функція | `src/scripts/core/66-year-planner.js:104` |
+| `ypNumPace` | функція | `src/scripts/core/66-year-planner.js:111` |
+| `ypMoments` | функція | `src/scripts/core/66-year-planner.js:118` |
+| `ypTrackers` | функція | `src/scripts/core/66-year-planner.js:125` |
+| `ypNumRecord` | функція | `src/scripts/core/66-year-planner.js:140` |
+| `ypWishCard` | функція | `src/scripts/core/66-year-planner.js:159` |
+| `ypNewCard` | функція | `src/scripts/core/66-year-planner.js:164` |
+| `YP_DOW` | обʼєкт | `src/scripts/core/66-year-planner.js:169` |
+| `ypAddDays` | функція | `src/scripts/core/66-year-planner.js:170` |
+| `ypWeekMon` | функція | `src/scripts/core/66-year-planner.js:171` |
+| `ypDow` | функція | `src/scripts/core/66-year-planner.js:172` |
+| `ypWeekTasks` | функція | `src/scripts/core/66-year-planner.js:174` |
+| `ypWeekHTML` | функція | `src/scripts/core/66-year-planner.js:180` |
+| `ypAddWeekStep` | функція | `src/scripts/core/66-year-planner.js:188` |
+| `ypReady` | функція | `src/scripts/core/66-year-planner.js:199` |
+| `ypNotReady` | функція | `src/scripts/core/66-year-planner.js:200` |
+| `ypPushTask` | функція | `src/scripts/core/66-year-planner.js:201` |
+| `ypRoad` | функція | `src/scripts/core/66-year-planner.js:212` |
+| `ypEmpty` | функція | `src/scripts/core/66-year-planner.js:224` |
+| `ypHTML` | функція | `src/scripts/core/66-year-planner.js:234` |
+| `ypRender` | функція | `src/scripts/core/66-year-planner.js:256` |
+| `ypBind` | функція | `src/scripts/core/66-year-planner.js:264` |
+| `ypItemGoalId` | функція | `src/scripts/core/66-year-planner.js:304` |
+| `ypGoalChip` | функція | `src/scripts/core/66-year-planner.js:305` |
+| `ypPerMonthAll` | функція | `src/scripts/core/66-year-planner.js:310` |
+| `ypMonthSavedAll` | функція | `src/scripts/core/66-year-planner.js:311` |
+| `ypPlanMonthHTML` | функція | `src/scripts/core/66-year-planner.js:312` |
+| `ypPlanYearMs` | функція | `src/scripts/core/66-year-planner.js:324` |
+| `ypPlanYearFoot` | функція | `src/scripts/core/66-year-planner.js:330` |
+| `ypPlanBind` | функція | `src/scripts/core/66-year-planner.js:338` |
+| `ypGoalsOfFolder` | функція | `src/scripts/core/66-year-planner.js:354` |
+| `ypFolderGoalPhoto` | функція | `src/scripts/core/66-year-planner.js:355` |
+| `ypFolderGoalHTML` | функція | `src/scripts/core/66-year-planner.js:356` |
+| `ypFolderGoalBind` | функція | `src/scripts/core/66-year-planner.js:373` |
+| `ypFlowAsk` | функція | `src/scripts/core/66-year-planner.js:382` |
+| `ypFlowOpen` | функція | `src/scripts/core/66-year-planner.js:390` |
+| `ypDock` | функція | `src/scripts/core/66-year-planner.js:395` |
+| `YP_BATCH_MAX` | значення | `src/scripts/core/66-year-planner.js:406` |
+| `YP_TYPE_UK` | обʼєкт | `src/scripts/core/66-year-planner.js:407` |
+| `YP_TYPE_EN` | обʼєкт | `src/scripts/core/66-year-planner.js:408` |
+| `ypYm` | функція | `src/scripts/core/66-year-planner.js:409` |
+| `ypBatchPrepare` | функція | `src/scripts/core/66-year-planner.js:411` |
+| `ypBatchSheet` | функція | `src/scripts/core/66-year-planner.js:467` |
+| `ypBatchApply` | функція | `src/scripts/core/66-year-planner.js:493` |
+| `ypBatchUndo` | функція | `src/scripts/core/66-year-planner.js:532` |
+| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:558` |
+| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:559` |
+| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:560` |
+| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:565` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

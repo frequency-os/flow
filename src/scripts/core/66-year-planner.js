@@ -58,9 +58,11 @@
       h+=tile('data-ypfold',ypT('Папка цілі','Goal folder'),`${safeEmoji(f.emoji,'📁')} ${esc(String(f.name||ypT('Папка','Folder')))} ›`,
         ch?esc(ch+' '+(mrEn()?(ch===1?'chat':'chats'):pluralUk(ch,'чат','чати','чатів'))):ypT('записи, фото, чати','notes, photos, chats')); }
     else h+=tile('data-ypfpick',ypT('Папка цілі','Goal folder'),ypT('＋ Привʼязати','＋ Link'),ypT('де житимуть записи цілі','where the goal notes live'),' add');
-    if(sum){ const sv=mrSaved(g), pm=mrPerMonth(g), w=Math.min(100,Math.round(sv/sum*100));
-      h+=`<button class="yp-tile" data-ypopen><small>${ypT('Гроші','Money')}</small><b>${esc(mrK(sv,g))} <em>${ypT('з ','of ')}${esc(mrK(sum,g))}</em></b>
-        <i class="yp-bar"><u style="width:${w}%"></u></i>${pm?`<span class="warm">${ypT('щомісяця ','monthly ')}${esc(mrK(pm,g))}</span>`:''}</button>`; }
+    if(sum){ const sv=mrSaved(g), w=Math.min(100,Math.round(sv/sum*100)), mt=ypMonthTarget(g), ms=ypMonthSaved(g);
+      // етап 10: «цього місяця X з Y» і «＋ Відкласти» — наявна шторка переказу mrMoveSheet (людина підтверджує суму)
+      h+=`<div class="yp-tile money"><button class="yp-tile-h" data-ypopen><small>${ypT('Гроші','Money')}</small><b>${esc(mrK(sv,g))} <em>${ypT('з ','of ')}${esc(mrK(sum,g))}</em></b>
+        <i class="yp-bar"><u style="width:${w}%"></u></i>${mt?`<span class="${ms>=mt?'ok':'warm'}">${ypT('цього місяця ','this month ')}${esc(mrK(ms,g))} ${ypT('з ','of ')}${esc(mrK(mt,g))}</span>`:''}</button>
+        ${sv<sum?`<button class="yp-tile-a" data-ypin>＋ ${ypT('Відкласти','Save')}</button>`:''}</div>`; }
     else h+=tile('data-ypsum',ypT('Гроші','Money'),ypT('＋ Сума цілі','＋ Target sum'),ypT('якщо на ціль треба гроші','if the goal needs money'),' add');
     const tm=L.time||{};
     h+=tile('data-ypgoplan',ypT('Час на ціль','Time on goal'),tm.blocks?esc(tm.blocks+' '+(mrEn()?(tm.blocks===1?'block':'blocks'):pluralUk(tm.blocks,'блок','блоки','блоків'))):'—',
@@ -71,20 +73,88 @@
     return `<div class="yp-tiles">${h}</div>`;
   }
   // підказка темпу: скільки на місяць, щоб устигнути (етап 10 додасть «позаду / попереду»)
-  function ypTempo(g){
-    const sum=mrMoneySum(g), pm=sum?mrPerMonth(g):0; if(!pm) return '';
-    const due=mrDueDs(g);
-    return `<div class="yp-tempo"><span class="yp-spark sm" aria-hidden="true">✦</span>
-      <span>${ypT('Щоб устигнути','To make it')}${due?ypT(' до ',' by ')+esc(mrDate(due)):''}: <b>${esc(mrK(pm,g))}</b> ${ypT('на місяць','a month')}</span>
-      <button data-ypflow>${ypT('Розписати','Plan it')}</button></div>`;
+  /* ── гроші цілі за місяць (етап 10) ──
+     Відкладено цього місяця — операції конверта цілі з датою цього місяця (in − out).
+     Ціль на місяць — від стану на ПОЧАТОК місяця: (лишилось + уже відкладене цього місяця) / місяців до фінішу,
+     інакше після кожного «Відкласти» вона сама зменшувалась би. */
+  function ypMonthSaved(g,ym){
+    try{ ym=ym||ymdLocal().slice(0,7); const e=mrEnv(g); if(!e||!Array.isArray(e.ops)) return 0;
+      return Math.max(0,e.ops.reduce((a,o)=>a+(o&&String(o.date||'').slice(0,7)===ym?(o.t==='in'?+o.amount||0:-(+o.amount||0)):0),0)); }catch(_){ return 0; }
   }
-  // трекери цілі, що вже є: число «зараз → мета» і щоденна позначка в папці (етап 8 додасть історію й моменти)
-  function ypTrackers(g){
+  function ypMonthTarget(g){
+    const sum=mrMoneySum(g); if(!sum) return 0;
+    const d=mrDaysLeft(mrDueDs(g)); if(d===null||d<0) return 0;
+    const need0=Math.max(0,sum-mrSaved(g))+ypMonthSaved(g);
+    return need0?Math.ceil(need0/Math.max(1,Math.ceil(d/30.44))):0;
+  }
+  function ypTempo(g){
+    const sum=mrMoneySum(g), mt=sum?ypMonthTarget(g):0; if(!mt) return '';
+    const due=mrDueDs(g), ms=ypMonthSaved(g), left=Math.max(0,mt-ms), done=left<=0;
+    return `<div class="yp-tempo${done?' ok':''}"><span class="yp-spark sm" aria-hidden="true">✦</span>
+      <span>${ypT('Щоб устигнути','To make it')}${due?ypT(' до ',' by ')+esc(mrDate(due)):''}: <b>${esc(mrK(mt,g))}</b> ${ypT('на місяць','a month')}`
+      +` · ${done?ypT('цього місяця вже є ✓','this month is done ✓'):ypT('цього місяця ще ','still this month ')+esc(mrK(left,g))}</span>
+      ${done?`<button data-ypflow>${ypT('Розписати','Plan it')}</button>`:`<button data-ypin>${ypT('Відкласти','Save')}</button>`}</div>`;
+  }
+  /* ── трекери цілі (етап 8) ──
+     Число — «зараз → мета» цілі (g.from/g.to, як у формі місії) + НОВЕ поле g.numLog=[{ds,v}]: історія записів
+     для графіка й темпу. Пише лише «＋ Записати» після тапу (ypNumRecord). Щодня — наявний «Трекер цілі» в папці.
+     Моменти — звичайні записи папки цілі: лише читаємо кількість і останній; пишуть у самій папці. */
+  function ypNumLog(g){ return Array.isArray(g&&g.numLog)?g.numLog.filter(x=>x&&/^\d{4}-\d{2}-\d{2}$/.test(String(x.ds||''))&&isFinite(+x.v)):[]; }
+  function ypFmtNum(v){ const n=+v; if(!isFinite(n)) return ''; try{ return n.toLocaleString(mrEn()?'en-US':'uk-UA',{maximumFractionDigits:2}); }catch(_){ return String(n); } }
+  function ypSpark(vals){
+    if(vals.length<2) return '';
+    const mn=Math.min(...vals), mx=Math.max(...vals), w=120, h=30;
+    const pts=vals.map((v,i)=>Math.round(i/(vals.length-1)*w)+','+Math.round(h-((v-mn)/((mx-mn)||1))*h)).join(' ');
+    return `<svg class="yp-spk" viewBox="0 -2 ${w} ${h+4}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2"/></svg>`;
+  }
+  // темп: де мало б бути число сьогодні, якщо рухатись рівно від першого запису до мети в день фінішу
+  function ypNumPace(g,n){
+    const L=ypNumLog(g), due=mrDueDs(g); if(!L.length||!due) return null;
+    const d0=L[0].ds, td=ymdLocal(); if(!(due>d0)||td<d0) return null;
+    const day=s=>new Date(s+'T12:00:00').getTime(), f=Math.min(1,(day(td)-day(d0))/(day(due)-day(d0)));
+    const v0=+L[0].v, exp=v0+(n.to-v0)*f, up=n.to>=v0, diff=up?(n.cur-exp):(exp-n.cur);
+    return {ok:diff>=-Math.abs(n.to-v0)*0.02, gap:Math.abs(Math.round((n.cur-exp)*100)/100)};
+  }
+  function ypMoments(fk){
+    try{ const B=(typeof boards==='object'&&Array.isArray(boards[fk]))?boards[fk]:[]; const recs=[];
+      const walk=a=>(a||[]).forEach(b=>{ if(!b) return; if(b.type!=='subs'&&b.type!=='divider') recs.push(b); if(Array.isArray(b.children)) walk(b.children); }); walk(B);
+      const last=recs.slice().reverse().find(b=>String(b.text||b.title||'').replace(/<[^>]*>/g,'').trim());
+      return {n:recs.length, last:last?String(last.text||last.title||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim():''}; }
+    catch(_){ return {n:0,last:''}; }
+  }
+  function ypTrackers(g,full){
     const out=[], n=jnNum(g), fk=moOwnFolder(g.folderKey)?g.folderKey:'';
-    if(n) out.push(`<button class="yp-trk" data-ypopen><small>${ypT('Число','Number')}</small><b>${esc(String(n.cur))} → ${esc(String(n.to))}</b><i class="yp-bar"><u style="width:${n.pct}%"></u></i></button>`);
+    if(n){ const L=ypNumLog(g), vals=L.slice(-12).map(x=>+x.v), pace=ypNumPace(g,n), manual=!jnNumIncome(g);
+      out.push(`<div class="yp-trk num"><button class="yp-trk-h" data-ypopen><small>${ypT('Число','Number')}${pace?` · <em class="${pace.ok?'ok':'warn'}">${pace.ok?ypT('у темпі','on pace'):ypT('позаду на ','behind by ')+esc(ypFmtNum(pace.gap))}</em>`:''}</small>
+        <b>${esc(ypFmtNum(n.cur))} → ${esc(ypFmtNum(n.to))}</b></button>${ypSpark(vals)}<i class="yp-bar"><u style="width:${n.pct}%"></u></i>
+        ${manual?`<button class="yp-trk-a" data-ypnum>＋ ${ypT('Записати','Record')}</button>`:''}</div>`); }
+    else if(full) out.push(`<button class="yp-trk add" data-ypnumset><small>${ypT('Число','Number')}</small><b>＋ ${ypT('Мета числом','Numeric target')}</b><span>${ypT('гроші, кг, км, сторінки','money, kg, km, pages')}</span></button>`);
     const tr=fk&&typeof moTracker==='function'?moTracker(fk):null;
     if(tr){ const st=moStreak(tr); out.push(`<button class="yp-trk" data-ypfold><small>${ypT('Щодня','Daily')}</small><b>${st} ${mrEn()?(st===1?'day':'days'):pluralUk(st,'день','дні','днів')}</b><span>${ypT('поспіль','in a row')}</span></button>`); }
+    if(fk){ const mo=ypMoments(fk);
+      out.push(`<button class="yp-trk" data-ypfold><small>${ypT('Моменти','Moments')}</small><b>${mo.n?esc(String(mo.n))+' '+(mrEn()?(mo.n===1?'record':'records'):pluralUk(mo.n,'запис','записи','записів')):ypT('＋ Перший момент','＋ First moment')}</b>`
+        +`<span>${mo.last?esc(mo.last.length>40?mo.last.slice(0,39)+'…':mo.last):ypT('нотатки й фото в папці цілі','notes and photos in the goal folder')}</span></button>`); }
     return out.length?`<div class="yp-trks">${out.join('')}</div>`:'';
+  }
+  // «＋ Записати»: нове значення числа цілі → g.from (як у формі місії) + рядок історії за сьогодні
+  function ypNumRecord(g,rer){
+    const n=jnNum(g); if(!n||jnNumIncome(g)) return;
+    inputModal({ title:ypT('Записати результат','Record a result'), value:String(n.cur), placeholder:ypT('Напр. 62000','E.g. 62000'), onOk:v=>{
+      const x=jnNumOf(v); if(x===null){ try{ plToast(ypT('Потрібне число','A number is needed')); }catch(_){} return; }
+      if(!ypReady()){ ypNotReady(); return; }
+      const c=jnGoalById(g.id); if(!c) return;
+      const td=ymdLocal();
+      if(!Array.isArray(c.numLog)) c.numLog=[];
+      // перший запис — точка відліку темпу: якщо історії ще нема, спершу кладемо «було» (поточне число)
+      const old=jnNumOf(c.from);
+      if(!c.numLog.length&&old!==null&&+old!==x) c.numLog.push({ds:td, v:+old, base:1});   // «було» — не перезаписується
+      const last=c.numLog[c.numLog.length-1];
+      if(last&&last.ds===td&&!last.base) last.v=x; else c.numLog.push({ds:td, v:x});        // другий запис за день — уточнення
+      if(c.numLog.length>400) c.numLog=[c.numLog[0]].concat(c.numLog.slice(-399));   // перша точка — відлік темпу, лишається
+      c.from=String(x); saveGoals();
+      try{ plToast(ypT('Записано: ','Recorded: ')+ypFmtNum(x)); }catch(_){}
+      if(typeof rer==='function') rer();
+    }});
   }
   function ypWishCard(w){
     const src=safeImg(w.type==='video'?w.thumb:w.img)||'';
@@ -176,7 +246,7 @@
       <button class="yp-pill add" data-ypnew>＋ ${ypT('Нова ціль','New goal')}</button>${ypFreePill(free)}</div>`;
     if(ypShowFree&&free.length) h+=`<div class="yp-strip">${free.map(ypWishCard).join('')}</div>`;
     h+=`<div class="yp-main"><section class="yp-left">${ypHero(g)}${ypTiles(g)}</section>
-      <section class="yp-right">${ypTempo(g)}${ypTrackers(g)}${ypWeekHTML(g)}
+      <section class="yp-right">${ypTempo(g)}${ypTrackers(g,true)}${ypWeekHTML(g)}
         <div class="yp-rh"><b>${ypT('Дорога року','Road of the year')}</b><span>${esc(MR_QN[mrQuarters()[0].q])} — ${esc(MR_QN[mrQuarters()[3].q])}</span></div>
         ${ypRoad(g)}
         <button class="mr-link" data-ypjn>${ypT('Точка Б, гроші й правила року ›','Point B, money and rules of the year ›')}</button></section></div>`;
@@ -211,6 +281,9 @@
     q('[data-ypstep]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrAddStep(g,rer); });
     q('[data-ypweek]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) ypAddWeekStep(g,rer); });
     q('[data-ypgoplan]').forEach(b=>b.onclick=()=>{ if(typeof goPlan==='function') goPlan(); });
+    q('[data-ypnum]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) ypNumRecord(g,rer); });   // етап 8
+    q('[data-ypin]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrMoveSheet(g,'in',rer); });   // етап 10: наявна шторка «Відкласти»
+    q('[data-ypnumset]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) jnEditor(g,{after:rer}); });
     q('[data-ypyear]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) ypSel=String(g.id); goYearPlan({from:'folder', fk:b.dataset.ypyear}); });
     q('[data-ypt]').forEach(b=>b.onclick=()=>{
       if(!ypReady()){ ypNotReady(); return; }
@@ -234,7 +307,8 @@
     const ph=jnMissionPhoto(g), c=safeColor(g.color,'#5b8def');
     return `<button class="pn-gchip" style="--gc:${c}" data-pngoal="${esc(g.id)}">${ph?`<img src="${esc(ph)}" alt="">`:'<i aria-hidden="true"></i>'}<span>${esc(String(g.name||'').slice(0,24))}</span></button>`;
   }
-  function ypPerMonthAll(){ try{ return mrActive().reduce((a,g)=>a+(mrMoneySum(g)?mrPerMonth(g):0),0); }catch(_){ return 0; } }
+  function ypPerMonthAll(){ try{ return mrActive().reduce((a,g)=>a+(mrMoneySum(g)?ypMonthTarget(g):0),0); }catch(_){ return 0; } }
+  function ypMonthSavedAll(ym){ try{ return mrActive().reduce((a,g)=>a+ypMonthSaved(g,ym),0); }catch(_){ return 0; } }
   function ypPlanMonthHTML(ym){
     const rows=[]; mrActive().forEach(g=>jnLevels(g).filter(m=>m.ym===ym).forEach(m=>rows.push({g,m})));
     const pm=ypPerMonthAll();
@@ -245,7 +319,7 @@
         <i class="ypm-c" aria-hidden="true"></i>${ph?`<img src="${esc(ph)}" alt="">`:'<i class="ypm-d" aria-hidden="true"></i>'}
         <span><b>${esc(String(m.t||''))}</b><small>${esc(String(g.name||''))}</small></span></button>`; }).join('');
     return (rows.length?`<div class="pn-lbl"><span>${ypT('Віхи місяця','Milestones this month')}</span><span>${done} ${ypT('з','of')} ${rows.length}</span></div><div class="pn-glass ypm">${r}</div>`:'')
-      +(pm?`<button class="pn-glass ypm-money" data-pnyp><span>${ypT('На цілі щомісяця','For goals each month')}</span><b>${esc(money(pm))}</b><em>${ypT('Мій рік ›','My year ›')}</em></button>`:'');
+      +(pm?`<button class="pn-glass ypm-money" data-pnyp><span>${ypT('На цілі цього місяця','For goals this month')}</span><b>${esc(money(ypMonthSavedAll(ym)))} <small>${ypT('з ','of ')}${esc(money(pm))}</small></b><em>${ypT('Мій рік ›','My year ›')}</em></button>`:'');
   }
   function ypPlanYearMs(ym){
     const L=[]; mrActive().forEach(g=>jnLevels(g).filter(m=>m.ym===ym).forEach(m=>L.push({g,m})));
