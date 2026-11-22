@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 105 |
-| Рядків JS | 39679 |
+| Рядків JS | 39733 |
 | Файлів CSS | 56 |
-| Рядків CSS | 12407 |
-| Сутностей верхнього рівня | 3105 |
+| Рядків CSS | 12415 |
+| Сутностей верхнього рівня | 3115 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -103,7 +103,7 @@
 | `src/scripts/core/63-widget-sheet.js` | 238 | 22 |
 | `src/scripts/core/64-rich-text.js` | 196 | 23 |
 | `src/scripts/core/65-plan.js` | 359 | 58 |
-| `src/scripts/core/66-year-planner.js` | 135 | 19 |
+| `src/scripts/core/66-year-planner.js` | 189 | 29 |
 | `src/scripts/page-editor/01-palette.js` | 190 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 793 | 55 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1165 | 60 |
@@ -189,7 +189,7 @@
 | `src/styles/core/40-block-store.css` | 126 | 0 |
 | `src/styles/core/41-widget-sheet.css` | 177 | 0 |
 | `src/styles/core/42-plan.css` | 196 | 2 |
-| `src/styles/core/43-year-planner.css` | 94 | 0 |
+| `src/styles/core/43-year-planner.css` | 102 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (84)
 
@@ -3247,7 +3247,7 @@
 | `pnIsOpen` | функція | `src/scripts/core/65-plan.js:343` |
 | `goPlan` | функція | `src/scripts/core/65-plan.js:346` |
 
-### `src/scripts/core/66-year-planner.js` — 19 сутностей
+### `src/scripts/core/66-year-planner.js` — 29 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3261,15 +3261,25 @@
 | `ypWishCard` | функція | `src/scripts/core/66-year-planner.js:31` |
 | `ypNewCard` | функція | `src/scripts/core/66-year-planner.js:36` |
 | `ypChain` | функція | `src/scripts/core/66-year-planner.js:39` |
-| `ypRoad` | функція | `src/scripts/core/66-year-planner.js:53` |
-| `ypEmpty` | функція | `src/scripts/core/66-year-planner.js:65` |
-| `ypHTML` | функція | `src/scripts/core/66-year-planner.js:75` |
-| `ypRender` | функція | `src/scripts/core/66-year-planner.js:91` |
-| `ypDock` | функція | `src/scripts/core/66-year-planner.js:119` |
-| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:127` |
-| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:128` |
-| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:129` |
-| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:134` |
+| `YP_DOW` | обʼєкт | `src/scripts/core/66-year-planner.js:57` |
+| `ypAddDays` | функція | `src/scripts/core/66-year-planner.js:58` |
+| `ypWeekMon` | функція | `src/scripts/core/66-year-planner.js:59` |
+| `ypDow` | функція | `src/scripts/core/66-year-planner.js:60` |
+| `ypWeekTasks` | функція | `src/scripts/core/66-year-planner.js:62` |
+| `ypWeekHTML` | функція | `src/scripts/core/66-year-planner.js:68` |
+| `ypAddWeekStep` | функція | `src/scripts/core/66-year-planner.js:76` |
+| `ypReady` | функція | `src/scripts/core/66-year-planner.js:87` |
+| `ypNotReady` | функція | `src/scripts/core/66-year-planner.js:88` |
+| `ypPushTask` | функція | `src/scripts/core/66-year-planner.js:89` |
+| `ypRoad` | функція | `src/scripts/core/66-year-planner.js:100` |
+| `ypEmpty` | функція | `src/scripts/core/66-year-planner.js:112` |
+| `ypHTML` | функція | `src/scripts/core/66-year-planner.js:122` |
+| `ypRender` | функція | `src/scripts/core/66-year-planner.js:138` |
+| `ypDock` | функція | `src/scripts/core/66-year-planner.js:173` |
+| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:181` |
+| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:182` |
+| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:183` |
+| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:188` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

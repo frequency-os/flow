@@ -71,6 +71,14 @@
   .yp-add{all:unset;box-sizing:border-box;cursor:pointer;align-self:flex-start;min-height:44px;padding:0 14px;display:inline-flex;align-items:center;border-radius:12px;
     font-size:14px;font-weight:800;color:var(--accent);border:1px dashed var(--line);margin-left:22px;}
 
+  /* «Цей тиждень» усередині поточного кварталу (етап 2) — справи «Плану» з goalId */
+  .yp-week{display:flex;flex-direction:column;gap:6px;margin-top:4px;padding:12px;border-radius:16px;background:var(--bg-2);border:1px solid var(--line);}
+  .yp-wh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .yp-wh b{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .yp-wh span{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .yp-add.in{margin-left:0;border:0;padding:0 4px;}
+  .yp-ln.plan{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,var(--line));}
+
   /* порожній рік */
   .yp-empty{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:20px;background:var(--card);border:1px dashed var(--line);}
   .yp-empty b{font-size:17px;font-weight:800;color:var(--text);line-height:1.3;}
