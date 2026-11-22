@@ -463,3 +463,5 @@
   .wg-t.wd.trk.sz-s .wd-rg .wd-big{display:none;}
   .wg-t.wd.trk.sz-s .wd-pl .wd-cap{-webkit-line-clamp:2;}
   @media (prefers-reduced-motion:reduce){ .wd-tapr .vl{transition:none;} }
+  /* вихідні трекера (22.11.2026, крок 2): смугастий день — не пропуск */
+  .wd-days.week i.rest u,.wd-hg i.rest,.wd-hm i.rest,.wd-days.month i.rest{background:repeating-linear-gradient(45deg,var(--pg-track,rgba(127,127,127,.25)) 0 2px,transparent 2px 4px);}

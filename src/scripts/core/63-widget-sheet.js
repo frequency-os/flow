@@ -51,6 +51,16 @@
     const d=JSON.parse(JSON.stringify(b0));   // чернетка: прев'ю малюється з неї, у блок — при закритті
     const was={}; WS_KEYS.forEach(k=>{ was[k]=JSON.stringify(d[k]); });   // з чим порівнювати при закритті
     let tab=opt.tab==='own'?'own':'gen';
+    /* ритм і вихідні (22.11.2026, крок 2): це поля ТРЕКЕРА місії, не віджета. Чернетка trD (ключ — папка місії);
+       прев'ю бачить її через d.__tr (поля нема в WS_KEYS — у блок не пишеться); у трекер — лише при закритті і лише якщо змінено */
+    let trD=null;
+    const trSync=()=>{ if(d.type!=='dhabit'){ trD=null; return null; }
+      let q=null; try{ q=wdGoal(d,fk); }catch(_){}
+      const gk=q&&moOwnFolder(q.folderKey)?q.folderKey:'', t=gk?moTracker(gk):null;
+      if(!t){ trD=null; delete d.__tr; return null; }
+      if(!trD||trD.gk!==gk){ const r=moRhythm(t); trD={gk, rest:moRest(t), rhythm:t.rhythm?r:null};
+        trD.wasRest=JSON.stringify(trD.rest); trD.wasRh=JSON.stringify(trD.rhythm); }   // окремо: пишемо лише змінене поле
+      d.__tr={rest:trD.rest.slice(), rhythm:trD.rhythm?Object.assign({},trD.rhythm):undefined}; return t; };
     // розмір однієї клітинки — з живої дошки (якщо віджет на екрані), інакше типовий
     const cellEl=document.querySelector('[data-wghost="'+CSS.escape(String(id))+'"]');
     const boardEl=cellEl&&cellEl.closest('.pg-board.wboard');
@@ -69,6 +79,7 @@
     const sh=ov.querySelector('.ws-sh'), body=ov.querySelector('.ws-body'), pvc=ov.querySelector('.ws-pvc'), pvh=ov.querySelector('.ws-pvh');
     pvh.setAttribute('inert','');
     const pvDraw=()=>{
+      trSync();
       const c=wdCell(d,dev), w=Math.min(c[0]*cw+(c[0]-1)*gap, sh.clientWidth-32), h=c[1]*rh+(c[1]-1)*gap;
       pvc.style.width=Math.max(70,Math.round(w))+'px'; pvc.style.height=Math.round(Math.min(h,dev==='d'?300:260))+'px';
       try{ wgFill(pvh,d,fk); }catch(_){}
@@ -113,13 +124,18 @@
           ${goals.map(g=>`<button data-wsg="${esc(g.id)}" class="${String(g.id)===gid?'on':''}">${safeEmoji(g.emoji,'🎯')} ${esc(String(g.name||'Місія').slice(0,24))}</button>`).join('')}</div>`);
       }
       // трекер (22.11.2026): вигляд — лише малюнок; позначки ті самі. Період і «Показувати» стосуються лише «Ланцюга»
-      const lk=t==='dhabit'?wdLook(d):'';
+      const lk=t==='dhabit'?wdLook(d):'', trk=t==='dhabit'?trSync():null, rh=trD&&trD.rhythm?trD.rhythm:{k:'day'};
       if(t==='dhabit') h=grp('Вигляд',`<span class="ws-looks">${WD_LOOKS.map(([k,l])=>`<button data-wsset="look" data-v="${k}" class="${lk===k?'on':''}" aria-pressed="${lk===k}"><i class="ws-lk ${k}" aria-hidden="true"></i>${l}</button>`).join('')}</span>`
-        +(lk==='path'?row('Днів у шляху',seg('days',WD_PATH_N.map(n=>[n,n]),wdPathN(d))):''))+h;
+        +(lk==='path'&&rh.k!=='days'?row('Днів у шляху',seg('days',WD_PATH_N.map(n=>[n,n]),wdPathN(d))):''))
+        +(trk?grp('Ритм · для всієї місії',`<div class="ws-it">${seg('rhy',[['day','Щодня'],['week','На тиждень'],['days','N днів']],rh.k)}</div>`
+            +(rh.k==='week'?row('Днів на тиждень',`<span class="ws-step"><button data-wsst="rhn" data-n="-1" aria-label="Менше">−</button><b>${rh.n}</b><button data-wsst="rhn" data-n="1" aria-label="Більше">＋</button></span>`):'')
+            +(rh.k==='days'?row('Скільки днів',seg('rdays',MO_DAYS_N.map(n=>[n,n]),rh.n)):''))
+          +grp('Вихідні дні',`<span class="ws-days7">${DY_DOW.map((x,i)=>`<button data-wsrest="${i}" class="${trD.rest.includes(i)?'on':''}" aria-pressed="${trD.rest.includes(i)}">${x}</button>`).join('')}</span>`
+            +'<div class="ws-note">Пропущений вихідний не рве серію і не рахується в «з N».</div>'):'')+h;
       let main='';
       if(m.per&&(!lk||lk==='chain')) main+=row('Період',seg('period',m.per,wdPer(d)));
       if(t==='dmission') main+=row('Головне число',seg('main',[['pct','%'],['steps','Кроки'],['days','Дні']],d.main==='steps'||d.main==='days'?d.main:'pct'));
-      if(t==='dhabit'&&((lk==='chain'&&wdPer(d)==='week')||lk==='ring')) main+=row('Ціль на тиждень',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
+      if(t==='dhabit'&&!trk&&((lk==='chain'&&wdPer(d)==='week')||lk==='ring')) main+=row('Ціль на тиждень',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
       if(t==='dhabit'&&lk==='chain') main+=tg('tapmk',!!d.tapmk,'Позначати день тапом по віджету');
       if(t==='dtime'&&wdPer(d)!=='day') main+=row('Ціль годин',`<span class="ws-step"><button data-wsst="goal" data-n="-1" aria-label="Менше">−</button><b>${wsGoal(d)||'—'}</b><button data-wsst="goal" data-n="1" aria-label="Більше">＋</button></span>`);
       if(t==='dcal') main+=row('Події',seg('ev',[['fold','Цієї папки'],['all','Весь Планер']],d.ev==='all'?'all':'fold'));
@@ -144,8 +160,20 @@
       ch.forEach(k=>{ if(d[k]===undefined) delete q[k]; else q[k]=JSON.parse(JSON.stringify(d[k])); });
       saveBoard(); return true;
     }
-    function close(){ if(closed) return; closed=true; const ch=commit(); ov.classList.add('out'); setTimeout(()=>ov.remove(),220); if(ch) wdRedraw(); document.removeEventListener('keydown',onKey,true); }
-    ov.__wsClose=()=>{ if(!closed){ closed=true; if(commit()) wdRedraw(); document.removeEventListener('keydown',onKey,true); } };
+    // ритм/вихідні — у свіжий трекер (синк міг його підмінити), лише змінені, лише після дії людини
+    function commitTr(){
+      if(!trD) return false;
+      const chRest=JSON.stringify(trD.rest)!==trD.wasRest, chRh=JSON.stringify(trD.rhythm)!==trD.wasRh;
+      if(!chRest&&!chRh) return false;
+      const t=moOwnFolder(trD.gk)?moTracker(trD.gk):null; if(!t) return false;
+      // лише змінене поле: вихідні, що прийшли синком з іншого пристрою, не затираються зміною ритму (і навпаки);
+      // незнайомий ритм із новішої версії лишається, поки людина сама не вибере інший
+      if(chRest){ if(trD.rest.length) t.rest=trD.rest.slice(); else delete t.rest; }
+      if(chRh){ if(trD.rhythm&&trD.rhythm.k!=='day') t.rhythm=Object.assign({},trD.rhythm); else delete t.rhythm; }
+      saveBoard(); return true;
+    }
+    function close(){ if(closed) return; closed=true; const ch=commitTr()|commit(); ov.classList.add('out'); setTimeout(()=>ov.remove(),220); if(ch) wdRedraw(); document.removeEventListener('keydown',onKey,true); }
+    ov.__wsClose=()=>{ if(!closed){ closed=true; if(commitTr()|commit()) wdRedraw(); document.removeEventListener('keydown',onKey,true); } };
     function onKey(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } }
     document.addEventListener('keydown',onKey,true);
     ov.addEventListener('click',e=>{ if(e.target===ov){ close(); return; }
@@ -162,6 +190,8 @@
         else if(k==='ev'){ if(v==='all') d.ev='all'; else delete d.ev; }
         else if(k==='q'){ if(v==='0') delete d.q; else d.q=+v; }
         else if(k==='period'){ d.period=v; }
+        else if(k==='rhy'&&trD){ trD.rhythm=v==='week'?{k:'week',n:Math.min(7,wsGoal(d)||4)}:v==='days'?{k:'days',n:MO_DAYS_N.includes(wdPathN(d))?wdPathN(d):30}:null; }
+        else if(k==='rdays'&&trD&&trD.rhythm){ trD.rhythm={k:'days',n:MO_DAYS_N.includes(+v)?+v:30}; }
         else if(k==='look'){ if(v==='chain') delete d.look; else d.look=v; }
         else if(k==='days'){ if(+v===30) delete d.days; else d.days=+v; }
         draw(); return; }
@@ -176,6 +206,10 @@
         if(us.has(u)){ if(us.size===1){ plToast('Хоча б одна одиниця'); return; } us.delete(u); } else us.add(u);
         const L=TM_U.filter(z=>us.has(z)); if(L.join()===TM_DEF.join()) delete d.units; else d.units=L; draw(); return; }
       if(x.dataset.wsg!==undefined){ if(x.dataset.wsg) d.goalId=x.dataset.wsg; else delete d.goalId; draw(); return; }
+      if(x.dataset.wsrest!==undefined&&trD){ const i=+x.dataset.wsrest;
+        if(trD.rest.includes(i)) trD.rest=trD.rest.filter(z=>z!==i); else if(trD.rest.length<6) trD.rest=[...trD.rest,i].sort(); else plToast('Хоча б один робочий день');
+        draw(); return; }
+      if(x.dataset.wsst==='rhn'&&trD&&trD.rhythm){ trD.rhythm={k:'week',n:Math.max(1,Math.min(7,trD.rhythm.n+(+x.dataset.n<0?-1:1)))}; draw(); return; }
       if(x.dataset.wsst){ const mx=d.type==='dhabit'?7:(wdPer(d)==='month'?200:60), v=(wsGoal(d)||0)+(+x.dataset.n<0?-1:1);
         if(v<=0) delete d.goal; else d.goal=Math.min(mx,v); draw(); return; }
       if(x.dataset.wspk){ const [w,h]=x.dataset.wspk.split(',').map(Number); wdSetCell(d,dev,w,h); draw(); return; }
