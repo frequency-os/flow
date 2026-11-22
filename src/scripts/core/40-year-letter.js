@@ -174,7 +174,8 @@
     const g=goalsData, s=x=>typeof x==='string'?x.trim():'';
     return [s(g.mission), s(g.pointB)&&('Тепер у мене: '+s(g.pointB)), s(g.pointA)&&('А рік тому було так: '+s(g.pointA))].filter(Boolean).join('\n\n');
   }
-  function ylEdit(){
+  // after — що перемалювати після «Зберегти» (напр. «Мій рік» у Журналі, 57-my-plan.js)
+  function ylEdit(after){
     const L=ylLetter(), date=ylDate(L);
     let wishId=L.wishId;
     const ws=(function(){ try{ return (wishes||[]).filter(w=>w&&(w.type==='video'?w.thumb:w.img)); }catch(_){ return []; } })();
@@ -209,6 +210,7 @@
       const dv=ov.querySelector('#ylDate').value;
       goalsData.letter={ text, date:/^\d{4}-\d{2}-\d{2}$/.test(dv)?dv:date, wishId:(wishId===L.wishId || ws.some(w=>w.id===wishId))?wishId:'' };   // своє фото не губимо, навіть якщо мрії ще не прочитались
       saveGoals(); close(); renderGoals();
+      if(typeof after==='function') try{ after(); }catch(_){}
       try{ plToast(text.trim()?'Лист збережено':'Лист очищено'); }catch(_){}
     };
     setTimeout(()=>{ try{ ta.focus(); }catch(_){} },60);

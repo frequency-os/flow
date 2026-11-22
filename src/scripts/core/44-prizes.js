@@ -132,20 +132,21 @@
     plToast('🏆 '+pzK(a,q)+' — у скарбничку «'+q.reward.t+'»');
   }
   // гроші зі скарбнички назад на рахунок: рух 'out' у конверті + переказ 'in' у Гаманці (_tr — не дохід)
-  function pzWithdraw(g,a,label){
-    const e=pzEnv(g); if(!e) return false;
-    a=Math.min(Math.round(a), pzSaved(g)); if(!(a>0)) return false;
+  // env — інший конверт місії (гроші цілі «Мого року», 57-my-plan.js); без нього — скарбничка призу
+  function pzWithdraw(g,a,label,env){
+    const e=env||pzEnv(g); if(!e) return false;
+    a=Math.min(Math.round(a), Math.max(0,envSaved(e))); if(!(a>0)) return false;
     envMigrate(e);
     const date=ymdLocal(), finId='fin_'+Date.now()+Math.random().toString(36).slice(2,6);
     // окремий тип 'back': старий нормалізатор (інші пристрої зі старою збіркою) реагує лише на t:'out' і не сховає цей запис як витрату
     e.ops.unshift({id:'eop_'+Date.now()+Math.random().toString(36).slice(2,5), t:'back', label:label||'Повернуто в Гаманець', amount:a, date, finOpId:finId, back:true});
     e.saved=e.ops.reduce((s,o)=>s+(o.t==='in'?o.amount:-o.amount),0);
     let card; try{ card=mainCard().id; }catch(_){}
-    const wo={id:finId, type:'in', amount:a, label:'Зі скарбнички: '+e.name, date, env:e.name, envId:e.id, card, _tr:true, pzClaim:label==='Приз забрано'||undefined};
+    const wo={id:finId, type:'in', amount:a, label:(env?'З конверта: ':'Зі скарбнички: ')+e.name, date, env:e.name, envId:e.id, card, _tr:true, pzClaim:label==='Приз забрано'||undefined};
     if(envCur(e)) wo.cur=envCur(e);   // назад у баланс валюти скарбнички
     finOps.push(wo);
     saveEnvelopes(); saveFinOps();
-    plToast('↩ '+pzK(a,g)+' повернуто на рахунок');
+    plToast('↩ '+moneyK(a,envCur(e))+' повернуто на рахунок');
     return true;
   }
   function pzCelebrate(g,after){

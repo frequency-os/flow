@@ -248,8 +248,8 @@
       return;
     }
     if(jnTab==='year'){
-      body.innerHTML=yrHTML(); yrBind(body);
-      if(sub) sub.textContent='рік · база цілей · '+yrYear();
+      body.innerHTML=mrHTML(); mrBind(body);   // «Мій рік» (57-my-plan.js); «База цілей» — кнопкою в ньому
+      if(sub) sub.textContent=mrSub();
       return;
     }
     if(jnTab==='month'){
@@ -273,8 +273,9 @@
     f.innerHTML=tabs.map(([k,l])=>`<button data-jntab="${k}"${cur===k?' class="on" aria-pressed="true"':''}>${l}</button>`).join('');
     f.querySelectorAll('[data-jntab]').forEach(b=>b.onclick=()=>{
       const k=b.dataset.jntab;
-      // «Рік» — База цілей (45-year.js); лист і Дорога року (Горизонт) — смужкою в ній
+      // «Рік» — сторінка «Мій рік» (57-my-plan.js); детальна «База цілей» (45-year.js) — кнопкою в ній
       if(k==='day'&&jnTab==='day'){ jnDayDs=''; }
+      if(k==='year'&&jnTab==='year'){ mrDetail=false; }   // повторний тап «Рік» — назад до «Мого року»
       const sj=jnEl('scr-journal'), inJ=sj&&sj.classList.contains('active');
       jnTab=k; if(inJ) jnRender(); else goJournal(); jnTop();
     });
@@ -305,7 +306,7 @@
     const dev=!!(window.upDevOn&&window.upDevOn());
     /* ноутбук (≥1180px): ліворуч день по годинах, праворуч герой, місії, ресурси — 32-journal… CSS .jn-cols; телефон — той самий порядок */
     body.innerHTML=`<div class="jn-cols"><div class="jn-side">
-      ${hero.started?'':jnStartCard()}
+      ${mrDayCard()}
       <div class="jn-top">
         <span class="jn-duo"><button class="jn-me" data-jnhero><span class="jn-av sm">${jnAvatar()}</span>
           <span class="jn-me-b"><b>${esc(jnName())}${jnMateName()}</b><span class="jn-xp"><span class="jn-bar gold"><i style="width:${Math.round(xpIn/JN_XP_LVL*100)}%"></i></span>рів. ${lvl}</span></span></button>${jnMateHTML()}</span>
@@ -354,7 +355,8 @@
         try{ const id=petCur(); if(FLOW_PETS[id]&&FLOW_PETS[id].hero) heroWardrobe(id); else petPickerSheet(); }catch(_){} }; }
     { const a=body.querySelector('[data-jnarch]'); if(a) a.onclick=()=>{ jnShowArchive=!jnShowArchive; jnRender(); }; }
     { const m=body.querySelector('[data-jnmap]'); if(m) m.onclick=()=>{ if(window.goWorld) window.goWorld(); }; }
-    { const st=body.querySelector('[data-jnstart]'); if(st) st.onclick=()=>jnStart(+jnHero().startStep||1); }
+    { const st=body.querySelector('[data-jnstart]'); if(st) st.onclick=e=>{ e.stopPropagation(); jnStart(+jnHero().startStep||1); }; }
+    mrDayBind(body);   // картка «Мій рік» (57-my-plan.js)
     { const hs=body.querySelector('[data-jnhist]'); if(hs) hs.onclick=()=>jnDaySheet(ymdLocal()); }
     { const se=body.querySelector('[data-jnset]'); if(se) se.onclick=jnSettings; }
     body.querySelectorAll('[data-jnday]').forEach(b=>b.onclick=()=>jnDaySheet(b.dataset.jnday));
@@ -598,12 +600,15 @@
           // перевіряємо і без c0.reward: старша збірка на іншому пристрої могла затерти приз, а конверт із грошима лишився (знаходиться за goalId)
           if(c0&&typeof pzSaved==='function'&&pzSaved(c0)>0){ const pe=pzEnv(c0), pn=(c0.reward&&c0.reward.t)||(pe&&pe.name)||'приз';
             actionSheet({title:'Спершу поверни гроші зі скарбнички', sub:'У скарбничці «'+String(pn)+'» лежить '+money(pzSaved(c0))+'. Поверни їх у Гаманець — тоді місію можна видалити.', items:[{ic:'refresh', label:'Відкрити скарбничку', onClick:()=>{ ov.remove(); if(c0.reward&&String(c0.reward.t||'').trim()) pzJarSheet(c0); else { try{ goEnvelopes(); }catch(_){} } }}]}); return; }
+          // так само — гроші в конверті цілі («Мій рік», 57-my-plan.js): спершу повернути в Гаманець
+          if(c0&&typeof mrSaved==='function'&&mrSaved(c0)>0){ const me=mrEnv(c0);
+            actionSheet({title:'Спершу поверни гроші з конверта цілі', sub:'У конверті «'+String((me&&me.name)||c0.name||'ціль')+'» лежить '+money(mrSaved(c0))+'. Поверни їх у Гаманець — тоді місію можна видалити.', items:[{ic:'refresh', label:'Відкрити ціль', onClick:()=>{ ov.remove(); mrGoalPage(c0); }}]}); return; }
           confirmSheet({title:'Видалити місію «'+String(gl.name||'').slice(0,40)+'»?',
           sub:'Зникнуть її рівні, кроки й трекер, а з Планера — невиконані блоки місії від сьогодні. Виконані лишаться. Можна натомість перенести в архів.',
           okLabel:'Видалити', onOk:()=>{
             const cur=(goalsData.goals||[]).find(x=>x&&x.id===gl.id);
             if(!cur){ ov.remove(); jnRender(); try{ plToast('Місію вже змінили або прибрали на іншому пристрої'); }catch(_){} return; }
-            try{ if(cur.wishId){ const w=wishes.find(x=>x.id===cur.wishId); if(w){ delete w.goalId; saveWishes(); } } }catch(_){}
+            try{ mrUnlinkWishes(cur); }catch(_){}   // усі мрії цілі (і wishId, і фото з «Мого року») знову вільні
             const p=plData(), ids=['rt_m_'+cur.id].concat(jnOtherTpls(cur).filter(t=>/^rt_ai_/.test(String(t.id))).map(t=>t.id));
             p.recurring=(p.recurring||[]).filter(t=>!(t&&ids.includes(t.id))); ids.forEach(jnClearFuture);
             goalsData.goals=goalsData.goals.filter(x=>!(x&&x.id===cur.id));
@@ -664,12 +669,8 @@
   }
 
   /* ─── СТАРТ ГРИ: 5 кроків, усе вводить людина (жодних прикладів і заготовок) ───
-     Кожен крок пише лише після «Далі». Пройдений старт запамʼятовується (hero.started) і сам ніколи не скидається. */
-  function jnStartCard(){
-    const st=+jnHero().startStep||0;
-    return `<div class="jn-start"><b>${st>1?'Продовжити старт гри':'Почни гру'}</b><span>5 кроків: куди йдеш, хто ти, з чим стартуєш, місії, перший день.</span>
-      <button data-jnstart>${st>1?'Продовжити · крок '+st+' з 5':'Почати · 5 кроків'}</button></div>`;
-  }
+     Кожен крок пише лише після «Далі». Пройдений старт запамʼятовується (hero.started) і сам ніколи не скидається.
+     20.10.2026: окрему картку «Почни гру» прибрано — майстер відкривається кнопкою «Покроково» з картки «Мій рік» (57-my-plan.js). */
   function jnStart(step){
     step=Math.min(5,Math.max(1,+step||1));
     const h=jnHero(), L=ylLetter(), p=plData();
