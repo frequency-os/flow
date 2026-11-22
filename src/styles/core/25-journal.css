@@ -52,7 +52,7 @@
   .jn-empty{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px dashed var(--line);border-radius:16px;padding:16px;font-size:13px;color:var(--muted);line-height:1.45;}
   .jn-empty b{font-size:16px;color:var(--text);}
   .jn-empty button{all:unset;cursor:pointer;align-self:flex-start;margin-top:4px;background:var(--accent);color:#fff;font-weight:800;font-size:14px;border-radius:12px;padding:12px 16px;}
-  .jn-arch,.jn-map{all:unset;box-sizing:border-box;cursor:pointer;text-align:center;font-size:13px;font-weight:800;color:var(--muted);
+  .jn-arch{all:unset;box-sizing:border-box;cursor:pointer;text-align:center;font-size:13px;font-weight:800;color:var(--muted);
     border:1px dashed var(--line);border-radius:14px;padding:12px;min-height:44px;}
   .jn-pad{height:110px;}
 

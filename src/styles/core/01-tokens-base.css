@@ -267,6 +267,9 @@
   .icon-btn.on{background:linear-gradient(135deg,rgba(106,125,255,.28),rgba(160,107,255,.18));border-color:rgba(106,125,255,.5);}
   .icon-btn.on svg{color:#fff;}
 
+  /* у нижній панелі й сайдбарі кнопки ховаються атрибутом hidden — display:flex його перебиває.
+     Правило жило в 17-my-year.css і зникло разом із ним (1c66294) — без нього видно другий «Планер» */
+  .nav a[hidden],.dsb-i[hidden]{display:none;}
   .back{display:inline-flex;align-items:center;gap:8px;background:var(--bg-2);border:1px solid var(--line);
     color:var(--text);border-radius:12px;padding:10px 16px 10px 12px;font-family:inherit;font-size:14px;
     font-weight:700;cursor:pointer;transition:all .18s;margin-bottom:20px;}

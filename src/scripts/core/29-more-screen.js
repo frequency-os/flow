@@ -14,11 +14,6 @@
       {k:'diary',  ic:'book',    c:'violet', t:'Щоденник',      d:'записи дня й зошити'},
       {k:'wishes', ic:'compass', c:'amber',  t:'Карта бажань',  d:'бажання, колаж і ранковий ритуал'},
     ];
-    const DEV_ROWS=[
-      {k:'upgrade', ic:'dna',  c:'violet', t:'Апгрейд',          d:'Персонаж, сфери, заявлений шлях'},
-      {k:'misto',   ic:'city', c:'blue',   t:'Гра «Місто дня»',  d:'Прототип: місто, персонаж, друзі'},
-      {k:'core',    ic:'compass', c:'violet', t:'Ядро',          d:'Сузірʼя: цілі й усе, що до них веде'},
-    ];
     const ico=(n,c)=>(window.stgIco?window.stgIco(n,c):'');
     const chev=()=>'<span class="mr-chev">'+(window.stgSvg?window.stgSvg('chev'):'›')+'</span>';
     function rowHTML(m){
@@ -34,11 +29,8 @@
         (_m==='lite'
           ? `<div class="mr-sl" data-sec="lite">Решта Frequency</div>
              <div class="mr-grp" data-sec="lite">${LITE_DOORS.map(rowHTML).join('')}</div>`
-          : '') +
-        ((window.upDevOn&&window.upDevOn())
-          ? `<div class="mr-sl" data-sec="dev">Розробка</div>
-             <div class="mr-grp" data-sec="dev">${DEV_ROWS.map(rowHTML).join('')}</div>`
           : '');
+      // розділ «Розробка» (Апгрейд, Місто дня, Ядро) прибрано 22.11.2026
       host.querySelectorAll('[data-mh]').forEach(b=>b.addEventListener('click',()=>openMoreSheet(b.dataset.mh)));
       renderMoreIndex();
     }
@@ -49,7 +41,7 @@
        екрані, вирішує атрибут data-msec на #scr-more (22-more-screen.css).
        «Інструменти» на комп'ютері стоять завжди — це дії, а не налаштування. */
     const MSEC=[['profile','Профіль'],['look','Вигляд'],['blocks','Блоки'],['day','Мій день'],['data','Дані і приватність'],
-      ['about','Про застосунок'],['adv','Розширені'],['lite','Решта Frequency'],['dev','Розробка']];
+      ['about','Про застосунок'],['adv','Розширені'],['lite','Решта Frequency']];
     function moreIsWide(){ try{ return window.matchMedia('(min-width:1024px)').matches; }catch(_){ return false; } }
     function renderMoreIndex(){
       const ix=document.getElementById('moreIndex'), scr=document.getElementById('scr-more'); if(!ix||!scr) return;
@@ -72,16 +64,6 @@
     // кожна плитка — жива дія (колишня шторка «🚧 У розробці» більше не потрібна)
     function openMoreSheet(key){
       try{ window.platform.haptic('light'); }catch(_){}
-      if(key==='upgrade'){ if(window.goUpgrade) window.goUpgrade(); return; }
-      if(key==='core'){ if(window.goCore) window.goCore(); return; }   // Ядро (59-core-screen.js), поки лише для розробника
-      // гра — окрема сторінка поруч (src/web/misto.html), свої дані, назад — кнопкою з іконкою Frequency
-      // без мережі не переходимо: воркер її не кешує, а в застосунку з екрана «Додому» на iPhone
-      // зі сторінки «немає інтернету» нема кнопки «назад» — вийти можна лише закривши застосунок
-      if(key==='misto'){
-        if(!(window.upDevOn&&window.upDevOn())) return;   // dev-гра: лише за воротами upDevOn
-        if(navigator.onLine===false){ if(typeof flowAlert==='function') flowAlert('Гра відкривається лише з інтернетом. Спробуй, коли зʼявиться мережа.','Немає мережі'); return; }
-        location.href='misto.html'; return;
-      }
       if(key==='projects'){ if(window.goProjects) window.goProjects(); return; }
       if(key==='aipriv'){ if(window.aiPrivacySheet) window.aiPrivacySheet(); return; }
       if(key==='quick'){ if(window.flowQuickCapture) window.flowQuickCapture(); return; }

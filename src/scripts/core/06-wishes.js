@@ -514,7 +514,8 @@
     saveWishes(); renderWishes();
   }
   // Перетворити бажання на ціль (одне джерело правди: зв'язок через id)
-  function wishToGoal(id){
+  // after(gid) — хто відкрив (екран «Мій рік») сам покаже нову ціль; без нього — як раніше, питання «Відкрити Цілі?»
+  function wishToGoal(id, after){
     const w=wishes.find(x=>x.id===id); if(!w) return;
     const cover = w.type==='video' ? (w.thumb||'') : (w.img||'');
     inputModal({ title:'Зробити ціллю', value:w.cap||'', placeholder:'Напр. Поїздка в Париж, 2027',
@@ -528,6 +529,7 @@
           folderKey:null, open:true, wishId:w.id, wishImg:cover });
         w.goalId=gid;
         saveWishes(); saveGoals();
+        if(typeof after==='function'){ after(gid); return; }
         confirmSheet({
           title:'Бажання стало ціллю ⭐',
           sub:'«'+nm+'» тепер у Цілях з цим фото. Відкрити зараз?',

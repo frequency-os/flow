@@ -1,9 +1,9 @@
-  /* ════════ Сфери: папка + будівля в «Моєму світі» ════════
+  /* ════════ Сфери: папка з рівнем і досвідом ════════
      Сфера — це звичайна папка з полем sphere:{tpl,bld}. Працюєш у ній як завжди
      (блоки, сторінки, чати); вкладку «Сфери» з Огляду прибрано 21.11.2026 (sphHomeSync більше не кличуть),
-     а гра (misto.html) бачить ті самі цифри через flowWorldBridge.spheres() і
-     нічого в папках не змінює. Шаблон створює папку одразу з потрібними блоками.
-     Поки що лише для розробника (ворота upDevOn), як і «Мій світ».
+     Гру «Місто дня» / «Мій світ», що показувала сфери будівлями, видалено 22.11.2026.
+     Шаблон створює папку одразу з потрібними блоками.
+     Поки що лише для розробника (ворота upDevOn, 30-dev-gate.js).
      Позначка пишеться тільки з дії людини (меню папки чи «Нова сфера») —
      автоматичних записів тут нема. */
 
@@ -196,9 +196,7 @@
     host.hidden=false; host.style.setProperty('--sc',T.c);
     host.innerHTML=`<span class="sph-ic">${sphIcon(T.ic)}</span>
       <span class="sph-hb"><small>Сфера · рівень ${s.lv} · ${s.xp} XP</small><b>${esc(T.n)}</b>
-        <span class="sph-hn">${(s.nums||[]).slice(0,3).map(n=>`<i class="${n.tone||''}">${esc(n.k)} <b>${esc(n.v)}</b></i>`).join('')}</span></span>
-      <button class="sph-go" id="sphGoWorld" aria-label="Відкрити в «Моєму світі»">У грі ›</button>`;
-    const g=document.getElementById('sphGoWorld'); if(g) g.onclick=()=>{ try{ goWorld({focus:fk}); }catch(_){} };
+        <span class="sph-hn">${(s.nums||[]).slice(0,3).map(n=>`<i class="${n.tone||''}">${esc(n.k)} <b>${esc(n.v)}</b></i>`).join('')}</span></span>`;
   }
 
   /* ── для гри: список сфер із цифрами (лише читання) ── */

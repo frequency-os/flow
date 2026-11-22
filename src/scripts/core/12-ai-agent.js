@@ -362,7 +362,7 @@
       const ds=plTodayStr();
       if(localStorage.getItem('ai_week_ds')===ds) return;
       localStorage.setItem('ai_week_ds',ds);
-      aiChatSend('Тижневий огляд: подивись останні 7 днів, цілі й фінанси. Скажи: скільки блоків закрито по днях, що просіло, 1-2 чесні висновки і один фокус на наступний тиждень. Якщо є лист із точки Б — скажи мовою листа, яке речення цього тижня наблизилось, яке відстало, і чи встигаю з віхами місяця. Стисло, без води.');
+      aiChatSend('Тижневий огляд: подивись останні 7 днів, цілі й фінанси. Скажи: скільки блоків закрито по днях, що просіло, 1-2 чесні висновки і один фокус на наступний тиждень. Якщо є лист із точки Б — скажи мовою листа, яке речення цього тижня наблизилось, яке відстало, і чи встигаю з віхами місяця. Потім запропонуй ОДНИМ пакетом year_plan 2–3 кроки (week_step) на наступний тиждень для кожної активної цілі, з датами наступного тижня — я виберу галочками. Стисло, без води.');
     }catch(e){ console.error('aiWeeklyMaybe',e); }
   }
   function aiAgentStatusFor(name,inp){
@@ -506,6 +506,24 @@
         t:{ type:'string', description:'текст кроку (add_step) або фрагмент наявного кроку (check_step)' },
         emoji:{ type:'string', description:'емодзі для create_goal' }
       }, required:['action','goal'] } },
+    { name:'year_plan',
+      description:'План року ПАКЕТОМ (екран «Мій рік»): кілька нових цілей, кроків по кварталах, кроків на тиждень і сум-мет за ОДИН виклик. '
+        +'Людина бачить усі пункти в шторці з галочками і застосовує обрані одним натиском — тому це одна зміна для ліміту. До 30 пунктів. '
+        +'type: goal (нова ціль, goal = назва) · quarter_step (віха: goal, t, ym РРРР-ММ у межах 12 місяців від поточного) · '
+        +'week_step (справа в «Плані»: goal, t, ds РРРР-ММ-ДД від сьогодні до +31 дня) · money (лише СУМА-мета цілі: goal, sum; гроші НЕ переказує). '
+        +'goal для кроків/сум — фрагмент назви наявної цілі або точна назва нової цілі з цього ж пакета. '
+        +'Неоднозначні назви повертаються тобі списком — уточни й виклич знову. Перед пакетом подивись цілі через get_data goals.',
+      input_schema:{ type:'object', properties:{
+        note:{ type:'string', description:'одне речення для людини над списком: на чому тримається план' },
+        items:{ type:'array', items:{ type:'object', properties:{
+          type:{ type:'string', enum:['goal','quarter_step','week_step','money'] },
+          goal:{ type:'string' },
+          t:{ type:'string', description:'текст кроку (quarter_step / week_step)' },
+          ym:{ type:'string', description:'РРРР-ММ для quarter_step' },
+          ds:{ type:'string', description:'РРРР-ММ-ДД для week_step' },
+          sum:{ type:'number', description:'сума-мета для money' }
+        }, required:['type','goal'] } }
+      }, required:['items'] } },
     { name:'finance',
       description:'Весь блок Гроші: add_expense (витрата), add_income (дохід), env_deposit/env_spend (конверти), env_create (новий конверт), debt_add (записати борг), debt_pay (погасити борг повністю/частково), debt_edit (виправити борг: імʼя та/або залишок), debt_delete (видалити борг повністю, з історією), debt_list (хто кому винен), del_last (видалити останній AI-запис витрати/доходу — для виправлень). Грошові записи людина підтверджує шторкою — просто викликай; якщо скасувала, не повторюй.',
       input_schema:{ type:'object', properties:{
@@ -551,7 +569,8 @@
       }, required:['action'] } },
   ];
 
-  const AI_AGENT_ADDON='\n\nАГЕНТНИЙ РЕЖИМ: у тебе є інструменти get_data, planner, goals, finance, patterns, memory, folders, diary. '
+  const AI_AGENT_ADDON='\n\nАГЕНТНИЙ РЕЖИМ: у тебе є інструменти get_data, planner, goals, year_plan, finance, patterns, memory, folders, diary. '
+    +'ПЛАН РОКУ (людина просить розписати рік, цілі по кварталах і тижнях, «Мій рік») — ОДНИМ викликом year_plan зі списком items (до 30): людина бачить усі пункти з галочками і застосовує обрані; це одна зміна для ліміту. Гроші year_plan лише ПЛАНУЄ (сума-мета), не переказує. Після виклику чесно перекажи, що застосовано, а що людина зняла. '
     +'Дії з блоками планера — ЛИШЕ інструмент planner. «Нагадай мені о X про Y» — теж planner: на наявний блок action=remind, для нового — create з полем remind (короткий блок на той час). Кроки/цілі — інструмент goals. ВЕСЬ блок Гроші — інструмент finance: витрати, доходи, конверти (env_deposit/env_spend/env_create), борги (debt_add/debt_pay/debt_edit/debt_delete/debt_list) і виправлення (del_last). Помилково записаний борг можна виправити (debt_edit: імʼя/залишок) або видалити (debt_delete). Ніколи не кажи, що не можеш редагувати борги чи конверти — можеш, викликом finance. '
     +'Цикли заміни звичок — інструмент patterns (перемога=mark_new, зрив=mark_old, без осуду). '
     +'Довготривалі факти про людину — інструмент memory (save/forget); запис людина підтверджує шторкою. '
@@ -574,6 +593,7 @@
       if(name==='get_data') return flowToolRead(inp||{});
       if(name==='planner')  return await flowToolPlanner(inp||{});
       if(name==='goals')    return await flowToolGoals(inp||{});
+      if(name==='year_plan') return await flowToolYearPlan(inp||{});
       /* розділ, який людина закрила від AI (Ще → AI і приватність): інструмент
          не читає і не пише — навіть «записати витрату» повертає баланси */
       if(name==='finance')  return aiSectionOff('finance') ? aiSectionOffMsg('finance') : await flowToolFinance(inp||{});
@@ -913,6 +933,32 @@
         setTimeout(()=>fin(false), 120000);
       }catch(e){ res(false); }
     });
+  }
+  /* year_plan (екран «Мій рік», етап 4, 22.11.2026): пакет пунктів → перевірка й привʼязка до справжніх
+     цілей (ypBatchPrepare) → шторка з галочками (ypBatchSheet) → запис обраних (ypBatchApply) → рядок
+     у aiLog з undo.yplan. Неоднозначне — моделі, нічого не пишемо. Повертаємо фактичний результат. */
+  async function flowToolYearPlan(inp){
+    if(typeof ypBatchPrepare!=='function') return '⚠️ екран «Мій рік» недоступний';
+    const pr=ypBatchPrepare(inp.items);
+    if(pr.fatal) return '⚠️ '+pr.fatal+'. Нічого не змінено.';
+    if(pr.ambiguous.length) return '⚠️ неоднозначні назви цілей — уточни й надішли пакет знову (нічого не змінено):\n'+pr.ambiguous.join('\n')
+      +(pr.errors.length?'\nІнші помилки:\n'+pr.errors.join('\n'):'');
+    if(!pr.rows.length) return '⚠️ жодного правильного пункту — нічого не змінено:\n'+pr.errors.join('\n');
+    if(!ypReady()) return '⚠️ цілі ще завантажуються — нічого не змінено, спробуй за мить';
+    const idx=await ypBatchSheet(pr.rows, inp.note);
+    if(!idx) return 'людина скасувала — нічого не змінено, не повторюй';
+    if(!ypReady()) return '⚠️ цілі ще завантажуються — нічого не змінено';
+    const r=ypBatchApply(pr.rows, idx);
+    const skipped=pr.rows.filter((_,i)=>!idx.includes(i)).map(x=>'«'+x.label+'»');
+    if(r.done.length){
+      aiLog.unshift({ts:Date.now(), nb:0, ns:0, nf:0, nop:r.done.length, np:0, undo:{yplan:r.undo}});
+      aiChatSave();
+      try{ plToast('🤖 '+mrT('план року: ','year plan: ')+r.done.length); }catch(_){}
+    }
+    return 'застосовано '+r.done.length+' з '+pr.rows.length+(r.done.length?':\n• '+r.done.join('\n• '):'')
+      +(skipped.length?'\nлюдина зняла галочки ('+skipped.length+'): '+skipped.join('; ')+' — не пропонуй їх знову':'')
+      +(r.lost&&r.lost.length?'\nне записано, бо нову ціль для них не створено ('+r.lost.length+'): '+r.lost.map(x=>'«'+x+'»').join('; '):'')
+      +(pr.errors.length?'\nвідкинуто перевіркою:\n'+pr.errors.join('\n'):'');
   }
   function aiFinConfirm(sub){
     return aiToolConfirm(sub,{title:'💶 Frequency хоче записати у Фінанси'});
@@ -1844,6 +1890,7 @@
         list.splice(idx,0,x.block);
       }catch(e){ console.error('aiUndoDel',e); }
     });
+    if(L.undo&&L.undo.yplan){ try{ ypBatchUndo(L.undo.yplan); }catch(e){ console.error('aiUndoYearPlan',e); } }   // пакет «Мій рік» (66-year-planner.js)
     (L.undo&&L.undo.pages||[]).forEach(x=>{
       try{
         if(typeof boards==='object'&&Array.isArray(boards[x.fk])){

@@ -469,6 +469,8 @@
       close();
       inputModal({ title:'Нова папка', placeholder:'Назва папки', emoji:true, emojiVal:'📁',
         onOk:(nm,emojiVal)=>{
+          // папки ще не прочитано — інакше saveFolders запише заглушку з однією новою папкою (як 16-dashboard.js:1190)
+          if(foldersLoaded!==true){ try{ plToast('Папки ще завантажуються — спробуй за мить'); }catch(_){} return; }
           const used=order.length;
           const key='f_'+Date.now();
           const em=(emojiVal!==undefined?emojiVal:'📁');
@@ -697,12 +699,16 @@
     c.querySelectorAll('[data-delgoal]').forEach(el=>el.onclick=()=>{
       const gid=el.dataset.delgoal;
       const gl=g.goals.find(x=>x.id===gid); if(!gl) return;
+      // гроші в конверті цілі («Мій рік», 57-my-plan.js) чи скарбничці призу (44-prizes.js) — спершу повернути, як у Журналі
+      const held=(typeof mrSaved==='function'?mrSaved(gl):0)+(typeof pzSaved==='function'?pzSaved(gl):0);
+      if(held>0){ flowAlert('У конверті цієї цілі лежить '+money(held)+'. Спершу поверни гроші в Гаманець (сторінка цілі в Журналі → «Мій рік») — тоді ціль можна видалити.', 'Ціль із грошима'); return; }
       confirmSheet({
         title:'Видалити ціль?',
         sub:'«'+gl.name+'»'+(gl.wishId?' · бажання залишиться в Карті.':''),
         okLabel:'Видалити',
         onOk:()=>{
-          if(gl.wishId){ const w=wishes.find(x=>x.id===gl.wishId); if(w){ delete w.goalId; saveWishes(); } }
+          if(typeof mrUnlinkWishes==='function') mrUnlinkWishes(gl);   // усі фото цілі лишаються в Карті, але знову «вільні»
+          else if(gl.wishId){ const w=wishes.find(x=>x.id===gl.wishId); if(w){ delete w.goalId; saveWishes(); } }
           g.goals=g.goals.filter(x=>x.id!==gid); saveGoals(); renderGoalsTab();
         }
       });

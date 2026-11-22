@@ -275,6 +275,17 @@
       'Підсумок від Флоу':'Summary from Flow', 'Флоу · підсумок папки':'Flow · folder summary', 'Флоу читає папку…':'Flow is reading the folder…',
       'Флоу пропонує — ти вирішуєш':'Flow suggests — you decide', 'Спитати Флоу про папку':'Ask Flow about this folder',
       'Оновити':'Refresh', 'Спробувати ще':'Try again',
+      // «Мій рік» у Журналі (57-my-plan.js)
+      'Точка Б':'Point B', 'ким ти будеш через рік':'who you will be in a year', 'Цілі':'Goals', 'Календар року':'Year calendar',
+      'Нова ціль':'New goal', 'Ким ти будеш через рік?':'Who will you be in a year?', 'Написати':'Write', 'Змінити':'Edit',
+      'Кілька речень про себе через рік: як минає день, що вже є, що змінилось. Це твоя точка Б.':'A few sentences about yourself a year from now: how your day goes, what you have, what changed. This is your point B.',
+      'тапни плитку — відкриється ціль':'tap a tile to open the goal', 'почни з однієї':'start with one', 'великі кроки по чвертях':'big steps by quarter',
+      'Тут стануть кроки':'Your steps will go here', 'Додай ціль і розбий її на 3–4 великі кроки — вони розкладуться по чвертях року.':'Add a goal and split it into 3–4 big steps — they will spread across the quarters.',
+      'Усі квартали і таблиця ›':'All quarters and table ›', '‹ Мій рік':'‹ My year', 'Мій рік':'My year', 'зараз':'now', 'кроків нема':'no steps',
+      'Одна сторінка: точка Б, 1–3 цілі і великі кроки по чвертях року.':'One page: point B, 1–3 goals and big steps by quarter.',
+      'Розписати рік':'Plan my year', 'Відкрити план':'Open plan', 'Покроково з підказками':'Step by step with hints',
+      'Точку Б ще не написано':'Point B is not written yet', 'На цей квартал кроків нема':'No steps for this quarter',
+      'Січ–Бер':'Jan–Mar', 'Кві–Чер':'Apr–Jun', 'Лип–Вер':'Jul–Sep', 'Жов–Гру':'Oct–Dec',
     };
 
     // ---- другий рівень: окремі слова (дні тижня, місяці) --------------

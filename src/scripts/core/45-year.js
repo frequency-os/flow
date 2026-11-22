@@ -39,8 +39,7 @@
     const y=yrYear(), cur=ymdLocal().slice(0,4);
     const f=[['all','Усі'],['main','Головні'],['pause','Пауза'],['archive','Архів']];
     return `<div class="yr-top"><div class="yr-yn"><button data-yrshift="-1" aria-label="Попередній рік">‹</button><b>${y}</b><button data-yrshift="1" aria-label="Наступний рік">›</button>${y!==cur?'<button class="mo-now" data-yrthis>Цей рік</button>':''}</div>
-      <div class="yr-filt">${f.map(([k,l])=>`<button data-yrf="${k}"${yrState.filter===k?' class="on"':''}>${l}</button>`).join('')}<button data-yradd>＋ Місія</button></div></div>
-      <button class="yr-letter" data-yrletter><span>✉️</span><span><b>Лист із точки Б · Дорога року</b><small>${(()=>{ try{ const L=goalsData.letter; return L&&L.text?esc(String(L.text).slice(0,70))+'…':'напиши, ким ти будеш через рік'; }catch(_){ return ''; } })()}</small></span><i>›</i></button>`;
+      <div class="yr-filt">${f.map(([k,l])=>`<button data-yrf="${k}"${yrState.filter===k?' class="on"':''}>${l}</button>`).join('')}<button data-yradd>＋ Місія</button></div></div>`;   // лист «Точка Б» — тепер угорі «Мого року» (57-my-plan.js), старий екран «План на рік» звідси не відкриваємо
   }
 
   // ── Mac: Таблиця року ──
@@ -118,7 +117,6 @@
     { const t=c.querySelector('[data-yrthis]'); if(t) t.onclick=()=>{ yrState.y=''; yrState.q=-1; jnRender(); }; }
     c.querySelectorAll('[data-yrf]').forEach(b=>b.onclick=()=>{ yrState.filter=b.dataset.yrf; jnRender(); });
     { const a=c.querySelector('[data-yradd]'); if(a) a.onclick=()=>jnEditor(null); }
-    { const l=c.querySelector('[data-yrletter]'); if(l) l.onclick=()=>{ try{ goGoals(); }catch(_){} }; }
     { const m=c.querySelector('[data-yrmx]'); if(m) m.onclick=()=>{ yrSetMxOpen(!yrMxOpen()); jnRender(); }; }
     c.querySelectorAll('[data-yrq]').forEach(b=>b.onclick=()=>{ yrState.q=+b.dataset.yrq; jnRender(); });
     c.querySelectorAll('[data-yrm]').forEach(b=>b.onclick=()=>{ const g=(goalsData.goals||[]).find(x=>String(x.id)===b.dataset.yrm); if(g) moMissionPage(g,'path'); });

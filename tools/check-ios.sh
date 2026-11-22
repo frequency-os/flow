@@ -18,7 +18,7 @@ for pat in "dev_eval|інструмент Нокса, що виконує код
   if [ "$n" = 0 ]; then echo "   ✅ нема «$p»"
   else echo "   ❌ «$p» трапляється $n раз — $why"; bad=$((bad+1)); fi
 done
-# ворота dev-екранів (Апгрейд, Місто дня, Сфери, Мій світ): у dist-ios upDevOn
+# ворота dev-можливостей (Сфери, агент, проксі ШІ; 30-dev-gate.js): у dist-ios upDevOn
 # має бути рівно одна і з тілом лише «return false;» — тоді вони не відкриються ніколи
 dv=$(python3 - "$F" <<'PY'
 import re,sys
