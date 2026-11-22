@@ -115,7 +115,9 @@
   function pnMeta(it){
     const tm=it.h!=null?`<span>${pnHM(it.h)}–${pnHM(Math.min(it.end,24))}</span>`:'';
     const fr=it.from?`<span class="pn-from">${esc(pnT('from'))} ${esc(pnShort(it.from))}</span>`:'';
-    const ch=pnChip(it); return (ch||tm||fr)?`<span class="pn-meta">${ch}${tm}${fr}</span>`:'';
+    // чіп цілі (66-year-planner.js, етап 9): справа з goalId або блок з link.goalId
+    let gch=''; try{ gch=typeof ypGoalChip==='function'?ypGoalChip(ypItemGoalId(it)):''; }catch(_){}
+    const ch=gch+pnChip(it); return (ch||tm||fr)?`<span class="pn-meta">${ch}${tm}${fr}</span>`:'';
   }
   function pnRow(it,big){
     return `<div class="pn-row${big?' pn-big pn-glass':''}${it.done?' done':''}">${pnCheck(it)}
@@ -199,7 +201,8 @@
       const dots=bl.slice(0,3).map(b=>`<i style="background:${pnFolderColor(b.folder)||'var(--pn-acc)'}"></i>`).join('');
       cells+=`<button class="${ds===td?'td':''}" data-pngo="${ds}"><span>${d}</span><em>${dots}</em></button>`;
     }
-    return `<div class="pn-cal pn-glass"><div class="pn-calh">${PN_DOW[L].map(d=>`<span>${d}</span>`).join('')}</div><div class="pn-calg">${cells}</div></div>
+    let goalsH=''; try{ goalsH=typeof ypPlanMonthHTML==='function'?ypPlanMonthHTML(ym):''; }catch(_){}   // віхи й гроші цілей місяця (етап 9)
+    return goalsH+`<div class="pn-cal pn-glass"><div class="pn-calh">${PN_DOW[L].map(d=>`<span>${d}</span>`).join('')}</div><div class="pn-calg">${cells}</div></div>
       <div class="pn-lbl"><span>${esc(pnT('monthDone'))}</span><span>${done} ${esc(pnT('of'))} ${all}</span></div>
       <div class="pn-bar pn-glass"><i style="width:${all?Math.round(done/all*100):0}%"></i></div>`;
   }
@@ -209,8 +212,10 @@
     Object.keys(p.blocksByDay||{}).forEach(ds=>{ if(ds.slice(0,4)!==String(y)) return; pnRaw(ds).forEach(b=>add(ds.slice(0,7),!!b.done)); });
     (p.tasks||[]).forEach(t=>{ const d=pnTaskDate(t); if(t&&t.scope==='day'&&!t.slotted&&d.slice(0,4)===String(y)) add(d.slice(0,7),!!t.done); });
     const tiles=PN_MON[L].map((nm,i)=>{ const k=y+'-'+String(i+1).padStart(2,'0'), s=stat[k]||[0,0];
-      return `<button class="pn-glass${k===cur?' on':''}" data-pnym="${k}"><span>${esc(nm.slice(0,3))}</span><span class="pn-yb"><i style="width:${s[1]?Math.round(s[0]/s[1]*100):0}%"></i></span><small>${s[1]?s[0]+'/'+s[1]:''}</small></button>`; }).join('');
-    return `<div class="pn-yr">${tiles}</div><div class="pn-soon pn-glass"><b>${esc(pnT('yearSoon'))}</b>${esc(pnT('yearSoonTx'))}</div>`;
+      return `<button class="pn-glass${k===cur?' on':''}" data-pnym="${k}"><span>${esc(nm.slice(0,3))}</span><span class="pn-yb"><i style="width:${s[1]?Math.round(s[0]/s[1]*100):0}%"></i></span><small>${s[1]?s[0]+'/'+s[1]:''}</small>${(()=>{ try{ return typeof ypPlanYearMs==='function'?ypPlanYearMs(k):''; }catch(_){ return ''; } })()}</button>`; }).join('');
+    // замість заглушки «окремим кроком» — цілі року з «Мого року» (66-year-planner.js, етап 9)
+    let foot=''; try{ foot=typeof ypPlanYearFoot==='function'?ypPlanYearFoot():''; }catch(_){}
+    return `<div class="pn-yr">${tiles}</div>`+(foot||`<div class="pn-soon pn-glass"><b>${esc(pnT('yearSoon'))}</b>${esc(pnT('yearSoonTx'))}</div>`);
   }
 
   /* ─── Шапка і каркас ─── */
@@ -333,6 +338,7 @@
     on('[data-pnstar]',el=>{ const [k,id]=pnSplit(el.dataset.pnstar); pnToggleStar(k,id); });
     on('[data-pnopen]',el=>{ const [k,id]=pnSplit(el.dataset.pnopen); pnOpen(k,id); });
     on('[data-pnmx]',el=>{ const [k,id]=pnSplit(el.dataset.pnmx); const p=plData(), m=(p.matrix[k]||[]).find(x=>x&&String(x.id)===id); if(m){ m.done=!m.done; pnSave(); pnRender(); } });
+    try{ if(typeof ypPlanBind==='function') ypPlanBind(c,()=>pnRender()); }catch(_){}   // ціль у «Плані» (етап 9)
     on('[data-pnfold]',el=>{ try{ goFolder(el.dataset.pnfold); }catch(e){ console.error('pnFolder',e); } });
     on('[data-pnhour]',el=>{ const q=plData(), old=q.selDate; q.selDate=pnDay(); try{ plBlockSheet(null,+el.dataset.pnhour); } finally{ q.selDate=old; } });
     const a=c.querySelector('#pnAddIn'); if(a) a.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing){ e.preventDefault(); pnAddTask(a.value); } });

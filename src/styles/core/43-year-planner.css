@@ -1,54 +1,119 @@
   /* ════════ «Мій рік» — планер із Карти бажань (66-year-planner.js, 22.11.2026) ════════
-     Яскраве лише одне — стрічка фото мрій. Ланцюжок, дорога й поле Флоу — тихі, на токенах. */
+     Вигляд Н1 «Герой цілі» (етап 6): яскраве одне — фото мрії в героях; пігулки, плитки, дорога й Флоу — тихі, на токенах.
+     Телефон — одна колонка; ≥1024px — дві: ліворуч герой і плитки, праворуч темп, трекери, тиждень, дорога. */
   #ypBody{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
   :where(#scr-yplan) button{font:inherit;}
-  .yp-top{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+
+  /* шапка */
+  .yp-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
   .yp-top .back{margin-bottom:0;}
+  .yp-head{flex:1;min-width:140px;}
+  .yp-head h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.1;color:var(--text);}
+  .yp-head span{display:block;margin-top:2px;font-size:13px;color:var(--muted);}
   .yp-map{all:unset;box-sizing:border-box;cursor:pointer;min-height:44px;padding:0 14px;display:inline-flex;align-items:center;border-radius:12px;
     font-size:14px;font-weight:700;color:var(--accent);background:var(--bg-2);border:1px solid var(--line);}
-  .yp-head h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
-  .yp-head span{display:block;margin-top:2px;font-size:13px;color:var(--muted);}
+  .yp-flowtop{all:unset;box-sizing:border-box;cursor:pointer;min-height:44px;padding:0 16px 0 8px;display:none;align-items:center;gap:8px;border-radius:12px;
+    font-size:14px;font-weight:800;color:#fff;background:var(--accent);}
+  .yp-spark{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff;background:var(--accent);}
+  .yp-spark.sm{width:24px;height:24px;font-size:12px;background:color-mix(in srgb,#fff 22%,transparent);}
 
-  /* стрічка: цілі й вільні мрії */
+  /* пігулки цілей */
+  .yp-pills{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .yp-pills::-webkit-scrollbar{display:none;}
+  .yp-pill{all:unset;box-sizing:border-box;cursor:pointer;flex:none;display:flex;align-items:center;gap:10px;min-height:52px;padding:5px 16px 5px 5px;border-radius:26px;
+    background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .yp-pill img,.yp-pill .yp-dot{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;}
+  .yp-pill .yp-dot{background:color-mix(in srgb,var(--c) 70%,var(--card));}
+  .yp-pill b{display:block;font-size:14px;font-weight:700;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .yp-pill small{display:block;font-size:11px;color:var(--muted);margin-top:1px;}
+  .yp-pill.on{border:1.5px solid var(--text);background:var(--bg-2);}
+  .yp-pill:not(.on):not(.add) b{font-weight:600;color:color-mix(in srgb,var(--text) 82%,var(--muted));}
+  .yp-pill.add{padding:0 18px;color:var(--accent);font-size:14px;font-weight:800;background:transparent;border:1px dashed var(--line);}
+  .yp-free{all:unset;box-sizing:border-box;cursor:pointer;flex:none;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px 0 6px;border-radius:22px;
+    font-size:13px;color:var(--muted);background:var(--bg-2);}
+  .yp-av{display:flex;}
+  .yp-av img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--bg-2);}
+  .yp-av img+img{margin-left:-10px;}
+
+  /* розгорнуті мрії без плану — картки з «Зробити ціллю» */
   .yp-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;margin:0 -2px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
   .yp-strip::-webkit-scrollbar{display:none;}
   .yp-card{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:120px;height:156px;border-radius:18px;position:relative;overflow:hidden;scroll-snap-align:start;
     display:flex;flex-direction:column;justify-content:space-between;padding:10px;color:var(--text);
-    background:color-mix(in srgb,var(--c,var(--accent)) 26%,var(--card));border:1px solid color-mix(in srgb,var(--c,var(--accent)) 34%,var(--line));
-    box-shadow:var(--dp-shadow-s,none);transition:opacity .2s;}
+    background:color-mix(in srgb,var(--c,var(--accent)) 26%,var(--card));border:1px solid color-mix(in srgb,var(--c,var(--accent)) 34%,var(--line));box-shadow:var(--dp-shadow-s,none);}
   .yp-card.ph{color:#fff;background-size:cover;background-position:center;border-color:transparent;}
   .yp-card.ph::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08) 30%,rgba(0,0,0,.74));}
   .yp-card>*{position:relative;}
-  .yp-strip:has(.yp-card.on) .yp-card:not(.on):not(.wish):not(.add){opacity:.62;}
-  .yp-card.on{outline:2px solid var(--text);outline-offset:2px;opacity:1;}
-  .yp-card.wish{opacity:.9;justify-content:flex-end;}
+  .yp-card.wish{justify-content:flex-end;}
   .yp-card.wish small{font-weight:800;}
   .yp-card.add{align-items:center;justify-content:center;gap:4px;color:var(--accent);background:transparent;border:1px dashed var(--line);box-shadow:none;}
   .yp-card.add span{font-size:30px;font-weight:300;line-height:1;}
   .yp-card.add b{font-size:14px;font-weight:800;}
-  .yp-ring{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
-    background:conic-gradient(currentColor calc(var(--p,0)*1%),color-mix(in srgb,currentColor 26%,transparent) 0);}
-  .yp-ring i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:800;
-    background:color-mix(in srgb,#000 55%,transparent);color:#fff;font-variant-numeric:tabular-nums;}
-  .yp-card:not(.ph) .yp-ring i{background:var(--card);color:var(--text);}
   .yp-cn{display:flex;flex-direction:column;gap:3px;}
   .yp-cn b{font-size:14px;font-weight:800;line-height:1.2;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
   .yp-cn small{font-size:11px;opacity:.88;}
 
-  /* вибрана ціль і ланцюжок зв'язків */
-  .yp-goal{padding:14px;border-radius:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--dp-shadow-s,none);display:flex;flex-direction:column;gap:12px;}
-  .yp-gh{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:4px;}
-  .yp-gh b{font-size:19px;font-weight:800;color:var(--text);}
-  .yp-gh span{font-size:13px;line-height:1.45;color:var(--muted);}
-  .yp-chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
-  .yp-ln{all:unset;box-sizing:border-box;min-height:32px;padding:0 10px;display:inline-flex;align-items:center;border-radius:10px;
-    font-size:12.5px;font-weight:700;color:var(--text);background:var(--bg-2);border:1px solid var(--line);}
-  button.yp-ln{cursor:pointer;min-height:36px;}
-  .yp-ln.add{color:var(--accent);border-style:dashed;background:transparent;}
-  .yp-ln.dim{color:var(--muted);}
-  .yp-to{font-style:normal;font-size:12px;color:var(--muted);}
+  /* дві колонки на комп'ютері, одна на телефоні */
+  .yp-main{display:flex;flex-direction:column;gap:14px;}
+  .yp-left,.yp-right{display:flex;flex-direction:column;gap:12px;min-width:0;}
 
-  /* дорога кварталів */
+  /* герой цілі — єдине яскраве місце */
+  .yp-hero{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:flex-end;gap:14px;min-height:260px;padding:18px;border-radius:22px;color:var(--text);
+    background:color-mix(in srgb,var(--c) 30%,var(--card));border:1px solid color-mix(in srgb,var(--c) 36%,var(--line));box-shadow:var(--dp-shadow-s,none);}
+  .yp-hero.ph{color:#fff;background-size:cover;background-position:center;border-color:transparent;}
+  .yp-hero.ph::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,10,14,0) 30%,rgba(8,10,14,.86));}
+  .yp-hero>*{position:relative;}
+  .yp-hb{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;}
+  .yp-hb small{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;}
+  .yp-hb b{font-size:28px;font-weight:800;line-height:1.08;letter-spacing:-.02em;overflow-wrap:break-word;}
+  .yp-hb span{font-size:14px;line-height:1.4;opacity:.88;}
+  .yp-ring{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:conic-gradient(currentColor calc(var(--p,0)*1%),color-mix(in srgb,currentColor 24%,transparent) 0);}
+  .yp-ring i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:800;
+    background:color-mix(in srgb,#000 55%,transparent);color:#fff;font-variant-numeric:tabular-nums;}
+  .yp-ring.big{width:64px;height:64px;}
+  .yp-ring.big i{width:52px;height:52px;font-size:15px;}
+  .yp-hero:not(.ph) .yp-ring i{background:var(--card);color:var(--text);}
+
+  /* плитки зв'язків: папка · гроші · час · план */
+  .yp-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .yp-tile{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:88px;padding:12px 14px;border-radius:16px;
+    background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .yp-tile small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .yp-tile b{font-size:15px;font-weight:700;line-height:1.3;overflow-wrap:break-word;}
+  .yp-tile b em{font-style:normal;font-weight:500;color:var(--muted);}
+  .yp-tile span{font-size:12px;color:var(--muted);line-height:1.35;}
+  .yp-tile span.warm{color:color-mix(in srgb,#e0b060 80%,var(--text));}
+  .yp-tile.add b{color:var(--accent);}
+  .yp-tile.add{border-style:dashed;background:transparent;}
+  .yp-tile.plan{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));}
+  .yp-tile.plan span{color:var(--accent);}
+  .yp-bar{display:block;height:4px;border-radius:2px;margin:6px 0 2px;overflow:hidden;background:color-mix(in srgb,var(--text) 10%,transparent);}
+  .yp-bar u{display:block;height:100%;border-radius:2px;background:var(--accent);}
+
+  /* темп і трекери */
+  .yp-tempo{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.4;color:var(--text);
+    background:color-mix(in srgb,var(--accent) 10%,var(--card));border:1px solid color-mix(in srgb,var(--accent) 28%,var(--line));}
+  .yp-tempo .yp-spark{background:var(--accent);}
+  .yp-tempo>span:nth-child(2){flex:1;min-width:0;}
+  .yp-tempo button{all:unset;box-sizing:border-box;cursor:pointer;min-height:36px;padding:0 12px;display:inline-flex;align-items:center;border-radius:10px;
+    font-size:13px;font-weight:800;color:#fff;background:var(--accent);}
+  .yp-trks{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;}
+  .yp-trk{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .yp-trk small{font-size:11px;color:var(--muted);}
+  .yp-trk b{font-size:15px;font-weight:700;}
+  .yp-trk span{font-size:12px;color:var(--muted);}
+
+  /* «Цей тиждень» — справи «Плану» з goalId (етап 2) */
+  .yp-week{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
+  .yp-wh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .yp-wh b{font-size:15px;font-weight:800;color:var(--text);}
+  .yp-wh span{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
+
+  /* дорога кварталів: на телефоні вертикаль, на комп'ютері — 4 колонки */
+  .yp-rh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:4px;}
+  .yp-rh b{font-size:17px;font-weight:800;color:var(--text);}
+  .yp-rh span{font-size:12px;color:var(--muted);}
   .yp-road{list-style:none;margin:0;padding:0 0 0 22px;position:relative;display:flex;flex-direction:column;gap:12px;}
   .yp-road::before{content:'';position:absolute;left:6px;top:10px;bottom:10px;width:2px;border-radius:2px;background:var(--line);}
   .yp-q{position:relative;display:flex;flex-direction:column;gap:6px;}
@@ -70,14 +135,7 @@
   .yp-none{margin:0;font-size:13px;color:var(--muted);}
   .yp-add{all:unset;box-sizing:border-box;cursor:pointer;align-self:flex-start;min-height:44px;padding:0 14px;display:inline-flex;align-items:center;border-radius:12px;
     font-size:14px;font-weight:800;color:var(--accent);border:1px dashed var(--line);margin-left:22px;}
-
-  /* «Цей тиждень» усередині поточного кварталу (етап 2) — справи «Плану» з goalId */
-  .yp-week{display:flex;flex-direction:column;gap:6px;margin-top:4px;padding:12px;border-radius:16px;background:var(--bg-2);border:1px solid var(--line);}
-  .yp-wh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-  .yp-wh b{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
-  .yp-wh span{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
   .yp-add.in{margin-left:0;border:0;padding:0 4px;}
-  .yp-ln.plan{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,var(--line));}
 
   /* шторка-пакет «Флоу пропонує план» (етап 4) — поверх наявного .asheet */
   .yp-bl{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;margin:4px 0 12px;-webkit-overflow-scrolling:touch;}
@@ -92,19 +150,81 @@
   .yp-empty b{font-size:17px;font-weight:800;color:var(--text);line-height:1.3;}
   .yp-empty span{font-size:14px;line-height:1.5;color:var(--muted);}
 
-  /* поле Флоу над нижньою панеллю — та сама геометрія, що в «Плані» (місце для котика праворуч) */
+  /* поле Флоу над нижньою панеллю (телефон) — та сама геометрія, що в «Плані» (місце для котика праворуч) */
   .yp-pad{height:84px;}
   .yp-flow{position:fixed;z-index:150;left:max(14px, calc(50% - 226px));width:calc(min(100% - 28px, 452px) - 76px);box-sizing:border-box;
     bottom:calc(var(--nav-top) + 14px);display:flex;align-items:center;gap:10px;min-height:48px;padding:0 16px 0 12px;border-radius:26px;cursor:pointer;
     font:inherit;font-size:14.5px;text-align:left;color:var(--text);background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);
     box-shadow:0 10px 30px -10px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);}
   .yp-flow span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .yp-spark{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff;background:var(--accent);}
   body:not(.in-yplan) .yp-flow,body.spot-open .yp-flow{display:none;}
+
+  /* комп'ютер: дві колонки, дорога в 4 колонки, Флоу — кнопкою в шапці замість плаваючого поля */
   @media (min-width:1024px){
-    .yp-flow{left:calc(50% + 124px);transform:translateX(-50%);width:min(560px, calc(100% - 420px));bottom:24px;}
-    .yp-strip{flex-wrap:wrap;overflow:visible;}
+    #ypBody{max-width:1160px;}
+    .yp-flowtop{display:inline-flex;}
+    .yp-flow{display:none;}
+    .yp-pad{height:32px;}
+    .yp-main{display:grid;grid-template-columns:minmax(340px,420px) minmax(0,1fr);gap:24px;align-items:start;}
+    .yp-left{position:sticky;top:16px;}
+    .yp-hero{min-height:300px;}
+    .yp-road{flex-direction:row;padding:28px 0 0;gap:12px;}
+    .yp-road::before{left:8px;right:8px;top:7px;bottom:auto;width:auto;height:2px;}
+    .yp-q{flex:1;min-width:0;}
+    .yp-q::before{left:0;top:-28px;}
+    .yp-qh{flex-direction:column;gap:2px;}
+    .yp-add{margin-left:0;}
+    /* вузька колонка кварталу: місяць кроку — під текстом, інакше дата стискає текст до літери в рядок */
+    .yp-road .yp-lv{flex-wrap:wrap;align-items:flex-start;row-gap:2px;}
+    .yp-road .yp-lv span{flex:1 1 0;}
+    .yp-road .yp-lv small{flex-basis:100%;padding-left:30px;}
   }
 
-  .yp-card:focus-visible,.yp-gh:focus-visible,.yp-ln:focus-visible,.yp-lv:focus-visible,.yp-add:focus-visible,.yp-map:focus-visible,.yp-flow:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-  @media (prefers-reduced-motion:reduce){ .yp-card{transition:none;} }
+  .yp-pill:focus-visible,.yp-free:focus-visible,.yp-hero:focus-visible,.yp-tile:focus-visible,.yp-trk:focus-visible,.yp-tempo button:focus-visible,.yp-card:focus-visible,
+  .yp-lv:focus-visible,.yp-add:focus-visible,.yp-map:focus-visible,.yp-flowtop:focus-visible,.yp-flow:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ Етап 7: картка цілі під обкладинкою папки (П1) — fhBelowRender, 36-chats.js ════ */
+  .ypf{display:flex;flex-direction:column;gap:10px;margin:4px 0 14px;padding:14px;border-radius:20px;background:var(--card);border:1px solid color-mix(in srgb,var(--c) 40%,var(--line));box-shadow:var(--dp-shadow-s,none);}
+  .ypf-h{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;color:var(--text);}
+  .ypf-h img,.ypf-dot{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;}
+  .ypf-dot{background:color-mix(in srgb,var(--c) 60%,var(--card));}
+  .ypf-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .ypf-t small{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .ypf-t b{font-size:18px;font-weight:800;line-height:1.2;overflow-wrap:break-word;}
+  .ypf .yp-ring{width:44px;height:44px;color:var(--accent);}
+  .ypf .yp-ring i{width:34px;height:34px;font-size:11px;background:var(--card);color:var(--text);}
+  .ypf-qs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+  .ypf-q{display:flex;flex-direction:column;gap:2px;min-width:0;padding:8px;border-radius:12px;background:var(--bg-2);}
+  .ypf-q.now{background:color-mix(in srgb,var(--accent) 14%,var(--bg-2));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 40%,transparent);}
+  .ypf-q small{font-size:10px;font-weight:800;color:var(--muted);}
+  .ypf-q.now small{color:var(--accent);}
+  .ypf-q b{font-size:12px;font-weight:600;line-height:1.3;color:var(--text);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .ypf-q i{font-style:normal;font-size:10px;color:var(--muted);}
+  .ypf .yp-week{background:var(--bg-2);}
+  .ypf .mr-link{min-height:40px;}
+  .ypf-h:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ Етап 9: ціль у «Плані» (65-plan.js) — на токенах «Плану» (--pn-*) ════ */
+  .pn-gchip{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:5px;max-width:160px;padding:2px 8px 2px 3px;border-radius:9px;margin-right:6px;
+    font-size:11.5px;font-weight:650;color:var(--pn-tx,var(--text));background:color-mix(in srgb,var(--gc) 26%,transparent);}
+  .pn-gchip img,.pn-gchip i{width:16px;height:16px;border-radius:5px;object-fit:cover;flex:none;}
+  .pn-gchip i{background:var(--gc);}
+  .pn-gchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ypm{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:18px;margin-bottom:10px;}
+  .ypm-r{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 8px;border-radius:12px;color:var(--pn-tx,var(--text));}
+  .ypm-c{flex:none;width:22px;height:22px;border-radius:50%;box-sizing:border-box;border:2px solid var(--pn-tx3,var(--muted));}
+  .ypm-r.ok .ypm-c{background:var(--pn-ok,#30d158);border-color:var(--pn-ok,#30d158);}
+  .ypm-r img,.ypm-d{flex:none;width:32px;height:32px;border-radius:9px;object-fit:cover;}
+  .ypm-d{background:var(--gc);}
+  .ypm-r span{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .ypm-r b{font-size:14px;font-weight:650;overflow-wrap:break-word;}
+  .ypm-r.ok b{color:var(--pn-tx2,var(--muted));text-decoration:line-through;}
+  .ypm-r small{font-size:11.5px;color:var(--pn-tx2,var(--muted));}
+  .ypm-money{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:10px 14px;border-radius:18px;margin-bottom:12px;color:var(--pn-tx,var(--text));}
+  .ypm-money span{flex:1;font-size:13px;color:var(--pn-tx2,var(--muted));}
+  .ypm-money b{font-size:16px;font-weight:750;}
+  .ypm-money em{font-style:normal;font-size:13px;font-weight:700;color:var(--pn-acc,var(--accent));}
+  .ypy-m{display:flex;align-items:center;gap:4px;margin-top:4px;font-size:10.5px;line-height:1.25;color:var(--pn-tx,var(--text));text-align:left;overflow:hidden;}
+  .ypy-m i{flex:none;width:7px;height:7px;border-radius:50%;}
+  .ypy-f{display:block;width:100%;box-sizing:border-box;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;}
+  .pn-gchip:focus-visible,.ypm-r:focus-visible,.ypm-money:focus-visible{outline:2px solid var(--pn-acc,var(--accent));outline-offset:2px;}

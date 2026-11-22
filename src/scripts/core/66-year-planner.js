@@ -7,7 +7,8 @@
      mrNewGoal / mrAddStep / mrSumSheet / mrGoalPage (57-my-plan.js), jnMsSetDone (41-journal.js).
      Етап 2: «Цей тиждень» — справи «Плану» з полем goalId (нове поле лише в справі, створеній тут). */
   let ypSel='';                         // id вибраної цілі — лише в памʼяті екрана
-  let ypBack='home';                    // звідки прийшли: 'home' | 'journal'
+  let ypBack='home';                    // звідки прийшли: 'home' | 'journal' | 'folder'
+  let ypBackFk='';                      // папка, з якої прийшли (ypBack==='folder')
   const YP_QN=['I','II','III','IV'];
   function ypT(uk,en){ return mrT(uk,en); }
 
@@ -21,12 +22,69 @@
     return g||null;
   }
 
-  // ── стрічка: ціль-картка (фото мрії або колір цілі) і вільна мрія ──
-  function ypCard(g,on){
-    const c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), pct=Math.max(0,Math.min(100,jnPct(g)||0)), fin=mrFinish(g);
-    return `<button class="yp-card${ph?' ph':''}${on?' on':''}" data-ypg="${esc(g.id)}" aria-pressed="${on}" style="--c:${c};--p:${pct};${ph?`background-image:url('${esc(ph)}')`:''}">
-      <span class="yp-ring" aria-hidden="true"><i>${pct}</i></span>
-      <span class="yp-cn"><b>${esc(g.name||ypT('Ціль','Goal'))}</b><small>${fin?ypT('до ','by ')+esc(fin):ypT('без терміну','no date')}</small></span></button>`;
+  /* ── Н1 (етап 6, 22.11.2026): пігулки цілей угорі, фото-герой, плитки звʼязків, трекери, тиждень, дорога.
+     Плитки читають Core.graph() (57-core.js) — ті самі числа, що бачить Ядро й Флоу. ── */
+  let ypShowFree=false;                 // розгорнуто «мрії без плану» — лише памʼять екрана
+  function ypPct(g){ return Math.max(0,Math.min(100,jnPct(g)||0)); }
+  function ypPill(g,on){
+    const c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), fin=mrFinish(g);
+    return `<button class="yp-pill${on?' on':''}" data-ypg="${esc(g.id)}" aria-pressed="${on}" style="--c:${c}">
+      ${ph?`<img src="${esc(ph)}" alt="">`:`<span class="yp-dot" aria-hidden="true"></span>`}
+      <span><b>${esc(g.name||ypT('Ціль','Goal'))}</b><small>${ypPct(g)}%${fin?' · '+ypT('до ','by ')+esc(fin):''}</small></span></button>`;
+  }
+  function ypFreePill(free){
+    if(!free.length) return '';
+    const n=free.length, av=free.slice(0,3).map(w=>{ const s=safeImg(w.type==='video'?w.thumb:w.img)||''; return s?`<img src="${esc(s)}" alt="">`:''; }).join('');
+    const lab=mrEn()?n+(n===1?' dream':' dreams')+' without a plan':n+' '+pluralUk(n,'мрія','мрії','мрій')+' без плану';
+    return `<button class="yp-free" data-ypfree aria-expanded="${ypShowFree}"><span class="yp-av">${av}</span>${esc(lab)} ${ypShowFree?'⌃':'›'}</button>`;
+  }
+  // зв'язки цілі одним читанням Ядра; якщо Ядра нема — порожньо, плитки покажуть «＋»
+  function ypLinks(g){
+    try{ const gr=window.Core&&window.Core.graph(); const x=gr&&(gr.goals||[]).find(v=>v.id===String(g.id)); return (x&&x.links)||{}; }catch(_){ return {}; }
+  }
+  function ypHero(g){
+    const c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), pct=ypPct(g), fin=mrFinish(g), why=String(g.why||'').trim();
+    const eb=[jnRole(g)==='main'?ypT('головна ціль','main goal'):ypT('ціль року','goal of the year'), fin?ypT('до ','by ')+fin:''].filter(Boolean).join(' · ');
+    return `<button class="yp-hero${ph?' ph':''}" data-ypopen style="--c:${c};--p:${pct};${ph?`background-image:url('${esc(ph)}')`:''}">
+      <span class="yp-hb"><small>${esc(eb)}</small><b>${esc(g.name||ypT('Ціль','Goal'))}</b>
+        <span>${why?esc(why.length>110?why.slice(0,109)+'…':why):ypT('Навіщо тобі ця ціль? Тапни — і допиши.','Why this goal? Tap and add a line.')}</span></span>
+      <span class="yp-ring big" aria-hidden="true"><i>${pct}%</i></span></button>`;
+  }
+  function ypTiles(g){
+    const L=ypLinks(g), fk=moOwnFolder(g.folderKey)?g.folderKey:'', sum=mrMoneySum(g);
+    const tile=(attr,lab,val,sub,extra)=>`<button class="yp-tile${extra||''}" ${attr}><small>${lab}</small><b>${val}</b>${sub?`<span>${sub}</span>`:''}</button>`;
+    let h='';
+    if(fk){ const f=folders[fk], ch=(L.chats||[]).length;
+      h+=tile('data-ypfold',ypT('Папка цілі','Goal folder'),`${safeEmoji(f.emoji,'📁')} ${esc(String(f.name||ypT('Папка','Folder')))} ›`,
+        ch?esc(ch+' '+(mrEn()?(ch===1?'chat':'chats'):pluralUk(ch,'чат','чати','чатів'))):ypT('записи, фото, чати','notes, photos, chats')); }
+    else h+=tile('data-ypfpick',ypT('Папка цілі','Goal folder'),ypT('＋ Привʼязати','＋ Link'),ypT('де житимуть записи цілі','where the goal notes live'),' add');
+    if(sum){ const sv=mrSaved(g), pm=mrPerMonth(g), w=Math.min(100,Math.round(sv/sum*100));
+      h+=`<button class="yp-tile" data-ypopen><small>${ypT('Гроші','Money')}</small><b>${esc(mrK(sv,g))} <em>${ypT('з ','of ')}${esc(mrK(sum,g))}</em></b>
+        <i class="yp-bar"><u style="width:${w}%"></u></i>${pm?`<span class="warm">${ypT('щомісяця ','monthly ')}${esc(mrK(pm,g))}</span>`:''}</button>`; }
+    else h+=tile('data-ypsum',ypT('Гроші','Money'),ypT('＋ Сума цілі','＋ Target sum'),ypT('якщо на ціль треба гроші','if the goal needs money'),' add');
+    const tm=L.time||{};
+    h+=tile('data-ypgoplan',ypT('Час на ціль','Time on goal'),tm.blocks?esc(tm.blocks+' '+(mrEn()?(tm.blocks===1?'block':'blocks'):pluralUk(tm.blocks,'блок','блоки','блоків'))):'—',
+      tm.blocks?ypT('за 7 днів · зроблено ','last 7 days · done ')+tm.done:ypT('блоки з ціллю в «Плані»','goal blocks in Plan'));
+    const wk=ypWeekTasks(g), lv=jnLevels(g);
+    h+=wk.length?tile('data-ypgoplan',ypT('У «Плані»','In Plan'),`${wk.filter(t=>t.done).length} ${ypT('з','of')} ${wk.length}`,ypT('цього тижня · відкрити ›','this week · open ›'),' plan')
+      :tile('data-ypopen',ypT('Кроки року','Year steps'),`${lv.filter(m=>m.done).length} ${ypT('з','of')} ${lv.length}`,lv.length?'':ypT('додай 3–4 великі кроки','add 3–4 big steps'));
+    return `<div class="yp-tiles">${h}</div>`;
+  }
+  // підказка темпу: скільки на місяць, щоб устигнути (етап 10 додасть «позаду / попереду»)
+  function ypTempo(g){
+    const sum=mrMoneySum(g), pm=sum?mrPerMonth(g):0; if(!pm) return '';
+    const due=mrDueDs(g);
+    return `<div class="yp-tempo"><span class="yp-spark sm" aria-hidden="true">✦</span>
+      <span>${ypT('Щоб устигнути','To make it')}${due?ypT(' до ',' by ')+esc(mrDate(due)):''}: <b>${esc(mrK(pm,g))}</b> ${ypT('на місяць','a month')}</span>
+      <button data-ypflow>${ypT('Розписати','Plan it')}</button></div>`;
+  }
+  // трекери цілі, що вже є: число «зараз → мета» і щоденна позначка в папці (етап 8 додасть історію й моменти)
+  function ypTrackers(g){
+    const out=[], n=jnNum(g), fk=moOwnFolder(g.folderKey)?g.folderKey:'';
+    if(n) out.push(`<button class="yp-trk" data-ypopen><small>${ypT('Число','Number')}</small><b>${esc(String(n.cur))} → ${esc(String(n.to))}</b><i class="yp-bar"><u style="width:${n.pct}%"></u></i></button>`);
+    const tr=fk&&typeof moTracker==='function'?moTracker(fk):null;
+    if(tr){ const st=moStreak(tr); out.push(`<button class="yp-trk" data-ypfold><small>${ypT('Щодня','Daily')}</small><b>${st} ${mrEn()?(st===1?'day':'days'):pluralUk(st,'день','дні','днів')}</b><span>${ypT('поспіль','in a row')}</span></button>`); }
+    return out.length?`<div class="yp-trks">${out.join('')}</div>`:'';
   }
   function ypWishCard(w){
     const src=safeImg(w.type==='video'?w.thumb:w.img)||'';
@@ -34,22 +92,6 @@
       <span class="yp-cn"><b>${esc(w.cap||ypT('Мрія','Dream'))}</b><small>＋ ${ypT('Зробити ціллю','Make it a goal')}</small></span></button>`;
   }
   function ypNewCard(){ return `<button class="yp-card add" data-ypnew><span aria-hidden="true">＋</span><b>${ypT('Нова ціль','New goal')}</b></button>`; }
-
-  // ── ланцюжок: що вже зв'язано з ціллю; бракує — кнопка, що веде туди, де це задають ──
-  function ypChain(g){
-    const ph=jnMissionPhoto(g), fk=moOwnFolder(g.folderKey)?g.folderKey:'', sum=mrMoneySum(g);
-    const lv=jnLevels(g), done=lv.filter(m=>m.done).length;
-    const arrow='<i class="yp-to" aria-hidden="true">→</i>';
-    const parts=[
-      ph?`<span class="yp-ln">${ypT('Мрія','Dream')}</span>`:`<button class="yp-ln add" data-ypopen>＋ ${ypT('фото мрії','dream photo')}</button>`,
-      fk?`<button class="yp-ln" data-ypfold>${safeEmoji(folders[fk].emoji,'📁')} ${esc(String(folders[fk].name||ypT('Папка','Folder')))}</button>`:`<button class="yp-ln add" data-ypfpick>＋ ${ypT('папка','folder')}</button>`,
-      sum?`<button class="yp-ln" data-ypopen>${esc(mrK(mrSaved(g),g))} / ${esc(mrK(sum,g))}</button>`:`<button class="yp-ln add" data-ypsum>＋ ${ypT('гроші','money')}</button>`,
-      `<span class="yp-ln${lv.length?'':' dim'}">${ypT('кроки ','steps ')}${done}/${lv.length}</span>`
-    ];
-    const wk=ypWeekTasks(g);   // етап 2: ланка «План» — кроки цього тижня
-    if(wk.length) parts.push(`<button class="yp-ln plan" data-ypgoplan>${ypT('План ','Plan ')}${wk.filter(t=>t.done).length}/${wk.length}</button>`);
-    return `<div class="yp-chain" aria-label="${ypT("Зв'язки цілі",'Goal links')}">${parts.join(arrow)}</div>`;
-  }
 
   /* ── «Цей тиждень» (етап 2): крок тижня — ЗВИЧАЙНА справа «Плану» з датою і полем goalId.
      Одне джерело (plData().tasks у goals_data): галочка тут = галочка в «Плані», і навпаки.
@@ -73,26 +115,26 @@
       ${rows||`<p class="yp-none">${ypT('Кроків на тиждень ще нема — вони стануть справами в «Плані».','No steps this week yet — they become tasks in Plan.')}</p>`}
       <button class="yp-add in" data-ypweek>＋ ${ypT('Крок на цей тиждень','Step for this week')}</button></div>`;
   }
-  function ypAddWeekStep(g){
+  function ypAddWeekStep(g,rer){
     inputModal({ title:ypT('Крок на цей тиждень','Step for this week'), placeholder:ypT('Напр. Відкласти ₴ 2 000','E.g. Put aside 50'), onOk:v=>{
       v=String(v||'').trim().slice(0,200); if(!v) return;
       const td=ymdLocal(), sun=ypAddDays(ypWeekMon(),6), days=[];
       for(let ds=td; ds<=sun; ds=ypAddDays(ds,1)) days.push(ds);
       actionSheet({ title:ypT('Коли?','When?'), sub:v, items:days.map((ds,i)=>({ ic:'calendar',
         label:i===0?ypT('Сьогодні','Today'):i===1?ypT('Завтра','Tomorrow'):ypDow(ds)+', '+(+ds.slice(8)),
-        onClick:()=>ypPushTask(g,v,ds) })) });
+        onClick:()=>ypPushTask(g,v,ds,rer) })) });
     }});
   }
   // goals_data ще не прочитано (старт без мережі) — не пишемо, як «Забіг» (56-run.js rnReady)
   function ypReady(){ try{ return typeof window.storeKeyReady!=='function'||window.storeKeyReady('goals_data')===true; }catch(_){ return false; } }
   function ypNotReady(){ try{ plToast(ypT('Ще завантажуються цілі — спробуй за мить','Goals are still loading — try again in a moment')); }catch(_){} }
-  function ypPushTask(g,v,ds){
+  function ypPushTask(g,v,ds,rer){
     if(!ypReady()){ ypNotReady(); return; }
     const cur=jnGoalById(g.id); if(!cur) return;   // ціль могли прибрати, поки відкрита шторка
     const t={ id:'t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5), scope:'day', t:v, date:ds, c:'val', p:2, tag:'',
       done:false, open:false, subs:[], goalId:String(cur.id) };
     if(moOwnFolder(cur.folderKey)) t.folder=cur.folderKey;   // у «Плані» справа покаже папку цілі
-    plData().tasks.push(t); saveGoals(); ypRender();
+    plData().tasks.push(t); saveGoals(); (typeof rer==='function'?rer:ypRender)();
     try{ plToast(ypT('＋ крок у «Плані»','＋ step in Plan')); }catch(_){}
   }
 
@@ -105,7 +147,7 @@
           <i aria-hidden="true"></i><span>${esc(m.t||'')}</span><small>${esc(mrMonth(m.ym))}</small></button>`).join('');
       return `<li class="yp-q${i===0?' now':''}"><div class="yp-qh"><b>${YP_QN[qq.q]} ${ypT('квартал','quarter')}${i===0?' · '+ypT('зараз','now'):''}</b>
           <span>${esc(MR_QN[qq.q])}${qq.y!==cy?' '+esc(qq.y):''}</span></div>
-        ${items||`<p class="yp-none">${ypT('Кроків ще нема','No steps yet')}</p>`}${i===0?ypWeekHTML(g):''}</li>`;
+        ${items||`<p class="yp-none">${ypT('Кроків ще нема','No steps yet')}</p>`}</li>`;
     }).join('')+'</ol>'+`<button class="yp-add" data-ypstep>＋ ${ypT('Крок на квартал','Step for a quarter')}</button>`;
   }
 
@@ -121,52 +163,143 @@
 
   function ypHTML(){
     const goals=mrActive(), g=ypCur(goals), free=ypFreeWishes();
-    const backL=ypBack==='journal'?ypT('‹ Журнал','‹ Journal'):ypT('‹ Огляд','‹ Overview');
-    let h=`<div class="yp-top"><button class="back" data-ypback>${backL}</button><button class="yp-map" data-ypmap>${ypT('Усі мрії','All dreams')}</button></div>
-      <div class="yp-head"><h1>${ypT('Мій рік','My year')}</h1><span>${ypT('до ','until ')}${esc(mrUntil())}</span></div>`;
+    const backL=ypBack==='journal'?ypT('‹ Журнал','‹ Journal')
+      :ypBack==='plan'?ypT('‹ План','‹ Plan')
+      :(ypBack==='folder'&&moOwnFolder(ypBackFk))?'‹ '+String(folders[ypBackFk].name||ypT('Папка','Folder')).slice(0,24):ypT('‹ Огляд','‹ Overview');
+    const ng=goals.length, cnt=ng?' · '+(mrEn()?ng+(ng===1?' goal':' goals'):ng+' '+pluralUk(ng,'ціль','цілі','цілей')):'';
+    let h=`<div class="yp-top"><button class="back" data-ypback>${esc(backL)}</button>
+        <div class="yp-head"><h1>${ypT('Мій рік','My year')}</h1><span>${ypT('до ','until ')}${esc(mrUntil())}${esc(cnt)}</span></div>
+        <button class="yp-map" data-ypmap>${ypT('Усі мрії','All dreams')}</button>
+        <button class="yp-flowtop" data-ypflow><span class="yp-spark sm" aria-hidden="true">✦</span>${ypT('Флоу, розпиши мій рік','Flow, plan my year')}</button></div>`;
     if(!g) return h+ypEmpty()+'<div class="yp-pad"></div>';
-    h+=`<div class="yp-strip" role="group" aria-label="${ypT('Цілі року','Goals of the year')}">${goals.map(x=>ypCard(x,x===g)).join('')}${free.map(ypWishCard).join('')}${ypNewCard()}</div>`;
-    const why=String(g.why||'').trim();
-    h+=`<section class="yp-goal"><button class="yp-gh" data-ypopen><b>${esc(g.name||ypT('Ціль','Goal'))}</b>
-        <span>${why?esc(why.length>120?why.slice(0,119)+'…':why):ypT('Навіщо тобі ця ціль? Відкрий — і допиши.','Why this goal? Open it and add a line.')}</span></button>
-      ${ypChain(g)}</section>`;
-    h+=ypRoad(g);
-    h+=`<button class="mr-link" data-ypjn>${ypT('Точка Б, гроші й правила року ›','Point B, money and rules of the year ›')}</button>`;
+    h+=`<div class="yp-pills" role="group" aria-label="${ypT('Цілі року','Goals of the year')}">${goals.map(x=>ypPill(x,x===g)).join('')}
+      <button class="yp-pill add" data-ypnew>＋ ${ypT('Нова ціль','New goal')}</button>${ypFreePill(free)}</div>`;
+    if(ypShowFree&&free.length) h+=`<div class="yp-strip">${free.map(ypWishCard).join('')}</div>`;
+    h+=`<div class="yp-main"><section class="yp-left">${ypHero(g)}${ypTiles(g)}</section>
+      <section class="yp-right">${ypTempo(g)}${ypTrackers(g)}${ypWeekHTML(g)}
+        <div class="yp-rh"><b>${ypT('Дорога року','Road of the year')}</b><span>${esc(MR_QN[mrQuarters()[0].q])} — ${esc(MR_QN[mrQuarters()[3].q])}</span></div>
+        ${ypRoad(g)}
+        <button class="mr-link" data-ypjn>${ypT('Точка Б, гроші й правила року ›','Point B, money and rules of the year ›')}</button></section></div>`;
     return h+'<div class="yp-pad"></div>';
   }
 
   function ypRender(){
     const body=document.getElementById('ypBody'); if(!body) return;
     body.innerHTML=ypHTML();
-    const q=s=>body.querySelectorAll(s);
-    const cur=()=>jnGoalById(ypSel);
-    q('[data-ypback]').forEach(b=>b.onclick=()=>{ if(ypBack==='journal') goJournal(); else goHome(); });
+    ypBind(body, ()=>jnGoalById(ypSel), ypRender);
+    ypDock();
+  }
+  /* обробники кнопок цілі — спільні для «Мого року» і картки цілі в папці (етап 7):
+     cur() — жива ціль (свіжа з goalsData), rer() — перемалювати те місце, звідки тапнули */
+  function ypBind(root, cur, rer){
+    const q=s=>root.querySelectorAll(s);
+    q('[data-ypback]').forEach(b=>b.onclick=()=>{ if(ypBack==='journal') goJournal(); else if(ypBack==='folder'&&moOwnFolder(ypBackFk)) goFolder(ypBackFk); else if(ypBack==='plan'&&typeof goPlan==='function') goPlan(true); else goHome(); });
     q('[data-ypmap]').forEach(b=>b.onclick=()=>goWishes({back:goYearPlanBack, label:ypT('‹ Мій рік','‹ My year')}));
     q('[data-ypg]').forEach(b=>b.onclick=()=>{
       if(ypSel===b.dataset.ypg){ const g=cur(); if(g) mrGoalPage(g); return; }   // повторний тап — відкрити ціль
-      ypSel=b.dataset.ypg; ypRender();
+      ypSel=b.dataset.ypg; rer();
     });
-    q('[data-ypw]').forEach(b=>b.onclick=()=>wishToGoal(b.dataset.ypw, gid=>{ ypSel=String(gid); ypRender(); const g=jnGoalById(gid); if(g) mrGoalPage(g); }));
+    q('[data-ypw]').forEach(b=>b.onclick=()=>wishToGoal(b.dataset.ypw, gid=>{ ypSel=String(gid); rer(); const g=jnGoalById(gid); if(g) mrGoalPage(g); }));
     q('[data-ypnew]').forEach(b=>b.onclick=mrNewGoal);
+    q('[data-ypfree]').forEach(b=>b.onclick=()=>{ ypShowFree=!ypShowFree; rer(); });
+    q('[data-ypflow]').forEach(b=>b.onclick=ypFlowOpen);
     q('[data-ypjn]').forEach(b=>b.onclick=()=>{ mrDetail=false; goJournal({tab:'year'}); });
     q('[data-ypopen]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrGoalPage(g); });
-    q('[data-ypfpick]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrPickFolder(g,ypRender); });   // етап 3
-    q('[data-ypsum]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrSumSheet(g,ypRender); });
+    q('[data-ypfpick]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrPickFolder(g,rer); });   // етап 3
+    q('[data-ypsum]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrSumSheet(g,rer); });
     q('[data-ypfold]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g&&moOwnFolder(g.folderKey)) goFolder(g.folderKey); });
-    q('[data-ypstep]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrAddStep(g,ypRender); });
-    q('[data-ypweek]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) ypAddWeekStep(g); });
+    q('[data-ypstep]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) mrAddStep(g,rer); });
+    q('[data-ypweek]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) ypAddWeekStep(g,rer); });
     q('[data-ypgoplan]').forEach(b=>b.onclick=()=>{ if(typeof goPlan==='function') goPlan(); });
+    q('[data-ypyear]').forEach(b=>b.onclick=()=>{ const g=cur(); if(g) ypSel=String(g.id); goYearPlan({from:'folder', fk:b.dataset.ypyear}); });
     q('[data-ypt]').forEach(b=>b.onclick=()=>{
       if(!ypReady()){ ypNotReady(); return; }
       const t=(plData().tasks||[]).find(x=>x&&String(x.id)===b.dataset.ypt); if(!t) return;
-      t.done=!t.done; saveGoals(); ypRender();
+      t.done=!t.done; saveGoals(); rer();
     });
     q('[data-ypms]').forEach(b=>b.onclick=()=>{
+      if(!ypReady()){ ypNotReady(); return; }
       const g=cur(), m=g&&(g.ms||[]).find(x=>x&&String(x.id)===b.dataset.ypms);
       if(!m){ if(g) mrGoalPage(g); return; }   // крок не з «Дороги» (старий рівень) — правиться на сторінці цілі
-      jnMsSetDone(m,!m.done); saveGoals(); ypRender();
+      jnMsSetDone(m,!m.done); saveGoals(); rer();
     });
-    ypDock();
+  }
+
+  /* ════════ Етап 9: ціль у «Плані» (65-plan.js) — лише показ, запис лише тапом ════════
+     День/Тиждень: чіп цілі в справі (task.goalId) і блоці (block.link.goalId). Місяць: віхи цілей цього
+     місяця + скільки на цілі щомісяця. Рік: перша віха кожного місяця замість заглушки «окремим кроком». */
+  function ypItemGoalId(it){ const r=it&&it.ref; if(!r) return ''; return String(r.goalId||(r.link&&r.link.goalId)||''); }
+  function ypGoalChip(goalId){
+    const g=goalId?jnGoalById(goalId):null; if(!g||jnStatus(g)==='archive') return '';
+    const ph=jnMissionPhoto(g), c=safeColor(g.color,'#5b8def');
+    return `<button class="pn-gchip" style="--gc:${c}" data-pngoal="${esc(g.id)}">${ph?`<img src="${esc(ph)}" alt="">`:'<i aria-hidden="true"></i>'}<span>${esc(String(g.name||'').slice(0,24))}</span></button>`;
+  }
+  function ypPerMonthAll(){ try{ return mrActive().reduce((a,g)=>a+(mrMoneySum(g)?mrPerMonth(g):0),0); }catch(_){ return 0; } }
+  function ypPlanMonthHTML(ym){
+    const rows=[]; mrActive().forEach(g=>jnLevels(g).filter(m=>m.ym===ym).forEach(m=>rows.push({g,m})));
+    const pm=ypPerMonthAll();
+    if(!rows.length&&!pm) return '';
+    const done=rows.filter(x=>x.m.done).length;
+    const r=rows.map(({g,m})=>{ const ph=jnMissionPhoto(g);
+      return `<button class="ypm-r${m.done?' ok':''}" data-pnms="${esc(g.id)}:${esc(m.id)}" aria-pressed="${!!m.done}" style="--gc:${safeColor(g.color,'#5b8def')}">
+        <i class="ypm-c" aria-hidden="true"></i>${ph?`<img src="${esc(ph)}" alt="">`:'<i class="ypm-d" aria-hidden="true"></i>'}
+        <span><b>${esc(String(m.t||''))}</b><small>${esc(String(g.name||''))}</small></span></button>`; }).join('');
+    return (rows.length?`<div class="pn-lbl"><span>${ypT('Віхи місяця','Milestones this month')}</span><span>${done} ${ypT('з','of')} ${rows.length}</span></div><div class="pn-glass ypm">${r}</div>`:'')
+      +(pm?`<button class="pn-glass ypm-money" data-pnyp><span>${ypT('На цілі щомісяця','For goals each month')}</span><b>${esc(money(pm))}</b><em>${ypT('Мій рік ›','My year ›')}</em></button>`:'');
+  }
+  function ypPlanYearMs(ym){
+    const L=[]; mrActive().forEach(g=>jnLevels(g).filter(m=>m.ym===ym).forEach(m=>L.push({g,m})));
+    if(!L.length) return '';
+    const x=L[0];
+    return `<span class="ypy-m"><i style="background:${safeColor(x.g.color,'#5b8def')}"></i>${esc(String(x.m.t||'').slice(0,28))}${L.length>1?' +'+(L.length-1):''}</span>`;
+  }
+  function ypPlanYearFoot(){
+    const gs=mrActive(), pm=ypPerMonthAll();
+    if(!gs.length) return `<button class="pn-soon pn-glass" data-pnyp><b>${ypT('План року','Year plan')}</b>${ypT('Обери 1–3 мрії й зроби їх цілями — тут стануть їхні кроки по місяцях. Мій рік ›','Pick 1–3 dreams and make them goals — their monthly steps will show here. My year ›')}</button>`;
+    const n=gs.length;
+    return `<button class="pn-soon pn-glass ypy-f" data-pnyp><b>${esc(mrEn()?n+(n===1?' goal':' goals')+' this year':n+' '+pluralUk(n,'ціль','цілі','цілей')+' року')}</b>`
+      +`${pm?ypT('на цілі щомісяця ','for goals each month ')+esc(money(pm))+' · ':''}${ypT('Мій рік ›','My year ›')}</button>`;
+  }
+  // тапи з «Плану»: чіп цілі, віха місяця, «Мій рік» — повертаємось у той самий вигляд «Плану»
+  function ypPlanBind(root, rer){
+    root.querySelectorAll('[data-pngoal]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); ypSel=b.dataset.pngoal; goYearPlan({from:'plan'}); });
+    root.querySelectorAll('[data-pnyp]').forEach(b=>b.onclick=()=>goYearPlan({from:'plan'}));
+    root.querySelectorAll('[data-pnms]').forEach(b=>b.onclick=()=>{
+      if(!ypReady()){ ypNotReady(); return; }
+      const [gid,mid]=String(b.dataset.pnms).split(':'), g=jnGoalById(gid), m=g&&(g.ms||[]).find(x=>x&&String(x.id)===mid);
+      if(!m){ if(g) mrGoalPage(g); return; }   // віха не з «Дороги» — правиться на сторінці цілі
+      jnMsSetDone(m,!m.done); saveGoals(); rer();
+    });
+  }
+
+  /* ════════ Етап 7: ціль у папці (П1) ════════
+     Папка, до якої привʼязана ціль (goal.folderKey), показує під обкладинкою картку цілі: фото, %, квартали,
+     трекери, «Цей тиждень» і перехід у «Мій рік». Кличе 36-chats.js (fhBelowRender) — лише показ;
+     пише тільки після тапу тими самими обробниками, що й «Мій рік» (ypBind). Обкладинка папки без власної
+     обкладинки бере фото мрії цілі — теж лише на екрані (fhCoverStyle), нічого не зберігається. */
+  function ypGoalsOfFolder(fk){ try{ return mrActive().filter(g=>g&&String(g.folderKey||'')===String(fk)); }catch(_){ return []; } }
+  function ypFolderGoalPhoto(fk){ const g=ypGoalsOfFolder(fk)[0]; return g?jnMissionPhoto(g):''; }
+  function ypFolderGoalHTML(fk){
+    const gs=ypGoalsOfFolder(fk); if(!gs.length) return '';
+    const g=gs[0], ph=jnMissionPhoto(g), pct=ypPct(g), fin=mrFinish(g), c=safeColor(g.color,'#5b8def');
+    const qs=mrQuarters().map((qq,i)=>{ const lv=mrLvIn(g,qq), d=lv.filter(m=>m.done).length;
+      return `<span class="ypf-q${i===0?' now':''}"><small>${YP_QN[qq.q]}${i===0?' · '+ypT('зараз','now'):''}</small>`
+        +`<b>${lv.length?esc(String(lv[0].t||''))+(lv.length>1?' +'+(lv.length-1):''):'—'}</b>${lv.length?`<i>${d}/${lv.length}</i>`:''}</span>`; }).join('');
+    const more=gs.length>1?(mrEn()?' · +'+(gs.length-1)+' more':' · ще '+(gs.length-1)):'';
+    return `<section class="ypf" data-ypfg="${esc(g.id)}" style="--c:${c};--p:${pct}">
+      <button class="ypf-h" data-ypopen>${ph?`<img src="${esc(ph)}" alt="">`:'<span class="ypf-dot" aria-hidden="true"></span>'}
+        <span class="ypf-t"><small>${ypT('ціль цієї папки','goal of this folder')}${fin?' · '+ypT('до ','by ')+esc(fin):''}</small><b>${esc(g.name||ypT('Ціль','Goal'))}</b></span>
+        <span class="yp-ring" aria-hidden="true"><i>${pct}</i></span></button>
+      <div class="ypf-qs">${qs}</div>
+      ${ypTrackers(g)}
+      ${ypWeekHTML(g)}
+      <button class="mr-link" data-ypyear="${esc(fk)}">${ypT('Уся ціль у «Моєму році» ›','The whole goal in My year ›')}${esc(more)}</button>
+    </section>`;
+  }
+  function ypFolderGoalBind(box,fk,rer){
+    const sec=box&&box.querySelector('.ypf'); if(!sec) return;
+    const gid=sec.dataset.ypfg;
+    ypBind(sec, ()=>jnGoalById(gid), rer);
   }
 
   /* поле Флоу над нижньою панеллю — як у «Плані». Етап 4: відкриває чат із ВПИСАНИМ (не надісланим)
@@ -180,14 +313,14 @@
       : ypT('Розпиши мій рік: подивись мої цілі й мрії і запропонуй пакетом кроки по кварталах, 2–3 кроки на цей тиждень і суми, де потрібні гроші.',
           'Plan my year: look at my goals and dreams and suggest, as one batch, steps by quarter, 2–3 steps for this week and target sums where money is needed.');
   }
+  function ypFlowOpen(){
+    if(!window.aiChatSheet) return;
+    const q=ypFlowAsk(); window.aiChatSheet();
+    setTimeout(()=>{ const i=document.getElementById('aiInput'); if(i&&!i.value){ i.value=q; try{ i.dispatchEvent(new Event('input',{bubbles:true})); i.focus(); }catch(_){} } }, 60);
+  }
   function ypDock(){
     let d=document.getElementById('ypFlow');
-    if(!d){ d=document.createElement('button'); d.id='ypFlow'; d.type='button'; d.className='yp-flow'; document.body.appendChild(d);
-      d.onclick=()=>{
-        if(!window.aiChatSheet) return;
-        const q=ypFlowAsk(); window.aiChatSheet();
-        setTimeout(()=>{ const i=document.getElementById('aiInput'); if(i&&!i.value){ i.value=q; try{ i.dispatchEvent(new Event('input',{bubbles:true})); i.focus(); }catch(_){} } }, 60);
-      }; }
+    if(!d){ d=document.createElement('button'); d.id='ypFlow'; d.type='button'; d.className='yp-flow'; document.body.appendChild(d); d.onclick=ypFlowOpen; }
     d.innerHTML=`<span class="yp-spark" aria-hidden="true">✦</span><span>${ypT('Флоу, розпиши мій рік','Flow, plan my year')}</span>`;
   }
 
@@ -351,7 +484,7 @@
   function ypRefresh(){ const s=document.getElementById('scr-yplan'); if(s&&s.classList.contains('active')) ypRender(); }
   function goYearPlanBack(){ goYearPlan({keepBack:true}); }
   function goYearPlan(opts){ try{
-    if(opts&&typeof opts==='object'){ if(opts.from) ypBack=opts.from; else if(!opts.keepBack) ypBack='home'; }
+    if(opts&&typeof opts==='object'){ if(opts.from){ ypBack=opts.from; ypBackFk=opts.from==='folder'?String(opts.fk||''):''; } else if(!opts.keepBack) ypBack='home'; }
     else ypBack='home';
     ypRender(); show('scr-yplan'); window.scrollTo(0,0);
   }catch(e){ console.error('goYearPlan',e); } }

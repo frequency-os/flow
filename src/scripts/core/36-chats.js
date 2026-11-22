@@ -713,6 +713,9 @@
     if(cov&&!cov.img&&api.grads[cov.g||0]) return 'background:'+api.grads[cov.g||0]+';';
     if(f.photo){ try{ u=safeImg(window.photoSrc(f.photo)); }catch(_){ u=''; }
       if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`; }
+    // своєї обкладинки нема, а папка — дім цілі: фото мрії цілі (66-year-planner.js). Лише показ, нічого не зберігаємо
+    try{ u=typeof ypFolderGoalPhoto==='function'?safeImg(ypFolderGoalPhoto(fk)):''; }catch(_){ u=''; }
+    if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`;
     const c=safeColor(f.c,'#6a7dff');
     return `background:linear-gradient(160deg,color-mix(in srgb,${c} 60%,#0f1115),color-mix(in srgb,${c} 14%,var(--bg)));`;
   }
@@ -806,8 +809,11 @@
     let box=document.getElementById('fhBelow');
     if(!box){ box=document.createElement('div'); box.id='fhBelow'; box.className='fhb'; }
     if(box.previousElementSibling!==hero) hero.after(box);
-    box.innerHTML=fhKidsHTML(fk,s.kids)+fhPillsHTML(fk,s)+fhAiHTML(fk,s);
+    // ціль цієї папки (66-year-planner.js, етап 7) — над підпапками; лише показ, запис — тапом
+    const goalH=(()=>{ try{ return typeof ypFolderGoalHTML==='function'?ypFolderGoalHTML(fk):''; }catch(_){ return ''; } })();
+    box.innerHTML=goalH+fhKidsHTML(fk,s.kids)+fhPillsHTML(fk,s)+fhAiHTML(fk,s);
     box.hidden=!box.innerHTML;
+    if(goalH) try{ ypFolderGoalBind(box,fk,()=>fhBelowRender(fk)); }catch(_){}
     fhAiBind(box,fk);
     box.querySelectorAll('[data-fhk]').forEach(b=>{ b.onclick=()=>pgSubOpen(fk,b.dataset.fhk);
       chAttachLongPress(b,()=>fhLookSheet(b.dataset.fhk)); });
