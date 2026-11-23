@@ -81,6 +81,7 @@
       // недописане (хід ще йде) не зберігаємо: хід допише й збереже сам
       const msgs=aiChatMsgs.filter(m=>!m.streaming).map(m=>{
         const o={role:m.role,content:aiStoreContent(m.content),applied:!!m.applied,declined:!!m.declined};
+        if(m.folderPrivate) o.folderPrivate=true;
         if(m.trace) o.trace=m.trace;   // слід агента: вже компактний (aiTraceFinish обрізає)
         return o;
       });

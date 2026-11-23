@@ -6,7 +6,7 @@
      у папці місії — ще й мітку місії. У Гаманці (вкладка «Огляд») — Місія · Конверти · Борги й правила (10.10.2026: з Огляду прибрано в ⚙ Огляду, folderOpts.money).
      Хост на сторінці: <div data-wghost="id"> (page-editor/02-block-styles.js), у Гаманці — [data-wghome] (wlRender). */
 
-  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, dmission:1, dhabit:1, dtime:1, dtasks:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
+  const WG_TYPES={wgwallet:1, wgmission:1, wgenv:1, wgdebt:1, wgmoney:1, wgwork:1, wgworkpanel:1, dmission:1, dhabit:1, dtime:1, dtasks:1, dcal:1, dcount:1, dsave:1, dcounter:1, dphoto:1, countdown:1};   // d* — «Дані» (нижче)
   const WG_SETTINGS={
     wgwallet:{t:'Гаманець',ic:'👛'},
     wgwork:{t:'Робота',ic:'⏱'},
@@ -53,6 +53,7 @@
   }
   function wgHTML(b,fk){
     const ym=wlYm(), t=b&&b.type;
+    if(t==='wgworkpanel') return wkPanelHTML(b);
     if(wdIs(t)) return wdHTML(b,fk);   // «Дані»: вікна в місію / трекер / Планер
     if(t==='wgwallet'){
       let bal=0, pz=0; try{ bal=walletBalance(); pz=typeof pzTotal==='function'?pzTotal():0; }catch(_){}
@@ -138,6 +139,7 @@
     else if(a==='planadd'){ try{ wlState.tab='plan'; goFinance(); }catch(_){} }
     else if(a==='debts'){ try{ goDebts(); }catch(_){} }
     else if(a==='work'){ try{ goWork(); }catch(_){} }
+    else if(a.startsWith('wkp:')){ try{ wkpAct(a.slice(4),el,id); }catch(err){ console.error('wkpAct',err); } }
     else if(a==='workadd'){ try{ workTapDay(ymdLocal()); }catch(_){} }   // та сама шторка, що й тап по дню в календарі Роботи
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }

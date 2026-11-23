@@ -732,6 +732,20 @@
   .ai-done.off{color:#9aa0c8}
   .ai-dots{color:#9aa0c8;font-size:12.5px}
   .ai-clog{display:flex;flex-direction:column;gap:9px}
+  .ai-action-card{align-self:flex-start;box-sizing:border-box;width:min(100%,420px);display:grid;gap:12px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--text);overflow-wrap:anywhere}
+  .ai-action-card h3{font-size:1rem;font-weight:600;margin:0}
+  .ai-action-rows label{display:flex;align-items:center;gap:12px;min-height:48px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}
+  .ai-action-rows input{width:18px;height:18px;flex:none;accent-color:var(--accent);margin:0 2px}
+  .ai-action-rows small{display:block;margin-top:3px;color:var(--muted);font-size:.8125rem;white-space:pre-line}
+  .ai-action-rows input:disabled+span{opacity:.55}
+  .ai-action-buttons{display:flex;flex-wrap:wrap;gap:8px}
+  .ai-action-buttons button{min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card);color:var(--text);font:inherit;cursor:pointer}
+  .ai-action-buttons .primary{background:var(--accent);color:var(--bg);border-color:transparent;font-weight:600}
+  .ai-action-buttons button:disabled{opacity:.5;cursor:default}
+  .ai-action-buttons button:focus-visible,.ai-action-rows input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .ai-action-receipt{width:auto;color:var(--muted)}
+  .ai-clog:has(.ai-action-buttons)>#aiTraceLive,
+  .ai-clog:has(.ai-action-buttons)>.ai-msg:has(#aiStreamTxt){display:none}
   /* аврора-німб: дихає завжди, розганяється коли Флоу думає */
   .ai-aurora{position:absolute;top:-70px;left:50%;transform:translateX(-50%);width:360px;height:230px;
     pointer-events:none;z-index:0;filter:blur(32px);opacity:.55;

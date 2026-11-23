@@ -370,3 +370,20 @@
 .fsp-lbl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
 #fspGrid{padding-top:4px;}
 @media (min-width:1024px){ .fsp-cov.fsp-open{height:220px;} }
+/* кільце тижня трекера на картці папки (22.11.2026, 16-dashboard.js fc3Ring): тап — позначка, решта картки — відкрити */
+:is(#folderGrid,#fspGrid) .fc3-ring{all:unset;box-sizing:border-box;cursor:pointer;position:absolute;right:8px;bottom:8px;z-index:4;width:46px;height:46px;border-radius:50%;
+  display:grid;place-items:center;background:color-mix(in srgb,#000 28%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+:is(#folderGrid,#fspGrid) .fc3-ring svg{position:absolute;inset:3px;width:40px;height:40px;transform:rotate(-90deg);}
+:is(#folderGrid,#fspGrid) .fc3-ring circle{fill:none;stroke-width:3.6;}
+:is(#folderGrid,#fspGrid) .fc3-ring .tr{stroke:rgba(255,255,255,.25);}
+:is(#folderGrid,#fspGrid) .fc3-ring .vl{stroke:#fff;stroke-linecap:round;transition:stroke-dasharray .35s ease;}
+:is(#folderGrid,#fspGrid) .fc3-ring.on .tr{fill:var(--c,#6a7dff);stroke:#fff;}
+:is(#folderGrid,#fspGrid) .fc3-ring .ck{fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transform-origin:18px 18px;}
+:is(#folderGrid,#fspGrid) .fc3-ring b{position:relative;font-size:13px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
+:is(#folderGrid,#fspGrid) .fc3-ring:active{transform:scale(.94);}
+:is(#folderGrid,#fspGrid) .fc3-ring:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+:is(#folderGrid,#fspGrid) .fc3-hasring .fc3-label{right:60px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-ring{right:4px;bottom:4px;width:40px;height:40px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-ring svg{inset:2px;width:36px;height:36px;}
+:is(#folderGrid,#fspGrid).fsz-s .fc3-hasring .fc3-label{right:48px;}
+@media (prefers-reduced-motion:reduce){ :is(#folderGrid,#fspGrid) .fc3-ring .vl{transition:none;} }

@@ -67,7 +67,7 @@
       let q=null; try{ q=wdGoal(d,fk); }catch(_){}
       const gk=q&&moOwnFolder(q.folderKey)?q.folderKey:'', t=gk?moTracker(gk):null;
       if(!t){ trD=null; delete d.__tr; return null; }
-      if(!trD||trD.gk!==gk){ const r=moRhythm(t); trD={gk, rest:moRest(t), rhythm:t.rhythm?r:null};
+      if(!trD||trD.gk!==gk){ const r=moRhythm(t); trD={gk, rest:moRest(t), rhythm:t.rhythm?r:null, overview:t.ov!==false, wasOverview:t.ov!==false};
         trD.wasRest=JSON.stringify(trD.rest); trD.wasRh=JSON.stringify(trD.rhythm); }   // окремо: пишемо лише змінене поле
       d.__tr={rest:trD.rest.slice(), rhythm:trD.rhythm?Object.assign({},trD.rhythm):undefined}; return t; };
     // розмір однієї клітинки — з живої дошки (якщо віджет на екрані), інакше типовий
@@ -169,7 +169,8 @@
             +(rh.k==='week'?row('Днів на тиждень',`<span class="ws-step"><button data-wsst="rhn" data-n="-1" aria-label="Менше">−</button><b>${rh.n}</b><button data-wsst="rhn" data-n="1" aria-label="Більше">＋</button></span>`):'')
             +(rh.k==='days'?row('Скільки днів',seg('rdays',MO_DAYS_N.map(n=>[n,n]),rh.n)):''))
           +grp('Вихідні дні',`<span class="ws-days7">${DY_DOW.map((x,i)=>`<button data-wsrest="${i}" class="${trD.rest.includes(i)?'on':''}" aria-pressed="${trD.rest.includes(i)}">${x}</button>`).join('')}</span>`
-            +'<div class="ws-note">Пропущений вихідний не рве серію і не рахується в «з N».</div>'):'')+h;
+            +'<div class="ws-note">Пропущений вихідний не рве серію і не рахується в «з N».</div>')
+          +grp('',tg('overview',trD.overview,flowLang()==='en'?'Ring on Overview':'Кільце на Огляді')):'')+h;
       let main='';
       if(m.per&&(!lk||lk==='chain')) main+=row('Період',seg('period',m.per,wdPer(d)));
       if(t==='dmission') main+=row('Головне число',seg('main',[['pct','%'],['steps','Кроки'],['days','Дні']],d.main==='steps'||d.main==='days'?d.main:'pct'));
@@ -192,7 +193,7 @@
     // Записуємо лише змінені поля у свіжий блок тієї самої дошки.
     let closed=false;
     const changedKeys=()=>WS_KEYS.filter(k=>JSON.stringify(d[k])!==was[k]);
-    const trackerChanged=()=>trD&&(JSON.stringify(trD.rest)!==trD.wasRest||JSON.stringify(trD.rhythm)!==trD.wasRh);
+    const trackerChanged=()=>trD&&(JSON.stringify(trD.rest)!==trD.wasRest||JSON.stringify(trD.rhythm)!==trD.wasRh||trD.overview!==trD.wasOverview);
     function liveBlock(){
       if(boardKey!==openedBoard) return null;
       const b=getBlock(id);
@@ -210,14 +211,14 @@
     }
     // ритм/вихідні — у свіжий трекер (синк міг його підмінити), лише змінені, лише після дії людини
     function commitTr(){
-      if(!trD) return false;
+      if(!trackerChanged()) return false;
       const chRest=JSON.stringify(trD.rest)!==trD.wasRest, chRh=JSON.stringify(trD.rhythm)!==trD.wasRh;
-      if(!chRest&&!chRh) return false;
       const t=moOwnFolder(trD.gk)?moTracker(trD.gk):null; if(!t) return false;
       // лише змінене поле: вихідні, що прийшли синком з іншого пристрою, не затираються зміною ритму (і навпаки);
       // незнайомий ритм із новішої версії лишається, поки людина сама не вибере інший
       if(chRest){ if(trD.rest.length) t.rest=trD.rest.slice(); else delete t.rest; }
       if(chRh){ if(trD.rhythm&&trD.rhythm.k!=='day') t.rhythm=Object.assign({},trD.rhythm); else delete t.rhythm; }
+      if(trD.overview!==trD.wasOverview){ if(trD.overview) delete t.ov; else t.ov=false; }
       return true;
     }
     function close(save=false){
@@ -228,6 +229,7 @@
       if(q){
         const blockChanged=commit(q), trackerSaved=commitTr();
         if(blockChanged||trackerSaved){ saveBoard(); wdRedraw(); }
+        if(trackerSaved&&trD.overview!==trD.wasOverview) renderDashboard();
       }
       ov.inert=true;
       ov.classList.add('out');
@@ -265,6 +267,7 @@
         if(k==='nohd'){ if(d.nohd) delete d.nohd; else d.nohd=true; }
         else if(k==='yearly'){ if(d.yearly) delete d.yearly; else d.yearly=true; }
         else if(k==='tapmk'){ if(d.tapmk) delete d.tapmk; else d.tapmk=true; }
+        else if(k==='overview'&&trD){ trD.overview=!trD.overview; }
         else if(k.slice(0,5)==='show.'){ const s=k.slice(5), on=wdOn(d,s), sh2=d.show&&typeof d.show==='object'?d.show:{};
           if(on) sh2[s]=false; else delete sh2[s]; if(Object.keys(sh2).length) d.show=sh2; else delete d.show; }
         draw(); return; }

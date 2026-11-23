@@ -28,30 +28,38 @@
        human/aiOff). Винятків нема: Фото дня більше не ходить на воркер. */
     const ai=opts.ai; if(ai){ opts=Object.assign({},opts); delete opts.ai; }
     await aiConsentGate(ai);
+    const folderPayload=!!ai?.uses?.includes('folders');
     /* 529 — Anthropic перевантажений, зазвичай на секунду-дві: один тихий повтор, і лише
        тоді людина бачить «AI зараз перевантажений» (GAP2-4). */
-    let r=await aiFetchOnce(url,opts);
-    if(r&&r.status===529){ await new Promise(res=>setTimeout(res,1500)); r=await aiFetchOnce(url,opts); }
+    let r=await aiFetchOnce(url,opts,folderPayload);
+    if(r&&r.status===529){ await new Promise(res=>setTimeout(res,1500)); r=await aiFetchOnce(url,opts,folderPayload); }
     return r;
   }
   // мережева відмова fetch (не відповідь сервера) — позначка e.net: людина побачить «немає інтернету» (BUGS-5)
   function aiNetFetch(url,opts){
     return fetch(url,opts).catch(e=>{ if(e&&e.name!=='AbortError'){ try{ e.net=true; }catch(_){} } throw e; });
   }
-  async function aiFetchOnce(url,opts){
+  async function aiFetchOnce(url,opts,folderPayload){
     let tok='';
     try{ if(typeof window.sbAccessToken==='function') tok=await window.sbAccessToken(); }catch(_){}
-    if(!tok) return aiNetFetch(url,opts);
+    const send=(options,net=aiNetFetch)=>{
+      if(folderPayload){
+        if(aiSectionOff('folders')) throw aiSectionError('folders');
+        if(!aiConsentOk()) throw aiOffError(aiPrivGet().off);
+      }
+      return net(url,options);
+    };
+    if(!tok) return send(opts);
     const withTok=Object.assign({},opts,{headers:Object.assign({},opts.headers||{},{Authorization:'Bearer '+tok})});
     if(aiAuthOff){
-      const r=await aiNetFetch(url,opts);
+      const r=await send(opts);
       if(r.status!==401) return r;
-      aiAuthOff=false; return aiNetFetch(url,withTok);
+      aiAuthOff=false; return send(withTok);
     }
-    try{ return await fetch(url,withTok); }
+    try{ return await send(withTok,fetch); }
     catch(e){
-      if(e && e.name==='AbortError') throw e;
-      const r=await aiNetFetch(url,opts);   // впаде й це — значить, справді нема мережі
+      if(e && (e.name==='AbortError'||e.aiOff)) throw e;
+      const r=await send(opts);   // впаде й це — значить, справді нема мережі
       aiAuthOff=true; return r;
     }
   }

@@ -221,6 +221,31 @@
     const active=(f.widgets||[]).filter(w=>w.ready).length;
     return active ? (active+' '+pluralUk(active,'активний','активні','активних')) : '';
   }
+  /* кільце тижня на картці папки (22.11.2026, крок 4 «Трекера цілі»): тап — позначка за сьогодні в трекері місії
+     (moToggleMark, як у віджеті), решта картки відкриває папку. Сховати — шторка віджета, «Кільце на Огляді» (t.ov=false). */
+  function fc3Ring(k){
+    try{
+      const g=wgFolderMission(k); if(!g||!moOwnFolder(g.folderKey)) return '';
+      const t=moTracker(g.folderKey); if(!t||t.ov===false) return '';
+      const td=ymdLocal(), on=moMarked(t,td), r=moRhythm(t), gl=r.k==='week'?r.n:Math.max(1,7-moRest(t).length);
+      const n=jnWeek().filter(ds=>ds<=td&&moMarked(t,ds)).length, p=Math.min(100,Math.round(n/gl*100));
+      return `<button class="fc3-ring${on?' on':''}" data-fring="${esc(k)}" aria-pressed="${on}" aria-label="${on?'Зняти позначку за сьогодні':'Позначити сьогодні'} · ${escAttr(g.name||'')} · ${n} з ${gl} цього тижня">`
+        +`<svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" class="tr"/><circle cx="18" cy="18" r="15" class="vl" pathLength="100" stroke-dasharray="${p} 100"/>`
+        +`${on?'<path class="ck" d="M12 18.5l4 4 8-9"/>':''}</svg>${on?'':`<b>${n}</b>`}</button>`;
+    }catch(_){ return ''; }   // трекер ще не готовий (порядок файлів) — картка без кільця
+  }
+  function fc3RingBind(el,k){
+    const rb=el.querySelector('[data-fring]'); if(!rb) return;
+    rb.onclick=e=>{ e.stopPropagation();
+      let g=null; try{ g=wgFolderMission(k); }catch(_){}
+      const r=g?moToggleMark(g.folderKey,ymdLocal()):null;   // той самий запис, що й у віджеті трекера
+      if(r===null){ plToast('Не вийшло позначити — відкрий папку'); return; }
+      try{ window.platform.haptic('light'); }catch(_){}
+      plToast(r?'✓ Позначено на сьогодні':'Позначку за сьогодні знято');
+      const nh=fc3Ring(k); if(nh){ rb.outerHTML=nh; fc3RingBind(el,k); } else rb.remove();
+      try{ wgRefresh(); }catch(_){}
+    };
+  }
   // плитка-обкладинка; shape: '' | 'wide' (карусель секцій) | 'big' | 'tall' (бенто)
   function fc3Tile(k, shape){
     const f=folders[k];
@@ -254,12 +279,14 @@
       // знімок у папки є, і новий тихо затер би його (той самий id 'ph_'+key, і в хмарі)
       if(!f.photo) h+=`<button class="fc3-photo" data-fphoto="${esc(k)}" aria-label="Додати фото-обкладинку">${fc3Svg('cam')}</button>`;
     }
+    const ring=isGroup?'':fc3Ring(k); if(ring){ h+=ring; el.classList.add('fc3-hasring'); }
     h+=`<div class="fc3-label"><div class="fc3-name" data-i18n-skip="1">${prioDot(k)}${f.pinned?`<span class="fc3-pin" title="Закріплена">${fc3Svg('pin')}</span>`:''}${esc(f.name)}</div>${meta?`<div class="fc3-meta">${esc(meta)}</div>`:''}</div>`;
     h+=`<button class="fmenu fc3-menu" data-fmenu="${esc(k)}" aria-label="Меню папки «${escAttr(f.name)}»" title="Налаштування">⋯</button>`;
     // ручка для мишки (15.11.2026): видно лише при наведенні на комп'ютері; на телефоні — затиснути плитку
     h+=`<span class="fdrag-handle fc3-grip" aria-hidden="true" title="Тягни: на папку — всередину, між папками — переставити">⠿</span>`;
     el.innerHTML=h;
-    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')||e.target.closest('.fdrag-handle')) return;
+    fc3RingBind(el,k);
+    el.onclick=(e)=>{ if(e.target.closest('.fmenu')||e.target.closest('.fc3-photo')||e.target.closest('.fdrag-handle')||e.target.closest('.fc3-ring')) return;
       if(window.__folderDragJustEnded && Date.now()-window.__folderDragJustEnded<400) return;
       if(isGroup){ openGroupAsChosen(k); return; }
       goFolder(k); };

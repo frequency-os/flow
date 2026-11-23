@@ -191,7 +191,8 @@
   function moMarked(t,ds){ const v=t.marks[ds]; return t.type==='heatmap'?(+v>0):!!v; }
   /* ритм і вихідні трекера (22.11.2026, крок 2 «Трекера цілі»): поля t.rest=[0..6] (0 = Пн) і t.rhythm={k:'week',n}|{k:'days',n}.
      Нема полів — щодня і без вихідних, як було. Пишуться лише зі шторки віджета (63-widget-sheet.js) після «Готово». */
-  const MO_DAYS_N=[21,30,66,100];
+  // var, а не const: Огляд (16-dashboard.js, кільце на картці) може намалюватись раніше, ніж виконався цей файл
+  var MO_DAYS_N=[21,30,66,100];
   function moRest(t){ return Array.isArray(t&&t.rest)?[...new Set(t.rest.map(Number).filter(x=>Number.isInteger(x)&&x>=0&&x<=6))].sort():[]; }
   function moIsRest(t,ds){
     if(!Array.isArray(t&&t.rest)) return false;   // у старих трекерів списку нема зовсім — тоді вихідних нема

@@ -246,6 +246,7 @@
 
   function syncSalaryToFin(year,month,amount,pday,sym){
     if(!amount||amount<=0) return;
+    if(window.storeKeyReady&&!['fin_ops','work_sessions','work_cfg',WKEXTRAKEY].every(key=>window.storeKeyReady(key))) return;
     const ymKey=`${year}-${String(month).padStart(2,'0')}`;
     if(workPostedSal[ymKey]==='deleted') return;
     // місяць зарплати обнулено («Почати фінанси з нуля») — навіть якщо старий пристрій повернув work_cfg без позначки
@@ -258,6 +259,19 @@
     // лише коли змінилась зароблена сума чи валюта Роботи.
     const code=finCurCode(workCur);
     let op=finOps.find(o=>o._autoSal===true && o._salYM===ymKey);
+    // Віднімаємо лише прив’язані доходи, які досі є в Гаманці.
+    const incomes=new Map(finOps.filter(o=>o.type==='in'&&!o._autoSal&&!o._tr).map(o=>[String(o.id),o]));
+    let pushedAmt=0;
+    for(const w of workSessionsIn(ymKey)){
+      if(!w.pushed||!w.opId||finCurCode(w.cur)!==code) continue;
+      const income=incomes.get(String(w.opId));
+      if(!income) continue;
+      incomes.delete(String(w.opId));
+      if(income._fx?.cur===code&&+income._fx.rate>0) pushedAmt+=Math.max(0,(+income.amount||0)/income._fx.rate);
+      else if(code===finCurCode(income.cur||mainCur())) pushedAmt+=Math.max(0,+income.amount||0);
+      else pushedAmt+=Math.max(0,+w.amount||0);
+    }
+    amount=Math.max(0,Math.round((amount-pushedAmt)*100)/100);
     const frozen=(op&&op._fx&&op._fx.cur===code&&+op._fx.rate>0)?+op._fx.rate:0;
     const fx=finFx(amount, code, code===mainCur()?1:(frozen||finLastRate(code)));
     const label='Зарплата · '+WK_MONTHS[month-1]+' '+year+fx.tail;
@@ -271,10 +285,12 @@
         if(fx.fx) op._fx=fx.fx; else delete op._fx;
         autoSave(()=>saveFinOps());
       }
+      transferPlannedToEnvelopes(ymKey);
       return;
     }
     let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
-    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc, _mc:mainCur() };
+    // _amt0 — сума в мить запису: якщо після виплати додались години, блок «Робота» покаже «Доплата» (66-work-panel.js)
+    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc, _mc:mainCur(), _amt0:fx.amount };
     // у Плані місяця є рядок «Зарплата» — привʼязуємо, щоб він став ✓, а не висів відкритим поруч із записаною зарплатою (47-rules.js)
     try{ const pl=typeof rlPlan==='function'?rlPlan(ymKey,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ymKey,r.id)); if(row) op.planId=row.id; }catch(_){}
     if(fx.fx) op._fx=fx.fx;
@@ -287,8 +303,11 @@
   // переказ запланованого з конвертів у saved (один раз на місяць)
   function transferPlannedToEnvelopes(ymKey){
     if(!Array.isArray(envelopes) || !envelopes.length) return;
+    if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))) return;
     if(!workPostedSal) workPostedSal={};
     if(workPostedSal['planDone:'+ymKey]==='1') return;
+    const total=envelopes.reduce((sum,e)=>sum+(!envCur(e)?Math.max(0,+e.planned?.[ymKey]||0):0),0);
+    if(total<=0||total>Math.max(0,curFree(''))+1e-9) return;
     let moved=false;
     envelopes.forEach(e=>{
       if(typeof envCur==='function'&&envCur(e)) return;   // €-конверт: заплановане в гривнях не переносимо сам (етап 3 валют)
@@ -307,9 +326,13 @@
     if(!Array.isArray(envelopes)) return 0;
     return envelopes.reduce((s,e)=>s+((e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0),0);
   }
+  // скільки зарплати місяця вже лягло в конверт (рух «Із зарплати (РРРР-ММ)» — transferPlannedToEnvelopes / allocSave)
+  function allocMovedIn(e,ymKey){ const lbl='Із зарплати ('+ymKey+')'; return (Array.isArray(e.ops)?e.ops:[]).filter(o=>o&&o.t==='in'&&o.label===lbl).reduce((s,o)=>s+(+o.amount||0),0); }
+  function allocSalOp(ymKey){ return (finOps||[]).find(o=>o&&o._autoSal===true&&o._salYM===ymKey)||null; }
   function openAllocModal(){
     const sym=CUR[workCur]||workCur;
     let me=workSessionsIn(workMonth).reduce((s,w)=>s+(+w.amount||0),0);
+    try{ me+=extrasNet(workMonth); }catch(_){}   // як і зарплата: з авансами, премами й витратами місяця
     const ymKey=workMonth;
     if(!(me>0)){ try{ me=finOps.filter(o=>o.type==='in'&&!o._tr&&String(o.date||'').slice(0,7)===workMonth).reduce((s,o)=>s+o.amount,0); }catch(_){} }
     if(!(me>0)){ flowAlert('Спершу додай дохід або познач відпрацьовані дні — буде що розподіляти.'); return; }
@@ -317,21 +340,32 @@
       flowAlert('Спершу створи конверти у Фінансах → ✉️ Конверти (напр. «Подушка», «Оренда»).'); return;
     }
     const list=document.getElementById('allocList');
+    const paid=!!allocSalOp(ymKey);   // після виплати поле = скільки ДОКЛАСТИ зараз; уже переказане — підписом
+    list.__allocMonth=ymKey;
+    list.__allocPaid=paid;
+    let movedTot=0;
     list.innerHTML=envelopes.filter(e=>!(typeof envCur==='function'&&envCur(e))).map(e=>{   // лише головна валюта
       const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
-      const goalTxt=e.goal?`ціль ${fmt(e.goal)} · є ${fmt(e.saved||0)}`:`є ${fmt(e.saved||0)}`;
+      const mv=allocMovedIn(e,ymKey); movedTot+=mv;
+      const goalTxt=(e.goal?`ціль ${fmt(e.goal)} · є ${fmt(e.saved||0)}`:`є ${fmt(e.saved||0)}`)+(mv>0?` · із зарплати вже ${fmt(mv)}`:'');
       return `<div class="alloc-env">
         <div class="ic">${safeEmoji(e.emoji,'✉️')}</div>
         <div class="mid"><b>${esc(e.name)}</b><small>${goalTxt}</small></div>
-        <div class="pinput"><input type="number" min="0" step="10" data-alloc="${esc(e.id)}" value="${p||''}" placeholder="0"><span>${sym}</span></div>
+        <div class="pinput"><input type="number" min="0" step="10" data-alloc="${esc(e.id)}" value="${paid?'':p||''}" placeholder="0"><span>${sym}</span></div>
       </div>`;
     }).join('');
-    list.querySelectorAll('[data-alloc]').forEach(inp=>inp.addEventListener('input',()=>allocUpdateSummary(me,sym)));
+    list.__allocBase=movedTot;
+    list.querySelectorAll('[data-alloc]').forEach(inp=>{ if(paid) inp.placeholder='＋'; inp.addEventListener('input',()=>allocUpdateSummary(me,sym)); });
+    // до виплати — «план», після — гроші йдуть у конверти одразу: тексти шторки кажуть, що станеться насправді
+    { const bk=document.getElementById('allocBack'), t=bk&&bk.querySelector('.wkm-date'), lab=bk&&bk.querySelector('.wkm-lab'), sv=document.getElementById('allocSave');
+      if(t&&t.lastChild) t.lastChild.nodeValue=paid?'У конверти із зарплати':'Розподіл наперед';
+      if(lab) lab.textContent=paid?'КОНВЕРТИ — скільки докласти зараз':'КОНВЕРТИ — закинь наперед';
+      if(sv) sv.textContent=paid?'Покласти в конверти':'Зберегти план'; }
     allocUpdateSummary(me,sym);
     document.getElementById('allocBack').classList.add('on');
   }
   function allocUpdateSummary(me,sym){
-    let planned=0;
+    let planned=+(document.getElementById('allocList').__allocBase)||0;   // уже переказане із зарплати теж розподілене
     document.querySelectorAll('#allocList [data-alloc]').forEach(inp=>{ planned+=parseFloat(inp.value)||0; });
     const free=me-planned;
     document.getElementById('allocTotal').textContent=fmt(me)+' '+sym;
@@ -343,15 +377,37 @@
   }
   function allocSave(){
     const ymKey=workMonth;
-    document.querySelectorAll('#allocList [data-alloc]').forEach(inp=>{
-      const e=envelopes.find(x=>String(x.id)===String(inp.dataset.alloc)); if(!e) return;
-      if(!e.planned) e.planned={};
-      const v=parseFloat(inp.value)||0;
-      if(v>0) e.planned[ymKey]=v; else delete e.planned[ymKey];
+    /* Зарплату цього місяця вже записано — розподіл іде в конверти одразу (тапом людини), а не «в план»:
+       раніше заплановане після дня виплати висіло назавжди — переливання є лише в мить запису зарплати. */
+    const sal=allocSalOp(ymKey);
+    const list=document.getElementById('allocList');
+    if(list.__allocMonth!==ymKey||list.__allocPaid!==!!sal){
+      openAllocModal(); plToast('Стан виплати змінився. Перевір суми ще раз.'); return;
+    }
+    if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))){
+      plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); return;
+    }
+    const allocations=Array.from(list.querySelectorAll('[data-alloc]')).flatMap(inp=>{
+      const e=envelopes.find(x=>String(x.id)===String(inp.dataset.alloc));
+      const raw=parseFloat(inp.value);
+      return e&&!envCur(e)?[{e,v:Number.isFinite(raw)&&raw>0?Math.round(raw*100)/100:0}]:[];
     });
+    if(sal&&allocations.reduce((sum,{v})=>sum+v,0)>Math.max(0,curFree(''))+1e-9){
+      flowAlert('Вільно лише '+money(Math.max(0,curFree('')))+'. Нічого не записано.'); return;
+    }
+    let _wc; if(sal){ try{ ensureCards(); _wc=workCard().id; }catch(_){} }
+    allocations.forEach(({e,v})=>{
+      if(!e.planned) e.planned={};
+      if(sal){
+        if(v>0){ envAddOp(e,'in',v,'Із зарплати ('+ymKey+')',_wc); delete e.planned[ymKey]; }
+      }
+      else if(v>0) e.planned[ymKey]=v; else delete e.planned[ymKey];
+    });
+    if(sal&&sal._amt0!=null&&sal._amt0!==sal.amount){ sal._amt0=sal.amount; saveFinOps(); }   // доплату розглянуто — більше не показуємо
     saveEnvelopes();
     document.getElementById('allocBack').classList.remove('on');
     renderWork(); try{ renderFinance(); }catch(_){}
+    try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}   // блок «Робота» в папці — новий розподіл одразу
   }
   { const b=document.getElementById('wkAllocBtn'); if(b) b.onclick=openAllocModal; }
   { const b=document.getElementById('allocSave'); if(b) b.onclick=allocSave; }
@@ -451,7 +507,8 @@
   { const el=document.getElementById('wkPayday'); if(el) el.addEventListener('input',()=>{
       const v=parseInt(el.value); if(v>=1&&v<=31){ workPayday=v; saveWork(); }
       const sym=CUR[workCur]||workCur; const ms=workSessionsIn(workMonth); const me=ms.reduce((s,w)=>s+(+w.amount||0),0);
-      renderWorkSalary(me,sym);
+      let net=0; try{ net=extrasNet(workMonth); }catch(_){}
+      renderWorkSalary(me+net,sym);   // як у renderWork: без авансів зарплата на мить «зменшувалась» і перезаписувалась
     }); }
   { const el=document.getElementById('wkCur'); if(el) el.addEventListener('change',()=>{
       workCur=el.value; saveWork(); renderWork();

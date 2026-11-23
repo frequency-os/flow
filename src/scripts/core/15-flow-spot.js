@@ -222,6 +222,9 @@
     window.__aiHamAct=null; // нове заняття в гамачку при кожному відкритті
   }
   function aiClose(){
+    if(aiActionReview) aiActionReview.cancel();
+    if(aiActionReceipt) aiActionReceipt.remove();
+    aiActionReceipt=null;
     aiSpeakStop(); aiSlashHide();
     const ms=document.getElementById('aiMemSheet'); if(ms) ms.remove();
     const s=document.getElementById('aiScr'); if(s) s.remove();
@@ -363,7 +366,7 @@
     if(!aiLog.length) return '';
     const fmtT=ts=>{ const d=new Date(ts); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
     return `<div class="ai-chlog">${aiLog.slice(0,6).map(l=>
-      `<span class="ai-chp">✎ <b>${l.nb+l.ns+(l.nf||0)+(l.nop||0)+(l.np||0)}</b> · ${fmtT(l.ts)} <em data-undo="${l.ts}">↩</em></span>`).join('')}</div>`;
+      `<span class="ai-chp">✎ <b>${l.nb+l.ns+(l.nf||0)+(l.nop||0)+(l.np||0)+(l.nt||0)}</b> · ${fmtT(l.ts)} <em data-undo="${l.ts}">↩</em></span>`).join('')}</div>`;
   }
   /* ── міні-таймлайн дня 6:00–24:00: наявне · нове · перенесене ── */
   function aiTlHTML(pr){
@@ -432,13 +435,13 @@
   function aiTraceLiveHTML(){
     if(!aiTrace||!aiTrace.steps.length) return '';
     return `<div class="ai-trace"><div class="tr-h">Флоу працює з твоїми даними<i>${aiTrace.steps.filter(s=>!s.run).length}/${aiTrace.steps.length}</i></div>`
-      +aiTrace.steps.map(s=>`<div class="tr-st${s.run?' run':''}"><span class="tx">${esc(s.t)}</span>${s.n?`<span class="n">${esc(s.n)}</span>`:''}${s.run?'<span class="spin"></span>':'<span class="ok">✓</span>'}</div>`).join('')
+      +aiTrace.steps.map(s=>`<div class="tr-st${s.run?' run':''}"><span class="tx">${esc(s.t)}</span>${s.n?`<span class="n">${esc(s.n)}</span>`:''}${s.run?'<span class="spin"></span>':s.cancelled?'':'<span class="ok">✓</span>'}</div>`).join('')
       +`</div>`;
   }
   function aiTraceRowHTML(tr){
     const names=(tr.shelf||[]).map(x=>x.name).slice(0,3).join(' · ');
     return `<div class="ai-tracerow" data-trx="1">⚡ <b>${aiPlz(tr.steps.length,'крок','кроки','кроків')}</b>${names?' · '+esc(names):''}
-      <div class="tr-full">${tr.steps.map(s=>`<div class="tr-st"><span class="tx">${esc(s.t)}</span>${s.n?`<span class="n">${esc(s.n)}</span>`:''}<span class="ok">✓</span></div>`).join('')}</div></div>`;
+      <div class="tr-full">${tr.steps.map(s=>`<div class="tr-st"><span class="tx">${esc(s.t)}</span>${s.n?`<span class="n">${esc(s.n)}</span>`:''}${s.cancelled?'':'<span class="ok">✓</span>'}</div>`).join('')}</div></div>`;
   }
   const AI_SHELF_GO={day:'navPlanner',backlog:'navPlanner',fin:'navFinance',folders:'navProjects'};
   function aiShelfHTML(tr){
@@ -474,7 +477,7 @@
     });
     el.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>aiUndo(+b.dataset.undo));
     el.querySelectorAll('[data-commit]').forEach(b=>b.onclick=()=>{
-      const m=aiChatMsgs[+b.dataset.commit]; if(!m||m.applied) return;
+      const m=aiChatMsgs[+b.dataset.commit]; if(!m||m.applied||m.folderPrivate) return;
       // applied — ДО aiCommit: повторний тап, поки пакет застосовується, не застосує його вдруге
       m.applied=true; aiCommit(aiParseBlocks(m.content)); aiChatSave(); aiRenderHead(); aiRenderBody();
     });
@@ -711,6 +714,98 @@
     }
     return s+`</div>`;
   }
+  let aiActionReview=null, aiActionReceipt=null;
+  function aiMountActionCard(){
+    const body=document.getElementById('aiChatBody');
+    const log=body?.querySelector('.ai-clog');
+    if(!log) return;
+    const card=aiActionReview?.card||aiActionReceipt;
+    if(!card||card.parentNode===log) return;
+    const live=log.querySelector('#aiTraceLive');
+    log.insertBefore(card,live);
+    card.scrollIntoView({block:'nearest'});
+  }
+  function aiReviewActions(rows,title){
+    if(!document.querySelector('#aiChatBody .ai-clog')||aiActionReview) return Promise.resolve(null);
+    const en=flowLang()==='en';
+    return new Promise(resolve=>{
+      const card=document.createElement('section');
+      card.className='ai-action-card';
+      card.setAttribute('aria-label',title);
+      card.setAttribute('data-i18n-skip','1');
+      const heading=document.createElement('h3');
+      heading.textContent=title;
+      card.append(heading);
+      const list=document.createElement('div');
+      list.className='ai-action-rows';
+      const choices=rows.map(({label,detail})=>{
+        const row=document.createElement('label');
+        const check=document.createElement('input');
+        check.type='checkbox';
+        check.checked=true;
+        const text=document.createElement('span');
+        text.textContent=label;
+        if(detail){
+          const meta=document.createElement('small');
+          meta.textContent=detail;
+          text.append(meta);
+        }
+        row.append(check,text);
+        list.append(row);
+        return check;
+      });
+      const actions=document.createElement('div');
+      actions.className='ai-action-buttons';
+      const apply=document.createElement('button'), cancel=document.createElement('button');
+      apply.type=cancel.type='button';
+      apply.className='primary';
+      cancel.textContent=en?'Cancel':'Скасувати';
+      const selection=()=>choices.flatMap((check,i)=>check.checked&&!check.disabled?[i]:[]);
+      const update=()=>{
+        rows.forEach(({requires},i)=>{
+          if(requires!==undefined) choices[i].disabled=!choices[requires].checked;
+        });
+        const n=selection().length;
+        apply.disabled=!n;
+        apply.textContent=en?(n?'Run '+n+(n===1?' action':' actions'):'Select actions')
+          :n?'Виконати '+n+' '+pluralUk(n,'дію','дії','дій'):'Обери дії';
+      };
+      const finish=value=>{
+        if(aiActionReview?.card!==card) return;
+        clearTimeout(timer);
+        aiActionReview=null;
+        card.remove();
+        if(!value) aiShowActionReceipt(0,0,true);
+        resolve(value);
+      };
+      const timer=setTimeout(()=>finish(null),120000);
+      aiActionReview={card,cancel:()=>finish(null)};
+      if(aiActionReceipt) aiActionReceipt.remove();
+      aiActionReceipt=null;
+      list.onchange=update;
+      apply.onclick=()=>{ const selected=selection(); if(selected.length) finish(selected); };
+      cancel.onclick=aiActionReview.cancel;
+      card.onkeydown=e=>{ if(e.key==='Escape'){ e.stopPropagation(); finish(null); } };
+      actions.append(apply,cancel);
+      card.append(list,actions);
+      update();
+      aiMountActionCard();
+      choices[0]?.focus({preventScroll:true});
+    });
+  }
+  function aiShowActionReceipt(done,selected,cancelled=false){
+    if(!document.getElementById('aiChatBody')) return;
+    if(aiActionReceipt) aiActionReceipt.remove();
+    const en=flowLang()==='en';
+    const card=document.createElement('div');
+    card.className='ai-action-card ai-action-receipt';
+    card.setAttribute('role','status');
+    card.setAttribute('data-i18n-skip','1');
+    card.textContent=cancelled?(en?'These actions were cancelled.':'Ці дії скасовано.')
+      :en?'Completed '+done+' of '+selected:'Виконано '+done+' із '+selected;
+    aiActionReceipt=card;
+    aiMountActionCard();
+  }
   function aiRenderBody(){
     const el=document.getElementById('aiChatBody'); if(!el) return;
     el.className='ai-body v-uni';
@@ -735,7 +830,7 @@
     let lastOpsIdx=-1;
     for(let i=aiChatMsgs.length-1;i>=0;i--){
       const m=aiChatMsgs[i];
-      if(m.role==='assistant'&&!m.streaming&&aiOpsCount(aiParseBlocks(m.content))){ lastOpsIdx=i; break; }
+      if(m.role==='assistant'&&!m.streaming&&!m.folderPrivate&&aiOpsCount(aiParseBlocks(m.content))){ lastOpsIdx=i; break; }
     }
     // цифри малюємо лише під найсвіжішим слідом: для старих вони б показували теперішнє, а не тодішнє
     let lastTraceIdx=-1;
@@ -745,7 +840,7 @@
     html+=`<div class="ai-clog">${aiChatMsgs.map((m,mi)=>{
       if(m.role==='user') return `<div class="ai-msg u" data-i18n-skip="1">${esc(m.content)}</div>`;
       if(m.streaming) return '';
-      const pr=aiParseBlocks(m.content);
+      const pr=m.folderPrivate?{text:aiStreamText(m.content)}:aiParseBlocks(m.content);
       const cnt=aiOpsCount(pr);
       let s=m.trace?aiTraceRowHTML(m.trace):'';
       s+=`<div class="ai-msg a">${aiMD(pr.text)}`;
@@ -758,6 +853,7 @@
     }).join('')}${aiBusy?'<div id="aiTraceLive">'+aiTraceLiveHTML()+'</div><div class="ai-msg a"><span id="aiStreamTxt">'+aiBusyHTML()+'</span></div>':''}</div>`;
     el.innerHTML=html;
     aiWireBody(el);
+    aiMountActionCard();
     el.scrollTop=el.scrollHeight;
   }
   /* ── скіли: слеш-команди зі своїм промптом і СВОЇМ зрізом контексту ── */
@@ -786,7 +882,7 @@
     if(!aiAllowed()) return;   // фонове стискання: після «Не зараз» не питаємо згоду вдруге
     aiSumBusy=true;
     try{
-      const old=aiChatMsgs.slice(0,aiChatMsgs.length-16);
+      const old=aiChatMsgs.slice(0,aiChatMsgs.length-16).filter(m=>!m.folderPrivate);
       const dlg=old.map(m=>(m.role==='user'?'Я: ':'Флоу: ')+aiStreamText(m.content).slice(0,300)).join('\n');
       const s=await aiCall('Стисни діалог у резюме до 500 символів українською: факти про людину, рішення, домовленості, незакриті теми. Без води, без markdown. Якщо є попереднє резюме — обʼєднай.',
         [{role:'user',content:(aiSum?'ПОПЕРЕДНЄ РЕЗЮМЕ: '+aiSum+'\n\n':'')+'ДІАЛОГ:\n'+dlg}], null, {bg:true});
@@ -804,6 +900,8 @@
       plToast('🔒 Фото закрито від AI — знімок не надіслано');
       if(!q&&!aiAttach.length) return;
     }
+    if(aiActionReceipt) aiActionReceipt.remove();
+    aiActionReceipt=null;
     const inp=document.getElementById('aiInput'); if(inp){ inp.value=''; inp.placeholder='Напиши '+FLOW_PETS[petCur()].name+'…'; }
     aiSlashHide();
     let sk=aiSkillFor(q);
@@ -827,7 +925,8 @@
       let sys=AI_CHAT_SYS+'\n\n'+petPersona();
       if(sk) sys+='\n\n'+AI_SKILLS[sk.key].sys;
       sys+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
-      const msgs=aiChatMsgs.slice(-13,-1).map(x=>({role:x.role==='user'?'user':'assistant',content:x.content}));
+      const msgs=aiChatMsgs.slice(-13,-1).map(x=>({role:x.role==='user'?'user':'assistant',
+        content:x.folderPrivate?'[Попередня відповідь містила приватний вміст папки.]':x.content}));
       if(att.length){ // останнє user-повідомлення стає мультимодальним
         const blocks=[];
         att.forEach(a=>{
@@ -862,20 +961,20 @@
           if(sk) sysDyn+='\n\n'+AI_SKILLS[sk.key].sys;
           sysDyn+='\n\nКОНТЕКСТ:\n'+aiCtx(sk?AI_SKILLS[sk.key].ctx:null);
         }
-        txt=await aiAgentTurn(sysStable,sysDyn,msgs,shown,onDelta);
+        txt=await aiAgentTurn(sysStable,sysDyn,msgs,shown,onDelta,()=>{m.folderPrivate=true;});
         usedW=aiTurnWrites;
         const tr=aiTraceFinish(); if(tr) m.trace=tr;
       } else {
         txt=await aiCall(sys,msgs,onDelta);
       }
-      m.content=txt||'…'; delete m.streaming;
+      m.content=m.folderPrivate?(aiStreamText(txt)||'…'):(txt||'…'); delete m.streaming;
       const pr=aiParseBlocks(m.content);
       // факти в памʼять — лише через шторку і в залишок ліміту змін цього повідомлення (SEC-5)
-      if(pr.mem.length) usedW+=await aiMemGate(pr.mem,AI_WRITE_LIMIT-usedW);
-      aiSpeak(pr.text);
+      if(!m.folderPrivate&&pr.mem.length) usedW+=await aiMemGate(pr.mem,AI_WRITE_LIMIT-usedW);
+      if(!m.folderPrivate) aiSpeak(pr.text);
       /* «Авто» довіряє додаванню, але не знищенню: перенос/закриття/видалення наявного —
          через шторку і в залишок ліміту цього повідомлення (AI-3). Скасувала — пакет відхилено. */
-      if(aiAuto&&aiOpsCount(pr)){
+      if(!m.folderPrivate&&aiAuto&&aiOpsCount(pr)){
         const g=await aiGateOps(pr,{room:AI_WRITE_LIMIT-usedW});
         // позначка ДО aiCommit: його aiChatSave одразу збереже її разом із пакетом
         if(g.pr){ m.applied=true; if(aiOpsCount(g.pr)) aiCommit(g.pr); } else m.declined=true;
