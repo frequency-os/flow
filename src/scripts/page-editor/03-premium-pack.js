@@ -991,7 +991,9 @@
       });
       syncBar();
       if(focusIdx!=null){ var x=wrap.querySelector('[data-i="'+focusIdx+'"]');
-        if(x){ caretEnd(x); try{ x.scrollIntoView({block:'nearest'}); }catch(_){} } }
+        // прокручуємо лише список рядків у полі: scrollIntoView на iPhone смикав усю сторінку (23.11.2026)
+        if(x){ caretEnd(x); var rw=x.parentNode, top=rw.offsetTop, bot=top+rw.offsetHeight;
+          if(top<wrap.scrollTop) wrap.scrollTop=top; else if(bot>wrap.scrollTop+wrap.clientHeight) wrap.scrollTop=bot-wrap.clientHeight; } }
     }
     // курсор має бути саме в цьому рядку (Firefox без caretRangeFromPoint лишає його деінде) — інакше ставимо в кінець
     function pgcCaretIn(el){ var s=window.getSelection(); if(!s||!s.rangeCount||!el.contains(s.getRangeAt(0).startContainer)) caretEnd(el); }
@@ -1113,11 +1115,23 @@
     document.getElementById('pgcPlus').onclick=function(){ if(typeof pgcBlocks==='function') pgcBlocks(); else pgAddViaMenu(true); };
     send.onclick=sendAll;
     draw(null);
-    // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі
+    // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі.
+    // 23.11.2026: ЄДИНИЙ власник позиції поля — раз на кадр, без порогу і без ховання на час руху
+    // (раніше поле стрибало на порозі 120 px і блимало, бо 08b-rich-text.js гасило його на кожен рух екрана).
+    // Поки клавіатура відкрита, поле росте не вище половини видимої частини — інакше залазило під верх.
     var vv=window.visualViewport;
-    if(vv){ var kb=function(){ if(!scr.classList.contains('active')){ box.style.bottom=''; return; }
+    if(vv){ var kbQ=false, kbLast=-1;
+      var kbApply=function(){ kbQ=false;
+        if(!scr.classList.contains('active')){ if(kbLast!==0){ box.style.bottom=''; wrap.style.maxHeight=''; document.body.style.removeProperty('--pgc-kb'); kbLast=0; } return; }
         if(box.classList.contains('pgc-panemode')) return;   // відкрита панель «⋯» (08b-rich-text.js) сама тримає картку над собою
-        var h=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); box.style.bottom = h>120 ? (h+8)+'px' : ''; };
+        var h=Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+        if(h<40) h=0;   // смуга браузера / заокруглення — не клавіатура
+        if(h===kbLast) return; kbLast=h;
+        box.style.bottom = h ? (h+8)+'px' : '';
+        wrap.style.maxHeight = h ? Math.max(76, Math.round(vv.height*0.5)-60)+'px' : '';
+        document.body.style.setProperty('--pgc-kb', h+'px');
+      };
+      var kb=function(){ if(kbQ) return; kbQ=true; requestAnimationFrame(kbApply); };
       vv.addEventListener('resize',kb); vv.addEventListener('scroll',kb); }
     // видно лише в документі (і не в «Стрічці» папки); на ноутбуці — по ширині колонки документа
     function sync(){

@@ -1195,6 +1195,8 @@
   .pgc-send svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
   .pgc-plus:focus-visible,.pgc-modes button:focus-visible,.pgc-send:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
   #scr-page.pgc-on .pg-addblock{display:none;}   /* «＋» тепер у нижньому полі */
+  /* останній блок не ховається під полем, хоч яке воно високе, і під клавіатурою (23.11.2026) */
+  #scr-page.pgc-on .pg-doc{padding-bottom:max(200px, calc(var(--pgc-h,62px) + var(--pgc-kb,0px) + 48px));}
   @media (max-width:1023px){ body.pgc-live .nav{display:none !important;} }
   @media (max-width:1023px){ body.pgc-live #flowCap{bottom:calc(var(--pgc-h,62px) + 22px + env(safe-area-inset-bottom)) !important;} }   /* котик — над полем, хоч яке воно високе */   /* у документі нижнє меню ховається — повернення стрілкою вгорі */
   @media (min-width:1024px){ .pgc{right:auto;bottom:18px;} }
@@ -1388,8 +1390,6 @@
   .pn-folds button{border:0;border-radius:12px;min-height:44px;padding:0 12px;text-align:left;cursor:pointer;background:rgba(127,127,127,.12);color:inherit;font:inherit;font-size:14px;}
   .pg-pane button:focus-visible{outline:2px solid #9aa6ff;outline-offset:2px;}
   @media (prefers-reduced-transparency:reduce){ .pg-pane{background:#1c1a28;} .pg-pane.pg-paper{background:#fff;} }
-  /* поки клавіатура їде — картку не видно (iPhone повідомляє висоту із запізненням) */
-  #pgComposer.pgc-moving{opacity:0 !important;transition:none !important;}
   /* смужка під годинником, коли клавіатура зсуває видиму частину */
   .pg-safetop{display:none;position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);z-index:240;pointer-events:none;}
   /* ноутбук: підказка клавіш під полем, поки в ньому пишеш */

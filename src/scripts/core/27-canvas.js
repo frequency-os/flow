@@ -532,9 +532,12 @@
       if(window.scrollY || document.documentElement.scrollTop) window.scrollTo(0, 0);
     }
 
-    // скрол активного поля так, щоб воно було над клавіатурою
+    // скрол активного поля так, щоб воно було над клавіатурою.
+    // Нижні поля папки й чату самі стоять над клавіатурою (03-premium-pack.js, 35-channel.js) —
+    // їх не крутимо: два «господарі» тягнули сторінку в різні боки, і поле скакало (23.11.2026)
+    const DOCKED = '#pgComposer,#chComposer';
     function ensureVisible(el){
-      if(!el) return;
+      if(!el || (el.closest && el.closest(DOCKED))) return;
       requestAnimationFrame(()=>{
         const r = el.getBoundingClientRect();
         const safeBottom = (vv ? vv.height : window.innerHeight) - 24;

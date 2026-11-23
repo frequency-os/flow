@@ -565,10 +565,10 @@
   (function(){
     var vv=window.visualViewport, b=pgcApi&&pgcApi.box, scrP=document.getElementById('scr-page'); if(!vv||!b||!scrP) return;
     var cap=document.createElement('div'); cap.className='pg-safetop'; cap.setAttribute('aria-hidden','true'); document.body.appendChild(cap);
-    var t=0;
+    // 23.11.2026: картку більше НЕ ховаємо на час руху (.pgc-moving) — iPhone шле десятки подій, і поле блимало;
+    // тепер його позицію раз на кадр тримає 03-premium-pack.js, тож ховати нема чого.
     function moved(){
       if(!scrP.classList.contains('active')){ cap.style.display='none'; return; }
-      b.classList.add('pgc-moving'); clearTimeout(t); t=setTimeout(function(){ b.classList.remove('pgc-moving'); },180);
       var off=Math.max(0,vv.offsetTop||0);
       if(off>2&&rbPhone()){ cap.style.display='block'; cap.style.transform='translateY('+off+'px)'; try{ cap.style.background=getComputedStyle(scrP).backgroundColor||''; }catch(_){} }
       else cap.style.display='none';
