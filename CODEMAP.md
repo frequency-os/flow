@@ -14,7 +14,7 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 101 |
-| Рядків JS | 39853 |
+| Рядків JS | 39870 |
 | Файлів CSS | 52 |
 | Рядків CSS | 12460 |
 | Сутностей верхнього рівня | 3120 |
@@ -61,7 +61,7 @@
 | `src/scripts/core/24-reminders.js` | 181 | 16 |
 | `src/scripts/core/25-reader.js` | 566 | 40 |
 | `src/scripts/core/26-blocks-render.js` | 1207 | 16 |
-| `src/scripts/core/27-canvas.js` | 606 | 28 |
+| `src/scripts/core/27-canvas.js` | 609 | 29 |
 | `src/scripts/core/28-vision.js` | 36 | 3 |
 | `src/scripts/core/29-more-screen.js` | 611 | 29 |
 | `src/scripts/core/30-dev-gate.js` | 38 | 5 |
@@ -103,11 +103,11 @@
 | `src/scripts/core/66-year-planner.js` | 656 | 78 |
 | `src/scripts/page-editor/01-palette.js` | 192 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 794 | 55 |
-| `src/scripts/page-editor/03-premium-pack.js` | 1165 | 60 |
+| `src/scripts/page-editor/03-premium-pack.js` | 1179 | 60 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
 | `src/scripts/page-editor/08-w-projects-hub.js` | 691 | 41 |
-| `src/scripts/page-editor/08b-rich-text.js` | 585 | 100 |
+| `src/scripts/page-editor/08b-rich-text.js` | 585 | 99 |
 | `src/scripts/page-editor/09-open-page.js` | 33 | 1 |
 | `src/scripts/page-editor/10-mic.js` | 201 | 13 |
 | `src/vendor/jszip.min.js` _(мініфікований вендор)_ | 13 | — |
@@ -1677,7 +1677,7 @@
 | `focusItem` | функція | `src/scripts/core/26-blocks-render.js:607` |
 | `bindTiles` | функція | `src/scripts/core/26-blocks-render.js:616` |
 
-### `src/scripts/core/27-canvas.js` — 28 сутностей
+### `src/scripts/core/27-canvas.js` — 29 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1705,10 +1705,11 @@
 | `kbHeight` | функція | `src/scripts/core/27-canvas.js:517` |
 | `syncKb` | функція | `src/scripts/core/27-canvas.js:521` |
 | `unshift` | функція | `src/scripts/core/27-canvas.js:531` |
-| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:536` |
-| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:572` |
-| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:579` |
-| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:597` |
+| `DOCKED` | значення | `src/scripts/core/27-canvas.js:538` |
+| `ensureVisible` | функція | `src/scripts/core/27-canvas.js:539` |
+| `VISION_FKEY` | значення | `src/scripts/core/27-canvas.js:575` |
+| `migrateFolderPhotosOnce` | функція | `src/scripts/core/27-canvas.js:582` |
+| `removeSystemSeedFoldersOnce` | функція | `src/scripts/core/27-canvas.js:600` |
 
 ### `src/scripts/core/28-vision.js` — 3 сутностей
 
@@ -3406,9 +3407,9 @@
 | `pgTrackEdit` | функція | `src/scripts/page-editor/03-premium-pack.js:921` |
 | `pgAddViaMenu` | функція | `src/scripts/page-editor/03-premium-pack.js:928` |
 | `pgcApi` | значення | `src/scripts/page-editor/03-premium-pack.js:943` |
-| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:1144` |
-| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:1145` |
-| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:1150` |
+| `CD_MONTHS` | масив | `src/scripts/page-editor/03-premium-pack.js:1158` |
+| `cdFmt` | функція | `src/scripts/page-editor/03-premium-pack.js:1159` |
+| `cdHTML` | функція | `src/scripts/page-editor/03-premium-pack.js:1164` |
 
 ### `src/scripts/page-editor/04-table.js` — 26 сутностей
 
@@ -3500,7 +3501,7 @@
 | `covEdOpen` | функція | `src/scripts/page-editor/08-w-projects-hub.js:689` |
 | `covEdClose` | функція | `src/scripts/page-editor/08-w-projects-hub.js:690` |
 
-### `src/scripts/page-editor/08b-rich-text.js` — 100 сутностей
+### `src/scripts/page-editor/08b-rich-text.js` — 99 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3600,8 +3601,7 @@
 | `t` | значення | `src/scripts/page-editor/08b-rich-text.js:550` |
 | `vv` | значення | `src/scripts/page-editor/08b-rich-text.js:566` |
 | `cap` | значення | `src/scripts/page-editor/08b-rich-text.js:567` |
-| `t` | значення | `src/scripts/page-editor/08b-rich-text.js:568` |
-| `moved` | функція | `src/scripts/page-editor/08b-rich-text.js:569` |
+| `moved` | функція | `src/scripts/page-editor/08b-rich-text.js:570` |
 | `b` | значення | `src/scripts/page-editor/08b-rich-text.js:581` |
 | `k` | значення | `src/scripts/page-editor/08b-rich-text.js:582` |
 
