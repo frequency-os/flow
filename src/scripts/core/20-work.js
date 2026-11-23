@@ -272,6 +272,8 @@
       else pushedAmt+=Math.max(0,+w.amount||0);
     }
     amount=Math.max(0,Math.round((amount-pushedAmt)*100)/100);
+    // перевірка «є що писати» — ПІСЛЯ віднімання: усі зміни вже в Гаманці окремо → «Зарплати · … 0 ₴» не пишемо (23.11.2026)
+    if(!(amount>0)) return;
     const frozen=(op&&op._fx&&op._fx.cur===code&&+op._fx.rate>0)?+op._fx.rate:0;
     const fx=finFx(amount, code, code===mainCur()?1:(frozen||finLastRate(code)));
     const label='Зарплата · '+WK_MONTHS[month-1]+' '+year+fx.tail;
@@ -285,11 +287,12 @@
         if(fx.fx) op._fx=fx.fx; else delete op._fx;
         autoSave(()=>saveFinOps());
       }
-      transferPlannedToEnvelopes(ymKey);
+      // НЕ переливаємо тут: переливання — лише в мить першого запису зарплати (нижче). Інакше другий пристрій
+      // зі старими envelopes/work_cfg переливав би вдруге, і з Гаманця списувалось двічі (23.11.2026)
       return;
     }
     let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
-    // _amt0 — сума в мить запису: якщо після виплати додались години, блок «Робота» покаже «Доплата» (66-work-panel.js)
+    // _amt0 — сума в мить запису: якщо після виплати додались години, блок «Робота» покаже «Доплата» (67-work-panel.js)
     op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc, _mc:mainCur(), _amt0:fx.amount };
     // у Плані місяця є рядок «Зарплата» — привʼязуємо, щоб він став ✓, а не висів відкритим поруч із записаною зарплатою (47-rules.js)
     try{ const pl=typeof rlPlan==='function'?rlPlan(ymKey,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ymKey,r.id)); if(row) op.planId=row.id; }catch(_){}
@@ -309,16 +312,22 @@
     const total=envelopes.reduce((sum,e)=>sum+(!envCur(e)?Math.max(0,+e.planned?.[ymKey]||0):0),0);
     if(total<=0||total>Math.max(0,curFree(''))+1e-9) return;
     let moved=false;
-    envelopes.forEach(e=>{
-      if(typeof envCur==='function'&&envCur(e)) return;   // €-конверт: заплановане в гривнях не переносимо сам (етап 3 валют)
-      const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
-      if(p>0){
-        if(typeof envAddOp==='function'){ let _wc2; try{ ensureCards(); _wc2=workCard().id; }catch(_){} envAddOp(e,'in',p,'Із зарплати ('+ymKey+')',_wc2); }
-        else { e.saved=(+e.saved||0)+p; }
-        delete e.planned[ymKey]; moved=true;
-      }
+    // це робить програма, а не людина — storeAuto, щоб синк не вважав переливання ручною правкою (23.11.2026)
+    const run=fn=>{ if(window.storeAuto) window.storeAuto(fn); else fn(); };
+    run(()=>{
+      envelopes.forEach(e=>{
+        if(typeof envCur==='function'&&envCur(e)) return;   // €-конверт: заплановане в гривнях не переносимо сам (етап 3 валют)
+        const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
+        if(p>0){
+          // у конверті вже є рух «Із зарплати» за цей місяць — не дублюємо, лише прибираємо план
+          if(allocMovedIn(e,ymKey)>0){ delete e.planned[ymKey]; moved=true; return; }
+          if(typeof envAddOp==='function'){ let _wc2; try{ ensureCards(); _wc2=workCard().id; }catch(_){} envAddOp(e,'in',p,'Із зарплати ('+ymKey+')',_wc2); }
+          else { e.saved=(+e.saved||0)+p; }
+          delete e.planned[ymKey]; moved=true;
+        }
+      });
+      if(moved){ workPostedSal['planDone:'+ymKey]='1'; saveEnvelopes(); saveWork(); }
     });
-    if(moved){ workPostedSal['planDone:'+ymKey]='1'; saveEnvelopes(); saveWork(); }
   }
 
   /* ---- модалка розподілу зарплати наперед ---- */

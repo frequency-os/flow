@@ -237,6 +237,8 @@
   function fc3RingBind(el,k){
     const rb=el.querySelector('[data-fring]'); if(!rb) return;
     rb.onclick=e=>{ e.stopPropagation();
+      // дошки ще не звірились із хмарою — не пишемо, як у Фокусі (55-focus.js) (23.11.2026)
+      if(typeof window.storeKeyReady==='function'&&window.storeKeyReady('board')!==true){ plToast('Хмара ще звіряється — спробуй за хвилину'); return; }
       let g=null; try{ g=wgFolderMission(k); }catch(_){}
       const r=g?moToggleMark(g.folderKey,ymdLocal()):null;   // той самий запис, що й у віджеті трекера
       if(r===null){ plToast('Не вийшло позначити — відкрий папку'); return; }

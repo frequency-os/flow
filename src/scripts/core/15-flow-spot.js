@@ -366,7 +366,7 @@
     if(!aiLog.length) return '';
     const fmtT=ts=>{ const d=new Date(ts); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
     return `<div class="ai-chlog">${aiLog.slice(0,6).map(l=>
-      `<span class="ai-chp">✎ <b>${l.nb+l.ns+(l.nf||0)+(l.nop||0)+(l.np||0)+(l.nt||0)}</b> · ${fmtT(l.ts)} <em data-undo="${l.ts}">↩</em></span>`).join('')}</div>`;
+      `<span class="ai-chp">✎ <b>${[l.nb,l.ns,l.nf,l.nop,l.np,l.nt].reduce((s,x)=>s+(+x||0),0)}</b> · ${fmtT(l.ts)} <em data-undo="${l.ts}">↩</em></span>`).join('')}</div>`;
   }
   /* ── міні-таймлайн дня 6:00–24:00: наявне · нове · перенесене ── */
   function aiTlHTML(pr){
