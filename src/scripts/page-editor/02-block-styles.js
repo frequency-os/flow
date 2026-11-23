@@ -126,6 +126,10 @@
     var t=b.type,id=esc(b.id);   // id з даних іде в атрибути data-*=" " — екрануємо (звичайні id від uid() не змінюються)
     /* віджети «Гроші» (core/48-widgets.js) — живі плитки; старі фінансові віджети прибрано 09.10.2026 */
     if(typeof wgIs==='function'&&wgIs(t)) return '<div class="pg-content pgwg" data-wghost="'+id+'"></div>';
+    /* трекер місії (старий блок calendar у її папці) — живий «Трекер цілі» (core/48-widgets.js wdTrkCal, 23.11.2026);
+       якщо в папці вже є окремий віджет «Трекер цілі» цієї місії — ховаємо, щоб не було двох однакових */
+    if(t==='calendar'&&typeof wdTrkCal==='function'){ var tfk=wgCtxFolder();
+      if(wdTrkCal(b,tfk)) return wdTrkDup(tfk)?'<div class="pg-content pgtrk-hid" hidden></div>':'<div class="pg-content pgwg" data-wghost="'+id+'"></div>'; }
     var PG_OLD_FIN={fin:'Фінанси',envelope:'Конверт',project:'Проєкт',festival:'Фестиваль',kpi:'KPI'};
     if(PG_OLD_FIN[t]) return '<div class="pg-content"><div class="pg-oldw">🗂 Старий віджет «'+PG_OLD_FIN[t]+'» — прибирається в <b>Ще → Дані → Старі віджети</b>. Нові — у меню «/» → Гроші.</div></div>';
     /* прибрані 10.10.2026 ізольовані блоки — у старих документах лишається плашка з «Прибрати» */

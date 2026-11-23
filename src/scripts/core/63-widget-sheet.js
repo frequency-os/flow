@@ -50,6 +50,8 @@
   function wdSheet(id,opt){
     opt=opt||{};
     let b0=null; try{ b0=getBlock(id); }catch(_){}
+    // трекер місії (блок calendar) — шторка «Трекера цілі»; пишемо в сам блок лише поля віджета (WS_KEYS), тип лишається
+    const trkCal=!!(b0&&wdTrkCal(b0,wgCtxFolder())); if(trkCal) b0=wdCalView(b0);
     if(!b0||(!wdIs(b0.type)&&!wgHasSettings(b0.type))) return;
     document.querySelectorAll('.ws-ov').forEach(old=>{ old.__wsClose(); old.remove(); });
     const money=b0.type==='wgmoney', income=b0.kind!=='out';
@@ -155,7 +157,7 @@
           +(c.dir==='down'?grp('Коли настане',`<div class="ws-it">${seg('end',[['conf','🎉 Святкувати'],['quiet','Тихо'],['up','Рахувати «від»']],d.end==='quiet'||d.end==='up'?d.end:'conf')}</div>`):'');
       }
       let h='';
-      if(t!=='dtime'&&t!=='dcal'&&t!=='dtasks'){
+      if(t!=='dtime'&&t!=='dcal'&&t!=='dtasks'&&!trkCal){   // трекер місії завжди про свою місію — «Джерело» не міняється
         const goals=wlMissions(), fm=wgFolderMission(fk), gid=d.goalId&&goals.some(g=>String(g.id)===String(d.goalId))?String(d.goalId):'';
         h+=grp('Джерело',`<div class="ws-chips">
           <button data-wsg="" class="${gid?'':'on'}">📁 Місія цієї папки${fm?' · '+esc(String(fm.name||'').slice(0,20)):' (нема)'}</button>
@@ -197,6 +199,7 @@
     function liveBlock(){
       if(boardKey!==openedBoard) return null;
       const b=getBlock(id);
+      if(trkCal) return b&&b.type==='calendar'&&wdTrkCal(b,wgCtxFolder())?b:null;
       return b&&b.type===d.type&&(!money||b.kind===d.kind)?b:null;
     }
     function commit(q){

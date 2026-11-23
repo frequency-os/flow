@@ -465,3 +465,5 @@
   @media (prefers-reduced-motion:reduce){ .wd-tapr .vl{transition:none;} }
   /* вихідні трекера (22.11.2026, крок 2): смугастий день — не пропуск */
   .wd-days.week i.rest u,.wd-hg i.rest,.wd-hm i.rest,.wd-days.month i.rest{background:repeating-linear-gradient(45deg,var(--pg-track,rgba(127,127,127,.25)) 0 2px,transparent 2px 4px);}
+/* трекер місії, коли в папці вже є окремий віджет «Трекер цілі» цієї місії, — лише дані, не малюємо (48-widgets.js wdTrkDup, 23.11.2026) */
+.pgb:has(>.pgtrk-hid){display:none;}

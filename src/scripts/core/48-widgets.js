@@ -54,6 +54,7 @@
   function wgHTML(b,fk){
     const ym=wlYm(), t=b&&b.type;
     if(t==='wgworkpanel') return wkPanelHTML(b);
+    if(t==='calendar') return wdTrkCal(b,fk)?wdHTML(wdCalView(b),fk):'';   // трекер місії в новому вигляді (23.11.2026)
     if(wdIs(t)) return wdHTML(b,fk);   // «Дані»: вікна в місію / трекер / Планер
     if(t==='wgwallet'){
       let bal=0, pz=0; try{ bal=walletBalance(); pz=typeof pzTotal==='function'?pzTotal():0; }catch(_){}
@@ -144,7 +145,7 @@
     else if(a==='rules'){ try{ rlBook(); }catch(_){} }
     else if(a==='folderops'){ if(fk) wlFolderSheet(fk); }
     else if(a==='cfg'){ if(id) wdSheet(id,{tab:'own'}); }
-    else if(a.slice(0,2)==='wd'){ wdAct(a,el,blk(),fk,id); }
+    else if(a.slice(0,2)==='wd'){ const b=blk(); wdAct(a,el,wdTrkCal(b,fk)?wdCalView(b):b,fk,id); }
     else if(a==='add'){ const b=blk(); if(!b||!fk) return; const g=wgFolderMission(fk);
       wlOpSheet(b.kind==='out'?'out':'in', g?String(g.id):'', {folderKey:fk, src:b.src, cur:b.cur, label:b.kind==='out'?'':(b.label||'')}); }
   }
@@ -287,6 +288,18 @@
   function wdPathN(b){ return WD_PATH_N.includes(+(b&&b.days))?+b.days:30; }
   // усі позначені дні до сьогодні включно (ключі — лише справжні дати)
   // ритм і вихідні для показу: чернетка шторки (b.__tr, у блок не пишеться — нема в WS_KEYS) або сам трекер
+  /* трекер місії = старий блок calendar у її папці (moTracker). З 23.11.2026 він малюється як «Трекер цілі»: той самий код,
+     що й dhabit, але через «погляд» wdCalView — копію з type:'dhabit' (позначки — те саме посилання, не копія).
+     Дані не змінюються: тип у сховищі лишається calendar, вигляд і розмір — звичайні поля віджета на самому блоці. */
+  function wdTrkCal(b,fk){
+    try{ return !!(b&&b.type==='calendar'&&fk&&moOwnFolder(fk)&&moTracker(fk)===b&&wgFolderMission(fk)); }catch(_){ return false; }
+  }
+  function wdCalView(b){ return Object.assign({},b,{type:'dhabit',look:b.look||'grid',sz:b.sz||'l'}); }   // без вибору — «Сезон», великий
+  // у папці вже стоїть окремий віджет «Трекер цілі» цієї ж місії — блок-трекер не дублюємо, він лишається даними
+  function wdTrkDup(fk){
+    const walk=arr=>(arr||[]).some(x=>x&&((x.type==='dhabit'&&(()=>{ try{ const g=wdGoal(x,fk); return g&&g.folderKey===fk; }catch(_){ return false; } })())||(Array.isArray(x.children)&&walk(x.children))));
+    try{ return walk(boards[fk]); }catch(_){ return false; }
+  }
   function wdTrkView(b,tr){ return b&&b.__tr&&typeof b.__tr==='object'?b.__tr:tr; }
   // ціль тижня: ритм «N на тиждень»; поки ритму в трекері нема — старе поле віджета b.goal (без міграції)
   function wdWeekGoal(b,tv){ const r=moRhythm(tv); if(r.k==='week') return r.n; return tv&&tv.rhythm?0:wsGoal(b); }
