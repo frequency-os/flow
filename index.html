@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-22-2122-a85f862';
+  var BUILD='2026-11-23-1946-9703d7a';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1775,6 +1775,8 @@
   .pgc-send svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
   .pgc-plus:focus-visible,.pgc-modes button:focus-visible,.pgc-send:focus-visible{outline:2px solid var(--pg-acc);outline-offset:2px;}
   #scr-page.pgc-on .pg-addblock{display:none;}   /* «＋» тепер у нижньому полі */
+  /* останній блок не ховається під полем, хоч яке воно високе, і під клавіатурою (23.11.2026) */
+  #scr-page.pgc-on .pg-doc{padding-bottom:max(200px, calc(var(--pgc-h,62px) + var(--pgc-kb,0px) + 48px));}
   @media (max-width:1023px){ body.pgc-live .nav{display:none !important;} }
   @media (max-width:1023px){ body.pgc-live #flowCap{bottom:calc(var(--pgc-h,62px) + 22px + env(safe-area-inset-bottom)) !important;} }   /* котик — над полем, хоч яке воно високе */   /* у документі нижнє меню ховається — повернення стрілкою вгорі */
   @media (min-width:1024px){ .pgc{right:auto;bottom:18px;} }
@@ -1968,8 +1970,6 @@
   .pn-folds button{border:0;border-radius:12px;min-height:44px;padding:0 12px;text-align:left;cursor:pointer;background:rgba(127,127,127,.12);color:inherit;font:inherit;font-size:14px;}
   .pg-pane button:focus-visible{outline:2px solid #9aa6ff;outline-offset:2px;}
   @media (prefers-reduced-transparency:reduce){ .pg-pane{background:#1c1a28;} .pg-pane.pg-paper{background:#fff;} }
-  /* поки клавіатура їде — картку не видно (iPhone повідомляє висоту із запізненням) */
-  #pgComposer.pgc-moving{opacity:0 !important;transition:none !important;}
   /* смужка під годинником, коли клавіатура зсуває видиму частину */
   .pg-safetop{display:none;position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);z-index:240;pointer-events:none;}
   /* ноутбук: підказка клавіш під полем, поки в ньому пишеш */
@@ -29261,9 +29261,12 @@
       if(window.scrollY || document.documentElement.scrollTop) window.scrollTo(0, 0);
     }
 
-    // скрол активного поля так, щоб воно було над клавіатурою
+    // скрол активного поля так, щоб воно було над клавіатурою.
+    // Нижні поля папки й чату самі стоять над клавіатурою (03-premium-pack.js, 35-channel.js) —
+    // їх не крутимо: два «господарі» тягнули сторінку в різні боки, і поле скакало (23.11.2026)
+    const DOCKED = '#pgComposer,#chComposer';
     function ensureVisible(el){
-      if(!el) return;
+      if(!el || (el.closest && el.closest(DOCKED))) return;
       requestAnimationFrame(()=>{
         const r = el.getBoundingClientRect();
         const safeBottom = (vv ? vv.height : window.innerHeight) - 24;
@@ -44458,7 +44461,9 @@
       });
       syncBar();
       if(focusIdx!=null){ var x=wrap.querySelector('[data-i="'+focusIdx+'"]');
-        if(x){ caretEnd(x); try{ x.scrollIntoView({block:'nearest'}); }catch(_){} } }
+        // прокручуємо лише список рядків у полі: scrollIntoView на iPhone смикав усю сторінку (23.11.2026)
+        if(x){ caretEnd(x); var rw=x.parentNode, top=rw.offsetTop, bot=top+rw.offsetHeight;
+          if(top<wrap.scrollTop) wrap.scrollTop=top; else if(bot>wrap.scrollTop+wrap.clientHeight) wrap.scrollTop=bot-wrap.clientHeight; } }
     }
     // курсор має бути саме в цьому рядку (Firefox без caretRangeFromPoint лишає його деінде) — інакше ставимо в кінець
     function pgcCaretIn(el){ var s=window.getSelection(); if(!s||!s.rangeCount||!el.contains(s.getRangeAt(0).startContainer)) caretEnd(el); }
@@ -44580,11 +44585,23 @@
     document.getElementById('pgcPlus').onclick=function(){ if(typeof pgcBlocks==='function') pgcBlocks(); else pgAddViaMenu(true); };
     send.onclick=sendAll;
     draw(null);
-    // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі
+    // клавіатура iPhone: поле тримається над нею (iOS не зсуває fixed-елементи сам), як у Каналі.
+    // 23.11.2026: ЄДИНИЙ власник позиції поля — раз на кадр, без порогу і без ховання на час руху
+    // (раніше поле стрибало на порозі 120 px і блимало, бо 08b-rich-text.js гасило його на кожен рух екрана).
+    // Поки клавіатура відкрита, поле росте не вище половини видимої частини — інакше залазило під верх.
     var vv=window.visualViewport;
-    if(vv){ var kb=function(){ if(!scr.classList.contains('active')){ box.style.bottom=''; return; }
+    if(vv){ var kbQ=false, kbLast=-1;
+      var kbApply=function(){ kbQ=false;
+        if(!scr.classList.contains('active')){ if(kbLast!==0){ box.style.bottom=''; wrap.style.maxHeight=''; document.body.style.removeProperty('--pgc-kb'); kbLast=0; } return; }
         if(box.classList.contains('pgc-panemode')) return;   // відкрита панель «⋯» (08b-rich-text.js) сама тримає картку над собою
-        var h=Math.max(0, window.innerHeight - vv.height - vv.offsetTop); box.style.bottom = h>120 ? (h+8)+'px' : ''; };
+        var h=Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+        if(h<40) h=0;   // смуга браузера / заокруглення — не клавіатура
+        if(h===kbLast) return; kbLast=h;
+        box.style.bottom = h ? (h+8)+'px' : '';
+        wrap.style.maxHeight = h ? Math.max(76, Math.round(vv.height*0.5)-60)+'px' : '';
+        document.body.style.setProperty('--pgc-kb', h+'px');
+      };
+      var kb=function(){ if(kbQ) return; kbQ=true; requestAnimationFrame(kbApply); };
       vv.addEventListener('resize',kb); vv.addEventListener('scroll',kb); }
     // видно лише в документі (і не в «Стрічці» папки); на ноутбуці — по ширині колонки документа
     function sync(){
@@ -46182,10 +46199,10 @@
   (function(){
     var vv=window.visualViewport, b=pgcApi&&pgcApi.box, scrP=document.getElementById('scr-page'); if(!vv||!b||!scrP) return;
     var cap=document.createElement('div'); cap.className='pg-safetop'; cap.setAttribute('aria-hidden','true'); document.body.appendChild(cap);
-    var t=0;
+    // 23.11.2026: картку більше НЕ ховаємо на час руху (.pgc-moving) — iPhone шле десятки подій, і поле блимало;
+    // тепер його позицію раз на кадр тримає 03-premium-pack.js, тож ховати нема чого.
     function moved(){
       if(!scrP.classList.contains('active')){ cap.style.display='none'; return; }
-      b.classList.add('pgc-moving'); clearTimeout(t); t=setTimeout(function(){ b.classList.remove('pgc-moving'); },180);
       var off=Math.max(0,vv.offsetTop||0);
       if(off>2&&rbPhone()){ cap.style.display='block'; cap.style.transform='translateY('+off+'px)'; try{ cap.style.background=getComputedStyle(scrP).backgroundColor||''; }catch(_){} }
       else cap.style.display='none';
