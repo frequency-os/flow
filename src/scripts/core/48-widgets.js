@@ -245,7 +245,9 @@
     // ⚙ прибрано (19.11.2026): шапка сама — кнопка налаштувань; ще — утримати віджет або «Змінити» на дошці
     const m=WD_META[b.type], nm=b.type==='countdown'?'':String(b.hd||'').slice(0,40);
     if(b.nohd) return '';
-    return `<button class="wd-h" data-wga="wdcfg" aria-label="Налаштувати віджет «${esc(nm||m.t)}»"><i class="wd-dot"></i><b>${esc(nm||m.h)}</b>${extra&&!nm?`<span>${extra}</span>`:''}</button>`;
+    // трекер без своєї назви — називається як ціль («Бігати 30 днів»), а не загальним «Звичка» (23.11.2026)
+    let gn=''; if(b.type==='dhabit'&&!nm){ try{ const g=wdGoal(b,fk); gn=g?String(g.name||'').slice(0,28):''; }catch(_){} }
+    return `<button class="wd-h" data-wga="wdcfg" aria-label="Налаштувати віджет «${esc(nm||m.t)}»"><i class="wd-dot"></i><b>${esc(nm||gn||m.h)}</b>${extra&&!nm?`<span>${extra}</span>`:''}</button>`;
   }
   function wdTile(b,fk,inner,cls,color){
     const f=wdFolder(fk), c=safeColor(wdCcOf(b)||color||(f&&f.c)||'','#7c8cff'), tx=wdTier(b);
@@ -302,6 +304,10 @@
   }
   function wdTrkView(b,tr){ return b&&b.__tr&&typeof b.__tr==='object'?b.__tr:tr; }
   // ціль тижня: ритм «N на тиждень»; поки ритму в трекері нема — старе поле віджета b.goal (без міграції)
+  // скільки днів цього тижня — «повний тиждень»: ритм N на тиждень, інакше 7 мінус вихідні (так само рахує кільце на Огляді)
+  function wdWeekGl(b,tv){ return wdWeekGoal(b,tv)||Math.max(1,7-moRest(tv).length); }
+  // перша позначка трекера (не пізніше сьогодні); '' — позначок ще нема
+  function wdFirstMark(tr,mk,td){ return Object.keys(tr&&tr.marks||{}).filter(ds=>/^\d{4}-\d{2}-\d{2}$/.test(ds)&&ds<=td&&mk(ds)).sort()[0]||''; }
   function wdWeekGoal(b,tv){ const r=moRhythm(tv); if(r.k==='week') return r.n; return tv&&tv.rhythm?0:wsGoal(b); }
   function wdMarkedAll(tr,mk,td){ return Object.keys(tr&&tr.marks||{}).filter(ds=>/^\d{4}-\d{2}-\d{2}$/.test(ds)&&ds<=td&&mk(ds)).length; }
   const WD_PLANT=[[0,'Насінина','Seed'],[3,'Паросток','Sprout'],[7,'Росток','Seedling'],[21,'Кущ','Bush'],[66,'Дерево','Tree']];
@@ -338,15 +344,18 @@
     if(lk==='grid'){
       // тижні Пн–Нд до кінця цього тижня, стовпчик = тиждень; клітинки квадратні (32-widgets.css), тому S — 8 тижнів, M/L — 20
       const W=sz==='s'?8:20, end=new Date(td+'T12:00:00'); end.setDate(end.getDate()+(6-((end.getDay()+6)%7)));
-      let cells='', past=0, hit2=0;
+      // відсоток — лише від першої позначки (23.11.2026): тижні до старту трекера не «провалені», їх просто ще не було
+      const f0=wdFirstMark(tr,mk,td);
+      let cells='', past=0, hit2=0, w0='';
       for(let w=W-1;w>=0;w--) for(let i=6;i>=0;i--){ const d=new Date(end); d.setDate(end.getDate()-w*7-i); const ds=ymdLocal(d), m=mk(ds);
-        if(ds<=td&&!rs(ds)){ past++; if(m) hit2++; } cells+=`<i class="${m?'on':''}${rs(ds)?' rest':''}${ds===td?' td':''}${ds>td?' fut':''}"></i>`; }
-      const pct=past?Math.round(hit2/past*100):0, wk=jnWeek().filter(ds=>ds<=td&&mk(ds)).length;
+        if(!w0) w0=ds;
+        if(f0&&ds>=f0&&ds<=td&&!rs(ds)){ past++; if(m) hit2++; } cells+=`<i class="${m?'on':''}${rs(ds)?' rest':''}${ds===td?' td':''}${ds>td?' fut':''}"></i>`; }
+      const pct=past?Math.round(hit2/past*100):0, wk=jnWeek().filter(ds=>ds<=td&&mk(ds)).length, wg=wdWeekGl(b,tv);
       const t0=tiny(`${pct}%`); if(t0) return t0;
-      const sum=`за ${W} ${pluralUk(W,'тиждень','тижні','тижнів')}`;
+      const sum=!f0?'ще без позначок':f0>w0?`з ${jnDateTxt(f0)}`:`за ${W} ${pluralUk(W,'тиждень','тижні','тижнів')}`;
       return wdTile(b,fk,`${hit}${head}
-        ${sz==='l'?`<span class="wd-strk"><b class="wd-big xl">${pct}%</b><small class="wd-cap">${sum}<br>${wk}/7 цього тижня</small></span>`
-          :`<small class="wd-sub one"><em>${pct}%</em> ${sum}${sz==='m'?` · <em>${wk}/7</em> цей тиждень`:''}</small>`}
+        ${sz==='l'?`<span class="wd-strk"><b class="wd-big xl">${pct}%</b><small class="wd-cap">${sum}<br>${wk} з ${wg} цього тижня</small></span>`
+          :`<small class="wd-sub one"><em>${pct}%</em> ${sum}${sz==='m'?` · <em>${wk} з ${wg}</em> цей тиждень`:''}</small>`}
         <span class="wd-hm" style="--w:${W}" aria-hidden="true">${cells}</span>${pill('✓ Сьогодні','✓ Сьогодні є')}`,'hab trk grid',col);
     }
     if(lk==='plant'){
@@ -359,7 +368,7 @@
         ${pill('Полити сьогодні','Полито ✓')}`,'hab trk plant',col);
     }
     // ring: тиждень кільцем; саме кільце — кнопка позначки
-    const per=jnWeek(), n=per.filter(ds=>ds<=td&&mk(ds)).length, gl=wdWeekGoal(b,tv)||Math.max(1,7-moRest(tv).length), pct=Math.min(100,Math.round(n/gl*100));
+    const per=jnWeek(), n=per.filter(ds=>ds<=td&&mk(ds)).length, gl=wdWeekGl(b,tv), pct=Math.min(100,Math.round(n/gl*100));
     const t0=tiny(`${n}<span>/${gl}</span>`); if(t0) return t0;
     const st=moStreak(tv,mk);
     const ring=`<button class="wd-tapr${on?' on':''}" data-wga="wdmark" aria-pressed="${on}" aria-label="${on?'Зняти позначку за сьогодні':'Позначити сьогодні'}">
@@ -424,7 +433,7 @@
       const hitH=b.tapmk?`<button class="wg-hit" data-wga="wdmark" aria-pressed="${on}" aria-label="${on?'Зняти позначку за сьогодні':'Позначити сьогодні'}"></button>`
         :`<button class="wg-hit" data-wga="wdpage" data-wgg="${esc(g.id)}" data-wgtab="folder" aria-label="Трекер місії ${esc(g.name||'')}"></button>`;
       return wdTile(b,fk,`${hitH}
-        ${wdHead(b,fk,sz==='s'?'':'🔗 трекер місії')}${sz==='l'?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td,rs):''}
+        ${wdHead(b,fk,sz==='s'?'':'🔗 трекер місії')}${sz==='l'&&(b.hd||b.nohd)?name:''}${big}${cnt}${dots}${sz==='l'?wdHabGrid(mk,td,rs):''}
         <span class="wd-acts c"><button data-wga="wdmark" class="pill${on?' on':''}" aria-pressed="${on}">✓ Сьогодні${on?' є':''}</button></span>`,'hab',folders[gk].c);
     }
     if(t==='dcal'){
@@ -790,7 +799,7 @@
   function wdRedraw(){ try{ if(window.__pgWidgetsSync) window.__pgWidgetsSync(); }catch(_){} wgRefresh(); }
   function wdAct(a,el,b,fk,id){
     if(!b||!wdIs(b.type)) return;
-    if(a==='wdcfg') wdCfg(id);
+    if(a==='wdcfg') b.type==='dhabit'?wdSheet(id,{tab:'own'}):wdCfg(id);   // у трекера головне — на вкладці «Звичка»
     else if(a==='wdlink') wdPickMission(id);
     else if(a==='wdpage'){ const q=wlGoal(el.dataset.wgg); if(q){ try{ moMissionPage(q,el.dataset.wgtab||'path'); }catch(_){} } }
     else if(a==='wdmark'){
