@@ -265,3 +265,74 @@
   .yp-sh img,.yp-sh i{width:96px;height:96px;border-radius:16px;object-fit:cover;display:grid;place-items:center;font-style:normal;background:var(--card);}
   .yp-sh span{font-size:12px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
   .yp-done-a button:focus-visible,.yp-sh:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ «Мої цілі» — стіна мрій (О1, 24.11.2026) ════
+     Яскраве одне — фото мрій колажем. Числа, фільтри, тиждень і гроші — тихі, на токенах.
+     Стан: зелений «у темпі» і бурштиновий «позаду» — ті самі відтінки, що в трекерах вище. */
+  .yw-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px;padding:12px 14px;border-radius:18px;text-align:center;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--dp-shadow-s,none);}
+  .yw-stats b{display:block;font-size:22px;font-weight:800;line-height:1.1;color:var(--text);font-variant-numeric:tabular-nums;}
+  .yw-stats b.acc{color:var(--accent);}
+  .yw-stats span{display:block;margin-top:2px;font-size:11px;color:var(--muted);}
+  .yw-fs{display:flex;gap:6px;flex-wrap:wrap;}
+  .yw-f{all:unset;box-sizing:border-box;cursor:pointer;min-height:40px;padding:0 14px;display:inline-flex;align-items:center;border-radius:12px;
+    font-size:13px;font-weight:600;color:var(--muted);background:var(--bg-2);border:1px solid var(--line);}
+  .yw-f.on{font-weight:800;color:var(--text);background:var(--card);border-color:color-mix(in srgb,var(--text) 40%,var(--line));}
+  .yw-main{display:flex;flex-direction:column;gap:14px;}
+  .yw-left,.yw-right{display:flex;flex-direction:column;gap:12px;min-width:0;}
+
+  .yw-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:150px;grid-auto-flow:dense;gap:10px;}
+  .yw-card{position:relative;overflow:hidden;border-radius:20px;display:flex;align-items:flex-end;padding:10px;box-sizing:border-box;color:var(--text);
+    background:color-mix(in srgb,var(--c) 28%,var(--card));border:1px solid color-mix(in srgb,var(--c) 34%,var(--line));box-shadow:var(--dp-shadow-s,none);}
+  .yw-card.big{grid-row:span 2;padding:12px;}
+  .yw-card.ph{color:#fff;background-size:cover;background-position:center;border-color:transparent;}
+  .yw-card.ph::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(8,10,14,0) 28%,rgba(8,10,14,.86));}
+  .yw-card.st-done{box-shadow:inset 0 0 0 2px #30d158;}
+  .yw-hit{all:unset;position:absolute;inset:0;cursor:pointer;z-index:1;border-radius:inherit;}
+  .yw-b{position:relative;z-index:2;pointer-events:none;flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .yw-b b{font-size:14px;font-weight:800;line-height:1.15;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .yw-card.big .yw-b b{font-size:19px;}
+  .yw-m{font-size:11px;opacity:.9;font-variant-numeric:tabular-nums;}
+  .yw-bar{display:block;height:4px;border-radius:2px;overflow:hidden;margin:3px 0 1px;background:color-mix(in srgb,currentColor 22%,transparent);}
+  .yw-bar u{display:block;height:100%;background:currentColor;}
+  .yw-s{font-size:11px;line-height:1.3;opacity:.92;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .yw-s::before{content:'● ';}
+  .yw-card.st-ok .yw-s{color:color-mix(in srgb,#30d158 80%,currentColor);opacity:1;}
+  .yw-card.st-behind .yw-s{color:color-mix(in srgb,#e0b060 85%,currentColor);opacity:1;}
+  .yw-card.st-none .yw-s::before,.yw-card.st-done .yw-s::before{content:'';}
+  .yw-catch{all:unset;pointer-events:auto;box-sizing:border-box;cursor:pointer;align-self:flex-start;margin-top:4px;min-height:32px;padding:0 10px;display:inline-flex;align-items:center;
+    border-radius:10px;font-size:12px;font-weight:800;color:#fff;background:color-mix(in srgb,#000 45%,transparent);border:1px solid rgba(255,255,255,.28);}
+  .yw-card:not(.ph) .yw-catch{color:var(--accent);background:var(--bg-2);border-color:var(--line);}
+  .yw-catch::after{content:'';position:absolute;inset:-6px;}
+  .yw-catch{position:relative;}
+  .yw-tag{position:absolute;z-index:2;left:10px;top:10px;font-size:11px;font-weight:700;padding:4px 8px;border-radius:8px;color:#fff;background:rgba(10,12,16,.6);pointer-events:none;}
+  .yw-ok{position:absolute;z-index:2;right:8px;top:8px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#0b0e14;background:#30d158;pointer-events:none;}
+  .yw-free.yw-new{justify-content:center;}
+  .yw-free{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 12px;border-radius:14px;
+    font-size:13px;color:var(--muted);border:1px dashed var(--line);}
+  .yw-free>span:nth-child(2){flex:1;min-width:0;}
+  .yw-free em{font-style:normal;font-weight:800;color:var(--accent);white-space:nowrap;}
+  .yw-week .yp-lv span em{display:block;font-style:normal;font-size:11px;font-weight:600;color:var(--muted);margin-top:1px;}
+  .yw-week .yp-lv i{border-color:color-mix(in srgb,var(--c) 70%,var(--muted));}
+  .yw-money em{font-style:normal;font-weight:800;color:color-mix(in srgb,#30d158 75%,var(--text));}
+  .yw-money>span:first-child{flex:1;min-width:0;}
+  .yw-behind{background:color-mix(in srgb,#e0b060 12%,var(--card));border-color:color-mix(in srgb,#e0b060 38%,var(--line));}
+  .yw-behind>span:first-child{flex:1;min-width:0;}
+  .yw-behind button{background:color-mix(in srgb,#e0b060 70%,#000);}
+
+  /* лінія фінішів — лише на комп'ютері (на телефоні дні вже є на кожній картці) */
+  .yw-line{display:none;}
+  @media (min-width:1024px){
+    .yw-main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:24px;align-items:start;}
+    .yw-right{position:sticky;top:16px;}
+    .yw-grid{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:170px;}
+    .yw-line{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
+    .yw-track{position:relative;height:44px;margin:0 18px;}
+    .yw-rail{position:absolute;left:0;right:0;top:21px;height:2px;border-radius:1px;background:var(--line);}
+    .yw-dot{all:unset;box-sizing:border-box;cursor:pointer;position:absolute;top:4px;width:36px;height:36px;margin-left:-18px;border-radius:50%;overflow:hidden;
+      background:color-mix(in srgb,var(--c) 60%,var(--card));border:2px solid var(--card);}
+    .yw-dot.st-behind{border-color:#e0b060;}
+    .yw-dot img{width:100%;height:100%;object-fit:cover;display:block;}
+    .yw-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+  }
+  .yw-f:focus-visible,.yw-hit:focus-visible,.yw-catch:focus-visible,.yw-free:focus-visible,.yw-dot:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}

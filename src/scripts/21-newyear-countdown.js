@@ -21,10 +21,19 @@
   // активний «Забіг» (56-run.js) важливіший за лист: людина сама поставила цю дату (15.10.2026)
   function runEnd(){ try{ return window.runTarget?window.runTarget():null; }catch(_){ return null; } }
 
+  // найближчий фініш цілі (66-year-planner.js, window.ypNearest) — рішення 23.11: лічильник під Картою бажань
+  // рахує до нього, тап веде в «Мої цілі». Нема цілей з датою — далі як було: Забіг → точка Б → Новий рік.
+  function goalEnd(){
+    try{ var b=window.ypNearest?window.ypNearest():null; if(!b||!/^\d{4}-\d{2}-\d{2}$/.test(b.ds)) return null;
+      var t=new Date(+b.ds.slice(0,4),+b.ds.slice(5,7)-1,+b.ds.slice(8,10)+1,0,0,0,0);   // до кінця дня фінішу
+      return t>new Date()?{t:t,name:b.name}:null; }catch(_){ return null; }
+  }
+  function enLang(){ try{ return typeof flowLang==='function'&&flowLang()==='en'; }catch(_){ return false; } }
+
   // ── дрібний віджет на головному ──
   function tickWidget(){
     var d=document.getElementById('nycD');if(!d)return;
-    var rn=runEnd(),pb=rn?null:pointB(),t=rn||pb||targetDate(),diff=t-new Date();if(diff<0)diff=0;
+    var gl=goalEnd(),rn=gl?null:runEnd(),pb=(gl||rn)?null:pointB(),t=(gl&&gl.t)||rn||pb||targetDate(),diff=t-new Date();if(diff<0)diff=0;
     var s=Math.floor(diff/1000);
     var dd=Math.floor(s/86400);s-=dd*86400;
     var h=Math.floor(s/3600);s-=h*3600;
@@ -33,13 +42,20 @@
     document.getElementById('nycH').textContent=String(h).padStart(2,'0');
     document.getElementById('nycM').textContent=String(m).padStart(2,'0');
     document.getElementById('nycS').textContent=String(s).padStart(2,'0');
-    var title=rn?'До фінішу забігу':pb?'До точки Б':'До '+t.getFullYear()+' року';
+    var gn=gl?(gl.name.length>26?gl.name.slice(0,25)+'…':gl.name):'';
+    var title=gl?(enLang()?'Until “'+gn+'”':'До «'+gn+'»'):rn?'До фінішу забігу':pb?'До точки Б':'До '+t.getFullYear()+' року';
     var tt=document.getElementById('nycTitle');if(tt&&tt.textContent!==title)tt.textContent=title;
     var box=document.getElementById('nyCountdown');
-    if(box){var al=rn?'Лічильник до фінішу забігу — відкрити Забіг':pb?'Лічильник до точки Б з листа — відкрити Рік у Журналі':'Лічильник до Нового року';if(box.getAttribute('aria-label')!==al)box.setAttribute('aria-label',al);}
+    // значок: ціль — мішень; штрихову ялинку теми (41-theme-layer.js) не затираємо, а підміняємо й повертаємо
+    var em=box&&box.querySelector('.nyc-emoji');
+    if(em){ if(gl&&!em.dataset.goal){ em.dataset.orig=em.innerHTML; em.dataset.goal='1'; var sv=em.querySelector('svg');
+        if(sv) sv.innerHTML='<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8"/>'; else em.textContent='🎯'; }
+      else if(!gl&&em.dataset.goal){ em.innerHTML=em.dataset.orig||'🎄'; delete em.dataset.goal; delete em.dataset.orig; } }
+    if(box){var al=gl?(enLang()?'Countdown to the nearest goal finish — open My goals':'Лічильник до найближчого фінішу цілі — відкрити «Мої цілі»'):rn?'Лічильник до фінішу забігу — відкрити Забіг':pb?'Лічильник до точки Б з листа — відкрити Рік у Журналі':'Лічильник до Нового року';if(box.getAttribute('aria-label')!==al)box.setAttribute('aria-label',al);}
   }
   // тап по лічильнику на Огляді (onclick у index.html)
   window.__nycTap=function(){
+    if(goalEnd()&&typeof window.goYearPlan==='function'){window.goYearPlan({view:'wall'});return;}
     if(runEnd()&&typeof window.runOpen==='function'){window.runOpen();return;}
     if(pointB()&&typeof window.goJournal==='function'){window.goJournal({tab:'year'});return;}
     if(window.goNYC)window.goNYC();
