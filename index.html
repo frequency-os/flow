@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-23-2316-f04c540';
+  var BUILD='2026-11-24-2148-3b95a6e';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -29800,16 +29800,23 @@
 
     function isField(el){ return el && el.matches && el.matches(FIELD); }
 
-    // визначаємо відкриту клавіатуру за різницею висот в'юпорта
+    // висота клавіатури = на скільки видима частина нижча за вікно. БЕЗ offsetTop (24.11.2026):
+    // коли iPhone сам піднімає екран до поля, offsetTop росте — і стара формула вирішувала
+    // «клавіатура закрилась», смикала сторінку на нуль (unshift), iOS піднімав знову — сторінка тремтіла.
     function kbHeight(){
       if(!vv) return 0;
-      return Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      return Math.max(0, window.innerHeight - vv.height);
     }
+    // ensureVisible — НЕ на кожну подію екрана (їх десятки, і власна прокрутка породжувала нову →
+    // сторінка повзла вниз), а один раз, коли висота клавіатури встоялась
+    let kbSettle=0, kbLastH=-1;
     function syncKb(){
-      const open = kbHeight() > 120 && isField(document.activeElement);
+      const h = kbHeight(), open = h > 120 && isField(document.activeElement);
       document.body.classList.toggle('kb-open', open);
-      if(open) ensureVisible(document.activeElement);
-      else if(kbHeight() <= 120) unshift();
+      if(h <= 120){ kbLastH=-1; unshift(); return; }
+      if(Math.abs(h-kbLastH) < 40) return;   // лише зсув видимої частини, клавіатура та сама — нічого не крутимо
+      clearTimeout(kbSettle);
+      kbSettle=setTimeout(()=>{ kbLastH=kbHeight(); if(isField(document.activeElement)) ensureVisible(document.activeElement); },180);
     }
 
     // Клавіатура сховалась, а iOS (з іконки) лишає всю сторінку зсунутою вгору: знизу
@@ -29823,23 +29830,68 @@
     // Нижні поля папки й чату самі стоять над клавіатурою (03-premium-pack.js, 35-channel.js) —
     // їх не крутимо: два «господарі» тягнули сторінку в різні боки, і поле скакало (23.11.2026)
     const DOCKED = '#pgComposer,#chComposer';
-    function ensureVisible(el){
-      if(!el || (el.closest && el.closest(DOCKED))) return;
-      requestAnimationFrame(()=>{
-        const r = el.getBoundingClientRect();
-        const safeBottom = (vv ? vv.height : window.innerHeight) - 24;
-        if(r.bottom > safeBottom){
-          window.scrollBy({top: r.bottom - safeBottom + 16, behavior:'smooth'});
-        } else if(r.top < 80){
-          window.scrollBy({top: r.top - 80, behavior:'smooth'});
+    // панелі, що стоять над клавіатурою: оформлення тексту (08b-rich-text.js) і нижні поля —
+    // поле під ними так само не видно, як під клавіатурою (знімки з iPhone 24.11: «Aa B I S» лежала на рядку)
+    const BARS = '.pg-rbar.on,#pgComposer,#chComposer';
+    // що саме прокручується: найближчий предок із власною прокруткою (шторка), інакше body — у нас крутиться лише він
+    function scroller(el){
+      for(let p=el.parentElement; p && p!==document.body; p=p.parentElement){
+        const oy=getComputedStyle(p).overflowY;
+        if((oy==='auto'||oy==='scroll') && p.scrollHeight>p.clientHeight+1) return p;
+      }
+      return document.body;
+    }
+    function inFixed(el){
+      for(let p=el.parentElement; p && p!==document.body; p=p.parentElement){
+        if(getComputedStyle(p).position==='fixed') return true;
+      }
+      return false;
+    }
+    // прямокутник рядка з курсором (для довгого блоку — саме рядок, а не весь блок)
+    function caretRect(el){
+      try{
+        const s=window.getSelection();
+        if(s && s.rangeCount && el.contains(s.getRangeAt(0).startContainer)){
+          const rr=s.getRangeAt(0).getBoundingClientRect(); if(rr && rr.height) return rr;
         }
-      });
+      }catch(_){}
+      return el.getBoundingClientRect();
+    }
+    function ensureVisible(el){
+      if(!el || !el.isConnected || (el.closest && el.closest(DOCKED))) return;
+      // без requestAnimationFrame: кличуть лише з таймерів (фокус, клавіатура встоялась, друк), чекати кадру нема чого
+      {
+        const top0 = vv ? vv.offsetTop : 0, h0 = vv ? vv.height : window.innerHeight;
+        let bottom = top0 + h0;
+        document.querySelectorAll(BARS).forEach(b=>{
+          if(b.hidden || b.contains(el)) return;
+          const cs=getComputedStyle(b); if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0) return;
+          const br=b.getBoundingClientRect();
+          if(br.height && br.top > top0 + h0*0.35 && br.top < bottom) bottom = br.top;   // лише ті, що внизу видимої частини
+        });
+        const r = caretRect(el), lo = bottom - 12, hi = top0 + 80;
+        let d = 0;
+        if(r.bottom > lo) d = r.bottom - lo;
+        else if(r.top < hi) d = r.top - hi;
+        if(Math.abs(d) < 2) return;
+        const sp = scroller(el);
+        // поле в прибитій шторці, що сама не гортається, — сторінка за нею не допоможе, лише смикне фон
+        if(sp===document.body && inFixed(el)) return;
+        sp.scrollTop += d;   // одразу, без плавності: плавна прокрутка на iPhone повзла і перебивалась клавіатурою
+      }
     }
 
     if(vv){
       vv.addEventListener('resize', syncKb);
       vv.addEventListener('scroll', syncKb);
     }
+    // друкуєш, і курсор зійшов під панель (Enter у кінці документа) — підтягнути рядок; прокрутка не породжує input, тож циклу нема
+    let typeT=0;
+    document.addEventListener('input', e=>{
+      if(!document.body.classList.contains('kb-open') || !isField(e.target)) return;
+      // беремо поле, де курсор ЗАРАЗ: після Enter редактор перемальовує блок, і e.target уже не на сторінці
+      clearTimeout(typeT); typeT=setTimeout(()=>{ const a=document.activeElement; if(isField(a)) ensureVisible(a); },60);
+    });
     document.addEventListener('focusin', e=>{
       if(isField(e.target)){
         document.body.classList.add('kb-open');
