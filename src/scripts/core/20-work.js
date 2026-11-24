@@ -249,8 +249,10 @@
      Частина = звичайний дохід у fin_ops з _salPart:true і _salYM:'РРРР-ММ' (нового ключа нема, міграції нема).
      Старі автозаписи (_autoSal) лишаються як є і рахуються як «прийшло» за свій місяць.
      Зміни «→ у фінанси» теж «прийшли» — але лише поки їхній запис справді є в Гаманці (видалили там — чекаємо знову). */
-  // сума операції у валюті Роботи: для запису з курсом — сума до перерахунку
-  function salWorkAmt(o){ const code=finCurCode(workCur); return (o&&o._fx&&o._fx.cur===code&&+o._fx.was>0)?+o._fx.was:(+(o&&o.amount)||0); }
+  /* скільки частина важить у валюті Роботи: _salW — порахували в мить запису (частина могла прийти в іншій
+     валюті, 24.11.2026) і більше не перераховуємо, щоб «чекаємо» не плавало з курсом; старі записи — сума до
+     перерахунку (_fx.was) або сама сума */
+  function salWorkAmt(o){ if(o&&+o._salW>0) return +o._salW; const code=finCurCode(workCur); return (o&&o._fx&&o._fx.cur===code&&+o._fx.was>0)?+o._fx.was:(+(o&&o.amount)||0); }
   function salPartsIn(ym){ return (finOps||[]).filter(o=>o&&o.type==='in'&&o._salYM===ym&&(o._salPart===true||o._autoSal===true)).sort((a,b)=>String(a.date).localeCompare(String(b.date))); }
   function salState(ym){
     const ss=workSessionsIn(ym); let net=0; try{ net=extrasNet(ym); }catch(_){}
@@ -269,26 +271,45 @@
     const st=salState(ym), sym=CUR[workCur]||workCur, msym=CUR[mainCur()]||mainCur(), mn=WK_MONTHS[+ym.slice(5,7)-1];
     const envs=(Array.isArray(envelopes)?envelopes:[]).filter(e=>e&&!(typeof envCur==='function'&&envCur(e)));
     const td=ymdLocal();
+    // валюта частини: Роботи (типово) · головна · ті, що вже є в Гаманці
+    const wcode=finCurCode(workCur), mcode=mainCur();
+    let curs=[wcode,mcode]; try{ curs=curs.concat(wlCurList()); }catch(_){}
+    curs=[...new Set(curs.map(c=>finCurCode(c)))].filter(c=>curOk(c));
     jnOverlay(`<div class="jn-ed-h"><b>Прийшла зарплата</b><button data-jnx aria-label="Закрити">✕</button></div>
       <small class="dy-fm-sub">За ${esc(mn.toLowerCase())}: зароблено ${esc(fmt(st.earned))} ${esc(sym)} · прийшло ${esc(fmt(st.got+st.pushed))} · чекаємо ${esc(fmt(st.left))}</small>
-      <label class="jn-f"><span>Скільки прийшло, ${esc(sym)}</span><input id="salAmt" type="number" inputmode="decimal" min="0" step="any" value="${st.left>0?esc(String(st.left)):''}" placeholder="Напр. 5000"></label>
+      ${curs.length>1?`<div class="jn-f"><span>Валюта</span><div class="wl-chips" id="salCur">${curs.map(c=>`<button type="button" data-salcur="${esc(c)}"${c===wcode?' class="on"':''}>${esc(curSym(c))} ${esc(CUR_LIST[c].n)}${c===mcode?' · головна':''}</button>`).join('')}</div></div>`:''}
+      <label class="jn-f"><span id="salAmtLab">Скільки прийшло, ${esc(sym)}</span><input id="salAmt" type="number" inputmode="decimal" min="0" step="any" value="${st.left>0?esc(String(st.left)):''}" placeholder="Напр. 5000"></label>
+      <small class="sal-eq" id="salEq" aria-live="polite"></small>
       <label class="jn-f"><span>Коли</span><input id="salDate" type="date" value="${esc(td)}" max="${esc(td)}"></label>
       ${envs.length?`<div class="jn-f"><span>Одразу в конверти, ${esc(msym)} (необовʼязково)</span><div class="sal-envs">${envs.map(e=>{ const p=e.planned&&+e.planned[ym]>0?+e.planned[ym]:0;
         return `<label class="sal-env"><span>${esc(safeEmoji(e.emoji,'✉️'))} ${esc(String(e.name||'Конверт'))}${p?`<small>заплановано ${esc(fmt(p))}</small>`:''}</span><input type="number" inputmode="decimal" min="0" step="any" data-salenv="${esc(String(e.id))}" value="${p?esc(String(p)):''}" placeholder="0"></label>`; }).join('')}</div></div>`:''}
       <div class="jn-ed-foot"><button class="jn-btn" data-salok>Записати в Гаманець</button></div>`, ov=>{
+      let pc=wcode;   // валюта, у якій прийшла ця частина
+      // підказка: скільки це у валюті Роботи (за останнім курсом — точний курс спитаємо при записі)
+      const eqUpd=()=>{ const el=ov.querySelector('#salEq'); if(!el) return;
+        const v=parseFloat(String(ov.querySelector('#salAmt').value||'').replace(',','.'))||0;
+        if(pc===wcode||!(v>0)){ el.textContent=''; return; }
+        const toMain=pc===mcode?1:finLastRate(pc), wRate=wcode===mcode?1:finLastRate(wcode);
+        el.textContent=toMain>0&&wRate>0?'≈ '+fmt(Math.round(v*toMain/wRate*100)/100)+' '+sym+' із '+fmt(st.left)+' '+sym+' — за останнім курсом':'Курс спитаю, коли натиснеш «Записати»'; };
+      ov.querySelectorAll('[data-salcur]').forEach(b=>b.onclick=()=>{ pc=b.dataset.salcur;
+        ov.querySelectorAll('[data-salcur]').forEach(x=>x.classList.toggle('on',x===b));
+        const lab=ov.querySelector('#salAmtLab'); if(lab) lab.textContent='Скільки прийшло, '+curSym(pc); eqUpd(); });
+      ov.querySelector('#salAmt').addEventListener('input',eqUpd);
       ov.querySelector('[data-salok]').onclick=()=>{
         const amt=Math.round((parseFloat(String(ov.querySelector('#salAmt').value||'').replace(',','.'))||0)*100)/100;
         if(!(amt>0)){ ov.querySelector('#salAmt').focus(); return; }
         let date=String(ov.querySelector('#salDate').value||''); if(!/^\d{4}-\d\d-\d\d$/.test(date)||date>td) date=td;
         const put=[...ov.querySelectorAll('[data-salenv]')].map(i=>({e:envelopes.find(x=>String(x.id)===String(i.dataset.salenv)), v:Math.round((parseFloat(String(i.value||'').replace(',','.'))||0)*100)/100})).filter(x=>x.e&&x.v>0);
-        const code=finCurCode(workCur);
-        const go=rate=>{
+        const code=pc;
+        // rate — курс валюти частини до головної; rw — курс валюти Роботи до головної (лише щоб порахувати «прийшло»)
+        const go=(rate,rw)=>{
           const fx=finFx(amt, code, code===mainCur()?1:rate);
+          const salW=code===wcode?amt:(wcode===mcode?fx.amount:Math.round(fx.amount/rw*100)/100);
           const putSum=put.reduce((s,x)=>s+x.v,0);
           if(putSum>fx.amount+0.001){ flowAlert('У конверти більше ('+fmt(putSum)+' '+msym+'), ніж прийшло ('+fmt(fx.amount)+' '+msym+'). Нічого не записано.'); return; }
           const n=salPartsIn(ym).length;
           let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
-          const op=finOpFx({ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', label:'Зарплата · '+mn+' '+ym.slice(0,4)+(n?' · частина '+(n+1):''), date, card:_wc, _salPart:true, _salYM:ym, _mc:mainCur() }, amt, code, code===mainCur()?1:rate);
+          const op=finOpFx({ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', label:'Зарплата · '+mn+' '+ym.slice(0,4)+(n?' · частина '+(n+1):''), date, card:_wc, _salPart:true, _salYM:ym, _mc:mainCur(), _salW:salW }, amt, code, code===mainCur()?1:rate);
           // рядок «Зарплата» у Плані місяця стає ✓ (47-rules.js) — як було з автозаписом
           try{ const pl=typeof rlPlan==='function'?rlPlan(ym,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ym,r.id)); if(row) op.planId=row.id; }catch(_){}
           finOps.push(op); saveFinOps();
@@ -301,7 +322,10 @@
           try{ window.platform.haptic('success'); }catch(_){}
           try{ plToast('✓ Зарплата в Гаманці'+(put.length?' · у конверти '+fmt(put.reduce((s,x)=>s+x.v,0))+' '+msym:'')); }catch(_){}
         };
-        if(code===mainCur()) go(1); else finAskRate(code, r=>go(r));
+        // курс частини питаємо завжди (як Гаманець); курс Роботи — лише коли валюти різні й останнього курсу нема
+        const askW=cb=>{ if(wcode===mcode||code===wcode){ cb(1); return; } const r=finLastRate(wcode); if(r>0) cb(r); else finAskRate(wcode,cb); };
+        const askP=cb=>{ if(code===mcode) cb(1); else finAskRate(code,cb); };
+        askP(rate=>askW(rw=>go(rate,rw)));
       };
       setTimeout(()=>{ const i=ov.querySelector('#salAmt'); if(i){ i.focus(); i.select(); } },60);
     });

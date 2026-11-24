@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 102 |
-| Рядків JS | 41144 |
+| Рядків JS | 41168 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12810 |
+| Рядків CSS | 12811 |
 | Сутностей верхнього рівня | 3214 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
@@ -54,7 +54,7 @@
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
-| `src/scripts/core/20-work.js` | 580 | 56 |
+| `src/scripts/core/20-work.js` | 604 | 56 |
 | `src/scripts/core/21-patterns.js` | 34 | 6 |
 | `src/scripts/core/22-diary.js` | 589 | 62 |
 | `src/scripts/core/23-board.js` | 295 | 29 |
@@ -152,7 +152,7 @@
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
 | `src/styles/core/07-finance.css` | 590 | 0 |
-| `src/styles/core/08-work.css` | 262 | 0 |
+| `src/styles/core/08-work.css` | 263 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
 | `src/styles/core/11-spaces-desktop.css` | 221 | 0 |
@@ -1485,23 +1485,23 @@
 | `extraSave` | функція | `src/scripts/core/20-work.js:209` |
 | `delExtra` | функція | `src/scripts/core/20-work.js:225` |
 | `renderExtras` | функція | `src/scripts/core/20-work.js:226` |
-| `salWorkAmt` | функція | `src/scripts/core/20-work.js:253` |
-| `salPartsIn` | функція | `src/scripts/core/20-work.js:254` |
-| `salState` | функція | `src/scripts/core/20-work.js:255` |
-| `salGotSheet` | функція | `src/scripts/core/20-work.js:265` |
-| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:311` |
-| `allocMovedIn` | функція | `src/scripts/core/20-work.js:316` |
-| `allocSalOp` | функція | `src/scripts/core/20-work.js:318` |
-| `openAllocModal` | функція | `src/scripts/core/20-work.js:319` |
-| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:354` |
-| `allocSave` | функція | `src/scripts/core/20-work.js:365` |
-| `renderWork` | функція | `src/scripts/core/20-work.js:403` |
-| `workShiftMonth` | функція | `src/scripts/core/20-work.js:507` |
-| `salPushGuard` | функція | `src/scripts/core/20-work.js:516` |
-| `pushWorkBatch` | функція | `src/scripts/core/20-work.js:524` |
-| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:538` |
-| `delWork` | функція | `src/scripts/core/20-work.js:557` |
-| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:567` |
+| `salWorkAmt` | функція | `src/scripts/core/20-work.js:255` |
+| `salPartsIn` | функція | `src/scripts/core/20-work.js:256` |
+| `salState` | функція | `src/scripts/core/20-work.js:257` |
+| `salGotSheet` | функція | `src/scripts/core/20-work.js:267` |
+| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:335` |
+| `allocMovedIn` | функція | `src/scripts/core/20-work.js:340` |
+| `allocSalOp` | функція | `src/scripts/core/20-work.js:342` |
+| `openAllocModal` | функція | `src/scripts/core/20-work.js:343` |
+| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:378` |
+| `allocSave` | функція | `src/scripts/core/20-work.js:389` |
+| `renderWork` | функція | `src/scripts/core/20-work.js:427` |
+| `workShiftMonth` | функція | `src/scripts/core/20-work.js:531` |
+| `salPushGuard` | функція | `src/scripts/core/20-work.js:540` |
+| `pushWorkBatch` | функція | `src/scripts/core/20-work.js:548` |
+| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:562` |
+| `delWork` | функція | `src/scripts/core/20-work.js:581` |
+| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:591` |
 
 ### `src/scripts/core/21-patterns.js` — 6 сутностей
 
