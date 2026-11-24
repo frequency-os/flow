@@ -104,7 +104,7 @@
       if(!i) return b.id?wgPageTile(b,fk,'wide c-work',`${wgSettingsHead(b,'Робота','⏱ Робота')}<small>Дані про години недоступні</small>`):'';
       return wgPageTile(b,fk,'wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
         ${wgSettingsHead(b,'Робота','⏱ Робота · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase()))}<b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
-        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>
+        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплата прийшла':i.got>0?'прийшло '+esc(fmt(i.got))+' · чекаємо '+esc(fmt(i.left)):i.due?'чекаємо зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>
         ${b.id?'<span class="wg-acts one"><button data-wga="workadd">＋ Години</button></span>':''}`);   // на сторінці папки (є id блока) — запис годин на сьогодні; у Гаманці — без кнопки
     }
     if(t==='wgmoney'){

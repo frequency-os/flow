@@ -146,30 +146,28 @@
     const isCur=(yy===cY&&mm===cMN+1), isFuture=(yy>cY)||(yy===cY&&mm>cMN+1);
     const isPast=(yy<cY)||(yy===cY&&mm<cMN+1);
 
-    // статус: locked (очікується) / unlocked (отримана)
-    let status='locked';
-    if(monthEarned>0){
-      if(isFuture) status='locked';
-      else if(isCur) status = now.getDate()>=pday ? 'unlocked' : 'locked';
-      else if(isPast) status='unlocked';
-    }
-
-    if(box){ box.classList.toggle('paid', status==='unlocked'); }
+    // стан місяця: зароблено · прийшло · чекаємо (лише показ — у Гаманець тут нічого не пишеться)
+    const st=salState(workMonth);
+    if(box){ box.classList.toggle('paid', st.done); }
     const planned=workPlannedTotal(workMonth);
-    const planTxt = planned>0 ? ` · розподілено ${fmt(planned)} ${sym}, вільно ${fmt(Math.max(0,monthEarned-planned))} ${sym}` : '';
-    if(status==='unlocked'){
+    const came=st.got+st.pushed;
+    if(st.done){
       if(labEl) labEl.innerHTML='<span class="dot ok"></span>ЗАРПЛАТА ОТРИМАНА';
-      subEl.textContent=`Прийшла ${ds} · додано у фінанси`;
-      syncSalaryToFin(yy,mm,monthEarned,pday,sym);
+      subEl.textContent=`Прийшло ${fmt(came)} ${sym}`+(st.parts.length>1?` · ${st.parts.length} ${pluralUk(st.parts.length,'частина','частини','частин')}`:'');
     } else {
       const left = isCur ? (pday-now.getDate()) : null;
       if(labEl) labEl.innerHTML='<span class="dot"></span>ОЧІКУЄТЬСЯ ЗАРПЛАТА';
-      subEl.textContent=`${ds}${(left!==null&&left>=0)?` · через ${left} ${pluralDaysWk(left)}`:''}${planTxt||' · плануй конверти заздалегідь'}`;
+      subEl.textContent=`${ds}${(left!==null&&left>=0)?` · через ${left} ${pluralDaysWk(left)}`:''}`
+        +(came>0?` · прийшло ${fmt(came)}, чекаємо ${fmt(st.left)} ${sym}`:'')
+        +(planned>0?` · у конверти заплановано ${fmt(planned)} ${sym}`:(came>0?'':' · плануй конверти заздалегідь'));
     }
+    // «Прийшла зарплата» (24.11.2026) — у картці зарплати; кнопку додаємо раз (index.html не чіпаємо)
+    if(box&&!box.querySelector('#wkGotBtn')){ const gb=document.createElement('button'); gb.id='wkGotBtn'; gb.type='button'; gb.className='wk-got'; gb.textContent='＋ Прийшла зарплата';
+      gb.onclick=e=>{ e.stopPropagation(); salGotSheet(workMonth); }; box.appendChild(gb); }
   }
   function pluralDaysWk(n){const a=Math.abs(n)%100,b=a%10;if(a>=11&&a<=14)return'днів';if(b===1)return'день';if(b>=2&&b<=4)return'дні';return'днів';}
 
-  // автосинхронізація зарплати у finOps (один раз на місяць, без дублів)
+  // workPostedSal лишився для «Почати фінанси з нуля» (51-money-reset.js: 'deleted' — місяць обнулено)
   let workPostedSal={}; // 'YYYY-MM' -> 'posted'|'deleted'
   let workExtras=[];    // {id, ym, kind:'advance'|'bonus'|'expense', amount, note, date}
   const WKEXTRAKEY='work_extras';
@@ -244,89 +242,68 @@
     applyWkBlocks();
   }
 
-  function syncSalaryToFin(year,month,amount,pday,sym){
-    if(!amount||amount<=0) return;
-    if(window.storeKeyReady&&!['fin_ops','work_sessions','work_cfg',WKEXTRAKEY].every(key=>window.storeKeyReady(key))) return;
-    const ymKey=`${year}-${String(month).padStart(2,'0')}`;
-    if(workPostedSal[ymKey]==='deleted') return;
-    // місяць зарплати обнулено («Почати фінанси з нуля») — навіть якщо старий пристрій повернув work_cfg без позначки
-    try{ if(typeof finTombHas==='function'&&finTombHas('sal',ymKey)) return; }catch(_){}
-    const dim=new Date(year,month,0).getDate();
-    const txDate=`${year}-${String(month).padStart(2,'0')}-${String(Math.min(pday,dim)).padStart(2,'0')}`;
-    // Зарплата пишеться сама, без людини, — курс не питаємо. Раз записаний
-    // курс живе в самій операції (op._fx їде в хмару разом з fin_ops), тож
-    // пристрої рахують однаково і не перебивають одне одного. Перерахунок —
-    // лише коли змінилась зароблена сума чи валюта Роботи.
-    const code=finCurCode(workCur);
-    let op=finOps.find(o=>o._autoSal===true && o._salYM===ymKey);
-    // Віднімаємо лише прив’язані доходи, які досі є в Гаманці.
-    const incomes=new Map(finOps.filter(o=>o.type==='in'&&!o._autoSal&&!o._tr).map(o=>[String(o.id),o]));
-    let pushedAmt=0;
-    for(const w of workSessionsIn(ymKey)){
-      if(!w.pushed||!w.opId||finCurCode(w.cur)!==code) continue;
-      const income=incomes.get(String(w.opId));
-      if(!income) continue;
-      incomes.delete(String(w.opId));
-      if(income._fx?.cur===code&&+income._fx.rate>0) pushedAmt+=Math.max(0,(+income.amount||0)/income._fx.rate);
-      else if(code===finCurCode(income.cur||mainCur())) pushedAmt+=Math.max(0,+income.amount||0);
-      else pushedAmt+=Math.max(0,+w.amount||0);
-    }
-    amount=Math.max(0,Math.round((amount-pushedAmt)*100)/100);
-    // перевірка «є що писати» — ПІСЛЯ віднімання: усі зміни вже в Гаманці окремо → «Зарплати · … 0 ₴» не пишемо (23.11.2026)
-    if(!(amount>0)) return;
-    const frozen=(op&&op._fx&&op._fx.cur===code&&+op._fx.rate>0)?+op._fx.rate:0;
-    const fx=finFx(amount, code, code===mainCur()?1:(frozen||finLastRate(code)));
-    const label='Зарплата · '+WK_MONTHS[month-1]+' '+year+fx.tail;
-    const autoSave=fn=>{ if(window.storeAuto) window.storeAuto(fn); else fn(); };
-    if(op){
-      // записано при іншій головній валюті (старі — у ₴) — не перераховуємо: заморожений курс і суму не чіпаємо
-      if((op._mc||'UAH')!==mainCur()) return;
-      const fxSame=JSON.stringify(op._fx||null)===JSON.stringify(fx.fx);
-      if(op.amount!==fx.amount || op.date!==txDate || !fxSame){   // підпис сам по собі не чіпаємо
-        op.amount=fx.amount; op.date=txDate; op.label=label;
-        if(fx.fx) op._fx=fx.fx; else delete op._fx;
-        autoSave(()=>saveFinOps());
-      }
-      // НЕ переливаємо тут: переливання — лише в мить першого запису зарплати (нижче). Інакше другий пристрій
-      // зі старими envelopes/work_cfg переливав би вдруге, і з Гаманця списувалось двічі (23.11.2026)
-      return;
-    }
-    let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
-    // _amt0 — сума в мить запису: якщо після виплати додались години, блок «Робота» покаже «Доплата» (67-work-panel.js)
-    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc, _mc:mainCur(), _amt0:fx.amount };
-    // у Плані місяця є рядок «Зарплата» — привʼязуємо, щоб він став ✓, а не висів відкритим поруч із записаною зарплатою (47-rules.js)
-    try{ const pl=typeof rlPlan==='function'?rlPlan(ymKey,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ymKey,r.id)); if(row) op.planId=row.id; }catch(_){}
-    if(fx.fx) op._fx=fx.fx;
-    finOps.push(op); workPostedSal[ymKey]='posted'; autoSave(()=>{ saveFinOps(); saveWork(); });
-    // коли зарплата прийшла — перелити заплановане у конверти
-    transferPlannedToEnvelopes(ymKey);
-    try{ renderFinance(); }catch(_){}
+  /* ════════ Зарплата частинами (24.11.2026) ════════
+     Гроші в Гаманець приходять ЛИШЕ тапом людини «Прийшла зарплата»: сума, дата, за який місяць і що одразу
+     покласти в конверти. Частин за місяць — скільки завгодно. Автозапис у день виплати прибрано: він сам
+     дописував fin_ops при відкритті Роботи і давав подвійний дохід зі змінами «→ у фінанси».
+     Частина = звичайний дохід у fin_ops з _salPart:true і _salYM:'РРРР-ММ' (нового ключа нема, міграції нема).
+     Старі автозаписи (_autoSal) лишаються як є і рахуються як «прийшло» за свій місяць.
+     Зміни «→ у фінанси» теж «прийшли» — але лише поки їхній запис справді є в Гаманці (видалили там — чекаємо знову). */
+  // сума операції у валюті Роботи: для запису з курсом — сума до перерахунку
+  function salWorkAmt(o){ const code=finCurCode(workCur); return (o&&o._fx&&o._fx.cur===code&&+o._fx.was>0)?+o._fx.was:(+(o&&o.amount)||0); }
+  function salPartsIn(ym){ return (finOps||[]).filter(o=>o&&o.type==='in'&&o._salYM===ym&&(o._salPart===true||o._autoSal===true)).sort((a,b)=>String(a.date).localeCompare(String(b.date))); }
+  function salState(ym){
+    const ss=workSessionsIn(ym); let net=0; try{ net=extrasNet(ym); }catch(_){}
+    const earned=Math.round((ss.reduce((s,w)=>s+(+w.amount||0),0)+net)*100)/100;
+    const ids=new Set((finOps||[]).map(o=>String(o&&o.id)));
+    const pushed=ss.filter(w=>w.pushed&&w.opId&&ids.has(String(w.opId))).reduce((s,w)=>s+(+w.amount||0),0);
+    const parts=salPartsIn(ym), got=Math.round(parts.reduce((s,o)=>s+salWorkAmt(o),0)*100)/100;
+    const left=Math.max(0,Math.round((earned-pushed-got)*100)/100);
+    return {earned, pushed, got, parts, left, done:earned>0&&left<0.5};
   }
-
-  // переказ запланованого з конвертів у saved (один раз на місяць)
-  function transferPlannedToEnvelopes(ymKey){
-    if(!Array.isArray(envelopes) || !envelopes.length) return;
-    if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))) return;
-    if(!workPostedSal) workPostedSal={};
-    if(workPostedSal['planDone:'+ymKey]==='1') return;
-    const total=envelopes.reduce((sum,e)=>sum+(!envCur(e)?Math.max(0,+e.planned?.[ymKey]||0):0),0);
-    if(total<=0||total>Math.max(0,curFree(''))+1e-9) return;
-    let moved=false;
-    // це робить програма, а не людина — storeAuto, щоб синк не вважав переливання ручною правкою (23.11.2026)
-    const run=fn=>{ if(window.storeAuto) window.storeAuto(fn); else fn(); };
-    run(()=>{
-      envelopes.forEach(e=>{
-        if(typeof envCur==='function'&&envCur(e)) return;   // €-конверт: заплановане в гривнях не переносимо сам (етап 3 валют)
-        const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
-        if(p>0){
-          // у конверті вже є рух «Із зарплати» за цей місяць — не дублюємо, лише прибираємо план
-          if(allocMovedIn(e,ymKey)>0){ delete e.planned[ymKey]; moved=true; return; }
-          if(typeof envAddOp==='function'){ let _wc2; try{ ensureCards(); _wc2=workCard().id; }catch(_){} envAddOp(e,'in',p,'Із зарплати ('+ymKey+')',_wc2); }
-          else { e.saved=(+e.saved||0)+p; }
-          delete e.planned[ymKey]; moved=true;
-        }
-      });
-      if(moved){ workPostedSal['planDone:'+ymKey]='1'; saveEnvelopes(); saveWork(); }
+  /* шторка «Прийшла зарплата» (тап людини) */
+  function salGotSheet(ym){
+    ym=/^\d{4}-\d\d$/.test(String(ym||''))?ym:workMonth;
+    // поки Гаманець не звірився з хмарою — не пишемо: «чекаємо» було б хибним, а поповнення конверта програло б хмарній копії
+    if(window.storeKeyReady&&!['fin_ops',ENVKEY,WORKKEY,'fin_tomb'].every(k=>window.storeKeyReady(k))){ try{ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); }catch(_){} return; }
+    const st=salState(ym), sym=CUR[workCur]||workCur, msym=CUR[mainCur()]||mainCur(), mn=WK_MONTHS[+ym.slice(5,7)-1];
+    const envs=(Array.isArray(envelopes)?envelopes:[]).filter(e=>e&&!(typeof envCur==='function'&&envCur(e)));
+    const td=ymdLocal();
+    jnOverlay(`<div class="jn-ed-h"><b>Прийшла зарплата</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">За ${esc(mn.toLowerCase())}: зароблено ${esc(fmt(st.earned))} ${esc(sym)} · прийшло ${esc(fmt(st.got+st.pushed))} · чекаємо ${esc(fmt(st.left))}</small>
+      <label class="jn-f"><span>Скільки прийшло, ${esc(sym)}</span><input id="salAmt" type="number" inputmode="decimal" min="0" step="any" value="${st.left>0?esc(String(st.left)):''}" placeholder="Напр. 5000"></label>
+      <label class="jn-f"><span>Коли</span><input id="salDate" type="date" value="${esc(td)}" max="${esc(td)}"></label>
+      ${envs.length?`<div class="jn-f"><span>Одразу в конверти, ${esc(msym)} (необовʼязково)</span><div class="sal-envs">${envs.map(e=>{ const p=e.planned&&+e.planned[ym]>0?+e.planned[ym]:0;
+        return `<label class="sal-env"><span>${esc(safeEmoji(e.emoji,'✉️'))} ${esc(String(e.name||'Конверт'))}${p?`<small>заплановано ${esc(fmt(p))}</small>`:''}</span><input type="number" inputmode="decimal" min="0" step="any" data-salenv="${esc(String(e.id))}" value="${p?esc(String(p)):''}" placeholder="0"></label>`; }).join('')}</div></div>`:''}
+      <div class="jn-ed-foot"><button class="jn-btn" data-salok>Записати в Гаманець</button></div>`, ov=>{
+      ov.querySelector('[data-salok]').onclick=()=>{
+        const amt=Math.round((parseFloat(String(ov.querySelector('#salAmt').value||'').replace(',','.'))||0)*100)/100;
+        if(!(amt>0)){ ov.querySelector('#salAmt').focus(); return; }
+        let date=String(ov.querySelector('#salDate').value||''); if(!/^\d{4}-\d\d-\d\d$/.test(date)||date>td) date=td;
+        const put=[...ov.querySelectorAll('[data-salenv]')].map(i=>({e:envelopes.find(x=>String(x.id)===String(i.dataset.salenv)), v:Math.round((parseFloat(String(i.value||'').replace(',','.'))||0)*100)/100})).filter(x=>x.e&&x.v>0);
+        const code=finCurCode(workCur);
+        const go=rate=>{
+          const fx=finFx(amt, code, code===mainCur()?1:rate);
+          const putSum=put.reduce((s,x)=>s+x.v,0);
+          if(putSum>fx.amount+0.001){ flowAlert('У конверти більше ('+fmt(putSum)+' '+msym+'), ніж прийшло ('+fmt(fx.amount)+' '+msym+'). Нічого не записано.'); return; }
+          const n=salPartsIn(ym).length;
+          let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
+          const op=finOpFx({ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', label:'Зарплата · '+mn+' '+ym.slice(0,4)+(n?' · частина '+(n+1):''), date, card:_wc, _salPart:true, _salYM:ym, _mc:mainCur() }, amt, code, code===mainCur()?1:rate);
+          // рядок «Зарплата» у Плані місяця стає ✓ (47-rules.js) — як було з автозаписом
+          try{ const pl=typeof rlPlan==='function'?rlPlan(ym,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ym,r.id)); if(row) op.planId=row.id; }catch(_){}
+          finOps.push(op); saveFinOps();
+          try{ finTombMarkSal(ym); }catch(_){}   // стара версія застосунку з автозаписом пропустить цей місяць (51-money-reset.js)
+          put.forEach(x=>{ if(typeof envAddOp==='function') envAddOp(x.e,'in',x.v,'Із зарплати ('+ym+')',_wc);
+            if(x.e.planned&&+x.e.planned[ym]>0){ const r=Math.round((+x.e.planned[ym]-x.v)*100)/100; if(r>0) x.e.planned[ym]=r; else delete x.e.planned[ym]; } });
+          if(put.length) saveEnvelopes();
+          ov.remove();
+          renderWork(); try{ renderFinance(); }catch(_){} try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}
+          try{ window.platform.haptic('success'); }catch(_){}
+          try{ plToast('✓ Зарплата в Гаманці'+(put.length?' · у конверти '+fmt(put.reduce((s,x)=>s+x.v,0))+' '+msym:'')); }catch(_){}
+        };
+        if(code===mainCur()) go(1); else finAskRate(code, r=>go(r));
+      };
+      setTimeout(()=>{ const i=ov.querySelector('#salAmt'); if(i){ i.focus(); i.select(); } },60);
     });
   }
 
@@ -337,7 +314,8 @@
   }
   // скільки зарплати місяця вже лягло в конверт (рух «Із зарплати (РРРР-ММ)» — transferPlannedToEnvelopes / allocSave)
   function allocMovedIn(e,ymKey){ const lbl='Із зарплати ('+ymKey+')'; return (Array.isArray(e.ops)?e.ops:[]).filter(o=>o&&o.t==='in'&&o.label===lbl).reduce((s,o)=>s+(+o.amount||0),0); }
-  function allocSalOp(ymKey){ return (finOps||[]).find(o=>o&&o._autoSal===true&&o._salYM===ymKey)||null; }
+  // зарплата за місяць уже приходила (частина «Прийшла зарплата» чи старий автозапис) — розподіл іде в конверти одразу
+  function allocSalOp(ymKey){ return (finOps||[]).find(o=>o&&o.type==='in'&&o._salYM===ymKey&&(o._salPart===true||o._autoSal===true))||null; }
   function openAllocModal(){
     const sym=CUR[workCur]||workCur;
     let me=workSessionsIn(workMonth).reduce((s,w)=>s+(+w.amount||0),0);
@@ -412,7 +390,6 @@
       }
       else if(v>0) e.planned[ymKey]=v; else delete e.planned[ymKey];
     });
-    if(sal&&sal._amt0!=null&&sal._amt0!==sal.amount){ sal._amt0=sal.amount; saveFinOps(); }   // доплату розглянуто — більше не показуємо
     saveEnvelopes();
     document.getElementById('allocBack').classList.remove('on');
     renderWork(); try{ renderFinance(); }catch(_){}
@@ -534,8 +511,18 @@
   { const p=document.getElementById('wkCalPrev'); if(p) p.onclick=()=>workShiftMonth(-1); }
   { const n=document.getElementById('wkCalNext'); if(n) n.onclick=()=>workShiftMonth(1); }
 
+  /* зарплату за місяць уже внесено «Прийшла зарплата» — окремий запис зміни «→ у фінанси» подвоїв би дохід (24.11.2026):
+     питаємо людину; зміни, що вміщаються в «чекаємо», проходять без питань */
+  function salPushGuard(list, go){
+    const by={}; list.forEach(w=>{ const ym=String(w.date).slice(0,7); by[ym]=(by[ym]||0)+(+w.amount||0); });
+    const over=Object.keys(by).find(ym=>{ const st=salState(ym); return st.got>0&&by[ym]>st.left+0.5; });
+    if(!over){ go(); return; }
+    confirmSheet({ title:'Зарплату за '+WK_MONTHS[+over.slice(5,7)-1].toLowerCase()+' вже записано', ic:'wallet', okLabel:'Все одно записати',
+      sub:'Ці години вже входять у зарплату, що прийшла. Окремий запис порахує той самий дохід двічі.', onOk:go });
+  }
   // пачка змін: курс кожної чужої валюти питаємо ОДИН раз, а не на кожну зміну
-  function pushWorkBatch(list){
+  function pushWorkBatch(list, _ok){
+    if(!_ok){ salPushGuard(list,()=>pushWorkBatch(list,true)); return; }
     const need=[...new Set(list.map(w=>finCurCode(w.cur)).filter(c=>c!==mainCur()))];
     const rates={};
     const next=()=>{
@@ -551,6 +538,7 @@
   function pushWorkToFin(id, batch, rates){
     const w=workSessions.find(x=>String(x.id)===String(id));
     if(!w || w.pushed) return;
+    if(!batch&&!(rates&&rates.__ok)){ salPushGuard([w],()=>pushWorkToFin(id,batch,Object.assign({},rates,{__ok:1}))); return; }   // пачку перевіряє pushWorkBatch
     const code=finCurCode(w.cur);
     if(code!==mainCur() && !(rates&&rates[code]>0)){
       finAskRate(code, r=>pushWorkToFin(id, batch, Object.assign({}, rates, {[code]:r})));

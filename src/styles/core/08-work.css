@@ -240,10 +240,23 @@
   .wkp-empty{margin:0;font-size:13.5px;line-height:1.45;color:var(--muted);}
   .wkp-acts{display:flex;gap:8px;}
   .wkp .wkp-acts button{flex:1;min-height:44px;border-radius:12px;background:rgba(127,127,127,.1);font-weight:700;font-size:13.5px;display:grid;place-items:center;text-align:center;padding:0 8px;}
-  .wkp-extra{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:18px;background:rgba(139,124,255,.12);border:1px solid rgba(139,124,255,.35);}
-  .wkp-ex-ic{width:36px;height:36px;flex:none;border-radius:12px;display:grid;place-items:center;background:rgba(139,124,255,.22);color:var(--accent);font-weight:800;}
-  .wkp-ex-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;} .wkp-ex-t b{font-size:14px;font-weight:800;} .wkp-ex-t small{font-size:12px;color:var(--muted);}
-  .wkp .wkp-extra button{min-height:44px;padding:0 14px;border-radius:12px;background:var(--accent);color:#0b0820;font-weight:800;font-size:13.5px;display:grid;place-items:center;}
+  /* зарплата частинами (24.11.2026) */
+  .wkp-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+  .wkp-sum span{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .wkp-sum small{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .wkp-sum b{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wkp-sum b.ok{color:#1f9d5c;}
+  .wkp-row .dot.ok{background:#34c77b;}
+  .wkp .wkp-main.got{background:#34c77b;color:#04140b;}
+  .sal-envs{display:flex;flex-direction:column;gap:8px;}
+  .sal-env{display:flex;align-items:center;gap:10px;}
+  .sal-env>span{flex:1;min-width:0;display:flex;flex-direction:column;font-weight:700;font-size:14px;}
+  .sal-env>span small{font-size:12px;font-weight:600;color:var(--muted);}
+  .jn-ed .sal-env input:not([type="checkbox"]){width:120px;flex:0 0 120px;}   /* сильніше за .jn-ed input{width:100%} — інакше назва конверта сплющується */
+  .wk-salary .wk-got{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;width:100%;min-height:46px;margin-top:12px;border-radius:14px;
+    background:#34c77b;color:#04140b;font:800 15px Manrope;}
+  .wk-salary .wk-got:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  html:not(.t-light) .wkp-sum b.ok{color:#6fe0a5;}
   html:not(.t-light) .wkp-st.sal b,html:not(.t-light) .wkp-d.on b{color:#8fb4ff;}
   html:not(.t-light) .wkp-st.env b,html:not(.t-light) .wkp-d.pay b{color:#ffcf6b;}
   html:not(.t-light) .wkp-st span.wkp-free{color:#6fe0a5;}

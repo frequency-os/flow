@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 102 |
-| Рядків JS | 41129 |
+| Рядків JS | 41144 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12797 |
-| Сутностей верхнього рівня | 3210 |
+| Рядків CSS | 12810 |
+| Сутностей верхнього рівня | 3214 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -54,7 +54,7 @@
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
 | `src/scripts/core/18-debts.js` | 248 | 19 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
-| `src/scripts/core/20-work.js` | 592 | 53 |
+| `src/scripts/core/20-work.js` | 580 | 56 |
 | `src/scripts/core/21-patterns.js` | 34 | 6 |
 | `src/scripts/core/22-diary.js` | 589 | 62 |
 | `src/scripts/core/23-board.js` | 295 | 29 |
@@ -84,7 +84,7 @@
 | `src/scripts/core/49-calendar.js` | 310 | 36 |
 | `src/scripts/core/49-finlit.js` | 150 | 18 |
 | `src/scripts/core/50-quickadd.js` | 65 | 5 |
-| `src/scripts/core/51-money-reset.js` | 132 | 15 |
+| `src/scripts/core/51-money-reset.js` | 147 | 16 |
 | `src/scripts/core/52-fresh-start.js` | 214 | 29 |
 | `src/scripts/core/53-starter.js` | 178 | 22 |
 | `src/scripts/core/54-intro.js` | 131 | 13 |
@@ -101,7 +101,7 @@
 | `src/scripts/core/64-rich-text.js` | 196 | 23 |
 | `src/scripts/core/65-plan.js` | 365 | 58 |
 | `src/scripts/core/66-year-planner.js` | 1057 | 119 |
-| `src/scripts/core/67-work-panel.js` | 77 | 9 |
+| `src/scripts/core/67-work-panel.js` | 89 | 9 |
 | `src/scripts/page-editor/01-palette.js` | 194 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 892 | 62 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1187 | 60 |
@@ -152,7 +152,7 @@
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
 | `src/styles/core/07-finance.css` | 590 | 0 |
-| `src/styles/core/08-work.css` | 249 | 0 |
+| `src/styles/core/08-work.css` | 262 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
 | `src/styles/core/11-spaces-desktop.css` | 221 | 0 |
@@ -1442,7 +1442,7 @@
 | `exportSpend` | функція | `src/scripts/core/19-spending.js:126` |
 | `clearSpend` | функція | `src/scripts/core/19-spending.js:135` |
 
-### `src/scripts/core/20-work.js` — 53 сутностей
+### `src/scripts/core/20-work.js` — 56 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1468,37 +1468,40 @@
 | `ymOffset` | функція | `src/scripts/core/20-work.js:113` |
 | `renderWorkMonthStrip` | функція | `src/scripts/core/20-work.js:119` |
 | `renderWorkSalary` | функція | `src/scripts/core/20-work.js:135` |
-| `pluralDaysWk` | функція | `src/scripts/core/20-work.js:170` |
-| `workPostedSal` | обʼєкт | `src/scripts/core/20-work.js:173` |
-| `workExtras` | масив | `src/scripts/core/20-work.js:174` |
-| `WKEXTRAKEY` | значення | `src/scripts/core/20-work.js:175` |
-| `wkBlocks` | обʼєкт | `src/scripts/core/20-work.js:177` |
-| `WKBLKKEY` | значення | `src/scripts/core/20-work.js:178` |
-| `saveWkBlocks` | функція | `src/scripts/core/20-work.js:179` |
-| `applyWkBlocks` | функція | `src/scripts/core/20-work.js:180` |
-| `saveExtras` | функція | `src/scripts/core/20-work.js:191` |
-| `EXTRA_META` | обʼєкт | `src/scripts/core/20-work.js:192` |
-| `extrasIn` | функція | `src/scripts/core/20-work.js:193` |
-| `extrasNet` | функція | `src/scripts/core/20-work.js:194` |
-| `extraKind` | значення | `src/scripts/core/20-work.js:195` |
-| `addExtra` | функція | `src/scripts/core/20-work.js:196` |
-| `extraSave` | функція | `src/scripts/core/20-work.js:211` |
-| `delExtra` | функція | `src/scripts/core/20-work.js:227` |
-| `renderExtras` | функція | `src/scripts/core/20-work.js:228` |
-| `syncSalaryToFin` | функція | `src/scripts/core/20-work.js:247` |
-| `transferPlannedToEnvelopes` | функція | `src/scripts/core/20-work.js:307` |
-| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:334` |
-| `allocMovedIn` | функція | `src/scripts/core/20-work.js:339` |
-| `allocSalOp` | функція | `src/scripts/core/20-work.js:340` |
-| `openAllocModal` | функція | `src/scripts/core/20-work.js:341` |
-| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:376` |
-| `allocSave` | функція | `src/scripts/core/20-work.js:387` |
-| `renderWork` | функція | `src/scripts/core/20-work.js:426` |
-| `workShiftMonth` | функція | `src/scripts/core/20-work.js:530` |
-| `pushWorkBatch` | функція | `src/scripts/core/20-work.js:538` |
-| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:551` |
-| `delWork` | функція | `src/scripts/core/20-work.js:569` |
-| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:579` |
+| `pluralDaysWk` | функція | `src/scripts/core/20-work.js:168` |
+| `workPostedSal` | обʼєкт | `src/scripts/core/20-work.js:171` |
+| `workExtras` | масив | `src/scripts/core/20-work.js:172` |
+| `WKEXTRAKEY` | значення | `src/scripts/core/20-work.js:173` |
+| `wkBlocks` | обʼєкт | `src/scripts/core/20-work.js:175` |
+| `WKBLKKEY` | значення | `src/scripts/core/20-work.js:176` |
+| `saveWkBlocks` | функція | `src/scripts/core/20-work.js:177` |
+| `applyWkBlocks` | функція | `src/scripts/core/20-work.js:178` |
+| `saveExtras` | функція | `src/scripts/core/20-work.js:189` |
+| `EXTRA_META` | обʼєкт | `src/scripts/core/20-work.js:190` |
+| `extrasIn` | функція | `src/scripts/core/20-work.js:191` |
+| `extrasNet` | функція | `src/scripts/core/20-work.js:192` |
+| `extraKind` | значення | `src/scripts/core/20-work.js:193` |
+| `addExtra` | функція | `src/scripts/core/20-work.js:194` |
+| `extraSave` | функція | `src/scripts/core/20-work.js:209` |
+| `delExtra` | функція | `src/scripts/core/20-work.js:225` |
+| `renderExtras` | функція | `src/scripts/core/20-work.js:226` |
+| `salWorkAmt` | функція | `src/scripts/core/20-work.js:253` |
+| `salPartsIn` | функція | `src/scripts/core/20-work.js:254` |
+| `salState` | функція | `src/scripts/core/20-work.js:255` |
+| `salGotSheet` | функція | `src/scripts/core/20-work.js:265` |
+| `workPlannedTotal` | функція | `src/scripts/core/20-work.js:311` |
+| `allocMovedIn` | функція | `src/scripts/core/20-work.js:316` |
+| `allocSalOp` | функція | `src/scripts/core/20-work.js:318` |
+| `openAllocModal` | функція | `src/scripts/core/20-work.js:319` |
+| `allocUpdateSummary` | функція | `src/scripts/core/20-work.js:354` |
+| `allocSave` | функція | `src/scripts/core/20-work.js:365` |
+| `renderWork` | функція | `src/scripts/core/20-work.js:403` |
+| `workShiftMonth` | функція | `src/scripts/core/20-work.js:507` |
+| `salPushGuard` | функція | `src/scripts/core/20-work.js:516` |
+| `pushWorkBatch` | функція | `src/scripts/core/20-work.js:524` |
+| `pushWorkToFin` | функція | `src/scripts/core/20-work.js:538` |
+| `delWork` | функція | `src/scripts/core/20-work.js:557` |
+| `clearWorkMonth` | функція | `src/scripts/core/20-work.js:567` |
 
 ### `src/scripts/core/21-patterns.js` — 6 сутностей
 
@@ -2665,25 +2668,26 @@
 | `qaRun` | функція | `src/scripts/core/50-quickadd.js:30` |
 | `qaGuide` | функція | `src/scripts/core/50-quickadd.js:50` |
 
-### `src/scripts/core/51-money-reset.js` — 15 сутностей
+### `src/scripts/core/51-money-reset.js` — 16 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
-| `wkMoneyInfo` | функція | `src/scripts/core/51-money-reset.js:11` |
-| `wkExpectedMain` | функція | `src/scripts/core/51-money-reset.js:28` |
-| `wkPlanRowHTML` | функція | `src/scripts/core/51-money-reset.js:35` |
-| `wkPlanBind` | функція | `src/scripts/core/51-money-reset.js:40` |
-| `finResetScan` | функція | `src/scripts/core/51-money-reset.js:43` |
-| `finResetReady` | функція | `src/scripts/core/51-money-reset.js:50` |
-| `finResetAll` | функція | `src/scripts/core/51-money-reset.js:55` |
-| `FIN_TOMB_KINDS` | масив | `src/scripts/core/51-money-reset.js:90` |
-| `window.finTombReset` | функція | `src/scripts/core/51-money-reset.js:92` |
-| `finTombNorm` | функція | `src/scripts/core/51-money-reset.js:94` |
-| `finTombGet` | функція | `src/scripts/core/51-money-reset.js:99` |
-| `finTombHas` | функція | `src/scripts/core/51-money-reset.js:100` |
-| `finTombApply` | функція | `src/scripts/core/51-money-reset.js:105` |
-| `finTombLoad` | функція | `src/scripts/core/51-money-reset.js:115` |
-| `finTombAdd` | функція | `src/scripts/core/51-money-reset.js:122` |
+| `wkMoneyInfo` | функція | `src/scripts/core/51-money-reset.js:12` |
+| `wkExpectedMain` | функція | `src/scripts/core/51-money-reset.js:32` |
+| `wkPlanRowHTML` | функція | `src/scripts/core/51-money-reset.js:39` |
+| `wkPlanBind` | функція | `src/scripts/core/51-money-reset.js:44` |
+| `finResetScan` | функція | `src/scripts/core/51-money-reset.js:47` |
+| `finResetReady` | функція | `src/scripts/core/51-money-reset.js:54` |
+| `finResetAll` | функція | `src/scripts/core/51-money-reset.js:59` |
+| `FIN_TOMB_KINDS` | масив | `src/scripts/core/51-money-reset.js:94` |
+| `window.finTombReset` | функція | `src/scripts/core/51-money-reset.js:96` |
+| `finTombNorm` | функція | `src/scripts/core/51-money-reset.js:98` |
+| `finTombGet` | функція | `src/scripts/core/51-money-reset.js:103` |
+| `finTombHas` | функція | `src/scripts/core/51-money-reset.js:104` |
+| `finTombApply` | функція | `src/scripts/core/51-money-reset.js:109` |
+| `finTombLoad` | функція | `src/scripts/core/51-money-reset.js:119` |
+| `finTombAdd` | функція | `src/scripts/core/51-money-reset.js:126` |
+| `finTombMarkSal` | функція | `src/scripts/core/51-money-reset.js:140` |
 
 ### `src/scripts/core/52-fresh-start.js` — 29 сутностей
 
@@ -3351,7 +3355,7 @@
 | `wkpEnvRows` | функція | `src/scripts/core/67-work-panel.js:16` |
 | `wkpCalHTML` | функція | `src/scripts/core/67-work-panel.js:21` |
 | `wkPanelHTML` | функція | `src/scripts/core/67-work-panel.js:34` |
-| `wkpAct` | функція | `src/scripts/core/67-work-panel.js:70` |
+| `wkpAct` | функція | `src/scripts/core/67-work-panel.js:81` |
 
 ### `src/scripts/page-editor/01-palette.js` — 17 сутностей
 

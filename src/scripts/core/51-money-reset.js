@@ -1,7 +1,8 @@
   /* ════════ Робота ↔ Гаманець і «Почати фінанси з нуля» (51-money-reset.js, 10.10.2026) ════════
      1) wkMoneyInfo(ym) — лише ЧИТАННЯ календаря Роботи (20-work.js): години, зароблено (зміни + аванси/премії),
-        день виплати, чи зарплату вже записано (op._autoSal з _salYM). Записує зарплату, як і раніше, сама Робота
-        (syncSalaryToFin) — тут нічого не пишеться.
+        день виплати, скільки зарплати вже прийшло (salState: частини _salPart, старі автозаписи _autoSal,
+        зміни «→ у фінанси») і скільки ще чекаємо. Записує зарплату лише людина — «Прийшла зарплата»
+        (20-work.js salGotSheet, з 24.11.2026; автозапису більше нема) — тут нічого не пишеться.
         Використання: плитка «⏱ Робота» в Гаманці (48-widgets.js), рядок «Очікується з Роботи» у Плані й прогнозі (47-rules.js).
      2) finResetScan / finResetAll — «Ще → Дані → Почати фінанси з нуля»: лише за тапом людини, після підтвердження
         й лише коли fin_ops / конверти / goals_data звірені з хмарою. Стирає ГРОШІ: операції Гаманця, конверти й
@@ -18,11 +19,14 @@
     const pday=Math.min(Math.max(parseInt(workPayday)||dim,1),dim);
     const sal=(finOps||[]).find(o=>o&&o._autoSal===true&&o._salYM===ym)||null;
     let cur=''; try{ const c=finCurCode(workCur); cur=c&&curOk(c)&&c!==mainCur()?c:''; }catch(_){}
-    const left=sal?0:Math.max(0,Math.round((earned-pushed)*100)/100);
+    // зарплата частинами (20-work.js salState): «прийшло» = частини + старі автозаписи + зміни «→ у фінанси», що ще є в Гаманці
+    let st=null; try{ st=typeof salState==='function'?salState(ym):null; }catch(_){}
+    const left=st?st.left:(sal?0:Math.max(0,Math.round((earned-pushed)*100)/100));
+
     const td=ymdLocal(), due=ym<td.slice(0,7)||(ym===td.slice(0,7)&&+td.slice(8,10)>=pday);   // день виплати вже настав
     // зарплату цього місяця видалено руками чи обнулено фінанси — Робота її не запише, тож і не «очікуємо»
     let skip=false; try{ skip=!sal&&workPostedSal&&workPostedSal[ym]==='deleted'; }catch(_){}
-    return {ym, hours, earned, pday, paid:!!sal, salOp:sal, cur, left:skip?0:left, due, skip, has:!skip&&(ss.length>0||Math.abs(net)>0)};
+    return {ym, hours, earned, pday, paid:st?st.done:!!sal, salOp:sal, got:st?Math.round((st.got+st.pushed)*100)/100:0, cur, left:skip?0:left, due, skip, has:!skip&&(ss.length>0||Math.abs(net)>0)};
   }
   // очікувана зарплата в головній валюті (для прогнозу Плану): Робота в €, зарплата пишеться в ₴ за курсом — так само рахуємо
   function wkExpectedMain(ym){
@@ -127,6 +131,17 @@
     try{ const pl=jnHero().plan||{}; add('plan',Object.values(pl).flatMap(p=>p&&typeof p==='object'?[].concat(p.in||[],p.out||[]):[]).map(r=>r&&r.id)); }catch(_){}
     try{ add('sal',Object.keys(workPostedSal||{}).filter(ym=>/^\d{4}-\d{2}$/.test(ym)&&workPostedSal[ym]==='deleted')); }catch(_){}
     t.at=new Date().toISOString(); delete t._s;
+    const out={at:t.at}; FIN_TOMB_KINDS.forEach(k=>{ out[k]=t[k]; });
+    try{ const q=window.storage.set('fin_tomb',JSON.stringify(out),false); if(q&&q.catch)q.catch(()=>{}); }catch(_){}
+  }  /* Зарплата частинами (24.11.2026): місяць, за який людина вже натиснула «Прийшла зарплата», кладемо в sal —
+     СТАРА версія застосунку (Mac/телефон до оновлення, ще з автозаписом) перевіряє finTombHas('sal',ym) і тоді
+     не допише зарплату поверх частин. Нова версія sal не читає (у finTombApply його нема) — нічого не ховається.
+     Лише тапом людини (з salGotSheet) і лише коли fin_tomb прочитано: інакше запис затер би надгробки з хмари. */
+  function finTombMarkSal(ym){
+    if(!/^\d{4}-\d{2}$/.test(String(ym||''))) return;
+    if(window.storeKeyReady&&!window.storeKeyReady('fin_tomb')) return;
+    if(finTombHas('sal',ym)) return;
+    const t=finTombGet(); t.sal=[...new Set([...(t.sal||[]),ym])].slice(-FIN_TOMB_CAP); delete t._s; t.at=new Date().toISOString();
     const out={at:t.at}; FIN_TOMB_KINDS.forEach(k=>{ out[k]=t[k]; });
     try{ const q=window.storage.set('fin_tomb',JSON.stringify(out),false); if(q&&q.catch)q.catch(()=>{}); }catch(_){}
   }
