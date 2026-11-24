@@ -336,3 +336,45 @@
     .yw-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
   }
   .yw-f:focus-visible,.yw-hit:focus-visible,.yw-catch:focus-visible,.yw-free:focus-visible,.yw-dot:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ Кадр фото мрії — точка фокусу (wishFocusEditor, 06-wishes.js, 24.11.2026) ════
+     Телефон — на весь екран; компʼютер — віконце з превʼю праворуч. Фото показано ЦІЛИМ (contain),
+     кружечок — точка, довкола якої кожна картка обрізає фото. */
+  .wfe-ov{position:fixed;inset:0;z-index:100000;background:rgba(5,6,9,.86);display:flex;align-items:stretch;justify-content:center;}
+  .wfe-box{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg);color:var(--text);padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 14px);box-sizing:border-box;min-height:0;}
+  .wfe-top{display:flex;align-items:center;gap:10px;min-height:48px;}
+  .wfe-top b{flex:1;text-align:center;font-size:16px;font-weight:800;}
+  .wfe-x,.wfe-ok,.wfe-c{all:unset;box-sizing:border-box;cursor:pointer;min-height:44px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;font-size:14px;font-weight:700;}
+  .wfe-x{color:var(--muted);}
+  .wfe-ok{color:#fff;background:var(--accent);font-weight:800;}
+  .wfe-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;margin-top:8px;}
+  .wfe-stage{position:relative;flex:1;min-height:260px;border-radius:18px;overflow:hidden;background:#0b0d12;touch-action:none;cursor:crosshair;outline:none;}
+  .wfe-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-select:none;pointer-events:none;}
+  .wfe-ring{position:absolute;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.5);pointer-events:none;}
+  .wfe-ring::after{content:'';position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#fff;}
+  .wfe-hint{position:absolute;left:10px;right:10px;bottom:10px;padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.35;color:#fff;background:rgba(10,12,16,.72);pointer-events:none;}
+  .wfe-stage:focus-visible{box-shadow:inset 0 0 0 2px var(--accent);}
+  .wfe-side{display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .wfe-side small{font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--muted);}
+  .wfe-pvs{display:flex;gap:10px;align-items:flex-end;overflow-x:auto;scrollbar-width:none;}
+  .wfe-pv{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;}
+  .wfe-pv span{font-size:10px;color:var(--muted);}
+  .wfe-p{display:block;background-size:cover;background-position:50% 50%;border-radius:12px;border:1px solid var(--line);}
+  .wfe-p.tall{width:62px;height:110px;} .wfe-p.wide{width:130px;height:84px;} .wfe-p.band{width:110px;height:56px;} .wfe-p.sq{width:62px;height:62px;border-radius:16px;}
+  .wfe-c{align-self:flex-start;color:var(--text);background:var(--bg-2);border:1px solid var(--line);font-weight:600;}
+  .wfe-x:focus-visible,.wfe-ok:focus-visible,.wfe-c:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (min-width:1024px){
+    .wfe-ov{align-items:center;padding:40px;}
+    .wfe-box{flex:none;width:min(1040px,100%);height:min(640px,100%);border-radius:20px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6);padding:16px 20px 20px;}
+    .wfe-main{flex-direction:row;gap:18px;}
+    .wfe-side{width:300px;flex:none;}
+    .wfe-pvs{flex-wrap:wrap;overflow:visible;}
+    .wfe-p.tall{width:86px;height:160px;} .wfe-p.wide{width:180px;height:112px;} .wfe-p.band{width:180px;height:90px;} .wfe-p.sq{width:86px;height:86px;}
+  }
+  /* ⋯ на картці стіни — «Відкрити ціль», «Кадр фото» */
+  .yw-more{all:unset;box-sizing:border-box;cursor:pointer;position:absolute;z-index:3;right:8px;top:8px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+    font-size:16px;font-weight:800;line-height:1;color:#fff;background:rgba(10,12,16,.55);}
+  .yw-more::after{content:'';position:absolute;inset:-6px;}
+  .yw-card:not(.ph) .yw-more{color:var(--text);background:var(--bg-2);}
+  .yw-card .yw-ok{right:46px;}
+  .yw-more:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}

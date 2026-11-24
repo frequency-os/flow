@@ -138,6 +138,80 @@
   // слайдшоу з фото Карти бажань на блоці «Загальний прогрес»
   const WISH_SLIDE_MS=5000;          // скільки показується одне фото
   let wishSlideTimer=null, wishSlideIdx=0;
+  /* ════════ Точка фокусу фото мрії (24.11.2026) ════════
+     Старий кадр w.pos={x,y,scale} — зсув рамки банера: без збільшення він дорівнює 0 (рухати нічого),
+     і інші форми (висока картка стіни, широкий герой, квадрат папки) його не розуміють.
+     Нове поле w.focus={x,y} — відсотки 0..100: «що має бути видно». Кожне місце обрізає фото cover
+     довкола цієї точки через background-position / object-position. Пишеться лише кнопкою «Готово»;
+     w.pos не видаляємо (його й далі розуміє банер, якщо точки ще нема). */
+  function wishFocusXY(w){
+    const f=w&&w.focus; if(!f||typeof f!=='object') return null;
+    const x=+f.x, y=+f.y;
+    return (isFinite(x)&&isFinite(y)&&x>=0&&x<=100&&y>=0&&y<=100)?{x:Math.round(x),y:Math.round(y)}:null;
+  }
+  function wishFocusBg(w){ const f=wishFocusXY(w); return f?`background-position:${f.x}% ${f.y}%;`:''; }
+  function wishFocusObj(w){ const f=wishFocusXY(w); return f?`object-position:${f.x}% ${f.y}%;`:''; }
+  function wishFocusEditor(id, after){
+    const w0=wishes.find(x=>x&&x.id===id); if(!w0) return;
+    const src0=window.photoSrc?window.photoSrc(w0.type==='video'?w0.thumb:w0.img):(w0.type==='video'?w0.thumb:w0.img);
+    const src=safeImg(src0); if(!src){ flowAlert(mrT('Фото не вдалося відкрити.','The photo could not be opened.')); return; }
+    const f0=wishFocusXY(w0)||{x:50,y:50}; let fx=f0.x, fy=f0.y;
+    const T=(uk,en)=>mrT(uk,en);
+    const ov=document.createElement('div'); ov.className='wfe-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    const pv=(cls,lab)=>`<div class="wfe-pv"><i class="wfe-p ${cls}" style="background-image:url('${esc(src)}')"></i><span>${lab}</span></div>`;
+    ov.innerHTML=`<div class="wfe-box">
+      <div class="wfe-top"><button class="wfe-x" data-wfex>${T('Скасувати','Cancel')}</button><b>${T('Кадр фото','Photo focus')}</b><button class="wfe-ok" data-wfeok>${T('Готово','Done')}</button></div>
+      <div class="wfe-main">
+        <div class="wfe-stage" data-wfestage tabindex="0" aria-label="${T('Точка фокусу: стрілки — зсунути','Focus point: arrows move it')}">
+          <img src="${esc(src)}" alt="" draggable="false" data-wfeimg><span class="wfe-ring" data-wfering aria-hidden="true"></span>
+          <span class="wfe-hint">${T('Тапни або тягни кружечок туди, що має бути видно завжди','Tap or drag the circle to what must always stay visible')}</span>
+        </div>
+        <div class="wfe-side">
+          <small>${T('ТАК ВИГЛЯДАТИМЕ','HOW IT WILL LOOK')}</small>
+          <div class="wfe-pvs">${pv('tall',T('Стіна','Wall'))}${pv('wide',T('Герой','Hero'))}${pv('band',T('Огляд','Overview'))}${pv('sq',T('Папка','Folder'))}</div>
+          <button class="wfe-c" data-wfecenter>${T('На центр','Center')}</button>
+        </div>
+      </div></div>`;
+    document.body.appendChild(ov);
+    const stage=ov.querySelector('[data-wfestage]'), img=ov.querySelector('[data-wfeimg]'), ring=ov.querySelector('[data-wfering]');
+    // де саме лежить фото всередині сцени (object-fit:contain лишає поля)
+    const box=()=>{ const r=stage.getBoundingClientRect(), nw=img.naturalWidth||1, nh=img.naturalHeight||1, k=Math.min(r.width/nw,r.height/nh), w=nw*k, h=nh*k;
+      return {x:r.left+(r.width-w)/2, y:r.top+(r.height-h)/2, w, h, ox:(r.width-w)/2, oy:(r.height-h)/2}; };
+    const paint=()=>{ const b=box(); ring.style.left=(b.ox+b.w*fx/100)+'px'; ring.style.top=(b.oy+b.h*fy/100)+'px';
+      ov.querySelectorAll('.wfe-p').forEach(el=>el.style.backgroundPosition=fx+'% '+fy+'%'); };
+    const setFrom=e=>{ const b=box(); fx=Math.round(Math.max(0,Math.min(100,(e.clientX-b.x)/b.w*100))); fy=Math.round(Math.max(0,Math.min(100,(e.clientY-b.y)/b.h*100))); paint(); };
+    img.onload=paint; if(img.complete) paint();
+    let drag=false;
+    stage.addEventListener('pointerdown',e=>{ drag=true; try{ stage.setPointerCapture(e.pointerId); }catch(_){} setFrom(e); });
+    stage.addEventListener('pointermove',e=>{ if(drag) setFrom(e); });
+    const up=()=>{ drag=false; }; stage.addEventListener('pointerup',up); stage.addEventListener('pointercancel',up);
+    const onResize=()=>paint(); window.addEventListener('resize',onResize);
+    const close=()=>{ window.removeEventListener('resize',onResize); document.removeEventListener('keydown',onKey,true); ov.remove(); };
+    const save=()=>{
+      // Карту бажань ще не прочитано (старт без мережі) — не пишемо, щоб не затерти справжню
+      try{ if(window.storeKeyReady&&window.storeKeyReady('wishes_board')!==true){ plToast(T('Карта бажань ще завантажується — спробуй за мить','The Vision board is still loading — try again in a moment')); return; } }catch(_){}
+      const w=wishes.find(x=>x&&x.id===id); close(); if(!w) return;
+      w.focus={x:fx,y:fy}; saveWishes();
+      try{ renderWishes(); }catch(_){} try{ updateSummaryBg(); }catch(_){} try{ if(typeof ypRefresh==='function') ypRefresh(); }catch(_){}
+      if(typeof after==='function') after();
+    };
+    const onKey=e=>{
+      if(e.key==='Escape'){ e.preventDefault(); close(); return; }
+      if(e.key==='Enter'){ if(e.target&&e.target.closest&&e.target.closest('button')) return;   // Enter на кнопці — її власна дія («Скасувати» не зберігає)
+        e.preventDefault(); save(); return; }
+      const d={ArrowLeft:[-2,0],ArrowRight:[2,0],ArrowUp:[0,-2],ArrowDown:[0,2]}[e.key]; if(!d) return;
+      e.preventDefault(); fx=Math.max(0,Math.min(100,fx+d[0])); fy=Math.max(0,Math.min(100,fy+d[1])); paint();
+    };
+    document.addEventListener('keydown',onKey,true);
+    ov.addEventListener('click',e=>{
+      if(e.target===ov||e.target.closest('[data-wfex]')){ close(); return; }
+      if(e.target.closest('[data-wfeok]')){ save(); return; }
+      if(e.target.closest('[data-wfecenter]')){ fx=50; fy=50; paint(); }
+    });
+    setTimeout(()=>{ try{ stage.focus(); }catch(_){} },30);
+  }
+  window.wishFocusEditor=wishFocusEditor;
+
   function updateSummaryBg(){
     try{ renderHeroStreak(); }catch(_){}
     const card=document.getElementById('summaryCard');
@@ -169,9 +243,10 @@
     // разом із картинкою несемо збережений кадр (w.pos) — той самий формат
     // {x,y,scale}, що й photoPos у папок
     const shown=withImg.slice(-6);
-    const imgs=shown.map(w=> ({ src:(w.type==='video'?w.thumb:w.img), pos:w.pos||null }) );
+    // нова точка фокусу (w.focus) важливіша за старий кадр — тоді без transform, лише background-position
+    const imgs=shown.map(w=> ({ src:(w.type==='video'?w.thumb:w.img), pos:w.pos||null, fp:wishFocusBg(w) }) );
     slides.innerHTML=imgs.map((it,i)=>{
-      const xf=it.pos?`transform:translate(${it.pos.x}%,${it.pos.y}%) scale(${it.pos.scale});`:'';
+      const xf=it.fp?it.fp:(it.pos?`transform:translate(${+it.pos.x||0}%,${+it.pos.y||0}%) scale(${+it.pos.scale||1});`:'');
       return `<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(it.src)}');${xf}"></div>`;
     }).join('');
     if(imgs.length>1){
@@ -323,7 +398,7 @@
 
     const ov=document.createElement('div'); ov.className='wcard';
     ov.innerHTML=`<div class="wcard-in">
-      <div class="wcard-hero" style="background-image:url('${safeImg(cover)}')">
+      <div class="wcard-hero" style="background-image:url('${safeImg(cover)}');${wishFocusBg(w)}">
         <button class="wcard-x" data-wcx="1">✕</button>
         <span class="wcard-badge ${done?'done':''}">${done?'✓ Досягнуто':(linkedGoal?'🎯 Ціль':'✨ Образ')}</span>
         <div class="wcard-cap">${esc(w.cap||'Образ майбутнього')}</div>
@@ -482,25 +557,12 @@
       items.push({ic:'target', label:'Зробити ціллю', sub:'Додати в Цілі з цим фото', primary:true, onClick:()=>wishToGoal(id)});
     }
     if(!isVid) items.push({ic:'photo', label:'Замінити фото', sub:'підпис, дата й ціль лишаються', onClick:()=>replaceWishPhoto(id)});
-    /* Кадрування для банера Огляду. Знімок там лежить у широкій картці, тож
-       вертикальне фото обрізається по центру — часто не там, де треба.
-       Редактор той самий, що й для фото папки (openPhotoCropEditor). */
+    /* Кадр фото (24.11.2026): точка фокусу w.focus — для ВСІХ місць, де видно цю мрію (Огляд, стіна «Моїх цілей»,
+       герой «Мого року», папка цілі). Старий «Кадрувати для Огляду» (openPhotoCropEditor) без збільшення не рухався. */
     { const src = (w.type==='video') ? w.thumb : w.img;
-      if(src) items.push({ic:'crop', label:'Кадрувати для Огляду',
-        sub: w.pos ? 'Кадр підібрано · тап щоб змінити' : 'Обрати видиму частину',
-        onClick:()=>{
-          if(typeof openPhotoCropEditor!=='function'){ flowAlert('Редактор кадру недоступний.'); return; }
-          /* src — це адреса у сховищі (idb:wi_…), а не саме фото: відколи знімки
-             переїхали в PhotoDB, редактор отримував її сирою й малював чорне
-             поле — ні зсунути, ні масштабувати (баг 03.10.2026). Розгортаємо
-             так само, як для фото папки (16-dashboard.js). */
-          openPhotoCropEditor({ img:window.photoSrc(src), pos:w.pos||null, title:'Кадр для Огляду',
-            onSave:(pos)=>{ w.pos=pos; saveWishes(); try{renderWishes();}catch(_){}
-              // тло банера малює updateSummaryBg(), не renderWishBg — назва
-              // інша, і без цього виклику кадр застосувався б лише після
-              // перезавантаження екрана
-              try{ updateSummaryBg(); }catch(_){} } });
-        }});
+      if(src) items.push({ic:'crop', label:'Кадр фото',
+        sub: wishFocusXY(w) ? 'Точку вибрано · тап, щоб змінити' : 'Що має бути видно на всіх картках',
+        onClick:()=>wishFocusEditor(id) });
     }
     if(idx>0) items.push({ic:'up', label:'Перемістити вперед', onClick:()=>moveWish(id,-1)});
     if(idx<wishes.length-1) items.push({ic:'down', label:'Перемістити назад', onClick:()=>moveWish(id,1)});
@@ -1367,7 +1429,7 @@
     const C=113.1;
     const slides=ordered.map(w=>{
       const isVid=w.type==='video';
-      const bg=isVid?(w.thumb?`background-image:url('${safeImg(w.thumb)}')`:`background:linear-gradient(135deg,#241b3e,#0e0a20)`):`background-image:url('${safeImg(w.img)}')`;
+      const bg=isVid?(w.thumb?`background-image:url('${safeImg(w.thumb)}')`:`background:linear-gradient(135deg,#241b3e,#0e0a20)`):`background-image:url('${safeImg(w.img)}');${wishFocusBg(w)}`;
       const gl=w.goalId?goals.find(x=>x.id===w.goalId):null;
       let pct=null;
       if(gl){ const st=gl.steps||[]; const sd=st.filter(s=>s.done).length; pct=st.length?Math.round(sd/st.length*100):(gl.progress||0); }
@@ -1468,7 +1530,7 @@
       const isVid=w.type==='video';
       const bgStyle = isVid
         ? (w.thumb?`background-image:url('${safeImg(w.thumb)}')`:`background:linear-gradient(135deg,#1b2335,#0e1320)`)
-        : `background-image:url('${safeImg(w.img)}')`;
+        : `background-image:url('${safeImg(w.img)}');${wishFocusBg(w)}`;
       const playIcon = isVid?`<div class="wish-play">▶</div>`:'';
       // AI-тема: HUD-панель із прогресом зв'язаної цілі (якщо є)
       let hud='';

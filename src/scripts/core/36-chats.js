@@ -715,7 +715,8 @@
       if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`; }
     // своєї обкладинки нема, а папка — дім цілі: фото мрії цілі (66-year-planner.js). Лише показ, нічого не зберігаємо
     try{ u=typeof ypFolderGoalPhoto==='function'?safeImg(ypFolderGoalPhoto(fk)):''; }catch(_){ u=''; }
-    if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`;
+    if(u){ let fp=''; try{ fp=typeof ypFolderGoalFocus==='function'?ypFolderGoalFocus(fk):''; }catch(_){ fp=''; }   // точка фокусу мрії
+      return `background-image:url('${esc(u)}');background-size:cover;background-position:center;${fp}`; }
     const c=safeColor(f.c,'#6a7dff');
     return `background:linear-gradient(160deg,color-mix(in srgb,${c} 60%,#0f1115),color-mix(in srgb,${c} 14%,var(--bg)));`;
   }

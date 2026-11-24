@@ -208,15 +208,21 @@
       return safeImg(w.type==='video'?w.thumb:w.img)||'';
     }catch(_){ return ''; }
   }
+  /* точка фокусу фото місії (24.11.2026): та сама мрія, що в jnMissionPhoto → її w.focus (wishFocus*, 06-wishes.js).
+     Повертає готовий шматок style лише з чисел — '' якщо точки нема (тоді фото по центру, як було). */
+  function jnMissionFocus(gl,kind){
+    try{ const w=(wishes||[]).find(x=>x&&x.goalId&&String(x.goalId)===String(gl.id)&&(x.type==='video'?x.thumb:x.img));
+      return w?(kind==='obj'?wishFocusObj(w):wishFocusBg(w)):''; }catch(_){ return ''; }
+  }
   function jnGoalById(id){ return (goalsData.goals||[]).find(g=>g&&String(g.id||g.name)===String(id))||null; }
   function jnBg(gl){
     const ph=gl?jnMissionPhoto(gl):'';
-    return ph?`background-image:url('${ph}')`:'';
+    return ph?`background-image:url('${ph}');${jnMissionFocus(gl)}`:'';
   }
   function jnStory(gl){
     const c=safeColor(gl.color,'#3ec7b4'), pct=jnPct(gl), ph=jnMissionPhoto(gl), off=jnStatus(gl)!=='active'||jnRole(gl)==='wait';
     return `<button class="jn-st${off?' off':''}" data-jnstory="${esc(gl.id)}" style="--c:${c};--p:${pct}">
-      <span class="jn-st-r"><span class="jn-st-i"${ph?` style="background-image:url('${ph}')"`:''}>${ph?'':safeEmoji(gl.emoji,'🎯')}</span></span>
+      <span class="jn-st-r"><span class="jn-st-i"${ph?` style="background-image:url('${ph}');${jnMissionFocus(gl)}"`:''}>${ph?'':safeEmoji(gl.emoji,'🎯')}</span></span>
       <small>${esc(gl.name||'Місія')}</small></button>`;
   }
   // справи дня: спершу невиконані за часом, потім виконані

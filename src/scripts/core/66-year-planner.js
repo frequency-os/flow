@@ -29,7 +29,7 @@
   function ypPill(g,on){
     const c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), fin=mrFinish(g);
     return `<button class="yp-pill${on?' on':''}" data-ypg="${esc(g.id)}" aria-pressed="${on}" style="--c:${c}">
-      ${ph?`<img src="${esc(ph)}" alt="">`:`<span class="yp-dot" aria-hidden="true"></span>`}
+      ${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:`<span class="yp-dot" aria-hidden="true"></span>`}
       <span><b>${esc(g.name||ypT('Ціль','Goal'))}</b><small>${ypPct(g)}%${fin?' · '+ypT('до ','by ')+esc(fin):''}</small></span></button>`;
   }
   function ypFreePill(free){
@@ -45,7 +45,7 @@
   function ypHero(g){
     const c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), pct=ypPct(g), fin=mrFinish(g), why=String(g.why||'').trim();
     const eb=[jnRole(g)==='main'?ypT('головна ціль','main goal'):ypT('ціль року','goal of the year'), fin?ypT('до ','by ')+fin:''].filter(Boolean).join(' · ');
-    return `<button class="yp-hero${ph?' ph':''}" data-ypopen style="--c:${c};--p:${pct};${ph?`background-image:url('${esc(ph)}')`:''}">
+    return `<button class="yp-hero${ph?' ph':''}" data-ypopen style="--c:${c};--p:${pct};${ph?`background-image:url('${esc(ph)}');${jnMissionFocus(g)}`:''}">
       <span class="yp-hb"><small>${esc(eb)}</small><b>${esc(g.name||ypT('Ціль','Goal'))}</b>
         <span>${why?esc(why.length>110?why.slice(0,109)+'…':why):ypT('Навіщо тобі ця ціль? Тапни — і допиши.','Why this goal? Tap and add a line.')}</span></span>
       <span class="yp-ring big" aria-hidden="true"><i>${pct}%</i></span></button>`;
@@ -318,7 +318,7 @@
   function ypGoalChip(goalId){
     const g=goalId?jnGoalById(goalId):null; if(!g||jnStatus(g)==='archive') return '';
     const ph=jnMissionPhoto(g), c=safeColor(g.color,'#5b8def');
-    return `<button class="pn-gchip" style="--gc:${c}" data-pngoal="${esc(g.id)}">${ph?`<img src="${esc(ph)}" alt="">`:'<i aria-hidden="true"></i>'}<span>${esc(String(g.name||'').slice(0,24))}</span></button>`;
+    return `<button class="pn-gchip" style="--gc:${c}" data-pngoal="${esc(g.id)}">${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:'<i aria-hidden="true"></i>'}<span>${esc(String(g.name||'').slice(0,24))}</span></button>`;
   }
   function ypPerMonthAll(){ try{ return mrActive().reduce((a,g)=>a+(mrMoneySum(g)?ypMonthTarget(g):0),0); }catch(_){ return 0; } }
   function ypMonthSavedAll(ym){ try{ return mrActive().reduce((a,g)=>a+ypMonthSaved(g,ym),0); }catch(_){ return 0; } }
@@ -329,7 +329,7 @@
     const done=rows.filter(x=>x.m.done).length;
     const r=rows.map(({g,m})=>{ const ph=jnMissionPhoto(g);
       return `<button class="ypm-r${m.done?' ok':''}" data-pnms="${esc(g.id)}:${esc(m.id)}" aria-pressed="${!!m.done}" style="--gc:${safeColor(g.color,'#5b8def')}">
-        <i class="ypm-c" aria-hidden="true"></i>${ph?`<img src="${esc(ph)}" alt="">`:'<i class="ypm-d" aria-hidden="true"></i>'}
+        <i class="ypm-c" aria-hidden="true"></i>${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:'<i class="ypm-d" aria-hidden="true"></i>'}
         <span><b>${esc(String(m.t||''))}</b><small>${esc(String(g.name||''))}</small></span></button>`; }).join('');
     return (rows.length?`<div class="pn-lbl"><span>${ypT('Віхи місяця','Milestones this month')}</span><span>${done} ${ypT('з','of')} ${rows.length}</span></div><div class="pn-glass ypm">${r}</div>`:'')
       +(pm?`<button class="pn-glass ypm-money" data-pnyp><span>${ypT('На цілі цього місяця','For goals this month')}</span><b>${esc(money(ypMonthSavedAll(ym)))} <small>${ypT('з ','of ')}${esc(money(pm))}</small></b><em>${ypT('Мій рік ›','My year ›')}</em></button>`:'');
@@ -377,8 +377,8 @@
     let gs=[]; try{ gs=(goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)==='archive'&&ypPct(g)>=100); }catch(_){}
     if(!gs.length) return '';
     return `<div class="yp-rh"><b>${ypT('Здійснені','Done')}</b><span>${gs.length}</span></div><div class="yp-shelf">${gs.slice(-12).reverse().map(g=>{
-      const w=ypWishOf(g), src=w?safeImg(w.proofImg||(w.type==='video'?w.thumb:w.img)||''):'';
-      return `<button class="yp-sh" data-ypshelf="${esc(g.id)}">${src?`<img src="${esc(src)}" alt="">`:'<i aria-hidden="true">✓</i>'}<span>${esc(String(g.name||''))}</span></button>`; }).join('')}</div>`;
+      const w=ypWishOf(g), src=w?safeImg(w.proofImg||(w.type==='video'?w.thumb:w.img)||''):'', fo=w&&!w.proofImg?wishFocusObj(w):'';
+      return `<button class="yp-sh" data-ypshelf="${esc(g.id)}">${src?`<img src="${esc(src)}" alt="" style="${fo}">`:'<i aria-hidden="true">✓</i>'}<span>${esc(String(g.name||''))}</span></button>`; }).join('')}</div>`;
   }
   function ypProofPhoto(g,rer){
     if(!ypReady()){ ypNotReady(); return; }
@@ -437,6 +437,7 @@
      обкладинки бере фото мрії цілі — теж лише на екрані (fhCoverStyle), нічого не зберігається. */
   function ypGoalsOfFolder(fk){ try{ return mrActive().filter(g=>g&&String(g.folderKey||'')===String(fk)); }catch(_){ return []; } }
   function ypFolderGoalPhoto(fk){ const g=ypGoalsOfFolder(fk)[0]; return g?jnMissionPhoto(g):''; }
+  function ypFolderGoalFocus(fk){ const g=ypGoalsOfFolder(fk)[0]; return g?jnMissionFocus(g):''; }   // точка фокусу для обкладинки папки
   function ypFolderGoalHTML(fk){
     const gs=ypGoalsOfFolder(fk); if(!gs.length) return '';
     const g=gs[0], ph=jnMissionPhoto(g), pct=ypPct(g), fin=mrFinish(g), c=safeColor(g.color,'#5b8def');
@@ -445,7 +446,7 @@
         +`<b>${lv.length?esc(String(lv[0].t||''))+(lv.length>1?' +'+(lv.length-1):''):'—'}</b>${lv.length?`<i>${d}/${lv.length}</i>`:''}</span>`; }).join('');
     const more=gs.length>1?(mrEn()?' · +'+(gs.length-1)+' more':' · ще '+(gs.length-1)):'';
     return `<section class="ypf" data-ypfg="${esc(g.id)}" style="--c:${c};--p:${pct}">
-      <button class="ypf-h" data-ypopen>${ph?`<img src="${esc(ph)}" alt="">`:'<span class="ypf-dot" aria-hidden="true"></span>'}
+      <button class="ypf-h" data-ypopen>${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:'<span class="ypf-dot" aria-hidden="true"></span>'}
         <span class="ypf-t"><small>${ypT('ціль цієї папки','goal of this folder')}${fin?' · '+ypT('до ','by ')+esc(fin):''}</small><b>${esc(g.name||ypT('Ціль','Goal'))}</b></span>
         <span class="yp-ring" aria-hidden="true"><i>${pct}</i></span></button>
       <div class="ypf-qs">${qs}</div>
@@ -727,12 +728,14 @@
 
   function ypWallCard(g,big){
     const s=ypStatus(g), c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), pct=ypPct(g);
-    const w=s.k==='done'?ypWishOf(g):null, src=(w&&w.proofImg?safeImg(w.proofImg):'')||ph;
+    const w=s.k==='done'?ypWishOf(g):null, proof=w&&w.proofImg?safeImg(w.proofImg):'', src=proof||ph;
+    const fp=proof?'':jnMissionFocus(g);   // фото-доказ — інший знімок, для нього точки нема
     const role=jnRole(g)==='main'&&s.k!=='done'?`<span class="yw-tag">${ypT('головна','main')}</span>`:'';
     const meta=s.k==='done'?'':[s.k==='none'?'':pct+'%', ypDaysTxt(g)].filter(Boolean).join(' · ');
-    return `<div class="yw-card${big?' big':''}${src?' ph':''} st-${s.k}" style="--c:${c};${src?`background-image:url('${esc(src)}')`:''}">
+    return `<div class="yw-card${big?' big':''}${src?' ph':''} st-${s.k}" style="--c:${c};${src?`background-image:url('${esc(src)}');${fp}`:''}">
       <button class="yw-hit" data-ypwall="${esc(g.id)}" aria-label="${esc(String(g.name||ypT('Ціль','Goal'))+' — '+ypStatusTxt(s))}"></button>
       ${role}${s.k==='done'?'<span class="yw-ok" aria-hidden="true">✓</span>':''}
+      <button class="yw-more" data-ypwmore="${esc(g.id)}" aria-label="${esc(ypT('Дії з ціллю','Goal actions'))}">⋯</button>
       <div class="yw-b"><b>${esc(String(g.name||ypT('Ціль','Goal')))}</b>
         ${meta?`<span class="yw-m">${esc(meta)}</span>`:''}${big&&s.k!=='done'?`<i class="yw-bar"><u style="width:${pct}%"></u></i>`:''}
         <small class="yw-s">${esc(ypStatusTxt(s))}</small>
@@ -761,7 +764,7 @@
     const day=s=>new Date(s+'T12:00:00').getTime(), span=day(end)-day(td);
     const dots=goals.map(g=>{ const ds=mrDueDs(g); if(!ds||ds<td) return '';
       const x=Math.min(100,Math.round((day(ds)-day(td))/span*100)), ph=jnMissionPhoto(g), s=ypStatus(g);
-      return `<button class="yw-dot st-${s.k}" data-ypwall="${esc(g.id)}" style="left:${x}%;--c:${safeColor(g.color,'#5b8def')}" title="${esc(String(g.name||'')+' · '+mrDate(ds))}">${ph?`<img src="${esc(ph)}" alt="">`:''}</button>`; }).join('');
+      return `<button class="yw-dot st-${s.k}" data-ypwall="${esc(g.id)}" style="left:${x}%;--c:${safeColor(g.color,'#5b8def')}" title="${esc(String(g.name||'')+' · '+mrDate(ds))}">${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:''}</button>`; }).join('');
     return `<div class="yw-line"><div class="yp-wh"><b>${ypT('Лінія фінішів','Finish line')}</b><span>${ypT('до ','until ')}${esc(mrUntil())}</span></div>
       <div class="yw-track"><i class="yw-rail"></i>${dots}</div><div class="yw-ends"><span>${ypT('сьогодні','today')}</span><span>${ypT('точка Б','point B')}</span></div></div>`;
   }
@@ -797,6 +800,16 @@
   function ypWallBind(root){
     const q=s=>root.querySelectorAll(s);
     q('[data-ypwall]').forEach(b=>b.onclick=()=>{ ypSel=String(b.dataset.ypwall); ypView='goal'; ypFromWall=true; ypRender(); window.scrollTo(0,0); });
+    // ⋯ на картці: відкрити ціль і «Кадр фото» — точка фокусу мрії цілі (wishFocusEditor, 06-wishes.js)
+    q('[data-ypwmore]').forEach(b=>b.onclick=e=>{ e.stopPropagation();
+      const g=jnGoalById(b.dataset.ypwmore); if(!g) return;
+      const w=(wishes||[]).find(x=>x&&String(x.goalId||'')===String(g.id)&&(x.type==='video'?x.thumb:x.img));
+      const items=[{ic:'target', label:ypT('Відкрити ціль','Open goal'), primary:true, onClick:()=>{ ypSel=String(g.id); ypView='goal'; ypFromWall=true; ypRender(); window.scrollTo(0,0); }}];
+      if(w) items.push({ic:'crop', label:ypT('Кадр фото','Photo focus'), sub:wishFocusXY(w)?ypT('Точку вибрано · тап, щоб змінити','Point set · tap to change'):ypT('Що має бути видно на всіх картках','What must stay visible on every card'),
+        onClick:()=>wishFocusEditor(w.id, ypRender)});
+      else items.push({ic:'photo', label:ypT('Додати фото','Add a photo'), sub:ypT('на сторінці цілі','on the goal page'), onClick:()=>mrGoalPage(g)});
+      actionSheet({ title:String(g.name||ypT('Ціль','Goal')), items });
+    });
     q('[data-ypwf]').forEach(b=>b.onclick=()=>{ ypWallF=b.dataset.ypwf; ypRender(); });
     q('[data-ypwmap]').forEach(b=>b.onclick=()=>goWishes({back:goYearPlanBack, label:ypT('‹ Мої цілі','‹ My goals')}));
     q('[data-ypw]').forEach(b=>b.onclick=()=>wishToGoal(b.dataset.ypw, gid=>{ ypSel=String(gid); ypRender(); }));

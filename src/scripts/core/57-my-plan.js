@@ -67,7 +67,7 @@
     const c=safeColor(g.color,'#3ec7b4'), ph=jnMissionPhoto(g), pct=jnPct(g), fin=mrFinish(g);
     const fk=moOwnFolder(g.folderKey)?g.folderKey:'';
     const tag=fk?String(folders[fk].name||'Папка'):(jnRole(g)==='main'?'головна':'');
-    return `<button class="mr-tile${ph?' ph':''}" data-mrg="${esc(g.id)}" style="--c:${c};${ph?`background-image:url('${esc(ph)}')`:''}">
+    return `<button class="mr-tile${ph?' ph':''}" data-mrg="${esc(g.id)}" style="--c:${c};${ph?`background-image:url('${esc(ph)}');${jnMissionFocus(g)}`:''}">
       <small>${esc(tag)}</small>
       <span class="mr-tb"><b>${esc(g.name||'Ціль')}</b><i class="mr-pg"><u style="width:${pct}%"></u></i>
         <span class="mr-meta"><span>${pct}%</span><span>${fin?mrT('до ','by ')+esc(fin):'кроків нема'}</span></span></span></button>`;
@@ -179,7 +179,7 @@
     const sum=mrMoneySum(g), sv=mrSaved(g), pm=mrPerMonth(g), lv=jnLevels(g), ws=mrWishesOf(g);
     const tag=[fk?String(folders[fk].name||''):'', jnRole(g)==='main'?mrT('головна ціль','main goal'):''].filter(Boolean).join(' · ');
     const sec=(t,act,body)=>`<section class="mr-gb"><div class="mr-gb-h"><b>${t}</b>${act||''}</div>${body}</section>`;
-    let h=`<div class="mr-gp-cover${ph?' ph':''}" style="--c:${c};${ph?`background-image:url('${esc(ph)}')`:''}">
+    let h=`<div class="mr-gp-cover${ph?' ph':''}" style="--c:${c};${ph?`background-image:url('${esc(ph)}');${jnMissionFocus(g)}`:''}">
       <div class="mr-gp-bar"><button data-gpx>‹ ${mrT('Мій рік','My year')}</button><button data-gpphoto>${ph?mrT('Змінити фото','Change photo'):mrT('＋ Фото','＋ Photo')}</button></div>
       <div class="mr-gp-t">${tag?`<small>${esc(tag)}</small>`:''}<b>${esc(g.name||'Ціль')}</b>
         <span>${pct}%${due?' · '+mrT('до ','by ')+esc(mrDate(due)):''}</span><i class="mr-pg"><u style="width:${pct}%"></u></i></div></div><div class="mr-gp-in">`;
