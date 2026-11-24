@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 102 |
-| Рядків JS | 40797 |
+| Рядків JS | 40871 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12653 |
-| Сутностей верхнього рівня | 3182 |
+| Рядків CSS | 12690 |
+| Сутностей верхнього рівня | 3190 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -46,7 +46,7 @@
 | `src/scripts/core/09-goals.js` | 744 | 31 |
 | `src/scripts/core/10-planner.js` | 881 | 43 |
 | `src/scripts/core/11-ai-flow.js` | 337 | 36 |
-| `src/scripts/core/12-ai-agent.js` | 2182 | 105 |
+| `src/scripts/core/12-ai-agent.js` | 2185 | 105 |
 | `src/scripts/core/13-pets.js` | 226 | 14 |
 | `src/scripts/core/14-react.js` | 338 | 43 |
 | `src/scripts/core/15-flow-spot.js` | 1796 | 93 |
@@ -100,7 +100,7 @@
 | `src/scripts/core/63-widget-sheet.js` | 374 | 22 |
 | `src/scripts/core/64-rich-text.js` | 196 | 23 |
 | `src/scripts/core/65-plan.js` | 365 | 58 |
-| `src/scripts/core/66-year-planner.js` | 848 | 98 |
+| `src/scripts/core/66-year-planner.js` | 919 | 106 |
 | `src/scripts/core/67-work-panel.js` | 77 | 9 |
 | `src/scripts/page-editor/01-palette.js` | 194 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 798 | 55 |
@@ -182,7 +182,7 @@
 | `src/styles/core/40-block-store.css` | 143 | 0 |
 | `src/styles/core/41-widget-sheet.css` | 200 | 0 |
 | `src/styles/core/42-plan.css` | 196 | 2 |
-| `src/styles/core/43-year-planner.css` | 380 | 0 |
+| `src/styles/core/43-year-planner.css` | 417 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (84)
 
@@ -1061,78 +1061,78 @@
 | `aiPageAsk` | функція | `src/scripts/core/12-ai-agent.js:330` |
 | `aiMorningMaybe` | функція | `src/scripts/core/12-ai-agent.js:339` |
 | `aiWeeklyMaybe` | функція | `src/scripts/core/12-ai-agent.js:355` |
-| `aiAgentStatusFor` | функція | `src/scripts/core/12-ai-agent.js:368` |
-| `aiTrace` | значення | `src/scripts/core/12-ai-agent.js:409` |
-| `aiPlz` | функція | `src/scripts/core/12-ai-agent.js:410` |
-| `AI_TRACE_READ` | обʼєкт | `src/scripts/core/12-ai-agent.js:414` |
-| `aiTraceReadMeta` | функція | `src/scripts/core/12-ai-agent.js:422` |
-| `aiTraceStart` | функція | `src/scripts/core/12-ai-agent.js:440` |
-| `aiTraceStep` | функція | `src/scripts/core/12-ai-agent.js:441` |
-| `aiTraceEnd` | функція | `src/scripts/core/12-ai-agent.js:458` |
-| `aiTraceRepaint` | функція | `src/scripts/core/12-ai-agent.js:465` |
-| `aiTraceFinish` | функція | `src/scripts/core/12-ai-agent.js:471` |
-| `FLOW_TOOLS` | масив | `src/scripts/core/12-ai-agent.js:481` |
-| `AI_AGENT_ADDON` | значення | `src/scripts/core/12-ai-agent.js:591` |
-| `flowToolExec` | функція | `src/scripts/core/12-ai-agent.js:612` |
-| `aiMissionLine` | функція | `src/scripts/core/12-ai-agent.js:642` |
-| `aiJournalRead` | функція | `src/scripts/core/12-ai-agent.js:665` |
-| `flowToolRead` | функція | `src/scripts/core/12-ai-agent.js:693` |
-| `aiRemindWhen` | функція | `src/scripts/core/12-ai-agent.js:798` |
-| `flowToolPlanner` | функція | `src/scripts/core/12-ai-agent.js:805` |
-| `flowToolGoals` | функція | `src/scripts/core/12-ai-agent.js:918` |
-| `aiPlanDateValid` | функція | `src/scripts/core/12-ai-agent.js:983` |
-| `flowToolFolderPlan` | функція | `src/scripts/core/12-ai-agent.js:986` |
-| `aiFolderDocReady` | функція | `src/scripts/core/12-ai-agent.js:1029` |
-| `aiFolderDocText` | функція | `src/scripts/core/12-ai-agent.js:1032` |
-| `aiFolderDocRows` | функція | `src/scripts/core/12-ai-agent.js:1042` |
-| `flowToolFolderTasks` | функція | `src/scripts/core/12-ai-agent.js:1073` |
-| `aiToolConfirm` | функція | `src/scripts/core/12-ai-agent.js:1141` |
-| `flowToolYearPlan` | функція | `src/scripts/core/12-ai-agent.js:1164` |
-| `aiFinConfirm` | функція | `src/scripts/core/12-ai-agent.js:1187` |
-| `flowToolFinance` | функція | `src/scripts/core/12-ai-agent.js:1190` |
-| `flowToolDiary` | функція | `src/scripts/core/12-ai-agent.js:1339` |
-| `flowToolPatterns` | функція | `src/scripts/core/12-ai-agent.js:1389` |
-| `flowToolMemory` | функція | `src/scripts/core/12-ai-agent.js:1410` |
-| `aiMemGate` | функція | `src/scripts/core/12-ai-agent.js:1436` |
-| `flowToolFolders` | функція | `src/scripts/core/12-ai-agent.js:1445` |
-| `AI_MAIN_RE` | значення | `src/scripts/core/12-ai-agent.js:1502` |
-| `aiPickModel` | функція | `src/scripts/core/12-ai-agent.js:1503` |
-| `aiCacheMin` | функція | `src/scripts/core/12-ai-agent.js:1510` |
-| `aiTokEst` | функція | `src/scripts/core/12-ai-agent.js:1515` |
-| `aiCacheTail` | функція | `src/scripts/core/12-ai-agent.js:1520` |
-| `aiUsageAdd` | функція | `src/scripts/core/12-ai-agent.js:1531` |
-| `aiCallRaw` | функція | `src/scripts/core/12-ai-agent.js:1544` |
-| `aiToolIsWrite` | функція | `src/scripts/core/12-ai-agent.js:1620` |
-| `AI_WRITE_LIMIT` | значення | `src/scripts/core/12-ai-agent.js:1630` |
-| `aiTurnWrites` | значення | `src/scripts/core/12-ai-agent.js:1631` |
-| `aiTurnDone` | масив | `src/scripts/core/12-ai-agent.js:1632` |
-| `aiDoneLine` | функція | `src/scripts/core/12-ai-agent.js:1636` |
-| `aiToolWriteCost` | функція | `src/scripts/core/12-ai-agent.js:1654` |
-| `AI_TOOL_OUT_MAX` | обʼєкт | `src/scripts/core/12-ai-agent.js:1664` |
-| `aiToolOut` | функція | `src/scripts/core/12-ai-agent.js:1665` |
-| `aiAgentTurn` | функція | `src/scripts/core/12-ai-agent.js:1670` |
-| `aiFinMonthNet` | функція | `src/scripts/core/12-ai-agent.js:1751` |
-| `aiFinCtx` | функція | `src/scripts/core/12-ai-agent.js:1759` |
-| `aiCtx` | функція | `src/scripts/core/12-ai-agent.js:1779` |
-| `aiFindGoal` | функція | `src/scripts/core/12-ai-agent.js:1821` |
-| `aiParseBlocks` | функція | `src/scripts/core/12-ai-agent.js:1825` |
-| `aiOpsCount` | функція | `src/scripts/core/12-ai-agent.js:1856` |
-| `aiStreamText` | функція | `src/scripts/core/12-ai-agent.js:1861` |
-| `aiOpDs` | функція | `src/scripts/core/12-ai-agent.js:1871` |
-| `aiOpMatches` | функція | `src/scripts/core/12-ai-agent.js:1872` |
-| `aiOpBlock` | функція | `src/scripts/core/12-ai-agent.js:1882` |
-| `aiFindBlockByT` | функція | `src/scripts/core/12-ai-agent.js:1883` |
-| `aiOpWarn` | функція | `src/scripts/core/12-ai-agent.js:1885` |
-| `aiResolveOps` | функція | `src/scripts/core/12-ai-agent.js:1897` |
-| `aiMissText` | функція | `src/scripts/core/12-ai-agent.js:1911` |
-| `aiOpRow` | функція | `src/scripts/core/12-ai-agent.js:1918` |
-| `aiGateOps` | функція | `src/scripts/core/12-ai-agent.js:1925` |
-| `aiFindFolderKey` | функція | `src/scripts/core/12-ai-agent.js:1945` |
-| `aiBuildPageBlock` | функція | `src/scripts/core/12-ai-agent.js:1953` |
-| `aiApplyPages` | функція | `src/scripts/core/12-ai-agent.js:1971` |
-| `aiApplyActions` | функція | `src/scripts/core/12-ai-agent.js:1994` |
-| `aiCommit` | функція | `src/scripts/core/12-ai-agent.js:2084` |
-| `aiUndo` | функція | `src/scripts/core/12-ai-agent.js:2100` |
+| `aiAgentStatusFor` | функція | `src/scripts/core/12-ai-agent.js:371` |
+| `aiTrace` | значення | `src/scripts/core/12-ai-agent.js:412` |
+| `aiPlz` | функція | `src/scripts/core/12-ai-agent.js:413` |
+| `AI_TRACE_READ` | обʼєкт | `src/scripts/core/12-ai-agent.js:417` |
+| `aiTraceReadMeta` | функція | `src/scripts/core/12-ai-agent.js:425` |
+| `aiTraceStart` | функція | `src/scripts/core/12-ai-agent.js:443` |
+| `aiTraceStep` | функція | `src/scripts/core/12-ai-agent.js:444` |
+| `aiTraceEnd` | функція | `src/scripts/core/12-ai-agent.js:461` |
+| `aiTraceRepaint` | функція | `src/scripts/core/12-ai-agent.js:468` |
+| `aiTraceFinish` | функція | `src/scripts/core/12-ai-agent.js:474` |
+| `FLOW_TOOLS` | масив | `src/scripts/core/12-ai-agent.js:484` |
+| `AI_AGENT_ADDON` | значення | `src/scripts/core/12-ai-agent.js:594` |
+| `flowToolExec` | функція | `src/scripts/core/12-ai-agent.js:615` |
+| `aiMissionLine` | функція | `src/scripts/core/12-ai-agent.js:645` |
+| `aiJournalRead` | функція | `src/scripts/core/12-ai-agent.js:668` |
+| `flowToolRead` | функція | `src/scripts/core/12-ai-agent.js:696` |
+| `aiRemindWhen` | функція | `src/scripts/core/12-ai-agent.js:801` |
+| `flowToolPlanner` | функція | `src/scripts/core/12-ai-agent.js:808` |
+| `flowToolGoals` | функція | `src/scripts/core/12-ai-agent.js:921` |
+| `aiPlanDateValid` | функція | `src/scripts/core/12-ai-agent.js:986` |
+| `flowToolFolderPlan` | функція | `src/scripts/core/12-ai-agent.js:989` |
+| `aiFolderDocReady` | функція | `src/scripts/core/12-ai-agent.js:1032` |
+| `aiFolderDocText` | функція | `src/scripts/core/12-ai-agent.js:1035` |
+| `aiFolderDocRows` | функція | `src/scripts/core/12-ai-agent.js:1045` |
+| `flowToolFolderTasks` | функція | `src/scripts/core/12-ai-agent.js:1076` |
+| `aiToolConfirm` | функція | `src/scripts/core/12-ai-agent.js:1144` |
+| `flowToolYearPlan` | функція | `src/scripts/core/12-ai-agent.js:1167` |
+| `aiFinConfirm` | функція | `src/scripts/core/12-ai-agent.js:1190` |
+| `flowToolFinance` | функція | `src/scripts/core/12-ai-agent.js:1193` |
+| `flowToolDiary` | функція | `src/scripts/core/12-ai-agent.js:1342` |
+| `flowToolPatterns` | функція | `src/scripts/core/12-ai-agent.js:1392` |
+| `flowToolMemory` | функція | `src/scripts/core/12-ai-agent.js:1413` |
+| `aiMemGate` | функція | `src/scripts/core/12-ai-agent.js:1439` |
+| `flowToolFolders` | функція | `src/scripts/core/12-ai-agent.js:1448` |
+| `AI_MAIN_RE` | значення | `src/scripts/core/12-ai-agent.js:1505` |
+| `aiPickModel` | функція | `src/scripts/core/12-ai-agent.js:1506` |
+| `aiCacheMin` | функція | `src/scripts/core/12-ai-agent.js:1513` |
+| `aiTokEst` | функція | `src/scripts/core/12-ai-agent.js:1518` |
+| `aiCacheTail` | функція | `src/scripts/core/12-ai-agent.js:1523` |
+| `aiUsageAdd` | функція | `src/scripts/core/12-ai-agent.js:1534` |
+| `aiCallRaw` | функція | `src/scripts/core/12-ai-agent.js:1547` |
+| `aiToolIsWrite` | функція | `src/scripts/core/12-ai-agent.js:1623` |
+| `AI_WRITE_LIMIT` | значення | `src/scripts/core/12-ai-agent.js:1633` |
+| `aiTurnWrites` | значення | `src/scripts/core/12-ai-agent.js:1634` |
+| `aiTurnDone` | масив | `src/scripts/core/12-ai-agent.js:1635` |
+| `aiDoneLine` | функція | `src/scripts/core/12-ai-agent.js:1639` |
+| `aiToolWriteCost` | функція | `src/scripts/core/12-ai-agent.js:1657` |
+| `AI_TOOL_OUT_MAX` | обʼєкт | `src/scripts/core/12-ai-agent.js:1667` |
+| `aiToolOut` | функція | `src/scripts/core/12-ai-agent.js:1668` |
+| `aiAgentTurn` | функція | `src/scripts/core/12-ai-agent.js:1673` |
+| `aiFinMonthNet` | функція | `src/scripts/core/12-ai-agent.js:1754` |
+| `aiFinCtx` | функція | `src/scripts/core/12-ai-agent.js:1762` |
+| `aiCtx` | функція | `src/scripts/core/12-ai-agent.js:1782` |
+| `aiFindGoal` | функція | `src/scripts/core/12-ai-agent.js:1824` |
+| `aiParseBlocks` | функція | `src/scripts/core/12-ai-agent.js:1828` |
+| `aiOpsCount` | функція | `src/scripts/core/12-ai-agent.js:1859` |
+| `aiStreamText` | функція | `src/scripts/core/12-ai-agent.js:1864` |
+| `aiOpDs` | функція | `src/scripts/core/12-ai-agent.js:1874` |
+| `aiOpMatches` | функція | `src/scripts/core/12-ai-agent.js:1875` |
+| `aiOpBlock` | функція | `src/scripts/core/12-ai-agent.js:1885` |
+| `aiFindBlockByT` | функція | `src/scripts/core/12-ai-agent.js:1886` |
+| `aiOpWarn` | функція | `src/scripts/core/12-ai-agent.js:1888` |
+| `aiResolveOps` | функція | `src/scripts/core/12-ai-agent.js:1900` |
+| `aiMissText` | функція | `src/scripts/core/12-ai-agent.js:1914` |
+| `aiOpRow` | функція | `src/scripts/core/12-ai-agent.js:1921` |
+| `aiGateOps` | функція | `src/scripts/core/12-ai-agent.js:1928` |
+| `aiFindFolderKey` | функція | `src/scripts/core/12-ai-agent.js:1948` |
+| `aiBuildPageBlock` | функція | `src/scripts/core/12-ai-agent.js:1956` |
+| `aiApplyPages` | функція | `src/scripts/core/12-ai-agent.js:1974` |
+| `aiApplyActions` | функція | `src/scripts/core/12-ai-agent.js:1997` |
+| `aiCommit` | функція | `src/scripts/core/12-ai-agent.js:2087` |
+| `aiUndo` | функція | `src/scripts/core/12-ai-agent.js:2103` |
 
 ### `src/scripts/core/13-pets.js` — 14 сутностей
 
@@ -3215,7 +3215,7 @@
 | `pnIsOpen` | функція | `src/scripts/core/65-plan.js:349` |
 | `goPlan` | функція | `src/scripts/core/65-plan.js:352` |
 
-### `src/scripts/core/66-year-planner.js` — 98 сутностей
+### `src/scripts/core/66-year-planner.js` — 106 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3297,26 +3297,34 @@
 | `ypView` | значення | `src/scripts/core/66-year-planner.js:660` |
 | `ypFromWall` | значення | `src/scripts/core/66-year-planner.js:661` |
 | `ypWallF` | значення | `src/scripts/core/66-year-planner.js:662` |
-| `ypStartDs` | функція | `src/scripts/core/66-year-planner.js:665` |
-| `ypPrevYm` | функція | `src/scripts/core/66-year-planner.js:671` |
-| `ypStatus` | функція | `src/scripts/core/66-year-planner.js:676` |
-| `ypStatusTxt` | функція | `src/scripts/core/66-year-planner.js:705` |
-| `ypStatusRow` | функція | `src/scripts/core/66-year-planner.js:709` |
-| `ypDaysTxt` | функція | `src/scripts/core/66-year-planner.js:713` |
-| `ypNearestGoal` | функція | `src/scripts/core/66-year-planner.js:719` |
-| `window.ypNearest` | функція | `src/scripts/core/66-year-planner.js:724` |
-| `ypDoneGoals` | функція | `src/scripts/core/66-year-planner.js:725` |
-| `ypWallCard` | функція | `src/scripts/core/66-year-planner.js:729` |
-| `ypWallWeek` | функція | `src/scripts/core/66-year-planner.js:746` |
-| `ypWallMoney` | функція | `src/scripts/core/66-year-planner.js:755` |
-| `ypWallLine` | функція | `src/scripts/core/66-year-planner.js:762` |
-| `ypWallHTML` | функція | `src/scripts/core/66-year-planner.js:771` |
-| `ypWallBind` | функція | `src/scripts/core/66-year-planner.js:800` |
-| `ypFlowCatch` | функція | `src/scripts/core/66-year-planner.js:826` |
-| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:836` |
-| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:837` |
-| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:838` |
-| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:847` |
+| `ypTab` | функція | `src/scripts/core/66-year-planner.js:665` |
+| `ypSetTab` | функція | `src/scripts/core/66-year-planner.js:666` |
+| `YP_SENS` | масив | `src/scripts/core/66-year-planner.js:669` |
+| `ypPrefs` | функція | `src/scripts/core/66-year-planner.js:670` |
+| `ypSetPref` | функція | `src/scripts/core/66-year-planner.js:674` |
+| `ypStartDs` | функція | `src/scripts/core/66-year-planner.js:681` |
+| `ypPrevYm` | функція | `src/scripts/core/66-year-planner.js:687` |
+| `ypStatus` | функція | `src/scripts/core/66-year-planner.js:692` |
+| `ypStatusTxt` | функція | `src/scripts/core/66-year-planner.js:722` |
+| `ypStatusRow` | функція | `src/scripts/core/66-year-planner.js:726` |
+| `ypDaysTxt` | функція | `src/scripts/core/66-year-planner.js:730` |
+| `ypNearestGoal` | функція | `src/scripts/core/66-year-planner.js:736` |
+| `window.ypNearest` | функція | `src/scripts/core/66-year-planner.js:741` |
+| `ypDoneGoals` | функція | `src/scripts/core/66-year-planner.js:742` |
+| `ypWallCard` | функція | `src/scripts/core/66-year-planner.js:746` |
+| `ypWallWeek` | функція | `src/scripts/core/66-year-planner.js:763` |
+| `ypWallMoney` | функція | `src/scripts/core/66-year-planner.js:772` |
+| `ypWallLine` | функція | `src/scripts/core/66-year-planner.js:779` |
+| `ypWallHTML` | функція | `src/scripts/core/66-year-planner.js:788` |
+| `ypWallBind` | функція | `src/scripts/core/66-year-planner.js:822` |
+| `ypPathHTML` | функція | `src/scripts/core/66-year-planner.js:850` |
+| `ypPop` | функція | `src/scripts/core/66-year-planner.js:856` |
+| `ypSettings` | функція | `src/scripts/core/66-year-planner.js:878` |
+| `ypFlowCatch` | функція | `src/scripts/core/66-year-planner.js:897` |
+| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:907` |
+| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:908` |
+| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:909` |
+| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:918` |
 
 ### `src/scripts/core/67-work-panel.js` — 9 сутностей
 

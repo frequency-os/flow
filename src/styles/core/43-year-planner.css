@@ -378,3 +378,40 @@
   .yw-card:not(.ph) .yw-more{color:var(--text);background:var(--bg-2);}
   .yw-card .yw-ok{right:46px;}
   .yw-more:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ Вкладки «Мрії · Шлях» і ⚙ «Мої цілі» (25.11.2026) ════ */
+  .yp-gear{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:18px;
+    color:var(--text);background:var(--bg-2);border:1px solid var(--line);}
+  .yw-tabrow{display:flex;gap:8px;align-items:center;}
+  .yw-tabs{flex:1;display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--card);border:1px solid var(--line);}
+  .yw-tabs button{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;
+    font-size:14px;font-weight:600;color:var(--muted);}
+  .yw-tabs button[aria-selected="true"]{font-weight:800;color:var(--text);background:var(--bg-2);box-shadow:inset 0 0 0 1px var(--line);}
+  @media (min-width:1024px){ .yw-tabs{flex:0 1 320px;} }
+
+  /* віконце біля кнопки: телефон — шторка знизу; компʼютер — під кнопкою (клас .at ставить ypPop) */
+  .yp-pop-ov{position:fixed;inset:0;z-index:1400;background:rgba(8,10,16,.45);display:flex;align-items:flex-end;justify-content:center;}
+  .yp-pop{width:100%;max-width:480px;box-sizing:border-box;padding:14px 16px calc(18px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0;
+    background:var(--card);color:var(--text);border-top:1px solid var(--line);box-shadow:0 -14px 50px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:10px;outline:none;}
+  @media (min-width:1024px){
+    .yp-pop-ov{background:transparent;}
+    .yp-pop.at{position:fixed;width:380px;border-radius:16px;border:1px solid var(--line);padding:14px;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+  }
+  .yp-pop-h{display:flex;align-items:center;gap:10px;}
+  .yp-pop-h b{flex:1;font-size:17px;font-weight:800;}
+  .yp-pop-x{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--muted);}
+  .yp-pop-l{font-size:14px;font-weight:700;}
+  .yp-seg{display:flex;gap:4px;padding:3px;border-radius:12px;background:var(--bg-2);}
+  .yp-seg button{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted);}
+  .yp-seg button[aria-pressed="true"]{font-weight:800;color:var(--text);background:var(--card);box-shadow:inset 0 0 0 1px var(--line);}
+  .yp-pop-s{margin:0;font-size:12px;line-height:1.45;color:var(--muted);}
+  .yp-pop-row{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 0;border-top:1px solid var(--line);}
+  .yp-pop-row>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .yp-pop-row b{font-size:14px;font-weight:700;}
+  .yp-pop-row small{font-size:12px;color:var(--muted);line-height:1.35;}
+  .yp-sw{flex:none;width:44px;height:26px;border-radius:13px;background:color-mix(in srgb,var(--muted) 45%,var(--bg-2));position:relative;transition:background .15s;}
+  .yp-sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;}
+  .yp-pop-row[aria-checked="true"] .yp-sw{background:var(--accent);}
+  .yp-pop-row[aria-checked="true"] .yp-sw::after{transform:translateX(18px);}
+  @media (prefers-reduced-motion:reduce){ .yp-sw,.yp-sw::after{transition:none;} }
+  .yp-gear:focus-visible,.yw-tabs button:focus-visible,.yp-seg button:focus-visible,.yp-pop-row:focus-visible,.yp-pop-x:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
