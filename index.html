@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-24-2157-805f6ad';
+  var BUILD='2026-11-24-2324-85d4593';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -10386,6 +10386,48 @@
     .yw-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
   }
   .yw-f:focus-visible,.yw-hit:focus-visible,.yw-catch:focus-visible,.yw-free:focus-visible,.yw-dot:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ Кадр фото мрії — точка фокусу (wishFocusEditor, 06-wishes.js, 24.11.2026) ════
+     Телефон — на весь екран; компʼютер — віконце з превʼю праворуч. Фото показано ЦІЛИМ (contain),
+     кружечок — точка, довкола якої кожна картка обрізає фото. */
+  .wfe-ov{position:fixed;inset:0;z-index:100000;background:rgba(5,6,9,.86);display:flex;align-items:stretch;justify-content:center;}
+  .wfe-box{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg);color:var(--text);padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 14px);box-sizing:border-box;min-height:0;}
+  .wfe-top{display:flex;align-items:center;gap:10px;min-height:48px;}
+  .wfe-top b{flex:1;text-align:center;font-size:16px;font-weight:800;}
+  .wfe-x,.wfe-ok,.wfe-c{all:unset;box-sizing:border-box;cursor:pointer;min-height:44px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;font-size:14px;font-weight:700;}
+  .wfe-x{color:var(--muted);}
+  .wfe-ok{color:#fff;background:var(--accent);font-weight:800;}
+  .wfe-main{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;margin-top:8px;}
+  .wfe-stage{position:relative;flex:1;min-height:260px;border-radius:18px;overflow:hidden;background:#0b0d12;touch-action:none;cursor:crosshair;outline:none;}
+  .wfe-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-select:none;pointer-events:none;}
+  .wfe-ring{position:absolute;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.5);pointer-events:none;}
+  .wfe-ring::after{content:'';position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#fff;}
+  .wfe-hint{position:absolute;left:10px;right:10px;bottom:10px;padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.35;color:#fff;background:rgba(10,12,16,.72);pointer-events:none;}
+  .wfe-stage:focus-visible{box-shadow:inset 0 0 0 2px var(--accent);}
+  .wfe-side{display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .wfe-side small{font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--muted);}
+  .wfe-pvs{display:flex;gap:10px;align-items:flex-end;overflow-x:auto;scrollbar-width:none;}
+  .wfe-pv{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;}
+  .wfe-pv span{font-size:10px;color:var(--muted);}
+  .wfe-p{display:block;background-size:cover;background-position:50% 50%;border-radius:12px;border:1px solid var(--line);}
+  .wfe-p.tall{width:62px;height:110px;} .wfe-p.wide{width:130px;height:84px;} .wfe-p.band{width:110px;height:56px;} .wfe-p.sq{width:62px;height:62px;border-radius:16px;}
+  .wfe-c{align-self:flex-start;color:var(--text);background:var(--bg-2);border:1px solid var(--line);font-weight:600;}
+  .wfe-x:focus-visible,.wfe-ok:focus-visible,.wfe-c:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  @media (min-width:1024px){
+    .wfe-ov{align-items:center;padding:40px;}
+    .wfe-box{flex:none;width:min(1040px,100%);height:min(640px,100%);border-radius:20px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6);padding:16px 20px 20px;}
+    .wfe-main{flex-direction:row;gap:18px;}
+    .wfe-side{width:300px;flex:none;}
+    .wfe-pvs{flex-wrap:wrap;overflow:visible;}
+    .wfe-p.tall{width:86px;height:160px;} .wfe-p.wide{width:180px;height:112px;} .wfe-p.band{width:180px;height:90px;} .wfe-p.sq{width:86px;height:86px;}
+  }
+  /* ⋯ на картці стіни — «Відкрити ціль», «Кадр фото» */
+  .yw-more{all:unset;box-sizing:border-box;cursor:pointer;position:absolute;z-index:3;right:8px;top:8px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+    font-size:16px;font-weight:800;line-height:1;color:#fff;background:rgba(10,12,16,.55);}
+  .yw-more::after{content:'';position:absolute;inset:-6px;}
+  .yw-card:not(.ph) .yw-more{color:var(--text);background:var(--bg-2);}
+  .yw-card .yw-ok{right:46px;}
+  .yw-more:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 </style>
 <style id="diary-css">
 /* ===== ЩОДЕННИК ===== */
@@ -15311,6 +15353,80 @@
   // слайдшоу з фото Карти бажань на блоці «Загальний прогрес»
   const WISH_SLIDE_MS=5000;          // скільки показується одне фото
   let wishSlideTimer=null, wishSlideIdx=0;
+  /* ════════ Точка фокусу фото мрії (24.11.2026) ════════
+     Старий кадр w.pos={x,y,scale} — зсув рамки банера: без збільшення він дорівнює 0 (рухати нічого),
+     і інші форми (висока картка стіни, широкий герой, квадрат папки) його не розуміють.
+     Нове поле w.focus={x,y} — відсотки 0..100: «що має бути видно». Кожне місце обрізає фото cover
+     довкола цієї точки через background-position / object-position. Пишеться лише кнопкою «Готово»;
+     w.pos не видаляємо (його й далі розуміє банер, якщо точки ще нема). */
+  function wishFocusXY(w){
+    const f=w&&w.focus; if(!f||typeof f!=='object') return null;
+    const x=+f.x, y=+f.y;
+    return (isFinite(x)&&isFinite(y)&&x>=0&&x<=100&&y>=0&&y<=100)?{x:Math.round(x),y:Math.round(y)}:null;
+  }
+  function wishFocusBg(w){ const f=wishFocusXY(w); return f?`background-position:${f.x}% ${f.y}%;`:''; }
+  function wishFocusObj(w){ const f=wishFocusXY(w); return f?`object-position:${f.x}% ${f.y}%;`:''; }
+  function wishFocusEditor(id, after){
+    const w0=wishes.find(x=>x&&x.id===id); if(!w0) return;
+    const src0=window.photoSrc?window.photoSrc(w0.type==='video'?w0.thumb:w0.img):(w0.type==='video'?w0.thumb:w0.img);
+    const src=safeImg(src0); if(!src){ flowAlert(mrT('Фото не вдалося відкрити.','The photo could not be opened.')); return; }
+    const f0=wishFocusXY(w0)||{x:50,y:50}; let fx=f0.x, fy=f0.y;
+    const T=(uk,en)=>mrT(uk,en);
+    const ov=document.createElement('div'); ov.className='wfe-ov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    const pv=(cls,lab)=>`<div class="wfe-pv"><i class="wfe-p ${cls}" style="background-image:url('${esc(src)}')"></i><span>${lab}</span></div>`;
+    ov.innerHTML=`<div class="wfe-box">
+      <div class="wfe-top"><button class="wfe-x" data-wfex>${T('Скасувати','Cancel')}</button><b>${T('Кадр фото','Photo focus')}</b><button class="wfe-ok" data-wfeok>${T('Готово','Done')}</button></div>
+      <div class="wfe-main">
+        <div class="wfe-stage" data-wfestage tabindex="0" aria-label="${T('Точка фокусу: стрілки — зсунути','Focus point: arrows move it')}">
+          <img src="${esc(src)}" alt="" draggable="false" data-wfeimg><span class="wfe-ring" data-wfering aria-hidden="true"></span>
+          <span class="wfe-hint">${T('Тапни або тягни кружечок туди, що має бути видно завжди','Tap or drag the circle to what must always stay visible')}</span>
+        </div>
+        <div class="wfe-side">
+          <small>${T('ТАК ВИГЛЯДАТИМЕ','HOW IT WILL LOOK')}</small>
+          <div class="wfe-pvs">${pv('tall',T('Стіна','Wall'))}${pv('wide',T('Герой','Hero'))}${pv('band',T('Огляд','Overview'))}${pv('sq',T('Папка','Folder'))}</div>
+          <button class="wfe-c" data-wfecenter>${T('На центр','Center')}</button>
+        </div>
+      </div></div>`;
+    document.body.appendChild(ov);
+    const stage=ov.querySelector('[data-wfestage]'), img=ov.querySelector('[data-wfeimg]'), ring=ov.querySelector('[data-wfering]');
+    // де саме лежить фото всередині сцени (object-fit:contain лишає поля)
+    const box=()=>{ const r=stage.getBoundingClientRect(), nw=img.naturalWidth||1, nh=img.naturalHeight||1, k=Math.min(r.width/nw,r.height/nh), w=nw*k, h=nh*k;
+      return {x:r.left+(r.width-w)/2, y:r.top+(r.height-h)/2, w, h, ox:(r.width-w)/2, oy:(r.height-h)/2}; };
+    const paint=()=>{ const b=box(); ring.style.left=(b.ox+b.w*fx/100)+'px'; ring.style.top=(b.oy+b.h*fy/100)+'px';
+      ov.querySelectorAll('.wfe-p').forEach(el=>el.style.backgroundPosition=fx+'% '+fy+'%'); };
+    const setFrom=e=>{ const b=box(); fx=Math.round(Math.max(0,Math.min(100,(e.clientX-b.x)/b.w*100))); fy=Math.round(Math.max(0,Math.min(100,(e.clientY-b.y)/b.h*100))); paint(); };
+    img.onload=paint; if(img.complete) paint();
+    let drag=false;
+    stage.addEventListener('pointerdown',e=>{ drag=true; try{ stage.setPointerCapture(e.pointerId); }catch(_){} setFrom(e); });
+    stage.addEventListener('pointermove',e=>{ if(drag) setFrom(e); });
+    const up=()=>{ drag=false; }; stage.addEventListener('pointerup',up); stage.addEventListener('pointercancel',up);
+    const onResize=()=>paint(); window.addEventListener('resize',onResize);
+    const close=()=>{ window.removeEventListener('resize',onResize); document.removeEventListener('keydown',onKey,true); ov.remove(); };
+    const save=()=>{
+      // Карту бажань ще не прочитано (старт без мережі) — не пишемо, щоб не затерти справжню
+      try{ if(window.storeKeyReady&&window.storeKeyReady('wishes_board')!==true){ plToast(T('Карта бажань ще завантажується — спробуй за мить','The Vision board is still loading — try again in a moment')); return; } }catch(_){}
+      const w=wishes.find(x=>x&&x.id===id); close(); if(!w) return;
+      w.focus={x:fx,y:fy}; saveWishes();
+      try{ renderWishes(); }catch(_){} try{ updateSummaryBg(); }catch(_){} try{ if(typeof ypRefresh==='function') ypRefresh(); }catch(_){}
+      if(typeof after==='function') after();
+    };
+    const onKey=e=>{
+      if(e.key==='Escape'){ e.preventDefault(); close(); return; }
+      if(e.key==='Enter'){ if(e.target&&e.target.closest&&e.target.closest('button')) return;   // Enter на кнопці — її власна дія («Скасувати» не зберігає)
+        e.preventDefault(); save(); return; }
+      const d={ArrowLeft:[-2,0],ArrowRight:[2,0],ArrowUp:[0,-2],ArrowDown:[0,2]}[e.key]; if(!d) return;
+      e.preventDefault(); fx=Math.max(0,Math.min(100,fx+d[0])); fy=Math.max(0,Math.min(100,fy+d[1])); paint();
+    };
+    document.addEventListener('keydown',onKey,true);
+    ov.addEventListener('click',e=>{
+      if(e.target===ov||e.target.closest('[data-wfex]')){ close(); return; }
+      if(e.target.closest('[data-wfeok]')){ save(); return; }
+      if(e.target.closest('[data-wfecenter]')){ fx=50; fy=50; paint(); }
+    });
+    setTimeout(()=>{ try{ stage.focus(); }catch(_){} },30);
+  }
+  window.wishFocusEditor=wishFocusEditor;
+
   function updateSummaryBg(){
     try{ renderHeroStreak(); }catch(_){}
     const card=document.getElementById('summaryCard');
@@ -15342,9 +15458,10 @@
     // разом із картинкою несемо збережений кадр (w.pos) — той самий формат
     // {x,y,scale}, що й photoPos у папок
     const shown=withImg.slice(-6);
-    const imgs=shown.map(w=> ({ src:(w.type==='video'?w.thumb:w.img), pos:w.pos||null }) );
+    // нова точка фокусу (w.focus) важливіша за старий кадр — тоді без transform, лише background-position
+    const imgs=shown.map(w=> ({ src:(w.type==='video'?w.thumb:w.img), pos:w.pos||null, fp:wishFocusBg(w) }) );
     slides.innerHTML=imgs.map((it,i)=>{
-      const xf=it.pos?`transform:translate(${it.pos.x}%,${it.pos.y}%) scale(${it.pos.scale});`:'';
+      const xf=it.fp?it.fp:(it.pos?`transform:translate(${+it.pos.x||0}%,${+it.pos.y||0}%) scale(${+it.pos.scale||1});`:'');
       return `<div class="wishslide ${i===0?'on':''}" style="background-image:url('${safeImg(it.src)}');${xf}"></div>`;
     }).join('');
     if(imgs.length>1){
@@ -15496,7 +15613,7 @@
 
     const ov=document.createElement('div'); ov.className='wcard';
     ov.innerHTML=`<div class="wcard-in">
-      <div class="wcard-hero" style="background-image:url('${safeImg(cover)}')">
+      <div class="wcard-hero" style="background-image:url('${safeImg(cover)}');${wishFocusBg(w)}">
         <button class="wcard-x" data-wcx="1">✕</button>
         <span class="wcard-badge ${done?'done':''}">${done?'✓ Досягнуто':(linkedGoal?'🎯 Ціль':'✨ Образ')}</span>
         <div class="wcard-cap">${esc(w.cap||'Образ майбутнього')}</div>
@@ -15655,25 +15772,12 @@
       items.push({ic:'target', label:'Зробити ціллю', sub:'Додати в Цілі з цим фото', primary:true, onClick:()=>wishToGoal(id)});
     }
     if(!isVid) items.push({ic:'photo', label:'Замінити фото', sub:'підпис, дата й ціль лишаються', onClick:()=>replaceWishPhoto(id)});
-    /* Кадрування для банера Огляду. Знімок там лежить у широкій картці, тож
-       вертикальне фото обрізається по центру — часто не там, де треба.
-       Редактор той самий, що й для фото папки (openPhotoCropEditor). */
+    /* Кадр фото (24.11.2026): точка фокусу w.focus — для ВСІХ місць, де видно цю мрію (Огляд, стіна «Моїх цілей»,
+       герой «Мого року», папка цілі). Старий «Кадрувати для Огляду» (openPhotoCropEditor) без збільшення не рухався. */
     { const src = (w.type==='video') ? w.thumb : w.img;
-      if(src) items.push({ic:'crop', label:'Кадрувати для Огляду',
-        sub: w.pos ? 'Кадр підібрано · тап щоб змінити' : 'Обрати видиму частину',
-        onClick:()=>{
-          if(typeof openPhotoCropEditor!=='function'){ flowAlert('Редактор кадру недоступний.'); return; }
-          /* src — це адреса у сховищі (idb:wi_…), а не саме фото: відколи знімки
-             переїхали в PhotoDB, редактор отримував її сирою й малював чорне
-             поле — ні зсунути, ні масштабувати (баг 03.10.2026). Розгортаємо
-             так само, як для фото папки (16-dashboard.js). */
-          openPhotoCropEditor({ img:window.photoSrc(src), pos:w.pos||null, title:'Кадр для Огляду',
-            onSave:(pos)=>{ w.pos=pos; saveWishes(); try{renderWishes();}catch(_){}
-              // тло банера малює updateSummaryBg(), не renderWishBg — назва
-              // інша, і без цього виклику кадр застосувався б лише після
-              // перезавантаження екрана
-              try{ updateSummaryBg(); }catch(_){} } });
-        }});
+      if(src) items.push({ic:'crop', label:'Кадр фото',
+        sub: wishFocusXY(w) ? 'Точку вибрано · тап, щоб змінити' : 'Що має бути видно на всіх картках',
+        onClick:()=>wishFocusEditor(id) });
     }
     if(idx>0) items.push({ic:'up', label:'Перемістити вперед', onClick:()=>moveWish(id,-1)});
     if(idx<wishes.length-1) items.push({ic:'down', label:'Перемістити назад', onClick:()=>moveWish(id,1)});
@@ -16540,7 +16644,7 @@
     const C=113.1;
     const slides=ordered.map(w=>{
       const isVid=w.type==='video';
-      const bg=isVid?(w.thumb?`background-image:url('${safeImg(w.thumb)}')`:`background:linear-gradient(135deg,#241b3e,#0e0a20)`):`background-image:url('${safeImg(w.img)}')`;
+      const bg=isVid?(w.thumb?`background-image:url('${safeImg(w.thumb)}')`:`background:linear-gradient(135deg,#241b3e,#0e0a20)`):`background-image:url('${safeImg(w.img)}');${wishFocusBg(w)}`;
       const gl=w.goalId?goals.find(x=>x.id===w.goalId):null;
       let pct=null;
       if(gl){ const st=gl.steps||[]; const sd=st.filter(s=>s.done).length; pct=st.length?Math.round(sd/st.length*100):(gl.progress||0); }
@@ -16641,7 +16745,7 @@
       const isVid=w.type==='video';
       const bgStyle = isVid
         ? (w.thumb?`background-image:url('${safeImg(w.thumb)}')`:`background:linear-gradient(135deg,#1b2335,#0e1320)`)
-        : `background-image:url('${safeImg(w.img)}')`;
+        : `background-image:url('${safeImg(w.img)}');${wishFocusBg(w)}`;
       const playIcon = isVid?`<div class="wish-play">▶</div>`:'';
       // AI-тема: HUD-панель із прогресом зв'язаної цілі (якщо є)
       let hud='';
@@ -32334,7 +32438,8 @@
       if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`; }
     // своєї обкладинки нема, а папка — дім цілі: фото мрії цілі (66-year-planner.js). Лише показ, нічого не зберігаємо
     try{ u=typeof ypFolderGoalPhoto==='function'?safeImg(ypFolderGoalPhoto(fk)):''; }catch(_){ u=''; }
-    if(u) return `background-image:url('${esc(u)}');background-size:cover;background-position:center;`;
+    if(u){ let fp=''; try{ fp=typeof ypFolderGoalFocus==='function'?ypFolderGoalFocus(fk):''; }catch(_){ fp=''; }   // точка фокусу мрії
+      return `background-image:url('${esc(u)}');background-size:cover;background-position:center;${fp}`; }
     const c=safeColor(f.c,'#6a7dff');
     return `background:linear-gradient(160deg,color-mix(in srgb,${c} 60%,#0f1115),color-mix(in srgb,${c} 14%,var(--bg)));`;
   }
@@ -33860,15 +33965,21 @@
       return safeImg(w.type==='video'?w.thumb:w.img)||'';
     }catch(_){ return ''; }
   }
+  /* точка фокусу фото місії (24.11.2026): та сама мрія, що в jnMissionPhoto → її w.focus (wishFocus*, 06-wishes.js).
+     Повертає готовий шматок style лише з чисел — '' якщо точки нема (тоді фото по центру, як було). */
+  function jnMissionFocus(gl,kind){
+    try{ const w=(wishes||[]).find(x=>x&&x.goalId&&String(x.goalId)===String(gl.id)&&(x.type==='video'?x.thumb:x.img));
+      return w?(kind==='obj'?wishFocusObj(w):wishFocusBg(w)):''; }catch(_){ return ''; }
+  }
   function jnGoalById(id){ return (goalsData.goals||[]).find(g=>g&&String(g.id||g.name)===String(id))||null; }
   function jnBg(gl){
     const ph=gl?jnMissionPhoto(gl):'';
-    return ph?`background-image:url('${ph}')`:'';
+    return ph?`background-image:url('${ph}');${jnMissionFocus(gl)}`:'';
   }
   function jnStory(gl){
     const c=safeColor(gl.color,'#3ec7b4'), pct=jnPct(gl), ph=jnMissionPhoto(gl), off=jnStatus(gl)!=='active'||jnRole(gl)==='wait';
     return `<button class="jn-st${off?' off':''}" data-jnstory="${esc(gl.id)}" style="--c:${c};--p:${pct}">
-      <span class="jn-st-r"><span class="jn-st-i"${ph?` style="background-image:url('${ph}')"`:''}>${ph?'':safeEmoji(gl.emoji,'🎯')}</span></span>
+      <span class="jn-st-r"><span class="jn-st-i"${ph?` style="background-image:url('${ph}');${jnMissionFocus(gl)}"`:''}>${ph?'':safeEmoji(gl.emoji,'🎯')}</span></span>
       <small>${esc(gl.name||'Місія')}</small></button>`;
   }
   // справи дня: спершу невиконані за часом, потім виконані
@@ -40027,7 +40138,7 @@
     const c=safeColor(g.color,'#3ec7b4'), ph=jnMissionPhoto(g), pct=jnPct(g), fin=mrFinish(g);
     const fk=moOwnFolder(g.folderKey)?g.folderKey:'';
     const tag=fk?String(folders[fk].name||'Папка'):(jnRole(g)==='main'?'головна':'');
-    return `<button class="mr-tile${ph?' ph':''}" data-mrg="${esc(g.id)}" style="--c:${c};${ph?`background-image:url('${esc(ph)}')`:''}">
+    return `<button class="mr-tile${ph?' ph':''}" data-mrg="${esc(g.id)}" style="--c:${c};${ph?`background-image:url('${esc(ph)}');${jnMissionFocus(g)}`:''}">
       <small>${esc(tag)}</small>
       <span class="mr-tb"><b>${esc(g.name||'Ціль')}</b><i class="mr-pg"><u style="width:${pct}%"></u></i>
         <span class="mr-meta"><span>${pct}%</span><span>${fin?mrT('до ','by ')+esc(fin):'кроків нема'}</span></span></span></button>`;
@@ -40139,7 +40250,7 @@
     const sum=mrMoneySum(g), sv=mrSaved(g), pm=mrPerMonth(g), lv=jnLevels(g), ws=mrWishesOf(g);
     const tag=[fk?String(folders[fk].name||''):'', jnRole(g)==='main'?mrT('головна ціль','main goal'):''].filter(Boolean).join(' · ');
     const sec=(t,act,body)=>`<section class="mr-gb"><div class="mr-gb-h"><b>${t}</b>${act||''}</div>${body}</section>`;
-    let h=`<div class="mr-gp-cover${ph?' ph':''}" style="--c:${c};${ph?`background-image:url('${esc(ph)}')`:''}">
+    let h=`<div class="mr-gp-cover${ph?' ph':''}" style="--c:${c};${ph?`background-image:url('${esc(ph)}');${jnMissionFocus(g)}`:''}">
       <div class="mr-gp-bar"><button data-gpx>‹ ${mrT('Мій рік','My year')}</button><button data-gpphoto>${ph?mrT('Змінити фото','Change photo'):mrT('＋ Фото','＋ Photo')}</button></div>
       <div class="mr-gp-t">${tag?`<small>${esc(tag)}</small>`:''}<b>${esc(g.name||'Ціль')}</b>
         <span>${pct}%${due?' · '+mrT('до ','by ')+esc(mrDate(due)):''}</span><i class="mr-pg"><u style="width:${pct}%"></u></i></div></div><div class="mr-gp-in">`;
@@ -42397,7 +42508,7 @@
   function ypPill(g,on){
     const c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), fin=mrFinish(g);
     return `<button class="yp-pill${on?' on':''}" data-ypg="${esc(g.id)}" aria-pressed="${on}" style="--c:${c}">
-      ${ph?`<img src="${esc(ph)}" alt="">`:`<span class="yp-dot" aria-hidden="true"></span>`}
+      ${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:`<span class="yp-dot" aria-hidden="true"></span>`}
       <span><b>${esc(g.name||ypT('Ціль','Goal'))}</b><small>${ypPct(g)}%${fin?' · '+ypT('до ','by ')+esc(fin):''}</small></span></button>`;
   }
   function ypFreePill(free){
@@ -42413,7 +42524,7 @@
   function ypHero(g){
     const c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), pct=ypPct(g), fin=mrFinish(g), why=String(g.why||'').trim();
     const eb=[jnRole(g)==='main'?ypT('головна ціль','main goal'):ypT('ціль року','goal of the year'), fin?ypT('до ','by ')+fin:''].filter(Boolean).join(' · ');
-    return `<button class="yp-hero${ph?' ph':''}" data-ypopen style="--c:${c};--p:${pct};${ph?`background-image:url('${esc(ph)}')`:''}">
+    return `<button class="yp-hero${ph?' ph':''}" data-ypopen style="--c:${c};--p:${pct};${ph?`background-image:url('${esc(ph)}');${jnMissionFocus(g)}`:''}">
       <span class="yp-hb"><small>${esc(eb)}</small><b>${esc(g.name||ypT('Ціль','Goal'))}</b>
         <span>${why?esc(why.length>110?why.slice(0,109)+'…':why):ypT('Навіщо тобі ця ціль? Тапни — і допиши.','Why this goal? Tap and add a line.')}</span></span>
       <span class="yp-ring big" aria-hidden="true"><i>${pct}%</i></span></button>`;
@@ -42686,7 +42797,7 @@
   function ypGoalChip(goalId){
     const g=goalId?jnGoalById(goalId):null; if(!g||jnStatus(g)==='archive') return '';
     const ph=jnMissionPhoto(g), c=safeColor(g.color,'#5b8def');
-    return `<button class="pn-gchip" style="--gc:${c}" data-pngoal="${esc(g.id)}">${ph?`<img src="${esc(ph)}" alt="">`:'<i aria-hidden="true"></i>'}<span>${esc(String(g.name||'').slice(0,24))}</span></button>`;
+    return `<button class="pn-gchip" style="--gc:${c}" data-pngoal="${esc(g.id)}">${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:'<i aria-hidden="true"></i>'}<span>${esc(String(g.name||'').slice(0,24))}</span></button>`;
   }
   function ypPerMonthAll(){ try{ return mrActive().reduce((a,g)=>a+(mrMoneySum(g)?ypMonthTarget(g):0),0); }catch(_){ return 0; } }
   function ypMonthSavedAll(ym){ try{ return mrActive().reduce((a,g)=>a+ypMonthSaved(g,ym),0); }catch(_){ return 0; } }
@@ -42697,7 +42808,7 @@
     const done=rows.filter(x=>x.m.done).length;
     const r=rows.map(({g,m})=>{ const ph=jnMissionPhoto(g);
       return `<button class="ypm-r${m.done?' ok':''}" data-pnms="${esc(g.id)}:${esc(m.id)}" aria-pressed="${!!m.done}" style="--gc:${safeColor(g.color,'#5b8def')}">
-        <i class="ypm-c" aria-hidden="true"></i>${ph?`<img src="${esc(ph)}" alt="">`:'<i class="ypm-d" aria-hidden="true"></i>'}
+        <i class="ypm-c" aria-hidden="true"></i>${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:'<i class="ypm-d" aria-hidden="true"></i>'}
         <span><b>${esc(String(m.t||''))}</b><small>${esc(String(g.name||''))}</small></span></button>`; }).join('');
     return (rows.length?`<div class="pn-lbl"><span>${ypT('Віхи місяця','Milestones this month')}</span><span>${done} ${ypT('з','of')} ${rows.length}</span></div><div class="pn-glass ypm">${r}</div>`:'')
       +(pm?`<button class="pn-glass ypm-money" data-pnyp><span>${ypT('На цілі цього місяця','For goals this month')}</span><b>${esc(money(ypMonthSavedAll(ym)))} <small>${ypT('з ','of ')}${esc(money(pm))}</small></b><em>${ypT('Мій рік ›','My year ›')}</em></button>`:'');
@@ -42745,8 +42856,8 @@
     let gs=[]; try{ gs=(goalsData.goals||[]).filter(g=>g&&g.id&&jnStatus(g)==='archive'&&ypPct(g)>=100); }catch(_){}
     if(!gs.length) return '';
     return `<div class="yp-rh"><b>${ypT('Здійснені','Done')}</b><span>${gs.length}</span></div><div class="yp-shelf">${gs.slice(-12).reverse().map(g=>{
-      const w=ypWishOf(g), src=w?safeImg(w.proofImg||(w.type==='video'?w.thumb:w.img)||''):'';
-      return `<button class="yp-sh" data-ypshelf="${esc(g.id)}">${src?`<img src="${esc(src)}" alt="">`:'<i aria-hidden="true">✓</i>'}<span>${esc(String(g.name||''))}</span></button>`; }).join('')}</div>`;
+      const w=ypWishOf(g), src=w?safeImg(w.proofImg||(w.type==='video'?w.thumb:w.img)||''):'', fo=w&&!w.proofImg?wishFocusObj(w):'';
+      return `<button class="yp-sh" data-ypshelf="${esc(g.id)}">${src?`<img src="${esc(src)}" alt="" style="${fo}">`:'<i aria-hidden="true">✓</i>'}<span>${esc(String(g.name||''))}</span></button>`; }).join('')}</div>`;
   }
   function ypProofPhoto(g,rer){
     if(!ypReady()){ ypNotReady(); return; }
@@ -42805,6 +42916,7 @@
      обкладинки бере фото мрії цілі — теж лише на екрані (fhCoverStyle), нічого не зберігається. */
   function ypGoalsOfFolder(fk){ try{ return mrActive().filter(g=>g&&String(g.folderKey||'')===String(fk)); }catch(_){ return []; } }
   function ypFolderGoalPhoto(fk){ const g=ypGoalsOfFolder(fk)[0]; return g?jnMissionPhoto(g):''; }
+  function ypFolderGoalFocus(fk){ const g=ypGoalsOfFolder(fk)[0]; return g?jnMissionFocus(g):''; }   // точка фокусу для обкладинки папки
   function ypFolderGoalHTML(fk){
     const gs=ypGoalsOfFolder(fk); if(!gs.length) return '';
     const g=gs[0], ph=jnMissionPhoto(g), pct=ypPct(g), fin=mrFinish(g), c=safeColor(g.color,'#5b8def');
@@ -42813,7 +42925,7 @@
         +`<b>${lv.length?esc(String(lv[0].t||''))+(lv.length>1?' +'+(lv.length-1):''):'—'}</b>${lv.length?`<i>${d}/${lv.length}</i>`:''}</span>`; }).join('');
     const more=gs.length>1?(mrEn()?' · +'+(gs.length-1)+' more':' · ще '+(gs.length-1)):'';
     return `<section class="ypf" data-ypfg="${esc(g.id)}" style="--c:${c};--p:${pct}">
-      <button class="ypf-h" data-ypopen>${ph?`<img src="${esc(ph)}" alt="">`:'<span class="ypf-dot" aria-hidden="true"></span>'}
+      <button class="ypf-h" data-ypopen>${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:'<span class="ypf-dot" aria-hidden="true"></span>'}
         <span class="ypf-t"><small>${ypT('ціль цієї папки','goal of this folder')}${fin?' · '+ypT('до ','by ')+esc(fin):''}</small><b>${esc(g.name||ypT('Ціль','Goal'))}</b></span>
         <span class="yp-ring" aria-hidden="true"><i>${pct}</i></span></button>
       <div class="ypf-qs">${qs}</div>
@@ -43095,12 +43207,14 @@
 
   function ypWallCard(g,big){
     const s=ypStatus(g), c=safeColor(g.color,'#5b8def'), ph=jnMissionPhoto(g), pct=ypPct(g);
-    const w=s.k==='done'?ypWishOf(g):null, src=(w&&w.proofImg?safeImg(w.proofImg):'')||ph;
+    const w=s.k==='done'?ypWishOf(g):null, proof=w&&w.proofImg?safeImg(w.proofImg):'', src=proof||ph;
+    const fp=proof?'':jnMissionFocus(g);   // фото-доказ — інший знімок, для нього точки нема
     const role=jnRole(g)==='main'&&s.k!=='done'?`<span class="yw-tag">${ypT('головна','main')}</span>`:'';
     const meta=s.k==='done'?'':[s.k==='none'?'':pct+'%', ypDaysTxt(g)].filter(Boolean).join(' · ');
-    return `<div class="yw-card${big?' big':''}${src?' ph':''} st-${s.k}" style="--c:${c};${src?`background-image:url('${esc(src)}')`:''}">
+    return `<div class="yw-card${big?' big':''}${src?' ph':''} st-${s.k}" style="--c:${c};${src?`background-image:url('${esc(src)}');${fp}`:''}">
       <button class="yw-hit" data-ypwall="${esc(g.id)}" aria-label="${esc(String(g.name||ypT('Ціль','Goal'))+' — '+ypStatusTxt(s))}"></button>
       ${role}${s.k==='done'?'<span class="yw-ok" aria-hidden="true">✓</span>':''}
+      <button class="yw-more" data-ypwmore="${esc(g.id)}" aria-label="${esc(ypT('Дії з ціллю','Goal actions'))}">⋯</button>
       <div class="yw-b"><b>${esc(String(g.name||ypT('Ціль','Goal')))}</b>
         ${meta?`<span class="yw-m">${esc(meta)}</span>`:''}${big&&s.k!=='done'?`<i class="yw-bar"><u style="width:${pct}%"></u></i>`:''}
         <small class="yw-s">${esc(ypStatusTxt(s))}</small>
@@ -43129,7 +43243,7 @@
     const day=s=>new Date(s+'T12:00:00').getTime(), span=day(end)-day(td);
     const dots=goals.map(g=>{ const ds=mrDueDs(g); if(!ds||ds<td) return '';
       const x=Math.min(100,Math.round((day(ds)-day(td))/span*100)), ph=jnMissionPhoto(g), s=ypStatus(g);
-      return `<button class="yw-dot st-${s.k}" data-ypwall="${esc(g.id)}" style="left:${x}%;--c:${safeColor(g.color,'#5b8def')}" title="${esc(String(g.name||'')+' · '+mrDate(ds))}">${ph?`<img src="${esc(ph)}" alt="">`:''}</button>`; }).join('');
+      return `<button class="yw-dot st-${s.k}" data-ypwall="${esc(g.id)}" style="left:${x}%;--c:${safeColor(g.color,'#5b8def')}" title="${esc(String(g.name||'')+' · '+mrDate(ds))}">${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:''}</button>`; }).join('');
     return `<div class="yw-line"><div class="yp-wh"><b>${ypT('Лінія фінішів','Finish line')}</b><span>${ypT('до ','until ')}${esc(mrUntil())}</span></div>
       <div class="yw-track"><i class="yw-rail"></i>${dots}</div><div class="yw-ends"><span>${ypT('сьогодні','today')}</span><span>${ypT('точка Б','point B')}</span></div></div>`;
   }
@@ -43165,6 +43279,16 @@
   function ypWallBind(root){
     const q=s=>root.querySelectorAll(s);
     q('[data-ypwall]').forEach(b=>b.onclick=()=>{ ypSel=String(b.dataset.ypwall); ypView='goal'; ypFromWall=true; ypRender(); window.scrollTo(0,0); });
+    // ⋯ на картці: відкрити ціль і «Кадр фото» — точка фокусу мрії цілі (wishFocusEditor, 06-wishes.js)
+    q('[data-ypwmore]').forEach(b=>b.onclick=e=>{ e.stopPropagation();
+      const g=jnGoalById(b.dataset.ypwmore); if(!g) return;
+      const w=(wishes||[]).find(x=>x&&String(x.goalId||'')===String(g.id)&&(x.type==='video'?x.thumb:x.img));
+      const items=[{ic:'target', label:ypT('Відкрити ціль','Open goal'), primary:true, onClick:()=>{ ypSel=String(g.id); ypView='goal'; ypFromWall=true; ypRender(); window.scrollTo(0,0); }}];
+      if(w) items.push({ic:'crop', label:ypT('Кадр фото','Photo focus'), sub:wishFocusXY(w)?ypT('Точку вибрано · тап, щоб змінити','Point set · tap to change'):ypT('Що має бути видно на всіх картках','What must stay visible on every card'),
+        onClick:()=>wishFocusEditor(w.id, ypRender)});
+      else items.push({ic:'photo', label:ypT('Додати фото','Add a photo'), sub:ypT('на сторінці цілі','on the goal page'), onClick:()=>mrGoalPage(g)});
+      actionSheet({ title:String(g.name||ypT('Ціль','Goal')), items });
+    });
     q('[data-ypwf]').forEach(b=>b.onclick=()=>{ ypWallF=b.dataset.ypwf; ypRender(); });
     q('[data-ypwmap]').forEach(b=>b.onclick=()=>goWishes({back:goYearPlanBack, label:ypT('‹ Мої цілі','‹ My goals')}));
     q('[data-ypw]').forEach(b=>b.onclick=()=>wishToGoal(b.dataset.ypw, gid=>{ ypSel=String(gid); ypRender(); }));
