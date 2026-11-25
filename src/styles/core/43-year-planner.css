@@ -454,3 +454,22 @@
   .ypp-rc{position:absolute;z-index:2;right:10px;bottom:10px;margin:0;min-width:32px;justify-content:center;}
   .ypp-row .yw-hit{z-index:1;}
   .ypp-row .yw-catch{color:var(--accent);background:var(--bg-2);border-color:var(--line);}
+
+  /* ════ Дії рядка «Шляху» (етап 3): ✓ Крок · ＋₴ ════
+     Телефон (hover:none) — дії лежать ПІД рядком, свайп вліво їх відкриває (ypSwipeBind).
+     Компʼютер (hover:hover) — зʼявляються поверх правого краю при наведенні або фокусі з клавіатури. */
+  .ypp-sw{position:relative;border-radius:16px;overflow:hidden;}
+  .ypp-sw .ypp-row{z-index:1;touch-action:pan-y;transition:transform .2s ease;}
+  .ypp-acts{position:absolute;z-index:0;right:0;top:0;bottom:0;display:flex;}
+  .ypp-a{all:unset;box-sizing:border-box;cursor:pointer;min-width:76px;min-height:44px;padding:0 12px;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:#fff;}
+  .ypp-a.step{background:#2c6b45;}
+  .ypp-a.money{background:var(--accent);}
+  @media (hover:hover){
+    .ypp-acts{z-index:3;top:10px;bottom:auto;right:10px;gap:6px;opacity:0;pointer-events:none;transition:opacity .12s;}
+    .ypp-a{min-width:0;min-height:36px;border-radius:10px;}
+    .ypp-sw:hover .ypp-acts,.ypp-sw:focus-within .ypp-acts{opacity:1;pointer-events:auto;}
+    .ypp-sw:hover .ypp-days,.ypp-sw:focus-within .ypp-days{visibility:hidden;}
+  }
+  @media (prefers-reduced-motion:reduce){ .ypp-sw .ypp-row,.ypp-acts{transition:none;} }
+  .ypp-a:focus-visible{outline:2px solid #fff;outline-offset:-4px;}

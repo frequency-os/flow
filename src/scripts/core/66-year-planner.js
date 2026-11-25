@@ -835,6 +835,9 @@
     q('[data-yptab]').forEach(b=>b.onclick=()=>{ if(b.dataset.yptab!==ypTab) ypSetTab(b.dataset.yptab); });
     q('[data-ypset]').forEach(b=>b.onclick=()=>ypSettings(b));
     q('[data-yptoday]').forEach(b=>b.onclick=()=>ypAddTodayStep(mrActive()));
+    q('[data-ypstep1]').forEach(b=>b.onclick=()=>{ const g=jnGoalById(b.dataset.ypstep1); if(g) ypQuickStep(g); });
+    q('[data-ypin1]').forEach(b=>b.onclick=()=>{ const g=jnGoalById(b.dataset.ypin1); if(g) mrMoveSheet(g,'in',ypRender); });
+    ypSwipeBind(root);
     q('[data-ypcatchall]').forEach(b=>b.onclick=ypFlowCatchAll);
     q('[data-ypwf]').forEach(b=>b.onclick=()=>{ ypWallF=b.dataset.ypwf; ypRender(); });
     q('[data-ypwmap]').forEach(b=>b.onclick=()=>goWishes({back:goYearPlanBack, label:ypT('‹ Мої цілі','‹ My goals')}));
@@ -903,8 +906,11 @@
       return `<i${lv.length?' class="has"':''}><u style="width:${lv.length?Math.round(d/lv.length*100):0}%"></u></i>`; }).join('')+'</span>';
   }
   function ypPathRow(g){
-    const s=ypStatus(g), ph=jnMissionPhoto(g), pct=ypPct(g), d=mrDaysLeft(mrDueDs(g)), nx=ypNext(g);
-    return `<div class="ypp-row st-${s.k}">
+    const s=ypStatus(g), ph=jnMissionPhoto(g), pct=ypPct(g), d=mrDaysLeft(mrDueDs(g)), nx=ypNext(g), sum=mrMoneySum(g);
+    // дії рядка (етап 3): телефон — свайп вліво, компʼютер — наведення / Tab
+    const acts=`<div class="ypp-acts"><button class="ypp-a step" data-ypstep1="${esc(g.id)}">${nx?'✓ '+ypT('Крок','Step'):'＋ '+ypT('Крок','Step')}</button>`
+      +(sum&&mrSaved(g)<sum?`<button class="ypp-a money" data-ypin1="${esc(g.id)}">＋₴</button>`:'')+`</div>`;
+    return `<div class="ypp-sw" data-ypsw>${acts}<div class="ypp-row st-${s.k}">
       <button class="yw-hit" data-ypwall="${esc(g.id)}" aria-label="${esc(String(g.name||'')+' — '+ypStatusTxt(s))}"></button>
       ${ph?`<img src="${esc(ph)}" alt="" style="${jnMissionFocus(g,'obj')}">`:`<span class="ypp-dot" style="--c:${safeColor(g.color,'#5b8def')}"></span>`}
       <span class="ypp-rb"><span class="ypp-rh"><b>${esc(String(g.name||''))}</b><em>${s.k==='none'?'—':pct+'%'}</em></span>
@@ -912,7 +918,7 @@
         ${nx?`<small class="ypp-next">${ypT('далі: ','next: ')}${esc(nx)}</small>`:''}</span>
       ${d!==null&&d>=0?`<span class="ypp-days"><b>${d}</b><small>${mrEn()?(d===1?'day':'days'):pluralUk(d,'день','дні','днів')}</small></span>`:''}
       ${s.k==='behind'?`<button class="yw-catch ypp-rc" data-ypcatch="${esc(g.id)}">✦</button>`:s.k==='none'?`<button class="yw-catch ypp-rc" data-ypplan="${esc(g.id)}" aria-label="${esc(ypT('Розписати','Plan it'))}">＋</button>`:''}
-    </div>`;
+    </div></div>`;
   }
   function ypPathHTML(goals){
     const act=goals.filter(g=>ypPct(g)<100);
@@ -923,6 +929,36 @@
     return `<div class="ypp">${ypPathToday(act)}${ypPathBehind(act)}${ypPathHero(main)}
       ${rest.length?`<div class="ypp-rows">${rest.map(ypPathRow).join('')}</div>`:''}
       <button class="yw-free yw-new" data-ypnew><em>＋ ${ypT('Нова ціль','New goal')}</em></button>${ypWallMoney()}</div>`;
+  }
+  /* «✓ Крок» з рядка: відмітити НАСТУПНИЙ крок — найближчу незроблену справу тижня, інакше незроблену віху.
+     Кроку нема — «＋ Крок» на тиждень (ypAddWeekStep). Пише лише після ypReady(); тост каже, що саме відмічено. */
+  function ypQuickStep(g){
+    if(!ypReady()){ ypNotReady(); return; }
+    const t=ypWeekTasks(g).find(x=>!x.done);
+    if(t){ t.done=true; saveGoals(); try{ plToast('✓ '+String(t.t||'').slice(0,60)); }catch(_){} ypRender(); return; }
+    const m=(g.ms||[]).find(x=>x&&!x.done&&jnLevels(g).some(l=>String(l.id)===String(x.id)));
+    if(m){ jnMsSetDone(m,true); saveGoals(); try{ plToast('✓ '+String(m.t||'').slice(0,60)); }catch(_){} ypRender(); return; }
+    ypAddWeekStep(g,ypRender);
+  }
+  /* Свайп рядка «Шляху»: тягни вліво — відкриються дії; лише палець/стилус (мишка — наведення в CSS).
+     Вертикальна прокрутка лишається (touch-action:pan-y); після свайпу клік по рядку не відкриває ціль. */
+  function ypSwipeBind(root){
+    const closeAll=except=>root.querySelectorAll('.ypp-sw.open').forEach(x=>{ if(x!==except){ x.classList.remove('open'); x.querySelector('.ypp-row').style.transform=''; } });
+    root.querySelectorAll('.ypp-sw').forEach(sw=>{
+      const row=sw.querySelector('.ypp-row'), acts=sw.querySelector('.ypp-acts'); let x0=0,y0=0,base=0,drag=false,id=null,moved=false;
+      const aw=()=>acts.offsetWidth||150;
+      row.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse') return; id=e.pointerId; x0=e.clientX; y0=e.clientY; base=sw.classList.contains('open')?-aw():0; drag=false; moved=false; });
+      row.addEventListener('pointermove',e=>{ if(e.pointerId!==id) return; const dx=e.clientX-x0, dy=e.clientY-y0;
+        if(!drag){ if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy)) return; drag=true; moved=true; closeAll(sw); row.style.transition='none'; try{ row.setPointerCapture(id); }catch(_){} }
+        row.style.transform='translateX('+Math.max(-aw(),Math.min(0,base+dx))+'px)'; });
+      const end=e=>{ if(e.pointerId!==id) return; id=null; if(!drag) return; drag=false; row.style.transition='';
+        const cur=new DOMMatrix(getComputedStyle(row).transform).m41, open=cur<-aw()/2;
+        sw.classList.toggle('open',open); row.style.transform=open?'translateX('+(-aw())+'px)':''; };
+      row.addEventListener('pointerup',end); row.addEventListener('pointercancel',end);
+      // після свайпу — не відкривати ціль; відкритий рядок — тап закриває
+      row.addEventListener('click',e=>{ if(moved){ moved=false; e.stopPropagation(); e.preventDefault(); return; }
+        if(sw.classList.contains('open')){ e.stopPropagation(); e.preventDefault(); closeAll(null); } },true);
+    });
   }
   // «＋ Крок на сьогодні»: текст → яка ціль → звичайна справа «Плану» на сьогодні з goalId (ypPushTask)
   function ypAddTodayStep(goals){
