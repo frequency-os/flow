@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 102 |
-| Рядків JS | 40871 |
+| Рядків JS | 40963 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12690 |
-| Сутностей верхнього рівня | 3190 |
+| Рядків CSS | 12729 |
+| Сутностей верхнього рівня | 3200 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -100,7 +100,7 @@
 | `src/scripts/core/63-widget-sheet.js` | 374 | 22 |
 | `src/scripts/core/64-rich-text.js` | 196 | 23 |
 | `src/scripts/core/65-plan.js` | 365 | 58 |
-| `src/scripts/core/66-year-planner.js` | 919 | 106 |
+| `src/scripts/core/66-year-planner.js` | 1011 | 116 |
 | `src/scripts/core/67-work-panel.js` | 77 | 9 |
 | `src/scripts/page-editor/01-palette.js` | 194 | 17 |
 | `src/scripts/page-editor/02-block-styles.js` | 798 | 55 |
@@ -182,7 +182,7 @@
 | `src/styles/core/40-block-store.css` | 143 | 0 |
 | `src/styles/core/41-widget-sheet.css` | 200 | 0 |
 | `src/styles/core/42-plan.css` | 196 | 2 |
-| `src/styles/core/43-year-planner.css` | 417 | 0 |
+| `src/styles/core/43-year-planner.css` | 456 | 0 |
 
 ## Ключі сховища — FLOW_KEYS (84)
 
@@ -3215,7 +3215,7 @@
 | `pnIsOpen` | функція | `src/scripts/core/65-plan.js:349` |
 | `goPlan` | функція | `src/scripts/core/65-plan.js:352` |
 
-### `src/scripts/core/66-year-planner.js` — 106 сутностей
+### `src/scripts/core/66-year-planner.js` — 116 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -3317,14 +3317,24 @@
 | `ypWallLine` | функція | `src/scripts/core/66-year-planner.js:779` |
 | `ypWallHTML` | функція | `src/scripts/core/66-year-planner.js:788` |
 | `ypWallBind` | функція | `src/scripts/core/66-year-planner.js:822` |
-| `ypPathHTML` | функція | `src/scripts/core/66-year-planner.js:850` |
-| `ypPop` | функція | `src/scripts/core/66-year-planner.js:856` |
-| `ypSettings` | функція | `src/scripts/core/66-year-planner.js:878` |
-| `ypFlowCatch` | функція | `src/scripts/core/66-year-planner.js:897` |
-| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:907` |
-| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:908` |
-| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:909` |
-| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:918` |
+| `ypTodayTasks` | функція | `src/scripts/core/66-year-planner.js:854` |
+| `ypPathToday` | функція | `src/scripts/core/66-year-planner.js:860` |
+| `ypPathBehind` | функція | `src/scripts/core/66-year-planner.js:870` |
+| `ypNext` | функція | `src/scripts/core/66-year-planner.js:877` |
+| `ypChips` | функція | `src/scripts/core/66-year-planner.js:882` |
+| `ypPathHero` | функція | `src/scripts/core/66-year-planner.js:889` |
+| `ypQBar` | функція | `src/scripts/core/66-year-planner.js:901` |
+| `ypPathRow` | функція | `src/scripts/core/66-year-planner.js:905` |
+| `ypPathHTML` | функція | `src/scripts/core/66-year-planner.js:917` |
+| `ypAddTodayStep` | функція | `src/scripts/core/66-year-planner.js:928` |
+| `ypFlowCatchAll` | функція | `src/scripts/core/66-year-planner.js:937` |
+| `ypPop` | функція | `src/scripts/core/66-year-planner.js:948` |
+| `ypSettings` | функція | `src/scripts/core/66-year-planner.js:970` |
+| `ypFlowCatch` | функція | `src/scripts/core/66-year-planner.js:989` |
+| `ypRefresh` | функція | `src/scripts/core/66-year-planner.js:999` |
+| `goYearPlanBack` | функція | `src/scripts/core/66-year-planner.js:1000` |
+| `goYearPlan` | функція | `src/scripts/core/66-year-planner.js:1001` |
+| `window.goYearPlan` | значення | `src/scripts/core/66-year-planner.js:1010` |
 
 ### `src/scripts/core/67-work-panel.js` — 9 сутностей
 

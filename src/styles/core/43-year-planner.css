@@ -415,3 +415,42 @@
   .yp-pop-row[aria-checked="true"] .yp-sw::after{transform:translateX(18px);}
   @media (prefers-reduced-motion:reduce){ .yp-sw,.yp-sw::after{transition:none;} }
   .yp-gear:focus-visible,.yw-tabs button:focus-visible,.yp-seg button:focus-visible,.yp-pop-row:focus-visible,.yp-pop-x:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ════ «Шлях» (етап 2, 25.11.2026) — яскраве одне: фото головної цілі; решта тиха ════ */
+  .ypp{display:flex;flex-direction:column;gap:12px;}
+  .ypp-card{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);}
+  .ypp-today{border-color:color-mix(in srgb,var(--accent) 35%,var(--line));}
+  .ypp-t img{flex:none;width:28px;height:28px;border-radius:8px;object-fit:cover;}
+  .ypp-t span em{display:block;font-style:normal;font-size:11px;font-weight:600;color:var(--muted);margin-top:1px;}
+  .ypp-behind>span:first-child{flex:1;min-width:0;}
+  .ypp-hero{height:300px;}
+  .ypp-hero .yw-b b{font-size:22px;}
+  .ypp-next{font-size:12px;line-height:1.35;padding:5px 8px;border-radius:9px;background:color-mix(in srgb,currentColor 14%,transparent);align-self:flex-start;max-width:100%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-sizing:border-box;}
+  .ypp-chips{display:flex;gap:5px;flex-wrap:wrap;}
+  .ypp-chips:empty{display:none;}
+  .ypp-chip{font-size:11px;font-weight:700;padding:4px 7px;border-radius:7px;background:color-mix(in srgb,#000 35%,transparent);color:#fff;white-space:nowrap;}
+  .ypp-hero:not(.ph) .ypp-chip{background:var(--bg-2);color:var(--text);}
+  .ypp-rows{display:flex;flex-direction:column;gap:8px;}
+  .ypp-row{position:relative;display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--text);}
+  .ypp-row.st-behind{border-color:color-mix(in srgb,#e0b060 40%,var(--line));background:color-mix(in srgb,#e0b060 6%,var(--card));}
+  .ypp-row>img,.ypp-dot{position:relative;z-index:0;flex:none;width:52px;height:52px;border-radius:14px;object-fit:cover;pointer-events:none;}
+  .ypp-dot{background:color-mix(in srgb,var(--c) 60%,var(--card));}
+  .ypp-rb{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;pointer-events:none;}
+  .ypp-rh{display:flex;justify-content:space-between;gap:8px;}
+  .ypp-rh b{font-size:15px;font-weight:800;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ypp-rh em{font-style:normal;font-size:14px;font-weight:800;}
+  .ypp-row .yw-s{color:var(--muted);}
+  .ypp-row.st-ok .yw-s{color:color-mix(in srgb,#30d158 75%,var(--text));}
+  .ypp-row.st-behind .yw-s{color:color-mix(in srgb,#e0b060 80%,var(--text));}
+  .ypp-row .ypp-next{background:var(--bg-2);color:var(--text);}
+  .ypp-q{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;margin-top:2px;}
+  .ypp-q i{display:block;height:5px;border-radius:3px;overflow:hidden;background:color-mix(in srgb,var(--text) 8%,transparent);}
+  .ypp-q i.has{background:color-mix(in srgb,var(--text) 16%,transparent);}
+  .ypp-q u{display:block;height:100%;background:var(--accent);}
+  .ypp-days{flex:none;min-width:44px;text-align:center;pointer-events:none;}
+  .ypp-days b{display:block;font-size:20px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
+  .ypp-days small{font-size:10px;color:var(--muted);}
+  .ypp-rc{position:absolute;z-index:2;right:10px;bottom:10px;margin:0;min-width:32px;justify-content:center;}
+  .ypp-row .yw-hit{z-index:1;}
+  .ypp-row .yw-catch{color:var(--accent);background:var(--bg-2);border-color:var(--line);}
