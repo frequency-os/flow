@@ -62,14 +62,15 @@
   /* борги на картці балансу (10.10.2026): баланс — справжні гроші, а рядок нижче показує, що буде після боргів.
      Рахуються лише НЕ проведені в Гаманець борги (проведені вже сидять у балансі операцією) і лише в головній валюті. */
   function wlDebtTotals(){
-    let owe=0, owed=0, other=0;
+    let owe=0, owed=0, other=0, pct=0;
     try{ (debtItems||[]).forEach(i=>{ if(!i||i.synced) return; const v=balance(i); if(!(v>0)) return;
-      if((i.cur||'UAH')!==mainCur()){ other++; return; } if(i.kind==='owe') owe+=v; else owed+=v; }); }catch(_){}
-    return {owe:Math.round(owe*100)/100, owed:Math.round(owed*100)/100, other};
+      if((i.cur||'UAH')!==mainCur()){ other++; return; } if(i.kind==='owe'){ owe+=v; pct+=debtMonthInterest(i); } else owed+=v; }); }catch(_){}
+    return {owe:Math.round(owe*100)/100, owed:Math.round(owed*100)/100, other, pct};   // pct — скільки відсотки моїх боргів коштують на місяць (18-debts.js)
   }
   function wlDebtLineHTML(total){
     const d=wlDebtTotals(); if(!d.owe&&!d.owed&&!d.other) return '';
     const parts=[]; if(d.owe) parts.push('я винен −'+wlMoney(d.owe)); if(d.owed) parts.push('мені винні +'+wlMoney(d.owed)); if(d.other) parts.push(d.other+' в іншій валюті');
+    if(d.pct) parts.push('відсотки −'+wlMoney(d.pct)+'/міс');
     return `<button class="wl-debt" data-wldebt><span>🤝 ${esc(parts.join(' · '))}</span><span>після боргів ≈ <b>${esc(wlMoney(total-d.owe+d.owed))}</b> ›</span></button>`;
   }
   function wlOverviewHTML(ops,all,ym){

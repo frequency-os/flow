@@ -257,6 +257,7 @@
         <input id="date" type="date">
       </div>
       <input id="note" class="mb" placeholder="Причина / коментар (необов'язково)…" maxlength="80">
+      <input id="rate" class="mb" type="number" inputmode="decimal" placeholder="% річних, якщо є (кредитка, розстрочка)" min="0" max="200" step="0.1">
       <button class="add" id="add">+ Додати запис</button>
     </div>
 
@@ -795,6 +796,7 @@
     <div class="grip"></div>
     <div class="mhead"><div class="av" id="mAv"></div><div><div class="nm" id="mName"></div><div class="st" id="mKind"></div></div></div>
     <div class="bigbal" id="mBal"><div class="lab">Поточний залишок</div><div class="val" id="mVal">0 ₴</div><div class="desc" id="mDesc"></div></div>
+    <button class="debt-rate" id="mRate"></button>
     <div class="ops"><button class="pay" id="opPay"></button><button class="more" id="opMore"></button></div>
     <div class="prompt hidden" id="prompt"><div class="pt" id="pTitle"></div><div class="pr">
       <input id="pAmount" type="number" inputmode="decimal" placeholder="Сума" min="0" step="0.01"><button class="ok" id="pOk">Готово</button></div></div>

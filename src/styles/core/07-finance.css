@@ -344,6 +344,12 @@
   .bigbal .lab{font-size:12px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;}
   .bigbal .val{font-size:34px;font-weight:800;color:var(--c);margin-top:6px;letter-spacing:-.02em;}
   .bigbal .val.zero{color:var(--owed);} .bigbal .desc{font-size:13px;color:var(--muted);margin-top:4px;}
+  .meta.debt-pct{color:var(--owe);font-weight:700;margin-top:1px;}
+  .debt-rate{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;width:100%;margin:-8px 0 16px;padding:11px 14px;text-align:left;
+    background:var(--field);border:1.5px dashed var(--line);border-radius:14px;color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;}
+  .debt-rate b{font-weight:800;} .debt-rate span{color:var(--muted);}
+  .debt-rate small{flex-basis:100%;font-size:12px;color:var(--muted);order:3;}
+  .debt-rate i{font-style:normal;font-weight:700;font-size:12px;color:var(--accent);margin-left:auto;}
   .ops{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:20px;}
   .ops button{border:1.5px solid var(--line);background:var(--field);color:var(--text);border-radius:14px;padding:13px 10px;
     font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .16s;line-height:1.3;}

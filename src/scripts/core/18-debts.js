@@ -105,6 +105,13 @@
     return '';
   }
   function balance(i){ return i.ops.reduce((s,o)=>s+(o.type==='borrow'?o.amount:-o.amount),0); }
+  /* ---- Відсотки (27.11.2026, етап 1 переробки Гаманця) ----
+     Поле rate у боргу — % річних, необовʼязкове. Лише показуємо, скільки відсотки коштують
+     на місяць; сам борг від цього НЕ росте (нарахування банк робить сам, і в нього свої правила). */
+  function debtRateParse(v){ const n=Math.round(parseFloat(String(v==null?'':v).replace(',','.'))*10)/10; return n>0&&n<=200?n:0; }
+  function debtRate(i){ return debtRateParse(i&&i.rate); }   // з хмари/AI може прийти будь-що — читаємо лише через парсер
+  function debtMonthInterest(i){ const r=debtRate(i), b=balance(i); return r&&b>0?Math.round(b*r/100/12):0; }
+  function debtSaveHint(r){ return Math.round(1000*r/100); }   // 1 000, віддана раніше, — мінус стільки відсотків за рік
 
   document.getElementById('add').onclick=()=>{
     const name=document.getElementById('name').value.trim();
@@ -113,8 +120,10 @@
     const date=document.getElementById('date').value;
     const note=document.getElementById('note').value.trim();
     if(!name||!(amount>0)){ (!name?document.getElementById('name'):document.getElementById('amount')).focus(); return; }
-    debtItems.unshift({ id:Date.now(), kind:debtKind, name, cur, ops:[{id:Date.now(),type:'borrow',amount,date,note}] });
-    document.getElementById('name').value=''; document.getElementById('amount').value=''; document.getElementById('note').value='';
+    const it={ id:Date.now(), kind:debtKind, name, cur, ops:[{id:Date.now(),type:'borrow',amount,date,note}] };
+    const rate=debtRateParse(document.getElementById('rate').value); if(rate) it.rate=rate;   // старі борги без rate = «без відсотків»
+    debtItems.unshift(it);
+    document.getElementById('name').value=''; document.getElementById('amount').value=''; document.getElementById('note').value=''; document.getElementById('rate').value='';
     debtSave(); debtRender();
   };
 
@@ -139,6 +148,7 @@
       const d=last&&last.date?new Date(last.date).toLocaleDateString('uk-UA',{day:'numeric',month:'short',year:'numeric'}):'';
       const kindTxt=i.kind==='owe'?'Я винен':'Мені винні';
       const opsTxt=i.ops.length>1?` · ${i.ops.length} оп.`:'';
+      const mi=settled?0:debtMonthInterest(i), rateTxt=debtRate(i)?`${String(debtRate(i)).replace('.',',')}%${mi?` · ${i.kind==='owe'?'−':'+'}${fmt(mi)} ${CUR[i.cur]||i.cur}/міс`:''}`:'';
       const amtHtml=settled?`<div class="settled">✓ Погашено</div>`:`<div class="amt">${sign}${fmt(bal)} ${esc(CUR[i.cur]||i.cur)}</div>`;
       const syncBtn = (!settled)
         ? (i.synced
@@ -147,7 +157,7 @@
         : '';
       return `<div class="item clickable" style="--c:${c}" data-debtopen="${esc(i.id)}">
         <div class="who">${esc(initials(i.name))}</div>
-        <div class="mid"><div class="nm">${esc(i.name)}</div><div class="meta">${kindTxt}${d?' · '+d:''}${opsTxt}</div>${syncBtn}</div>
+        <div class="mid"><div class="nm">${esc(i.name)}</div><div class="meta">${kindTxt}${d?' · '+d:''}${opsTxt}</div>${rateTxt?`<div class="meta debt-pct">${esc(rateTxt)}</div>`:''}${syncBtn}</div>
         ${amtHtml}<div class="chev">›</div></div>`;
     }).join('');
     document.querySelectorAll('[data-debtsync]').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation(); toggleDebtSync(b.dataset.debtsync); });
@@ -204,6 +214,7 @@
     const bal=balance(i), settled=bal<=0.0001, v=document.getElementById('mVal');
     v.textContent=settled?'0 '+sym:fmt(bal)+' '+sym; v.classList.toggle('zero',settled);
     document.getElementById('mDesc').textContent=settled?'Борг повністю погашено 🎉':(i.kind==='owe'?'Стільки ще треба віддати':'Стільки тобі ще винні');
+    debtRateBtn(i, settled, sym);
     const pay=document.getElementById('opPay'), more=document.getElementById('opMore');
     if(i.kind==='owe'){ pay.innerHTML='↓ Я віддав<small>зменшити борг</small>'; more.innerHTML='↑ Позичив ще<small>збільшити борг</small>'; }
     else{ pay.innerHTML='↓ Мені повернули<small>зменшити борг</small>'; more.innerHTML='↑ Дав ще<small>збільшити борг</small>'; }
@@ -222,6 +233,18 @@
     // як і в списку: id операції — у data-атрибуті, а не в JS-коді onclick
     document.querySelectorAll('#mHist [data-debtopdel]').forEach(el=>el.onclick=()=>{
       const o=i.ops.find(x=>String(x.id)===el.dataset.debtopdel); if(o) delOp(o.id); });
+  }
+  // рядок «% річних» у картці боргу: показує, скільки коштують відсотки, і дає змінити ставку
+  function debtRateBtn(i, settled, sym){
+    const b=document.getElementById('mRate'); if(!b) return;
+    const r=debtRate(i), mi=settled?0:debtMonthInterest(i), owe=i.kind==='owe';
+    const save=r&&!settled&&owe?debtSaveHint(r):0;   // скільки береже кожна 1 000, віддана раніше
+    b.innerHTML=r
+      ?`<b>${esc(String(r).replace('.',','))}% річних</b>${mi?`<span>${owe?'відсотки коштують':'тобі набігає'} ≈ ${esc(fmt(mi))} ${esc(sym)} на місяць</span>`:''}${save?`<small>Кожні 1 000 ${esc(sym)}, віддані раніше, бережуть ≈ ${esc(fmt(save))} ${esc(sym)} на рік</small>`:''}<i>змінити</i>`
+      :`<span>Без відсотків</span><i>＋ % річних</i>`;
+    b.onclick=()=>inputModal({title:'% річних', value:r?String(r):'', placeholder:'напр. 32 (0 — без відсотків)', onOk:v=>{
+      const n=debtRateParse(v); if(n) i.rate=n; else delete i.rate;
+      debtSave(); renderModal(); debtRender(); try{ renderFinance(); }catch(_){} }});
   }
   function askOp(type){ pendingType=type;
     const i=debtItems.find(x=>x.id===curId), p=document.getElementById('prompt');
