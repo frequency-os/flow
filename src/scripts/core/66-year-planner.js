@@ -830,11 +830,11 @@
       if(w) items.push({ic:'crop', label:ypT('Кадр фото','Photo focus'), sub:wishFocusXY(w)?ypT('Точку вибрано · тап, щоб змінити','Point set · tap to change'):ypT('Що має бути видно на всіх картках','What must stay visible on every card'),
         onClick:()=>wishFocusEditor(w.id, ypRender)});
       else items.push({ic:'photo', label:ypT('Додати фото','Add a photo'), sub:ypT('на сторінці цілі','on the goal page'), onClick:()=>mrGoalPage(g)});
-      actionSheet({ title:String(g.name||ypT('Ціль','Goal')), items });
+      ypMenu(b, String(g.name||ypT('Ціль','Goal')), items);
     });
     q('[data-yptab]').forEach(b=>b.onclick=()=>{ if(b.dataset.yptab!==ypTab) ypSetTab(b.dataset.yptab); });
     q('[data-ypset]').forEach(b=>b.onclick=()=>ypSettings(b));
-    q('[data-yptoday]').forEach(b=>b.onclick=()=>ypAddTodayStep(mrActive()));
+    q('[data-yptoday]').forEach(b=>b.onclick=()=>ypAddTodayStep(mrActive(), b));
     q('[data-ypstep1]').forEach(b=>b.onclick=()=>{ const g=jnGoalById(b.dataset.ypstep1); if(g) ypQuickStep(g); });
     q('[data-ypin1]').forEach(b=>b.onclick=()=>{ const g=jnGoalById(b.dataset.ypin1); if(g) mrMoveSheet(g,'in',ypRender); });
     ypSwipeBind(root);
@@ -846,9 +846,9 @@
     q('[data-ypwin]').forEach(b=>b.onclick=()=>{
       const gs=mrActive().filter(g=>mrMoneySum(g)&&mrSaved(g)<mrMoneySum(g));
       if(gs.length===1){ mrMoveSheet(gs[0],'in',ypRender); return; }
-      actionSheet({ title:ypT('На яку ціль відкласти?','Save for which goal?'), items:gs.map(g=>({ ic:'target',
+      ypMenu(b, ypT('На яку ціль відкласти?','Save for which goal?'), gs.map(g=>({
         label:String(g.name||'')+' · '+ypT('цього місяця ','this month ')+mrK(ypMonthSaved(g),g)+ypT(' з ',' of ')+mrK(ypMonthTarget(g),g),
-        onClick:()=>mrMoveSheet(g,'in',ypRender) })) });
+        onClick:()=>mrMoveSheet(g,'in',ypRender) })));
     });
   }
   /* ════════ «Шлях» (етап 2, 25.11.2026) — що робити, а не лише як справи ════════
@@ -926,9 +926,11 @@
     // головна — роль main, інакше найближчий фініш, інакше перша
     const main=act.find(g=>jnRole(g)==='main')||act.slice().sort((a,b)=>String(mrDueDs(a)||'9').localeCompare(String(mrDueDs(b)||'9')))[0];
     const rest=act.filter(g=>g!==main);
-    return `<div class="ypp">${ypPathToday(act)}${ypPathBehind(act)}${ypPathHero(main)}
-      ${rest.length?`<div class="ypp-rows">${rest.map(ypPathRow).join('')}</div>`:''}
-      <button class="yw-free yw-new" data-ypnew><em>＋ ${ypT('Нова ціль','New goal')}</em></button>${ypWallMoney()}</div>`;
+    // телефон — одна колонка в цьому ж порядку; компʼютер (≥1024) — три: сьогодні · цілі · фініші, тиждень і гроші
+    return `<div class="ypp"><div class="ypp-c1">${ypPathToday(act)}${ypPathBehind(act)}</div>
+      <div class="ypp-c2">${ypPathHero(main)}${rest.length?`<div class="ypp-rows">${rest.map(ypPathRow).join('')}</div>`:''}
+        <button class="yw-free yw-new" data-ypnew><em>＋ ${ypT('Нова ціль','New goal')}</em></button></div>
+      <div class="ypp-c3">${ypWallLine(act)}<div class="ypp-desk">${ypWallWeek(act)}</div>${ypWallMoney()}</div></div>`;
   }
   /* «✓ Крок» з рядка: відмітити НАСТУПНИЙ крок — найближчу незроблену справу тижня, інакше незроблену віху.
      Кроку нема — «＋ Крок» на тиждень (ypAddWeekStep). Пише лише після ypReady(); тост каже, що саме відмічено. */
@@ -961,12 +963,12 @@
     });
   }
   // «＋ Крок на сьогодні»: текст → яка ціль → звичайна справа «Плану» на сьогодні з goalId (ypPushTask)
-  function ypAddTodayStep(goals){
+  function ypAddTodayStep(goals, anchor){
     inputModal({ title:ypT('Крок на сьогодні','Step for today'), placeholder:ypT('Напр. Подзвонити в банк','E.g. Call the bank'), onOk:v=>{
       v=String(v||'').trim().slice(0,200); if(!v) return;
       const act=goals.filter(g=>ypPct(g)<100);
       if(act.length===1){ ypPushTask(act[0],v,ymdLocal(),ypRender); return; }
-      actionSheet({ title:ypT('Для якої цілі?','For which goal?'), sub:v, items:act.map(g=>({ ic:'target', label:String(g.name||''), onClick:()=>ypPushTask(g,v,ymdLocal(),ypRender) })) });
+      ypMenu(anchor, ypT('Для якої цілі?','For which goal?'), act.map(g=>({ label:String(g.name||''), onClick:()=>ypPushTask(g,v,ymdLocal(),ypRender) })), v);
     }});
   }
   // «✦ Наздогнати разом» — одне ВПИСАНЕ питання про всі цілі позаду; зміни — лише шторкою year_plan
@@ -1020,6 +1022,14 @@
       pop.querySelectorAll('[data-ypsens]').forEach(b=>b.onclick=()=>{ if(ypSetPref('sens',b.dataset.ypsens)){ pop.innerHTML=draw(); bind(pop); ypRender(); try{ ypHomeHint(); }catch(_){} } });
       pop.querySelectorAll('[data-ypflowpref]').forEach(b=>b.onclick=()=>{ if(ypSetPref('flow',!ypPrefs().flow)){ pop.innerHTML=draw(); bind(pop); } });
     });
+  }
+  /* Меню дій віконцем (етап 4): замість actionSheet у «Моїх цілях» — біля кнопки на компʼютері, шторкою на телефоні.
+     items: [{label, sub, primary, onClick}] — підписи екрануються тут. */
+  function ypMenu(anchor, title, items, sub){
+    ypPop(anchor, `<div class="yp-pop-h"><b>${esc(title)}</b><button class="yp-pop-x" data-yppopx aria-label="${esc(ypT('Закрити','Close'))}">✕</button></div>`
+      +(sub?`<p class="yp-pop-s">${esc(sub)}</p>`:'')
+      +`<div class="yp-menu">${items.map((it,i)=>`<button class="yp-mi${it.primary?' pri':''}" data-ypmi="${i}"><b>${esc(it.label)}</b>${it.sub?`<small>${esc(it.sub)}</small>`:''}</button>`).join('')}</div>`,
+      (pop,close)=>pop.querySelectorAll('[data-ypmi]').forEach(b=>b.onclick=()=>{ const it=items[+b.dataset.ypmi]; close(); if(it&&typeof it.onClick==='function') it.onClick(); }));
   }
   // «✦ Наздогнати»: Флоу з ВПИСАНИМ (не надісланим) питанням; зміни — лише шторкою year_plan з галочками
   function ypFlowCatch(g){
