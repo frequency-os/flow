@@ -1,6 +1,97 @@
   /* оформлений текст у полі (19.11.2026): позначки → <b> <i> <s> <mark> <a>, усе інше екрановано (core/64-rich-text.js) */
   function txRich(b){ try{ if(typeof txHTML==='function'){ var h=txHTML(txtOf(b)); return typeof txChips==='function'?txChips(h):h; } }catch(_){} return esc(txtOf(b)); }   /* + фішки дат, сум і @папок (лише показ) */
   function txIsRich(b){ return !!(b&&typeof TX_RICH!=='undefined'&&TX_RICH[b.type]); }
+
+  /* ── Пости з соцмереж (27.11.2026, етап 1 — без мережі) ──
+     Мережу, тип і автора дістаємо лише з самої адреси: сторінку поста
+     не завантажуємо (браузер не пустить через CORS — це етап 2, воркер).
+     Обкладинка — власне фото (скрін поста), лежить у блоці полем cover. */
+  var PG_NETS=[
+    [/(^|\.)instagram\.com$/,'Instagram','IG','#c13584'],
+    [/(^|\.)(tiktok\.com)$/,'TikTok','TT','#25232b'],
+    [/(^|\.)(youtube\.com|youtu\.be)$/,'YouTube','YT','#d93025'],
+    [/(^|\.)threads\.(net|com)$/,'Threads','Th','#3a3a40'],
+    [/(^|\.)(x\.com|twitter\.com)$/,'X','X','#2b2b30'],
+    [/(^|\.)(t\.me|telegram\.me)$/,'Telegram','TG','#2a9fd6'],
+    [/(^|\.)(facebook\.com|fb\.watch)$/,'Facebook','FB','#1877f2'],
+    [/(^|\.)(pinterest\.[a-z.]+|pin\.it)$/,'Pinterest','P','#e60023'],
+    [/(^|\.)linkedin\.com$/,'LinkedIn','in','#0a66c2'],
+    [/(^|\.)reddit\.com$/,'Reddit','R','#ff4500']
+  ];
+  var PG_NOT_AUTHOR={p:1,reel:1,reels:1,tv:1,stories:1,explore:1,i:1,home:1,search:1,watch:1,shorts:1,embed:1,channel:1,c:1,share:1,video:1,s:1,login:1,hashtag:1,pin:1,r:1,in:1,company:1,feed:1,groups:1,events:1};
+  function pgYtId(u){ var m=String(u||'').match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m?m[1]:''; }
+  function pgSocial(u){
+    var h=safeHref(u); if(!h||!/^https?:\/\//i.test(h)) return null;
+    var url; try{ url=new URL(h); }catch(_){ return null; }
+    var host=url.hostname.toLowerCase().replace(/^(www|m|vm|vt|mobile)\./,'');
+    var seg=url.pathname.split('/').filter(Boolean).map(function(s){ try{ return decodeURIComponent(s); }catch(_){ return s; } });
+    var net=null; for(var i=0;i<PG_NETS.length;i++){ if(PG_NETS[i][0].test(host)){ net=PG_NETS[i]; break; } }
+    var r={host:host, n:net?net[1]:host, a:net?net[2]:(host.charAt(0)||'•').toUpperCase(), c:net?net[3]:'', kind:'', author:'', yt:'', social:!!net};
+    var s0=seg[0]||'', s1=seg[1]||'';
+    var who=function(x){ x=String(x||'').replace(/^@/,''); return /^[\w.\-]{1,40}$/.test(x)&&!PG_NOT_AUTHOR[x.toLowerCase()]?x:''; };
+    if(!net){ r.kind=''; return r; }
+    switch(net[1]){
+      case 'Instagram':
+        if(s0==='reel'||s0==='reels'||s0==='tv') r.kind='reels'; else if(s0==='p') r.kind='пост'; else if(s0==='stories'){ r.kind='сторіс'; r.author=who(s1); }
+        else { r.author=who(s0); if(s1==='reel'||s1==='p') r.kind=s1==='p'?'пост':'reels'; else if(r.author) r.kind='профіль'; }
+        break;
+      case 'TikTok':
+        if(s0.charAt(0)==='@'){ r.author=who(s0); r.kind=s1==='video'?'відео':(s1==='photo'?'фото':'профіль'); } else r.kind='відео';
+        break;
+      case 'YouTube':
+        r.yt=pgYtId(h); r.kind=s0==='shorts'?'Shorts':(r.yt?'відео':'');
+        if(s0.charAt(0)==='@'){ r.author=who(s0); if(!r.yt) r.kind='канал'; }
+        break;
+      case 'Threads': case 'X':
+        r.author=who(s0); r.kind=(s1==='post'||s1==='status')?'пост':(r.author?'профіль':'');
+        break;
+      case 'Telegram':
+        if(s0==='s'){ r.author=who(s1); r.kind=/^\d+$/.test(seg[2]||'')?'пост':'канал'; }
+        else { r.author=who(s0); r.kind=/^\d+$/.test(s1)?'пост':(r.author?'канал':''); }
+        break;
+      default:
+        r.kind='';
+    }
+    return r;
+  }
+  /* рядок, у якому лише адреса (або позначка-посилання на саму адресу) → адреса; інакше '' */
+  function pgUrlOnly(t){
+    var s=String(t==null?'':t).trim();
+    var m=/^\[([^\]\n]{1,300})\]\(((?:https?:\/\/)[^\s)<>"'`]{1,800})\)$/i.exec(s);
+    if(m) s=m[2];
+    if(!/^https?:\/\/[^\s<>"'`]{3,800}$/i.test(s)) return '';
+    return safeHref(s)?s:'';
+  }
+  /* підтип «Вкладення» за адресою — той самий, що й у полі адреси блоку */
+  function pgAttSub(v){
+    if(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/|live\/))[\w-]{11}/.test(v)) return 'video';
+    if(/\.(mp3|m4a|wav|ogg|aac)(\?|#|$)/i.test(v)) return 'audio';
+    return 'link';
+  }
+  function pgLinkCard(b,id){
+    var u=b.url||'', s=pgSocial(u)||{n:'Посилання',a:'•',c:'',kind:'',author:'',yt:'',social:false};
+    var go=safeHref(u), cov=b.cover&&/^(data:image\/|idb:)/.test(String(b.cover))?safeImg(b.cover):'';
+    var who=s.author?'@'+s.author:s.n, sub=s.author?s.n+(s.kind?' · '+s.kind:''):(s.kind||(s.social?'':'сайт'));
+    var media='';
+    if(cov) media='<div class="pgsc-cv"><img src="'+esc(cov)+'" alt="" decoding="async" loading="lazy"></div>';
+    else if(s.yt) media=b.play
+      ? '<div class="pgem pgsc-em"><iframe src="https://www.youtube.com/embed/'+s.yt+'?autoplay=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
+      : '<button class="pgem pgem-th pgsc-em" data-pgemplay="'+id+'" aria-label="Дивитись відео" style="background-image:url(\'https://i.ytimg.com/vi/'+s.yt+'/hqdefault.jpg\')"><span class="pgem-p">▶</span></button>';
+    var hasNote=b.note!=null;
+    return '<div class="pg-content"><div class="pgsc'+(s.social?' soc':'')+'"'+(s.c?' style="--nc:'+s.c+'"':'')+'>'
+      +'<div class="pgsc-h"><span class="pgsc-b" aria-hidden="true">'+esc(s.a)+'</span>'
+      +'<div class="pgsc-m"><b data-i18n-skip="1">'+esc(who)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</div>'
+      +(go?'<a class="pgsc-go" href="'+esc(go)+'" target="_blank" rel="noopener" aria-label="Відкрити">↗</a>':'')+'</div>'
+      +media
+      +'<div class="pgsc-t pg-empty" contenteditable="true" data-ph="Назва (необовʼязково)…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
+      +(hasNote?'<div class="pgsc-n pg-empty" contenteditable="true" data-ph="Нотатка: чим це корисне…" data-pglknote="'+id+'">'+esc(b.note||'')+'</div>':'')
+      +'<div class="pgsc-a">'
+        +(hasNote?'':'<button data-pglknoteadd="'+id+'">＋ Нотатка</button>')
+        +'<button data-pglkcover="'+id+'">'+(cov?'Змінити фото':'＋ Фото')+'</button>'
+        +(cov?'<button data-pglkcoverdel="'+id+'">Прибрати фото</button>':'')
+        +'<button data-pglkurl="'+id+'">Змінити посилання</button>'
+      +'</div></div></div>';
+  }
   function equalizeWidths(cols){ var n=cols.length||1; cols.forEach(function(c){ c.width=1/n; }); }
 
   /* ── стиль заголовка: колір / шрифт / контур / виділення, як в Instagram-текстах ── */
@@ -304,6 +395,7 @@
       if(sub==='video'){
         var emM=(b.url||'').match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/);
         var emVid=emM?emM[1]:null, emIn;
+        if(emVid) return pgLinkCard(b,id);   /* YouTube — картка поста з мініатюрою (27.11.2026) */
         if(!emVid) emIn='<button class="pgpp-empty" data-pgemset="'+id+'">＋ Посилання YouTube</button>';
         else if(b.play) emIn='<div class="pgem"><iframe src="https://www.youtube.com/embed/'+emVid+'?autoplay=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>';
         else emIn='<button class="pgem pgem-th" data-pgemplay="'+id+'" style="background-image:url(\'https://i.ytimg.com/vi/'+emVid+'/hqdefault.jpg\')"><span class="pgem-p">▶</span></button>';
@@ -316,6 +408,7 @@
           +'<span class="pgau-t">0:00</span><audio preload="none" data-pgauel="'+id+'" src="'+esc(b.url)+'"></audio></div></div>';
       }
       var _au=b.url||'';
+      if(safeHref(_au)) return pgLinkCard(b,id);   /* є адреса — картка поста/сайту (27.11.2026) */
       return '<div class="pg-content"><div class="pglk"><span class="pglk-ic">'+pgsIc('link')+'</span>'
         +'<div class="pglk-b"><div class="pglk-t pg-empty" contenteditable="true" data-ph="Назва…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
         +'<input class="pglk-u" type="url" inputmode="url" placeholder="Встав посилання (YouTube / mp3 / будь-що)…" value="'+esc(_au)+'" data-pglink="'+id+'"></div>'
@@ -351,6 +444,7 @@
     }
     if(t==='link'){
       var u=b.url||'';
+      if(safeHref(u)) return pgLinkCard(b,id);
       return '<div class="pg-content"><div class="pglk">'
         +'<span class="pglk-ic">'+pgsIc('link')+'</span>'
         +'<div class="pglk-b"><div class="pglk-t pg-empty" contenteditable="true" data-ph="Назва посилання…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'

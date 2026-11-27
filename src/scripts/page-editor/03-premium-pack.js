@@ -5,6 +5,11 @@
       if(lp){lp.block.ptext=pr.textContent;save();
         var w=pr.closest('.pgpr'),ln=w&&w.querySelector('.pgpr-len');
         if(ln)ln.textContent=pr.textContent.length? pr.textContent.length+' зн.':'';}return;}
+    var lnt=e.target.closest&&e.target.closest('[data-pglknote]');
+    if(lnt){var lnl=locate(lnt.dataset.pglknote);
+      if(lnl){var nv=lnt.textContent.replace(/\s+$/,'');
+        if(nv) lnl.block.note=nv; else delete lnl.block.note;   /* порожню нотатку прибираємо — знову «＋ Нотатка» */
+        save(); if(!nv) render();}return;}
     var tt=e.target.closest&&e.target.closest('[data-pgtabtxt]');
     if(tt){var t0=tt.dataset.pgtabtxt.split('|');var l=locate(t0[0]);
       if(l&&l.block.tabs&&l.block.tabs[t0[1]]){l.block.tabs[t0[1]].text=tt.textContent;save();}return;}
@@ -1080,12 +1085,15 @@
       add=add.map(function(l){ var t=l.text.trim(); if(typeof TX_RICH!=='undefined'&&!TX_RICH[l.t]&&typeof txPlainKeep==='function') t=txPlainKeep(t); return {t:l.t,text:t}; });
       add.forEach(function(l,k){
         var t=l.text;
-        if(!k&&last&&last.type==='note'&&!String(last.text||'').trim()&&!(last.children&&last.children.length)){
+        if(!k&&!(l.t==='note'&&pgUrlOnly(t))&&last&&last.type==='note'&&!String(last.text||'').trim()&&!(last.children&&last.children.length)){
           // порожній рядок у кінці («Пишіть…») — заповнюємо його, а не ставимо запис після нього
           reuse=last; was={type:last.type,text:last.text,done:last.done};
           last.type=l.t; last.text=t; if(l.t==='task') last.done=false; made.push(last); return;
         }
-        var nb={id:uid(),type:l.t,text:t}; if(l.t==='task') nb.done=false; arr.push(nb); made.push(nb);
+        /* рядок-адреса (пост із соцмережі, відео, сайт) — одразу картка «Вкладення», а не текст (27.11.2026) */
+        var lu=(l.t==='note')?pgUrlOnly(t):'';
+        var nb=lu?{id:uid(),type:'attach',sub:pgAttSub(lu),url:lu,title:''}:{id:uid(),type:l.t,text:t};
+        if(l.t==='task') nb.done=false; arr.push(nb); made.push(nb);
       });
       var fresh=made.filter(function(b){ return b!==reuse; }), redo=add.map(function(l){ return {t:l.t,text:l.text.trim()}; });
       pushOp(function(){   // одне «Скасувати» — прибирає весь пакет

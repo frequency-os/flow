@@ -150,6 +150,23 @@
     if(aa){var laa=locate(aa.dataset.pgaccadd);
       if(laa){var ba=laa.block;ba.secs=ba.secs||[];
         ba.secs.push({name:'Секція '+(ba.secs.length+1),text:'',open:1});save();render();}return;}
+    /* картка посилання з соцмережі (27.11.2026): нотатка, своє фото-обкладинка, інша адреса */
+    var lna=e.target.closest&&e.target.closest('[data-pglknoteadd]');
+    if(lna){var lnl=locate(lna.dataset.pglknoteadd);
+      if(lnl){lnl.block.note='';save();render();
+        var nf=editor.querySelector('[data-pglknote="'+lnl.block.id+'"]');if(nf){try{nf.focus();}catch(_){}}}return;}
+    var lcv=e.target.closest&&e.target.closest('[data-pglkcover]');
+    if(lcv){pgPickPhoto(lcv.dataset.pglkcover,null,'cover');return;}
+    var lcd=e.target.closest&&e.target.closest('[data-pglkcoverdel]');
+    if(lcd){var lcl=locate(lcd.dataset.pglkcoverdel);if(lcl){delete lcl.block.cover;save();render();}return;}
+    var lku=e.target.closest&&e.target.closest('[data-pglkurl]');
+    if(lku){var lkl=locate(lku.dataset.pglkurl);if(!lkl)return;
+      pgAsk('Посилання','https://…',lkl.block.url||'',function(v){
+        var l=locate(lku.dataset.pglkurl);if(!l)return;
+        l.block.url=v;l.block.play=0;
+        if(l.block.type==='attach'){l.block.sub=pgAttSub(v);
+          if(l.block.sub==='audio'&&!l.block.name){try{l.block.name=decodeURIComponent(v.split('/').pop()||'Аудіо');}catch(_){l.block.name='Аудіо';}}}
+        save();render();});return;}
     var es=e.target.closest&&e.target.closest('[data-pgemset]');
     if(es){pgAsk('Посилання YouTube','https://youtu.be/…','',function(v){
       var l=locate(es.dataset.pgemset);if(l){l.block.url=v;l.block.play=0;save();render();}});return;}
@@ -319,7 +336,7 @@
       var v=(li.value||'').trim();
       loc2.block.url=v;
       if(loc2.block.type==='attach'){ /* автовизначення підтипу «Вкладення» за URL (SPECblocksv2 §3.1) */
-        if(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))[\w-]{11}/.test(v)) loc2.block.sub='video';
+        if(pgAttSub(v)==='video') loc2.block.sub='video';
         else if(/\.(mp3|m4a|wav|ogg|aac)(\?|#|$)/i.test(v)){
           loc2.block.sub='audio';
           if(!loc2.block.name){ try{ loc2.block.name=decodeURIComponent(v.split('/').pop()||'Аудіо'); }catch(_){ loc2.block.name='Аудіо'; } }
@@ -329,7 +346,8 @@
       save(); render();
     }
   });
-  function pgPickPhoto(bid,onDone){
+  /* field: куди класти знімок — 'data' (блок «Фото», типово) або 'cover' (обкладинка картки посилання) */
+  function pgPickPhoto(bid,onDone,field){
     var inp=document.createElement('input');
     inp.type='file'; inp.accept='image/*';
     inp.onchange=function(){
@@ -343,8 +361,8 @@
           var cv=document.createElement('canvas'); cv.width=w2; cv.height=h2;
           cv.getContext('2d').drawImage(img,0,0,w2,h2);
           var loc=locate(bid); if(!loc)return;
-          loc.block.data=cv.toDataURL('image/jpeg',0.72);
-          loc.block.pos=null;
+          if(field==='cover'){ loc.block.cover=cv.toDataURL('image/jpeg',0.72); }
+          else { loc.block.data=cv.toDataURL('image/jpeg',0.72); loc.block.pos=null; }
           save(); render();
           if(onDone) onDone();
         };

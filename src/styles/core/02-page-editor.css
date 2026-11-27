@@ -797,6 +797,30 @@
     outline:none;padding:1px 0 0;}
   .pglk-go{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
     background:var(--pg-field);border:1px solid var(--pg-line);color:var(--pg-fg2);text-decoration:none;font-size:14px;}
+  /* ── картка посилання / поста з соцмережі (27.11.2026) ── */
+  .pgsc{--nc:#4ecdc4;border:1px solid var(--pg-line);border-radius:18px;overflow:hidden;
+    background:var(--pg-card);box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 24px -14px rgba(0,0,0,.45);}
+  .pgsc-h{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;}
+  .pgsc-b{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--nc);color:#fff;font-size:11px;font-weight:800;letter-spacing:.01em;}
+  .pgsc:not(.soc) .pgsc-b{background:color-mix(in srgb,var(--nc) 16%,transparent);color:var(--nc);}
+  .pgsc-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .pgsc-m b{font-size:14px;font-weight:650;color:var(--pg-fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgsc-m small{font-size:12px;color:var(--pg-mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgsc-go{flex:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--pg-field);border:1px solid var(--pg-line);color:var(--pg-fg2);text-decoration:none;font-size:16px;}
+  .pgsc-cv{background:var(--pg-card2);}
+  .pgsc-cv img{display:block;width:100%;max-height:420px;object-fit:cover;}
+  .pgsc .pgsc-em{border-radius:0;}
+  .pgsc-t{padding:10px 12px 0;font-size:15px;font-weight:600;line-height:1.35;color:var(--pg-fg);outline:none;}
+  .pgsc-t:empty{padding-top:6px;font-size:13px;font-weight:500;}
+  .pgsc-n{margin:8px 12px 0;padding:8px 10px;border-radius:10px;background:var(--pg-card2);font-size:14px;line-height:1.45;
+    color:var(--pg-fg2);outline:none;white-space:pre-wrap;}
+  .pgsc-a{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 12px;}
+  .pgsc-a button{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--pg-line);background:var(--pg-field);
+    color:var(--pg-fg2);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;}
+  @media (hover:hover){ .pgsc-a button:hover,.pgsc-go:hover{border-color:color-mix(in srgb,var(--nc) 55%,var(--pg-line));} }
+  @media (min-width:760px){ .pgsc{max-width:560px;} }
   /* ── десктоп: редактор сторінки ── */
   @media (min-width:760px){
     #scr-page .pg-doc{max-width:none;margin:0;padding-left:clamp(24px,4vw,56px);padding-right:clamp(24px,4vw,56px);}
