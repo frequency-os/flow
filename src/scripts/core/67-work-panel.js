@@ -85,5 +85,5 @@
     if(a==='prev'||a==='next'){ wkpYm[id]=ymOffset(ym,a==='next'?1:-1); wgRefresh(); return; }
     if(a==='got'){ salGotSheet(ym); return; }   // «Прийшла зарплата» за місяць, що відкритий у календарі
     if(a==='alloc'){ workMonth=ym; openAllocModal(); return; }
-    if(a==='full'){ workMonth=ym; goWork(); return; }
+    if(a==='full'){ workMonth=ym; goWork({screen:true}); return; }   // повний екран, навіть коли старі входи ведуть у папку
   }

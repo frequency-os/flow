@@ -213,7 +213,8 @@
   function dsbTreeHTML(){
     let cur=''; try{ const s=document.getElementById('scr-page'); if(s&&s.classList.contains('active')) cur=pgFolderKey()||''; }catch(_){}
     const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k));
-    let tops=[]; try{ tops=topFolderKeys().filter(vis); }catch(_){ return ''; }
+    const oldWorkOff=typeof rfInstalled==='function'&&!!rfInstalled('robota');   // є готова «Робота» — заводську не показуємо
+    let tops=[]; try{ tops=topFolderKeys().filter(vis).filter(k=>!(oldWorkOff&&k==='work')); }catch(_){ return ''; }
     if(!tops.length) return '';
     const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
       return `<div class="dsbt-r${k===cur?' on':''}" style="--lvl:${lvl}">

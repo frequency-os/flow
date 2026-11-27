@@ -157,6 +157,8 @@
         if(f.gview==='folder'||f.gview==='space'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // без поля — «Простір» (типове з 15.11.2026)
         // група, яку людина сама зібрала (16-dashboard.js isFolderGroup, 21.11.2026); звичайна папка з підпапками поля не має
         if(f.group===true) cfg[k].group=true;
+        // з якої готової папки встановлено (68-ready-folders.js, 27.11.2026): «Робота» — одна на акаунт і ховає заводську
+        if(typeof f.ready==='string'&&/^[a-z]{2,16}$/.test(f.ready)) cfg[k].ready=f.ready;
         // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo/canvas («Полотно», 18.11.2026); «Документ» — типове, не пишемо
         if(f.view==='chat'||f.view==='photo'||f.view==='canvas') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
@@ -433,7 +435,10 @@
   let workOrigin='work', workFrom='';
   /* «Робота» — інструмент Гаманця (14.10.2026): запамʼятовуємо екран, з якого прийшли, і «назад» веде туди ж
      (раніше вело в «Проєкти» або в давно відкриту папку) */
-  function goWork(){
+  function goWork(o){
+    /* встановлено готову папку «Робота» (68-ready-folders.js) — усі старі входи (плитка, Гаманець, План, клавіша 5,
+       «Проєкти») ведуть у неї; повний екран зарплати — лише {screen:true} (кнопка «Ставка й аванси» в блоці) */
+    if(!(o&&o.screen)){ const rk=typeof rfInstalled==='function'?rfInstalled('robota'):''; if(rk&&folders[rk]){ goFolder(rk); return; } }
     const a=document.querySelector('.screen.active'); const from=a?a.id:'';
     if(from!=='scr-work'){ workFrom=from; workOrigin=(from==='scr-page'&&currentFolderKey)?currentFolderKey:'work'; }
     renderWork(); show('scr-work'); }

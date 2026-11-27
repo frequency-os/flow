@@ -648,7 +648,8 @@
   function renderProjects(){
     const host=document.getElementById('projectsBody'); if(!host) return;
     // заводські проєкти
-    const factory=[
+    // заводська «Робота» ховається, щойно встановлено готову папку «Робота» (68-ready-folders.js)
+    const factory=(typeof rfInstalled==='function'&&rfInstalled('robota'))?[]:[
       {k:'work',   emo:'💼', c:'106,125,255', t:'Робота',      d:'Зміни, ставка та зарплата'},
     ];
     // папки-проєкти користувача
@@ -664,9 +665,9 @@
         d:bits.length?bits.join(' · '):'ще без кроків', badge:st[1], badgeC:st[2]};
     });
     host.innerHTML=
-      `<div class="mh-lbl">⚡ Заводські</div>
-       <div class="mh-grid">${factory.map(prjTileHTML).join('')}</div>
-       <div class="mh-lbl mt">🚀 Мої проєкти</div>
+      (factory.length?`<div class="mh-lbl">⚡ Заводські</div>
+       <div class="mh-grid">${factory.map(prjTileHTML).join('')}</div>`:'')+
+      `<div class="mh-lbl${factory.length?' mt':''}">🚀 Мої проєкти</div>
        ${mine.length?`<div class="mh-grid">${mine.map(prjTileHTML).join('')}</div>`
          :`<div class="prj-empty">Тут зʼявляться твої проєкти. Створи перший — і він житиме на цій вкладці.</div>`}
        <button class="prj-add" data-prj="add">＋ Новий проєкт</button>`;

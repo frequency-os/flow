@@ -7,7 +7,7 @@
      Блок із полем since новіше за BS_BASE — «Нове»: у меню нема, поки людина його не візьме. Агент Флоу і шаблони
      створюють блоки як раніше — магазин керує лише меню. Тексти — двома мовами (flowLang). */
   var BS_KEY='blocks_got', BS_BASE='2026-11-18';
-  var BS_SPH=[['all','Усе','All'],['trk','Трекери','Trackers'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
+  var BS_SPH=[['all','Усе','All'],['ready','Готові папки','Ready folders'],['trk','Трекери','Trackers'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
   /* k → сфери, значок, колір, звʼязок, прев'ю; тексти uk/en: n назва, s одне речення, d опис, st три кроки.
      ПРАВИЛО: кожен НОВИЙ запис тут — з since:'РРРР-ММ-ДД' пізніше за BS_BASE. Без since блок у людей, що вже
      тапали «Отримати/Прибрати», мовчки зник би з меню (у їхньому збереженому списку його нема). */
@@ -166,6 +166,7 @@
     const sp=bsState.sph, inSp=k=>sp==='all'||BS_ITEMS[k].sp.includes(sp);
     let h=`<div class="bs-chips" role="group">${BS_SPH.map(s=>`<button class="bs-chip${sp===s[0]?' on':''}" data-bssph="${s[0]}">${en?s[2]:s[1]}</button>`).join('')}</div>`;
     if(sp==='trk'&&!q) return h+bsTrkHTML(en);
+    if(sp==='ready'&&!q) return h+(typeof rfStoreHTML==='function'?rfStoreHTML(en):'');   // готові папки (68-ready-folders.js)
     if(q||sp!=='all'){ const L=keys.filter(k=>match(k)&&inSp(k));
       return h+(L.length?`<div class="bs-shelf">${L.map(bsRow).join('')}</div>`:`<p class="bs-empty">${en?'Nothing found':'Нічого не знайшлось'}</p>`); }
     // прибрані людиною (не нові) — одразу зверху: сюди веде рядок «Ще N блоків у Магазині» з меню «＋ Блок»
@@ -228,6 +229,7 @@
       if(t.closest('[data-bsx]')){ close(); return; }
       if(t.closest('[data-bsback]')){ if(bsState.open){ bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); } else close(); return; }
       const g=t.closest('[data-bsget]'); if(g){ e.stopPropagation(); const k=g.dataset.bsget, on=!bsGot(k); if(bsSet(k,on)===false) return; if(on) bsToast(en?'In the “+ Block” menu ✓':'Є в меню «＋ Блок» ✓'); return; }
+      const ri=t.closest('[data-rfinst]'); if(ri){ const k=ri.dataset.rfinst; close(); setTimeout(()=>{ try{ rfInstall(k); }catch(err){ console.error('rfInstall',err); } },120); return; }   // готова папка: створити й відкрити
       const rm=t.closest('[data-bsrm]'); if(rm){ if(bsSet(rm.dataset.bsrm,false)===false) return; bsToast(en?'Removed from the menu — still works in folders':'Прибрано з меню — у папках працює далі'); return; }
       const s=t.closest('[data-bssph]'); if(s){ bsState.sph=s.dataset.bssph; bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
       const op=t.closest('[data-bsopen]'); if(op){ bsState.open=op.dataset.bsopen; bsState.look=op.dataset.bslook||''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
