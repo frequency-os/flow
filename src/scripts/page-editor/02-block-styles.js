@@ -16,7 +16,8 @@
     [/(^|\.)(facebook\.com|fb\.watch)$/,'Facebook','FB','#1877f2'],
     [/(^|\.)(pinterest\.[a-z.]+|pin\.it)$/,'Pinterest','P','#e60023'],
     [/(^|\.)linkedin\.com$/,'LinkedIn','in','#0a66c2'],
-    [/(^|\.)reddit\.com$/,'Reddit','R','#ff4500']
+    [/(^|\.)reddit\.com$/,'Reddit','R','#ff4500'],
+    [/(^|\.)spotify\.com$/,'Spotify','S','#1db954']
   ];
   var PG_NOT_AUTHOR={p:1,reel:1,reels:1,tv:1,stories:1,explore:1,i:1,home:1,search:1,watch:1,shorts:1,embed:1,channel:1,c:1,share:1,video:1,s:1,login:1,hashtag:1,pin:1,r:1,in:1,company:1,feed:1,groups:1,events:1};
   function pgYtId(u){ var m=String(u||'').match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m?m[1]:''; }
@@ -48,6 +49,10 @@
       case 'Telegram':
         if(s0==='s'){ r.author=who(s1); r.kind=/^\d+$/.test(seg[2]||'')?'пост':'канал'; }
         else { r.author=who(s0); r.kind=/^\d+$/.test(s1)?'пост':(r.author?'канал':''); }
+        break;
+      case 'Spotify':   /* open.spotify.com/intl-uk/track/… — мовну частину пропускаємо */
+        var sp=/^intl-/.test(s0)?s1:s0;
+        r.kind={track:'трек',album:'альбом',playlist:'плейлист',episode:'епізод',show:'подкаст',artist:'виконавець'}[sp]||'';
         break;
       default:
         r.kind='';

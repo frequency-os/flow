@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 103 |
-| Рядків JS | 41224 |
+| Рядків JS | 41253 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12822 |
-| Сутностей верхнього рівня | 3220 |
+| Рядків CSS | 12828 |
+| Сутностей верхнього рівня | 3225 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -52,7 +52,7 @@
 | `src/scripts/core/15-flow-spot.js` | 1796 | 93 |
 | `src/scripts/core/16-dashboard.js` | 1633 | 88 |
 | `src/scripts/core/17-folder-render.js` | 16 | 2 |
-| `src/scripts/core/18-debts.js` | 248 | 19 |
+| `src/scripts/core/18-debts.js` | 271 | 24 |
 | `src/scripts/core/19-spending.js` | 136 | 14 |
 | `src/scripts/core/20-work.js` | 604 | 56 |
 | `src/scripts/core/21-patterns.js` | 34 | 6 |
@@ -77,7 +77,7 @@
 | `src/scripts/core/43-month.js` | 299 | 42 |
 | `src/scripts/core/44-prizes.js` | 172 | 24 |
 | `src/scripts/core/45-year.js` | 143 | 21 |
-| `src/scripts/core/46-wallet.js` | 508 | 43 |
+| `src/scripts/core/46-wallet.js` | 509 | 43 |
 | `src/scripts/core/47-rules.js` | 351 | 29 |
 | `src/scripts/core/48-hero.js` | 342 | 41 |
 | `src/scripts/core/48-widgets.js` | 984 | 105 |
@@ -104,7 +104,7 @@
 | `src/scripts/core/67-work-panel.js` | 89 | 9 |
 | `src/scripts/core/68-ready-folders.js` | 46 | 6 |
 | `src/scripts/page-editor/01-palette.js` | 194 | 17 |
-| `src/scripts/page-editor/02-block-styles.js` | 892 | 62 |
+| `src/scripts/page-editor/02-block-styles.js` | 897 | 62 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1187 | 60 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
@@ -152,7 +152,7 @@
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 126 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
-| `src/styles/core/07-finance.css` | 590 | 0 |
+| `src/styles/core/07-finance.css` | 596 | 0 |
 | `src/styles/core/08-work.css` | 263 | 0 |
 | `src/styles/core/09-board-canvas.css` | 188 | 3 |
 | `src/styles/core/10-reader-blocks.css` | 448 | 4 |
@@ -1400,7 +1400,7 @@
 | `debtTotals` | функція | `src/scripts/core/17-folder-render.js:5` |
 | `debtSummary` | функція | `src/scripts/core/17-folder-render.js:10` |
 
-### `src/scripts/core/18-debts.js` — 19 сутностей
+### `src/scripts/core/18-debts.js` — 24 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -1414,15 +1414,20 @@
 | `sanitizeStoredRich` | функція | `src/scripts/core/18-debts.js:69` |
 | `safeImg` | функція | `src/scripts/core/18-debts.js:91` |
 | `balance` | функція | `src/scripts/core/18-debts.js:107` |
-| `debtRender` | функція | `src/scripts/core/18-debts.js:121` |
-| `toggleDebtSync` | функція | `src/scripts/core/18-debts.js:160` |
-| `curId` | значення | `src/scripts/core/18-debts.js:190` |
-| `openModal` | функція | `src/scripts/core/18-debts.js:191` |
-| `closeModal` | функція | `src/scripts/core/18-debts.js:194` |
-| `renderModal` | функція | `src/scripts/core/18-debts.js:197` |
-| `askOp` | функція | `src/scripts/core/18-debts.js:226` |
-| `commitOp` | функція | `src/scripts/core/18-debts.js:235` |
-| `delOp` | функція | `src/scripts/core/18-debts.js:244` |
+| `debtRateParse` | функція | `src/scripts/core/18-debts.js:111` |
+| `debtRate` | функція | `src/scripts/core/18-debts.js:112` |
+| `debtMonthInterest` | функція | `src/scripts/core/18-debts.js:113` |
+| `debtSaveHint` | функція | `src/scripts/core/18-debts.js:114` |
+| `debtRender` | функція | `src/scripts/core/18-debts.js:130` |
+| `toggleDebtSync` | функція | `src/scripts/core/18-debts.js:170` |
+| `curId` | значення | `src/scripts/core/18-debts.js:200` |
+| `openModal` | функція | `src/scripts/core/18-debts.js:201` |
+| `closeModal` | функція | `src/scripts/core/18-debts.js:204` |
+| `renderModal` | функція | `src/scripts/core/18-debts.js:207` |
+| `debtRateBtn` | функція | `src/scripts/core/18-debts.js:238` |
+| `askOp` | функція | `src/scripts/core/18-debts.js:249` |
+| `commitOp` | функція | `src/scripts/core/18-debts.js:258` |
+| `delOp` | функція | `src/scripts/core/18-debts.js:267` |
 
 ### `src/scripts/core/19-spending.js` — 14 сутностей
 
@@ -2375,35 +2380,35 @@
 | `wlRender` | функція | `src/scripts/core/46-wallet.js:43` |
 | `wlDebtTotals` | функція | `src/scripts/core/46-wallet.js:64` |
 | `wlDebtLineHTML` | функція | `src/scripts/core/46-wallet.js:70` |
-| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:75` |
-| `wlGoalHours` | функція | `src/scripts/core/46-wallet.js:107` |
-| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:112` |
-| `wlFoldersHTML` | функція | `src/scripts/core/46-wallet.js:128` |
-| `wlFolderSheet` | функція | `src/scripts/core/46-wallet.js:139` |
-| `wlBind` | функція | `src/scripts/core/46-wallet.js:152` |
-| `WL_SRC` | обʼєкт | `src/scripts/core/46-wallet.js:178` |
-| `wlSrc` | функція | `src/scripts/core/46-wallet.js:179` |
-| `wlFolderName` | функція | `src/scripts/core/46-wallet.js:180` |
-| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:182` |
-| `wlEnvEmptyOffer` | функція | `src/scripts/core/46-wallet.js:253` |
-| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:277` |
-| `wlOpEdit` | функція | `src/scripts/core/46-wallet.js:300` |
-| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:322` |
-| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:330` |
-| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:343` |
-| `wlCurList` | функція | `src/scripts/core/46-wallet.js:365` |
-| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:370` |
-| `curBalance` | функція | `src/scripts/core/46-wallet.js:371` |
-| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:372` |
-| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:374` |
-| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:379` |
-| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:390` |
-| `wlExchange` | функція | `src/scripts/core/46-wallet.js:407` |
-| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:453` |
-| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:461` |
-| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:463` |
-| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:465` |
-| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:466` |
+| `wlOverviewHTML` | функція | `src/scripts/core/46-wallet.js:76` |
+| `wlGoalHours` | функція | `src/scripts/core/46-wallet.js:108` |
+| `wlMissionsHTML` | функція | `src/scripts/core/46-wallet.js:113` |
+| `wlFoldersHTML` | функція | `src/scripts/core/46-wallet.js:129` |
+| `wlFolderSheet` | функція | `src/scripts/core/46-wallet.js:140` |
+| `wlBind` | функція | `src/scripts/core/46-wallet.js:153` |
+| `WL_SRC` | обʼєкт | `src/scripts/core/46-wallet.js:179` |
+| `wlSrc` | функція | `src/scripts/core/46-wallet.js:180` |
+| `wlFolderName` | функція | `src/scripts/core/46-wallet.js:181` |
+| `wlOpSheet` | функція | `src/scripts/core/46-wallet.js:183` |
+| `wlEnvEmptyOffer` | функція | `src/scripts/core/46-wallet.js:254` |
+| `wlOpMenu` | функція | `src/scripts/core/46-wallet.js:278` |
+| `wlOpEdit` | функція | `src/scripts/core/46-wallet.js:301` |
+| `wlLinkedNote` | функція | `src/scripts/core/46-wallet.js:323` |
+| `wlMissionSheet` | функція | `src/scripts/core/46-wallet.js:331` |
+| `wlQuestCheck` | функція | `src/scripts/core/46-wallet.js:344` |
+| `wlCurList` | функція | `src/scripts/core/46-wallet.js:366` |
+| `wlCurSave` | функція | `src/scripts/core/46-wallet.js:371` |
+| `curBalance` | функція | `src/scripts/core/46-wallet.js:372` |
+| `wlTotalApprox` | функція | `src/scripts/core/46-wallet.js:373` |
+| `wlCursHTML` | функція | `src/scripts/core/46-wallet.js:375` |
+| `wlCurAdd` | функція | `src/scripts/core/46-wallet.js:380` |
+| `wlCurSheet` | функція | `src/scripts/core/46-wallet.js:391` |
+| `wlExchange` | функція | `src/scripts/core/46-wallet.js:408` |
+| `WL_ENV_TPL` | масив | `src/scripts/core/46-wallet.js:454` |
+| `WL_ENV_COLORS` | масив | `src/scripts/core/46-wallet.js:462` |
+| `wlSpendEnvs` | функція | `src/scripts/core/46-wallet.js:464` |
+| `wlEnvPick` | функція | `src/scripts/core/46-wallet.js:466` |
+| `wlEnvStarter` | функція | `src/scripts/core/46-wallet.js:467` |
 
 ### `src/scripts/core/47-rules.js` — 29 сутностей
 
@@ -3398,65 +3403,65 @@
 | `txRich` | функція | `src/scripts/page-editor/02-block-styles.js:2` |
 | `txIsRich` | функція | `src/scripts/page-editor/02-block-styles.js:3` |
 | `PG_NETS` | масив | `src/scripts/page-editor/02-block-styles.js:9` |
-| `PG_NOT_AUTHOR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:21` |
-| `pgYtId` | функція | `src/scripts/page-editor/02-block-styles.js:22` |
-| `pgSocial` | функція | `src/scripts/page-editor/02-block-styles.js:23` |
-| `pgUrlOnly` | функція | `src/scripts/page-editor/02-block-styles.js:58` |
-| `pgAttSub` | функція | `src/scripts/page-editor/02-block-styles.js:66` |
-| `pgLinkCard` | функція | `src/scripts/page-editor/02-block-styles.js:71` |
-| `equalizeWidths` | функція | `src/scripts/page-editor/02-block-styles.js:95` |
-| `PGH_FONTS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:98` |
-| `PGH_CLR_VAR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:102` |
-| `headingClr` | функція | `src/scripts/page-editor/02-block-styles.js:103` |
-| `headingStyle` | функція | `src/scripts/page-editor/02-block-styles.js:108` |
-| `pgShowHidden` | значення | `src/scripts/page-editor/02-block-styles.js:120` |
-| `condMet` | функція | `src/scripts/page-editor/02-block-styles.js:121` |
-| `moveBlockSide` | функція | `src/scripts/page-editor/02-block-styles.js:140` |
-| `undoMove` | функція | `src/scripts/page-editor/02-block-styles.js:175` |
-| `redoMove` | функція | `src/scripts/page-editor/02-block-styles.js:180` |
-| `undoStack` | масив | `src/scripts/page-editor/02-block-styles.js:187` |
-| `pushOp` | функція | `src/scripts/page-editor/02-block-styles.js:188` |
-| `doUndo` | функція | `src/scripts/page-editor/02-block-styles.js:194` |
-| `doRedo` | функція | `src/scripts/page-editor/02-block-styles.js:195` |
-| `syncUndoBtn` | функція | `src/scripts/page-editor/02-block-styles.js:196` |
-| `STATUS_COLORS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:206` |
-| `STATUS_ORDER` | масив | `src/scripts/page-editor/02-block-styles.js:207` |
-| `dbColType` | функція | `src/scripts/page-editor/02-block-styles.js:208` |
-| `dbFmtNum` | функція | `src/scripts/page-editor/02-block-styles.js:209` |
-| `PG_GONE` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:213` |
-| `inner` | функція | `src/scripts/page-editor/02-block-styles.js:216` |
-| `dbEnsure` | функція | `src/scripts/page-editor/02-block-styles.js:475` |
-| `dbHTML` | функція | `src/scripts/page-editor/02-block-styles.js:492` |
-| `pgSgBusy` | значення | `src/scripts/page-editor/02-block-styles.js:542` |
-| `pgSgPlace` | функція | `src/scripts/page-editor/02-block-styles.js:543` |
-| `PGLAST` | значення | `src/scripts/page-editor/02-block-styles.js:551` |
-| `pgLastGet` | функція | `src/scripts/page-editor/02-block-styles.js:552` |
-| `pgLastSet` | функція | `src/scripts/page-editor/02-block-styles.js:553` |
-| `PGRECENT` | значення | `src/scripts/page-editor/02-block-styles.js:555` |
-| `pgRecentGet` | функція | `src/scripts/page-editor/02-block-styles.js:556` |
-| `pgRecentAdd` | функція | `src/scripts/page-editor/02-block-styles.js:557` |
-| `renderList` | функція | `src/scripts/page-editor/02-block-styles.js:558` |
-| `renderBoardBlock` | функція | `src/scripts/page-editor/02-block-styles.js:578` |
-| `renderRowBlock` | функція | `src/scripts/page-editor/02-block-styles.js:613` |
-| `renumber` | функція | `src/scripts/page-editor/02-block-styles.js:630` |
-| `pgPath` | масив | `src/scripts/page-editor/02-block-styles.js:632` |
-| `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:633` |
-| `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:643` |
-| `render` | функція | `src/scripts/page-editor/02-block-styles.js:659` |
-| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:695` |
-| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:707` |
-| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:713` |
-| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:716` |
-| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:794` |
-| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:796` |
-| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:797` |
-| `pgsGotOk` | функція | `src/scripts/page-editor/02-block-styles.js:799` |
-| `pgsMatch` | функція | `src/scripts/page-editor/02-block-styles.js:800` |
-| `pgsHiddenN` | функція | `src/scripts/page-editor/02-block-styles.js:807` |
-| `pgsShopOpen` | функція | `src/scripts/page-editor/02-block-styles.js:809` |
-| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:810` |
-| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:815` |
-| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:829` |
+| `PG_NOT_AUTHOR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:22` |
+| `pgYtId` | функція | `src/scripts/page-editor/02-block-styles.js:23` |
+| `pgSocial` | функція | `src/scripts/page-editor/02-block-styles.js:24` |
+| `pgUrlOnly` | функція | `src/scripts/page-editor/02-block-styles.js:63` |
+| `pgAttSub` | функція | `src/scripts/page-editor/02-block-styles.js:71` |
+| `pgLinkCard` | функція | `src/scripts/page-editor/02-block-styles.js:76` |
+| `equalizeWidths` | функція | `src/scripts/page-editor/02-block-styles.js:100` |
+| `PGH_FONTS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:103` |
+| `PGH_CLR_VAR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:107` |
+| `headingClr` | функція | `src/scripts/page-editor/02-block-styles.js:108` |
+| `headingStyle` | функція | `src/scripts/page-editor/02-block-styles.js:113` |
+| `pgShowHidden` | значення | `src/scripts/page-editor/02-block-styles.js:125` |
+| `condMet` | функція | `src/scripts/page-editor/02-block-styles.js:126` |
+| `moveBlockSide` | функція | `src/scripts/page-editor/02-block-styles.js:145` |
+| `undoMove` | функція | `src/scripts/page-editor/02-block-styles.js:180` |
+| `redoMove` | функція | `src/scripts/page-editor/02-block-styles.js:185` |
+| `undoStack` | масив | `src/scripts/page-editor/02-block-styles.js:192` |
+| `pushOp` | функція | `src/scripts/page-editor/02-block-styles.js:193` |
+| `doUndo` | функція | `src/scripts/page-editor/02-block-styles.js:199` |
+| `doRedo` | функція | `src/scripts/page-editor/02-block-styles.js:200` |
+| `syncUndoBtn` | функція | `src/scripts/page-editor/02-block-styles.js:201` |
+| `STATUS_COLORS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:211` |
+| `STATUS_ORDER` | масив | `src/scripts/page-editor/02-block-styles.js:212` |
+| `dbColType` | функція | `src/scripts/page-editor/02-block-styles.js:213` |
+| `dbFmtNum` | функція | `src/scripts/page-editor/02-block-styles.js:214` |
+| `PG_GONE` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:218` |
+| `inner` | функція | `src/scripts/page-editor/02-block-styles.js:221` |
+| `dbEnsure` | функція | `src/scripts/page-editor/02-block-styles.js:480` |
+| `dbHTML` | функція | `src/scripts/page-editor/02-block-styles.js:497` |
+| `pgSgBusy` | значення | `src/scripts/page-editor/02-block-styles.js:547` |
+| `pgSgPlace` | функція | `src/scripts/page-editor/02-block-styles.js:548` |
+| `PGLAST` | значення | `src/scripts/page-editor/02-block-styles.js:556` |
+| `pgLastGet` | функція | `src/scripts/page-editor/02-block-styles.js:557` |
+| `pgLastSet` | функція | `src/scripts/page-editor/02-block-styles.js:558` |
+| `PGRECENT` | значення | `src/scripts/page-editor/02-block-styles.js:560` |
+| `pgRecentGet` | функція | `src/scripts/page-editor/02-block-styles.js:561` |
+| `pgRecentAdd` | функція | `src/scripts/page-editor/02-block-styles.js:562` |
+| `renderList` | функція | `src/scripts/page-editor/02-block-styles.js:563` |
+| `renderBoardBlock` | функція | `src/scripts/page-editor/02-block-styles.js:583` |
+| `renderRowBlock` | функція | `src/scripts/page-editor/02-block-styles.js:618` |
+| `renumber` | функція | `src/scripts/page-editor/02-block-styles.js:635` |
+| `pgPath` | масив | `src/scripts/page-editor/02-block-styles.js:637` |
+| `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:638` |
+| `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:648` |
+| `render` | функція | `src/scripts/page-editor/02-block-styles.js:664` |
+| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:700` |
+| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:712` |
+| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:718` |
+| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:721` |
+| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:799` |
+| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:801` |
+| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:802` |
+| `pgsGotOk` | функція | `src/scripts/page-editor/02-block-styles.js:804` |
+| `pgsMatch` | функція | `src/scripts/page-editor/02-block-styles.js:805` |
+| `pgsHiddenN` | функція | `src/scripts/page-editor/02-block-styles.js:812` |
+| `pgsShopOpen` | функція | `src/scripts/page-editor/02-block-styles.js:814` |
+| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:815` |
+| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:820` |
+| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:834` |
 
 ### `src/scripts/page-editor/03-premium-pack.js` — 60 сутностей
 
