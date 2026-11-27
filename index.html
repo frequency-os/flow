@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-27-1924-89b466a';
+  var BUILD='2026-11-27-2110-d843570';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1377,6 +1377,30 @@
     outline:none;padding:1px 0 0;}
   .pglk-go{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
     background:var(--pg-field);border:1px solid var(--pg-line);color:var(--pg-fg2);text-decoration:none;font-size:14px;}
+  /* ── картка посилання / поста з соцмережі (27.11.2026) ── */
+  .pgsc{--nc:#4ecdc4;border:1px solid var(--pg-line);border-radius:18px;overflow:hidden;
+    background:var(--pg-card);box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 24px -14px rgba(0,0,0,.45);}
+  .pgsc-h{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;}
+  .pgsc-b{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--nc);color:#fff;font-size:11px;font-weight:800;letter-spacing:.01em;}
+  .pgsc:not(.soc) .pgsc-b{background:color-mix(in srgb,var(--nc) 16%,transparent);color:var(--nc);}
+  .pgsc-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .pgsc-m b{font-size:14px;font-weight:650;color:var(--pg-fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgsc-m small{font-size:12px;color:var(--pg-mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pgsc-go{flex:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--pg-field);border:1px solid var(--pg-line);color:var(--pg-fg2);text-decoration:none;font-size:16px;}
+  .pgsc-cv{background:var(--pg-card2);}
+  .pgsc-cv img{display:block;width:100%;max-height:420px;object-fit:cover;}
+  .pgsc .pgsc-em{border-radius:0;}
+  .pgsc-t{padding:10px 12px 0;font-size:15px;font-weight:600;line-height:1.35;color:var(--pg-fg);outline:none;}
+  .pgsc-t:empty{padding-top:6px;font-size:13px;font-weight:500;}
+  .pgsc-n{margin:8px 12px 0;padding:8px 10px;border-radius:10px;background:var(--pg-card2);font-size:14px;line-height:1.45;
+    color:var(--pg-fg2);outline:none;white-space:pre-wrap;}
+  .pgsc-a{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 12px;}
+  .pgsc-a button{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--pg-line);background:var(--pg-field);
+    color:var(--pg-fg2);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;}
+  @media (hover:hover){ .pgsc-a button:hover,.pgsc-go:hover{border-color:color-mix(in srgb,var(--nc) 55%,var(--pg-line));} }
+  @media (min-width:760px){ .pgsc{max-width:560px;} }
   /* ── десктоп: редактор сторінки ── */
   @media (min-width:760px){
     #scr-page .pg-doc{max-width:none;margin:0;padding-left:clamp(24px,4vw,56px);padding-right:clamp(24px,4vw,56px);}
@@ -3934,10 +3958,24 @@
   .wkp-empty{margin:0;font-size:13.5px;line-height:1.45;color:var(--muted);}
   .wkp-acts{display:flex;gap:8px;}
   .wkp .wkp-acts button{flex:1;min-height:44px;border-radius:12px;background:rgba(127,127,127,.1);font-weight:700;font-size:13.5px;display:grid;place-items:center;text-align:center;padding:0 8px;}
-  .wkp-extra{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:18px;background:rgba(139,124,255,.12);border:1px solid rgba(139,124,255,.35);}
-  .wkp-ex-ic{width:36px;height:36px;flex:none;border-radius:12px;display:grid;place-items:center;background:rgba(139,124,255,.22);color:var(--accent);font-weight:800;}
-  .wkp-ex-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;} .wkp-ex-t b{font-size:14px;font-weight:800;} .wkp-ex-t small{font-size:12px;color:var(--muted);}
-  .wkp .wkp-extra button{min-height:44px;padding:0 14px;border-radius:12px;background:var(--accent);color:#0b0820;font-weight:800;font-size:13.5px;display:grid;place-items:center;}
+  /* зарплата частинами (24.11.2026) */
+  .wkp-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+  .wkp-sum span{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .wkp-sum small{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  .wkp-sum b{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wkp-sum b.ok{color:#1f9d5c;}
+  .wkp-row .dot.ok{background:#34c77b;}
+  .wkp .wkp-main.got{background:#34c77b;color:#04140b;}
+  .sal-eq{display:block;margin:-4px 2px 10px;font-size:12.5px;font-weight:600;color:var(--muted);min-height:1em;}
+  .sal-envs{display:flex;flex-direction:column;gap:8px;}
+  .sal-env{display:flex;align-items:center;gap:10px;}
+  .sal-env>span{flex:1;min-width:0;display:flex;flex-direction:column;font-weight:700;font-size:14px;}
+  .sal-env>span small{font-size:12px;font-weight:600;color:var(--muted);}
+  .jn-ed .sal-env input:not([type="checkbox"]){width:120px;flex:0 0 120px;}   /* сильніше за .jn-ed input{width:100%} — інакше назва конверта сплющується */
+  .wk-salary .wk-got{all:unset;box-sizing:border-box;cursor:pointer;display:grid;place-items:center;width:100%;min-height:46px;margin-top:12px;border-radius:14px;
+    background:#34c77b;color:#04140b;font:800 15px Manrope;}
+  .wk-salary .wk-got:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  html:not(.t-light) .wkp-sum b.ok{color:#6fe0a5;}
   html:not(.t-light) .wkp-st.sal b,html:not(.t-light) .wkp-d.on b{color:#8fb4ff;}
   html:not(.t-light) .wkp-st.env b,html:not(.t-light) .wkp-d.pay b{color:#ffcf6b;}
   html:not(.t-light) .wkp-st span.wkp-free{color:#6fe0a5;}
@@ -9652,6 +9690,17 @@
   .bsw-pl{display:flex;align-items:flex-end;gap:8px;}
   .bsw-pl .wd-plant{height:64px;min-height:0;}
   .bsw-pl>span{display:grid;gap:3px;}
+
+  /* готові папки (68-ready-folders.js, 27.11.2026) */
+  .rf-list{display:flex;flex-direction:column;gap:12px;padding:4px 16px 24px;}
+  .rf-card{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:22px;background:var(--card);border:1px solid var(--line);}
+  .rf-top{display:flex;align-items:center;gap:12px;min-width:0;}
+  .rf-em{width:48px;height:48px;flex:none;border-radius:15px;display:grid;place-items:center;font-size:24px;background:color-mix(in srgb,var(--c) 22%,transparent);}
+  .rf-tx{display:flex;flex-direction:column;gap:2px;min-width:0;} .rf-tx b{font-size:16px;font-weight:800;} .rf-tx small{font-size:13px;color:var(--muted);line-height:1.35;}
+  .rf-chips{display:flex;flex-wrap:wrap;gap:6px;} .rf-chips span{padding:5px 10px;border-radius:9px;font-size:12px;font-weight:700;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--text);}
+  .rf-get{all:unset;box-sizing:border-box;cursor:pointer;min-height:46px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:15px;background:color-mix(in srgb,var(--c) 26%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c) 70%,transparent);color:var(--text);}   /* текст теми на тоні кольору: білий на світло-зеленій чи помаранчевій не читався */
+  .rf-get.have{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c);color:var(--text);}
+  .rf-get:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   /* ════════ Налаштування віджетів і розмір клітинками (19.11.2026, 63-widget-sheet.js) ════════
      Дошка віджетів: телефон 4 колонки, компʼютер (≥760) 8 колонок; розмір клітинки — --wcm/--whm і --wcd/--whd з блоку.
      «Змінити»: хитання, ✕ і ручка ↘. Шторка: скло на токенах теми (--card, --text, --muted), тож живе і в світлій, і в темній. */
@@ -14335,6 +14384,8 @@
         if(f.gview==='folder'||f.gview==='space'||f.gview==='stack'||f.gview==='ios') cfg[k].gview=f.gview;   // без поля — «Простір» (типове з 15.11.2026)
         // група, яку людина сама зібрала (16-dashboard.js isFolderGroup, 21.11.2026); звичайна папка з підпапками поля не має
         if(f.group===true) cfg[k].group=true;
+        // з якої готової папки встановлено (68-ready-folders.js, 27.11.2026): «Робота» — одна на акаунт і ховає заводську
+        if(typeof f.ready==='string'&&/^[a-z]{2,16}$/.test(f.ready)) cfg[k].ready=f.ready;
         // вигляд папки зсередини (15.11.2026, 36-chats.js fhView): лише chat/photo/canvas («Полотно», 18.11.2026); «Документ» — типове, не пишемо
         if(f.view==='chat'||f.view==='photo'||f.view==='canvas') cfg[k].view=f.view;
         // пріоритет папки (12.10.2026): лише h/m/l; «без пріоритету» не пишемо
@@ -14611,7 +14662,10 @@
   let workOrigin='work', workFrom='';
   /* «Робота» — інструмент Гаманця (14.10.2026): запамʼятовуємо екран, з якого прийшли, і «назад» веде туди ж
      (раніше вело в «Проєкти» або в давно відкриту папку) */
-  function goWork(){
+  function goWork(o){
+    /* встановлено готову папку «Робота» (68-ready-folders.js) — усі старі входи (плитка, Гаманець, План, клавіша 5,
+       «Проєкти») ведуть у неї; повний екран зарплати — лише {screen:true} (кнопка «Ставка й аванси» в блоці) */
+    if(!(o&&o.screen)){ const rk=typeof rfInstalled==='function'?rfInstalled('robota'):''; if(rk&&folders[rk]){ goFolder(rk); return; } }
     const a=document.querySelector('.screen.active'); const from=a?a.id:'';
     if(from!=='scr-work'){ workFrom=from; workOrigin=(from==='scr-page'&&currentFolderKey)?currentFolderKey:'work'; }
     renderWork(); show('scr-work'); }
@@ -15275,7 +15329,8 @@
   function renderProjects(){
     const host=document.getElementById('projectsBody'); if(!host) return;
     // заводські проєкти
-    const factory=[
+    // заводська «Робота» ховається, щойно встановлено готову папку «Робота» (68-ready-folders.js)
+    const factory=(typeof rfInstalled==='function'&&rfInstalled('robota'))?[]:[
       {k:'work',   emo:'💼', c:'106,125,255', t:'Робота',      d:'Зміни, ставка та зарплата'},
     ];
     // папки-проєкти користувача
@@ -15291,9 +15346,9 @@
         d:bits.length?bits.join(' · '):'ще без кроків', badge:st[1], badgeC:st[2]};
     });
     host.innerHTML=
-      `<div class="mh-lbl">⚡ Заводські</div>
-       <div class="mh-grid">${factory.map(prjTileHTML).join('')}</div>
-       <div class="mh-lbl mt">🚀 Мої проєкти</div>
+      (factory.length?`<div class="mh-lbl">⚡ Заводські</div>
+       <div class="mh-grid">${factory.map(prjTileHTML).join('')}</div>`:'')+
+      `<div class="mh-lbl${factory.length?' mt':''}">🚀 Мої проєкти</div>
        ${mine.length?`<div class="mh-grid">${mine.map(prjTileHTML).join('')}</div>`
          :`<div class="prj-empty">Тут зʼявляться твої проєкти. Створи перший — і він житиме на цій вкладці.</div>`}
        <button class="prj-add" data-prj="add">＋ Новий проєкт</button>`;
@@ -26267,30 +26322,28 @@
     const isCur=(yy===cY&&mm===cMN+1), isFuture=(yy>cY)||(yy===cY&&mm>cMN+1);
     const isPast=(yy<cY)||(yy===cY&&mm<cMN+1);
 
-    // статус: locked (очікується) / unlocked (отримана)
-    let status='locked';
-    if(monthEarned>0){
-      if(isFuture) status='locked';
-      else if(isCur) status = now.getDate()>=pday ? 'unlocked' : 'locked';
-      else if(isPast) status='unlocked';
-    }
-
-    if(box){ box.classList.toggle('paid', status==='unlocked'); }
+    // стан місяця: зароблено · прийшло · чекаємо (лише показ — у Гаманець тут нічого не пишеться)
+    const st=salState(workMonth);
+    if(box){ box.classList.toggle('paid', st.done); }
     const planned=workPlannedTotal(workMonth);
-    const planTxt = planned>0 ? ` · розподілено ${fmt(planned)} ${sym}, вільно ${fmt(Math.max(0,monthEarned-planned))} ${sym}` : '';
-    if(status==='unlocked'){
+    const came=st.got+st.pushed;
+    if(st.done){
       if(labEl) labEl.innerHTML='<span class="dot ok"></span>ЗАРПЛАТА ОТРИМАНА';
-      subEl.textContent=`Прийшла ${ds} · додано у фінанси`;
-      syncSalaryToFin(yy,mm,monthEarned,pday,sym);
+      subEl.textContent=`Прийшло ${fmt(came)} ${sym}`+(st.parts.length>1?` · ${st.parts.length} ${pluralUk(st.parts.length,'частина','частини','частин')}`:'');
     } else {
       const left = isCur ? (pday-now.getDate()) : null;
       if(labEl) labEl.innerHTML='<span class="dot"></span>ОЧІКУЄТЬСЯ ЗАРПЛАТА';
-      subEl.textContent=`${ds}${(left!==null&&left>=0)?` · через ${left} ${pluralDaysWk(left)}`:''}${planTxt||' · плануй конверти заздалегідь'}`;
+      subEl.textContent=`${ds}${(left!==null&&left>=0)?` · через ${left} ${pluralDaysWk(left)}`:''}`
+        +(came>0?` · прийшло ${fmt(came)}, чекаємо ${fmt(st.left)} ${sym}`:'')
+        +(planned>0?` · у конверти заплановано ${fmt(planned)} ${sym}`:(came>0?'':' · плануй конверти заздалегідь'));
     }
+    // «Прийшла зарплата» (24.11.2026) — у картці зарплати; кнопку додаємо раз (index.html не чіпаємо)
+    if(box&&!box.querySelector('#wkGotBtn')){ const gb=document.createElement('button'); gb.id='wkGotBtn'; gb.type='button'; gb.className='wk-got'; gb.textContent='＋ Прийшла зарплата';
+      gb.onclick=e=>{ e.stopPropagation(); salGotSheet(workMonth); }; box.appendChild(gb); }
   }
   function pluralDaysWk(n){const a=Math.abs(n)%100,b=a%10;if(a>=11&&a<=14)return'днів';if(b===1)return'день';if(b>=2&&b<=4)return'дні';return'днів';}
 
-  // автосинхронізація зарплати у finOps (один раз на місяць, без дублів)
+  // workPostedSal лишився для «Почати фінанси з нуля» (51-money-reset.js: 'deleted' — місяць обнулено)
   let workPostedSal={}; // 'YYYY-MM' -> 'posted'|'deleted'
   let workExtras=[];    // {id, ym, kind:'advance'|'bonus'|'expense', amount, note, date}
   const WKEXTRAKEY='work_extras';
@@ -26365,89 +26418,92 @@
     applyWkBlocks();
   }
 
-  function syncSalaryToFin(year,month,amount,pday,sym){
-    if(!amount||amount<=0) return;
-    if(window.storeKeyReady&&!['fin_ops','work_sessions','work_cfg',WKEXTRAKEY].every(key=>window.storeKeyReady(key))) return;
-    const ymKey=`${year}-${String(month).padStart(2,'0')}`;
-    if(workPostedSal[ymKey]==='deleted') return;
-    // місяць зарплати обнулено («Почати фінанси з нуля») — навіть якщо старий пристрій повернув work_cfg без позначки
-    try{ if(typeof finTombHas==='function'&&finTombHas('sal',ymKey)) return; }catch(_){}
-    const dim=new Date(year,month,0).getDate();
-    const txDate=`${year}-${String(month).padStart(2,'0')}-${String(Math.min(pday,dim)).padStart(2,'0')}`;
-    // Зарплата пишеться сама, без людини, — курс не питаємо. Раз записаний
-    // курс живе в самій операції (op._fx їде в хмару разом з fin_ops), тож
-    // пристрої рахують однаково і не перебивають одне одного. Перерахунок —
-    // лише коли змінилась зароблена сума чи валюта Роботи.
-    const code=finCurCode(workCur);
-    let op=finOps.find(o=>o._autoSal===true && o._salYM===ymKey);
-    // Віднімаємо лише прив’язані доходи, які досі є в Гаманці.
-    const incomes=new Map(finOps.filter(o=>o.type==='in'&&!o._autoSal&&!o._tr).map(o=>[String(o.id),o]));
-    let pushedAmt=0;
-    for(const w of workSessionsIn(ymKey)){
-      if(!w.pushed||!w.opId||finCurCode(w.cur)!==code) continue;
-      const income=incomes.get(String(w.opId));
-      if(!income) continue;
-      incomes.delete(String(w.opId));
-      if(income._fx?.cur===code&&+income._fx.rate>0) pushedAmt+=Math.max(0,(+income.amount||0)/income._fx.rate);
-      else if(code===finCurCode(income.cur||mainCur())) pushedAmt+=Math.max(0,+income.amount||0);
-      else pushedAmt+=Math.max(0,+w.amount||0);
-    }
-    amount=Math.max(0,Math.round((amount-pushedAmt)*100)/100);
-    // перевірка «є що писати» — ПІСЛЯ віднімання: усі зміни вже в Гаманці окремо → «Зарплати · … 0 ₴» не пишемо (23.11.2026)
-    if(!(amount>0)) return;
-    const frozen=(op&&op._fx&&op._fx.cur===code&&+op._fx.rate>0)?+op._fx.rate:0;
-    const fx=finFx(amount, code, code===mainCur()?1:(frozen||finLastRate(code)));
-    const label='Зарплата · '+WK_MONTHS[month-1]+' '+year+fx.tail;
-    const autoSave=fn=>{ if(window.storeAuto) window.storeAuto(fn); else fn(); };
-    if(op){
-      // записано при іншій головній валюті (старі — у ₴) — не перераховуємо: заморожений курс і суму не чіпаємо
-      if((op._mc||'UAH')!==mainCur()) return;
-      const fxSame=JSON.stringify(op._fx||null)===JSON.stringify(fx.fx);
-      if(op.amount!==fx.amount || op.date!==txDate || !fxSame){   // підпис сам по собі не чіпаємо
-        op.amount=fx.amount; op.date=txDate; op.label=label;
-        if(fx.fx) op._fx=fx.fx; else delete op._fx;
-        autoSave(()=>saveFinOps());
-      }
-      // НЕ переливаємо тут: переливання — лише в мить першого запису зарплати (нижче). Інакше другий пристрій
-      // зі старими envelopes/work_cfg переливав би вдруге, і з Гаманця списувалось двічі (23.11.2026)
-      return;
-    }
-    let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
-    // _amt0 — сума в мить запису: якщо після виплати додались години, блок «Робота» покаже «Доплата» (67-work-panel.js)
-    op={ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', amount:fx.amount, label, date:txDate, _autoSal:true, _salYM:ymKey, card:_wc, _mc:mainCur(), _amt0:fx.amount };
-    // у Плані місяця є рядок «Зарплата» — привʼязуємо, щоб він став ✓, а не висів відкритим поруч із записаною зарплатою (47-rules.js)
-    try{ const pl=typeof rlPlan==='function'?rlPlan(ymKey,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ymKey,r.id)); if(row) op.planId=row.id; }catch(_){}
-    if(fx.fx) op._fx=fx.fx;
-    finOps.push(op); workPostedSal[ymKey]='posted'; autoSave(()=>{ saveFinOps(); saveWork(); });
-    // коли зарплата прийшла — перелити заплановане у конверти
-    transferPlannedToEnvelopes(ymKey);
-    try{ renderFinance(); }catch(_){}
+  /* ════════ Зарплата частинами (24.11.2026) ════════
+     Гроші в Гаманець приходять ЛИШЕ тапом людини «Прийшла зарплата»: сума, дата, за який місяць і що одразу
+     покласти в конверти. Частин за місяць — скільки завгодно. Автозапис у день виплати прибрано: він сам
+     дописував fin_ops при відкритті Роботи і давав подвійний дохід зі змінами «→ у фінанси».
+     Частина = звичайний дохід у fin_ops з _salPart:true і _salYM:'РРРР-ММ' (нового ключа нема, міграції нема).
+     Старі автозаписи (_autoSal) лишаються як є і рахуються як «прийшло» за свій місяць.
+     Зміни «→ у фінанси» теж «прийшли» — але лише поки їхній запис справді є в Гаманці (видалили там — чекаємо знову). */
+  /* скільки частина важить у валюті Роботи: _salW — порахували в мить запису (частина могла прийти в іншій
+     валюті, 24.11.2026) і більше не перераховуємо, щоб «чекаємо» не плавало з курсом; старі записи — сума до
+     перерахунку (_fx.was) або сама сума */
+  function salWorkAmt(o){ if(o&&+o._salW>0) return +o._salW; const code=finCurCode(workCur); return (o&&o._fx&&o._fx.cur===code&&+o._fx.was>0)?+o._fx.was:(+(o&&o.amount)||0); }
+  function salPartsIn(ym){ return (finOps||[]).filter(o=>o&&o.type==='in'&&o._salYM===ym&&(o._salPart===true||o._autoSal===true)).sort((a,b)=>String(a.date).localeCompare(String(b.date))); }
+  function salState(ym){
+    const ss=workSessionsIn(ym); let net=0; try{ net=extrasNet(ym); }catch(_){}
+    const earned=Math.round((ss.reduce((s,w)=>s+(+w.amount||0),0)+net)*100)/100;
+    const ids=new Set((finOps||[]).map(o=>String(o&&o.id)));
+    const pushed=ss.filter(w=>w.pushed&&w.opId&&ids.has(String(w.opId))).reduce((s,w)=>s+(+w.amount||0),0);
+    const parts=salPartsIn(ym), got=Math.round(parts.reduce((s,o)=>s+salWorkAmt(o),0)*100)/100;
+    const left=Math.max(0,Math.round((earned-pushed-got)*100)/100);
+    return {earned, pushed, got, parts, left, done:earned>0&&left<0.5};
   }
-
-  // переказ запланованого з конвертів у saved (один раз на місяць)
-  function transferPlannedToEnvelopes(ymKey){
-    if(!Array.isArray(envelopes) || !envelopes.length) return;
-    if(window.storeKeyReady&&!(window.storeKeyReady('fin_ops')&&window.storeKeyReady(ENVKEY))) return;
-    if(!workPostedSal) workPostedSal={};
-    if(workPostedSal['planDone:'+ymKey]==='1') return;
-    const total=envelopes.reduce((sum,e)=>sum+(!envCur(e)?Math.max(0,+e.planned?.[ymKey]||0):0),0);
-    if(total<=0||total>Math.max(0,curFree(''))+1e-9) return;
-    let moved=false;
-    // це робить програма, а не людина — storeAuto, щоб синк не вважав переливання ручною правкою (23.11.2026)
-    const run=fn=>{ if(window.storeAuto) window.storeAuto(fn); else fn(); };
-    run(()=>{
-      envelopes.forEach(e=>{
-        if(typeof envCur==='function'&&envCur(e)) return;   // €-конверт: заплановане в гривнях не переносимо сам (етап 3 валют)
-        const p=(e.planned&&e.planned[ymKey])?+e.planned[ymKey]:0;
-        if(p>0){
-          // у конверті вже є рух «Із зарплати» за цей місяць — не дублюємо, лише прибираємо план
-          if(allocMovedIn(e,ymKey)>0){ delete e.planned[ymKey]; moved=true; return; }
-          if(typeof envAddOp==='function'){ let _wc2; try{ ensureCards(); _wc2=workCard().id; }catch(_){} envAddOp(e,'in',p,'Із зарплати ('+ymKey+')',_wc2); }
-          else { e.saved=(+e.saved||0)+p; }
-          delete e.planned[ymKey]; moved=true;
-        }
-      });
-      if(moved){ workPostedSal['planDone:'+ymKey]='1'; saveEnvelopes(); saveWork(); }
+  /* шторка «Прийшла зарплата» (тап людини) */
+  function salGotSheet(ym){
+    ym=/^\d{4}-\d\d$/.test(String(ym||''))?ym:workMonth;
+    // поки Гаманець не звірився з хмарою — не пишемо: «чекаємо» було б хибним, а поповнення конверта програло б хмарній копії
+    if(window.storeKeyReady&&!['fin_ops',ENVKEY,WORKKEY,'fin_tomb'].every(k=>window.storeKeyReady(k))){ try{ plToast('Гаманець ще звіряється з хмарою — спробуй за хвилину'); }catch(_){} return; }
+    const st=salState(ym), sym=CUR[workCur]||workCur, msym=CUR[mainCur()]||mainCur(), mn=WK_MONTHS[+ym.slice(5,7)-1];
+    const envs=(Array.isArray(envelopes)?envelopes:[]).filter(e=>e&&!(typeof envCur==='function'&&envCur(e)));
+    const td=ymdLocal();
+    // валюта частини: Роботи (типово) · головна · ті, що вже є в Гаманці
+    const wcode=finCurCode(workCur), mcode=mainCur();
+    let curs=[wcode,mcode]; try{ curs=curs.concat(wlCurList()); }catch(_){}
+    curs=[...new Set(curs.map(c=>finCurCode(c)))].filter(c=>curOk(c));
+    jnOverlay(`<div class="jn-ed-h"><b>Прийшла зарплата</b><button data-jnx aria-label="Закрити">✕</button></div>
+      <small class="dy-fm-sub">За ${esc(mn.toLowerCase())}: зароблено ${esc(fmt(st.earned))} ${esc(sym)} · прийшло ${esc(fmt(st.got+st.pushed))} · чекаємо ${esc(fmt(st.left))}</small>
+      ${curs.length>1?`<div class="jn-f"><span>Валюта</span><div class="wl-chips" id="salCur">${curs.map(c=>`<button type="button" data-salcur="${esc(c)}"${c===wcode?' class="on"':''}>${esc(curSym(c))} ${esc(CUR_LIST[c].n)}${c===mcode?' · головна':''}</button>`).join('')}</div></div>`:''}
+      <label class="jn-f"><span id="salAmtLab">Скільки прийшло, ${esc(sym)}</span><input id="salAmt" type="number" inputmode="decimal" min="0" step="any" value="${st.left>0?esc(String(st.left)):''}" placeholder="Напр. 5000"></label>
+      <small class="sal-eq" id="salEq" aria-live="polite"></small>
+      <label class="jn-f"><span>Коли</span><input id="salDate" type="date" value="${esc(td)}" max="${esc(td)}"></label>
+      ${envs.length?`<div class="jn-f"><span>Одразу в конверти, ${esc(msym)} (необовʼязково)</span><div class="sal-envs">${envs.map(e=>{ const p=e.planned&&+e.planned[ym]>0?+e.planned[ym]:0;
+        return `<label class="sal-env"><span>${esc(safeEmoji(e.emoji,'✉️'))} ${esc(String(e.name||'Конверт'))}${p?`<small>заплановано ${esc(fmt(p))}</small>`:''}</span><input type="number" inputmode="decimal" min="0" step="any" data-salenv="${esc(String(e.id))}" value="${p?esc(String(p)):''}" placeholder="0"></label>`; }).join('')}</div></div>`:''}
+      <div class="jn-ed-foot"><button class="jn-btn" data-salok>Записати в Гаманець</button></div>`, ov=>{
+      let pc=wcode;   // валюта, у якій прийшла ця частина
+      // підказка: скільки це у валюті Роботи (за останнім курсом — точний курс спитаємо при записі)
+      const eqUpd=()=>{ const el=ov.querySelector('#salEq'); if(!el) return;
+        const v=parseFloat(String(ov.querySelector('#salAmt').value||'').replace(',','.'))||0;
+        if(pc===wcode||!(v>0)){ el.textContent=''; return; }
+        const toMain=pc===mcode?1:finLastRate(pc), wRate=wcode===mcode?1:finLastRate(wcode);
+        el.textContent=toMain>0&&wRate>0?'≈ '+fmt(Math.round(v*toMain/wRate*100)/100)+' '+sym+' із '+fmt(st.left)+' '+sym+' — за останнім курсом':'Курс спитаю, коли натиснеш «Записати»'; };
+      ov.querySelectorAll('[data-salcur]').forEach(b=>b.onclick=()=>{ pc=b.dataset.salcur;
+        ov.querySelectorAll('[data-salcur]').forEach(x=>x.classList.toggle('on',x===b));
+        const lab=ov.querySelector('#salAmtLab'); if(lab) lab.textContent='Скільки прийшло, '+curSym(pc); eqUpd(); });
+      ov.querySelector('#salAmt').addEventListener('input',eqUpd);
+      ov.querySelector('[data-salok]').onclick=()=>{
+        const amt=Math.round((parseFloat(String(ov.querySelector('#salAmt').value||'').replace(',','.'))||0)*100)/100;
+        if(!(amt>0)){ ov.querySelector('#salAmt').focus(); return; }
+        let date=String(ov.querySelector('#salDate').value||''); if(!/^\d{4}-\d\d-\d\d$/.test(date)||date>td) date=td;
+        const put=[...ov.querySelectorAll('[data-salenv]')].map(i=>({e:envelopes.find(x=>String(x.id)===String(i.dataset.salenv)), v:Math.round((parseFloat(String(i.value||'').replace(',','.'))||0)*100)/100})).filter(x=>x.e&&x.v>0);
+        const code=pc;
+        // rate — курс валюти частини до головної; rw — курс валюти Роботи до головної (лише щоб порахувати «прийшло»)
+        const go=(rate,rw)=>{
+          const fx=finFx(amt, code, code===mainCur()?1:rate);
+          const salW=code===wcode?amt:(wcode===mcode?fx.amount:Math.round(fx.amount/rw*100)/100);
+          const putSum=put.reduce((s,x)=>s+x.v,0);
+          if(putSum>fx.amount+0.001){ flowAlert('У конверти більше ('+fmt(putSum)+' '+msym+'), ніж прийшло ('+fmt(fx.amount)+' '+msym+'). Нічого не записано.'); return; }
+          const n=salPartsIn(ym).length;
+          let _wc; try{ ensureCards(); _wc=workCard().id; }catch(_){}
+          const op=finOpFx({ id:Date.now()+'_'+Math.random().toString(36).slice(2,6), type:'in', label:'Зарплата · '+mn+' '+ym.slice(0,4)+(n?' · частина '+(n+1):''), date, card:_wc, _salPart:true, _salYM:ym, _mc:mainCur(), _salW:salW }, amt, code, code===mainCur()?1:rate);
+          // рядок «Зарплата» у Плані місяця стає ✓ (47-rules.js) — як було з автозаписом
+          try{ const pl=typeof rlPlan==='function'?rlPlan(ym,false):null; const row=pl&&pl.in.find(r=>!rlRowCur(r)&&/зарплат|(^|[^а-яіїєґ])зп([^а-яіїєґ]|$)|salary/i.test(String(r.t||''))&&!rlPlanFact(ym,r.id)); if(row) op.planId=row.id; }catch(_){}
+          finOps.push(op); saveFinOps();
+          try{ finTombMarkSal(ym); }catch(_){}   // стара версія застосунку з автозаписом пропустить цей місяць (51-money-reset.js)
+          put.forEach(x=>{ if(typeof envAddOp==='function') envAddOp(x.e,'in',x.v,'Із зарплати ('+ym+')',_wc);
+            if(x.e.planned&&+x.e.planned[ym]>0){ const r=Math.round((+x.e.planned[ym]-x.v)*100)/100; if(r>0) x.e.planned[ym]=r; else delete x.e.planned[ym]; } });
+          if(put.length) saveEnvelopes();
+          ov.remove();
+          renderWork(); try{ renderFinance(); }catch(_){} try{ if(typeof wgRefresh==='function') wgRefresh(); }catch(_){}
+          try{ window.platform.haptic('success'); }catch(_){}
+          try{ plToast('✓ Зарплата в Гаманці'+(put.length?' · у конверти '+fmt(put.reduce((s,x)=>s+x.v,0))+' '+msym:'')); }catch(_){}
+        };
+        // курс частини питаємо завжди (як Гаманець); курс Роботи — лише коли валюти різні й останнього курсу нема
+        const askW=cb=>{ if(wcode===mcode||code===wcode){ cb(1); return; } const r=finLastRate(wcode); if(r>0) cb(r); else finAskRate(wcode,cb); };
+        const askP=cb=>{ if(code===mcode) cb(1); else finAskRate(code,cb); };
+        askP(rate=>askW(rw=>go(rate,rw)));
+      };
+      setTimeout(()=>{ const i=ov.querySelector('#salAmt'); if(i){ i.focus(); i.select(); } },60);
     });
   }
 
@@ -26458,7 +26514,8 @@
   }
   // скільки зарплати місяця вже лягло в конверт (рух «Із зарплати (РРРР-ММ)» — transferPlannedToEnvelopes / allocSave)
   function allocMovedIn(e,ymKey){ const lbl='Із зарплати ('+ymKey+')'; return (Array.isArray(e.ops)?e.ops:[]).filter(o=>o&&o.t==='in'&&o.label===lbl).reduce((s,o)=>s+(+o.amount||0),0); }
-  function allocSalOp(ymKey){ return (finOps||[]).find(o=>o&&o._autoSal===true&&o._salYM===ymKey)||null; }
+  // зарплата за місяць уже приходила (частина «Прийшла зарплата» чи старий автозапис) — розподіл іде в конверти одразу
+  function allocSalOp(ymKey){ return (finOps||[]).find(o=>o&&o.type==='in'&&o._salYM===ymKey&&(o._salPart===true||o._autoSal===true))||null; }
   function openAllocModal(){
     const sym=CUR[workCur]||workCur;
     let me=workSessionsIn(workMonth).reduce((s,w)=>s+(+w.amount||0),0);
@@ -26533,7 +26590,6 @@
       }
       else if(v>0) e.planned[ymKey]=v; else delete e.planned[ymKey];
     });
-    if(sal&&sal._amt0!=null&&sal._amt0!==sal.amount){ sal._amt0=sal.amount; saveFinOps(); }   // доплату розглянуто — більше не показуємо
     saveEnvelopes();
     document.getElementById('allocBack').classList.remove('on');
     renderWork(); try{ renderFinance(); }catch(_){}
@@ -26655,8 +26711,18 @@
   { const p=document.getElementById('wkCalPrev'); if(p) p.onclick=()=>workShiftMonth(-1); }
   { const n=document.getElementById('wkCalNext'); if(n) n.onclick=()=>workShiftMonth(1); }
 
+  /* зарплату за місяць уже внесено «Прийшла зарплата» — окремий запис зміни «→ у фінанси» подвоїв би дохід (24.11.2026):
+     питаємо людину; зміни, що вміщаються в «чекаємо», проходять без питань */
+  function salPushGuard(list, go){
+    const by={}; list.forEach(w=>{ const ym=String(w.date).slice(0,7); by[ym]=(by[ym]||0)+(+w.amount||0); });
+    const over=Object.keys(by).find(ym=>{ const st=salState(ym); return st.got>0&&by[ym]>st.left+0.5; });
+    if(!over){ go(); return; }
+    confirmSheet({ title:'Зарплату за '+WK_MONTHS[+over.slice(5,7)-1].toLowerCase()+' вже записано', ic:'wallet', okLabel:'Все одно записати',
+      sub:'Ці години вже входять у зарплату, що прийшла. Окремий запис порахує той самий дохід двічі.', onOk:go });
+  }
   // пачка змін: курс кожної чужої валюти питаємо ОДИН раз, а не на кожну зміну
-  function pushWorkBatch(list){
+  function pushWorkBatch(list, _ok){
+    if(!_ok){ salPushGuard(list,()=>pushWorkBatch(list,true)); return; }
     const need=[...new Set(list.map(w=>finCurCode(w.cur)).filter(c=>c!==mainCur()))];
     const rates={};
     const next=()=>{
@@ -26672,6 +26738,7 @@
   function pushWorkToFin(id, batch, rates){
     const w=workSessions.find(x=>String(x.id)===String(id));
     if(!w || w.pushed) return;
+    if(!batch&&!(rates&&rates.__ok)){ salPushGuard([w],()=>pushWorkToFin(id,batch,Object.assign({},rates,{__ok:1}))); return; }   // пачку перевіряє pushWorkBatch
     const code=finCurCode(w.cur);
     if(code!==mainCur() && !(rates&&rates[code]>0)){
       finAskRate(code, r=>pushWorkToFin(id, batch, Object.assign({}, rates, {[code]:r})));
@@ -29871,9 +29938,10 @@
         const vw=(c.view==='chat'||c.view==='photo'||c.view==='canvas')?c.view:undefined;   // вигляд папки (36-chats.js fhView); canvas — «Полотно»; решта — «Документ»
         const grp=c.group===true?true:undefined;   // група, зібрана людиною (16-dashboard.js isFolderGroup); без поля — звичайна папка
         const tb=(typeof c.tab==='string'&&/^t[a-z0-9]{1,23}$/.test(c.tab))?c.tab:undefined;   // своя вкладка Огляду (36-chats.js); без поля — «Папки»
-        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp,tab:tb}); }
+        const rd=(typeof c.ready==='string'&&/^[a-z]{2,16}$/.test(c.ready))?c.ready:undefined;   // готова папка з Магазину (68-ready-folders.js)
+        if(folders[k]){ Object.assign(folders[k],{c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,pct:c.pct||folders[k].pct||0,parent:c.parent||'',role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp,tab:tb,ready:rd}); }
         // видалена (на цьому чи іншому пристрої) — не доливаємо її назад зі старої копії конфігу
-        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp,tab:tb}; }
+        else if(c.custom && !folderTombed(k)){ folders[k]={key:k,c:c.c,emoji:c.emoji,icon:ic,iconSet:c.iconSet?1:0,name:c.name,pct:c.pct||0,photo:c.photo||'',photoPos:c.photoPos||null,flayout:c.flayout||'a',pinned:!!c.pinned,custom:true,parent:c.parent||'',widgets:[],role:c.role||'area',status:c.status||'',due:c.due||'',sphere:sph,gview:gv,prio:pr,view:vw,group:grp,tab:tb,ready:rd}; }
       });
     }
   }
@@ -36988,7 +37056,7 @@
       if(!i) return b.id?wgPageTile(b,fk,'wide c-work',`${wgSettingsHead(b,'Робота','⏱ Робота')}<small>Дані про години недоступні</small>`):'';
       return wgPageTile(b,fk,'wide c-work',`<button class="wg-hit" data-wga="work" aria-label="Робота — календар годин"></button>
         ${wgSettingsHead(b,'Робота','⏱ Робота · '+esc(MO_NAMES[+ym.slice(5,7)-1].toLowerCase()))}<b class="wg-big">${esc(moneyK(i.earned,i.cur))}</b>
-        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплату записано':i.due?'тапни — запише зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>
+        <small>${esc(String(Math.round(i.hours*10)/10).replace('.',','))} год · ${i.paid?'✓ зарплата прийшла':i.got>0?'прийшло '+esc(fmt(i.got))+' · чекаємо '+esc(fmt(i.left)):i.due?'чекаємо зарплату':'виплата '+esc(String(i.pday))+'-го'}</small>
         ${b.id?'<span class="wg-acts one"><button data-wga="workadd">＋ Години</button></span>':''}`);   // на сторінці папки (є id блока) — запис годин на сьогодні; у Гаманці — без кнопки
     }
     if(t==='wgmoney'){
@@ -38393,8 +38461,9 @@
   }
   /* ════════ Робота ↔ Гаманець і «Почати фінанси з нуля» (51-money-reset.js, 10.10.2026) ════════
      1) wkMoneyInfo(ym) — лише ЧИТАННЯ календаря Роботи (20-work.js): години, зароблено (зміни + аванси/премії),
-        день виплати, чи зарплату вже записано (op._autoSal з _salYM). Записує зарплату, як і раніше, сама Робота
-        (syncSalaryToFin) — тут нічого не пишеться.
+        день виплати, скільки зарплати вже прийшло (salState: частини _salPart, старі автозаписи _autoSal,
+        зміни «→ у фінанси») і скільки ще чекаємо. Записує зарплату лише людина — «Прийшла зарплата»
+        (20-work.js salGotSheet, з 24.11.2026; автозапису більше нема) — тут нічого не пишеться.
         Використання: плитка «⏱ Робота» в Гаманці (48-widgets.js), рядок «Очікується з Роботи» у Плані й прогнозі (47-rules.js).
      2) finResetScan / finResetAll — «Ще → Дані → Почати фінанси з нуля»: лише за тапом людини, після підтвердження
         й лише коли fin_ops / конверти / goals_data звірені з хмарою. Стирає ГРОШІ: операції Гаманця, конверти й
@@ -38411,11 +38480,14 @@
     const pday=Math.min(Math.max(parseInt(workPayday)||dim,1),dim);
     const sal=(finOps||[]).find(o=>o&&o._autoSal===true&&o._salYM===ym)||null;
     let cur=''; try{ const c=finCurCode(workCur); cur=c&&curOk(c)&&c!==mainCur()?c:''; }catch(_){}
-    const left=sal?0:Math.max(0,Math.round((earned-pushed)*100)/100);
+    // зарплата частинами (20-work.js salState): «прийшло» = частини + старі автозаписи + зміни «→ у фінанси», що ще є в Гаманці
+    let st=null; try{ st=typeof salState==='function'?salState(ym):null; }catch(_){}
+    const left=st?st.left:(sal?0:Math.max(0,Math.round((earned-pushed)*100)/100));
+
     const td=ymdLocal(), due=ym<td.slice(0,7)||(ym===td.slice(0,7)&&+td.slice(8,10)>=pday);   // день виплати вже настав
     // зарплату цього місяця видалено руками чи обнулено фінанси — Робота її не запише, тож і не «очікуємо»
     let skip=false; try{ skip=!sal&&workPostedSal&&workPostedSal[ym]==='deleted'; }catch(_){}
-    return {ym, hours, earned, pday, paid:!!sal, salOp:sal, cur, left:skip?0:left, due, skip, has:!skip&&(ss.length>0||Math.abs(net)>0)};
+    return {ym, hours, earned, pday, paid:st?st.done:!!sal, salOp:sal, got:st?Math.round((st.got+st.pushed)*100)/100:0, cur, left:skip?0:left, due, skip, has:!skip&&(ss.length>0||Math.abs(net)>0)};
   }
   // очікувана зарплата в головній валюті (для прогнозу Плану): Робота в €, зарплата пишеться в ₴ за курсом — так само рахуємо
   function wkExpectedMain(ym){
@@ -38520,6 +38592,17 @@
     try{ const pl=jnHero().plan||{}; add('plan',Object.values(pl).flatMap(p=>p&&typeof p==='object'?[].concat(p.in||[],p.out||[]):[]).map(r=>r&&r.id)); }catch(_){}
     try{ add('sal',Object.keys(workPostedSal||{}).filter(ym=>/^\d{4}-\d{2}$/.test(ym)&&workPostedSal[ym]==='deleted')); }catch(_){}
     t.at=new Date().toISOString(); delete t._s;
+    const out={at:t.at}; FIN_TOMB_KINDS.forEach(k=>{ out[k]=t[k]; });
+    try{ const q=window.storage.set('fin_tomb',JSON.stringify(out),false); if(q&&q.catch)q.catch(()=>{}); }catch(_){}
+  }  /* Зарплата частинами (24.11.2026): місяць, за який людина вже натиснула «Прийшла зарплата», кладемо в sal —
+     СТАРА версія застосунку (Mac/телефон до оновлення, ще з автозаписом) перевіряє finTombHas('sal',ym) і тоді
+     не допише зарплату поверх частин. Нова версія sal не читає (у finTombApply його нема) — нічого не ховається.
+     Лише тапом людини (з salGotSheet) і лише коли fin_tomb прочитано: інакше запис затер би надгробки з хмари. */
+  function finTombMarkSal(ym){
+    if(!/^\d{4}-\d{2}$/.test(String(ym||''))) return;
+    if(window.storeKeyReady&&!window.storeKeyReady('fin_tomb')) return;
+    if(finTombHas('sal',ym)) return;
+    const t=finTombGet(); t.sal=[...new Set([...(t.sal||[]),ym])].slice(-FIN_TOMB_CAP); delete t._s; t.at=new Date().toISOString();
     const out={at:t.at}; FIN_TOMB_KINDS.forEach(k=>{ out[k]=t[k]; });
     try{ const q=window.storage.set('fin_tomb',JSON.stringify(out),false); if(q&&q.catch)q.catch(()=>{}); }catch(_){}
   }
@@ -39261,7 +39344,8 @@
   function dsbTreeHTML(){
     let cur=''; try{ const s=document.getElementById('scr-page'); if(s&&s.classList.contains('active')) cur=pgFolderKey()||''; }catch(_){}
     const vis=k=>folders[k]&&(typeof folderVisible!=='function'||folderVisible(k));
-    let tops=[]; try{ tops=topFolderKeys().filter(vis); }catch(_){ return ''; }
+    const oldWorkOff=typeof rfInstalled==='function'&&!!rfInstalled('robota');   // є готова «Робота» — заводську не показуємо
+    let tops=[]; try{ tops=topFolderKeys().filter(vis).filter(k=>!(oldWorkOff&&k==='work')); }catch(_){ return ''; }
     if(!tops.length) return '';
     const row=(k,lvl)=>{ const f=folders[k], kids=childFolderKeys(k).filter(vis), open=!!dsbOpen[k]||(cur&&kids.includes(cur));
       return `<div class="dsbt-r${k===cur?' on':''}" style="--lvl:${lvl}">
@@ -41435,7 +41519,7 @@
      Блок із полем since новіше за BS_BASE — «Нове»: у меню нема, поки людина його не візьме. Агент Флоу і шаблони
      створюють блоки як раніше — магазин керує лише меню. Тексти — двома мовами (flowLang). */
   var BS_KEY='blocks_got', BS_BASE='2026-11-18';
-  var BS_SPH=[['all','Усе','All'],['trk','Трекери','Trackers'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
+  var BS_SPH=[['all','Усе','All'],['ready','Готові папки','Ready folders'],['trk','Трекери','Trackers'],['health','Здоровʼя','Health'],['money','Гроші','Money'],['work','Робота','Work'],['study','Навчання','Study'],['goals','Цілі','Goals'],['home','Дім','Home']];
   /* k → сфери, значок, колір, звʼязок, прев'ю; тексти uk/en: n назва, s одне речення, d опис, st три кроки.
      ПРАВИЛО: кожен НОВИЙ запис тут — з since:'РРРР-ММ-ДД' пізніше за BS_BASE. Без since блок у людей, що вже
      тапали «Отримати/Прибрати», мовчки зник би з меню (у їхньому збереженому списку його нема). */
@@ -41594,6 +41678,7 @@
     const sp=bsState.sph, inSp=k=>sp==='all'||BS_ITEMS[k].sp.includes(sp);
     let h=`<div class="bs-chips" role="group">${BS_SPH.map(s=>`<button class="bs-chip${sp===s[0]?' on':''}" data-bssph="${s[0]}">${en?s[2]:s[1]}</button>`).join('')}</div>`;
     if(sp==='trk'&&!q) return h+bsTrkHTML(en);
+    if(sp==='ready'&&!q) return h+(typeof rfStoreHTML==='function'?rfStoreHTML(en):'');   // готові папки (68-ready-folders.js)
     if(q||sp!=='all'){ const L=keys.filter(k=>match(k)&&inSp(k));
       return h+(L.length?`<div class="bs-shelf">${L.map(bsRow).join('')}</div>`:`<p class="bs-empty">${en?'Nothing found':'Нічого не знайшлось'}</p>`); }
     // прибрані людиною (не нові) — одразу зверху: сюди веде рядок «Ще N блоків у Магазині» з меню «＋ Блок»
@@ -41656,6 +41741,7 @@
       if(t.closest('[data-bsx]')){ close(); return; }
       if(t.closest('[data-bsback]')){ if(bsState.open){ bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); } else close(); return; }
       const g=t.closest('[data-bsget]'); if(g){ e.stopPropagation(); const k=g.dataset.bsget, on=!bsGot(k); if(bsSet(k,on)===false) return; if(on) bsToast(en?'In the “+ Block” menu ✓':'Є в меню «＋ Блок» ✓'); return; }
+      const ri=t.closest('[data-rfinst]'); if(ri){ const k=ri.dataset.rfinst; close(); setTimeout(()=>{ try{ rfInstall(k); }catch(err){ console.error('rfInstall',err); } },120); return; }   // готова папка: створити й відкрити
       const rm=t.closest('[data-bsrm]'); if(rm){ if(bsSet(rm.dataset.bsrm,false)===false) return; bsToast(en?'Removed from the menu — still works in folders':'Прибрано з меню — у папках працює далі'); return; }
       const s=t.closest('[data-bssph]'); if(s){ bsState.sph=s.dataset.bssph; bsState.open=''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
       const op=t.closest('[data-bsopen]'); if(op){ bsState.open=op.dataset.bsopen; bsState.look=op.dataset.bslook||''; ov.querySelector('.bs-body').scrollTop=0; bsRedraw(); return; }
@@ -43662,7 +43748,7 @@
      місяця (тап по дню — та сама шторка, що на екрані Роботи), «＋ Години сьогодні», «Куди піде зарплата».
      Блок НІЧОГО свого не зберігає (лише id у дошці): читає години й ставку (20-work.js), зарплату
      в Гаманці (wkMoneyInfo, 51-money-reset.js) і конверти (08-finance.js). Пише тільки тапом людини
-     тими ж функціями Роботи: workTapDay (години), openAllocModal (розподіл). Підключено в 48-widgets.js
+     тими ж функціями Роботи: workTapDay (години), salGotSheet («Прийшла зарплата», 24.11), openAllocModal (план конвертів). Підключено в 48-widgets.js
      (WG_TYPES, wgHTML, wgAct → wkpAct). Повний екран Роботи (ставка, день виплати, аванси) — «Налаштування». */
   const wkpYm={};   // місяць, який гортає блок (лише памʼять, як wdCalYm)
   const WKP_ENV_C=['#f0b429','#34c77b','#5ec8ff','#ff7a9c','#9b8cff','#ff9a4d'];
@@ -43697,10 +43783,15 @@
     const ss=workSessionsIn(ym), days=new Set(ss.filter(w=>+w.hours>0).map(w=>w.date)).size;
     const td=ymdLocal(), cur=ym===td.slice(0,7), left=cur?Math.max(0,i.pday-+td.slice(8,10)):0;
     const rows=wkpEnvRows(ym), env=rows.reduce((s,r)=>s+r.sum,0), free=Math.max(0,i.earned-env);
-    const salSub=i.paid?'✓ у Гаманці':i.skip?'не записується':cur&&!i.due?(left?'через '+left+' '+pluralUk(left,'день','дні','днів'):'сьогодні'):i.due&&!i.paid?'чекає запису':'виплата '+i.pday+'-го';
+    // зарплата частинами (20-work.js salState): що прийшло — лише тапом «Прийшла зарплата»
+    let st=null; try{ st=salState(ym); }catch(_){}
+    st=st||{earned:i.earned,got:0,pushed:0,parts:[],left:0,done:false};
+    const came=st.got+st.pushed;
+    const salSub=st.done?'✓ прийшла':came>0?'прийшло '+fmt(Math.round(came)):cur&&!i.due?(left?'через '+left+' '+pluralUk(left,'день','дні','днів'):'сьогодні'):'чекаємо';
     const mn=MO_NAMES[+ym.slice(5,7)-1];
-    const sal=i.paid?i.salOp:null, extra=sal&&sal._amt0!=null?Math.round((+sal.amount||0)-(+sal._amt0||0)):0;   // години, додані після виплати
-    const msym=CUR[mainCur()]||mainCur();
+    const pparts=st.parts.map(o=>{ const d=String(o.date||''); return `<div class="wkp-row"><span class="dot ok"></span><span class="n">${esc(d.slice(8,10)+'.'+d.slice(5,7))}${o._autoSal?' · автозапис':''}</span><b>${esc(wkpMoney(salWorkAmt(o),sym))}</b></div>`; }).join('')
+      +(st.pushed>0?`<div class="wkp-row"><span class="dot ok"></span><span class="n">Зміни «→ у фінанси»</span><b>${esc(wkpMoney(st.pushed,sym))}</b></div>`:'');
+    const gotPct=st.earned>0?Math.max(0,Math.min(100,came/st.earned*100)).toFixed(1):'0';
     const pct=n=>i.earned>0?Math.max(0,Math.min(100,n/i.earned*100)).toFixed(1):'0';
     return `<div class="wkp">
       <div class="wkp-flow">
@@ -43710,14 +43801,20 @@
         <svg class="wkp-ar env" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
         <div class="wkp-st env"><small>Конверти</small><b>${esc(wkpMoney(env,sym))}</b><span class="wkp-free">вільно ${esc(fmt(Math.round(free)))}</span></div>
       </div>
-      ${extra>=1?`<div class="wkp-extra"><span class="wkp-ex-ic" aria-hidden="true">＋</span><span class="wkp-ex-t"><b>Доплата +${esc(fmt(extra))} ${esc(msym)}</b><small>години, додані після виплати</small></span><button data-wga="wkp:alloc">Розкласти</button></div>`:''}
       <div class="wkp-card">
         <div class="wkp-hd"><button class="wkp-nav" data-wga="wkp:prev" aria-label="Попередній місяць">‹</button><b>${esc(mn)} ${esc(ym.slice(0,4))}</b><button class="wkp-nav" data-wga="wkp:next" aria-label="Наступний місяць">›</button></div>
         <div class="wkp-cal">${wkpCalHTML(ym)}</div>
         <button class="wkp-main" data-wga="wkp:today">＋ Години сьогодні</button>
       </div>
       <div class="wkp-card">
-        <div class="wkp-hd2"><b>Куди піде зарплата</b><small>${i.paid?'вже розкладено':esc(String(i.pday))+'-го, сама'}</small></div>
+        <div class="wkp-hd2"><b>Зарплата за ${esc(mn.toLowerCase())}</b><small>${st.done?'вся прийшла':'виплата '+esc(String(i.pday))+'-го'}</small></div>
+        <div class="wkp-bar" aria-hidden="true"><i style="width:${gotPct}%;background:#34c77b"></i><i class="wkp-free"></i></div>
+        <div class="wkp-sum"><span><small>Зароблено</small><b>${esc(wkpMoney(st.earned,sym))}</b></span><span><small>Прийшло</small><b class="ok">${esc(wkpMoney(came,sym))}</b></span><span><small>Чекаємо</small><b>${esc(wkpMoney(st.left,sym))}</b></span></div>
+        ${pparts?`<div class="wkp-rows">${pparts}</div>`:''}
+        <button class="wkp-main got" data-wga="wkp:got">＋ Прийшла зарплата</button>
+      </div>
+      <div class="wkp-card">
+        <div class="wkp-hd2"><b>Куди піде зарплата</b><small>план на місяць</small></div>
         ${rows.length?`<div class="wkp-bar" aria-hidden="true">${rows.map(r=>`<i style="width:${pct(r.sum)}%;background:${r.c}"></i>`).join('')}<i class="wkp-free" style="width:${pct(free)}%"></i></div>
         <div class="wkp-rows">${rows.map(r=>`<div class="wkp-row"><span class="dot" style="background:${r.c}"></span><span class="n">${esc(String(r.e.name||'Конверт'))}</span><b>${esc(wkpMoney(r.sum,sym))}</b></div>`).join('')}
           <div class="wkp-row mu"><span class="dot"></span><span class="n">Вільно в Гаманці</span><b>${esc(wkpMoney(free,sym))}</b></div></div>`
@@ -43731,8 +43828,55 @@
     if(a==='day'){ const d=String(el.dataset.d||''); if(/^\d{4}-\d\d-\d\d$/.test(d)) workTapDay(d); return; }
     if(a==='today'){ workTapDay(ymdLocal()); return; }
     if(a==='prev'||a==='next'){ wkpYm[id]=ymOffset(ym,a==='next'?1:-1); wgRefresh(); return; }
+    if(a==='got'){ salGotSheet(ym); return; }   // «Прийшла зарплата» за місяць, що відкритий у календарі
     if(a==='alloc'){ workMonth=ym; openAllocModal(); return; }
-    if(a==='full'){ workMonth=ym; goWork(); return; }
+    if(a==='full'){ workMonth=ym; goWork({screen:true}); return; }   // повний екран, навіть коли старі входи ведуть у папку
+  }
+  /* ════════ Готові папки (22.11.2026) — відділ Магазину блоків (62-block-store.js, вкладка «Готові папки»; файл 68-ready-folders.js) ════════
+     «Встановити» = звичайна папка з набором блоків: її можна перейменувати, ставити підпапки, звʼязки, свої блоки.
+     Створюється ЛИШЕ тапом людини (inputModal → назва й емодзі), при старті нічого не пишеться.
+     «Робота» — папка з блоком «Календар годин» (67-work-panel.js); одна на акаунт: якщо вже є — «Відкрити».
+     Решта — шаблони колишніх Сфер (39-spheres.js SPH_TPL), без шапки сфери: просто папка з блоками.
+     Позначка походження в папці: ready:'<ключ>' (лише для «Відкрити» й для схованої заводської Роботи). */
+  const RF_SPH_EN={fin:['Finance desk','Income, spending, monthly target',['Income','Spending','Wallet']],sport:['Sport','Workouts, habit, plan',['Heatmap','Plan']],
+    learn:['Learning','Day streak, lessons',['Streak','Plan']],brand:['Brand / content','Posts, plan',['Heatmap','Plan']],
+    habit:['Habit','Days without slips, savings',['Heatmap','Countdown']],home:['Home','Chores, sleep, your tasks',['Heatmap','Plan']]};
+  function rfItems(){
+    const L=[{k:'robota',em:'💼',c:'#5b8def',uk:['Робота','Календар годин → зарплата → конверти',['Календар годин','Зарплата','Конверти']],
+      en:['Work','Hours calendar → salary → envelopes',['Hours calendar','Salary','Envelopes']],blocks:()=>[{type:'wgworkpanel'}]}];
+    try{ SPH_ORDER.filter(t=>t!=='work'&&SPH_TPL[t]).forEach(t=>{ const T=SPH_TPL[t], en=RF_SPH_EN[t]||[T.n,T.d,T.chips];
+      L.push({k:t,em:T.em,c:T.c,uk:[T.n,T.d,T.chips],en,blocks:T.blocks}); }); }catch(_){}
+    return L;
+  }
+  function rfFind(k){ return rfItems().find(x=>x.k===k)||null; }
+  // уже встановлена «Робота» (одна на акаунт); для інших шаблонів можна ставити скільки завгодно
+  function rfInstalled(k){ if(k!=='robota') return ''; try{ return Object.keys(folders).find(fk=>folders[fk]&&folders[fk].ready==='robota'&&!folders[fk].deleted&&(typeof folderVisible!=='function'||folderVisible(fk)))||''; }catch(_){ return ''; } }
+  function rfStoreHTML(en){
+    return `<p class="bs-lead">${en?'A ready folder is a normal folder with blocks already in place: rename it, add subfolders, links and your own blocks.':'Готова папка — звичайна папка, де блоки вже стоять: перейменовуй, додавай підпапки, звʼязки й свої блоки.'}</p>
+      <div class="rf-list">${rfItems().map(it=>{ const T=en?it.en:it.uk, have=rfInstalled(it.k);
+        const c=/^#[0-9a-f]{6}$/i.test(String(it.c||''))?it.c:'#6a7dff';   // колір і емодзі — поки з констант, але перевіряємо: шаблони колись можуть прийти ззовні
+        return `<div class="rf-card" style="--c:${c}"><div class="rf-top"><span class="rf-em" aria-hidden="true">${esc(String(it.em||''))}</span><span class="rf-tx"><b>${esc(T[0])}</b><small>${esc(T[1])}</small></span></div>
+          <div class="rf-chips">${(T[2]||[]).map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+          <button class="rf-get${have?' have':''}" data-rfinst="${esc(it.k)}">${have?(en?'Open':'Відкрити'):(en?'Install':'Встановити')}</button></div>`; }).join('')}</div>`;
+  }
+  function rfInstall(k){
+    const it=rfFind(k); if(!it) return;
+    const have=rfInstalled(k); if(have){ goFolder(have); return; }
+    const en=(typeof bsLang==='function'&&bsLang()==='en'), T=en?it.en:it.uk;
+    inputModal({ title:(en?'New folder · ':'Нова папка · ')+T[0], placeholder:T[0], value:T[0], emoji:true, emojiVal:it.em,
+      onOk:(name, emojiVal)=>{
+        if(foldersLoaded!==true){ try{ plToast(en?'Folders are still loading — try in a moment':'Папки ще завантажуються — спробуй за мить'); }catch(_){} return; }   // як fmDuplicate і folder.create у Ядрі
+        const nm=String(name||'').trim().slice(0,60)||T[0];
+        const em=(emojiVal!==undefined&&emojiVal!=='')?emojiVal:it.em;
+        const key='f_'+Date.now();
+        folders[key]={ key, c:it.c, emoji:em, icon:folderIconFor(em), name:nm, pct:0, photo:'', flayout:'a', pinned:false, custom:true, widgets:[], ready:k };
+        order.push(key);
+        boards[key]=it.blocks().map((b,i)=>{ const o=Object.assign({id:'rf'+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5)},b);
+          if(o.type==='wplanday') o.pfolder=key; return o; });
+        saveBoard(); saveFolders(); renderDashboard();   // тап людини — звичайний запис (не {auto:true})
+        try{ window.platform.haptic('medium'); }catch(_){}
+        goFolder(key);
+      }});
   }
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
@@ -44125,6 +44269,97 @@
   /* оформлений текст у полі (19.11.2026): позначки → <b> <i> <s> <mark> <a>, усе інше екрановано (core/64-rich-text.js) */
   function txRich(b){ try{ if(typeof txHTML==='function'){ var h=txHTML(txtOf(b)); return typeof txChips==='function'?txChips(h):h; } }catch(_){} return esc(txtOf(b)); }   /* + фішки дат, сум і @папок (лише показ) */
   function txIsRich(b){ return !!(b&&typeof TX_RICH!=='undefined'&&TX_RICH[b.type]); }
+
+  /* ── Пости з соцмереж (27.11.2026, етап 1 — без мережі) ──
+     Мережу, тип і автора дістаємо лише з самої адреси: сторінку поста
+     не завантажуємо (браузер не пустить через CORS — це етап 2, воркер).
+     Обкладинка — власне фото (скрін поста), лежить у блоці полем cover. */
+  var PG_NETS=[
+    [/(^|\.)instagram\.com$/,'Instagram','IG','#c13584'],
+    [/(^|\.)(tiktok\.com)$/,'TikTok','TT','#25232b'],
+    [/(^|\.)(youtube\.com|youtu\.be)$/,'YouTube','YT','#d93025'],
+    [/(^|\.)threads\.(net|com)$/,'Threads','Th','#3a3a40'],
+    [/(^|\.)(x\.com|twitter\.com)$/,'X','X','#2b2b30'],
+    [/(^|\.)(t\.me|telegram\.me)$/,'Telegram','TG','#2a9fd6'],
+    [/(^|\.)(facebook\.com|fb\.watch)$/,'Facebook','FB','#1877f2'],
+    [/(^|\.)(pinterest\.[a-z.]+|pin\.it)$/,'Pinterest','P','#e60023'],
+    [/(^|\.)linkedin\.com$/,'LinkedIn','in','#0a66c2'],
+    [/(^|\.)reddit\.com$/,'Reddit','R','#ff4500']
+  ];
+  var PG_NOT_AUTHOR={p:1,reel:1,reels:1,tv:1,stories:1,explore:1,i:1,home:1,search:1,watch:1,shorts:1,embed:1,channel:1,c:1,share:1,video:1,s:1,login:1,hashtag:1,pin:1,r:1,in:1,company:1,feed:1,groups:1,events:1};
+  function pgYtId(u){ var m=String(u||'').match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m?m[1]:''; }
+  function pgSocial(u){
+    var h=safeHref(u); if(!h||!/^https?:\/\//i.test(h)) return null;
+    var url; try{ url=new URL(h); }catch(_){ return null; }
+    var host=url.hostname.toLowerCase().replace(/^(www|m|vm|vt|mobile)\./,'');
+    var seg=url.pathname.split('/').filter(Boolean).map(function(s){ try{ return decodeURIComponent(s); }catch(_){ return s; } });
+    var net=null; for(var i=0;i<PG_NETS.length;i++){ if(PG_NETS[i][0].test(host)){ net=PG_NETS[i]; break; } }
+    var r={host:host, n:net?net[1]:host, a:net?net[2]:(host.charAt(0)||'•').toUpperCase(), c:net?net[3]:'', kind:'', author:'', yt:'', social:!!net};
+    var s0=seg[0]||'', s1=seg[1]||'';
+    var who=function(x){ x=String(x||'').replace(/^@/,''); return /^[\w.\-]{1,40}$/.test(x)&&!PG_NOT_AUTHOR[x.toLowerCase()]?x:''; };
+    if(!net){ r.kind=''; return r; }
+    switch(net[1]){
+      case 'Instagram':
+        if(s0==='reel'||s0==='reels'||s0==='tv') r.kind='reels'; else if(s0==='p') r.kind='пост'; else if(s0==='stories'){ r.kind='сторіс'; r.author=who(s1); }
+        else { r.author=who(s0); if(s1==='reel'||s1==='p') r.kind=s1==='p'?'пост':'reels'; else if(r.author) r.kind='профіль'; }
+        break;
+      case 'TikTok':
+        if(s0.charAt(0)==='@'){ r.author=who(s0); r.kind=s1==='video'?'відео':(s1==='photo'?'фото':'профіль'); } else r.kind='відео';
+        break;
+      case 'YouTube':
+        r.yt=pgYtId(h); r.kind=s0==='shorts'?'Shorts':(r.yt?'відео':'');
+        if(s0.charAt(0)==='@'){ r.author=who(s0); if(!r.yt) r.kind='канал'; }
+        break;
+      case 'Threads': case 'X':
+        r.author=who(s0); r.kind=(s1==='post'||s1==='status')?'пост':(r.author?'профіль':'');
+        break;
+      case 'Telegram':
+        if(s0==='s'){ r.author=who(s1); r.kind=/^\d+$/.test(seg[2]||'')?'пост':'канал'; }
+        else { r.author=who(s0); r.kind=/^\d+$/.test(s1)?'пост':(r.author?'канал':''); }
+        break;
+      default:
+        r.kind='';
+    }
+    return r;
+  }
+  /* рядок, у якому лише адреса (або позначка-посилання на саму адресу) → адреса; інакше '' */
+  function pgUrlOnly(t){
+    var s=String(t==null?'':t).trim();
+    var m=/^\[([^\]\n]{1,300})\]\(((?:https?:\/\/)[^\s)<>"'`]{1,800})\)$/i.exec(s);
+    if(m) s=m[2];
+    if(!/^https?:\/\/[^\s<>"'`]{3,800}$/i.test(s)) return '';
+    return safeHref(s)?s:'';
+  }
+  /* підтип «Вкладення» за адресою — той самий, що й у полі адреси блоку */
+  function pgAttSub(v){
+    if(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/|live\/))[\w-]{11}/.test(v)) return 'video';
+    if(/\.(mp3|m4a|wav|ogg|aac)(\?|#|$)/i.test(v)) return 'audio';
+    return 'link';
+  }
+  function pgLinkCard(b,id){
+    var u=b.url||'', s=pgSocial(u)||{n:'Посилання',a:'•',c:'',kind:'',author:'',yt:'',social:false};
+    var go=safeHref(u), cov=b.cover&&/^(data:image\/|idb:)/.test(String(b.cover))?safeImg(b.cover):'';
+    var who=s.author?'@'+s.author:s.n, sub=s.author?s.n+(s.kind?' · '+s.kind:''):(s.kind||(s.social?'':'сайт'));
+    var media='';
+    if(cov) media='<div class="pgsc-cv"><img src="'+esc(cov)+'" alt="" decoding="async" loading="lazy"></div>';
+    else if(s.yt) media=b.play
+      ? '<div class="pgem pgsc-em"><iframe src="https://www.youtube.com/embed/'+s.yt+'?autoplay=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
+      : '<button class="pgem pgem-th pgsc-em" data-pgemplay="'+id+'" aria-label="Дивитись відео" style="background-image:url(\'https://i.ytimg.com/vi/'+s.yt+'/hqdefault.jpg\')"><span class="pgem-p">▶</span></button>';
+    var hasNote=b.note!=null;
+    return '<div class="pg-content"><div class="pgsc'+(s.social?' soc':'')+'"'+(s.c?' style="--nc:'+s.c+'"':'')+'>'
+      +'<div class="pgsc-h"><span class="pgsc-b" aria-hidden="true">'+esc(s.a)+'</span>'
+      +'<div class="pgsc-m"><b data-i18n-skip="1">'+esc(who)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</div>'
+      +(go?'<a class="pgsc-go" href="'+esc(go)+'" target="_blank" rel="noopener" aria-label="Відкрити">↗</a>':'')+'</div>'
+      +media
+      +'<div class="pgsc-t pg-empty" contenteditable="true" data-ph="Назва (необовʼязково)…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
+      +(hasNote?'<div class="pgsc-n pg-empty" contenteditable="true" data-ph="Нотатка: чим це корисне…" data-pglknote="'+id+'">'+esc(b.note||'')+'</div>':'')
+      +'<div class="pgsc-a">'
+        +(hasNote?'':'<button data-pglknoteadd="'+id+'">＋ Нотатка</button>')
+        +'<button data-pglkcover="'+id+'">'+(cov?'Змінити фото':'＋ Фото')+'</button>'
+        +(cov?'<button data-pglkcoverdel="'+id+'">Прибрати фото</button>':'')
+        +'<button data-pglkurl="'+id+'">Змінити посилання</button>'
+      +'</div></div></div>';
+  }
   function equalizeWidths(cols){ var n=cols.length||1; cols.forEach(function(c){ c.width=1/n; }); }
 
   /* ── стиль заголовка: колір / шрифт / контур / виділення, як в Instagram-текстах ── */
@@ -44428,6 +44663,7 @@
       if(sub==='video'){
         var emM=(b.url||'').match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/);
         var emVid=emM?emM[1]:null, emIn;
+        if(emVid) return pgLinkCard(b,id);   /* YouTube — картка поста з мініатюрою (27.11.2026) */
         if(!emVid) emIn='<button class="pgpp-empty" data-pgemset="'+id+'">＋ Посилання YouTube</button>';
         else if(b.play) emIn='<div class="pgem"><iframe src="https://www.youtube.com/embed/'+emVid+'?autoplay=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>';
         else emIn='<button class="pgem pgem-th" data-pgemplay="'+id+'" style="background-image:url(\'https://i.ytimg.com/vi/'+emVid+'/hqdefault.jpg\')"><span class="pgem-p">▶</span></button>';
@@ -44440,6 +44676,7 @@
           +'<span class="pgau-t">0:00</span><audio preload="none" data-pgauel="'+id+'" src="'+esc(b.url)+'"></audio></div></div>';
       }
       var _au=b.url||'';
+      if(safeHref(_au)) return pgLinkCard(b,id);   /* є адреса — картка поста/сайту (27.11.2026) */
       return '<div class="pg-content"><div class="pglk"><span class="pglk-ic">'+pgsIc('link')+'</span>'
         +'<div class="pglk-b"><div class="pglk-t pg-empty" contenteditable="true" data-ph="Назва…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
         +'<input class="pglk-u" type="url" inputmode="url" placeholder="Встав посилання (YouTube / mp3 / будь-що)…" value="'+esc(_au)+'" data-pglink="'+id+'"></div>'
@@ -44475,6 +44712,7 @@
     }
     if(t==='link'){
       var u=b.url||'';
+      if(safeHref(u)) return pgLinkCard(b,id);
       return '<div class="pg-content"><div class="pglk">'
         +'<span class="pglk-ic">'+pgsIc('link')+'</span>'
         +'<div class="pglk-b"><div class="pglk-t pg-empty" contenteditable="true" data-ph="Назва посилання…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
@@ -44927,6 +45165,11 @@
       if(lp){lp.block.ptext=pr.textContent;save();
         var w=pr.closest('.pgpr'),ln=w&&w.querySelector('.pgpr-len');
         if(ln)ln.textContent=pr.textContent.length? pr.textContent.length+' зн.':'';}return;}
+    var lnt=e.target.closest&&e.target.closest('[data-pglknote]');
+    if(lnt){var lnl=locate(lnt.dataset.pglknote);
+      if(lnl){var nv=lnt.textContent.replace(/\s+$/,'');
+        if(nv) lnl.block.note=nv; else delete lnl.block.note;   /* порожню нотатку прибираємо — знову «＋ Нотатка» */
+        save(); if(!nv) render();}return;}
     var tt=e.target.closest&&e.target.closest('[data-pgtabtxt]');
     if(tt){var t0=tt.dataset.pgtabtxt.split('|');var l=locate(t0[0]);
       if(l&&l.block.tabs&&l.block.tabs[t0[1]]){l.block.tabs[t0[1]].text=tt.textContent;save();}return;}
@@ -46002,12 +46245,15 @@
       add=add.map(function(l){ var t=l.text.trim(); if(typeof TX_RICH!=='undefined'&&!TX_RICH[l.t]&&typeof txPlainKeep==='function') t=txPlainKeep(t); return {t:l.t,text:t}; });
       add.forEach(function(l,k){
         var t=l.text;
-        if(!k&&last&&last.type==='note'&&!String(last.text||'').trim()&&!(last.children&&last.children.length)){
+        if(!k&&!(l.t==='note'&&pgUrlOnly(t))&&last&&last.type==='note'&&!String(last.text||'').trim()&&!(last.children&&last.children.length)){
           // порожній рядок у кінці («Пишіть…») — заповнюємо його, а не ставимо запис після нього
           reuse=last; was={type:last.type,text:last.text,done:last.done};
           last.type=l.t; last.text=t; if(l.t==='task') last.done=false; made.push(last); return;
         }
-        var nb={id:uid(),type:l.t,text:t}; if(l.t==='task') nb.done=false; arr.push(nb); made.push(nb);
+        /* рядок-адреса (пост із соцмережі, відео, сайт) — одразу картка «Вкладення», а не текст (27.11.2026) */
+        var lu=(l.t==='note')?pgUrlOnly(t):'';
+        var nb=lu?{id:uid(),type:'attach',sub:pgAttSub(lu),url:lu,title:''}:{id:uid(),type:l.t,text:t};
+        if(l.t==='task') nb.done=false; arr.push(nb); made.push(nb);
       });
       var fresh=made.filter(function(b){ return b!==reuse; }), redo=add.map(function(l){ return {t:l.t,text:l.text.trim()}; });
       pushOp(function(){   // одне «Скасувати» — прибирає весь пакет
@@ -46545,6 +46791,23 @@
     if(aa){var laa=locate(aa.dataset.pgaccadd);
       if(laa){var ba=laa.block;ba.secs=ba.secs||[];
         ba.secs.push({name:'Секція '+(ba.secs.length+1),text:'',open:1});save();render();}return;}
+    /* картка посилання з соцмережі (27.11.2026): нотатка, своє фото-обкладинка, інша адреса */
+    var lna=e.target.closest&&e.target.closest('[data-pglknoteadd]');
+    if(lna){var lnl=locate(lna.dataset.pglknoteadd);
+      if(lnl){lnl.block.note='';save();render();
+        var nf=editor.querySelector('[data-pglknote="'+lnl.block.id+'"]');if(nf){try{nf.focus();}catch(_){}}}return;}
+    var lcv=e.target.closest&&e.target.closest('[data-pglkcover]');
+    if(lcv){pgPickPhoto(lcv.dataset.pglkcover,null,'cover');return;}
+    var lcd=e.target.closest&&e.target.closest('[data-pglkcoverdel]');
+    if(lcd){var lcl=locate(lcd.dataset.pglkcoverdel);if(lcl){delete lcl.block.cover;save();render();}return;}
+    var lku=e.target.closest&&e.target.closest('[data-pglkurl]');
+    if(lku){var lkl=locate(lku.dataset.pglkurl);if(!lkl)return;
+      pgAsk('Посилання','https://…',lkl.block.url||'',function(v){
+        var l=locate(lku.dataset.pglkurl);if(!l)return;
+        l.block.url=v;l.block.play=0;
+        if(l.block.type==='attach'){l.block.sub=pgAttSub(v);
+          if(l.block.sub==='audio'&&!l.block.name){try{l.block.name=decodeURIComponent(v.split('/').pop()||'Аудіо');}catch(_){l.block.name='Аудіо';}}}
+        save();render();});return;}
     var es=e.target.closest&&e.target.closest('[data-pgemset]');
     if(es){pgAsk('Посилання YouTube','https://youtu.be/…','',function(v){
       var l=locate(es.dataset.pgemset);if(l){l.block.url=v;l.block.play=0;save();render();}});return;}
@@ -46714,7 +46977,7 @@
       var v=(li.value||'').trim();
       loc2.block.url=v;
       if(loc2.block.type==='attach'){ /* автовизначення підтипу «Вкладення» за URL (SPECblocksv2 §3.1) */
-        if(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))[\w-]{11}/.test(v)) loc2.block.sub='video';
+        if(pgAttSub(v)==='video') loc2.block.sub='video';
         else if(/\.(mp3|m4a|wav|ogg|aac)(\?|#|$)/i.test(v)){
           loc2.block.sub='audio';
           if(!loc2.block.name){ try{ loc2.block.name=decodeURIComponent(v.split('/').pop()||'Аудіо'); }catch(_){ loc2.block.name='Аудіо'; } }
@@ -46724,7 +46987,8 @@
       save(); render();
     }
   });
-  function pgPickPhoto(bid,onDone){
+  /* field: куди класти знімок — 'data' (блок «Фото», типово) або 'cover' (обкладинка картки посилання) */
+  function pgPickPhoto(bid,onDone,field){
     var inp=document.createElement('input');
     inp.type='file'; inp.accept='image/*';
     inp.onchange=function(){
@@ -46738,8 +47002,8 @@
           var cv=document.createElement('canvas'); cv.width=w2; cv.height=h2;
           cv.getContext('2d').drawImage(img,0,0,w2,h2);
           var loc=locate(bid); if(!loc)return;
-          loc.block.data=cv.toDataURL('image/jpeg',0.72);
-          loc.block.pos=null;
+          if(field==='cover'){ loc.block.cover=cv.toDataURL('image/jpeg',0.72); }
+          else { loc.block.data=cv.toDataURL('image/jpeg',0.72); loc.block.pos=null; }
           save(); render();
           if(onDone) onDone();
         };
