@@ -25,7 +25,7 @@
      вирізає ці інструменти разом із цим коментарем і прибирає 'unsafe-eval' з CSP;
      у веб-версії поки лишаємо — рішення за Ярославом. -->
 <!-- @dev-only:end -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://mogtitbgvrhzyhxmzvhs.supabase.co wss://mogtitbgvrhzyhxmzvhs.supabase.co https://flowai.life-yaroslav-kril.workers.dev; frame-src 'self' https://www.youtube.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://mogtitbgvrhzyhxmzvhs.supabase.co wss://mogtitbgvrhzyhxmzvhs.supabase.co https://flowai.life-yaroslav-kril.workers.dev https://flow-preview.life-yaroslav-kril.workers.dev; frame-src 'self' https://www.youtube.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Frequency</title>
 <!-- шерінг: щоб посилання розгорталось карткою, а не голим URL (аудит Т6) -->
 <meta name="description" content="Frequency — персональна ОС: планер, гроші, проєкти, звички і AI-агент в одному застосунку.">
@@ -51,7 +51,7 @@
   // Версію вшиває tools/build.py: дата-час збірки + короткий git-хеш.
   // Раніше дашборд друкував у консоль вигадану «2026-07-29-folders-v2.4»,
   // яка не мінялась місяцями, — з телефона не було як дізнатись, що там стоїть.
-  var BUILD='2026-11-28-0646-5d7fe93';
+  var BUILD='2026-11-28-0728-a05823e';
   try{ window.FLOW_BUILD=BUILD; console.info('[Frequency] версія', BUILD); }catch(_){}
 
   /* ── Журнал помилок: останні 50, переживає перезапуск ──
@@ -1394,6 +1394,9 @@
   .pgsc .pgsc-em{border-radius:0;}
   .pgsc-t{padding:10px 12px 0;font-size:15px;font-weight:600;line-height:1.35;color:var(--pg-fg);outline:none;}
   .pgsc-t:empty{padding-top:6px;font-size:13px;font-weight:500;}
+  .pgsc-d{padding:4px 12px 0;font-size:13px;line-height:1.45;color:var(--pg-mut);
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .pgsc-a button:disabled{opacity:.6;cursor:progress;}
   .pgsc-n{margin:8px 12px 0;padding:8px 10px;border-radius:10px;background:var(--pg-card2);font-size:14px;line-height:1.45;
     color:var(--pg-fg2);outline:none;white-space:pre-wrap;}
   .pgsc-a{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 12px;}
@@ -2920,6 +2923,21 @@
     border:1px dashed var(--line);border-radius:16px;margin-top:10px;}
   .wish-empty .big{font-size:34px;margin-bottom:10px;}
 
+
+  /* ── В1 «Мрія + перешкода» (WOOP) у картці мрії, 28.11.2026 ── */
+  .wc-woop-sub{font-size:12.5px;line-height:1.45;color:var(--muted);margin:-2px 0 10px;}
+  .wc-woop-list{display:flex;flex-direction:column;gap:8px;}
+  .wc-woop{font:inherit;text-align:left;display:flex;flex-direction:column;gap:3px;padding:11px 12px;min-height:44px;
+    border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;}
+  .wc-woop:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .wc-woop-k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--muted);}
+  .wc-woop-v{font-size:14px;line-height:1.5;}
+  .wc-woop.is-empty .wc-woop-v{color:var(--muted);}
+  .wc-woop.plan{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:color-mix(in srgb,var(--accent) 10%,var(--card));}
+  .wc-woop.plan .wc-woop-k{color:var(--accent);}
+  /* план «якщо — то» на слайді колоди — поверх фото, тому білий текст на темній підкладці */
+  .wdk-plan{margin-top:10px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.42);color:#fff;font-size:12.5px;font-weight:700;line-height:1.4;}
+  .wdk-plan span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   /* ===== GOALS screen ===== */
   .gyear{display:flex;align-items:center;justify-content:center;gap:16px;margin:4px 0 18px;}
   .gyear-nav{width:40px;height:40px;border-radius:50%;background:var(--field);border:1px solid var(--line);color:var(--text);font-size:18px;cursor:pointer;}
@@ -6991,6 +7009,20 @@
   .rmom-next{width:100%;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.35);color:#fff;font:inherit;font-size:14px;font-weight:800;border-radius:15px;padding:14px;cursor:pointer;}
   .rmom-ov.plain .rmom-bg{background:radial-gradient(120% 70% at 50% 20%,#3a2f6e,#0b0a18 70%);animation:none;}
   @media (prefers-reduced-motion:reduce){ .rmom-bg{animation:none !important;} .rmom-ring .rr-fg{transition:none;} }
+
+  /* ── каталог ранків (Р1, 28.11.2026): фільтр за хвилинами + картки методик ── */
+  .red-flt{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px 10px;padding:0 14px;}
+  .red-flt::-webkit-scrollbar{display:none}
+  .red-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+  .red-card{font:inherit;text-align:left;display:flex;flex-direction:column;gap:3px;padding:11px 14px;min-height:44px;border-radius:14px;
+    border:1px solid var(--line);background:var(--field);color:var(--text);cursor:pointer;}
+  .red-card.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);}
+  .red-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .rc-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .rc-top b{font-size:14.5px;font-weight:800;}
+  .rc-min{flex:none;font-size:12px;font-weight:800;color:var(--accent);}
+  .rc-who{font-size:12px;font-weight:700;color:var(--muted);}
+  .rc-steps{font-size:12.5px;line-height:1.4;color:var(--text);opacity:.85;}
 /* ════════ ОГЛЯД · ПАПКИ-ОБКЛАДИНКИ (06.10.2026) ════════
    Вкладки-капсула, ⚙ «Вигляд папок», Галерея · Секції · Бенто (.fc3),
    шторка вигляду (.fvs-*) і обкладинка в меню папки (.fmc-*).
@@ -9267,7 +9299,7 @@
   .md-more{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
     background:color-mix(in srgb,var(--mc) 18%,transparent);color:var(--text);font-size:18px;font-weight:800;}
   .md-go:active,.md-more:active{transform:scale(.97);}
-  .md-go:focus-visible,.md-more:focus-visible,.md-row:focus-visible,.md-spine:focus-visible,.md-add:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .md-go:focus-visible,.md-more:focus-visible,.md-row:focus-visible,.md-add:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   .md-day-h{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 6px;font-size:13px;font-weight:800;color:var(--text);}
   .md-add{all:unset;cursor:pointer;font-size:12.5px;font-weight:800;color:var(--accent);padding:8px 4px;}
@@ -9279,19 +9311,6 @@
   .md-rn{flex:1;min-width:0;font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .md-row small{flex:none;font-size:11.5px;font-weight:700;color:var(--muted);}
 
-  /* полиця: корінці різної висоти (більше записів — вищий корінець) */
-  .md-shelf{display:flex;align-items:flex-end;gap:6px;min-height:164px;padding:0 6px;overflow-x:auto;scrollbar-width:none;
-    border-bottom:4px solid var(--line);border-radius:0 0 4px 4px;}
-  .md-shelf::-webkit-scrollbar{display:none;}
-  .md-spine{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:40px;border-radius:5px 5px 2px 2px;position:relative;
-    background:var(--bc);display:flex;flex-direction:column;align-items:center;gap:6px;padding:7px 0 8px;overflow:hidden;
-    box-shadow:inset 4px 0 0 rgba(0,0,0,.22), inset -1px 0 0 rgba(255,255,255,.12);}
-  .md-spine:active{transform:translateY(-3px);}
-  .md-sp-ic{font-size:13px;line-height:1;}
-  .md-sp-t{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;font-weight:800;color:#fff;white-space:nowrap;
-    overflow:hidden;text-overflow:ellipsis;max-height:calc(100% - 22px);text-shadow:0 1px 2px rgba(0,0,0,.35);}
-  .md-shelf-hint{align-self:center;flex:1;min-width:120px;font-size:12px;font-weight:700;color:var(--muted);line-height:1.4;padding-left:6px;}
-  .md-spine.new{height:138px;background:transparent;border:1.5px dashed var(--line);box-shadow:none;justify-content:center;color:var(--muted);}
 
   /* покроковий режим — поверх усього, але під шторками (1300) і «Моментом» (1400) */
   .md-focus{position:fixed;inset:0;z-index:1250;display:flex;justify-content:center;animation:fadein .2s;
@@ -10603,6 +10622,54 @@
     body.in-yplan .jn-ov .jn-ed{border-radius:20px;}
   }
   @media (min-width:1024px){ .ypp-c1 .ypp-behind{flex-direction:column;align-items:stretch;} .ypp-c1 .ypp-behind button{justify-content:center;} }
+  /* ════════ Сеанс візуалізації (В2, 28.11.2026) — 69-vis-session.js ════════
+     Фото мрії на весь екран, картка кроку внизу. Шар 1290: над покроковим режимом настроїв (1250),
+     але під шторками й віконцями (1300) — бо з кроку «Перешкода» відкривається віконце для тексту. */
+  .vs{position:fixed;inset:0;z-index:1290;background:#0b0916;color:#fff;animation:fadein .2s ease;}
+  .vs-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+  .vs-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.05) 35%,rgba(0,0,0,.55) 70%,rgba(0,0,0,.8) 100%);}
+  .vs-in{position:relative;height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;
+    max-width:520px;margin:0 auto;
+    padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);}
+  .vs-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .vs-x{width:44px;height:44px;flex:none;border-radius:22px;border:0;background:rgba(0,0,0,.4);color:#fff;font-size:16px;cursor:pointer;}
+  .vs-x:focus-visible,.vs-next:focus-visible,.vs-back:focus-visible,.vs-chip:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+  .vs-cap{flex:1;min-width:0;text-align:center;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .vs-sp{width:44px;flex:none;}
+  .vs-segs{display:flex;gap:4px;}
+  .vs-segs i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.28);}
+  .vs-segs i.on{background:#fff;}
+  .vs-card{margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:24px;
+    background:rgba(14,11,26,.84);border:1px solid rgba(255,255,255,.12);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
+  .vs-row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .vs-k{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#c4b5ff;}
+  .vs-tm{font-size:13px;font-weight:800;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;}
+  .vs-t{font-size:20px;line-height:1.3;font-weight:800;}
+  .vs-sub{font-size:14px;line-height:1.5;color:rgba(255,255,255,.78);}
+  .vs-quote{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.08);}
+  .vs-quote small{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+  .vs-quote span{font-size:14.5px;line-height:1.45;}
+  .vs-miss{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:13px;line-height:1.45;color:rgba(255,255,255,.75);}
+  .vs-feels{display:flex;flex-wrap:wrap;gap:6px;}
+  .vs-chip{font:inherit;font-size:13px;font-weight:700;min-height:40px;padding:0 14px;border-radius:20px;cursor:pointer;
+    border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;}
+  .vs-chip.on{border-color:#c4b5ff;background:rgba(139,108,240,.45);}
+  .vs-bot{display:flex;gap:8px;margin-top:4px;}
+  .vs-back{flex:1;min-height:48px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+  .vs-next{flex:2;min-height:48px;border-radius:14px;border:0;background:#8b6cf0;color:#fff;font:inherit;font-size:15px;font-weight:800;cursor:pointer;}
+
+  /* вхід у сеанс під колодою Карти бажань */
+  .vs-open{font:inherit;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:12px 14px;min-height:56px;
+    border-radius:18px;cursor:pointer;text-align:left;color:var(--text);
+    border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:color-mix(in srgb,var(--accent) 12%,var(--card));}
+  .vs-open:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .vs-open-ic{width:22px;height:22px;flex:none;color:var(--accent);}
+  .vs-open-ic svg{width:100%;height:100%;}
+  .vs-open-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .vs-open-tx b{font-size:15px;font-weight:800;}
+  .vs-open-tx small{font-size:12px;font-weight:700;color:var(--muted);}
+  .vs-open-ar{font-size:20px;color:var(--muted);}
 </style>
 <style id="diary-css">
 /* ===== ЩОДЕННИК ===== */
@@ -15810,6 +15877,7 @@
           <div class="wcard-fl">📝 Чому я цього хочу</div>
           <div class="wcard-desc ${w.desc?'':'empty'}" data-wcdesc="1">${w.desc?esc(w.desc):'Тап, щоб описати — навіщо тобі це…'}</div>
         </div>
+        ${wishWoopHTML(w)}
         <div class="wcard-field">
           <div class="wcard-fl">✅ Кроки до мрії${linkedGoal?' <span class="wcard-link">· з цілі</span>':''}</div>
           <div class="wcard-list">${stepsHtml}</div>
@@ -15829,6 +15897,14 @@
     ov.querySelector('[data-wcx]').onclick=close;
     // опис
     ov.querySelector('[data-wcdesc]').onclick=()=>inputModal({title:'Чому я цього хочу', value:w.desc||'', placeholder:'Що це для тебе значить…', onOk:(v)=>{ w.desc=v; saveWishes(); rerender(); }});
+    // мрія + перешкода + план (WOOP) — кожне поле окремо, пишемо лише після «OK»
+    ov.querySelectorAll('[data-wcwoop]').forEach(el=>el.onclick=()=>{
+      const k=el.dataset.wcwoop, f=WISH_WOOP.find(x=>x[0]===k); if(!f) return;
+      const en=ritEn(), cur=(w.woop&&typeof w.woop[k]==='string')?w.woop[k]:'';
+      inputModal({title:en?f[2]:f[1], value:cur, placeholder:en?f[4]:f[3], onOk:(v)=>{
+        if(v===null||v===undefined) return;
+        wishWoopSet(w,k,v); rerender(); }});
+    });
     // дата-ціль
     ov.querySelector('[data-wcdate]').onclick=()=>inputModal({title:'Дата-ціль', value:w.targetDate||'', placeholder:'Напр. Літо 2027', onOk:(v)=>{ w.targetDate=v; saveWishes(); rerender(); }});
     // кроки (тільки якщо власні, без зв'язаної цілі)
@@ -15846,6 +15922,31 @@
     // зробити ціллю / відкрити ціль
     const mg=ov.querySelector('[data-wcmakegoal]'); if(mg) mg.onclick=()=>{ close(); wishToGoal(id); };
     const og=ov.querySelector('[data-wcopengoal]'); if(og) og.onclick=()=>{ close(); goalsData.tab='goals'; saveGoals(); goGoals(); };
+  }
+  /* ── В1 «Мрія + перешкода» (метод WOOP, Gabriele Oettingen; 28.11.2026) ──
+     Сама приємна мрія знижує зусилля; мрія + перешкода в собі + план «якщо — то» — підвищує.
+     Дані — w.woop={res, obs, plan}: необовʼязкові рядки, зʼявляються лише після дії людини. */
+  const WISH_WOOP=[ // ключ · назва uk · назва en · підказка uk · підказка en
+    ['res', 'Найкращий результат', 'Best outcome', 'Що найкраще станеться, коли мрія здійсниться? Як це відчувається?', 'What is the best thing that happens when it comes true? How does it feel?'],
+    ['obs', 'Перешкода в мені', 'Inner obstacle', 'Що в тобі самому може завадити? Звичка, страх, втома…', 'What in you could get in the way? A habit, a fear, tiredness…'],
+    ['plan','Якщо — то', 'If — then', 'Якщо [перешкода], то я [дія]', 'If [obstacle], then I will [action]']
+  ];
+  // одне поле WOOP → у мрію і в сховище (лише з дії людини: «Готово» у вікні)
+  function wishWoopSet(w,k,v){
+    if(!w||!WISH_WOOP.some(f=>f[0]===k)) return;
+    w.woop=Object.assign({}, (w.woop&&typeof w.woop==='object')?w.woop:{}, {[k]:String(v==null?'':v).trim().slice(0,300)});
+    saveWishes();
+  }
+  function wishWoopHTML(w){
+    const en=ritEn(), wo=(w&&w.woop&&typeof w.woop==='object')?w.woop:{};
+    const rows=WISH_WOOP.map(f=>{ const v=typeof wo[f[0]]==='string'?wo[f[0]]:'';
+      return `<button type="button" class="wc-woop ${f[0]==='plan'?'plan':''} ${v?'':'is-empty'}" data-wcwoop="${f[0]}">
+        <span class="wc-woop-k">${esc(en?f[2]:f[1])}</span>
+        <span class="wc-woop-v">${v?esc(v):esc(en?f[4]:f[3])}</span></button>`; }).join('');
+    return `<div class="wcard-field">
+      <div class="wcard-fl">🧭 ${en?'Dream + obstacle':'Мрія + перешкода'}</div>
+      <div class="wc-woop-sub">${en?'A dream with an obstacle and a plan works better than a dream alone.':'Мрія разом із перешкодою і планом працює краще, ніж сама мрія.'}</div>
+      <div class="wc-woop-list">${rows}</div></div>`;
   }
   function pickProofPhoto(id, cb){
     const w=wishes.find(x=>x.id===id); if(!w) return;
@@ -16235,18 +16336,44 @@
     grat:{t:'Вдячність', ty:'text', ph:'За що сьогодні відчуваєш вдячність?', ic:'💛'},
     photo:{t:'Фото дня', ty:'photo', ic:'📸'},
     video:{t:'Відео-полиця', ty:'link', ic:'▶️'},
-    vis:{t:'Візуалізація', ty:'timer', sec:150, sub:'на фото з Карти бажань', ic:'✨'},
+    vis:{t:'Візуалізація', te:'Visualization', ty:'timer', sec:160, sub:'сеанс: результат · процес · перешкода · план', sube:'session: outcome · process · obstacle · plan', ic:'✨'},
     breath:{t:'Дихання 4·7·8', ty:'timer', sec:120, sub:'вдих 4 · затримка 7 · видих 8', ic:'🌬'},
     med:{t:'Медитація', ty:'timer', sec:300, sub:'тиша і дихання', ic:'🧘'},
     water:{t:'Склянка води', ty:'check', ic:'💧'},
-    move:{t:'Рух / зарядка', ty:'check', ic:'🏃'}
+    move:{t:'Рух / зарядка', ty:'check', ic:'🏃'},
+    // ── кроки з каталогу методик (28.11.2026); te/phe/sube — англійською ──
+    light:{t:'Денне світло', te:'Daylight', ty:'timer', sec:600, sub:'вийти надвір, без сонцезахисних окулярів', sube:'go outside, no sunglasses', ic:'☀️'},
+    coffee:{t:'Кава — через 90 хв', te:'Coffee after 90 min', ty:'check', sub:'після пробудження', sube:'after waking up', ic:'☕'},
+    aff:{t:'Афірмація', te:'Affirmation', ty:'text', ph:'Одне речення в теперішньому часі: «Я…»', phe:'One sentence in the present tense: “I am…”', ic:'💬'},
+    great:{t:'Що зробить сьогодні чудовим?', te:'What would make today great?', ty:'text', ph:'Три маленькі речі', phe:'Three small things', ic:'🌤'},
+    read:{t:'Читання', te:'Reading', ty:'timer', sec:600, sub:'10 сторінок книжки, що веде до мрії', sube:'10 pages of a book that moves you forward', ic:'📖'},
+    pages:{t:'Ранкові сторінки', te:'Morning pages', ty:'text', ph:'Пиши все, що в голові, без зупинок і правок', phe:'Write whatever is in your head, no stopping, no editing', ic:'📝'},
+    stoic:{t:'Що в моїй владі сьогодні?', te:'What is in my control today?', ty:'text', ph:'А що — ні, і це можна відпустити', phe:'And what is not — let it go', ic:'🏛'},
+    premed:{t:'Що може піти не так?', te:'What could go wrong?', ty:'text', ph:'І як я на це відповім', phe:'And how I will respond', ic:'🛡'},
+    frog:{t:'Головна справа — першою', te:'Most important task first', ty:'text', ph:'Одна найважча справа, до пошти і стрічки', phe:'One hardest task, before email and feeds', ic:'🐸'},
+    reflect:{t:'Роздуми і запис', te:'Reflect and write', ty:'timer', sec:1200, sub:'план, щоденник, тиша', sube:'plan, journal, silence', ic:'🧭'},
+    learn:{t:'Навчання', te:'Learning', ty:'timer', sec:1200, sub:'книжка, курс, подкаст', sube:'book, course, podcast', ic:'🎓'}
   };
+  /* Каталог ранків (Р1, 28.11.2026): методики з автором і хвилинами. Перші чотири — ті, що були
+     раніше, «Мій теперішній ранок» — першим, тож ранок, який людина вже має, лишається як був. */
   const RIT_TPL=[
-    {k:'now',   t:'Мій теперішній ранок', s:['mix','j1','j2','j3','photo','video']},
-    {k:'m5',    t:'5 хвилин',             s:['water','j3','vis']},
-    {k:'calm',  t:'Тиха голова',          s:['breath','grat','med','j3']},
-    {k:'sport', t:'Спорт зранку',         s:['water','move','j3']}
+    {k:'now',   t:'Мій теперішній ранок', te:'My current morning', who:'голос, щоденник, фото, відео', whoe:'voice, journal, photo, video', min:10, s:['mix','j1','j2','j3','photo','video']},
+    {k:'m5',    t:'5 хвилин',             te:'5 minutes',          who:'вода, намір, мрія', whoe:'water, intention, dream', min:5, s:['water','j3','vis']},
+    {k:'calm',  t:'Тиха голова',          te:'Quiet mind',         who:'дихання і тиша', whoe:'breathing and silence', min:10, s:['breath','grat','med','j3']},
+    {k:'sport', t:'Спорт зранку',         te:'Morning sport',      who:'вода і рух', whoe:'water and movement', min:10, s:['water','move','j3']},
+    {k:'fmj',   t:'5-Minute Journal',     te:'5-Minute Journal',   who:'Intelligent Change', min:5, s:['grat','great','aff']},
+    {k:'frog',  t:'З’їж жабу',       te:'Eat the frog',       who:'Brian Tracy', min:5, s:['water','frog']},
+    {k:'stoic', t:'Стоїчний ранок',       te:'Stoic morning',      who:'Марк Аврелій, Сенека', whoe:'Marcus Aurelius, Seneca', min:5, s:['stoic','premed','j3']},
+    {k:'prime', t:'Праймінг',             te:'Priming',            who:'Tony Robbins', min:10, s:['breath','grat','vis']},
+    {k:'savers',t:'Miracle Morning · SAVERS', te:'Miracle Morning · SAVERS', who:'Hal Elrod', min:20, s:['med','aff','vis','move','read','grat']},
+    {k:'light', t:'Світло і рух',         te:'Light and movement', who:'Andrew Huberman', min:15, s:['water','light','move','coffee']},
+    {k:'pages', t:'Ранкові сторінки',     te:'Morning pages',      who:'Julia Cameron', min:25, s:['water','pages','j3']},
+    {k:'club',  t:'20 / 20 / 20',         te:'20 / 20 / 20',       who:'Robin Sharma · Клуб 5 ранку', whoe:'Robin Sharma · The 5AM Club', min:60, s:['move','reflect','learn']}
   ];
+  // мова кроків і шаблонів: англійська — лише там, де є переклад (te/phe/sube/whoe)
+  function ritEn(){ try{ return (window.flowLang&&window.flowLang())==='en'; }catch(_){ return false; } }
+  function ritLoc(o){ if(!o||!ritEn()) return o;
+    return Object.assign({},o,{t:o.te||o.t, ph:o.phe||o.ph, sub:o.sube||o.sub, who:o.whoe||o.who}); }
   const RIT_TY={text:'текст', check:'галочка', timer:'таймер', mix:'аудіо', photo:'фото', link:'посилання'};
   // крок із даних → безпечний обʼєкт; чуже/зіпсоване відкидаємо
   function ritCleanStep(s){
@@ -16268,7 +16395,7 @@
     return arr.length?arr:RIT_TPL[0].s.map(id=>({id}));
   }
   const RIT_OWN_IC={text:'✍️', check:'☑️', timer:'⏱'};
-  function ritCat(id){ return Object.prototype.hasOwnProperty.call(RIT_CAT,id)?RIT_CAT[id]:null; }
+  function ritCat(id){ return Object.prototype.hasOwnProperty.call(RIT_CAT,id)?ritLoc(RIT_CAT[id]):null; }
   function ritMeta(s){ const c=ritCat(s.id); return c?Object.assign({id:s.id},c):Object.assign({ic:RIT_OWN_IC[s.ty]||'•'},s); }
   /* Голос — лише в трьох старих записах (a1..a3). Аудіо лягає в ritual_board цілим base64,
      тож голос у кожному новому кроці швидко з'їв би памʼять браузера. */
@@ -16290,7 +16417,7 @@
     if(ritCtx!=='m' && typeof moodName==='function') return moodName(ritCtx);
     const ids=ritSteps().map(s=>s.id).join(',');
     const t=RIT_TPL.find(x=>x.s.join(',')===ids);
-    return t?t.t:'свій набір';
+    return t?ritLoc(t).t:(ritEn()?'my own set':'свій набір');
   }
   // кроки, у яких своя картка (мікс, фото, відео); решта — однаковий рядок
   function ritStepHTML(s,d){
@@ -16399,7 +16526,12 @@
         try{ window.platform.haptic('light'); }catch(_){} return; }
       if(m.ty!=='timer') return;
       const mark=()=>{ const d2=ritDay(today); d2[s.id]=1; ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} };
-      if(s.id==='vis') ritEnterMoment({seconds:m.sec, label:'Візуалізація', doneLabel:'Готово', onDone:mark,
+      if(s.id==='vis' && typeof visSession==='function' && wishes.length){
+        const ctx=ritCtx;
+        visSession({onDone:feel=>{ ritCtx=ctx; const d2=ritDay(today); d2[s.id]=1; if(feel) d2.visFeel=feel;
+          ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} }});
+      }
+      else if(s.id==='vis') ritEnterMoment({seconds:m.sec, label:'Візуалізація', doneLabel:'Готово', onDone:mark,
         emptyMsg:'Додай фото в Карту бажань — тоді візуалізація йтиме на твоїх мріях'});
       else ritEnterMoment({seconds:m.sec, plain:true, label:'Крок ранку', cap:m.t, hint:m.sub||'Побудь у цьому кілька хвилин', doneLabel:'Готово', onDone:mark});
     });
@@ -16445,9 +16577,22 @@
     document.body.appendChild(ov);
     const box=ov.firstChild;   // шторка зʼявляється один раз, далі міняємо лише вміст (без повторної анімації)
     const close=()=>ov.remove();
+    const en=ritEn();
+    let flt='all';   // фільтр каталогу за хвилинами: all · s (до 5) · m (6–15) · l (більше)
+    const grp=m=>!m?'':(m<=5?'s':(m<=15?'m':'l'));
+    const FLT=[['all','Усі','All'],['s','до 5 хв','up to 5 min'],['m','10–15 хв','10–15 min'],['l','20+ хв','20+ min']];
     const draw=()=>{
       const ids=work.map(s=>s.id).join(',');
-      const tpls=TPLS.map(t=>`<button type="button" class="red-tpl ${t.s.map(x=>x.id||x).join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
+      // картка методики: назва, автор, хвилини і кроки — щоб вибирати, знаючи, що всередині
+      const tpls=TPLS.filter(t=>!isM||flt==='all'||grp(t.min)===flt).map(t0=>{
+        const t=ritLoc(t0), on=t.s.map(x=>x.id||x).join(',')===ids;
+        const steps=t.s.map(x=>{ const id=(typeof x==='string')?x:x.id, m=ritCat(id); return m?m.t:(x&&x.t)||''; }).filter(Boolean).join(' · ');
+        return `<button type="button" class="red-card ${on?'on':''}" data-rtpl="${esc(t.k)}" aria-pressed="${on?'true':'false'}">
+          <span class="rc-top"><b>${esc(t.t)}</b>${t.min?`<span class="rc-min">${t.min} ${en?'min':'хв'}</span>`:''}</span>
+          ${t.who?`<small class="rc-who">${esc(t.who)}</small>`:''}
+          <span class="rc-steps">${esc(steps)}</span></button>`; }).join('');
+      const flts=isM?`<div class="red-flt" role="group" aria-label="${en?'Duration':'Тривалість'}">${FLT.map(f=>
+        `<button type="button" class="red-tpl ${f[0]===flt?'on':''}" data-rflt="${f[0]}" aria-pressed="${f[0]===flt?'true':'false'}">${esc(en?f[2]:f[1])}</button>`).join('')}</div>`:'';
       const rows=work.map((s,i)=>{ const m=ritMeta(s);
         return `<div class="red-row"><span class="rst-ic">${esc(m.ic||'•')}</span>
           <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(m.ty==='text'&&m.a?'текст · голос':(RIT_TY[m.ty]||''))}${m.ty==='timer'?' · '+fmtDur(m.sec||180):''}</small></span>
@@ -16455,17 +16600,21 @@
           <button type="button" class="red-b" data-rdn="${i}" aria-label="Нижче" ${i<work.length-1?'':'disabled'}>↓</button>
           <button type="button" class="red-b x" data-rdel="${i}" aria-label="Прибрати">✕</button></div>`; }).join('');
       const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)&&(isM||RIT_MORNING_ONLY.indexOf(k)<0)).map(k=>
-        `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(RIT_CAT[k].t)}</button>`).join('');
+        `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(ritCat(k).t)}</button>`).join('');
       box.innerHTML=`<div class="asheet-grip"></div>
         <div class="asheet-title">${isM?'Мій ранок':esc(ritWithCtx(ctx,ritTplName))}</div>
-        <div class="asheet-sub">Шаблон або свій набір. Твої записи за минулі дні лишаються.</div>
-        <div class="red-tpls">${tpls}</div>
+        <div class="asheet-sub">${en?'Pick a method or build your own set. Your past entries stay.':'Обери методику або збери свій набір. Твої записи за минулі дні лишаються.'}</div>
+        ${isM?`<div class="red-lbl">${en?'Methods':'Методики'}</div>`:''}
+        ${flts}
+        <div class="red-cards">${tpls}</div>
+        <div class="red-lbl">${en?'My steps':'Мої кроки'}</div>
         <div class="red-list">${rows||'<div class="vhint">Додай хоча б один крок</div>'}</div>
         <div class="red-lbl">Додати крок</div>
         <div class="red-adds">${add}<button type="button" class="red-add own" data-rown="1">＋ Своє питання</button></div>
         <button type="button" class="red-ok" data-rok="1" ${work.length?'':'disabled'}>Готово</button>
         <button type="button" class="asheet-cancel">Скасувати</button>`;
       ov.querySelector('.asheet-cancel').onclick=close;
+      ov.querySelectorAll('[data-rflt]').forEach(b=>b.onclick=()=>{ flt=b.dataset.rflt; draw(); });
       ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=TPLS.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(x=>(typeof x==='string')?{id:x}:Object.assign({},x)); draw(); } });
       ov.querySelectorAll('[data-rup]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rup; if(i>0){ const x=work[i]; work[i]=work[i-1]; work[i-1]=x; draw(); } });
       ov.querySelectorAll('[data-rdn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rdn; if(i<work.length-1){ const x=work[i]; work[i]=work[i+1]; work[i+1]=x; draw(); } });
@@ -16849,6 +16998,7 @@
             ${gl?`<span class="wdk-chip goal">${esc(gl.name||'ціль')}</span>`:''}
           </div>
           ${cnt}
+          ${w.woop&&w.woop.plan?`<div class="wdk-plan"><span>${esc(w.woop.plan)}</span></div>`:''}
         </div>
       </div>`;
     }).join('');
@@ -16865,6 +17015,11 @@
         <div class="wdk-add" id="wdkAdd">${WICONS.photo}<span>Фото</span></div>${slides}
       </div>
       <div class="wdk-dots" id="wdkDots">${ordered.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>
+      ${(typeof visSession==='function')?`<button type="button" class="vs-open" id="vsOpen">
+        <span class="vs-open-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <span class="vs-open-tx"><b>${ritEn()?'Visualization · 3 min':'Сеанс візуалізації · 3 хв'}</b>
+          <small>${ritEn()?'outcome · process · obstacle · plan':'результат · процес · перешкода · план'}</small></span>
+        <span class="vs-open-ar" aria-hidden="true">›</span></button>`:''}
       ${(typeof moodsBlockHTML==='function')?moodsBlockHTML():`<div class="rit-sec" style="margin-top:18px"><span>🔥 Ранковий ритуал</span></div>
       <div id="ritInline" class="rit-wrap">${ritualInnerHTML()}</div>`}
       <div class="wish-note">${wishes.length} ${wishes.length===1?'образ':'образів'} · свайпай · ⋯ — дії · тап по чипу — дата</div>`;
@@ -16891,6 +17046,10 @@
       if(w&&w.type==='video'&&w.url) openWishVideo(w); else openWishCard(c.dataset.wid); });
     const add=body.querySelector('#wdkAdd'); if(add) add.onclick=()=>pickWishPhoto();
     const clg=body.querySelector('#clgOpen'); if(clg) clg.onclick=goCollage;
+    // сеанс із Карти теж зараховує крок «Візуалізація» сьогоднішнього ранку
+    const vso=body.querySelector('#vsOpen'); if(vso) vso.onclick=()=>visSession({onDone:feel=>{
+      ritWithCtx('m',()=>{ const d=ritDay(ritDs(0)); d.vis=1; if(feel) d.visFeel=feel; ritSaveToday(); });
+      ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} }});
     bindWishPrice(body);
     try{ if(typeof moodsBlockBind==='function') moodsBlockBind(body); else ritualBind(); }catch(e){ console.error('ritual inline',e); }
   }
@@ -40796,7 +40955,8 @@
   }
   /* ════════ «Мої настрої» (58-moods.js, 16.11.2026) — кілька ритуалів замість одного ранку ════════
      Задум погоджено 16.11.2026, вигляд — другий варіант: на Карті бажань велика картка
-     «Зараз» (настрій, якому зараз час) + стрічка «Мій день» + полиця щоденників корінцями;
+     «Зараз» (настрій, якому зараз час) + стрічка «Мій день» (полицю щоденників 28.11.2026 прибрано —
+     вона лише на екрані «Щоденник»);
      «Продовжити» відкриває покроковий режим на весь екран.
      • Ранок — це той самий ранковий ритуал (06-wishes.js): його дні й кроки лишаються
        в ritual_board / ritual_steps, тут лише його назва, значок і колір (MOODS.m).
@@ -40935,7 +41095,6 @@
         </div>
         <div class="md-day-h"><span>${esc(t.day)}</span><button type="button" class="md-add" data-mdnew="1">${esc(t.add)}</button></div>
         <div class="md-day">${rows}</div>
-        ${(typeof mdShelfHTML==='function')?mdShelfHTML():''}
       </div>`;
   }
   function moodsBlockBind(body){
@@ -40945,7 +41104,6 @@
     // тап по рядку стрічки — цей настрій стає «Зараз» і одразу відкривається
     root.querySelectorAll('[data-mdpick]').forEach(b=>b.onclick=()=>{ mdSel=b.dataset.mdpick; mdRerender(); moodFocus(mdSel); });
     const nb=root.querySelector('[data-mdnew]'); if(nb) nb.onclick=()=>moodSheet('');
-    if(typeof mdShelfBind==='function') mdShelfBind(root);
   }
   function mdRerender(){ try{ const s=document.getElementById('scr-wishes'); if(s&&s.classList.contains('active')) renderWishes(); }catch(_){} }
 
@@ -41159,59 +41317,6 @@
     ov.onclick=e=>{ if(e.target===ov) close(); };
   }
 
-  /* ── полиця «Щоденники» корінцями (дані — 22-diary.js) ── */
-  function mdShelfHTML(){
-    if(typeof diaShelf!=='function') return '';
-    const t=mdT(), books=diaShelf(), max=Math.max(1,...books.map(b=>b.n));
-    const sp=books.map(b=>{ const h=Math.round(138+22*Math.min(1,b.n/max));
-      return `<button type="button" class="md-spine" data-mdbook="${esc(b.id||'@day')}" style="--bc:${safeColor(b.color,'#5b6fd6')};height:${h}px" aria-label="${esc(b.name)}">
-        <span class="md-sp-ic">${esc(b.emoji)}</span><span class="md-sp-t">${esc(b.name)}</span></button>`; }).join('');
-    const hint=books.length<2?`<div class="md-shelf-hint">${esc(t.shelfHint)}</div>`:'';
-    return `<div class="md-day-h md-shelf-h"><span>${esc(t.shelf)}</span></div>
-      <div class="md-shelf">${sp}<button type="button" class="md-spine new" data-mdbooknew="1" aria-label="${esc(t.newBook)}"><span class="md-sp-ic">＋</span></button>${hint}</div>`;
-  }
-  function mdShelfBind(root){
-    root.querySelectorAll('[data-mdbook]').forEach(b=>b.onclick=()=>{
-      const id=b.dataset.mdbook;
-      if(id==='@day'){ try{ goDiary(); }catch(_){} return; }
-      if(typeof goDiaryBook==='function') goDiaryBook(id);
-    });
-    root.querySelectorAll('[data-mdbooknew]').forEach(b=>b.onclick=()=>mdBookNew());
-  }
-  function mdBookNew(){
-    const t=mdT(), em=(typeof DIA_BOOK_EMOJIS!=='undefined')?DIA_BOOK_EMOJIS:['📖'], co=(typeof DIA_BOOK_COLORS!=='undefined')?DIA_BOOK_COLORS:['#5b8def'];
-    const st={name:'', ic:em[0], color:co[0]};
-    const ov=document.createElement('div'); ov.className='asheet md-sheet';
-    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
-    ov.innerHTML='<div class="asheet-in"></div>';
-    document.body.appendChild(ov);
-    const box=ov.firstChild, close=()=>ov.remove();
-    const draw=()=>{
-      box.innerHTML=`<div class="asheet-grip"></div>
-        <div class="asheet-title">${esc(t.newBook)}</div>
-        <label class="md-lbl" for="mdBkName">${esc(t.name)}</label>
-        <input class="md-in" id="mdBkName" maxlength="24" placeholder="${esc(t.bookNamePh)}" value="${esc(st.name)}">
-        <div class="md-lbl">${esc(t.icon)}</div>
-        <div class="md-chips">${em.map(e=>`<button type="button" class="md-chip ${e===st.ic?'on':''}" data-bkic="${esc(e)}">${esc(e)}</button>`).join('')}</div>
-        <div class="md-lbl">${esc(t.color)}</div>
-        <div class="md-chips">${co.map(c=>`<button type="button" class="md-chip dot ${c===st.color?'on':''}" data-bkcol="${esc(c)}" style="--cc:${safeColor(c,'#5b8def')}"></button>`).join('')}</div>
-        <button type="button" class="red-ok" data-bkok="1">${esc(t.create)}</button>
-        <button type="button" class="asheet-cancel">${esc(t.cancel)}</button>`;
-      const nm=box.querySelector('#mdBkName'); nm.oninput=()=>{ st.name=nm.value; };
-      box.querySelectorAll('[data-bkic]').forEach(b=>b.onclick=()=>{ st.name=nm.value; st.ic=b.dataset.bkic; draw(); });
-      box.querySelectorAll('[data-bkcol]').forEach(b=>b.onclick=()=>{ st.name=nm.value; st.color=b.dataset.bkcol; draw(); });
-      box.querySelector('.asheet-cancel').onclick=close;
-      box.querySelector('[data-bkok]').onclick=()=>{
-        const name=String(nm.value||'').trim();
-        if(!name){ try{ plToast(t.needBook); }catch(_){} nm.focus(); return; }
-        const id=(typeof diaCreateBook==='function')?diaCreateBook(name, st.ic, st.color):'';
-        close(); mdRerender();
-        if(id&&typeof goDiaryBook==='function') goDiaryBook(id);
-      };
-    };
-    draw();
-    ov.onclick=e=>{ if(e.target===ov) close(); };
-  }
   /* ════════ Frequency Core — реєстр дій (60-core-actions.js, 17.11.2026) ════════
      Етап 2 задуму (prompts/frequency-core.md). Кожна дія, що ЗАПИСУЄ дані, описана
      тут один раз, і її однаково кличе кнопка людини і (з етапу 3) агент Флоу:
@@ -43910,6 +44015,123 @@
         goFolder(key);
       }});
   }
+  /* ════════ Сеанс візуалізації (В2, 28.11.2026) ════════
+     Три хвилини по фото мрії «фокус дня», 5 кроків: результат → процес → перешкода → план → відчуття.
+     На чому стоїть:
+       • PETTLEP — образні тренування спортсменів: від першої особи, усіма відчуттями;
+       • Taylor & Pham (UCLA): уявляти процес, а не лише фініш;
+       • WOOP (Gabriele Oettingen): мрія + перешкода + план «якщо — то» (поля w.woop, 06-wishes.js).
+     Відкривається з кроку «Візуалізація» в ранку (ritualBind) і з кнопки під колодою Карти.
+     Сам нічого не пише в ранок: по «Завершити» кличе onDone(відчуття), а зараховує той, хто відкрив.
+     Пише лише поле WOOP мрії — і лише коли людина сама його заповнила (wishWoopSet). */
+  const VS_T={
+    uk:{close:'Закрити', back:'Назад', next:'Далі', finish:'Завершити', yours:'Твої слова', add:'＋ Записати',
+      noObs:'Перешкоди ще нема — запиши одну, з нею уява працює краще.', noPlan:'Плану ще нема — одне речення «якщо — то».',
+      feels:[['calm','спокій'],['joy','радість'],['drive','азарт'],['doubt','сумнів'],['anxious','тривога']],
+      steps:[
+        {k:'Результат', t:'Ти вже там. Що бачиш перед собою?', sub:'Своїми очима, від першої особи — не як у кіно збоку. Що чути? Який запах?', sec:40, woop:'res'},
+        {k:'Процес', t:'Як пройшла дорога сюди? Прокрути один звичайний день шляху.', sub:'Уявляти процес, а не лише фініш, — так готуються краще.', sec:40},
+        {k:'Перешкода', t:'Що в тобі самому може завадити?', sub:'Не обставини — звичка, страх, втома.', sec:30, woop:'obs'},
+        {k:'План', t:'Якщо це станеться — що ти зробиш?', sub:'Уяви, як спрацьовує твій план «якщо — то».', sec:30, woop:'plan'},
+        {k:'Відчуття', t:'Що зараз відчуваєш у тілі?', sub:'Познач — за тиждень побачиш, як це змінюється.', sec:20, feel:true}
+      ]},
+    en:{close:'Close', back:'Back', next:'Next', finish:'Finish', yours:'Your words', add:'＋ Write it',
+      noObs:'No obstacle yet — write one, imagery works better with it.', noPlan:'No plan yet — one “if — then” sentence.',
+      feels:[['calm','calm'],['joy','joy'],['drive','drive'],['doubt','doubt'],['anxious','anxious']],
+      steps:[
+        {k:'Outcome', t:'You are already there. What do you see?', sub:'Through your own eyes, first person — not like watching a film. What do you hear? Smell?', sec:40, woop:'res'},
+        {k:'Process', t:'How did the road here go? Play one ordinary day of the journey.', sub:'Imagining the process, not just the finish line, prepares you better.', sec:40},
+        {k:'Obstacle', t:'What in you could get in the way?', sub:'Not circumstances — a habit, a fear, tiredness.', sec:30, woop:'obs'},
+        {k:'Plan', t:'If it happens — what will you do?', sub:'Imagine your “if — then” plan kicking in.', sec:30, woop:'plan'},
+        {k:'Feeling', t:'What do you feel in your body right now?', sub:'Mark it — in a week you will see how it changes.', sec:20, feel:true}
+      ]}
+  };
+  const vsT=()=>VS_T[(typeof ritEn==='function'&&ritEn())?'en':'uk'];
+
+  // мрія «фокус дня» — той самий вибір, що й у колоді Карти (renderWishDeck)
+  function visFocusWish(){
+    if(!Array.isArray(wishes)||!wishes.length) return null;
+    let seed=0; try{ const s=ymdLocal(); for(let i=0;i<s.length;i++) seed=(seed*31+s.charCodeAt(i))>>>0; }catch(_){}
+    return wishes[seed%wishes.length];
+  }
+
+  let vsTimer=null;
+  function visSession(opts){
+    opts=opts||{};
+    const w=visFocusWish(); if(!w) return;
+    const old=document.getElementById('visSess'); if(old) old.remove();
+    const st={i:0, left:0, feel:''};
+    const ov=document.createElement('div'); ov.className='vs'; ov.id='visSess';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+    document.body.appendChild(ov);
+    const stop=()=>{ if(vsTimer){ clearInterval(vsTimer); vsTimer=null; } };
+    const close=()=>{ stop(); ov.remove(); };
+    const fmt=n=>Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
+
+    const draw=()=>{
+      const t=vsT(), S=t.steps, s=S[st.i], last=st.i===S.length-1;
+      const img=w.type==='video'?(w.thumb||''):(w.img||'');
+      const wo=(w.woop&&typeof w.woop==='object')?w.woop:{};
+      let extra='';
+      if(s.woop){
+        const v=typeof wo[s.woop]==='string'?wo[s.woop].trim():'';
+        if(v) extra=`<div class="vs-quote"><small>${esc(t.yours)}</small><span>${esc(v)}</span></div>`;
+        else if(s.woop!=='res') extra=`<div class="vs-miss"><span>${esc(s.woop==='obs'?t.noObs:t.noPlan)}</span>
+          <button type="button" class="vs-chip" data-vsfill="${esc(s.woop)}">${esc(t.add)}</button></div>`;
+      }
+      if(s.feel) extra=`<div class="vs-feels" role="group" aria-label="${esc(s.k)}">${t.feels.map(([k,l])=>
+        `<button type="button" class="vs-chip ${st.feel===k?'on':''}" data-vsfeel="${k}" aria-pressed="${st.feel===k?'true':'false'}">${esc(l)}</button>`).join('')}</div>`;
+      ov.setAttribute('aria-label', w.cap||s.k);
+      ov.innerHTML=`<div class="vs-bg" style="background-image:url('${safeImg(img)}');${(typeof wishFocusBg==='function')?wishFocusBg(w):''}"></div>
+        <div class="vs-veil"></div>
+        <div class="vs-in">
+          <div class="vs-top">
+            <button type="button" class="vs-x" aria-label="${esc(t.close)}">✕</button>
+            <span class="vs-cap">${esc(w.cap||'')}</span><span class="vs-sp"></span></div>
+          <div class="vs-segs">${S.map((_,j)=>`<i class="${j<=st.i?'on':''}"></i>`).join('')}</div>
+          <div class="vs-card">
+            <div class="vs-row"><small class="vs-k">${st.i+1}/${S.length} · ${esc(s.k)}</small>
+              <span class="vs-tm" aria-live="off">${fmt(st.left)}</span></div>
+            <b class="vs-t">${esc(s.t)}</b>
+            <div class="vs-sub">${esc(s.sub)}</div>
+            ${extra}
+            <div class="vs-bot">
+              ${st.i>0?`<button type="button" class="vs-back">${esc(t.back)}</button>`:''}
+              <button type="button" class="vs-next">${esc(last?t.finish:t.next)}</button></div>
+          </div></div>`;
+      ov.querySelector('.vs-x').onclick=close;
+      const bk=ov.querySelector('.vs-back'); if(bk) bk.onclick=()=>go(st.i-1);
+      ov.querySelector('.vs-next').onclick=()=>{
+        if(!last){ go(st.i+1); return; }
+        close();
+        try{ if(typeof opts.onDone==='function') opts.onDone(st.feel); }catch(e){ console.error('visSession onDone',e); }
+      };
+      ov.querySelectorAll('[data-vsfeel]').forEach(b=>b.onclick=()=>{
+        st.feel=st.feel===b.dataset.vsfeel?'':b.dataset.vsfeel; draw(); });
+      ov.querySelectorAll('[data-vsfill]').forEach(b=>b.onclick=()=>{
+        const k=b.dataset.vsfill, f=(typeof WISH_WOOP!=='undefined')?WISH_WOOP.find(x=>x[0]===k):null; if(!f) return;
+        const en=vsT()===VS_T.en;
+        inputModal({title:en?f[2]:f[1], value:'', placeholder:en?f[4]:f[3], onOk:v=>{
+          if(v===null||v===undefined||!String(v).trim()) return;
+          wishWoopSet(w,k,v);
+          if(document.getElementById('visSess')===ov) draw(); }});
+      });
+    };
+    // таймер лише підказує темп: на нулі — легкий відгук, крок не перемикається сам
+    const go=i=>{
+      const S=vsT().steps; st.i=Math.max(0,Math.min(S.length-1,i)); st.left=S[st.i].sec;
+      stop(); draw();
+      vsTimer=setInterval(()=>{
+        if(!document.getElementById('visSess')){ stop(); return; }
+        if(st.left<=0) return;
+        st.left--;
+        const tm=ov.querySelector('.vs-tm'); if(tm) tm.textContent=fmt(st.left);
+        if(st.left===0){ try{ window.platform.haptic('light'); }catch(_){} }
+      },1000);
+    };
+    go(0);
+  }
+  window.visSession=visSession;
 </script>
 <div class="pg-backdrop" id="pgBackdrop"></div>
 <div class="pg-slash" id="pgSlash">
@@ -44389,12 +44611,14 @@
       +(go?'<a class="pgsc-go" href="'+esc(go)+'" target="_blank" rel="noopener" aria-label="Відкрити">↗</a>':'')+'</div>'
       +media
       +'<div class="pgsc-t pg-empty" contenteditable="true" data-ph="Назва (необовʼязково)…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
+      +(b.desc?'<div class="pgsc-d" data-i18n-skip="1">'+esc(b.desc)+'</div>':'')
       +(hasNote?'<div class="pgsc-n pg-empty" contenteditable="true" data-ph="Нотатка: чим це корисне…" data-pglknote="'+id+'">'+esc(b.note||'')+'</div>':'')
       +'<div class="pgsc-a">'
         +(hasNote?'':'<button data-pglknoteadd="'+id+'">＋ Нотатка</button>')
         +'<button data-pglkcover="'+id+'">'+(cov?'Змінити фото':'＋ Фото')+'</button>'
         +(cov?'<button data-pglkcoverdel="'+id+'">Прибрати фото</button>':'')
         +'<button data-pglkurl="'+id+'">Змінити посилання</button>'
+        +(go&&/^https?:/i.test(go)?'<button data-pglkpv="'+id+'">'+(b.pvAt?'Оновити прев\'ю':'Підтягнути прев\'ю')+'</button>':'')
       +'</div></div></div>';
   }
   function equalizeWidths(cols){ var n=cols.length||1; cols.forEach(function(c){ c.width=1/n; }); }
@@ -46301,6 +46525,8 @@
         fresh.forEach(function(b){ if(arr.indexOf(b)<0) arr.push(b); });
       });
       save(); render();
+      /* одноразові посилання (підтвердження, вхід, відписка) самі не відкриваємо — лише кнопкою */
+      fresh.forEach(function(b){ if(b.type==='attach'&&b.sub!=='audio'&&!PG_ONCE_URL.test(b.url||'')) pgPreview(b.id,false); });   /* картка поста — тягнемо прев'ю (08-w-projects-hub.js) */
       var lastT=lines[lines.length-1].t; lines=[{t:lastT,text:''}]; cur=0; draw(0);
       var rb=editor.querySelector('.pgb[data-id="'+made[made.length-1].id+'"]');
       if(rb){ try{ rb.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} }
@@ -46833,18 +47059,22 @@
     if(lna){var lnl=locate(lna.dataset.pglknoteadd);
       if(lnl){lnl.block.note='';save();render();
         var nf=editor.querySelector('[data-pglknote="'+lnl.block.id+'"]');if(nf){try{nf.focus();}catch(_){}}}return;}
+    var lpv=e.target.closest&&e.target.closest('[data-pglkpv]');
+    if(lpv){pgPreview(lpv.dataset.pglkpv,true);return;}
     var lcv=e.target.closest&&e.target.closest('[data-pglkcover]');
     if(lcv){pgPickPhoto(lcv.dataset.pglkcover,null,'cover');return;}
     var lcd=e.target.closest&&e.target.closest('[data-pglkcoverdel]');
-    if(lcd){var lcl=locate(lcd.dataset.pglkcoverdel);if(lcl){delete lcl.block.cover;save();render();}return;}
+    if(lcd){var lcl=locate(lcd.dataset.pglkcoverdel);if(lcl){delete lcl.block.cover;delete lcl.block.coverAuto;save();render();}return;}
     var lku=e.target.closest&&e.target.closest('[data-pglkurl]');
     if(lku){var lkl=locate(lku.dataset.pglkurl);if(!lkl)return;
       pgAsk('Посилання','https://…',lkl.block.url||'',function(v){
         var l=locate(lku.dataset.pglkurl);if(!l)return;
         l.block.url=v;l.block.play=0;
+        /* прев'ю старої адреси вже не про те: опис і автоматичну обкладинку прибираємо, своє фото лишаємо */
+        delete l.block.desc;delete l.block.pvAt;if(l.block.coverAuto){delete l.block.cover;delete l.block.coverAuto;}
         if(l.block.type==='attach'){l.block.sub=pgAttSub(v);
           if(l.block.sub==='audio'&&!l.block.name){try{l.block.name=decodeURIComponent(v.split('/').pop()||'Аудіо');}catch(_){l.block.name='Аудіо';}}}
-        save();render();});return;}
+        save();render();if(!PG_ONCE_URL.test(v))pgPreview(l.block.id,false);});return;}
     var es=e.target.closest&&e.target.closest('[data-pgemset]');
     if(es){pgAsk('Посилання YouTube','https://youtu.be/…','',function(v){
       var l=locate(es.dataset.pgemset);if(l){l.block.url=v;l.block.play=0;save();render();}});return;}
@@ -47024,6 +47254,75 @@
       save(); render();
     }
   });
+  /* ── Прев'ю посилання через окремий воркер flow-preview (28.11.2026, етап 2) ──
+     Воркер читає сторінку поста і віддає og:title / og:description / og:image
+     (worker/preview-worker.js). Картинку стискаємо і кладемо в блок полем cover
+     з позначкою coverAuto — тоді картка живе без інтернету, а своє фото людини
+     ніколи не підміняється. Запит іде лише з дії людини: вставила адресу,
+     змінила її чи натиснула «Оновити прев'ю». Без входу в акаунт — тихо нічого. */
+  var PG_PREVIEW_EP='https://flow-preview.life-yaroslav-kril.workers.dev';   /* мусить бути в connect-src (src/index.html) */
+  var pgPvBusy={};
+  /* адреси, схожі на одноразові: їх «відкриття» воркером може спалити посилання чи виконати дію */
+  var PG_ONCE_URL=/[?&#](token|code|otp|key|sig|signature|auth|ticket|invite)=|confirm|verif|unsubscribe|magic|reset|activate|login|signin|oauth|callback/i;
+  function pgPvMark(bid,on){
+    var bt=editor.querySelector('[data-pglkpv="'+bid+'"]'); if(!bt) return;
+    bt.disabled=!!on;
+    if(on) bt.textContent='Підтягую…';
+    else { var lb=locate(bid); bt.textContent=lb&&lb.block.pvAt?'Оновити прев\'ю':'Підтягнути прев\'ю'; }
+  }
+  function pgShrinkData(src,max,cb){
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var w=img.naturalWidth,h=img.naturalHeight; if(!w||!h){cb('');return;}
+        var r=Math.min(1,max/w,max/h); w=Math.round(w*r); h=Math.round(h*r);
+        var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h); cb(cv.toDataURL('image/jpeg',0.75));
+      }catch(_){ cb(''); }
+    };
+    img.onerror=function(){ cb(''); };
+    img.src=src;
+  }
+  function pgPreview(bid,manual){
+    var loc=locate(bid); if(!loc||pgPvBusy[bid]) return;
+    var b=loc.block, u=b.url||'', go=safeHref(u);
+    if(!go||!/^https?:\/\//i.test(go)) return;
+    if(b.type==='attach'&&b.sub==='audio') return;
+    if(navigator.onLine===false){ if(manual) plToastSafe('Нема інтернету — спробуй пізніше'); return; }
+    pgPvBusy[bid]=1; pgPvMark(bid,true);
+    var tokP=typeof window.sbAccessToken==='function'?window.sbAccessToken():Promise.resolve('');
+    Promise.resolve(tokP).then(function(tok){
+      if(!tok){ if(manual) plToastSafe('Щоб підтягнути картинку поста, увійди в акаунт (Ще → Акаунт)'); return null; }
+      var ac=typeof AbortController==='function'?new AbortController():null;
+      var tm=setTimeout(function(){ try{ if(ac) ac.abort(); }catch(_){} },15000);
+      return fetch(PG_PREVIEW_EP+'/preview',{method:'POST',signal:ac?ac.signal:undefined,
+          headers:{'content-type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({url:go})})
+        .then(function(r){ return r.json().catch(function(){ return {}; }); })
+        .then(function(j){ clearTimeout(tm); return j||{}; },function(e){ clearTimeout(tm); throw e; });
+    }).then(function(j){
+      if(!j) return;
+      if(!j.ok){ if(manual) plToastSafe(typeof j.error==='string'?j.error.slice(0,140):'Сайт не віддав прев\'ю'); return; }
+      var l=locate(bid); if(!l||l.block.url!==u) return;   /* адресу вже змінили — це прев'ю не про неї */
+      var bb=l.block;
+      var title=typeof j.title==='string'?j.title.trim().slice(0,200):'', desc=typeof j.desc==='string'?j.desc.trim().slice(0,400):'';
+      if(title&&!String(bb.title||'').trim()) bb.title=title;
+      if(desc&&desc!==title) bb.desc=desc; else delete bb.desc;
+      bb.pvAt=Date.now();
+      /* YouTube має свою мініатюру з ▶ — обкладинкою її не закриваємо */
+      var img=(!pgYtId(u)&&typeof j.image==='string'&&/^data:image\/(jpeg|png|webp|gif|avif);base64,[A-Za-z0-9+\/=]+$/i.test(j.image))?j.image:'';
+      if(img&&(!bb.cover||bb.coverAuto)){
+        save(); render();
+        pgShrinkData(img,900,function(d){
+          var l2=locate(bid); if(!d||!l2||l2.block.url!==u||(l2.block.cover&&!l2.block.coverAuto)) return;
+          l2.block.cover=d; l2.block.coverAuto=1; save(); render();
+        });
+        return;
+      }
+      if(manual&&!img&&!pgYtId(u)) plToastSafe(title||desc?'Картинки сайт не віддав — можна додати своє фото':'Сайт нічого не віддав — додай фото чи назву вручну');
+      save(); render();
+    }).catch(function(){ if(manual) plToastSafe('Не вдалося звʼязатися з сервером прев\'ю'); })
+    .then(function(){ delete pgPvBusy[bid]; pgPvMark(bid,false); });
+  }
   /* field: куди класти знімок — 'data' (блок «Фото», типово) або 'cover' (обкладинка картки посилання) */
   function pgPickPhoto(bid,onDone,field){
     var inp=document.createElement('input');
@@ -47039,7 +47338,7 @@
           var cv=document.createElement('canvas'); cv.width=w2; cv.height=h2;
           cv.getContext('2d').drawImage(img,0,0,w2,h2);
           var loc=locate(bid); if(!loc)return;
-          if(field==='cover'){ loc.block.cover=cv.toDataURL('image/jpeg',0.72); }
+          if(field==='cover'){ loc.block.cover=cv.toDataURL('image/jpeg',0.72); delete loc.block.coverAuto; }   /* своє фото важливіше за автоматичне */
           else { loc.block.data=cv.toDataURL('image/jpeg',0.72); loc.block.pos=null; }
           save(); render();
           if(onDone) onDone();
