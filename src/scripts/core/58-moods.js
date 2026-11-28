@@ -1,6 +1,7 @@
   /* ════════ «Мої настрої» (58-moods.js, 16.11.2026) — кілька ритуалів замість одного ранку ════════
      Задум погоджено 16.11.2026, вигляд — другий варіант: на Карті бажань велика картка
-     «Зараз» (настрій, якому зараз час) + стрічка «Мій день» + полиця щоденників корінцями;
+     «Зараз» (настрій, якому зараз час) + стрічка «Мій день» (полицю щоденників 28.11.2026 прибрано —
+     вона лише на екрані «Щоденник»);
      «Продовжити» відкриває покроковий режим на весь екран.
      • Ранок — це той самий ранковий ритуал (06-wishes.js): його дні й кроки лишаються
        в ritual_board / ritual_steps, тут лише його назва, значок і колір (MOODS.m).
@@ -139,7 +140,6 @@
         </div>
         <div class="md-day-h"><span>${esc(t.day)}</span><button type="button" class="md-add" data-mdnew="1">${esc(t.add)}</button></div>
         <div class="md-day">${rows}</div>
-        ${(typeof mdShelfHTML==='function')?mdShelfHTML():''}
       </div>`;
   }
   function moodsBlockBind(body){
@@ -149,7 +149,6 @@
     // тап по рядку стрічки — цей настрій стає «Зараз» і одразу відкривається
     root.querySelectorAll('[data-mdpick]').forEach(b=>b.onclick=()=>{ mdSel=b.dataset.mdpick; mdRerender(); moodFocus(mdSel); });
     const nb=root.querySelector('[data-mdnew]'); if(nb) nb.onclick=()=>moodSheet('');
-    if(typeof mdShelfBind==='function') mdShelfBind(root);
   }
   function mdRerender(){ try{ const s=document.getElementById('scr-wishes'); if(s&&s.classList.contains('active')) renderWishes(); }catch(_){} }
 
@@ -363,56 +362,3 @@
     ov.onclick=e=>{ if(e.target===ov) close(); };
   }
 
-  /* ── полиця «Щоденники» корінцями (дані — 22-diary.js) ── */
-  function mdShelfHTML(){
-    if(typeof diaShelf!=='function') return '';
-    const t=mdT(), books=diaShelf(), max=Math.max(1,...books.map(b=>b.n));
-    const sp=books.map(b=>{ const h=Math.round(138+22*Math.min(1,b.n/max));
-      return `<button type="button" class="md-spine" data-mdbook="${esc(b.id||'@day')}" style="--bc:${safeColor(b.color,'#5b6fd6')};height:${h}px" aria-label="${esc(b.name)}">
-        <span class="md-sp-ic">${esc(b.emoji)}</span><span class="md-sp-t">${esc(b.name)}</span></button>`; }).join('');
-    const hint=books.length<2?`<div class="md-shelf-hint">${esc(t.shelfHint)}</div>`:'';
-    return `<div class="md-day-h md-shelf-h"><span>${esc(t.shelf)}</span></div>
-      <div class="md-shelf">${sp}<button type="button" class="md-spine new" data-mdbooknew="1" aria-label="${esc(t.newBook)}"><span class="md-sp-ic">＋</span></button>${hint}</div>`;
-  }
-  function mdShelfBind(root){
-    root.querySelectorAll('[data-mdbook]').forEach(b=>b.onclick=()=>{
-      const id=b.dataset.mdbook;
-      if(id==='@day'){ try{ goDiary(); }catch(_){} return; }
-      if(typeof goDiaryBook==='function') goDiaryBook(id);
-    });
-    root.querySelectorAll('[data-mdbooknew]').forEach(b=>b.onclick=()=>mdBookNew());
-  }
-  function mdBookNew(){
-    const t=mdT(), em=(typeof DIA_BOOK_EMOJIS!=='undefined')?DIA_BOOK_EMOJIS:['📖'], co=(typeof DIA_BOOK_COLORS!=='undefined')?DIA_BOOK_COLORS:['#5b8def'];
-    const st={name:'', ic:em[0], color:co[0]};
-    const ov=document.createElement('div'); ov.className='asheet md-sheet';
-    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
-    ov.innerHTML='<div class="asheet-in"></div>';
-    document.body.appendChild(ov);
-    const box=ov.firstChild, close=()=>ov.remove();
-    const draw=()=>{
-      box.innerHTML=`<div class="asheet-grip"></div>
-        <div class="asheet-title">${esc(t.newBook)}</div>
-        <label class="md-lbl" for="mdBkName">${esc(t.name)}</label>
-        <input class="md-in" id="mdBkName" maxlength="24" placeholder="${esc(t.bookNamePh)}" value="${esc(st.name)}">
-        <div class="md-lbl">${esc(t.icon)}</div>
-        <div class="md-chips">${em.map(e=>`<button type="button" class="md-chip ${e===st.ic?'on':''}" data-bkic="${esc(e)}">${esc(e)}</button>`).join('')}</div>
-        <div class="md-lbl">${esc(t.color)}</div>
-        <div class="md-chips">${co.map(c=>`<button type="button" class="md-chip dot ${c===st.color?'on':''}" data-bkcol="${esc(c)}" style="--cc:${safeColor(c,'#5b8def')}"></button>`).join('')}</div>
-        <button type="button" class="red-ok" data-bkok="1">${esc(t.create)}</button>
-        <button type="button" class="asheet-cancel">${esc(t.cancel)}</button>`;
-      const nm=box.querySelector('#mdBkName'); nm.oninput=()=>{ st.name=nm.value; };
-      box.querySelectorAll('[data-bkic]').forEach(b=>b.onclick=()=>{ st.name=nm.value; st.ic=b.dataset.bkic; draw(); });
-      box.querySelectorAll('[data-bkcol]').forEach(b=>b.onclick=()=>{ st.name=nm.value; st.color=b.dataset.bkcol; draw(); });
-      box.querySelector('.asheet-cancel').onclick=close;
-      box.querySelector('[data-bkok]').onclick=()=>{
-        const name=String(nm.value||'').trim();
-        if(!name){ try{ plToast(t.needBook); }catch(_){} nm.focus(); return; }
-        const id=(typeof diaCreateBook==='function')?diaCreateBook(name, st.ic, st.color):'';
-        close(); mdRerender();
-        if(id&&typeof goDiaryBook==='function') goDiaryBook(id);
-      };
-    };
-    draw();
-    ov.onclick=e=>{ if(e.target===ov) close(); };
-  }

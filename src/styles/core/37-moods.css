@@ -15,7 +15,7 @@
   .md-more{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
     background:color-mix(in srgb,var(--mc) 18%,transparent);color:var(--text);font-size:18px;font-weight:800;}
   .md-go:active,.md-more:active{transform:scale(.97);}
-  .md-go:focus-visible,.md-more:focus-visible,.md-row:focus-visible,.md-spine:focus-visible,.md-add:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .md-go:focus-visible,.md-more:focus-visible,.md-row:focus-visible,.md-add:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   .md-day-h{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 6px;font-size:13px;font-weight:800;color:var(--text);}
   .md-add{all:unset;cursor:pointer;font-size:12.5px;font-weight:800;color:var(--accent);padding:8px 4px;}
@@ -27,19 +27,6 @@
   .md-rn{flex:1;min-width:0;font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .md-row small{flex:none;font-size:11.5px;font-weight:700;color:var(--muted);}
 
-  /* полиця: корінці різної висоти (більше записів — вищий корінець) */
-  .md-shelf{display:flex;align-items:flex-end;gap:6px;min-height:164px;padding:0 6px;overflow-x:auto;scrollbar-width:none;
-    border-bottom:4px solid var(--line);border-radius:0 0 4px 4px;}
-  .md-shelf::-webkit-scrollbar{display:none;}
-  .md-spine{all:unset;box-sizing:border-box;cursor:pointer;flex:none;width:40px;border-radius:5px 5px 2px 2px;position:relative;
-    background:var(--bc);display:flex;flex-direction:column;align-items:center;gap:6px;padding:7px 0 8px;overflow:hidden;
-    box-shadow:inset 4px 0 0 rgba(0,0,0,.22), inset -1px 0 0 rgba(255,255,255,.12);}
-  .md-spine:active{transform:translateY(-3px);}
-  .md-sp-ic{font-size:13px;line-height:1;}
-  .md-sp-t{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;font-weight:800;color:#fff;white-space:nowrap;
-    overflow:hidden;text-overflow:ellipsis;max-height:calc(100% - 22px);text-shadow:0 1px 2px rgba(0,0,0,.35);}
-  .md-shelf-hint{align-self:center;flex:1;min-width:120px;font-size:12px;font-weight:700;color:var(--muted);line-height:1.4;padding-left:6px;}
-  .md-spine.new{height:138px;background:transparent;border:1.5px dashed var(--line);box-shadow:none;justify-content:center;color:var(--muted);}
 
   /* покроковий режим — поверх усього, але під шторками (1300) і «Моментом» (1400) */
   .md-focus{position:fixed;inset:0;z-index:1250;display:flex;justify-content:center;animation:fadein .2s;
