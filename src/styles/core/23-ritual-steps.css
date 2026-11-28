@@ -63,3 +63,17 @@
   .rmom-next{width:100%;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.35);color:#fff;font:inherit;font-size:14px;font-weight:800;border-radius:15px;padding:14px;cursor:pointer;}
   .rmom-ov.plain .rmom-bg{background:radial-gradient(120% 70% at 50% 20%,#3a2f6e,#0b0a18 70%);animation:none;}
   @media (prefers-reduced-motion:reduce){ .rmom-bg{animation:none !important;} .rmom-ring .rr-fg{transition:none;} }
+
+  /* ── каталог ранків (Р1, 28.11.2026): фільтр за хвилинами + картки методик ── */
+  .red-flt{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px 10px;padding:0 14px;}
+  .red-flt::-webkit-scrollbar{display:none}
+  .red-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+  .red-card{font:inherit;text-align:left;display:flex;flex-direction:column;gap:3px;padding:11px 14px;min-height:44px;border-radius:14px;
+    border:1px solid var(--line);background:var(--field);color:var(--text);cursor:pointer;}
+  .red-card.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);}
+  .red-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .rc-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .rc-top b{font-size:14.5px;font-weight:800;}
+  .rc-min{flex:none;font-size:12px;font-weight:800;color:var(--accent);}
+  .rc-who{font-size:12px;font-weight:700;color:var(--muted);}
+  .rc-steps{font-size:12.5px;line-height:1.4;color:var(--text);opacity:.85;}

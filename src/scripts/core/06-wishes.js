@@ -841,14 +841,40 @@
     breath:{t:'Дихання 4·7·8', ty:'timer', sec:120, sub:'вдих 4 · затримка 7 · видих 8', ic:'🌬'},
     med:{t:'Медитація', ty:'timer', sec:300, sub:'тиша і дихання', ic:'🧘'},
     water:{t:'Склянка води', ty:'check', ic:'💧'},
-    move:{t:'Рух / зарядка', ty:'check', ic:'🏃'}
+    move:{t:'Рух / зарядка', ty:'check', ic:'🏃'},
+    // ── кроки з каталогу методик (28.11.2026); te/phe/sube — англійською ──
+    light:{t:'Денне світло', te:'Daylight', ty:'timer', sec:600, sub:'вийти надвір, без сонцезахисних окулярів', sube:'go outside, no sunglasses', ic:'☀️'},
+    coffee:{t:'Кава — через 90 хв', te:'Coffee after 90 min', ty:'check', sub:'після пробудження', sube:'after waking up', ic:'☕'},
+    aff:{t:'Афірмація', te:'Affirmation', ty:'text', ph:'Одне речення в теперішньому часі: «Я…»', phe:'One sentence in the present tense: “I am…”', ic:'💬'},
+    great:{t:'Що зробить сьогодні чудовим?', te:'What would make today great?', ty:'text', ph:'Три маленькі речі', phe:'Three small things', ic:'🌤'},
+    read:{t:'Читання', te:'Reading', ty:'timer', sec:600, sub:'10 сторінок книжки, що веде до мрії', sube:'10 pages of a book that moves you forward', ic:'📖'},
+    pages:{t:'Ранкові сторінки', te:'Morning pages', ty:'text', ph:'Пиши все, що в голові, без зупинок і правок', phe:'Write whatever is in your head, no stopping, no editing', ic:'📝'},
+    stoic:{t:'Що в моїй владі сьогодні?', te:'What is in my control today?', ty:'text', ph:'А що — ні, і це можна відпустити', phe:'And what is not — let it go', ic:'🏛'},
+    premed:{t:'Що може піти не так?', te:'What could go wrong?', ty:'text', ph:'І як я на це відповім', phe:'And how I will respond', ic:'🛡'},
+    frog:{t:'Головна справа — першою', te:'Most important task first', ty:'text', ph:'Одна найважча справа, до пошти і стрічки', phe:'One hardest task, before email and feeds', ic:'🐸'},
+    reflect:{t:'Роздуми і запис', te:'Reflect and write', ty:'timer', sec:1200, sub:'план, щоденник, тиша', sube:'plan, journal, silence', ic:'🧭'},
+    learn:{t:'Навчання', te:'Learning', ty:'timer', sec:1200, sub:'книжка, курс, подкаст', sube:'book, course, podcast', ic:'🎓'}
   };
+  /* Каталог ранків (Р1, 28.11.2026): методики з автором і хвилинами. Перші чотири — ті, що були
+     раніше, «Мій теперішній ранок» — першим, тож ранок, який людина вже має, лишається як був. */
   const RIT_TPL=[
-    {k:'now',   t:'Мій теперішній ранок', s:['mix','j1','j2','j3','photo','video']},
-    {k:'m5',    t:'5 хвилин',             s:['water','j3','vis']},
-    {k:'calm',  t:'Тиха голова',          s:['breath','grat','med','j3']},
-    {k:'sport', t:'Спорт зранку',         s:['water','move','j3']}
+    {k:'now',   t:'Мій теперішній ранок', te:'My current morning', who:'голос, щоденник, фото, відео', whoe:'voice, journal, photo, video', min:10, s:['mix','j1','j2','j3','photo','video']},
+    {k:'m5',    t:'5 хвилин',             te:'5 minutes',          who:'вода, намір, мрія', whoe:'water, intention, dream', min:5, s:['water','j3','vis']},
+    {k:'calm',  t:'Тиха голова',          te:'Quiet mind',         who:'дихання і тиша', whoe:'breathing and silence', min:10, s:['breath','grat','med','j3']},
+    {k:'sport', t:'Спорт зранку',         te:'Morning sport',      who:'вода і рух', whoe:'water and movement', min:10, s:['water','move','j3']},
+    {k:'fmj',   t:'5-Minute Journal',     te:'5-Minute Journal',   who:'Intelligent Change', min:5, s:['grat','great','aff']},
+    {k:'frog',  t:'З’їж жабу',       te:'Eat the frog',       who:'Brian Tracy', min:5, s:['water','frog']},
+    {k:'stoic', t:'Стоїчний ранок',       te:'Stoic morning',      who:'Марк Аврелій, Сенека', whoe:'Marcus Aurelius, Seneca', min:5, s:['stoic','premed','j3']},
+    {k:'prime', t:'Праймінг',             te:'Priming',            who:'Tony Robbins', min:10, s:['breath','grat','vis']},
+    {k:'savers',t:'Miracle Morning · SAVERS', te:'Miracle Morning · SAVERS', who:'Hal Elrod', min:20, s:['med','aff','vis','move','read','grat']},
+    {k:'light', t:'Світло і рух',         te:'Light and movement', who:'Andrew Huberman', min:15, s:['water','light','move','coffee']},
+    {k:'pages', t:'Ранкові сторінки',     te:'Morning pages',      who:'Julia Cameron', min:25, s:['water','pages','j3']},
+    {k:'club',  t:'20 / 20 / 20',         te:'20 / 20 / 20',       who:'Robin Sharma · Клуб 5 ранку', whoe:'Robin Sharma · The 5AM Club', min:60, s:['move','reflect','learn']}
   ];
+  // мова кроків і шаблонів: англійська — лише там, де є переклад (te/phe/sube/whoe)
+  function ritEn(){ try{ return (window.flowLang&&window.flowLang())==='en'; }catch(_){ return false; } }
+  function ritLoc(o){ if(!o||!ritEn()) return o;
+    return Object.assign({},o,{t:o.te||o.t, ph:o.phe||o.ph, sub:o.sube||o.sub, who:o.whoe||o.who}); }
   const RIT_TY={text:'текст', check:'галочка', timer:'таймер', mix:'аудіо', photo:'фото', link:'посилання'};
   // крок із даних → безпечний обʼєкт; чуже/зіпсоване відкидаємо
   function ritCleanStep(s){
@@ -870,7 +896,7 @@
     return arr.length?arr:RIT_TPL[0].s.map(id=>({id}));
   }
   const RIT_OWN_IC={text:'✍️', check:'☑️', timer:'⏱'};
-  function ritCat(id){ return Object.prototype.hasOwnProperty.call(RIT_CAT,id)?RIT_CAT[id]:null; }
+  function ritCat(id){ return Object.prototype.hasOwnProperty.call(RIT_CAT,id)?ritLoc(RIT_CAT[id]):null; }
   function ritMeta(s){ const c=ritCat(s.id); return c?Object.assign({id:s.id},c):Object.assign({ic:RIT_OWN_IC[s.ty]||'•'},s); }
   /* Голос — лише в трьох старих записах (a1..a3). Аудіо лягає в ritual_board цілим base64,
      тож голос у кожному новому кроці швидко з'їв би памʼять браузера. */
@@ -892,7 +918,7 @@
     if(ritCtx!=='m' && typeof moodName==='function') return moodName(ritCtx);
     const ids=ritSteps().map(s=>s.id).join(',');
     const t=RIT_TPL.find(x=>x.s.join(',')===ids);
-    return t?t.t:'свій набір';
+    return t?ritLoc(t).t:(ritEn()?'my own set':'свій набір');
   }
   // кроки, у яких своя картка (мікс, фото, відео); решта — однаковий рядок
   function ritStepHTML(s,d){
@@ -1047,9 +1073,22 @@
     document.body.appendChild(ov);
     const box=ov.firstChild;   // шторка зʼявляється один раз, далі міняємо лише вміст (без повторної анімації)
     const close=()=>ov.remove();
+    const en=ritEn();
+    let flt='all';   // фільтр каталогу за хвилинами: all · s (до 5) · m (6–15) · l (більше)
+    const grp=m=>!m?'':(m<=5?'s':(m<=15?'m':'l'));
+    const FLT=[['all','Усі','All'],['s','до 5 хв','up to 5 min'],['m','10–15 хв','10–15 min'],['l','20+ хв','20+ min']];
     const draw=()=>{
       const ids=work.map(s=>s.id).join(',');
-      const tpls=TPLS.map(t=>`<button type="button" class="red-tpl ${t.s.map(x=>x.id||x).join(',')===ids?'on':''}" data-rtpl="${t.k}">${esc(t.t)}</button>`).join('');
+      // картка методики: назва, автор, хвилини і кроки — щоб вибирати, знаючи, що всередині
+      const tpls=TPLS.filter(t=>!isM||flt==='all'||grp(t.min)===flt).map(t0=>{
+        const t=ritLoc(t0), on=t.s.map(x=>x.id||x).join(',')===ids;
+        const steps=t.s.map(x=>{ const id=(typeof x==='string')?x:x.id, m=ritCat(id); return m?m.t:(x&&x.t)||''; }).filter(Boolean).join(' · ');
+        return `<button type="button" class="red-card ${on?'on':''}" data-rtpl="${esc(t.k)}" aria-pressed="${on?'true':'false'}">
+          <span class="rc-top"><b>${esc(t.t)}</b>${t.min?`<span class="rc-min">${t.min} ${en?'min':'хв'}</span>`:''}</span>
+          ${t.who?`<small class="rc-who">${esc(t.who)}</small>`:''}
+          <span class="rc-steps">${esc(steps)}</span></button>`; }).join('');
+      const flts=isM?`<div class="red-flt" role="group" aria-label="${en?'Duration':'Тривалість'}">${FLT.map(f=>
+        `<button type="button" class="red-tpl ${f[0]===flt?'on':''}" data-rflt="${f[0]}" aria-pressed="${f[0]===flt?'true':'false'}">${esc(en?f[2]:f[1])}</button>`).join('')}</div>`:'';
       const rows=work.map((s,i)=>{ const m=ritMeta(s);
         return `<div class="red-row"><span class="rst-ic">${esc(m.ic||'•')}</span>
           <span class="rst-tx"><b>${esc(m.t)}</b><small>${esc(m.ty==='text'&&m.a?'текст · голос':(RIT_TY[m.ty]||''))}${m.ty==='timer'?' · '+fmtDur(m.sec||180):''}</small></span>
@@ -1057,17 +1096,21 @@
           <button type="button" class="red-b" data-rdn="${i}" aria-label="Нижче" ${i<work.length-1?'':'disabled'}>↓</button>
           <button type="button" class="red-b x" data-rdel="${i}" aria-label="Прибрати">✕</button></div>`; }).join('');
       const add=Object.keys(RIT_CAT).filter(k=>!work.some(s=>s.id===k)&&(isM||RIT_MORNING_ONLY.indexOf(k)<0)).map(k=>
-        `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(RIT_CAT[k].t)}</button>`).join('');
+        `<button type="button" class="red-add" data-radd="${k}">${esc(RIT_CAT[k].ic)} ${esc(ritCat(k).t)}</button>`).join('');
       box.innerHTML=`<div class="asheet-grip"></div>
         <div class="asheet-title">${isM?'Мій ранок':esc(ritWithCtx(ctx,ritTplName))}</div>
-        <div class="asheet-sub">Шаблон або свій набір. Твої записи за минулі дні лишаються.</div>
-        <div class="red-tpls">${tpls}</div>
+        <div class="asheet-sub">${en?'Pick a method or build your own set. Your past entries stay.':'Обери методику або збери свій набір. Твої записи за минулі дні лишаються.'}</div>
+        ${isM?`<div class="red-lbl">${en?'Methods':'Методики'}</div>`:''}
+        ${flts}
+        <div class="red-cards">${tpls}</div>
+        <div class="red-lbl">${en?'My steps':'Мої кроки'}</div>
         <div class="red-list">${rows||'<div class="vhint">Додай хоча б один крок</div>'}</div>
         <div class="red-lbl">Додати крок</div>
         <div class="red-adds">${add}<button type="button" class="red-add own" data-rown="1">＋ Своє питання</button></div>
         <button type="button" class="red-ok" data-rok="1" ${work.length?'':'disabled'}>Готово</button>
         <button type="button" class="asheet-cancel">Скасувати</button>`;
       ov.querySelector('.asheet-cancel').onclick=close;
+      ov.querySelectorAll('[data-rflt]').forEach(b=>b.onclick=()=>{ flt=b.dataset.rflt; draw(); });
       ov.querySelectorAll('[data-rtpl]').forEach(b=>b.onclick=()=>{ const t=TPLS.find(x=>x.k===b.dataset.rtpl); if(t){ work=t.s.map(x=>(typeof x==='string')?{id:x}:Object.assign({},x)); draw(); } });
       ov.querySelectorAll('[data-rup]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rup; if(i>0){ const x=work[i]; work[i]=work[i-1]; work[i-1]=x; draw(); } });
       ov.querySelectorAll('[data-rdn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.rdn; if(i<work.length-1){ const x=work[i]; work[i]=work[i+1]; work[i+1]=x; draw(); } });
