@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 106 |
-| Рядків JS | 41920 |
+| Рядків JS | 41937 |
 | Файлів CSS | 53 |
-| Рядків CSS | 12911 |
+| Рядків CSS | 12914 |
 | Сутностей верхнього рівня | 3284 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
@@ -105,7 +105,7 @@
 | `src/scripts/core/68-ready-folders.js` | 46 | 6 |
 | `src/scripts/core/69-vis-session.js` | 117 | 6 |
 | `src/scripts/page-editor/01-palette.js` | 194 | 17 |
-| `src/scripts/page-editor/02-block-styles.js` | 899 | 62 |
+| `src/scripts/page-editor/02-block-styles.js` | 916 | 62 |
 | `src/scripts/page-editor/03-premium-pack.js` | 1189 | 60 |
 | `src/scripts/page-editor/04-table.js` | 228 | 26 |
 | `src/scripts/page-editor/05-fold.js` | 66 | 8 |
@@ -150,7 +150,7 @@
 | `src/styles/22-more-screen.css` | 186 | 0 |
 | `src/styles/23-doc-readable.css` | 102 | 4 |
 | `src/styles/core/01-tokens-base.css` | 353 | 9 |
-| `src/styles/core/02-page-editor.css` | 1424 | 9 |
+| `src/styles/core/02-page-editor.css` | 1427 | 9 |
 | `src/styles/core/03-folders-projects.css` | 711 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
 | `src/styles/core/05-values-wishes.css` | 141 | 0 |
@@ -3430,65 +3430,65 @@
 | `txRich` | функція | `src/scripts/page-editor/02-block-styles.js:2` |
 | `txIsRich` | функція | `src/scripts/page-editor/02-block-styles.js:3` |
 | `PG_NETS` | масив | `src/scripts/page-editor/02-block-styles.js:9` |
-| `PG_NOT_AUTHOR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:22` |
-| `pgYtId` | функція | `src/scripts/page-editor/02-block-styles.js:23` |
-| `pgSocial` | функція | `src/scripts/page-editor/02-block-styles.js:24` |
-| `pgUrlOnly` | функція | `src/scripts/page-editor/02-block-styles.js:63` |
-| `pgAttSub` | функція | `src/scripts/page-editor/02-block-styles.js:71` |
-| `pgLinkCard` | функція | `src/scripts/page-editor/02-block-styles.js:76` |
-| `equalizeWidths` | функція | `src/scripts/page-editor/02-block-styles.js:102` |
-| `PGH_FONTS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:105` |
-| `PGH_CLR_VAR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:109` |
-| `headingClr` | функція | `src/scripts/page-editor/02-block-styles.js:110` |
-| `headingStyle` | функція | `src/scripts/page-editor/02-block-styles.js:115` |
-| `pgShowHidden` | значення | `src/scripts/page-editor/02-block-styles.js:127` |
-| `condMet` | функція | `src/scripts/page-editor/02-block-styles.js:128` |
-| `moveBlockSide` | функція | `src/scripts/page-editor/02-block-styles.js:147` |
-| `undoMove` | функція | `src/scripts/page-editor/02-block-styles.js:182` |
-| `redoMove` | функція | `src/scripts/page-editor/02-block-styles.js:187` |
-| `undoStack` | масив | `src/scripts/page-editor/02-block-styles.js:194` |
-| `pushOp` | функція | `src/scripts/page-editor/02-block-styles.js:195` |
-| `doUndo` | функція | `src/scripts/page-editor/02-block-styles.js:201` |
-| `doRedo` | функція | `src/scripts/page-editor/02-block-styles.js:202` |
-| `syncUndoBtn` | функція | `src/scripts/page-editor/02-block-styles.js:203` |
-| `STATUS_COLORS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:213` |
-| `STATUS_ORDER` | масив | `src/scripts/page-editor/02-block-styles.js:214` |
-| `dbColType` | функція | `src/scripts/page-editor/02-block-styles.js:215` |
-| `dbFmtNum` | функція | `src/scripts/page-editor/02-block-styles.js:216` |
-| `PG_GONE` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:220` |
-| `inner` | функція | `src/scripts/page-editor/02-block-styles.js:223` |
-| `dbEnsure` | функція | `src/scripts/page-editor/02-block-styles.js:482` |
-| `dbHTML` | функція | `src/scripts/page-editor/02-block-styles.js:499` |
-| `pgSgBusy` | значення | `src/scripts/page-editor/02-block-styles.js:549` |
-| `pgSgPlace` | функція | `src/scripts/page-editor/02-block-styles.js:550` |
-| `PGLAST` | значення | `src/scripts/page-editor/02-block-styles.js:558` |
-| `pgLastGet` | функція | `src/scripts/page-editor/02-block-styles.js:559` |
-| `pgLastSet` | функція | `src/scripts/page-editor/02-block-styles.js:560` |
-| `PGRECENT` | значення | `src/scripts/page-editor/02-block-styles.js:562` |
-| `pgRecentGet` | функція | `src/scripts/page-editor/02-block-styles.js:563` |
-| `pgRecentAdd` | функція | `src/scripts/page-editor/02-block-styles.js:564` |
-| `renderList` | функція | `src/scripts/page-editor/02-block-styles.js:565` |
-| `renderBoardBlock` | функція | `src/scripts/page-editor/02-block-styles.js:585` |
-| `renderRowBlock` | функція | `src/scripts/page-editor/02-block-styles.js:620` |
-| `renumber` | функція | `src/scripts/page-editor/02-block-styles.js:637` |
-| `pgPath` | масив | `src/scripts/page-editor/02-block-styles.js:639` |
-| `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:640` |
-| `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:650` |
-| `render` | функція | `src/scripts/page-editor/02-block-styles.js:666` |
-| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:702` |
-| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:714` |
-| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:720` |
-| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:723` |
-| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:801` |
-| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:803` |
-| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:804` |
-| `pgsGotOk` | функція | `src/scripts/page-editor/02-block-styles.js:806` |
-| `pgsMatch` | функція | `src/scripts/page-editor/02-block-styles.js:807` |
-| `pgsHiddenN` | функція | `src/scripts/page-editor/02-block-styles.js:814` |
-| `pgsShopOpen` | функція | `src/scripts/page-editor/02-block-styles.js:816` |
-| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:817` |
-| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:822` |
-| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:836` |
+| `PG_NOT_AUTHOR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:24` |
+| `pgYtId` | функція | `src/scripts/page-editor/02-block-styles.js:25` |
+| `pgSocial` | функція | `src/scripts/page-editor/02-block-styles.js:26` |
+| `pgUrlOnly` | функція | `src/scripts/page-editor/02-block-styles.js:77` |
+| `pgAttSub` | функція | `src/scripts/page-editor/02-block-styles.js:85` |
+| `pgLinkCard` | функція | `src/scripts/page-editor/02-block-styles.js:90` |
+| `equalizeWidths` | функція | `src/scripts/page-editor/02-block-styles.js:119` |
+| `PGH_FONTS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:122` |
+| `PGH_CLR_VAR` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:126` |
+| `headingClr` | функція | `src/scripts/page-editor/02-block-styles.js:127` |
+| `headingStyle` | функція | `src/scripts/page-editor/02-block-styles.js:132` |
+| `pgShowHidden` | значення | `src/scripts/page-editor/02-block-styles.js:144` |
+| `condMet` | функція | `src/scripts/page-editor/02-block-styles.js:145` |
+| `moveBlockSide` | функція | `src/scripts/page-editor/02-block-styles.js:164` |
+| `undoMove` | функція | `src/scripts/page-editor/02-block-styles.js:199` |
+| `redoMove` | функція | `src/scripts/page-editor/02-block-styles.js:204` |
+| `undoStack` | масив | `src/scripts/page-editor/02-block-styles.js:211` |
+| `pushOp` | функція | `src/scripts/page-editor/02-block-styles.js:212` |
+| `doUndo` | функція | `src/scripts/page-editor/02-block-styles.js:218` |
+| `doRedo` | функція | `src/scripts/page-editor/02-block-styles.js:219` |
+| `syncUndoBtn` | функція | `src/scripts/page-editor/02-block-styles.js:220` |
+| `STATUS_COLORS` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:230` |
+| `STATUS_ORDER` | масив | `src/scripts/page-editor/02-block-styles.js:231` |
+| `dbColType` | функція | `src/scripts/page-editor/02-block-styles.js:232` |
+| `dbFmtNum` | функція | `src/scripts/page-editor/02-block-styles.js:233` |
+| `PG_GONE` | обʼєкт | `src/scripts/page-editor/02-block-styles.js:237` |
+| `inner` | функція | `src/scripts/page-editor/02-block-styles.js:240` |
+| `dbEnsure` | функція | `src/scripts/page-editor/02-block-styles.js:499` |
+| `dbHTML` | функція | `src/scripts/page-editor/02-block-styles.js:516` |
+| `pgSgBusy` | значення | `src/scripts/page-editor/02-block-styles.js:566` |
+| `pgSgPlace` | функція | `src/scripts/page-editor/02-block-styles.js:567` |
+| `PGLAST` | значення | `src/scripts/page-editor/02-block-styles.js:575` |
+| `pgLastGet` | функція | `src/scripts/page-editor/02-block-styles.js:576` |
+| `pgLastSet` | функція | `src/scripts/page-editor/02-block-styles.js:577` |
+| `PGRECENT` | значення | `src/scripts/page-editor/02-block-styles.js:579` |
+| `pgRecentGet` | функція | `src/scripts/page-editor/02-block-styles.js:580` |
+| `pgRecentAdd` | функція | `src/scripts/page-editor/02-block-styles.js:581` |
+| `renderList` | функція | `src/scripts/page-editor/02-block-styles.js:582` |
+| `renderBoardBlock` | функція | `src/scripts/page-editor/02-block-styles.js:602` |
+| `renderRowBlock` | функція | `src/scripts/page-editor/02-block-styles.js:637` |
+| `renumber` | функція | `src/scripts/page-editor/02-block-styles.js:654` |
+| `pgPath` | масив | `src/scripts/page-editor/02-block-styles.js:656` |
+| `pgResolve` | функція | `src/scripts/page-editor/02-block-styles.js:657` |
+| `pgHeaStrip` | функція | `src/scripts/page-editor/02-block-styles.js:667` |
+| `render` | функція | `src/scripts/page-editor/02-block-styles.js:683` |
+| `fillWidgetHosts` | функція | `src/scripts/page-editor/02-block-styles.js:719` |
+| `window.__pgWidgetsSync` | функція | `src/scripts/page-editor/02-block-styles.js:731` |
+| `caretEnd` | функція | `src/scripts/page-editor/02-block-styles.js:737` |
+| `slashCtx` | значення | `src/scripts/page-editor/02-block-styles.js:740` |
+| `slash` | значення | `src/scripts/page-editor/02-block-styles.js:818` |
+| `srail` | значення | `src/scripts/page-editor/02-block-styles.js:820` |
+| `pgsCat` | значення | `src/scripts/page-editor/02-block-styles.js:821` |
+| `pgsGotOk` | функція | `src/scripts/page-editor/02-block-styles.js:823` |
+| `pgsMatch` | функція | `src/scripts/page-editor/02-block-styles.js:824` |
+| `pgsHiddenN` | функція | `src/scripts/page-editor/02-block-styles.js:831` |
+| `pgsShopOpen` | функція | `src/scripts/page-editor/02-block-styles.js:833` |
+| `pgsFiltered` | функція | `src/scripts/page-editor/02-block-styles.js:834` |
+| `buildRail` | функція | `src/scripts/page-editor/02-block-styles.js:839` |
+| `buildSlash` | функція | `src/scripts/page-editor/02-block-styles.js:853` |
 
 ### `src/scripts/page-editor/03-premium-pack.js` — 60 сутностей
 

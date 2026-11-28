@@ -9,6 +9,7 @@
   var PG_NETS=[
     [/(^|\.)instagram\.com$/,'Instagram','IG','#c13584'],
     [/(^|\.)(tiktok\.com)$/,'TikTok','TT','#25232b'],
+    [/^music\.youtube\.com$/,'YouTube Music','YM','#e52d27'],   /* раніше за YouTube: інакше спрацює загальне правило */
     [/(^|\.)(youtube\.com|youtu\.be)$/,'YouTube','YT','#d93025'],
     [/(^|\.)threads\.(net|com)$/,'Threads','Th','#3a3a40'],
     [/(^|\.)(x\.com|twitter\.com)$/,'X','X','#2b2b30'],
@@ -17,7 +18,8 @@
     [/(^|\.)(pinterest\.[a-z.]+|pin\.it)$/,'Pinterest','P','#e60023'],
     [/(^|\.)linkedin\.com$/,'LinkedIn','in','#0a66c2'],
     [/(^|\.)reddit\.com$/,'Reddit','R','#ff4500'],
-    [/(^|\.)spotify\.com$/,'Spotify','S','#1db954']
+    [/(^|\.)spotify\.com$/,'Spotify','S','#1db954'],
+    [/(^|\.)soundcloud\.com$/,'SoundCloud','SC','#ff5500']
   ];
   var PG_NOT_AUTHOR={p:1,reel:1,reels:1,tv:1,stories:1,explore:1,i:1,home:1,search:1,watch:1,shorts:1,embed:1,channel:1,c:1,share:1,video:1,s:1,login:1,hashtag:1,pin:1,r:1,in:1,company:1,feed:1,groups:1,events:1};
   function pgYtId(u){ var m=String(u||'').match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m?m[1]:''; }
@@ -27,7 +29,7 @@
     var host=url.hostname.toLowerCase().replace(/^(www|m|vm|vt|mobile)\./,'');
     var seg=url.pathname.split('/').filter(Boolean).map(function(s){ try{ return decodeURIComponent(s); }catch(_){ return s; } });
     var net=null; for(var i=0;i<PG_NETS.length;i++){ if(PG_NETS[i][0].test(host)){ net=PG_NETS[i]; break; } }
-    var r={host:host, n:net?net[1]:host, a:net?net[2]:(host.charAt(0)||'•').toUpperCase(), c:net?net[3]:'', kind:'', author:'', yt:'', social:!!net};
+    var r={host:host, n:net?net[1]:host, a:net?net[2]:(host.charAt(0)||'•').toUpperCase(), c:net?net[3]:'', kind:'', author:'', yt:'', sc:'', social:!!net};
     var s0=seg[0]||'', s1=seg[1]||'';
     var who=function(x){ x=String(x||'').replace(/^@/,''); return /^[\w.\-]{1,40}$/.test(x)&&!PG_NOT_AUTHOR[x.toLowerCase()]?x:''; };
     if(!net){ r.kind=''; return r; }
@@ -42,6 +44,18 @@
       case 'YouTube':
         r.yt=pgYtId(h); r.kind=s0==='shorts'?'Shorts':(r.yt?'відео':'');
         if(s0.charAt(0)==='@'){ r.author=who(s0); if(!r.yt) r.kind='канал'; }
+        break;
+      case 'YouTube Music':   /* music.youtube.com/watch?v=… — той самий програвач YouTube */
+        r.yt=pgYtId(h); r.kind=r.yt?'пісня':(s0==='playlist'?'плейлист':(s0==='browse'?'альбом':''));
+        break;
+      case 'SoundCloud':      /* soundcloud.com/виконавець/трек або /виконавець/sets/плейлист */
+        var SC_NO={discover:1,search:1,you:1,stream:1,upload:1,charts:1,pages:1,settings:1,messages:1,notifications:1};
+        if(host==='soundcloud.com'&&s0&&!SC_NO[s0.toLowerCase()]&&/^[\w.\-]{1,80}$/.test(s0)){
+          r.author=who(s0);
+          if(s1==='sets'&&seg[2]&&/^[\w.\-]{1,120}$/.test(seg[2])){ r.kind='плейлист'; r.sc='https://soundcloud.com/'+s0+'/sets/'+seg[2]; }
+          else if(s1&&/^[\w.\-]{1,120}$/.test(s1)&&!{tracks:1,albums:1,'popular-tracks':1,reposts:1,likes:1,followers:1,following:1}[s1]){ r.kind='трек'; r.sc='https://soundcloud.com/'+s0+'/'+s1; }
+          else r.kind='виконавець';
+        } else r.kind=host==='on.soundcloud.com'?'трек':'';
         break;
       case 'Threads': case 'X':
         r.author=who(s0); r.kind=(s1==='post'||s1==='status')?'пост':(r.author?'профіль':'');
@@ -77,11 +91,14 @@
     var u=b.url||'', s=pgSocial(u)||{n:'Посилання',a:'•',c:'',kind:'',author:'',yt:'',social:false};
     var go=safeHref(u), cov=b.cover&&/^(data:image\/|idb:)/.test(String(b.cover))?safeImg(b.cover):'';
     var who=s.author?'@'+s.author:s.n, sub=s.author?s.n+(s.kind?' · '+s.kind:''):(s.kind||(s.social?'':'сайт'));
-    var media='';
-    if(cov) media='<div class="pgsc-cv"><img src="'+esc(cov)+'" alt="" decoding="async" loading="lazy"></div>';
-    else if(s.yt) media=b.play
+    var media='', coverImg=cov?'<div class="pgsc-cv"><img src="'+esc(cov)+'" alt="" decoding="async" loading="lazy"></div>':'';
+    if(s.yt) media=b.play   /* YouTube і YouTube Music: грає в картці; своє фото — лише як обкладинка під ▶ */
       ? '<div class="pgem pgsc-em"><iframe src="https://www.youtube.com/embed/'+s.yt+'?autoplay=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
-      : '<button class="pgem pgem-th pgsc-em" data-pgemplay="'+id+'" aria-label="Дивитись відео" style="background-image:url(\'https://i.ytimg.com/vi/'+s.yt+'/hqdefault.jpg\')"><span class="pgem-p">▶</span></button>';
+      : '<button class="pgem pgem-th pgsc-em" data-pgemplay="'+id+'" aria-label="'+(s.n==='YouTube Music'?'Слухати':'Дивитись відео')+'" style="background-image:url(\''+(cov?safeImg(cov).replace(/'/g,'%27'):'https://i.ytimg.com/vi/'+s.yt+'/hqdefault.jpg')+'\')"><span class="pgem-p">▶</span></button>';
+    else if(s.sc) media=b.play   /* SoundCloud: офіційний програвач w.soundcloud.com (дозволений у frame-src) */
+      ? '<div class="pgsc-scp"><iframe src="https://w.soundcloud.com/player/?url='+encodeURIComponent(s.sc)+'&amp;auto_play=true&amp;visual=false&amp;show_comments=false&amp;color=%23ff5500" allow="autoplay" title="SoundCloud"></iframe></div>'
+      : coverImg+'<button class="pgsc-play" data-pgemplay="'+id+'"><span aria-hidden="true">▶</span> Слухати</button>';
+    else media=coverImg;
     var hasNote=b.note!=null;
     return '<div class="pg-content"><div class="pgsc'+(s.social?' soc':'')+'"'+(s.c?' style="--nc:'+s.c+'"':'')+'>'
       +'<div class="pgsc-h"><span class="pgsc-b" aria-hidden="true">'+esc(s.a)+'</span>'
