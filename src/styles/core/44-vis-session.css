@@ -1,0 +1,48 @@
+  /* ════════ Сеанс візуалізації (В2, 28.11.2026) — 69-vis-session.js ════════
+     Фото мрії на весь екран, картка кроку внизу. Шар 1290: над покроковим режимом настроїв (1250),
+     але під шторками й віконцями (1300) — бо з кроку «Перешкода» відкривається віконце для тексту. */
+  .vs{position:fixed;inset:0;z-index:1290;background:#0b0916;color:#fff;animation:fadein .2s ease;}
+  .vs-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+  .vs-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.05) 35%,rgba(0,0,0,.55) 70%,rgba(0,0,0,.8) 100%);}
+  .vs-in{position:relative;height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;
+    max-width:520px;margin:0 auto;
+    padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);}
+  .vs-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .vs-x{width:44px;height:44px;flex:none;border-radius:22px;border:0;background:rgba(0,0,0,.4);color:#fff;font-size:16px;cursor:pointer;}
+  .vs-x:focus-visible,.vs-next:focus-visible,.vs-back:focus-visible,.vs-chip:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+  .vs-cap{flex:1;min-width:0;text-align:center;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .vs-sp{width:44px;flex:none;}
+  .vs-segs{display:flex;gap:4px;}
+  .vs-segs i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.28);}
+  .vs-segs i.on{background:#fff;}
+  .vs-card{margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:24px;
+    background:rgba(14,11,26,.84);border:1px solid rgba(255,255,255,.12);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
+  .vs-row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .vs-k{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#c4b5ff;}
+  .vs-tm{font-size:13px;font-weight:800;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;}
+  .vs-t{font-size:20px;line-height:1.3;font-weight:800;}
+  .vs-sub{font-size:14px;line-height:1.5;color:rgba(255,255,255,.78);}
+  .vs-quote{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.08);}
+  .vs-quote small{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+  .vs-quote span{font-size:14.5px;line-height:1.45;}
+  .vs-miss{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:13px;line-height:1.45;color:rgba(255,255,255,.75);}
+  .vs-feels{display:flex;flex-wrap:wrap;gap:6px;}
+  .vs-chip{font:inherit;font-size:13px;font-weight:700;min-height:40px;padding:0 14px;border-radius:20px;cursor:pointer;
+    border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;}
+  .vs-chip.on{border-color:#c4b5ff;background:rgba(139,108,240,.45);}
+  .vs-bot{display:flex;gap:8px;margin-top:4px;}
+  .vs-back{flex:1;min-height:48px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+  .vs-next{flex:2;min-height:48px;border-radius:14px;border:0;background:#8b6cf0;color:#fff;font:inherit;font-size:15px;font-weight:800;cursor:pointer;}
+
+  /* вхід у сеанс під колодою Карти бажань */
+  .vs-open{font:inherit;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:12px 14px;min-height:56px;
+    border-radius:18px;cursor:pointer;text-align:left;color:var(--text);
+    border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:color-mix(in srgb,var(--accent) 12%,var(--card));}
+  .vs-open:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .vs-open-ic{width:22px;height:22px;flex:none;color:var(--accent);}
+  .vs-open-ic svg{width:100%;height:100%;}
+  .vs-open-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .vs-open-tx b{font-size:15px;font-weight:800;}
+  .vs-open-tx small{font-size:12px;font-weight:700;color:var(--muted);}
+  .vs-open-ar{font-size:20px;color:var(--muted);}

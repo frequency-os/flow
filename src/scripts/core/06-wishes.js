@@ -438,8 +438,7 @@
       const en=ritEn(), cur=(w.woop&&typeof w.woop[k]==='string')?w.woop[k]:'';
       inputModal({title:en?f[2]:f[1], value:cur, placeholder:en?f[4]:f[3], onOk:(v)=>{
         if(v===null||v===undefined) return;
-        w.woop=Object.assign({}, (w.woop&&typeof w.woop==='object')?w.woop:{}, {[k]:String(v).trim().slice(0,300)});
-        saveWishes(); rerender(); }});
+        wishWoopSet(w,k,v); rerender(); }});
     });
     // дата-ціль
     ov.querySelector('[data-wcdate]').onclick=()=>inputModal({title:'Дата-ціль', value:w.targetDate||'', placeholder:'Напр. Літо 2027', onOk:(v)=>{ w.targetDate=v; saveWishes(); rerender(); }});
@@ -467,6 +466,12 @@
     ['obs', 'Перешкода в мені', 'Inner obstacle', 'Що в тобі самому може завадити? Звичка, страх, втома…', 'What in you could get in the way? A habit, a fear, tiredness…'],
     ['plan','Якщо — то', 'If — then', 'Якщо [перешкода], то я [дія]', 'If [obstacle], then I will [action]']
   ];
+  // одне поле WOOP → у мрію і в сховище (лише з дії людини: «Готово» у вікні)
+  function wishWoopSet(w,k,v){
+    if(!w||!WISH_WOOP.some(f=>f[0]===k)) return;
+    w.woop=Object.assign({}, (w.woop&&typeof w.woop==='object')?w.woop:{}, {[k]:String(v==null?'':v).trim().slice(0,300)});
+    saveWishes();
+  }
   function wishWoopHTML(w){
     const en=ritEn(), wo=(w&&w.woop&&typeof w.woop==='object')?w.woop:{};
     const rows=WISH_WOOP.map(f=>{ const v=typeof wo[f[0]]==='string'?wo[f[0]]:'';
@@ -866,7 +871,7 @@
     grat:{t:'Вдячність', ty:'text', ph:'За що сьогодні відчуваєш вдячність?', ic:'💛'},
     photo:{t:'Фото дня', ty:'photo', ic:'📸'},
     video:{t:'Відео-полиця', ty:'link', ic:'▶️'},
-    vis:{t:'Візуалізація', ty:'timer', sec:150, sub:'на фото з Карти бажань', ic:'✨'},
+    vis:{t:'Візуалізація', te:'Visualization', ty:'timer', sec:160, sub:'сеанс: результат · процес · перешкода · план', sube:'session: outcome · process · obstacle · plan', ic:'✨'},
     breath:{t:'Дихання 4·7·8', ty:'timer', sec:120, sub:'вдих 4 · затримка 7 · видих 8', ic:'🌬'},
     med:{t:'Медитація', ty:'timer', sec:300, sub:'тиша і дихання', ic:'🧘'},
     water:{t:'Склянка води', ty:'check', ic:'💧'},
@@ -1056,7 +1061,12 @@
         try{ window.platform.haptic('light'); }catch(_){} return; }
       if(m.ty!=='timer') return;
       const mark=()=>{ const d2=ritDay(today); d2[s.id]=1; ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} };
-      if(s.id==='vis') ritEnterMoment({seconds:m.sec, label:'Візуалізація', doneLabel:'Готово', onDone:mark,
+      if(s.id==='vis' && typeof visSession==='function' && wishes.length){
+        const ctx=ritCtx;
+        visSession({onDone:feel=>{ ritCtx=ctx; const d2=ritDay(today); d2[s.id]=1; if(feel) d2.visFeel=feel;
+          ritSaveToday(); ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} }});
+      }
+      else if(s.id==='vis') ritEnterMoment({seconds:m.sec, label:'Візуалізація', doneLabel:'Готово', onDone:mark,
         emptyMsg:'Додай фото в Карту бажань — тоді візуалізація йтиме на твоїх мріях'});
       else ritEnterMoment({seconds:m.sec, plain:true, label:'Крок ранку', cap:m.t, hint:m.sub||'Побудь у цьому кілька хвилин', doneLabel:'Готово', onDone:mark});
     });
@@ -1540,6 +1550,11 @@
         <div class="wdk-add" id="wdkAdd">${WICONS.photo}<span>Фото</span></div>${slides}
       </div>
       <div class="wdk-dots" id="wdkDots">${ordered.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>
+      ${(typeof visSession==='function')?`<button type="button" class="vs-open" id="vsOpen">
+        <span class="vs-open-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <span class="vs-open-tx"><b>${ritEn()?'Visualization · 3 min':'Сеанс візуалізації · 3 хв'}</b>
+          <small>${ritEn()?'outcome · process · obstacle · plan':'результат · процес · перешкода · план'}</small></span>
+        <span class="vs-open-ar" aria-hidden="true">›</span></button>`:''}
       ${(typeof moodsBlockHTML==='function')?moodsBlockHTML():`<div class="rit-sec" style="margin-top:18px"><span>🔥 Ранковий ритуал</span></div>
       <div id="ritInline" class="rit-wrap">${ritualInnerHTML()}</div>`}
       <div class="wish-note">${wishes.length} ${wishes.length===1?'образ':'образів'} · свайпай · ⋯ — дії · тап по чипу — дата</div>`;
@@ -1566,6 +1581,10 @@
       if(w&&w.type==='video'&&w.url) openWishVideo(w); else openWishCard(c.dataset.wid); });
     const add=body.querySelector('#wdkAdd'); if(add) add.onclick=()=>pickWishPhoto();
     const clg=body.querySelector('#clgOpen'); if(clg) clg.onclick=goCollage;
+    // сеанс із Карти теж зараховує крок «Візуалізація» сьогоднішнього ранку
+    const vso=body.querySelector('#vsOpen'); if(vso) vso.onclick=()=>visSession({onDone:feel=>{
+      ritWithCtx('m',()=>{ const d=ritDay(ritDs(0)); d.vis=1; if(feel) d.visFeel=feel; ritSaveToday(); });
+      ritualRerender(); try{ window.platform.haptic('medium'); }catch(_){} }});
     bindWishPrice(body);
     try{ if(typeof moodsBlockBind==='function') moodsBlockBind(body); else ritualBind(); }catch(e){ console.error('ritual inline',e); }
   }
