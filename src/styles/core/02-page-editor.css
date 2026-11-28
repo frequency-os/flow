@@ -814,6 +814,9 @@
   .pgsc .pgsc-em{border-radius:0;}
   .pgsc-t{padding:10px 12px 0;font-size:15px;font-weight:600;line-height:1.35;color:var(--pg-fg);outline:none;}
   .pgsc-t:empty{padding-top:6px;font-size:13px;font-weight:500;}
+  .pgsc-d{padding:4px 12px 0;font-size:13px;line-height:1.45;color:var(--pg-mut);
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .pgsc-a button:disabled{opacity:.6;cursor:progress;}
   .pgsc-n{margin:8px 12px 0;padding:8px 10px;border-radius:10px;background:var(--pg-card2);font-size:14px;line-height:1.45;
     color:var(--pg-fg2);outline:none;white-space:pre-wrap;}
   .pgsc-a{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 12px;}

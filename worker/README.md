@@ -220,6 +220,30 @@ Frequency через Google: застосунок шле токен сесії, 
 потрібні і змінна, і правка в `aiPickModel` (`src/scripts/core/12-ai-agent.js`),
 скажи.
 
+## Окремий воркер прев'ю: `preview-worker.js` (28.11.2026)
+
+Тягне картинку, назву й опис поста для картки посилання в папці.
+**Окремий**, щоб не чіпати головний воркер (див. «СТОП» угорі).
+Застосунок шукає його за адресою
+`https://flow-preview.life-yaroslav-kril.workers.dev` — тому назва
+воркера має бути **рівно `flow-preview`**.
+
+1. **dash.cloudflare.com** → **Workers & Pages** → **Create** →
+   **Create Worker** (порожній «Hello World»).
+2. Назва: `flow-preview` → **Deploy**.
+3. **Edit code** → виділити все → вставити вміст `worker/preview-worker.js` → **Deploy**.
+4. **Settings → Variables and Secrets** → додати дві змінні
+   (значення — ті самі, що в головному воркері, звідти й скопіюй):
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON`
+
+   Без них воркер чесно відповідає 503 і нічого не відкриває.
+   За бажання `ALLOWED_USERS` — як у головному.
+5. Перевірка: відкрий застосунок, увійди в акаунт, встав у папку
+   посилання на статтю чи пін — у картці має з'явитись картинка.
+
+Перевірка коду без Cloudflare: `node worker/test-preview-worker.mjs`.
+
 ## Перевірити, що працює
 
 **Без Cloudflare, на Mac** (нічого не коштує, в Anthropic нічого не йде):

@@ -89,12 +89,14 @@
       +(go?'<a class="pgsc-go" href="'+esc(go)+'" target="_blank" rel="noopener" aria-label="Відкрити">↗</a>':'')+'</div>'
       +media
       +'<div class="pgsc-t pg-empty" contenteditable="true" data-ph="Назва (необовʼязково)…" data-edit="'+id+'">'+esc(b.title||'')+'</div>'
+      +(b.desc?'<div class="pgsc-d" data-i18n-skip="1">'+esc(b.desc)+'</div>':'')
       +(hasNote?'<div class="pgsc-n pg-empty" contenteditable="true" data-ph="Нотатка: чим це корисне…" data-pglknote="'+id+'">'+esc(b.note||'')+'</div>':'')
       +'<div class="pgsc-a">'
         +(hasNote?'':'<button data-pglknoteadd="'+id+'">＋ Нотатка</button>')
         +'<button data-pglkcover="'+id+'">'+(cov?'Змінити фото':'＋ Фото')+'</button>'
         +(cov?'<button data-pglkcoverdel="'+id+'">Прибрати фото</button>':'')
         +'<button data-pglkurl="'+id+'">Змінити посилання</button>'
+        +(go&&/^https?:/i.test(go)?'<button data-pglkpv="'+id+'">'+(b.pvAt?'Оновити прев\'ю':'Підтягнути прев\'ю')+'</button>':'')
       +'</div></div></div>';
   }
   function equalizeWidths(cols){ var n=cols.length||1; cols.forEach(function(c){ c.width=1/n; }); }

@@ -1104,6 +1104,8 @@
         fresh.forEach(function(b){ if(arr.indexOf(b)<0) arr.push(b); });
       });
       save(); render();
+      /* одноразові посилання (підтвердження, вхід, відписка) самі не відкриваємо — лише кнопкою */
+      fresh.forEach(function(b){ if(b.type==='attach'&&b.sub!=='audio'&&!PG_ONCE_URL.test(b.url||'')) pgPreview(b.id,false); });   /* картка поста — тягнемо прев'ю (08-w-projects-hub.js) */
       var lastT=lines[lines.length-1].t; lines=[{t:lastT,text:''}]; cur=0; draw(0);
       var rb=editor.querySelector('.pgb[data-id="'+made[made.length-1].id+'"]');
       if(rb){ try{ rb.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(_){} }

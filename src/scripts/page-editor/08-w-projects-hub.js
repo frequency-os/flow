@@ -155,18 +155,22 @@
     if(lna){var lnl=locate(lna.dataset.pglknoteadd);
       if(lnl){lnl.block.note='';save();render();
         var nf=editor.querySelector('[data-pglknote="'+lnl.block.id+'"]');if(nf){try{nf.focus();}catch(_){}}}return;}
+    var lpv=e.target.closest&&e.target.closest('[data-pglkpv]');
+    if(lpv){pgPreview(lpv.dataset.pglkpv,true);return;}
     var lcv=e.target.closest&&e.target.closest('[data-pglkcover]');
     if(lcv){pgPickPhoto(lcv.dataset.pglkcover,null,'cover');return;}
     var lcd=e.target.closest&&e.target.closest('[data-pglkcoverdel]');
-    if(lcd){var lcl=locate(lcd.dataset.pglkcoverdel);if(lcl){delete lcl.block.cover;save();render();}return;}
+    if(lcd){var lcl=locate(lcd.dataset.pglkcoverdel);if(lcl){delete lcl.block.cover;delete lcl.block.coverAuto;save();render();}return;}
     var lku=e.target.closest&&e.target.closest('[data-pglkurl]');
     if(lku){var lkl=locate(lku.dataset.pglkurl);if(!lkl)return;
       pgAsk('Посилання','https://…',lkl.block.url||'',function(v){
         var l=locate(lku.dataset.pglkurl);if(!l)return;
         l.block.url=v;l.block.play=0;
+        /* прев'ю старої адреси вже не про те: опис і автоматичну обкладинку прибираємо, своє фото лишаємо */
+        delete l.block.desc;delete l.block.pvAt;if(l.block.coverAuto){delete l.block.cover;delete l.block.coverAuto;}
         if(l.block.type==='attach'){l.block.sub=pgAttSub(v);
           if(l.block.sub==='audio'&&!l.block.name){try{l.block.name=decodeURIComponent(v.split('/').pop()||'Аудіо');}catch(_){l.block.name='Аудіо';}}}
-        save();render();});return;}
+        save();render();if(!PG_ONCE_URL.test(v))pgPreview(l.block.id,false);});return;}
     var es=e.target.closest&&e.target.closest('[data-pgemset]');
     if(es){pgAsk('Посилання YouTube','https://youtu.be/…','',function(v){
       var l=locate(es.dataset.pgemset);if(l){l.block.url=v;l.block.play=0;save();render();}});return;}
@@ -346,6 +350,75 @@
       save(); render();
     }
   });
+  /* ── Прев'ю посилання через окремий воркер flow-preview (28.11.2026, етап 2) ──
+     Воркер читає сторінку поста і віддає og:title / og:description / og:image
+     (worker/preview-worker.js). Картинку стискаємо і кладемо в блок полем cover
+     з позначкою coverAuto — тоді картка живе без інтернету, а своє фото людини
+     ніколи не підміняється. Запит іде лише з дії людини: вставила адресу,
+     змінила її чи натиснула «Оновити прев'ю». Без входу в акаунт — тихо нічого. */
+  var PG_PREVIEW_EP='https://flow-preview.life-yaroslav-kril.workers.dev';   /* мусить бути в connect-src (src/index.html) */
+  var pgPvBusy={};
+  /* адреси, схожі на одноразові: їх «відкриття» воркером може спалити посилання чи виконати дію */
+  var PG_ONCE_URL=/[?&#](token|code|otp|key|sig|signature|auth|ticket|invite)=|confirm|verif|unsubscribe|magic|reset|activate|login|signin|oauth|callback/i;
+  function pgPvMark(bid,on){
+    var bt=editor.querySelector('[data-pglkpv="'+bid+'"]'); if(!bt) return;
+    bt.disabled=!!on;
+    if(on) bt.textContent='Підтягую…';
+    else { var lb=locate(bid); bt.textContent=lb&&lb.block.pvAt?'Оновити прев\'ю':'Підтягнути прев\'ю'; }
+  }
+  function pgShrinkData(src,max,cb){
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var w=img.naturalWidth,h=img.naturalHeight; if(!w||!h){cb('');return;}
+        var r=Math.min(1,max/w,max/h); w=Math.round(w*r); h=Math.round(h*r);
+        var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h); cb(cv.toDataURL('image/jpeg',0.75));
+      }catch(_){ cb(''); }
+    };
+    img.onerror=function(){ cb(''); };
+    img.src=src;
+  }
+  function pgPreview(bid,manual){
+    var loc=locate(bid); if(!loc||pgPvBusy[bid]) return;
+    var b=loc.block, u=b.url||'', go=safeHref(u);
+    if(!go||!/^https?:\/\//i.test(go)) return;
+    if(b.type==='attach'&&b.sub==='audio') return;
+    if(navigator.onLine===false){ if(manual) plToastSafe('Нема інтернету — спробуй пізніше'); return; }
+    pgPvBusy[bid]=1; pgPvMark(bid,true);
+    var tokP=typeof window.sbAccessToken==='function'?window.sbAccessToken():Promise.resolve('');
+    Promise.resolve(tokP).then(function(tok){
+      if(!tok){ if(manual) plToastSafe('Щоб підтягнути картинку поста, увійди в акаунт (Ще → Акаунт)'); return null; }
+      var ac=typeof AbortController==='function'?new AbortController():null;
+      var tm=setTimeout(function(){ try{ if(ac) ac.abort(); }catch(_){} },15000);
+      return fetch(PG_PREVIEW_EP+'/preview',{method:'POST',signal:ac?ac.signal:undefined,
+          headers:{'content-type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({url:go})})
+        .then(function(r){ return r.json().catch(function(){ return {}; }); })
+        .then(function(j){ clearTimeout(tm); return j||{}; },function(e){ clearTimeout(tm); throw e; });
+    }).then(function(j){
+      if(!j) return;
+      if(!j.ok){ if(manual) plToastSafe(typeof j.error==='string'?j.error.slice(0,140):'Сайт не віддав прев\'ю'); return; }
+      var l=locate(bid); if(!l||l.block.url!==u) return;   /* адресу вже змінили — це прев'ю не про неї */
+      var bb=l.block;
+      var title=typeof j.title==='string'?j.title.trim().slice(0,200):'', desc=typeof j.desc==='string'?j.desc.trim().slice(0,400):'';
+      if(title&&!String(bb.title||'').trim()) bb.title=title;
+      if(desc&&desc!==title) bb.desc=desc; else delete bb.desc;
+      bb.pvAt=Date.now();
+      /* YouTube має свою мініатюру з ▶ — обкладинкою її не закриваємо */
+      var img=(!pgYtId(u)&&typeof j.image==='string'&&/^data:image\/(jpeg|png|webp|gif|avif);base64,[A-Za-z0-9+\/=]+$/i.test(j.image))?j.image:'';
+      if(img&&(!bb.cover||bb.coverAuto)){
+        save(); render();
+        pgShrinkData(img,900,function(d){
+          var l2=locate(bid); if(!d||!l2||l2.block.url!==u||(l2.block.cover&&!l2.block.coverAuto)) return;
+          l2.block.cover=d; l2.block.coverAuto=1; save(); render();
+        });
+        return;
+      }
+      if(manual&&!img&&!pgYtId(u)) plToastSafe(title||desc?'Картинки сайт не віддав — можна додати своє фото':'Сайт нічого не віддав — додай фото чи назву вручну');
+      save(); render();
+    }).catch(function(){ if(manual) plToastSafe('Не вдалося звʼязатися з сервером прев\'ю'); })
+    .then(function(){ delete pgPvBusy[bid]; pgPvMark(bid,false); });
+  }
   /* field: куди класти знімок — 'data' (блок «Фото», типово) або 'cover' (обкладинка картки посилання) */
   function pgPickPhoto(bid,onDone,field){
     var inp=document.createElement('input');
@@ -361,7 +434,7 @@
           var cv=document.createElement('canvas'); cv.width=w2; cv.height=h2;
           cv.getContext('2d').drawImage(img,0,0,w2,h2);
           var loc=locate(bid); if(!loc)return;
-          if(field==='cover'){ loc.block.cover=cv.toDataURL('image/jpeg',0.72); }
+          if(field==='cover'){ loc.block.cover=cv.toDataURL('image/jpeg',0.72); delete loc.block.coverAuto; }   /* своє фото важливіше за автоматичне */
           else { loc.block.data=cv.toDataURL('image/jpeg',0.72); loc.block.pos=null; }
           save(); render();
           if(onDone) onDone();

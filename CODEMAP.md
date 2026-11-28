@@ -14,10 +14,10 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 105 |
-| Рядків JS | 41691 |
+| Рядків JS | 41720 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12832 |
-| Сутностей верхнього рівня | 3265 |
+| Рядків CSS | 12844 |
+| Сутностей верхнього рівня | 3267 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
 ## Файли JS
@@ -40,7 +40,7 @@
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 454 | 63 |
 | `src/scripts/core/05-spaces.js` | 709 | 58 |
-| `src/scripts/core/06-wishes.js` | 1613 | 122 |
+| `src/scripts/core/06-wishes.js` | 1642 | 124 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 655 | 84 |
 | `src/scripts/core/09-goals.js` | 744 | 31 |
@@ -152,7 +152,7 @@
 | `src/styles/core/02-page-editor.css` | 1424 | 9 |
 | `src/styles/core/03-folders-projects.css` | 706 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
-| `src/styles/core/05-values-wishes.css` | 126 | 0 |
+| `src/styles/core/05-values-wishes.css` | 138 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
 | `src/styles/core/07-finance.css` | 596 | 0 |
 | `src/styles/core/08-work.css` | 263 | 0 |
@@ -679,7 +679,7 @@
 | `goWishes` | функція | `src/scripts/core/05-spaces.js:696` |
 | `window.goWishes` | значення | `src/scripts/core/05-spaces.js:700` |
 
-### `src/scripts/core/06-wishes.js` — 122 сутностей
+### `src/scripts/core/06-wishes.js` — 124 сутностей
 
 | Імʼя | Вид | Де |
 |---|---|---|
@@ -719,92 +719,94 @@
 | `replaceWishPhoto` | функція | `src/scripts/core/06-wishes.js:348` |
 | `askWishCap` | функція | `src/scripts/core/06-wishes.js:372` |
 | `openWishCard` | функція | `src/scripts/core/06-wishes.js:378` |
-| `pickProofPhoto` | функція | `src/scripts/core/06-wishes.js:452` |
-| `delWish` | функція | `src/scripts/core/06-wishes.js:459` |
-| `parseVideo` | функція | `src/scripts/core/06-wishes.js:474` |
-| `addWishVideo` | функція | `src/scripts/core/06-wishes.js:492` |
-| `setWishCover` | функція | `src/scripts/core/06-wishes.js:517` |
-| `openWishVideo` | функція | `src/scripts/core/06-wishes.js:534` |
-| `openWishMenu` | функція | `src/scripts/core/06-wishes.js:543` |
-| `moveWish` | функція | `src/scripts/core/06-wishes.js:572` |
-| `wishToGoal` | функція | `src/scripts/core/06-wishes.js:580` |
-| `RIT_KEY` | значення | `src/scripts/core/06-wishes.js:608` |
-| `RIT` | обʼєкт | `src/scripts/core/06-wishes.js:609` |
-| `RIT_STEPS_KEY` | значення | `src/scripts/core/06-wishes.js:613` |
-| `RIT_STEPS` | значення | `src/scripts/core/06-wishes.js:614` |
-| `loadRitual` | функція | `src/scripts/core/06-wishes.js:620` |
-| `saveRitual` | функція | `src/scripts/core/06-wishes.js:627` |
-| `saveRitSteps` | функція | `src/scripts/core/06-wishes.js:628` |
-| `__ritLoad` | значення | `src/scripts/core/06-wishes.js:629` |
-| `ritualRerender` | функція | `src/scripts/core/06-wishes.js:631` |
-| `ritualSheet` | функція | `src/scripts/core/06-wishes.js:640` |
-| `ritForWorld` | функція | `src/scripts/core/06-wishes.js:658` |
-| `ritForWorldM` | функція | `src/scripts/core/06-wishes.js:659` |
-| `ritDayForWorld` | функція | `src/scripts/core/06-wishes.js:668` |
-| `ritDayForWorldM` | функція | `src/scripts/core/06-wishes.js:669` |
-| `goRitual` | функція | `src/scripts/core/06-wishes.js:686` |
-| `ritCtx` | значення | `src/scripts/core/06-wishes.js:711` |
-| `ritWithCtx` | функція | `src/scripts/core/06-wishes.js:712` |
-| `ritDaysObj` | функція | `src/scripts/core/06-wishes.js:715` |
-| `ritDay` | функція | `src/scripts/core/06-wishes.js:720` |
-| `ritDs` | функція | `src/scripts/core/06-wishes.js:721` |
-| `ritStreak` | функція | `src/scripts/core/06-wishes.js:722` |
-| `ytId` | функція | `src/scripts/core/06-wishes.js:737` |
-| `fmtDur` | функція | `src/scripts/core/06-wishes.js:738` |
-| `ritRec` | значення | `src/scripts/core/06-wishes.js:741` |
-| `ritStopAll` | функція | `src/scripts/core/06-wishes.js:742` |
-| `ritRecord` | функція | `src/scripts/core/06-wishes.js:744` |
-| `ritPlay` | функція | `src/scripts/core/06-wishes.js:781` |
-| `ritMixPlay` | функція | `src/scripts/core/06-wishes.js:782` |
-| `ritFieldMic` | функція | `src/scripts/core/06-wishes.js:791` |
-| `ritMixMenu` | функція | `src/scripts/core/06-wishes.js:801` |
-| `ritAddLink` | функція | `src/scripts/core/06-wishes.js:809` |
-| `ritLinkMenu` | функція | `src/scripts/core/06-wishes.js:819` |
-| `RIT_CAT` | обʼєкт | `src/scripts/core/06-wishes.js:832` |
-| `RIT_TPL` | масив | `src/scripts/core/06-wishes.js:860` |
-| `ritEn` | функція | `src/scripts/core/06-wishes.js:875` |
-| `ritLoc` | функція | `src/scripts/core/06-wishes.js:876` |
-| `RIT_TY` | обʼєкт | `src/scripts/core/06-wishes.js:878` |
-| `ritCleanStep` | функція | `src/scripts/core/06-wishes.js:880` |
-| `RIT_MORNING_ONLY` | масив | `src/scripts/core/06-wishes.js:891` |
-| `ritSteps` | функція | `src/scripts/core/06-wishes.js:892` |
-| `RIT_OWN_IC` | обʼєкт | `src/scripts/core/06-wishes.js:898` |
-| `ritCat` | функція | `src/scripts/core/06-wishes.js:899` |
-| `ritMeta` | функція | `src/scripts/core/06-wishes.js:900` |
-| `ritAudioKey` | функція | `src/scripts/core/06-wishes.js:903` |
-| `ritStepDone` | функція | `src/scripts/core/06-wishes.js:904` |
-| `ritTouch` | функція | `src/scripts/core/06-wishes.js:911` |
-| `ritSaveToday` | функція | `src/scripts/core/06-wishes.js:912` |
-| `ritTplName` | функція | `src/scripts/core/06-wishes.js:917` |
-| `ritStepHTML` | функція | `src/scripts/core/06-wishes.js:924` |
-| `ritMixHTML` | функція | `src/scripts/core/06-wishes.js:949` |
-| `ritLinksHTML` | функція | `src/scripts/core/06-wishes.js:960` |
-| `ritualInnerHTML` | функція | `src/scripts/core/06-wishes.js:973` |
-| `ritualBind` | функція | `src/scripts/core/06-wishes.js:999` |
-| `ritEditor` | функція | `src/scripts/core/06-wishes.js:1065` |
-| `RPH_ICON` | значення | `src/scripts/core/06-wishes.js:1148` |
-| `ritPhotoCardHTML` | функція | `src/scripts/core/06-wishes.js:1149` |
-| `ritPhotoTap` | функція | `src/scripts/core/06-wishes.js:1163` |
-| `ritSavePhoto` | функція | `src/scripts/core/06-wishes.js:1179` |
-| `ritPhotoMenu` | функція | `src/scripts/core/06-wishes.js:1192` |
-| `rmomTimer` | значення | `src/scripts/core/06-wishes.js:1201` |
-| `ritEnterMoment` | функція | `src/scripts/core/06-wishes.js:1204` |
-| `ritMixRecTap` | функція | `src/scripts/core/06-wishes.js:1252` |
-| `ritMixLongOrRec` | функція | `src/scripts/core/06-wishes.js:1253` |
-| `CLG_KEY` | значення | `src/scripts/core/06-wishes.js:1261` |
-| `collage` | масив | `src/scripts/core/06-wishes.js:1262` |
-| `loadCollage` | функція | `src/scripts/core/06-wishes.js:1264` |
-| `saveCollage` | функція | `src/scripts/core/06-wishes.js:1266` |
-| `goCollage` | функція | `src/scripts/core/06-wishes.js:1269` |
-| `clgPickPhotos` | функція | `src/scripts/core/06-wishes.js:1272` |
-| `clgImportWishes` | функція | `src/scripts/core/06-wishes.js:1287` |
-| `clgMenu` | функція | `src/scripts/core/06-wishes.js:1298` |
-| `renderCollage` | функція | `src/scripts/core/06-wishes.js:1311` |
-| `clgWrap` | функція | `src/scripts/core/06-wishes.js:1368` |
-| `clgWallpaper` | функція | `src/scripts/core/06-wishes.js:1374` |
-| `wishDateInfo` | функція | `src/scripts/core/06-wishes.js:1448` |
-| `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1467` |
-| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1543` |
+| `WISH_WOOP` | масив | `src/scripts/core/06-wishes.js:465` |
+| `wishWoopHTML` | функція | `src/scripts/core/06-wishes.js:470` |
+| `pickProofPhoto` | функція | `src/scripts/core/06-wishes.js:481` |
+| `delWish` | функція | `src/scripts/core/06-wishes.js:488` |
+| `parseVideo` | функція | `src/scripts/core/06-wishes.js:503` |
+| `addWishVideo` | функція | `src/scripts/core/06-wishes.js:521` |
+| `setWishCover` | функція | `src/scripts/core/06-wishes.js:546` |
+| `openWishVideo` | функція | `src/scripts/core/06-wishes.js:563` |
+| `openWishMenu` | функція | `src/scripts/core/06-wishes.js:572` |
+| `moveWish` | функція | `src/scripts/core/06-wishes.js:601` |
+| `wishToGoal` | функція | `src/scripts/core/06-wishes.js:609` |
+| `RIT_KEY` | значення | `src/scripts/core/06-wishes.js:637` |
+| `RIT` | обʼєкт | `src/scripts/core/06-wishes.js:638` |
+| `RIT_STEPS_KEY` | значення | `src/scripts/core/06-wishes.js:642` |
+| `RIT_STEPS` | значення | `src/scripts/core/06-wishes.js:643` |
+| `loadRitual` | функція | `src/scripts/core/06-wishes.js:649` |
+| `saveRitual` | функція | `src/scripts/core/06-wishes.js:656` |
+| `saveRitSteps` | функція | `src/scripts/core/06-wishes.js:657` |
+| `__ritLoad` | значення | `src/scripts/core/06-wishes.js:658` |
+| `ritualRerender` | функція | `src/scripts/core/06-wishes.js:660` |
+| `ritualSheet` | функція | `src/scripts/core/06-wishes.js:669` |
+| `ritForWorld` | функція | `src/scripts/core/06-wishes.js:687` |
+| `ritForWorldM` | функція | `src/scripts/core/06-wishes.js:688` |
+| `ritDayForWorld` | функція | `src/scripts/core/06-wishes.js:697` |
+| `ritDayForWorldM` | функція | `src/scripts/core/06-wishes.js:698` |
+| `goRitual` | функція | `src/scripts/core/06-wishes.js:715` |
+| `ritCtx` | значення | `src/scripts/core/06-wishes.js:740` |
+| `ritWithCtx` | функція | `src/scripts/core/06-wishes.js:741` |
+| `ritDaysObj` | функція | `src/scripts/core/06-wishes.js:744` |
+| `ritDay` | функція | `src/scripts/core/06-wishes.js:749` |
+| `ritDs` | функція | `src/scripts/core/06-wishes.js:750` |
+| `ritStreak` | функція | `src/scripts/core/06-wishes.js:751` |
+| `ytId` | функція | `src/scripts/core/06-wishes.js:766` |
+| `fmtDur` | функція | `src/scripts/core/06-wishes.js:767` |
+| `ritRec` | значення | `src/scripts/core/06-wishes.js:770` |
+| `ritStopAll` | функція | `src/scripts/core/06-wishes.js:771` |
+| `ritRecord` | функція | `src/scripts/core/06-wishes.js:773` |
+| `ritPlay` | функція | `src/scripts/core/06-wishes.js:810` |
+| `ritMixPlay` | функція | `src/scripts/core/06-wishes.js:811` |
+| `ritFieldMic` | функція | `src/scripts/core/06-wishes.js:820` |
+| `ritMixMenu` | функція | `src/scripts/core/06-wishes.js:830` |
+| `ritAddLink` | функція | `src/scripts/core/06-wishes.js:838` |
+| `ritLinkMenu` | функція | `src/scripts/core/06-wishes.js:848` |
+| `RIT_CAT` | обʼєкт | `src/scripts/core/06-wishes.js:861` |
+| `RIT_TPL` | масив | `src/scripts/core/06-wishes.js:889` |
+| `ritEn` | функція | `src/scripts/core/06-wishes.js:904` |
+| `ritLoc` | функція | `src/scripts/core/06-wishes.js:905` |
+| `RIT_TY` | обʼєкт | `src/scripts/core/06-wishes.js:907` |
+| `ritCleanStep` | функція | `src/scripts/core/06-wishes.js:909` |
+| `RIT_MORNING_ONLY` | масив | `src/scripts/core/06-wishes.js:920` |
+| `ritSteps` | функція | `src/scripts/core/06-wishes.js:921` |
+| `RIT_OWN_IC` | обʼєкт | `src/scripts/core/06-wishes.js:927` |
+| `ritCat` | функція | `src/scripts/core/06-wishes.js:928` |
+| `ritMeta` | функція | `src/scripts/core/06-wishes.js:929` |
+| `ritAudioKey` | функція | `src/scripts/core/06-wishes.js:932` |
+| `ritStepDone` | функція | `src/scripts/core/06-wishes.js:933` |
+| `ritTouch` | функція | `src/scripts/core/06-wishes.js:940` |
+| `ritSaveToday` | функція | `src/scripts/core/06-wishes.js:941` |
+| `ritTplName` | функція | `src/scripts/core/06-wishes.js:946` |
+| `ritStepHTML` | функція | `src/scripts/core/06-wishes.js:953` |
+| `ritMixHTML` | функція | `src/scripts/core/06-wishes.js:978` |
+| `ritLinksHTML` | функція | `src/scripts/core/06-wishes.js:989` |
+| `ritualInnerHTML` | функція | `src/scripts/core/06-wishes.js:1002` |
+| `ritualBind` | функція | `src/scripts/core/06-wishes.js:1028` |
+| `ritEditor` | функція | `src/scripts/core/06-wishes.js:1094` |
+| `RPH_ICON` | значення | `src/scripts/core/06-wishes.js:1177` |
+| `ritPhotoCardHTML` | функція | `src/scripts/core/06-wishes.js:1178` |
+| `ritPhotoTap` | функція | `src/scripts/core/06-wishes.js:1192` |
+| `ritSavePhoto` | функція | `src/scripts/core/06-wishes.js:1208` |
+| `ritPhotoMenu` | функція | `src/scripts/core/06-wishes.js:1221` |
+| `rmomTimer` | значення | `src/scripts/core/06-wishes.js:1230` |
+| `ritEnterMoment` | функція | `src/scripts/core/06-wishes.js:1233` |
+| `ritMixRecTap` | функція | `src/scripts/core/06-wishes.js:1281` |
+| `ritMixLongOrRec` | функція | `src/scripts/core/06-wishes.js:1282` |
+| `CLG_KEY` | значення | `src/scripts/core/06-wishes.js:1290` |
+| `collage` | масив | `src/scripts/core/06-wishes.js:1291` |
+| `loadCollage` | функція | `src/scripts/core/06-wishes.js:1293` |
+| `saveCollage` | функція | `src/scripts/core/06-wishes.js:1295` |
+| `goCollage` | функція | `src/scripts/core/06-wishes.js:1298` |
+| `clgPickPhotos` | функція | `src/scripts/core/06-wishes.js:1301` |
+| `clgImportWishes` | функція | `src/scripts/core/06-wishes.js:1316` |
+| `clgMenu` | функція | `src/scripts/core/06-wishes.js:1327` |
+| `renderCollage` | функція | `src/scripts/core/06-wishes.js:1340` |
+| `clgWrap` | функція | `src/scripts/core/06-wishes.js:1397` |
+| `clgWallpaper` | функція | `src/scripts/core/06-wishes.js:1403` |
+| `wishDateInfo` | функція | `src/scripts/core/06-wishes.js:1477` |
+| `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1496` |
+| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1572` |
 
 ### `src/scripts/core/07-values.js` — 4 сутностей
 
