@@ -566,7 +566,8 @@
   /* ===== folder actions ===== */
   // in-app input modal (replaces blocked prompt)
   function inputModal(opts){
-    // opts: {title, value, placeholder, emoji (bool), onOk(val, emojiVal)}
+    // opts: {title, value, placeholder, emoji (bool), pick, onOk(val, emojiVal, pickVal)}
+    // pick (28.11.2026, розмір кроку): {label, value, items:[{v,label}]} — ряд фішок «одне з кількох» під полем
     const o=opts||{};
     const ov=document.createElement('div'); ov.className='imodal';
     ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');   // шторка модальна для VoiceOver
@@ -576,11 +577,16 @@
         <input class="im-emoji" maxlength="16" value="${escAttr(o.emojiVal||'')}" placeholder="${escAttr(o.emojiPh||'напр. 💰')}" aria-label="Емодзі">
         <button type="button" class="im-noemoji">Без емодзі</button>
       </div>${Array.isArray(o.emojiPicks)&&o.emojiPicks.length?`<div class="im-picks" role="group" aria-label="Готові емодзі">${o.emojiPicks.map(e=>`<button type="button" data-impick="${escAttr(e)}">${esc(e)}</button>`).join('')}</div>`:''}` : '';
+    const pk=o.pick&&Array.isArray(o.pick.items)&&o.pick.items.length?o.pick:null;
+    let pickVal=pk?String(pk.value!=null?pk.value:pk.items[0].v):undefined;
+    const pickRow = pk ? `
+      <div class="im-label">${esc(pk.label||'')}</div>
+      <div class="im-seg" role="radiogroup" aria-label="${escAttr(pk.label||'')}">${pk.items.map(it=>`<button type="button" role="radio" data-imseg="${escAttr(it.v)}" aria-checked="${String(it.v)===pickVal}"${String(it.v)===pickVal?' class="on"':''}>${esc(it.label)}</button>`).join('')}</div>` : '';
     ov.innerHTML=`<div class="im-in">
       <div class="im-grip"></div>
       <div class="im-title">${esc(o.title||'Назва')}</div>
       <input class="im-input" value="${escAttr(o.value||'')}" placeholder="${escAttr(o.placeholder||'Введи назву')}">
-      ${emojiRow}
+      ${pickRow}${emojiRow}
       <div class="im-btns">
         <button type="button" class="im-cancel">Скасувати</button>
         <button type="button" class="im-ok">Готово</button>
@@ -597,10 +603,12 @@
       // поле могло прийти з 📁 — фокус виділяє, тож введене ЗАМІНЮЄ, а не дописується поруч (було «🇬📁»)
       emo.onfocus=()=>{ try{ emo.select(); }catch(_){} };
       ov.querySelectorAll('[data-impick]').forEach(b=>b.onclick=()=>{ emo.value=b.dataset.impick; ov.querySelectorAll('[data-impick]').forEach(x=>x.classList.toggle('on',x===b)); }); }
+    if(pk) ov.querySelectorAll('[data-imseg]').forEach(btn=>btn.onclick=()=>{ pickVal=btn.dataset.imseg;
+      ov.querySelectorAll('[data-imseg]').forEach(x=>{ const on=x===btn; x.classList.toggle('on',on); x.setAttribute('aria-checked',String(on)); }); });
     // один символ, як його бачить людина: прапорець 🇬🇧 — це 4 «літери» JS, але один знак (раніше maxlength=4 різав його)
     const oneEmoji=s=>{ s=String(s||'').trim(); if(!s) return '';
       try{ const it=new Intl.Segmenter('uk',{granularity:'grapheme'}).segment(s)[Symbol.iterator]().next(); return it.done?'':it.value.segment; }catch(_){ return [...s].slice(0,2).join(''); } };
-    const ok=()=>{ const v=inp.value.trim(); const ev=o.emoji?oneEmoji(emo.value):undefined; close(); if(o.onOk) o.onOk(v, ev); };
+    const ok=()=>{ const v=inp.value.trim(); const ev=o.emoji?oneEmoji(emo.value):undefined; close(); if(o.onOk) o.onOk(v, ev, pickVal); };
     ov.querySelector('.im-ok').onclick=ok;
     inp.onkeydown=e=>{ if(e.key==='Enter') ok(); };
   }

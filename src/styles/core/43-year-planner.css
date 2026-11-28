@@ -498,3 +498,14 @@
     body.in-yplan .jn-ov .jn-ed{border-radius:20px;}
   }
   @media (min-width:1024px){ .ypp-c1 .ypp-behind{flex-direction:column;align-items:stretch;} .ypp-c1 .ypp-behind button{justify-content:center;} }
+
+  /* розмір кроку S/L (28.11.2026): маленька мітка після назви; M не показуємо */
+  .yp-sz{display:inline-block;margin-left:6px;padding:0 5px;border-radius:5px;font-size:10.5px;font-weight:800;line-height:16px;vertical-align:1px;
+    color:var(--muted);border:1px solid var(--line);text-decoration:none;}
+  .pn-meta .yp-sz{margin-left:0;align-self:center;}
+  .yp-szsum{color:var(--text);}
+  .yp-szic{font-size:15px;font-weight:800;line-height:1;color:var(--text);}
+  /* розмір кроку в шторці пакета Флоу — тап міняє S → M → L */
+  .yp-bsz{all:unset;box-sizing:border-box;flex:none;min-width:44px;min-height:44px;display:grid;place-items:center;cursor:pointer;
+    font-size:13px;font-weight:800;color:var(--accent);border-radius:10px;border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line));}
+  .yp-bsz:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
