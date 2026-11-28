@@ -117,6 +117,8 @@
     const fr=it.from?`<span class="pn-from">${esc(pnT('from'))} ${esc(pnShort(it.from))}</span>`:'';
     // чіп цілі (66-year-planner.js, етап 9): справа з goalId або блок з link.goalId
     let gch=''; try{ gch=typeof ypGoalChip==='function'?ypGoalChip(ypItemGoalId(it)):''; }catch(_){}
+    // розмір кроку S/L біля чіпа цілі (66-year-planner.js, 28.11.2026) — лише справи-кроки цілей
+    try{ if(gch&&it.kind!=='b'&&it.ref.goalId&&typeof ypSzTag==='function') gch+=ypSzTag(it.ref); }catch(_){}
     const ch=gch+pnChip(it); return (ch||tm||fr)?`<span class="pn-meta">${ch}${tm}${fr}</span>`:'';
   }
   function pnRow(it,big){
@@ -305,6 +307,7 @@
     else {
       if(!it.done) items.push({ic:PN_ICO.cal,label:pnT('move'),sub:pnTaskDate(it.ref)?pnShort(pnTaskDate(it.ref)):pnT('today'),onClick:()=>{
         try{ dyDayPicker(pnT('moveQ'),it.t,ds,pnTaskDate(it.ref)||pnToday(),target=>{ it.ref.date=target; pnSave(); pnRender(); try{ plToast('📅 '+pnShort(target)); }catch(_){} }); }catch(e){ console.error('pnMove',e); } }});
+      if(it.ref.goalId&&typeof ypSizeSheet==='function') items.push({ic:`<b class="yp-szic">${ypSz(it.ref).toUpperCase()}</b>`,label:(typeof ypT==='function'?ypT('Розмір','Size'):'Розмір'),sub:ypSzLabel(ypSz(it.ref)),onClick:()=>ypSizeSheet(it.ref,pnRender)});
       if(!it.done) items.push({ic:PN_ICO.clock,label:pnT('toHour'),onClick:()=>{ dyTaskToDay(it.id,ds);
         const b=plBlocksFor(ds).find(x=>x&&String(x.fromTask)===it.id); if(b){ if(it.ref.folder) b.folder=it.ref.folder; if(it.ref.star) b.star=true; if(it.ref.q) b.q=it.ref.q; pnSave(); } pnRender(); }});
       items.push({ic:PN_ICO.trash,label:pnT('del'),danger:true,onClick:()=>{ const p=plData(); p.tasks=(p.tasks||[]).filter(x=>!(x&&String(x.id)===it.id)); pnSave(); pnRender(); try{ plToast(pnT('deleted')); }catch(_){} }});

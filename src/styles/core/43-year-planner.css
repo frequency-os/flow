@@ -498,3 +498,10 @@
     body.in-yplan .jn-ov .jn-ed{border-radius:20px;}
   }
   @media (min-width:1024px){ .ypp-c1 .ypp-behind{flex-direction:column;align-items:stretch;} .ypp-c1 .ypp-behind button{justify-content:center;} }
+
+  /* розмір кроку S/L (28.11.2026): маленька мітка після назви; M не показуємо */
+  .yp-sz{display:inline-block;margin-left:6px;padding:0 5px;border-radius:5px;font-size:10.5px;font-weight:800;line-height:16px;vertical-align:1px;
+    color:var(--muted);border:1px solid var(--line);text-decoration:none;}
+  .pn-meta .yp-sz{margin-left:0;align-self:center;}
+  .yp-szsum{color:var(--text);}
+  .yp-szic{font-size:15px;font-weight:800;line-height:1;color:var(--text);}

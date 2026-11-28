@@ -183,29 +183,53 @@
   function ypWeekHTML(g){
     const L=ypWeekTasks(g), mon=ypWeekMon(), done=L.filter(t=>t.done).length;
     const rows=L.map(t=>`<button class="yp-lv${t.done?' ok':''}" data-ypt="${esc(t.id)}" aria-pressed="${!!t.done}">
-        <i aria-hidden="true"></i><span>${esc(t.t||'')}</span><small>${t.date<mon?ypT('з минулого','overdue'):(t.date>ypAddDays(mon,6)?ypT('наст. ','next ')+esc(ypDow(t.date)):esc(ypDow(t.date)))}</small></button>`).join('');
-    return `<div class="yp-week"><div class="yp-wh"><b>${ypT('Цей тиждень','This week')}</b><span>${L.length?done+ypT(' з ',' of ')+L.length:''}</span></div>
+        <i aria-hidden="true"></i><span>${esc(t.t||'')}${ypSzTag(t)}</span><small>${t.date<mon?ypT('з минулого','overdue'):(t.date>ypAddDays(mon,6)?ypT('наст. ','next ')+esc(ypDow(t.date)):esc(ypDow(t.date)))}</small></button>`).join('');
+    return `<div class="yp-week"><div class="yp-wh"><b>${ypT('Цей тиждень','This week')}</b><span>${L.length?done+ypT(' з ',' of ')+L.length:''}${ypSzSumTxt(L)}</span></div>
       ${rows||`<p class="yp-none">${ypT('Кроків на тиждень ще нема — вони стануть справами в «Плані».','No steps this week yet — they become tasks in Plan.')}</p>`}
       <button class="yp-add in" data-ypweek>＋ ${ypWeekend()?ypT('Крок на тиждень','Step for the week'):ypT('Крок на цей тиждень','Step for this week')}</button></div>`;
   }
   function ypAddWeekStep(g,rer){
-    inputModal({ title:ypT('Крок на цей тиждень','Step for this week'), placeholder:ypT('Напр. Відкласти ₴ 2 000','E.g. Put aside 50'), onOk:v=>{
+    inputModal({ title:ypT('Крок на цей тиждень','Step for this week'), placeholder:ypT('Напр. Відкласти ₴ 2 000','E.g. Put aside 50'), pick:ypSzPick(), onOk:(v,_e,sz)=>{
       v=String(v||'').trim().slice(0,200); if(!v) return;
       const td=ymdLocal(), sun=ypWeekEnd(), days=[];   // у вихідні — і дні наступного тижня
       for(let ds=td; ds<=sun; ds=ypAddDays(ds,1)) days.push(ds);
       actionSheet({ title:ypT('Коли?','When?'), sub:v, items:days.map((ds,i)=>({ ic:'calendar',
         label:i===0?ypT('Сьогодні','Today'):i===1?ypT('Завтра','Tomorrow'):(ds>ypAddDays(ypWeekMon(),6)?ypT('наст. ','next '):'')+ypDow(ds)+', '+(+ds.slice(8)),
-        onClick:()=>ypPushTask(g,v,ds,rer) })) });
+        onClick:()=>ypPushTask(g,v,ds,rer,sz) })) });
     }});
   }
   // goals_data ще не прочитано (старт без мережі) — не пишемо, як «Забіг» (56-run.js rnReady)
   function ypReady(){ try{ return typeof window.storeKeyReady!=='function'||window.storeKeyReady('goals_data')===true; }catch(_){ return false; } }
   function ypNotReady(){ try{ plToast(ypT('Ще завантажуються цілі — спробуй за мить','Goals are still loading — try again in a moment')); }catch(_){} }
-  function ypPushTask(g,v,ds,rer){
+  /* ── Розмір кроку S/M/L (28.11.2026) ── поле справи sz: 's' | 'l'; нема поля = M (старі кроки — M без міграції).
+     Хвилини — для суми тижня; далі на них стане «Скільки влазить» (профіль ресурсів). */
+  const YP_SZ={ s:{min:15,uk:'S · 15 хв',en:'S · 15 min'}, m:{min:60,uk:'M · 1 год',en:'M · 1 h'}, l:{min:180,uk:'L · 3 год',en:'L · 3 h'} };
+  function ypSz(t){ return t&&(t.sz==='s'||t.sz==='l')?t.sz:'m'; }
+  function ypSzLabel(k){ const z=YP_SZ[k]||YP_SZ.m; return mrEn()?z.en:z.uk; }
+  function ypSetSz(t,sz){ if(!t) return; if(sz==='s'||sz==='l') t.sz=sz; else delete t.sz; }
+  // мітка біля назви: лише S і L — M звичайний, щоб не шуміло
+  function ypSzTag(t){ const k=ypSz(t); return k==='m'?'':`<b class="yp-sz" title="${esc(ypSzLabel(k))}">${k.toUpperCase()}</b>`; }
+  function ypSzPick(){ return { label:ypT('Скільки це займе?','How long will it take?'), value:'m', items:['s','m','l'].map(k=>({v:k,label:ypSzLabel(k)})) }; }
+  // «~5 год» / «~45 хв» — сума незроблених кроків; 0 → ''
+  function ypSzSum(list){
+    const min=(list||[]).filter(t=>t&&!t.done).reduce((a,t)=>a+YP_SZ[ypSz(t)].min,0); if(!min) return '';
+    if(min<60) return '~'+min+ypT(' хв',' min');
+    const h=Math.round(min/30)/2, hs=mrEn()?String(h):String(h).replace('.',',');
+    return '~'+hs+ypT(' год',' h');
+  }
+  function ypSzSumTxt(list){ const x=ypSzSum(list); return x?` · <span class="yp-szsum" title="${esc(ypT('Скільки часу забере незроблене: S 15 хв, M 1 год, L 3 год','Time the undone steps need: S 15 min, M 1 h, L 3 h'))}">${esc(x)}</span>`:''; }
+  // змінити розмір наявної справи (меню справи в «Плані», 65-plan.js)
+  function ypSizeSheet(t,rer){
+    if(!t) return;
+    actionSheet({ title:ypT('Розмір кроку','Step size'), sub:String(t.t||'').slice(0,80), items:['s','m','l'].map(k=>({ ic:`<b class="yp-szic">${k.toUpperCase()}</b>`,
+      label:ypSzLabel(k)+(ypSz(t)===k?' ✓':''), onClick:()=>{ if(!ypReady()){ ypNotReady(); return; } ypSetSz(t,k); saveGoals(); (typeof rer==='function'?rer:ypRender)(); } })) });
+  }
+  function ypPushTask(g,v,ds,rer,sz){
     if(!ypReady()){ ypNotReady(); return; }
     const cur=jnGoalById(g.id); if(!cur) return;   // ціль могли прибрати, поки відкрита шторка
     const t={ id:'t_'+Date.now()+'_'+Math.random().toString(36).slice(2,5), scope:'day', t:v, date:ds, c:'val', p:2, tag:'',
       done:false, open:false, subs:[], goalId:String(cur.id) };
+    ypSetSz(t,sz);
     if(moOwnFolder(cur.folderKey)) t.folder=cur.folderKey;   // у «Плані» справа покаже папку цілі
     plData().tasks.push(t); saveGoals(); (typeof rer==='function'?rer:ypRender)();
     try{ plToast(ypT('＋ крок у «Плані»','＋ step in Plan')); }catch(_){}
@@ -765,8 +789,8 @@
     rows.sort((a,b)=>String(a.t.date).localeCompare(String(b.t.date)));
     const mon=ypWeekMon(), done=rows.filter(x=>x.t.done).length;
     const r=rows.map(({g,t})=>`<button class="yp-lv${t.done?' ok':''}" data-ypt="${esc(t.id)}" aria-pressed="${!!t.done}" style="--c:${safeColor(g.color,'#5b8def')}">
-        <i aria-hidden="true"></i><span>${esc(t.t||'')}<em>${esc(String(g.name||''))}</em></span><small>${t.date<mon?ypT('з минулого','overdue'):(t.date>ypAddDays(mon,6)?ypT('наст. ','next ')+esc(ypDow(t.date)):esc(ypDow(t.date)))}</small></button>`).join('');
-    return `<div class="yp-week yw-week"><div class="yp-wh"><b>${ypT('Цей тиждень — усі цілі','This week — all goals')}</b><span>${rows.length?done+ypT(' з ',' of ')+rows.length:''}</span></div>
+        <i aria-hidden="true"></i><span>${esc(t.t||'')}${ypSzTag(t)}<em>${esc(String(g.name||''))}</em></span><small>${t.date<mon?ypT('з минулого','overdue'):(t.date>ypAddDays(mon,6)?ypT('наст. ','next ')+esc(ypDow(t.date)):esc(ypDow(t.date)))}</small></button>`).join('');
+    return `<div class="yp-week yw-week"><div class="yp-wh"><b>${ypT('Цей тиждень — усі цілі','This week — all goals')}</b><span>${rows.length?done+ypT(' з ',' of ')+rows.length:''}${ypSzSumTxt(rows.map(x=>x.t))}</span></div>
       ${r||`<p class="yp-none">${ypT('Кроків на тиждень ще нема. Відкрий ціль і додай крок — або попроси Флоу.','No steps this week yet. Open a goal and add one, or ask Flow.')}</p>`}</div>`;
   }
   function ypWallMoney(){
@@ -865,7 +889,7 @@
     const r=L.map(t=>{ const g=jnGoalById(t.goalId), ph=g?jnMissionPhoto(g):'';
       return `<button class="yp-lv ypp-t${t.done?' ok':''}" data-ypt="${esc(t.id)}" aria-pressed="${!!t.done}">
         <i aria-hidden="true"></i>${ph?`<img src="${esc(ph)}" alt="" style="${g?jnMissionFocus(g,'obj'):''}">`:''}
-        <span>${esc(t.t||'')}<em>${esc(g?String(g.name||''):'')}${t.date<td?' · '+ypT('з минулого','overdue'):''}</em></span></button>`; }).join('');
+        <span>${esc(t.t||'')}${ypSzTag(t)}<em>${esc(g?String(g.name||''):'')}${t.date<td?' · '+ypT('з минулого','overdue'):''}</em></span></button>`; }).join('');
     return `<section class="ypp-card ypp-today"><div class="yp-wh"><b>${ypT('Сьогодні для цілей','Today for your goals')}</b><span>${L.length?done+ypT(' з ',' of ')+L.length:''}</span></div>
       ${r||`<p class="yp-none">${ypT('На сьогодні кроків нема. Один маленький крок — і ціль ближче.','No steps for today. One small step brings a goal closer.')}</p>`}
       <button class="yp-add in" data-yptoday>＋ ${ypT('Крок на сьогодні','Step for today')}</button></section>`;
@@ -964,11 +988,11 @@
   }
   // «＋ Крок на сьогодні»: текст → яка ціль → звичайна справа «Плану» на сьогодні з goalId (ypPushTask)
   function ypAddTodayStep(goals, anchor){
-    inputModal({ title:ypT('Крок на сьогодні','Step for today'), placeholder:ypT('Напр. Подзвонити в банк','E.g. Call the bank'), onOk:v=>{
+    inputModal({ title:ypT('Крок на сьогодні','Step for today'), placeholder:ypT('Напр. Подзвонити в банк','E.g. Call the bank'), pick:ypSzPick(), onOk:(v,_e,sz)=>{
       v=String(v||'').trim().slice(0,200); if(!v) return;
       const act=goals.filter(g=>ypPct(g)<100);
-      if(act.length===1){ ypPushTask(act[0],v,ymdLocal(),ypRender); return; }
-      ypMenu(anchor, ypT('Для якої цілі?','For which goal?'), act.map(g=>({ label:String(g.name||''), onClick:()=>ypPushTask(g,v,ymdLocal(),ypRender) })), v);
+      if(act.length===1){ ypPushTask(act[0],v,ymdLocal(),ypRender,sz); return; }
+      ypMenu(anchor, ypT('Для якої цілі?','For which goal?'), act.map(g=>({ label:String(g.name||''), onClick:()=>ypPushTask(g,v,ymdLocal(),ypRender,sz) })), v);
     }});
   }
   // «✦ Наздогнати разом» — одне ВПИСАНЕ питання про всі цілі позаду; зміни — лише шторкою year_plan
