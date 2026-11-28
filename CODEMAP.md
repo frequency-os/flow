@@ -14,9 +14,9 @@
 | Метрика | Значення |
 |---|---|
 | Файлів JS | 105 |
-| Рядків JS | 41720 |
+| Рядків JS | 41721 |
 | Файлів CSS | 52 |
-| Рядків CSS | 12844 |
+| Рядків CSS | 12847 |
 | Сутностей верхнього рівня | 3267 |
 | Ключів сховища (FLOW_KEYS) | 84 |
 
@@ -40,7 +40,7 @@
 | `src/scripts/core/03-platform.js` | 61 | 14 |
 | `src/scripts/core/04-folders-nav.js` | 454 | 63 |
 | `src/scripts/core/05-spaces.js` | 709 | 58 |
-| `src/scripts/core/06-wishes.js` | 1642 | 124 |
+| `src/scripts/core/06-wishes.js` | 1643 | 124 |
 | `src/scripts/core/07-values.js` | 21 | 4 |
 | `src/scripts/core/08-finance.js` | 655 | 84 |
 | `src/scripts/core/09-goals.js` | 744 | 31 |
@@ -152,7 +152,7 @@
 | `src/styles/core/02-page-editor.css` | 1424 | 9 |
 | `src/styles/core/03-folders-projects.css` | 706 | 0 |
 | `src/styles/core/04-menus.css` | 89 | 0 |
-| `src/styles/core/05-values-wishes.css` | 138 | 0 |
+| `src/styles/core/05-values-wishes.css` | 141 | 0 |
 | `src/styles/core/06-goals.css` | 206 | 0 |
 | `src/styles/core/07-finance.css` | 596 | 0 |
 | `src/styles/core/08-work.css` | 263 | 0 |
@@ -806,7 +806,7 @@
 | `clgWallpaper` | функція | `src/scripts/core/06-wishes.js:1403` |
 | `wishDateInfo` | функція | `src/scripts/core/06-wishes.js:1477` |
 | `renderWishDeck` | функція | `src/scripts/core/06-wishes.js:1496` |
-| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1572` |
+| `renderWishes` | функція | `src/scripts/core/06-wishes.js:1573` |
 
 ### `src/scripts/core/07-values.js` — 4 сутностей
 

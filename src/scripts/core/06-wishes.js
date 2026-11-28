@@ -412,6 +412,7 @@
           <div class="wcard-fl">📝 Чому я цього хочу</div>
           <div class="wcard-desc ${w.desc?'':'empty'}" data-wcdesc="1">${w.desc?esc(w.desc):'Тап, щоб описати — навіщо тобі це…'}</div>
         </div>
+        ${wishWoopHTML(w)}
         <div class="wcard-field">
           <div class="wcard-fl">✅ Кроки до мрії${linkedGoal?' <span class="wcard-link">· з цілі</span>':''}</div>
           <div class="wcard-list">${stepsHtml}</div>
@@ -431,6 +432,15 @@
     ov.querySelector('[data-wcx]').onclick=close;
     // опис
     ov.querySelector('[data-wcdesc]').onclick=()=>inputModal({title:'Чому я цього хочу', value:w.desc||'', placeholder:'Що це для тебе значить…', onOk:(v)=>{ w.desc=v; saveWishes(); rerender(); }});
+    // мрія + перешкода + план (WOOP) — кожне поле окремо, пишемо лише після «OK»
+    ov.querySelectorAll('[data-wcwoop]').forEach(el=>el.onclick=()=>{
+      const k=el.dataset.wcwoop, f=WISH_WOOP.find(x=>x[0]===k); if(!f) return;
+      const en=ritEn(), cur=(w.woop&&typeof w.woop[k]==='string')?w.woop[k]:'';
+      inputModal({title:en?f[2]:f[1], value:cur, placeholder:en?f[4]:f[3], onOk:(v)=>{
+        if(v===null||v===undefined) return;
+        w.woop=Object.assign({}, (w.woop&&typeof w.woop==='object')?w.woop:{}, {[k]:String(v).trim().slice(0,300)});
+        saveWishes(); rerender(); }});
+    });
     // дата-ціль
     ov.querySelector('[data-wcdate]').onclick=()=>inputModal({title:'Дата-ціль', value:w.targetDate||'', placeholder:'Напр. Літо 2027', onOk:(v)=>{ w.targetDate=v; saveWishes(); rerender(); }});
     // кроки (тільки якщо власні, без зв'язаної цілі)
@@ -448,6 +458,25 @@
     // зробити ціллю / відкрити ціль
     const mg=ov.querySelector('[data-wcmakegoal]'); if(mg) mg.onclick=()=>{ close(); wishToGoal(id); };
     const og=ov.querySelector('[data-wcopengoal]'); if(og) og.onclick=()=>{ close(); goalsData.tab='goals'; saveGoals(); goGoals(); };
+  }
+  /* ── В1 «Мрія + перешкода» (метод WOOP, Gabriele Oettingen; 28.11.2026) ──
+     Сама приємна мрія знижує зусилля; мрія + перешкода в собі + план «якщо — то» — підвищує.
+     Дані — w.woop={res, obs, plan}: необовʼязкові рядки, зʼявляються лише після дії людини. */
+  const WISH_WOOP=[ // ключ · назва uk · назва en · підказка uk · підказка en
+    ['res', 'Найкращий результат', 'Best outcome', 'Що найкраще станеться, коли мрія здійсниться? Як це відчувається?', 'What is the best thing that happens when it comes true? How does it feel?'],
+    ['obs', 'Перешкода в мені', 'Inner obstacle', 'Що в тобі самому може завадити? Звичка, страх, втома…', 'What in you could get in the way? A habit, a fear, tiredness…'],
+    ['plan','Якщо — то', 'If — then', 'Якщо [перешкода], то я [дія]', 'If [obstacle], then I will [action]']
+  ];
+  function wishWoopHTML(w){
+    const en=ritEn(), wo=(w&&w.woop&&typeof w.woop==='object')?w.woop:{};
+    const rows=WISH_WOOP.map(f=>{ const v=typeof wo[f[0]]==='string'?wo[f[0]]:'';
+      return `<button type="button" class="wc-woop ${f[0]==='plan'?'plan':''} ${v?'':'is-empty'}" data-wcwoop="${f[0]}">
+        <span class="wc-woop-k">${esc(en?f[2]:f[1])}</span>
+        <span class="wc-woop-v">${v?esc(v):esc(en?f[4]:f[3])}</span></button>`; }).join('');
+    return `<div class="wcard-field">
+      <div class="wcard-fl">🧭 ${en?'Dream + obstacle':'Мрія + перешкода'}</div>
+      <div class="wc-woop-sub">${en?'A dream with an obstacle and a plan works better than a dream alone.':'Мрія разом із перешкодою і планом працює краще, ніж сама мрія.'}</div>
+      <div class="wc-woop-list">${rows}</div></div>`;
   }
   function pickProofPhoto(id, cb){
     const w=wishes.find(x=>x.id===id); if(!w) return;
@@ -1494,6 +1523,7 @@
             ${gl?`<span class="wdk-chip goal">${esc(gl.name||'ціль')}</span>`:''}
           </div>
           ${cnt}
+          ${w.woop&&w.woop.plan?`<div class="wdk-plan"><span>${esc(w.woop.plan)}</span></div>`:''}
         </div>
       </div>`;
     }).join('');
