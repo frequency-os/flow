@@ -534,7 +534,9 @@
         +'type: goal (нова ціль, goal = назва) · quarter_step (віха: goal, t, ym РРРР-ММ у межах 12 місяців від поточного) · '
         +'week_step (справа в «Плані»: goal, t, ds РРРР-ММ-ДД від сьогодні до +31 дня) · money (лише СУМА-мета цілі: goal, sum; гроші НЕ переказує). '
         +'goal для кроків/сум — фрагмент назви наявної цілі або точна назва нової цілі з цього ж пакета. '
-        +'Неоднозначні назви повертаються тобі списком — уточни й виклич знову. Перед пакетом подивись цілі через get_data goals.',
+        +'Неоднозначні назви повертаються тобі списком — уточни й виклич знову. Перед пакетом подивись цілі через get_data goals. '
+        +'Кожному week_step став size: S (до ~15 хв: дзвінок, одна дія), M (~1 год), L (~3 год, пів дня); людина бачить і може змінити розмір у шторці. '
+        +'get_data goals показує, скільки годин кроків цілей уже на цьому тижні: якщо там понад ~8 год, пропонуй S-кроки або дати наступного тижня, а не нові L, і скажи про це в note.',
       input_schema:{ type:'object', properties:{
         note:{ type:'string', description:'одне речення для людини над списком: на чому тримається план' },
         items:{ type:'array', items:{ type:'object', properties:{
@@ -543,7 +545,8 @@
           t:{ type:'string', description:'текст кроку (quarter_step / week_step)' },
           ym:{ type:'string', description:'РРРР-ММ для quarter_step' },
           ds:{ type:'string', description:'РРРР-ММ-ДД для week_step' },
-          sum:{ type:'number', description:'сума-мета для money' }
+          sum:{ type:'number', description:'сума-мета для money' },
+          size:{ type:'string', enum:['S','M','L'], description:'розмір week_step: S≈15 хв, M≈1 год, L≈3 год; без поля — M' }
         }, required:['type','goal'] } }
       }, required:['items'] } },
     { name:'finance',
@@ -716,11 +719,13 @@
       return out.join('\n')||'порожньо';
     }
     if(inp.what==='goals'){
+      let wl=''; try{ wl=typeof ypAiWeekLoad==='function'?ypAiWeekLoad(false):''; }catch(_){}
       return ((goalsData.goals||[]).map(g=>{
         const st=g.steps||[], dn=st.filter(s=>s&&s.done).length;
         const nx=st.filter(s=>s&&!s.done).slice(0,3).map(s=>(s.name||s.t||s.text||'')).filter(Boolean);
         return (g.emoji||'🎯')+' '+g.name+' ('+dn+'/'+st.length+')'+(nx.length?' · далі: '+nx.join('; '):'')+aiMissionLine(g);
-      }).join('\n')+(ylAiCtx(true).length?'\n\nЛист і віхи по місяцях:\n'+ylAiCtx(true).join('\n'):''))||'цілей немає';
+      }).join('\n')+(ylAiCtx(true).length?'\n\nЛист і віхи по місяцях:\n'+ylAiCtx(true).join('\n'):'')
+        +(wl?'\n\n'+wl:''))||'цілей немає';
     }
     if((inp.what==='finance'||inp.what==='diary') && aiSectionOff(inp.what)) return aiSectionOffMsg(inp.what);
     if(inp.what==='finance') return aiFinCtx();
@@ -1812,6 +1817,7 @@
       // лист із точки Б замінив Точку Б (40-year-letter.js); без листа — як було
       if(!ylLetter().text.trim()) out.push('Точка Б: '+(((g.pointB||'').trim().slice(0,400))||'—'));
       ylAiCtx(false).forEach(l=>out.push(l));
+      try{ const wl=typeof ypAiWeekLoad==='function'?ypAiWeekLoad(true):''; if(wl) out.push(wl); }catch(_){}
     }
     if(want('fin')) out.push(aiSectionOff('finance') ? 'Фінанси: '+aiSectionOffMsg('finance') : 'Фінанси:\n'+aiFinCtx());
     // памʼять і резюме — тексти, які могли прийти з чужого вкладення: лише як цитата (SEC-9)

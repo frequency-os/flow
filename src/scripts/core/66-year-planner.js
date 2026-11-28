@@ -218,6 +218,21 @@
     return '~'+hs+ypT(' год',' h');
   }
   function ypSzSumTxt(list){ const x=ypSzSum(list); return x?` · <span class="yp-szsum" title="${esc(ypT('Скільки часу забере незроблене: S 15 хв, M 1 год, L 3 год','Time the undone steps need: S 15 min, M 1 h, L 3 h'))}">${esc(x)}</span>`:''; }
+  /* Для Флоу (12-ai-agent.js): навантаження тижня кроками цілей.
+     short — лише числа (постійний контекст); повний — ще й до 8 незроблених кроків, тексти як цитата (aiQuoteData). */
+  function ypAiWeekLoad(short){
+    try{
+      const act=mrActive().filter(g=>ypPct(g)<100), L=[];
+      act.forEach(g=>ypWeekTasks(g).forEach(t=>{ if(!t.done) L.push({g,t}); }));
+      if(!L.length) return short?'':'Кроки цілей цього тижня: незроблених нема.';
+      const min=L.reduce((a,x)=>a+YP_SZ[ypSz(x.t)].min,0), h=Math.round(min/30)/2;
+      const head='Кроки цілей цього тижня: незроблених '+L.length+', разом ~'+h+' год (S≈15 хв, M≈1 год, L≈3 год)';
+      if(short) return head+'.';
+      const list=L.sort((a,b)=>String(a.t.date).localeCompare(String(b.t.date))).slice(0,8)
+        .map(x=>'· '+String(x.t.t||'').slice(0,80)+' — '+String(x.g.name||'').slice(0,40)+', '+ypSz(x.t).toUpperCase()+', '+x.t.date).join('\n');
+      return head+':\n'+(typeof aiQuoteData==='function'?aiQuoteData(list):list);
+    }catch(_){ return ''; }
+  }
   // змінити розмір наявної справи (меню справи в «Плані», 65-plan.js)
   function ypSizeSheet(t,rer){
     if(!t) return;
@@ -579,7 +594,9 @@
         const ds=String(it.ds||'');
         // ymdLocal(new Date(ds))===ds: Chromium тихо переносить «2026-11-31» на 1 грудня — такої дати не приймаємо
         if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)||ymdLocal(new Date(ds+'T12:00:00'))!==ds||ds<td||ds>dsMax){ errors.push('#'+(i+1)+': ds «'+ds.slice(0,12)+'» — потрібна дата РРРР-ММ-ДД від '+td+' до '+dsMax); return; }
-        rows.push({type, ref, t, ds, label:gName+' · '+t+' · '+ypDow(ds)+', '+(+ds.slice(8))}); return;
+        // розмір (28.11.2026): S/M/L від Флоу; невідоме чи порожнє — M, як у людини за замовчуванням
+        const zs=low(it.size), sz=(zs==='s'||zs==='l')?zs:'m';
+        rows.push({type, ref, t, ds, sz, label:gName+' · '+t+' · '+ypDow(ds)+', '+(+ds.slice(8))}); return;
       }
       errors.push('#'+(i+1)+': невідомий type «'+String(type).slice(0,20)+'»');
     });
@@ -595,13 +612,17 @@
           <div class="asheet-title">${esc(ypT('Флоу пропонує план','Flow suggests a plan'))}</div>
           ${note?`<div class="asheet-sub">${esc(String(note).slice(0,240))}</div>`:''}
           <div class="yp-bl">${rows.map((r,i)=>`<label class="yp-bi"><input type="checkbox" checked data-ybi="${i}">
-            <span>${esc(r.label)}</span><em>${esc(T[r.type]||'')}</em></label>`).join('')}</div>
+            <span>${esc(r.label)}</span>${r.type==='week_step'?`<button type="button" class="yp-bsz" data-ybsz="${i}" aria-label="${esc(ypT('Розмір: ','Size: ')+ypSzLabel(r.sz)+ypT(' — змінити',' — change'))}">${esc(String(r.sz||'m').toUpperCase())}</button>`:''}<em>${esc(T[r.type]||'')}</em></label>`).join('')}</div>
           <button class="asheet-item primary" data-ok="1"><span class="tx"><span class="lab2" data-ylab></span></span></button>
           <button class="asheet-cancel">${esc(ypT('Скасувати','Cancel'))}</button></div>`;
         document.body.appendChild(ov);
         const okB=ov.querySelector('[data-ok]'), lab=ov.querySelector('[data-ylab]');
         const paint=()=>{ const n=on.filter(Boolean).length; lab.textContent=ypT('Застосувати ','Apply ')+n; okB.disabled=!n; okB.style.opacity=n?'':'.5'; };
         ov.querySelectorAll('[data-ybi]').forEach(c=>c.onchange=()=>{ on[+c.dataset.ybi]=c.checked; paint(); });
+        // розмір кроку прямо в шторці: S → M → L → S; кнопка всередині label не перемикає галочку
+        ov.querySelectorAll('[data-ybsz]').forEach(btn=>btn.onclick=e=>{ e.preventDefault(); e.stopPropagation();
+          const r=rows[+btn.dataset.ybsz], nx={s:'m',m:'l',l:'s'}[r.sz||'m']; r.sz=nx;
+          btn.textContent=nx.toUpperCase(); btn.setAttribute('aria-label',ypT('Розмір: ','Size: ')+ypSzLabel(nx)+ypT(' — змінити',' — change')); });
         paint();
         let done=false; const fin=v=>{ if(done) return; done=true; try{ ov.remove(); }catch(_){} res(v); };
         ov.onclick=e=>{ if(e.target===ov) fin(null); };
@@ -644,8 +665,9 @@
         undo.ms.push({gid:String(g.id), id:m.id}); done.push(ypT('крок «','step “')+r.t+ypT('» · ','” · ')+mrMonth(r.ym)); return;
       }
       const t={ id:uid('t_'), scope:'day', t:r.t, date:r.ds, c:'val', p:2, tag:'', done:false, open:false, subs:[], goalId:String(g.id), _src:'ai' };
+      ypSetSz(t,r.sz);
       if(moOwnFolder(g.folderKey)) t.folder=g.folderKey;
-      plData().tasks.push(t); undo.tasks.push(t.id); done.push(ypT('справа «','task “')+r.t+ypT('» · ','” · ')+r.ds);
+      plData().tasks.push(t); undo.tasks.push(t.id); done.push(ypT('справа «','task “')+r.t+ypT('» · ','” · ')+r.ds+' · '+ypSz(t).toUpperCase());   // фактичний розмір — людина могла змінити в шторці
     });
     if(done.length){ saveGoals(); if(envTouched) try{ saveEnvelopes(); }catch(_){} try{ ypRefresh(); }catch(_){} try{ if(typeof plRerender==='function') plRerender(); }catch(_){} }
     return {done, undo, lost};
